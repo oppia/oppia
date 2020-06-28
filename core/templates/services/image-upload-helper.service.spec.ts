@@ -58,16 +58,41 @@ describe('ImageUploadHelperService', function() {
       '_height_1d345_width_2d455_vertical_0d123.svg')).toBe(true);
   });
 
-  it('should clean a math SVG string and remove unwanted tags', function() {
+  it('should remove the role attribute from the Math SVG string', function() {
     var svgString = (
-      '<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.33ex" hei' +
-      'ght="1.429ex" viewBox="0 -511.5 572.5 615.4" role="img" focusable="' +
-      'false" style="vertical-align: -0.241ex;"><g stroke="currentColor" fi' +
-      'll="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">' +
-      '<path stroke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 286' +
-      '4Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 2' +
-      '6Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145' +
-      '284 52 289Z"></path></g></svg>'
+      '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
+      'focusable="false" role= "img" style="vertical-align: -0.241ex;" xmln' +
+      's="http://www.w3.org/2000/svg"><g stroke="currentColor" fill="curren' +
+      'tColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stro' +
+      'ke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 ' +
+      '406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 4' +
+      '14 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z' +
+      '"/></g></svg>'
+    );
+    var cleanedSvgString = (
+      ImageUploadHelperService.cleanMathExpressionSvgString(svgString));
+    var expectedCleanSvgString = (
+      '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.429e' +
+      'x" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vertical-a' +
+      'lign: -0.241ex;"><g stroke="currentColor" fill="currentColor" stro' +
+      'ke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
+      ' d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 ' +
+      '386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14' +
+      '0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></g></svg>'
+    );
+    expect(cleanedSvgString).toEqual(expectedCleanSvgString);
+  });
+
+  it('should replace xmlns:xlink with xmlns in a Math SVG string', function() {
+    var svgString = (
+      '<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.33ex" height' +
+      '="1.429ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="ve' +
+      'rtical-align: -0.241ex;"><g stroke="currentColor" fill="currentColor"' +
+      ' stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width' +
+      '="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q3' +
+      '68 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 ' +
+      '140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"></path></' +
+      'g></svg>'
     );
     var cleanedSvgString = (
       ImageUploadHelperService.cleanMathExpressionSvgString(svgString));

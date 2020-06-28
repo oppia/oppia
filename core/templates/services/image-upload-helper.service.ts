@@ -25,6 +25,16 @@ const Constants = require('constants.ts');
 angular.module('oppia').factory('ImageUploadHelperService', [
   '$sce', 'AssetsBackendApiService',
   function($sce, AssetsBackendApiService) {
+    var _generateDateTimeStringForFilename = function() {
+      var date = new Date();
+      return date.getFullYear() +
+        ('0' + (date.getMonth() + 1)).slice(-2) +
+        ('0' + date.getDate()).slice(-2) + '_' +
+        ('0' + date.getHours()).slice(-2) +
+        ('0' + date.getMinutes()).slice(-2) +
+        ('0' + date.getSeconds()).slice(-2) + '_' +
+        Math.random().toString(36).substr(2, 10);
+    };
     return {
       convertImageDataToImageFile: function(dataURI) {
         // Convert base64/URLEncoded data component to raw binary data
@@ -85,17 +95,8 @@ angular.module('oppia').factory('ImageUploadHelperService', [
       },
 
       generateImageFilename: function(height, width, extension) {
-        var date = new Date();
         return 'img_' +
-          date.getFullYear() +
-          ('0' + (date.getMonth() + 1)).slice(-2) +
-          ('0' + date.getDate()).slice(-2) +
-          '_' +
-          ('0' + date.getHours()).slice(-2) +
-          ('0' + date.getMinutes()).slice(-2) +
-          ('0' + date.getSeconds()).slice(-2) +
-          '_' +
-          Math.random().toString(36).substr(2, 10) +
+          _generateDateTimeStringForFilename() +
           '_height_' + height +
           '_width_' + width +
           '.' + extension;
@@ -154,15 +155,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           height, width, verticalPadding) {
         var date = new Date();
         return 'mathImg_' +
-          date.getFullYear() +
-          ('0' + (date.getMonth() + 1)).slice(-2) +
-          ('0' + date.getDate()).slice(-2) +
-          '_' +
-          ('0' + date.getHours()).slice(-2) +
-          ('0' + date.getMinutes()).slice(-2) +
-          ('0' + date.getSeconds()).slice(-2) +
-          '_' +
-          Math.random().toString(36).substr(2, 10) +
+          _generateDateTimeStringForFilename() +
           '_height_' + height +
           '_width_' + width +
           '_vertical_' + verticalPadding +
