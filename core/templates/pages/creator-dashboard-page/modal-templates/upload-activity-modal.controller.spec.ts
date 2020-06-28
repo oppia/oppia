@@ -53,7 +53,7 @@ describe('Upload Activity Modal Controller', function() {
       size: 100,
       name: 'file.mp3'
     };
-    // document has strict type rules which will fail typescript lint tests
+    // The document has strict type rules which will fail typescript lint tests
     // without the @ts-ignore.
     // @ts-ignore
     spyOn(document, 'getElementById').and.callFake(function() {
@@ -72,7 +72,7 @@ describe('Upload Activity Modal Controller', function() {
   it('should not save activity if file is empty', function() {
     var documentCopy = angular.copy(document);
     spyOn(AlertsService, 'addWarning').and.callThrough();
-    // document has strict type rules which will fail typescript lint tests
+    // The document has strict type rules which will fail typescript lint tests
     // without the @ts-ignore.
     // @ts-ignore
     spyOn(document, 'getElementById').and.callFake(function() {
