@@ -793,8 +793,8 @@ class JobRegistryTests(test_utils.GenericTestBase):
 
     def test_is_abstract_method_raises_exception_for_abstract_classes(self):
         class TestMockAbstractClass(jobs.BaseJobManager):
-
             """A sample Abstract Class."""
+
             pass
 
         mock_abstract_base_classes = [TestMockAbstractClass]

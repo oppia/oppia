@@ -53,8 +53,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_check_call(unused_cmd_tokens, *args, **kwargs):
             self.check_function_calls['check_call_is_called'] = True
             class Ret(python_utils.OBJECT):
-
                 """Return object with required attributes."""
+
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):

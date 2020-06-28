@@ -2475,6 +2475,22 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
                         \"\"\"
 
                         a = 1 + 2
+
+
+                    class ClassName(dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+
+                        # This is a comment.
+                        def func():
+                            a = 1 + 2
+
+
+                    class ClassName(dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+
+                        @staticmethod
+                        def func():
+                            a = 1 + 2
                 """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename

@@ -247,6 +247,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
     """
+
     def setUp(self):
         """Before each individual test, initialize data."""
         super(ExplorationPretestsUnitTest, self).setUp()

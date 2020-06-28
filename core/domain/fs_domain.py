@@ -69,6 +69,7 @@ class GeneralFileSystem(python_utils.OBJECT):
         entity_name: str. The name of the entity (eg: exploration, topic etc).
         entity_id: str. The ID of the corresponding entity.
     """
+
     def __init__(self, entity_name, entity_id):
         """Constructs a GeneralFileSystem object.
 

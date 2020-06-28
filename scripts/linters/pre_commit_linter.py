@@ -77,7 +77,7 @@ install_third_party_libs.main()
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
-_EXCLUSIVE_GROUP.add_argument(
+_PARSER.add_argument(
     '--path',
     help='path to the directory with files to be linted',
     action='store')
