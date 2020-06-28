@@ -103,6 +103,7 @@ describe('AlgebraicExpressionInputInteractive', function() {
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(ctrl.warningText).toBe('/ is not a valid postfix operator.');
   });
 
   it('should correctly validate current answer', function() {

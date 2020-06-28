@@ -103,6 +103,8 @@ describe('MathEquationInputInteractive', function() {
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(ctrl.warningText).toBe(
+      'It looks like your answer has an invalid bracket pairing.');
   });
 
   it('should submit the answer if valid', function() {
