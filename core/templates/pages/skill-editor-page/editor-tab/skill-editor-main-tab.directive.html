@@ -1,13 +1,13 @@
 <div class="skill-editor">
   <div class="skill-editor-content" ng-if="hasLoadedSkill()">
-    <div class="left-box">
+    <div class="skill-editor-components-container">
       <skill-concept-card-editor></skill-concept-card-editor>
       <skill-misconceptions-editor></skill-misconceptions-editor>
       <skill-prerequisite-skills-editor></skill-prerequisite-skills-editor>
       <skill-rubrics-editor></skill-rubrics-editor>
     </div>
-    <div class="right-box">
-      <md-card class="topic-box oppia-editor-card-section">
+    <div class="skill-editor-info-container">
+      <md-card class="oppia-editor-card-section">
         <strong class="status-heading">
           Status
         </strong>
@@ -35,7 +35,7 @@
         </div>
       </md-card>
       <md-card>
-        <div class="count-box">
+        <div class="skill-info-helper-box">
           <div class="misconception-count">
             <div class="count-value"><[skill.getMisconceptions().length]></div>
             <div class="count-text">Misconceptions</div>
@@ -60,11 +60,11 @@
     justify-content: center;
   }
 
-  .skill-editor .left-box {
+  .skill-editor .skill-editor-components-container {
     width: 40%;
   }
 
-  .skill-editor .right-box {
+  .skill-editor .skill-editor-info-container {
     width: 35%;
   }
 
@@ -84,7 +84,7 @@
     font-size: 18px;
   }
 
-  .skill-editor .count-box {
+  .skill-editor .skill-info-helper-box {
     align-items: center;
     border-radius: 4px;
     display: flex;
