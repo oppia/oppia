@@ -132,10 +132,6 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       successCallback(initialCard, nextFocusLabel);
     };
 
-    var _clearQuestions = function() {
-      questions = [];
-    };
-
     var _getCurrentStateData = function() {
       return questions[currentIndex].getStateData();
     };
@@ -193,7 +189,9 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       getExplorationVersion: function() {
         return version;
       },
-      clearQuestions: _clearQuestions,
+      clearQuestions: function() {
+        questions = [];
+      },
       getLanguageCode: function() {
         return questions[currentIndex].getLanguageCode();
       },

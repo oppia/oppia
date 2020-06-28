@@ -205,10 +205,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       ImageLocalStorageService.flushStoredImagesData();
       EditableQuestionBackendApiService.createQuestion(
         newQuestionSkillIds, newQuestionSkillDifficulties,
-        question.toBackendDict(true), imagesData
-      ).then(function() {
-
-      });
+        question.toBackendDict(true), imagesData);
     };
 
     var openQuestionEditor = function(questionDifficulty) {

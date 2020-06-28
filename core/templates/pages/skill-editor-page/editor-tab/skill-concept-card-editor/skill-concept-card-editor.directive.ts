@@ -163,8 +163,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
           $scope.showSkillPreview = function() {
             var skillDescription = (
               SkillEditorStateService.getSkill().getDescription());
-            var skillContent = (
+            var skillExplanation = (
               $scope.bindableFieldsDict.displayedConceptCardExplanation);
+            var skillWorkedExamples = (
+              $scope.bindableFieldsDict.displayedWorkedExamples);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/editor-tab/' +
@@ -172,7 +174,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               backdrop: true,
               resolve: {
                 skillDescription: () => skillDescription,
-                skillContent: () => skillContent
+                skillExplanation: () => skillExplanation,
+                skillWorkedExamples: () => skillWorkedExamples
               },
               controller: 'SkillPreviewModalController'
             });

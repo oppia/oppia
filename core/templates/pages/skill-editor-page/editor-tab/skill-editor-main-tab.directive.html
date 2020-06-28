@@ -37,11 +37,11 @@
       <md-card>
         <div class="count-box">
           <div class="misconception-count">
-            <div class="count-value">3</div>
+            <div class="count-value"><[skill.getMisconceptions().length]></div>
             <div class="count-text">Misconceptions</div>
           </div>
           <div class="example-count">
-            <div class="count-value">2</div>
+            <div class="count-value"><[skill.getConceptCard().getWorkedExamples().length]></div>
             <div class="count-text">Worked Examples</div>
           </div>
           <div class="create-question" ng-click="createQuestion()">

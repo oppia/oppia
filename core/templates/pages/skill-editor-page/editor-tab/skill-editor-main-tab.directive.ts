@@ -67,7 +67,8 @@ angular.module('oppia').directive('skillEditorMainTab', [
           };
 
           $scope.isTopicDropdownEnabled = function() {
-            return Boolean($scope.assignedSkillTopicData &&
+            return Boolean(
+              $scope.assignedSkillTopicData &&
                 Object.keys($scope.assignedSkillTopicData).length);
           };
 
@@ -77,6 +78,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
           };
 
           $scope.hasLoadedSkill = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
             return SkillEditorStateService.hasLoadedSkill();
           };
 

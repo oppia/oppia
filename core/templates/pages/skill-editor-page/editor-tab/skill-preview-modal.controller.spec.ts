@@ -20,7 +20,8 @@ describe('Skill Preview Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDescription = 'Description1';
-  var skillContent = 'This is the content';
+  var skillExplanation = 'This is the content';
+  var skillWorkedExamples = [];
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -34,12 +35,14 @@ describe('Skill Preview Modal Controller', function() {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
       skillDescription: skillDescription,
-      skillContent: skillContent
+      skillExplanation: skillExplanation,
+      skillWorkedExamples: skillWorkedExamples
     });
   }));
 
   it('should initialize the variables', function() {
     expect($scope.skillDescription).toEqual(skillDescription);
-    expect($scope.skillContent).toEqual(skillContent);
+    expect($scope.skillExplanation).toEqual(skillExplanation);
+    expect($scope.skillWorkedExamples).toEqual(skillWorkedExamples);
   });
 });

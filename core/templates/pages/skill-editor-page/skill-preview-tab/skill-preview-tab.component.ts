@@ -1,5 +1,4 @@
-
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,6 +51,7 @@ angular.module('oppia').component('skillPreviewTab', {
         QuestionObjectFactory, QuestionPlayerEngineService,
         SkillEditorStateService, StateCardObjectFactory, UrlService) {
       var ctrl = this;
+      var questionCount = 20;
       const INTERACTION_TYPES = {
         ALL: 'All',
         TEXT_INPUT: 'Text Input',
@@ -75,7 +75,7 @@ angular.module('oppia').component('skillPreviewTab', {
         ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().getHtml();
 
         QuestionBackendApiService.fetchQuestions(
-          [ctrl.skillId], 20, false).then((response) => {
+          [ctrl.skillId], questionCount, false).then((response) => {
           ctrl.questionsFetched = true;
           ctrl.questionDicts = response;
           ctrl.displayedQuestions = response;
@@ -91,7 +91,7 @@ angular.module('oppia').component('skillPreviewTab', {
 
       ctrl.applyFilters = function() {
         ctrl.displayedQuestions = ctrl.questionDicts.filter(
-          (questionDict) => {
+          questionDict => {
             var contentData = questionDict.question_state_data.content.html;
             var interactionType = (
               questionDict.question_state_data.interaction.id);
@@ -100,20 +100,20 @@ angular.module('oppia').component('skillPreviewTab', {
                 ctrl.questionTextFilter.toLowerCase()));
             if (ctrl.interactionFilter === INTERACTION_TYPES.ALL) {
               return htmlContentIsMatching;
-            } else if (ctrl.interactionFilter ===
-                INTERACTION_TYPES.TEXT_INPUT &&
+            } else if (
+              ctrl.interactionFilter === INTERACTION_TYPES.TEXT_INPUT &&
                   interactionType !== 'TextInput') {
               return false;
-            } else if (ctrl.interactionFilter ===
-                INTERACTION_TYPES.MULTIPLE_CHOICE &&
+            } else if (
+              ctrl.interactionFilter === INTERACTION_TYPES.MULTIPLE_CHOICE &&
                   interactionType !== 'MultipleChoiceInput') {
               return false;
-            } else if (ctrl.interactionFilter ===
-                INTERACTION_TYPES.ITEM_SELECTION &&
+            } else if (
+              ctrl.interactionFilter === INTERACTION_TYPES.ITEM_SELECTION &&
                   interactionType !== 'ItemSelectionInput') {
               return false;
-            } else if (ctrl.interactionFilter ===
-                INTERACTION_TYPES.NUMERIC_INPUT &&
+            } else if (
+              ctrl.interactionFilter === INTERACTION_TYPES.NUMERIC_INPUT &&
                   interactionType !== 'NumericInput') {
               return false;
             }

@@ -176,7 +176,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
-    def test_skill_is_assigned_to_topic_but_not_subtopic(self):
+    def test_skill_which_is_assigned_to_topic_but_not_subtopic(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
@@ -198,7 +198,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
-    def test_skill_is_not_assigned_to_any_topic(self):
+    def test_skill_which_is_not_assigned_to_any_topic(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
@@ -213,7 +213,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
-    def test_skill_is_assigned_to_multiple_topics(self):
+    def test_skill_which_is_assigned_to_multiple_topics(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
