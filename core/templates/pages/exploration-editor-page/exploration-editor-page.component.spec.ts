@@ -77,7 +77,6 @@ describe('Exploration editor page component', function() {
         param_changes: [],
         content: {
           html: '',
-          audio_translations: {}
         },
         unresolved_answers: {},
         interaction: {
@@ -85,7 +84,7 @@ describe('Exploration editor page component', function() {
           answer_groups: [],
           default_outcome: {
             param_changes: [],
-            dest: 'Introduction',
+            dest: 'Final',
             feedback: {
               html: '',
               audio_translations: {}
@@ -114,7 +113,7 @@ describe('Exploration editor page component', function() {
           answer_groups: [],
           default_outcome: {
             param_changes: [],
-            dest: 'Introduction',
+            dest: 'Final',
             feedback: {
               html: '',
               audio_translations: {}
@@ -217,8 +216,8 @@ describe('Exploration editor page component', function() {
   describe('when user permission is true and draft changes not valid',
     function() {
       var userPermissions = {
-        can_edit: true,
-        can_voiceover: true
+        canEdit: true,
+        canVoiceover: true
       };
 
       beforeEach(function() {
@@ -296,7 +295,7 @@ describe('Exploration editor page component', function() {
   describe('when user permission is false and draft changes are true',
     function() {
       var userPermissions = {
-        can_edit: false
+        canEdit: false
       };
 
       beforeEach(function() {
