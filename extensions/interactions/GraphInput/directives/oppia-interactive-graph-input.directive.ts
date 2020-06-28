@@ -89,7 +89,7 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
               stringToBool($attrs.canEditEdgeWeightWithValue) : false;
           };
 
-          // TODO(czxcjx): Write this function
+          // TODO(czxcjx): Write this function.
           var checkValidGraph = function(graph) {
             return Boolean(graph);
           };

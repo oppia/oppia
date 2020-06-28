@@ -355,13 +355,13 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.selectInitialChapterByName('Chapter 2');
 
       // Now Chapter 2 is the initial chapter and its destination is
-      // Chapter 3. Make Chapter 2's destination to be Chapter 1
+      // Chapter 3. Make Chapter 2's destination to be Chapter 1.
       await storyEditorPage.navigateToChapterByIndex(0);
       await storyEditorPage.removeDestination();
       await storyEditorPage.selectDestinationChapterByName('Chapter 1');
       await storyEditorPage.expectDestinationToBe('Chapter 1');
 
-      // Make chapter 1's destination to be Chapter 3
+      // Make chapter 1's destination to be Chapter 3.
       await storyEditorPage.navigateToChapterByIndex(1);
       await storyEditorPage.selectDestinationChapterByName('Chapter 3');
       await storyEditorPage.expectDestinationToBe('Chapter 3');

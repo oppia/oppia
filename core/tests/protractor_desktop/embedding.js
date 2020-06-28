@@ -54,7 +54,7 @@ describe('Embedding', function() {
     await defaultResponseEditor.setDestination(
       'Not 6', true, null);
 
-    // correct but why.
+    // Correct but why.
     await explorationEditorMainTab.moveToState('correct but why');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Right! Why do you think it is 6?'));
