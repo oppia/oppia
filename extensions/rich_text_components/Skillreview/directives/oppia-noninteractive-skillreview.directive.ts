@@ -16,6 +16,10 @@
  * @fileoverview Directive for the concept card rich-text component.
  */
 
+require(
+  'rich_text_components/Skillreview/directives/' +
+  'oppia-noninteractive-skillreview-concept-card-modal.controller.ts');
+
 require('components/concept-card/concept-card.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -51,20 +55,11 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
               template: require(
                 'components/concept-card/concept-card-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function(
-                    $controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.skillIds = [skillId];
-                  $scope.index = 0;
-                  $scope.modalHeader = 'Concept Card';
-                  $scope.isInTestMode = false;
-                }
-              ]
+              resolve: {
+                skillId: () => skillId
+              },
+              controller: (
+                'OppiaNoninteractiveSkillreviewConceptCardModalController')
             }).result.then(function() {}, function(res) {
               ContextService.removeCustomEntityContext();
               if (!(res === 'cancel' || res === 'escape key press')) {
