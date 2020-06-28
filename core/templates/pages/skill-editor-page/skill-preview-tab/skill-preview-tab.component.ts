@@ -51,7 +51,7 @@ angular.module('oppia').component('skillPreviewTab', {
         QuestionObjectFactory, QuestionPlayerEngineService,
         SkillEditorStateService, StateCardObjectFactory, UrlService) {
       var ctrl = this;
-      var questionCount = 20;
+      var QUESTION_COUNT = 20;
       const INTERACTION_TYPES = {
         ALL: 'All',
         TEXT_INPUT: 'Text Input',
@@ -75,7 +75,7 @@ angular.module('oppia').component('skillPreviewTab', {
         ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().getHtml();
 
         QuestionBackendApiService.fetchQuestions(
-          [ctrl.skillId], questionCount, false).then((response) => {
+          [ctrl.skillId], QUESTION_COUNT, false).then((response) => {
           ctrl.questionsFetched = true;
           ctrl.questionDicts = response;
           ctrl.displayedQuestions = response;

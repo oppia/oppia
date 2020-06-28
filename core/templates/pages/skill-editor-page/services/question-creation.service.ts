@@ -53,6 +53,7 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
     'topics-and-skills-dashboard-page.constants.ajs.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
