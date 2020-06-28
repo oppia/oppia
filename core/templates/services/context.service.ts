@@ -186,9 +186,6 @@ export class ContextService {
         }
         return AppConstants.ENTITY_TYPE.TOPIC;
       }
-      if (pathnameArray[i] === 'subtopic') {
-        return AppConstants.ENTITY_TYPE.SUBTOPIC;
-      }
       if (pathnameArray[i] === 'story_editor') {
         return AppConstants.ENTITY_TYPE.STORY;
       }
