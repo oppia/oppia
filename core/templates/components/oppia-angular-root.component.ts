@@ -84,6 +84,8 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
+import { AssetsBackendApiService } from
+  'services/assets-backend-api.service'
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
@@ -554,6 +556,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
   static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
+  static assetsBackendApiService: AssetsBackendApiService;
   static audioBarStatusService: AudioBarStatusService;
   static audioFileObjectFactory: AudioFileObjectFactory;
   static audioLanguageObjectFactory: AudioLanguageObjectFactory;
@@ -801,6 +804,7 @@ private answerGroupsCacheService: AnswerGroupsCacheService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
 private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
+private assetsBackendApiService: AssetsBackendApiService,
 private audioBarStatusService: AudioBarStatusService,
 private audioFileObjectFactory: AudioFileObjectFactory,
 private audioLanguageObjectFactory: AudioLanguageObjectFactory,
@@ -1049,6 +1053,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.answerGroupObjectFactory = this.answerGroupObjectFactory;
     OppiaAngularRootComponent.answerStatsObjectFactory = this.answerStatsObjectFactory;
     OppiaAngularRootComponent.appService = this.appService;
+    OppiaAngularRootComponent.assetsBackendApiService = this.assetsBackendApiService;
     OppiaAngularRootComponent.audioBarStatusService = this.audioBarStatusService;
     OppiaAngularRootComponent.audioFileObjectFactory = this.audioFileObjectFactory;
     OppiaAngularRootComponent.audioLanguageObjectFactory = this.audioLanguageObjectFactory;
