@@ -516,162 +516,175 @@ describe('Exploration editor page component', function() {
         expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('history');
       });
 
-      it('should change element scroll top when calling fn property function' +
-        ' on index 1 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
+      // The describe block below tests all the possible functions
+      // included on ctrl.EDITOR_TUTORIAL_OPTIONS array, which manipulates
+      // with JQuery the 'save from tutorial' button.
+      describe('when testing functions for JQuery manipulation from' +
+        ' ctrl.EDITOR_TUTORIAL_OPTIONS array', function() {
+        it('should change element scroll top when calling fn property' +
+          ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
+        function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
 
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: 20
-        }, 1000);
-      });
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: 20
+          }, 1000);
+        });
 
-      it('should not change element scroll top when calling fn property' +
-        ' function on index 1 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
+        it('should not change element scroll top when calling fn property' +
+          ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
 
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: 0
-        }, 1000);
-      });
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: 0
+          }, 1000);
+        });
 
-      it('should change state interaction element scroll top when calling fn' +
-        ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element').withArgs('#tutorialStateContent').and
-          .returnValue(<any>{
-            offset: () => ({
-              top: 5
-            })
-          });
+        it('should change state interaction element scroll top when calling' +
+          ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
+        function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
+          spyOn(angular, 'element').withArgs('#tutorialStateContent').and
+            .returnValue(<any>{
+              offset: () => ({
+                top: 5
+              })
+            });
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: (5 - 200)
+          }, 1000);
+        });
 
-      it('should change state content element scroll top when calling fn' +
-        ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-          .returnValue(<any>{
-            offset: () => ({
-              top: 20
-            })
-          });
+        it('should change state content element scroll top when calling fn' +
+          ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
+        function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
+          spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
+            .returnValue(<any>{
+              offset: () => ({
+                top: 20
+              })
+            });
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: (20 - 200)
+          }, 1000);
+        });
 
-      it('should change preview tab element scroll top when calling fn' +
-        ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
-          .returnValue(<any>{
-            offset: () => ({
-              top: 5
-            })
-          });
+        it('should change preview tab element scroll top when calling fn' +
+          ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
+        function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
+          spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
+            .returnValue(<any>{
+              offset: () => ({
+                top: 5
+              })
+            });
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: (5 - 200)
+          }, 1000);
+        });
 
-      it('should change state interaction element scroll top when calling fn' +
-        ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-          .returnValue(<any>{
-            offset: () => ({
-              top: 20
-            })
-          });
+        it('should change state interaction element scroll top when calling' +
+          ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
+        function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
+          spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
+            .returnValue(<any>{
+              offset: () => ({
+                top: 20
+              })
+            });
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
-      });
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: (20 - 200)
+          }, 1000);
+        });
 
-      it('should change preview tabn element scroll top when calling fn' +
-        ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
-          .returnValue(<any>{
-            offset: () => ({
-              top: 5
-            })
-          });
+        it('should change preview tabn element scroll top when calling fn' +
+          ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
+        function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
+          spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
+            .returnValue(<any>{
+              offset: () => ({
+                top: 5
+              })
+            });
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (5 - 200)
-        }, 1000);
-      });
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: (5 - 200)
+          }, 1000);
+        });
 
-      it('should change state interaction element scroll top when calling fn' +
-        ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS', function() {
-        var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
-        spyOn(window, '$').and.returnValue(element);
-        var animateSpy = spyOn(element, 'animate').and.callThrough();
-        spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-          .returnValue(<any>{
-            offset: () => ({
-              top: 20
-            })
-          });
+        it('should change state interaction element scroll top when calling' +
+          ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
+        function() {
+          var element = angular.element('div');
+          // @ts-ignore is being used in order to ignore JQuery properties that
+          // should be declared.
+          spyOn(window, '$').and.returnValue(element);
+          var animateSpy = spyOn(element, 'animate').and.callThrough();
+          spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
+            .returnValue(<any>{
+              offset: () => ({
+                top: 20
+              })
+            });
 
-        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
+          ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
 
-        expect(animateSpy).toHaveBeenCalledWith({
-          scrollTop: (20 - 200)
-        }, 1000);
+          expect(animateSpy).toHaveBeenCalledWith({
+            scrollTop: (20 - 200)
+          }, 1000);
+        });
       });
     });
 });
