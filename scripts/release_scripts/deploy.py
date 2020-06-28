@@ -289,9 +289,16 @@ def switch_version(app_name, current_release_version):
     library_page_loads_correctly = check_errors_in_a_page(
         release_version_library_url, 'Library page is loading correctly?')
     if library_page_loads_correctly:
-        gcloud_adapter.switch_version(
-            app_name, current_release_version)
-        python_utils.PRINT('Successfully migrated traffic to release version!')
+        if common.is_current_branch_a_hotfix_branch():
+            python_utils.PRINT('Do you want to switch version?')
+            version_switch = python_utils.INPUT()
+        else:
+            version_switch = 'yes'
+        if version_switch in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+            gcloud_adapter.switch_version(
+                app_name, current_release_version)
+            python_utils.PRINT(
+                'Successfully migrated traffic to release version!')
     else:
         raise Exception(
             'Aborting version switch due to issues in library page '

@@ -669,7 +669,7 @@ class DeployTests(test_utils.GenericTestBase):
             deploy.flush_memcache('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_version_switch(self):
+    def test_version_switch_with_release_branch(self):
         check_function_calls = {
             'switch_version_gets_called': False,
         }
@@ -682,7 +682,60 @@ class DeployTests(test_utils.GenericTestBase):
         switch_version_swap = self.swap(
             gcloud_adapter, 'switch_version', mock_switch_version)
         with self.open_tab_swap, switch_version_swap, self.input_swap:
-            deploy.switch_version('oppiaserver', '1-2-3')
+            with self.get_branch_swap:
+                deploy.switch_version('oppiaserver', '1-2-3')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_version_switch_with_hotfix_branch_and_affirmative_response(
+            self):
+        check_function_calls = {
+            'switch_version_gets_called': False,
+        }
+        expected_check_function_calls = {
+            'switch_version_gets_called': True
+        }
+        def mock_switch_version(
+                unused_app_name, unused_current_release_version):
+            check_function_calls['switch_version_gets_called'] = True
+        def mock_get_branch():
+            return 'release-1.2.3-hotfix-1'
+
+        switch_version_swap = self.swap(
+            gcloud_adapter, 'switch_version', mock_switch_version)
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with self.open_tab_swap, switch_version_swap, self.input_swap:
+            with get_branch_swap:
+                deploy.switch_version('oppiaserver', '1-2-3')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_version_switch_with_hotfix_branch_and_non_affirmative_response(
+            self):
+        check_function_calls = {
+            'switch_version_gets_called': False,
+        }
+        expected_check_function_calls = {
+            'switch_version_gets_called': False
+        }
+        def mock_switch_version(
+                unused_app_name, unused_current_release_version):
+            check_function_calls['switch_version_gets_called'] = True
+        def mock_get_branch():
+            return 'release-1.2.3-hotfix-1'
+        def mock_input():
+            if 'Do you want to switch version?' in self.print_arr:
+                return 'n'
+            return 'y'
+
+        switch_version_swap = self.swap(
+            gcloud_adapter, 'switch_version', mock_switch_version)
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+
+        with self.open_tab_swap, switch_version_swap, input_swap:
+            with get_branch_swap, self.print_swap:
+                deploy.switch_version('oppiaserver', '1-2-3')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_library_page_not_loading_correctly(self):
