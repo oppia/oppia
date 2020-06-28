@@ -32,13 +32,16 @@ angular.module('oppia').factory('SkillBackendApiService', [
         });
 
       $http.get(skillDataUrl).then(function(response) {
+        var assignedSkillTopicData = (
+          response.data.assigned_skill_topic_data_dict);
         var skill = angular.copy(response.data.skill);
         var groupedSkillSummaryDicts = angular.copy(
           response.data.grouped_skill_summaries);
         if (successCallback) {
           successCallback({
             skill: skill,
-            groupedSkillSummaries: groupedSkillSummaryDicts
+            groupedSkillSummaries: groupedSkillSummaryDicts,
+            assignedSkillTopicData
           });
         }
       }, function(errorResponse) {
