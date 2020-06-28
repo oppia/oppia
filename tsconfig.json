@@ -27,7 +27,8 @@
       "interactions/*": ["extensions/interactions/*"],
       "filters/*": ["core/templates/filters/*"],
       "static/*": ["third_party/static/*"],
-      "tests/*": ["core/templates/tests/*"]
+      "tests/*": ["core/templates/tests/*"],
+      "test_files/*": ["scripts/linters/test_files/*"]
     }
   },
   "files": [
@@ -35,7 +36,7 @@
     "assets/rich_text_components_definitions.ts",
     "core/tests/karma.conf.ts"
   ],
-  "include": ["core", "extensions", "typings"],
+  "include": ["core", "extensions", "typings", "scripts"],
   "exclude": [
     "core/tests",
     "core/templates/google-analytics.initializer.ts"

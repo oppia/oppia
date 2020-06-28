@@ -793,7 +793,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     corresponding_angularjs_filepath = (
                         filename_without_extension + '.ajs.ts')
 
-                    if os.path.isfile(corresponding_angularjs_filepath):
+                    is_corresponding_angularjs_filepath = (
+                        os.path.isfile(corresponding_angularjs_filepath))
+                    if is_corresponding_angularjs_filepath:
                         compiled_js_filepath = self._get_compiled_ts_filepath(
                             corresponding_angularjs_filepath)
                         file_content = self.file_cache.read(
