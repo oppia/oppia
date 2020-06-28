@@ -89,24 +89,14 @@ def main(args=None):
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    output_lines = []
-    # Reads and prints realtime output from the subprocess until it terminates.
-    while True:
-        line = task.stdout.readline()
-        line = python_utils.UNICODE(line, 'utf-8')
+    out, _ = task.communicate()
+    task.wait()
 
-        # No more output from the subprocess, and the subprocess has ended.
-        if len(line) == 0 and task.poll() is not None:
-            break
-
-        if line:
-            python_utils.PRINT(line, end='')
-            output_lines.append(line)
-    concatenated_output = ''.join(output_lines)
-
+    python_utils.PRINT(out)
     python_utils.PRINT('Done!')
 
-    if 'Trying to get the Angular injector' in concatenated_output:
+    if 'Trying to get the Angular injector' in python_utils.UNICODE(
+            out, 'utf-8'):
         python_utils.PRINT(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
