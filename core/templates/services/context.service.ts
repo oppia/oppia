@@ -37,6 +37,7 @@ export class ContextService {
   pageContext = null;
   explorationIsLinkedToStory = false;
   explorationId = null;
+  questionPlayerIsManuallySet = false;
   questionId = null;
   editorContext = null;
   customEntityContext = null;
@@ -113,6 +114,19 @@ export class ContextService {
 
       return ServicesConstants.PAGE_CONTEXT.OTHER;
     }
+  }
+  // This is required in cases like when we need to access question player
+  // from the skill editor preview tab.
+  setQuestionPlayerIsOpen(): void {
+    this.questionPlayerIsManuallySet = true;
+  }
+
+  clearQuestionPlayerIsOpen(): void {
+    this.questionPlayerIsManuallySet = false;
+  }
+
+  getQuestionPlayerIsManuallySet(): boolean {
+    return this.questionPlayerIsManuallySet;
   }
 
   canEntityReferToSkills(): boolean {
@@ -236,7 +250,9 @@ export class ContextService {
 
   isInQuestionPlayerMode(): boolean {
     return (
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER);
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER ||
+        this.questionPlayerIsManuallySet);
   }
 
   isInExplorationEditorPage(): boolean {

@@ -27,6 +27,9 @@ describe('Skill editor page', function() {
   var ctrl = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
+  var SkillObjectFactory = null;
+  var UndoRedoService = null;
+  var $uibModal = null;
   var UrlService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -38,7 +41,10 @@ describe('Skill editor page', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
+    $uibModal = $injector.get('$uibModal');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
+    SkillObjectFactory = $injector.get('SkillObjectFactory');
+    UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
 
     ctrl = $componentController('skillEditorPage');
@@ -57,5 +63,46 @@ describe('Skill editor page', function() {
     spyOn(SkillEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions');
     expect(ctrl.getActiveTabName()).toBe('questions');
+  });
+
+  it('should call SkillEditorRoutingService to navigate to main tab',
+    function() {
+      var routingSpy = spyOn(
+        SkillEditorRoutingService, 'navigateToMainTab');
+      ctrl.selectMainTab();
+      expect(routingSpy).toHaveBeenCalled();
+    });
+
+  it('should call SkillEditorRoutingService to navigate to preview tab',
+    function() {
+      var routingSpy = spyOn(
+        SkillEditorRoutingService, 'navigateToPreviewTab');
+      ctrl.selectPreviewTab();
+      expect(routingSpy).toHaveBeenCalled();
+    });
+
+  it('should call open save changes modal if unsaved changes are present',
+    function() {
+      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      ctrl.selectQuestionsTab();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+  it('should call open save changes modal if unsaved changes are present',
+    function() {
+      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
+      var routingSpy = spyOn(
+        SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
+      ctrl.selectQuestionsTab();
+      expect(routingSpy).toHaveBeenCalled();
+    });
+
+  it('should return warnings count for the skill', function() {
+    ctrl.skill = SkillObjectFactory.createInterstitialSkill();
+    // This is because an interstitial skill has empty rubrics
+    // array, and hence there's a warning. See SkillObjectFactory
+    // for reference.
+    expect(ctrl.getWarningsCount()).toEqual(1);
   });
 });

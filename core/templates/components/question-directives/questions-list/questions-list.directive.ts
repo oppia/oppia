@@ -55,6 +55,7 @@ require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
+require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -91,24 +92,26 @@ angular.module('oppia').directive('questionsList', [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
         '$location', 'AlertsService', 'ContextService',
         'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionsListService', 'QuestionUndoRedoService',
-        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-        'SkillSummaryObjectFactory', 'StateEditorService', 'UndoRedoService',
+        'MisconceptionObjectFactory', 'QuestionCreationService',
+        'QuestionObjectFactory', 'QuestionsListService',
+        'QuestionUndoRedoService', 'SkillBackendApiService',
+        'SkillDifficultyObjectFactory', 'SkillSummaryObjectFactory',
+        'StateEditorService', 'UndoRedoService',
         'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
-        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE', 'SKILL_DIFFICULTIES',
+        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             $location, AlertsService, ContextService,
             EditableQuestionBackendApiService, ImageLocalStorageService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionsListService, QuestionUndoRedoService,
-            SkillBackendApiService, SkillDifficultyObjectFactory,
-            SkillSummaryObjectFactory, StateEditorService, UndoRedoService,
+            MisconceptionObjectFactory, QuestionCreationService,
+            QuestionObjectFactory, QuestionsListService,
+            QuestionUndoRedoService, SkillBackendApiService,
+            SkillDifficultyObjectFactory, SkillSummaryObjectFactory,
+            StateEditorService, UndoRedoService,
             UrlService, DEFAULT_SKILL_DIFFICULTY,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
-            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE, SKILL_DIFFICULTIES) {
+            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
@@ -154,15 +157,8 @@ angular.module('oppia').directive('questionsList', [
             );
           };
 
-          ctrl.getDifficultyString = function(difficulty) {
-            if (difficulty === 0.3) {
-              return SKILL_DIFFICULTIES[0];
-            } else if (difficulty === 0.6) {
-              return SKILL_DIFFICULTIES[1];
-            } else {
-              return SKILL_DIFFICULTIES[2];
-            }
-          };
+          ctrl.getDifficultyString = (
+            QuestionCreationService.getDifficultyString);
 
           ctrl.saveAndPublishQuestion = function(commitMessage) {
             var validationErrors = ctrl.question.getValidationErrorMessage();

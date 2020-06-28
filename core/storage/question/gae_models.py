@@ -470,7 +470,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(QuestionSkillLinkModel). A list of random
-                QuestionSkillLinkModelscorresponding to given skill_ids, with
+                QuestionSkillLinkModels corresponding to given skill_ids, with
                 total_question_count/len(skill_ids) number of questions for
                 each skill. If not evenly divisible, it will be rounded up.
                 If not enough questions for a skill, just return all questions
@@ -519,7 +519,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             else:
                 sampled_question_skill_link_models = (
                     new_question_skill_link_models)
-
 
             question_skill_link_models.extend(
                 sampled_question_skill_link_models)

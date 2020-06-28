@@ -43,11 +43,17 @@ describe('Skill Editor Routing Service', function() {
     expect(sers.getTabStatuses()).toBe('main');
   });
 
-  it('should toggle between main tab and questions tab', function() {
+  it('should toggle between main tab, questions and preview tab', function() {
     sers.navigateToQuestionsTab();
     $rootScope.$apply();
     expect(sers.getActiveTabName()).toBe('questions');
     expect(sers.getTabStatuses()).toBe('questions');
+
+    sers.navigateToPreviewTab();
+    $rootScope.$apply();
+    expect(sers.getActiveTabName()).toBe('preview');
+    expect(sers.getTabStatuses()).toBe('preview');
+
     sers.navigateToMainTab();
     $rootScope.$apply();
     expect(sers.getActiveTabName()).toBe('main');
