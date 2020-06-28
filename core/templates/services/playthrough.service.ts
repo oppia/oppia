@@ -17,7 +17,6 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
@@ -27,11 +26,11 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PlaythroughBackendApiService } from
+  'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 
 interface MultipleIncorrectStateNames {
   'state_name': string;
@@ -47,12 +46,11 @@ interface CycleIdentifier {
 })
 export class PlaythroughService {
   constructor(
-    private http: HttpClient,
-    private explorationFeaturesService: ExplorationFeaturesService,
-    private learnerActionObjectFactory: LearnerActionObjectFactory,
-    private playthroughObjectFactory: PlaythroughObjectFactory,
-    private stopwatchObjectFactory: StopwatchObjectFactory,
-    private urlInterpolationService: UrlInterpolationService) {}
+      private explorationFeaturesService: ExplorationFeaturesService,
+      private learnerActionObjectFactory: LearnerActionObjectFactory,
+      private playthroughBackendApiService: PlaythroughBackendApiService,
+      private playthroughObjectFactory: PlaythroughObjectFactory,
+      private stopwatchObjectFactory: StopwatchObjectFactory) {}
 
     static playthrough: Playthrough = null;
     static expStopwatch: Stopwatch = null;
@@ -214,30 +212,19 @@ export class PlaythroughService {
     private storePlaythrough(isNewPlaythrough: boolean): void {
       let playthroughId = (
         isNewPlaythrough ? null : PlaythroughService.playthrough.playthroughId);
-      let promise = this.http.post(this.getFullPlaythroughUrl(), {
-        playthrough_data: PlaythroughService.playthrough.toBackendDict(),
-        issue_schema_version: ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION,
-        playthrough_id: playthroughId
-      }).toPromise();
+      let promise = this.playthroughBackendApiService.storePlaythrough(
+        PlaythroughService.playthrough,
+        ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION, playthroughId);
       if (isNewPlaythrough) {
-        promise.then((
-            response: {
-                'playthrough_stored': boolean, 'playthrough_id': string }) => {
-          if (response.playthrough_stored) {
+        promise.then(response => {
+          if (response.playthroughStored) {
             // In cases where maximum number of playthroughs already exists, the
             // above flag is not True and playthrough ID is not set.
             PlaythroughService.playthrough.playthroughId = (
-              response.playthrough_id);
+              response.playthroughId);
           }
         });
       }
-    }
-
-    private getFullPlaythroughUrl(): string {
-      return this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STORE_PLAYTHROUGH_URL, {
-          exploration_id: PlaythroughService.playthrough.expId
-        });
     }
 
     private isPlaythroughDiscarded(): boolean {
@@ -274,9 +261,8 @@ export class PlaythroughService {
       if (this.isPlaythroughDiscarded()) {
         return;
       }
-      let expStartLearnerAction = this.learnerActionObjectFactory.createNew(
-        AppConstants.ACTION_TYPE_EXPLORATION_START,
-        {
+      let expStartLearnerAction = this.learnerActionObjectFactory.
+        createNewExplorationStartAction({
           state_name: {
             value: initStateName
           }
@@ -306,29 +292,27 @@ export class PlaythroughService {
         this.createMultipleIncorrectIssueTracker(stateName);
       }
       PlaythroughService.playthrough.actions.push(
-        this.learnerActionObjectFactory.createNew(
-          AppConstants.ACTION_TYPE_ANSWER_SUBMIT,
-          {
-            state_name: {
-              value: stateName
-            },
-            dest_state_name: {
-              value: destStateName
-            },
-            interaction_id: {
-              value: interactionId
-            },
-            submitted_answer: {
-              value: answer
-            },
-            feedback: {
-              value: feedback
-            },
-            time_spent_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
+        this.learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {
+            value: stateName
           },
-          ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
+          dest_state_name: {
+            value: destStateName
+          },
+          interaction_id: {
+            value: interactionId
+          },
+          submitted_answer: {
+            value: answer
+          },
+          feedback: {
+            value: feedback
+          },
+          time_spent_state_in_msecs: {
+            value: timeSpentInStateSecs
+          }
+        },
+        ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
         ));
 
       let didNotMoveToNextState = (destStateName === stateName);
@@ -347,17 +331,15 @@ export class PlaythroughService {
         return;
       }
       PlaythroughService.playthrough.actions.push(
-        this.learnerActionObjectFactory.createNew(
-          AppConstants.ACTION_TYPE_EXPLORATION_QUIT,
-          {
-            state_name: {
-              value: stateName
-            },
-            time_spent_in_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
+        this.learnerActionObjectFactory.createNewExplorationQuitAction({
+          state_name: {
+            value: stateName
           },
-          ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
+          time_spent_in_state_in_msecs: {
+            value: timeSpentInStateSecs
+          }
+        },
+        ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
         ));
     }
 

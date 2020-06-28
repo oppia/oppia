@@ -20,5 +20,6 @@
 // main module the elements are attached to.
 require('pages/email-dashboard-pages/email-dashboard-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require('pages/email-dashboard-pages/email-dashboard-page.component.ts');

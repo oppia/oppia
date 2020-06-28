@@ -28,21 +28,44 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       authorName, contentHtml, misconceptionsBySkill, question,
       questionHeader, reviewable, skillDifficulty, skillRubrics,
       SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-    const init = () => {
-      $scope.authorName = authorName;
-      $scope.contentHtml = contentHtml;
-      $scope.reviewable = reviewable;
-      $scope.reviewMessage = '';
-      $scope.question = question;
-      $scope.questionHeader = questionHeader;
-      $scope.questionStateData = question.getStateData();
-      $scope.questionId = question.getId();
-      $scope.canEditQuestion = false;
-      $scope.misconceptionsBySkill = misconceptionsBySkill;
-      $scope.skillDifficultyLabel = getSkillDifficultyLabel();
-      $scope.skillRubricExplanations = getRubricExplanation(
-        $scope.skillDifficultyLabel);
+    const getSkillDifficultyLabel = () => {
+      const skillDifficultyFloatToLabel = invertMap(
+        SKILL_DIFFICULTY_LABEL_TO_FLOAT);
+      return skillDifficultyFloatToLabel[skillDifficulty];
     };
+
+    const getRubricExplanation = skillDifficultyLabel => {
+      for (const rubric of skillRubrics) {
+        if (rubric.difficulty === skillDifficultyLabel) {
+          return rubric.explanations;
+        }
+      }
+      return 'This rubric has not yet been specified.';
+    };
+
+    const invertMap = originalMap => {
+      return Object.keys(originalMap).reduce(
+        (invertedMap, key) => {
+          invertedMap[originalMap[key]] = key;
+          return invertedMap;
+        },
+        {}
+      );
+    };
+
+    $scope.authorName = authorName;
+    $scope.contentHtml = contentHtml;
+    $scope.reviewable = reviewable;
+    $scope.reviewMessage = '';
+    $scope.question = question;
+    $scope.questionHeader = questionHeader;
+    $scope.questionStateData = question.getStateData();
+    $scope.questionId = question.getId();
+    $scope.canEditQuestion = false;
+    $scope.misconceptionsBySkill = misconceptionsBySkill;
+    $scope.skillDifficultyLabel = getSkillDifficultyLabel();
+    $scope.skillRubricExplanations = getRubricExplanation(
+      $scope.skillDifficultyLabel);
 
     $scope.questionChanged = function() {
       $scope.validationError = null;
@@ -70,32 +93,5 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.cancel = function() {
       SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
-
-    const getSkillDifficultyLabel = () => {
-      const skillDifficultyFloatToLabel = invertMap(
-        SKILL_DIFFICULTY_LABEL_TO_FLOAT);
-      return skillDifficultyFloatToLabel[skillDifficulty];
-    };
-
-    const getRubricExplanation = skillDifficultyLabel => {
-      for (const rubric of skillRubrics) {
-        if (rubric.difficulty === skillDifficultyLabel) {
-          return rubric.explanations;
-        }
-      }
-      return 'This rubric has not yet been specified.';
-    };
-
-    const invertMap = originalMap => {
-      return Object.keys(originalMap).reduce(
-        (invertedMap, key) => {
-          invertedMap[originalMap[key]] = key;
-          return invertedMap;
-        },
-        {}
-      );
-    };
-
-    init();
   }
 ]);
