@@ -979,7 +979,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         failed = False
         with linter_utils.redirect_stdout(sys.stdout):
             for filepath in files_to_check:
-                file_content = FILE_CACHE.readlines(filepath)
+                file_content = self.file_cache.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in python_utils.RANGE(file_length):
                     line = file_content[line_num].strip()

@@ -74,6 +74,8 @@ INVALID_CONSTANT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_duplicate.constants.ts')
 INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
+INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_comments.ts')
 
 
 class JsTsLintTests(test_utils.GenericTestBase):
@@ -338,6 +340,16 @@ class JsTsLintTests(test_utils.GenericTestBase):
             'An instance of HttpClient is found in this file. You are not '
             'allowed to create http requests from files that are not '
             'backend api services.'], self.linter_stdout)
+
+    def test_missing_punctuation_at_end_of_comment(self):
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_FORMATTED_COMMENT_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        self.assert_same_list_elements([
+            'Line 39: Invalid punctuation used at '
+            'the end of the comment.'], self.linter_stdout)
+
 
     def test_get_linters_with_success(self):
         custom_linter, third_party = js_ts_linter.get_linters(
