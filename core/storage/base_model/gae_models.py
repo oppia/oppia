@@ -277,10 +277,8 @@ class BaseModel(ndb.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
         """
-        for entity in entities:
-            entity.update_timestamps(update_last_updated_time)
-
-        ndb.put_multi(entities)
+        ndb.put_multi(
+            entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def put_multi_async(cls, entities, update_last_updated_time=True):
@@ -291,10 +289,8 @@ class BaseModel(ndb.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
         """
-        for entity in entities:
-            entity.update_timestamps(update_last_updated_time)
-
-        ndb.put_multi_async(entities)
+        ndb.put_multi_async(
+            entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def delete_multi(cls, entities):
