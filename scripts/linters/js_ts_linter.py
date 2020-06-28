@@ -965,7 +965,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             continue
 
                         # Check if any of the allowed ending phrase is present
-                        # in comment and exclude that line from check.
+                        # in comment and exclude that line from check. Used 'in'
+                        # instead of 'startswith' because we have some comments
+                        # with urls inside the quotes.
+                        # Example: 'https://oppia.org'
                         allowed_end_phrase_present = any(
                             word in line.split()[-1] for word in
                             allowed_end_phrases)
