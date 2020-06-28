@@ -16,10 +16,31 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { ContextService } from 'services/context.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationFeaturesBackendApiService } from
+  'services/exploration-features-backend-api.service';
+import { ExplorationFeaturesService } from
+  'services/exploration-features.service';
+import { PageTitleService } from 'services/page-title.service';
+import { LoaderService } from 'services/loader.service';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateEditorService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateTopAnswersStatsBackendApiService } from
+  'services/state-top-answers-stats-backend-api.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
@@ -30,23 +51,23 @@ describe('Exploration editor page component', function() {
   var $scope = null;
   var $timeout = null;
   var $uibModal = null;
-  var AutosaveInfoModalsService = null;
-  var ChangeListService = null;
-  var ContextService = null;
-  var EditabilityService = null;
-  var ExplorationFeaturesBackendApiService = null;
-  var ExplorationFeaturesService = null;
-  var ExplorationRightsService = null;
-  var ExplorationTitleService = null;
-  var ExplorationWarningsService = null;
-  var GraphDataService = null;
-  var PageTitleService = null;
-  var RouterService = null;
-  var StateEditorService = null;
-  var StateTopAnswersStatsBackendApiService = null;
-  var SiteAnalyticsService = null;
-  var ThreadDataService = null;
-  var UserExplorationPermissionsService = null;
+  var aims = null;
+  var cls = null;
+  var cs = null;
+  var es = null;
+  var efbas = null;
+  var efs = null;
+  var ers = null;
+  var ets = null;
+  var ews = null;
+  var gds = null;
+  var pts = null;
+  var rs = null;
+  var ses = null;
+  var stasbas = null;
+  var sas = null;
+  var tds = null;
+  var ueps = null;
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -141,12 +162,26 @@ describe('Exploration editor page component', function() {
   };
   var getPermissionsSpy = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(function() {
+    TestBed.configureTestingModule({
+      providers: [
+        ContextService,
+        EditabilityService,
+        ExplorationFeaturesBackendApiService,
+        ExplorationFeaturesService,
+        PageTitleService,
+        LoaderService,
+        ParamChangesObjectFactory,
+        ParamSpecsObjectFactory,
+        SiteAnalyticsService,
+        StateClassifierMappingService,
+        StateEditorService,
+        StateTopAnswersStatsBackendApiService,
+        UserExplorationPermissionsService,
+        UrlInterpolationService
+      ]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationDataService', mockExplorationDataService);
@@ -157,26 +192,23 @@ describe('Exploration editor page component', function() {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $uibModal = $injector.get('$uibModal');
-    AutosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
-    ChangeListService = $injector.get('ChangeListService');
-    ContextService = $injector.get('ContextService');
-    EditabilityService = $injector.get('EditabilityService');
-    ExplorationFeaturesBackendApiService = $injector.get(
-      'ExplorationFeaturesBackendApiService');
-    ExplorationFeaturesService = $injector.get('ExplorationFeaturesService');
-    ExplorationRightsService = $injector.get('ExplorationRightsService');
-    ExplorationTitleService = $injector.get('ExplorationTitleService');
-    ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    GraphDataService = $injector.get('GraphDataService');
-    PageTitleService = $injector.get('PageTitleService');
-    RouterService = $injector.get('RouterService');
-    StateEditorService = $injector.get('StateEditorService');
-    StateTopAnswersStatsBackendApiService = $injector.get(
-      'StateTopAnswersStatsBackendApiService');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-    ThreadDataService = $injector.get('ThreadDataService');
-    UserExplorationPermissionsService = $injector.get(
-      'UserExplorationPermissionsService');
+    aims = $injector.get('AutosaveInfoModalsService');
+    cls = $injector.get('ChangeListService');
+    cs = $injector.get('ContextService');
+    es = $injector.get('EditabilityService');
+    efbas = $injector.get('ExplorationFeaturesBackendApiService');
+    efs = $injector.get('ExplorationFeaturesService');
+    ers = $injector.get('ExplorationRightsService');
+    ets = $injector.get('ExplorationTitleService');
+    ews = $injector.get('ExplorationWarningsService');
+    gds = $injector.get('GraphDataService');
+    pts = $injector.get('PageTitleService');
+    rs = $injector.get('RouterService');
+    ses = $injector.get('StateEditorService');
+    stasbas = $injector.get('StateTopAnswersStatsBackendApiService');
+    sas = $injector.get('SiteAnalyticsService');
+    tds = $injector.get('ThreadDataService');
+    ueps = $injector.get('UserExplorationPermissionsService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage');
@@ -191,18 +223,18 @@ describe('Exploration editor page component', function() {
 
       beforeEach(function() {
         getPermissionsSpy = spyOn(
-          UserExplorationPermissionsService, 'getPermissionsAsync');
-        spyOnAllFunctions(SiteAnalyticsService);
-        spyOn(ExplorationWarningsService, 'updateWarnings').and.callThrough();
-        spyOn(GraphDataService, 'recompute').and.callThrough();
-        spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+          ueps, 'getPermissionsAsync');
+        spyOnAllFunctions(sas);
+        spyOn(ews, 'updateWarnings').and.callThrough();
+        spyOn(gds, 'recompute').and.callThrough();
+        spyOn(pts, 'setPageTitle').and.callThrough();
 
         getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
-        spyOn(ContextService, 'getExplorationId').and.returnValue(
+        spyOn(cs, 'getExplorationId').and.returnValue(
           explorationId);
-        spyOn(ExplorationFeaturesBackendApiService, 'fetchExplorationFeatures')
+        spyOn(efbas, 'fetchExplorationFeatures')
           .and.returnValue($q.resolve({}));
-        spyOn(ThreadDataService, 'getOpenThreadsCountAsync').and.returnValue(
+        spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(0));
 
         explorationData.is_version_of_draft_valid = false;
@@ -212,50 +244,52 @@ describe('Exploration editor page component', function() {
 
       it('should mark exploration as editable and translatable',
         function() {
-          spyOn(EditabilityService, 'markEditable').and.callThrough();
-          spyOn(EditabilityService, 'markTranslatable').and.callThrough();
+          spyOn(es, 'markEditable').and.callThrough();
+          spyOn(es, 'markTranslatable').and.callThrough();
           $scope.$apply();
 
-          expect(EditabilityService.markEditable).toHaveBeenCalled();
-          expect(EditabilityService.markTranslatable).toHaveBeenCalled();
+          expect(es.markEditable).toHaveBeenCalled();
+          expect(es.markTranslatable).toHaveBeenCalled();
         });
 
-      it('should set active state name', function() {
-        spyOn(StateEditorService, 'getActiveStateName').and.returnValue(
+      it('should set active state name when active state name does not exist' +
+        ' on exploration', function() {
+        spyOn(ses, 'getActiveStateName').and.returnValue(
           'State2');
-        spyOn(StateEditorService, 'setActiveStateName').and.callThrough();
+        spyOn(ses, 'setActiveStateName').and.callThrough();
         $scope.$apply();
 
-        expect(StateEditorService.setActiveStateName).toHaveBeenCalled();
+        expect(ses.setActiveStateName).toHaveBeenCalledWith(
+          'Introduction');
       });
 
       it('should load change list by draft changes successfully', function() {
-        spyOn(ChangeListService, 'loadAutosavedChangeList').and.callThrough();
+        spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
         $scope.$apply();
 
-        expect(ChangeListService.loadAutosavedChangeList).toHaveBeenCalledWith(
+        expect(cls.loadAutosavedChangeList).toHaveBeenCalledWith(
           explorationData.draft_changes);
       });
 
       it('should show mismatch version modal when draft change is not null',
         function() {
-          spyOn(AutosaveInfoModalsService, 'showVersionMismatchModal').and
+          spyOn(aims, 'showVersionMismatchModal').and
             .callThrough();
           $scope.$apply();
 
-          expect(AutosaveInfoModalsService.showVersionMismatchModal)
+          expect(aims.showVersionMismatchModal)
             .toHaveBeenCalled();
         });
 
       it('should navigate to main tab', function() {
-        spyOn(RouterService, 'isLocationSetToNonStateEditorTab').and
+        spyOn(rs, 'isLocationSetToNonStateEditorTab').and
           .returnValue(null);
-        spyOn(RouterService, 'getCurrentStateFromLocationPath').and
+        spyOn(rs, 'getCurrentStateFromLocationPath').and
           .returnValue(null);
-        spyOn(RouterService, 'navigateToMainTab').and.callThrough();
+        spyOn(rs, 'navigateToMainTab').and.callThrough();
         $scope.$apply();
 
-        expect(RouterService.navigateToMainTab).toHaveBeenCalled();
+        expect(rs.navigateToMainTab).toHaveBeenCalled();
       });
     });
 
@@ -267,18 +301,18 @@ describe('Exploration editor page component', function() {
 
       beforeEach(function() {
         getPermissionsSpy = spyOn(
-          UserExplorationPermissionsService, 'getPermissionsAsync');
-        spyOnAllFunctions(SiteAnalyticsService);
-        spyOn(ExplorationWarningsService, 'updateWarnings').and.callThrough();
-        spyOn(GraphDataService, 'recompute').and.callThrough();
-        spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+          ueps, 'getPermissionsAsync');
+        spyOnAllFunctions(sas);
+        spyOn(ews, 'updateWarnings').and.callThrough();
+        spyOn(gds, 'recompute').and.callThrough();
+        spyOn(pts, 'setPageTitle').and.callThrough();
 
         getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
-        spyOn(ContextService, 'getExplorationId').and.returnValue(
+        spyOn(cs, 'getExplorationId').and.returnValue(
           explorationId);
-        spyOn(ExplorationFeaturesBackendApiService, 'fetchExplorationFeatures')
+        spyOn(efbas, 'fetchExplorationFeatures')
           .and.returnValue($q.resolve({}));
-        spyOn(ThreadDataService, 'getOpenThreadsCountAsync').and.returnValue(
+        spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(1));
 
         explorationData.is_version_of_draft_valid = true;
@@ -288,11 +322,11 @@ describe('Exploration editor page component', function() {
 
       it('should link exploration to story when initing exploration page',
         function() {
-          spyOn(ContextService, 'setExplorationIsLinkedToStory').and
+          spyOn(cs, 'setExplorationIsLinkedToStory').and
             .callThrough();
           $scope.$apply();
 
-          expect(ContextService.setExplorationIsLinkedToStory)
+          expect(cs.setExplorationIsLinkedToStory)
             .toHaveBeenCalled();
         });
 
@@ -317,47 +351,47 @@ describe('Exploration editor page component', function() {
       it('should get state top answers stats after initing exploration page',
         function() {
           var stateTopAnswersStatsBackendDict = {};
-          spyOn(ExplorationRightsService, 'isPublic').and.returnValue(true);
-          spyOn(StateTopAnswersStatsBackendApiService, 'fetchStats').and
+          spyOn(ers, 'isPublic').and.returnValue(true);
+          spyOn(stasbas, 'fetchStats').and
             .returnValue($q.resolve(stateTopAnswersStatsBackendDict));
           $scope.$apply();
 
-          expect(ExplorationWarningsService.updateWarnings)
+          expect(ews.updateWarnings)
             .toHaveBeenCalled();
         });
 
       it('should navigate to feedback tab', function() {
-        spyOn(RouterService, 'isLocationSetToNonStateEditorTab').and
+        spyOn(rs, 'isLocationSetToNonStateEditorTab').and
           .returnValue(null);
-        spyOn(RouterService, 'getCurrentStateFromLocationPath').and
+        spyOn(rs, 'getCurrentStateFromLocationPath').and
           .returnValue(null);
-        spyOn(RouterService, 'navigateToFeedbackTab').and.callThrough();
+        spyOn(rs, 'navigateToFeedbackTab').and.callThrough();
         $scope.$apply();
 
-        expect(RouterService.navigateToFeedbackTab).toHaveBeenCalled();
+        expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
       });
 
       it('should react when exploration property changes', function() {
-        ExplorationTitleService.init('Exploration Title');
+        ets.init('Exploration Title');
         $rootScope.$broadcast('explorationPropertyChanged');
 
-        expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+        expect(pts.setPageTitle).toHaveBeenCalledWith(
           'Exploration Title - Oppia Editor');
       });
 
       it('should react when untitled exploration property changes', function() {
-        ExplorationTitleService.init('');
+        ets.init('');
         $rootScope.$broadcast('explorationPropertyChanged');
 
-        expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+        expect(pts.setPageTitle).toHaveBeenCalledWith(
           'Untitled Exploration - Oppia Editor');
       });
 
       it('should react when refreshing graph', function() {
         $rootScope.$broadcast('refreshGraph');
 
-        expect(GraphDataService.recompute).toHaveBeenCalled();
-        expect(ExplorationWarningsService.updateWarnings).toHaveBeenCalled();
+        expect(gds.recompute).toHaveBeenCalled();
+        expect(ews.updateWarnings).toHaveBeenCalled();
       });
 
       it('should react when initExplorationPage is broadcasted', function() {
@@ -372,7 +406,7 @@ describe('Exploration editor page component', function() {
 
       it('should accept tutorial when closing welcome exploration modal and' +
         ' then skip it', function() {
-        spyOn(RouterService, 'navigateToMainTab').and.callThrough();
+        spyOn(rs, 'navigateToMainTab').and.callThrough();
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve(explorationId)
         });
@@ -382,22 +416,22 @@ describe('Exploration editor page component', function() {
         ctrl.showWelcomeExplorationModal();
         $scope.$apply();
 
-        expect(SiteAnalyticsService.registerAcceptTutorialModalEvent)
+        expect(sas.registerAcceptTutorialModalEvent)
           .toHaveBeenCalledWith(explorationId);
-        expect(RouterService.navigateToMainTab).toHaveBeenCalled();
+        expect(rs.navigateToMainTab).toHaveBeenCalled();
         $timeout.flush();
 
         expect(ctrl.tutorialInProgress).toBe(true);
 
         ctrl.onSkipTutorial();
-        expect(SiteAnalyticsService.registerSkipTutorialEvent)
+        expect(sas.registerSkipTutorialEvent)
           .toHaveBeenCalledWith(explorationId);
         expect(ctrl.tutorialInProgress).toBe(false);
       });
 
       it('should accept tutorial when closing welcome exploration modal and' +
         ' then finish it', function() {
-        spyOn(RouterService, 'navigateToMainTab').and.callThrough();
+        spyOn(rs, 'navigateToMainTab').and.callThrough();
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve(explorationId)
         });
@@ -407,24 +441,24 @@ describe('Exploration editor page component', function() {
         ctrl.showWelcomeExplorationModal();
         $scope.$apply();
 
-        expect(SiteAnalyticsService.registerAcceptTutorialModalEvent)
+        expect(sas.registerAcceptTutorialModalEvent)
           .toHaveBeenCalledWith(explorationId);
-        expect(RouterService.navigateToMainTab).toHaveBeenCalled();
+        expect(rs.navigateToMainTab).toHaveBeenCalled();
         $timeout.flush();
 
         expect(ctrl.tutorialInProgress).toBe(true);
 
         ctrl.onFinishTutorial();
-        expect(SiteAnalyticsService.registerFinishTutorialEvent)
+        expect(sas.registerFinishTutorialEvent)
           .toHaveBeenCalledWith(explorationId);
         expect(ctrl.tutorialInProgress).toBe(false);
       });
 
       it('should check if improvements tab is enabled', function() {
         var isInitializedSpy = spyOn(
-          ExplorationFeaturesService, 'isInitialized');
+          efs, 'isInitialized');
         var isImprovementsTabEnabledSpy = spyOn(
-          ExplorationFeaturesService, 'isImprovementsTabEnabled');
+          efs, 'isImprovementsTabEnabled');
         isInitializedSpy.and.returnValue(true);
         isImprovementsTabEnabledSpy.and.returnValue(true);
         expect(ctrl.isImprovementsTabEnabled()).toBe(true);
@@ -453,7 +487,7 @@ describe('Exploration editor page component', function() {
           ctrl.showWelcomeExplorationModal();
           $scope.$apply();
 
-          expect(SiteAnalyticsService.registerDeclineTutorialModalEvent)
+          expect(sas.registerDeclineTutorialModalEvent)
             .toHaveBeenCalled();
           expect(ctrl.tutorialInProgress).toBe(false);
         });
@@ -474,7 +508,7 @@ describe('Exploration editor page component', function() {
       });
 
       it('should get active tab name', function() {
-        var activeTabNameSpy = spyOn(RouterService, 'getActiveTabName');
+        var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
 
         activeTabNameSpy.and.returnValue('preview');
         expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('preview');
@@ -483,10 +517,11 @@ describe('Exploration editor page component', function() {
         expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('history');
       });
 
-      it('should change element scroll top when calling fn on index 1 of' +
-        ' EDITOR_TUTORIAL_OPTIONS', function() {
+      it('should change element scroll top when calling fn property function' +
+        ' on index 1 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
 
         var animateSpy = spyOn(element, 'animate').and.callThrough();
@@ -498,10 +533,11 @@ describe('Exploration editor page component', function() {
         }, 1000);
       });
 
-      it('should not change element scroll top when calling fn on index 1 of' +
-        ' EDITOR_TUTORIAL_OPTIONS', function() {
+      it('should not change element scroll top when calling fn property' +
+        ' function on index 1 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
 
         var animateSpy = spyOn(element, 'animate').and.callThrough();
@@ -514,9 +550,10 @@ describe('Exploration editor page component', function() {
       });
 
       it('should change state interaction element scroll top when calling fn' +
-        ' on index 3 of EDITOR_TUTORIAL_OPTIONS', function() {
+        ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element').withArgs('#tutorialStateContent').and
@@ -534,9 +571,10 @@ describe('Exploration editor page component', function() {
       });
 
       it('should change state content element scroll top when calling fn' +
-        ' on index 3 of EDITOR_TUTORIAL_OPTIONS', function() {
+        ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
@@ -554,9 +592,10 @@ describe('Exploration editor page component', function() {
       });
 
       it('should change preview tab element scroll top when calling fn' +
-        ' on index 5 of EDITOR_TUTORIAL_OPTIONS', function() {
+        ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
@@ -574,9 +613,10 @@ describe('Exploration editor page component', function() {
       });
 
       it('should change state interaction element scroll top when calling fn' +
-        ' on index 5 of EDITOR_TUTORIAL_OPTIONS', function() {
+        ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
@@ -594,9 +634,10 @@ describe('Exploration editor page component', function() {
       });
 
       it('should change preview tabn element scroll top when calling fn' +
-        ' on index 7 of EDITOR_TUTORIAL_OPTIONS', function() {
+        ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
@@ -614,9 +655,10 @@ describe('Exploration editor page component', function() {
       });
 
       it('should change state interaction element scroll top when calling fn' +
-        ' on index 7 of EDITOR_TUTORIAL_OPTIONS', function() {
+        ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS', function() {
         var element = angular.element('div');
-        // @ts-ignore
+        // @ts-ignore is being used in order to ignore JQuery properties that
+        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
