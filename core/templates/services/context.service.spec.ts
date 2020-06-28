@@ -56,12 +56,11 @@ describe('Context service', () => {
     });
 
     it('should correct set and the page context', () => {
-      const questionPlayerContext = 'question_player';
-      ecs.setPageContext(questionPlayerContext);
-      expect(ecs.getPageContext()).toBe(questionPlayerContext);
-
-      ecs.clearPageContext();
-      expect(ecs.getPageContext()).toBe('learner');
+      expect(ecs.isInQuestionPlayerMode()).toEqual(false);
+      ecs.setQuestionPlayerIsOpen();
+      expect(ecs.isInQuestionPlayerMode()).toEqual(true);
+      ecs.clearQuestionPlayerIsOpen();
+      expect(ecs.isInQuestionPlayerMode()).toEqual(false);
     });
   });
 

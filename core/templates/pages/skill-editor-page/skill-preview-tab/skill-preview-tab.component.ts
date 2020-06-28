@@ -129,7 +129,7 @@ angular.module('oppia').component('skillPreviewTab', {
       };
 
       $scope.$on('$destroy', function() {
-        ContextService.clearPageContext();
+        ContextService.clearQuestionPlayerIsOpen();
       });
     }]
 });

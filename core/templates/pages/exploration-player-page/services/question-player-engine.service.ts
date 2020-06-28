@@ -46,7 +46,7 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
       StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
-    ContextService.setPageContext('question_player');
+    ContextService.setQuestionPlayerIsOpen();
     var _explorationId = ContextService.getExplorationId();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var version = UrlService.getExplorationVersionFromUrl();
