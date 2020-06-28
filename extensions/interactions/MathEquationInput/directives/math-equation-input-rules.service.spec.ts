@@ -133,7 +133,7 @@ describe('Math equation input rules service', () => {
   it('should have a correct IsEquivalentTo rule', () => {
     inputString = '(2*x+1)*(x-3)=0';
 
-    // Accepted cases
+    // Accepted cases.
     expect(meirs.IsEquivalentTo('0=(2*x+1)*(x-3)',
       {x: inputString})).toBeTrue();
     expect(meirs.IsEquivalentTo('2*x^2-6*x+x-3=0',
@@ -160,7 +160,7 @@ describe('Math equation input rules service', () => {
 
     inputString = '13 + 2*w = 34';
 
-    // Accepted cases
+    // Accepted cases.
     expect(meirs.IsEquivalentTo('13 + 2*w = 34',
       {x: inputString})).toBeTrue();
     expect(meirs.IsEquivalentTo('26 + 4*w = 68',
