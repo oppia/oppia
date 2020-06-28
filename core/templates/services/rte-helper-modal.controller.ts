@@ -61,6 +61,11 @@ angular.module('oppia').controller('RteHelperModalController', [
               angular.copy(attrsCustomizationArgsDict[caName]) :
               customizationArgSpecs[i].default_value)
         };
+        // If the component being created or edited is math rich text component,
+        // we need to pass this extra attribute svgFile to the math RTE editor.
+        // The math RTE editor will auto-generate the svgFile based on the
+        // rawLatex value and then this file can be saved to the backend when
+        // the user clicks on the save button.
         mathValueDict.value.svgFile = null;
         $scope.tmpCustomizationArgs.push(mathValueDict);
       } else {
@@ -82,10 +87,26 @@ angular.module('oppia').controller('RteHelperModalController', [
       $scope.$broadcast('externalSave');
 
       var customizationArgsDict = {};
-      let caName : string;
+      // For the case of the math rich text components, we need to handle the
+      // saving of the generated SVG file here because the process of saving
+      // the SVG is asynchronous and the saving of SVG to the backend is to
+      // be done only after the user clicks on the save button.
+      // The saving of SVGs to the backend cannot be done in the math RTE editor
+      // because the control is passed to this function as soon as the user
+      // clicks on the save button.
       if ($scope.currentRteIsMathExpressionEditor) {
+        // The tmpCustomizationArgs is guranteed to have only one element for
+        // the case of math rich text component.
         var svgFile = $scope.tmpCustomizationArgs[0].value.svgFile;
         var svgFileName = $scope.tmpCustomizationArgs[0].value.svg_filename;
+        var rawLatex = $scope.tmpCustomizationArgs[0].value.raw_latex;
+        if (rawLatex === '' || svgFileName === '') {
+          AlertsService.addWarning(
+            'The rawLatex or svgFileName for a Math expression should not ' +
+            'be empty.');
+          $uibModalInstance.dismiss('cancel');
+          return;
+        }
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
@@ -94,7 +115,7 @@ angular.module('oppia').controller('RteHelperModalController', [
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: svgFileName
           };
-          caName = 'math_content';
+          var caName = $scope.tmpCustomizationArgs[0].name;
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
           $scope.currentRteIsMathExpressionEditor = false;
@@ -109,7 +130,7 @@ angular.module('oppia').controller('RteHelperModalController', [
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: response.filename
           };
-          caName = 'math_content';
+          var caName = $scope.tmpCustomizationArgs[0].name;
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
           $scope.currentRteIsMathExpressionEditor = false;
@@ -121,7 +142,7 @@ angular.module('oppia').controller('RteHelperModalController', [
         });
       } else {
         for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-          caName = $scope.tmpCustomizationArgs[i].name;
+          var caName = $scope.tmpCustomizationArgs[i].name;
           if (caName === 'video_id') {
             var temp = $scope.tmpCustomizationArgs[i].value;
             customizationArgsDict[caName] = (

@@ -15,6 +15,7 @@
 /**
  * @fileoverview Directive for math expression content editor.
  */
+
 require('mathjaxConfig.ts');
 require('directives/mathjax-bind.directive.ts');
 require('services/image-upload-helper.service.ts');
@@ -42,6 +43,11 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
         var convertLatexStringToSvg = function(inputLatexString) {
           var emptyDiv = document.createElement('div');
           var outputElement = angular.element(emptyDiv);
+          // We need to append the element with a script tag so that Mathjax
+          // can typeset and convert this element. The typesetting is not
+          // possible if we don't add a script tag. The code below is similar
+          // to how the math equations are rendered in the mathjaxBind
+          // directive (see mathjax-bind.directive.ts).
           var $script = angular.element(
             '<script type="math/tex">'
           ).html(inputLatexString === undefined ? '' : inputLatexString);
@@ -49,11 +55,18 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           outputElement.append($script);
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
           MathJax.Hub.Queue(function() {
-            ctrl.svgString = (
-              outputElement[0].getElementsByTagName('svg')[0].outerHTML);
+            if (outputElement[0].getElementsByTagName('svg')[0] !== undefined) {
+              ctrl.svgString = (
+                outputElement[0].getElementsByTagName('svg')[0].outerHTML);
+            }
           });
         };
-
+        // This method cleans the SVG string and generates a filename before
+        // the SVG can be saved to the backend in the RteHelperModalController.
+        // The method doesn't save the SVG to the backend, it just updates
+        // svgFile field in the ctrl.value passed to it and the
+        // RteHelperModalController will handle the saving of the file to the
+        // backend.
         var processAndSaveSvg = function() {
           var cleanedSvgString = (
             ImageUploadHelperService.cleanMathExpressionSvgString(
@@ -66,8 +79,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
               dimensions.height, dimensions.width, dimensions.verticalPadding));
           var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
           var invalidTagsAndAttributes = (
-            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
-              dataURI));
+            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
           var tags = invalidTagsAndAttributes.tags;
           var attrs = invalidTagsAndAttributes.attrs;
           if (tags.length === 0 && attrs.length === 0) {

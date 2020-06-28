@@ -180,6 +180,23 @@ describe('Rte Helper Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
+    it('should cancel the modal when if the rawLatex or filename field is' +
+       'empty for a math expression', function() {
+      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+      $scope.tmpCustomizationArgs = [{
+        name: 'math_content',
+        value: {
+          raw_latex: '',
+          svgFile: null,
+          svg_filename: ''
+        }
+      }];
+      $scope.save();
+      $scope.$apply();
+      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+    });
+
     it('should save modal customization args while in local storage',
       function() {
         var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
