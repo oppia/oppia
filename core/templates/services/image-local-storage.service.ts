@@ -28,7 +28,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
     // sessionStorage and 100kB is the max size limit for uploaded images, hence
     // the limit below.
     var MAX_IMAGES_STORABLE = 5 * 1024 / 100;
-    var newBgColor = null;
+    var thumbnailBgColor = null;
 
     return {
       getObjectUrlForImage: function(filename) {
@@ -74,16 +74,16 @@ angular.module('oppia').factory('ImageLocalStorageService', [
         }
         return returnData;
       },
-      setImageBgColor: function(bgColor) {
-        newBgColor = bgColor;
+      setThumbnailBgColor: function(bgColor) {
+        thumbnailBgColor = bgColor;
       },
-      getImageBgColor: function() {
-        return newBgColor;
+      getThumbnailBgColor: function() {
+        return thumbnailBgColor;
       },
       flushStoredImagesData: function() {
         $window.sessionStorage.clear();
         storedImageFilenames.length = 0;
-        newBgColor = null;
+        thumbnailBgColor = null;
       }
     };
   }
