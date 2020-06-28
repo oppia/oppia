@@ -55,11 +55,13 @@ describe('Context service', () => {
       expect(ecs.canAddOrEditComponents()).toBe(false);
     });
 
-    it('should correct set and the page context', () => {
+    it('should correctly return if question player is manually set', () => {
       expect(ecs.isInQuestionPlayerMode()).toEqual(false);
       ecs.setQuestionPlayerIsOpen();
+      expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(true);
       expect(ecs.isInQuestionPlayerMode()).toEqual(true);
       ecs.clearQuestionPlayerIsOpen();
+      expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(false);
       expect(ecs.isInQuestionPlayerMode()).toEqual(false);
     });
   });
