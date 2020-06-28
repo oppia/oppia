@@ -154,7 +154,7 @@ var ListEditor = function(elem) {
     },
     addItem: addItem,
     deleteItem: deleteItem,
-    // This will add or delete list elements as necessary
+    // This will add or delete list elements as necessary.
     setLength: async function(desiredLength) {
       var startingLength = await elem.all(
         await by.repeater('item in localValue track by $index')).count();
@@ -238,7 +238,7 @@ var RichTextEditor = async function(elem) {
       await _clickToolbarButton(
         'cke_button__oppia' + componentName.toLowerCase());
 
-      // The currently active modal is the last in the DOM
+      // The currently active modal is the last in the DOM.
       var modal = await element.all(by.css('.modal-dialog')).last();
 
       // Need to convert arguments to an actual array; we tell the component
@@ -267,7 +267,7 @@ var RichTextEditor = async function(elem) {
 };
 
 // Used to edit entries of a set of HTML strings, specifically used in the item
-// selection interaction test to customize interaction details
+// selection interaction test to customize interaction details.
 var SetOfHtmlStringEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
@@ -499,7 +499,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 
   return {
     readPlainText: function(text) {
-      // Plain text is in a text node so not recorded in either array
+      // Plain text is in a text node so not recorded in either array.
       expect(
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
@@ -551,7 +551,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 // interested in the process of interacting with the page than in the
 // information thereby conveyed.
 var toRichText = async function(text) {
-  // The 'handler' should be either a RichTextEditor or RichTextChecker
+  // The 'handler' should be either a RichTextEditor or RichTextChecker.
   return async function(handler) {
     if (handler.hasOwnProperty('setPlainText')) {
       await handler.setPlainText(text);
