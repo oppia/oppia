@@ -21,8 +21,8 @@
 // in via initArgs.
 
 require('services/guppy-configuration.service.ts');
-require('services/math-interactions.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {

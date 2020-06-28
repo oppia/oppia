@@ -20,14 +20,14 @@
  * followed by the name of the arg.
  */
 
-require('services/guppy-configuration.service.ts');
-require('services/math-interactions.service.ts');
-require('services/guppy-initialization.service.ts');
 require(
   'interactions/MathEquationInput/directives/' +
   'math-equation-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/guppy-configuration.service.ts');
+require('services/guppy-initialization.service.ts');
+require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
