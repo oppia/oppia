@@ -355,8 +355,6 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
-import { QuestionCreationService } from
-  'components/entity-creation-services/question-creation.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionPlayerStateService } from
 // eslint-disable-next-line max-len

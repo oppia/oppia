@@ -397,8 +397,6 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
-import { QuestionCreationService } from
-  'components/entity-creation-services/question-creation.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionPlayerStateService } from
 // eslint-disable-next-line max-len
@@ -791,7 +789,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static pythonProgramTokenizer: PythonProgramTokenizer;
   static questionBackendApiService: QuestionBackendApiService;
-  static questionCreationService: QuestionCreationService;
   static questionObjectFactory: QuestionObjectFactory;
   static questionPlayerStateService: QuestionPlayerStateService;
   static questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory;
@@ -1075,7 +1072,6 @@ private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
-private questionCreationService: QuestionCreationService,
 private questionObjectFactory: QuestionObjectFactory,
 private questionPlayerStateService: QuestionPlayerStateService,
 private questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory,
@@ -1360,7 +1356,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.profilePageBackendApiService = this.profilePageBackendApiService;
     OppiaAngularRootComponent.pythonProgramTokenizer = this.pythonProgramTokenizer;
     OppiaAngularRootComponent.questionBackendApiService = this.questionBackendApiService;
-    OppiaAngularRootComponent.questionCreationService = this.questionCreationService;
     OppiaAngularRootComponent.questionObjectFactory = this.questionObjectFactory;
     OppiaAngularRootComponent.questionPlayerStateService = this.questionPlayerStateService;
     OppiaAngularRootComponent.questionSummaryForOneSkillObjectFactory = this.questionSummaryForOneSkillObjectFactory;
