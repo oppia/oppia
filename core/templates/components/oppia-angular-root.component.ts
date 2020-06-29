@@ -319,6 +319,12 @@ import { LogicProofValidationService } from
   'interactions/LogicProof/directives/logic-proof-validation.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { MathEquationInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
@@ -747,6 +753,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static loggerService: LoggerService;
   static logicProofValidationService: LogicProofValidationService;
   static lostChangeObjectFactory: LostChangeObjectFactory;
+  static mathEquationInputRulesService: MathEquationInputRulesService;
+  static mathEquationInputValidationService: MathEquationInputValidationService;
   static mathExpressionInputValidationService: MathExpressionInputValidationService;
   static mathInteractionsService: MathInteractionsService;
   static messengerService: MessengerService;
@@ -1028,6 +1036,8 @@ private loaderService: LoaderService,
 private loggerService: LoggerService,
 private logicProofValidationService: LogicProofValidationService,
 private lostChangeObjectFactory: LostChangeObjectFactory,
+private mathEquationInputRulesService: MathEquationInputRulesService,
+private mathEquationInputValidationService: MathEquationInputValidationService,
 private mathExpressionInputValidationService: MathExpressionInputValidationService,
 private mathInteractionsService: MathInteractionsService,
 private messengerService: MessengerService,
@@ -1310,6 +1320,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.loggerService = this.loggerService;
     OppiaAngularRootComponent.logicProofValidationService = this.logicProofValidationService;
     OppiaAngularRootComponent.lostChangeObjectFactory = this.lostChangeObjectFactory;
+    OppiaAngularRootComponent.mathEquationInputRulesService = this.mathEquationInputRulesService;
+    OppiaAngularRootComponent.mathEquationInputValidationService = this.mathEquationInputValidationService;
     OppiaAngularRootComponent.mathExpressionInputValidationService = this.mathExpressionInputValidationService;
     OppiaAngularRootComponent.mathInteractionsService = this.mathInteractionsService;
     OppiaAngularRootComponent.messengerService = this.messengerService;
