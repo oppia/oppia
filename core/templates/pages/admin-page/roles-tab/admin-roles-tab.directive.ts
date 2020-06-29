@@ -356,7 +356,7 @@ angular.module('oppia').directive('adminRolesTab', [
             ctrl.graphData.finalStateIds = finalStateIds;
             ctrl.graphDataLoaded = true;
             // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           });
         };
