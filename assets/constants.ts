@@ -5126,6 +5126,7 @@ export = {
       "NumericInput",
       "SetInput",
       "AlgebraicExpressionInput",
+      "MathEquationInput",
       "MathExpressionInput",
       "NumberWithUnits"
     ]
@@ -5289,6 +5290,14 @@ export = {
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
     "floor", "if", "log", "or", "pow", "round", "then"
+  ],
+
+  // Greek letters allowed in math interactions.
+  "GREEK_LETTERS": [
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
+    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
+    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
   ],
 
   // Unfinished features.

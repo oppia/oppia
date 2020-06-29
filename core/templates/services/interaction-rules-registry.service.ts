@@ -46,6 +46,9 @@ import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
@@ -83,6 +86,7 @@ export class InteractionRulesRegistryService {
       private interactiveMapRulesService: InteractiveMapRulesService,
       private itemSelectionInputRulesService: ItemSelectionInputRulesService,
       private logicProofRulesService: LogicProofRulesService,
+      private mathEquationInputRulesService: MathEquationInputRulesService,
       private mathExpressionInputRulesService: MathExpressionInputRulesService,
       private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
       private musicNotesInputRulesService: MusicNotesInputRulesService,
@@ -104,6 +108,7 @@ export class InteractionRulesRegistryService {
       InteractiveMapRulesService: this.interactiveMapRulesService,
       ItemSelectionInputRulesService: this.itemSelectionInputRulesService,
       LogicProofRulesService: this.logicProofRulesService,
+      MathEquationInputRulesService: this.mathEquationInputRulesService,
       MathExpressionInputRulesService: this.mathExpressionInputRulesService,
       MultipleChoiceInputRulesService: this.multipleChoiceInputRulesService,
       MusicNotesInputRulesService: this.musicNotesInputRulesService,
