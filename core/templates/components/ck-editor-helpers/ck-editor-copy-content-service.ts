@@ -28,8 +28,13 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class CkEditorCopyContentService {
   private readonly COPY_EVENT = 'copy-element-to-translation-editor';
+  copyModeActive = false;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  toggleCopyMode() {
+    this.copyModeActive = !this.copyModeActive;
+  }
 
   /**
    * Traverses up and down element ancestors/descendants, searching for widget
@@ -140,6 +145,10 @@ export class CkEditorCopyContentService {
       target: HTMLElement,
       disabledWidgets?: string[]
   ) {
+    if (!this.copyModeActive) {
+      return;
+    }
+
     const { rootElement, containedWidgetTagName } = this._handleCopy(target);
 
     contentScope.$broadcast(

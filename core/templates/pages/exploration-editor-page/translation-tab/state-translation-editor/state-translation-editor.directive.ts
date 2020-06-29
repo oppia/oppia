@@ -24,7 +24,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: { copyMode: '=' },
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/translation-tab/' +
         'state-translation-editor/state-translation-editor.directive.html'),
@@ -153,10 +153,6 @@ angular.module('oppia').directive('stateTranslationEditor', [
           $scope.cancelEdit = function() {
             StateWrittenTranslationsService.restoreFromMemento();
             initEditor();
-          };
-
-          $scope.setCopyMode = function(active: boolean) {
-            $scope.copyMode.isActive = active;
           };
 
           ctrl.$onInit = function() {

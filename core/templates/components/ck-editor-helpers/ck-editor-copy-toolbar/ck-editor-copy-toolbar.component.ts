@@ -16,22 +16,24 @@
  * @fileoverview Ck editor copy toolbar component.
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { CkEditorCopyContentService } from '../ck-editor-copy-content-service';
 
 @Component({
   selector: 'ck-editor-copy-toolbar',
   templateUrl: './ck-editor-copy-toolbar.component.html'
 })
 export class CkEditorCopyToolbar {
-  @Input() toolActive = false;
-  @Output() setToolActive = new EventEmitter<boolean>();
+  constructor(private ckEditorCopyContentService: CkEditorCopyContentService) {
+    ckEditorCopyContentService.copyModeActive = false;
+  }
 
   toggleToolActive() {
-    this.setToolActive.emit(!this.toolActive);
-    if (!this.toolActive) {
-      document.body.style.cursor = 'copy';
+    this.ckEditorCopyContentService.toggleCopyMode();
 
+    if (this.ckEditorCopyContentService.copyModeActive) {
+      document.body.style.cursor = 'copy';
       document.querySelectorAll('.oppia-rte-editor')
         .forEach((editor: HTMLElement) => {
           editor.focus();

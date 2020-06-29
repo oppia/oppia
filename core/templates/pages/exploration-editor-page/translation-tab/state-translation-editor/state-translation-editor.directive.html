@@ -32,7 +32,7 @@
   </div>
 
   <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
-    <ck-editor-copy-toolbar [tool-active]="copyMode.isActive" (set-tool-active)="setCopyMode($event)"></ck-editor-copy-toolbar>
+    <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
 
     <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
     </schema-based-editor>
