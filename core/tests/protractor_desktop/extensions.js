@@ -239,11 +239,11 @@ describe('Interactions', function() {
         'Math', '16x^{12}/4x^2');
     });
 
-    await explorationEditorMainTab.setInteraction('MathExpressionInput');
+    await explorationEditorMainTab.setInteraction('AlgebraicExpressionInput');
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
-      'MathExpressionInput', await forms.toRichText('Good job!'), 'End', true,
-      'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
+      'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',
+      true, 'IsEquivalentTo', '(16(x^12))/4x^2');
     // Expecting answer to be 4x^10.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -282,7 +282,7 @@ describe('Interactions', function() {
 
     // Play Math Expression Input interaction.
     await explorationPlayerPage.submitAnswer(
-      'MathExpressionInput', '4 * x^(10)');
+      'AlgebraicExpressionInput', '4 * x^10');
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('Good job!'));
     await explorationPlayerPage.clickThroughToNextCard();

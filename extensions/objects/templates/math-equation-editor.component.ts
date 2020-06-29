@@ -13,36 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the AlgebraicExpressionInput interaction.
- *
- * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
- * followed by the name of the arg.
+ * @fileoverview Component for math equation editor.
  */
 
-require(
-  'interactions/AlgebraicExpressionInput/directives/' +
-  'algebraic-expression-input-rules.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
+// Every editor directive should implement an alwaysEditable option. There
+// may be additional customization options for the editor that should be passed
+// in via initArgs.
+
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
 require('services/math-interactions.service.ts');
 
-angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
-  template: require('./algebraic-expression-input-interaction.component.html'),
+angular.module('oppia').component('mathEquationEditor', {
+  bindings: {
+    value: '='
+  },
+  template: require('./math-equation-editor.component.html'),
   controller: [
-    '$scope', 'CurrentInteractionService', 'GuppyConfigurationService',
-    'AlgebraicExpressionInputRulesService', 'MathInteractionsService',
-    'GuppyInitializationService',
+    '$scope', 'GuppyConfigurationService', 'GuppyInitializationService',
+    'MathInteractionsService',
     function(
-        $scope, CurrentInteractionService, GuppyConfigurationService,
-        AlgebraicExpressionInputRulesService, MathInteractionsService,
-        GuppyInitializationService) {
+        $scope, GuppyConfigurationService, GuppyInitializationService,
+        MathInteractionsService) {
       const ctrl = this;
-      ctrl.value = '';
-      ctrl.hasBeenTouched = false;
       ctrl.warningText = '';
+      ctrl.hasBeenTouched = false;
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
@@ -50,7 +45,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           // is not compatible with nerdamer or with the backend validations.
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
-          let answerIsValid = MathInteractionsService.validateExpression(
+          var answerIsValid = MathInteractionsService.validateEquation(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
@@ -59,20 +54,16 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
         return true;
       };
 
-      ctrl.submitAnswer = function() {
-        if (!ctrl.isCurrentAnswerValid()) {
-          return;
-        }
-        CurrentInteractionService.onSubmit(
-          ctrl.value, AlgebraicExpressionInputRulesService);
-      };
-
       ctrl.$onInit = function() {
+        ctrl.alwaysEditable = true;
         ctrl.hasBeenTouched = false;
+        if (ctrl.value === null) {
+          ctrl.value = '';
+        }
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-learner');
+        GuppyInitializationService.init('guppy-div-creator');
         Guppy.event('change', () => {
-          let activeGuppyObject = (
+          var activeGuppyObject = (
             GuppyInitializationService.findActiveGuppyObject());
           if (activeGuppyObject !== undefined) {
             ctrl.hasBeenTouched = true;
@@ -82,9 +73,6 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
             $scope.$apply();
           }
         });
-
-        CurrentInteractionService.registerCurrentInteraction(
-          ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
       };
     }
   ]

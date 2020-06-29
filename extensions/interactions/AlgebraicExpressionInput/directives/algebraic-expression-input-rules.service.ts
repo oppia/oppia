@@ -19,24 +19,36 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const nerdamer = require('nerdamer');
+import nerdamer from 'nerdamer';
+
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlgebraicExpressionInputRulesService {
   MatchesExactlyWith(answer: string, inputs: {x: string}): boolean {
-    return nerdamer(answer).eq(inputs.x);
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    return nerdamer(nerdamer(answer).text()).eq(nerdamer(inputs.x).text());
   }
 
   IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
-    let expandedLearnerAnswer = nerdamer(`expand(${answer})`);
-    let simplifiedLearnerAnswer = nerdamer(
-      `simplify(${expandedLearnerAnswer})`);
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
-    let expandedCreatorAnswer = nerdamer(`expand(${inputs.x})`);
+    let expandedLearnerAnswer = nerdamer(answer).expand().text();
+    let simplifiedLearnerAnswer = nerdamer(
+      `simplify(${expandedLearnerAnswer})`).text();
+
+    let expandedCreatorAnswer = nerdamer(inputs.x).expand().text();
     let simplifiedCreatorAnswer = nerdamer(
-      `simplify(${expandedCreatorAnswer})`);
+      `simplify(${expandedCreatorAnswer})`).text();
 
     return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
   }
