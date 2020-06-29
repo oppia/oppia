@@ -63,8 +63,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             return Ret()
         def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):
             class Ret(python_utils.OBJECT):
-
                 """Return object that gives user-prefix error."""
+
                 def __init__(self):
                     self.returncode = 1
                 def communicate(self):
