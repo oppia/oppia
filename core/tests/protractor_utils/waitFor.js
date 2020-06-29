@@ -18,6 +18,7 @@
  */
 
 var until = protractor.ExpectedConditions;
+var fs = require('fs');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
 // server since the mobile tests are run on a real
@@ -117,6 +118,17 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
+/**
+ * Check if a file has been downloaded
+ */
+
+var fileToBeDownloaded = async function(filename) {
+  var name = global.downloadsPath + '/' + filename;
+  browser.driver.wait(function() {
+    return fs.existsSync(name);
+  }, 30000);
+};
+
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
@@ -125,3 +137,4 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
+exports.fileToBeDownloaded = fileToBeDownloaded;

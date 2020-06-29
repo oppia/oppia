@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,18 +18,20 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var fs = require('fs');
+var dPath = './downloads/topic_similarities.csv';
 
 describe('Admin misc test tab', function() {
   var adminPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var topicId = null;
-  var allowedErrors = ['Failed to load resource', 'Object', 'Entity',
-    '500', 'encode'];
+  var allowedErrors = [];
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
@@ -50,19 +52,18 @@ describe('Admin misc test tab', function() {
     await topicEditorPage.publishTopic();
   });
 
-  it('should upload similarity file', async function() {
+  it('should upload and download similarity files', async function() {
     await adminPage.get();
     await adminPage.getMiscTab();
     await adminPage.uploadTopicSimilarities(
       '../data/sample_topic_similarities.csv');
+    allowedErrors.push('encode', 'Object', 'resource');
     await adminPage.expectSimilaritiesToBeUploaded();
+    await browser.refresh();
     await adminPage.uploadTopicSimilarities('../data/cafe.mp3');
     await adminPage.expectUploadError();
-  });
-
-  it('should download similarity files', async function() {
     await adminPage.downloadSimilarityFile();
-    await adminPage.expectFileToBeDownloaded();
+    await waitFor.fileToBeDownloaded('topic_similarities.csv');
   });
 
   it('should clear the search index', async function() {
@@ -77,20 +78,27 @@ describe('Admin misc test tab', function() {
 
   it('should successfully change the username', async function() {
     await adminPage.changeUsername('miscTabTester', 'mTabChecker');
-    await adminPage.expectUsernameToBeChanged('miscTabTester', 'mTabChecker');
+    await browser.refresh();
+    await adminPage.expectUsernameToBeChanged('mTabChecker');
+  });
+
+  it('should try to send a test mail to admin', async function() {
+    await adminPage.sendTestEmail();
+    allowedErrors.push('400', 'emails', 'Object');
+    await adminPage.expectEmailError();
   });
 
   it('should regenerate contribution opportunities for a topic',
     async function() {
       await adminPage.regenerateContributionsForTopic('0');
       await adminPage.expectRegenerationError('0');
+      allowedErrors.push('500', 'Entity');
       await adminPage.regenerateContributionsForTopic(topicId.substring(1));
       await adminPage.expectConributionsToBeRegeneratedForTopic();
     });
 
   it('should fill out extract data form and extract data', async function() {
-    await adminPage.fillExtractDataForm(0, 0, 0, 0);
-    await adminPage.expectAllDataToBeExtracted();
+    await adminPage.fillExtractDataFormAndExpectData(0, 0, 0, 0);
   });
 
   afterEach(async function() {

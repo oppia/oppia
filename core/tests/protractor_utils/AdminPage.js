@@ -72,7 +72,7 @@ var AdminPage = function() {
   var regenerateContributionsTopicIdInput = element(
     by.css('.protractor-test-regen-contributions-topic-id'));
   var regenerateContributionsSubmitButton = element(
-    by.css('.protractor-test-regen-contributions-form-submit'));
+    by.css('.protractor-test-regen-contributions-form-submit-button'));
   var sendEmailButton = element(
     by.css('.protractor-test-send-test-mail-button'));
   var oldUsernameInput = element(
@@ -80,9 +80,11 @@ var AdminPage = function() {
   var newUsernameInput = element(
     by.css('.protractor-test-new-username-input'));
   var usernameChangeSubmitButton = element(
-    by.css('.protractor-test-username-change-submit'));
+    by.css('.protractor-test-username-change-submit-button'));
   var regenerationMessage = element(
     by.css('.protractor-test-regeneration-error-message'));
+  var usernameSection = element(
+    by.css('.protractor-test-dropdown-username-section'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -328,14 +330,14 @@ var AdminPage = function() {
       'Topic similarities uploaded successfully.');
     return true;
   };
-
+  
   this.expectUploadError = async function() {
-    await statusMessage.getText().then((text) => {
-      if (text.match('Server')) {
-        return true;
-      }
-      return false;
-    });
+    var text = await statusMessage.getText();
+    if (text == 'Server error: \'ascii\' codec can\'t encode characters in ' +
+          'position 1024-1025: ordinal not in range (128)') {
+      return true;
+    }
+    return false;
   };
 
   this.downloadSimilarityFile = async function() {
@@ -344,18 +346,11 @@ var AdminPage = function() {
     await similarityDownloadButton.click();
   };
 
-  this.expectFileToBeDownloaded = async function() {
-    var filename = global.downloadsPath + '/topic_similarities.csv';
-    browser.driver.wait(function() {
-      return fs.existsSync(filename);
-    }, 30000);
-  };
-
   this.clearSearchIndex = async function() {
     await waitFor.elementToBeClickable(searchIndexClearButton,
       'Clear search index button not clickable');
     await searchIndexClearButton.click();
-    await browser.switchTo().alert().accept();
+    await general.acceptAlert();
   };
 
   this.expectSearchIndexToBeCleared = async function() {
@@ -368,7 +363,7 @@ var AdminPage = function() {
     await waitFor.elementToBeClickable(flushMigrationBotContributionsButton,
       'Migration bot flush contributions button not clickable');
     await flushMigrationBotContributionsButton.click();
-    await browser.switchTo().alert().accept();
+    await general.acceptAlert();
   };
 
   this.expectMigrationBotContributionsToBeFlushed = async function() {
@@ -378,7 +373,7 @@ var AdminPage = function() {
     return true;
   };
 
-  this.fillExtractDataForm = async function(expID, expVer, state, ans) {
+  this.fillExtractDataFormAndExpectData = async function(expID, expVer, state, ans) {
     await waitFor.pageToFullyLoad();
     await extractDataExplorationIdInput.sendKeys(expID);
     await extractDataExplorationVersionInput.sendKeys(expVer);
@@ -387,11 +382,11 @@ var AdminPage = function() {
     await waitFor.elementToBeClickable(extractDataFormSubmitButton,
       'Extract data form submit button not clickable');
     await extractDataFormSubmitButton.click();
-  };
-
-  this.expectAllDataToBeExtracted = async function() {
-    await browser.getAllWindowHandles().then((handles) => {
-      expect(handles.length).toEqual(3);
+    expect(protractor.ExpectedConditions.urlContains('/explorationdataextractionhandler?exp_id=0&exp_version=0&state_name=0&num_answers=0')).toBeTruthy();
+    browser.getAllWindowHandles().then((handles) => {
+      browser.driver.switchTo().window(handles[2]);
+      browser.driver.close();
+      browser.driver.switchTo().window(handles[1]);
     });
   };
 
@@ -400,17 +395,19 @@ var AdminPage = function() {
     await waitFor.elementToBeClickable(regenerateContributionsSubmitButton,
       'Regenerate conributions form submit button not clickable');
     await regenerateContributionsSubmitButton.click();
-    await browser.switchTo().alert().accept();
+    await general.acceptAlert();
   };
 
   this.expectRegenerationError = async function(topic) {
     var text = 'Server error: Entity for class TopicModel with id ' +
       topic + ' not found';
+    await waitFor.visibilityOf(regenerationMessage);
     expect(regenerationMessage.getText()).toEqual(text);
   };
 
   this.expectConributionsToBeRegeneratedForTopic = async function() {
     var text = 'No. of opportunities model created: 0';
+    await waitFor.visibilityOf(regenerationMessage);
     expect(regenerationMessage.getText()).toEqual(text);
   };
 
@@ -420,24 +417,27 @@ var AdminPage = function() {
     await sendEmailButton.click();
   };
 
-  this.expectMailToBeSent = async function() {
+  this.expectEmailError = async function() {
     await waitFor.textToBePresentInElement(statusMessage,
       'Server error: This app cannot send emails.');
     return true;
   };
 
   this.changeUsername = async function(oldUsername, newUsername) {
+    await waitFor.visibilityOf(oldUsernameInput);
     await oldUsernameInput.sendKeys(oldUsername);
+    await waitFor.visibilityOf(newUsernameInput);
     await newUsernameInput.sendKeys(newUsername);
+    await waitFor.visibilityOf(usernameChangeSubmitButton);
     await waitFor.elementToBeClickable(usernameChangeSubmitButton,
       'Username change submit button not clickable');
     await usernameChangeSubmitButton.click();
-  };
-
-  this.expectUsernameToBeChanged = async function(oldUsername, newUsername) {
     var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
     await waitFor.textToBePresentInElement(statusMessage, text);
-    return true;
+  };
+
+  this.expectUsernameToBeChanged = async function(newUsername) {
+    expect(usernameSection.getText()).toEqual(newUsername);
   };
 };
 
