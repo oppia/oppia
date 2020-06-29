@@ -273,6 +273,9 @@ import { LogicProofValidationService } from
   'interactions/LogicProof/directives/logic-proof-validation.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+import { MathEquationInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
@@ -855,7 +858,10 @@ export class UpgradedServices {
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['MathExpressionInputValidationService'] =
+    upgradedServices['MathEquationInputValidationService'] =
+      new MathEquationInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
+    upgradedServices['MathEquationInputValidationService'] =
       new MathExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MessengerService'] = new MessengerService(
@@ -1096,6 +1102,7 @@ export class UpgradedServices {
         upgradedServices['InteractiveMapRulesService'],
         upgradedServices['ItemSelectionInputRulesService'],
         upgradedServices['LogicProofRulesService'],
+        upgradedServices['MathEquationInputRulesService'],
         upgradedServices['MathExpressionInputRulesService'],
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
