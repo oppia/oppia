@@ -31,6 +31,8 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-create-topic-button'));
   var createSkillButton = element(
     by.css('.protractor-test-create-skill-button'));
+  var createSkillButtonSecondary = element(
+    by.css('.protractor-test-create-skill-button-circle'));
   var deleteSkillButtons = element.all(
     by.css('.protractor-test-delete-skill-button'));
   var topicsTable = element(by.css('.protractor-test-topics-table'));
@@ -317,16 +319,13 @@ var TopicsAndSkillsDashboardPage = function() {
     var handles = await browser.getAllWindowHandles();
     initialHandles = handles;
     var parentHandle = await browser.getWindowHandle();
-    var introCardCreateSkillButtonPresent = await createSkillButton.isPresent();
-    if (introCardCreateSkillButtonPresent) {
+    try {
       await waitFor.elementToBeClickable(
         createSkillButton,
         'Create Skill button takes too long to be clickable');
       await createSkillButton.click();
-    } else {
+    } catch (e) {
       await this.navigateToSkillsTab();
-      var createSkillButtonSecondary = element(
-        by.css('.protractor-test-create-skill-button-circle'));
       await waitFor.elementToBeClickable(
         createSkillButtonSecondary,
         'Create Skill button takes too long to be clickable');
