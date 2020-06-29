@@ -107,6 +107,9 @@ class UserFacingExceptions(python_utils.OBJECT):
     class NotLoggedInException(Exception):
         """Error class for users that are not logged in (error code 401)."""
 
+        pass
+
+
     class InvalidInputException(Exception):
         """Error class for invalid input on the user side (error code 400)."""
 
@@ -125,7 +128,6 @@ class UserFacingExceptions(python_utils.OBJECT):
         pass
 
 
-
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
 
@@ -138,7 +140,6 @@ class UserFacingExceptions(python_utils.OBJECT):
         """
 
         pass
-
 
 
 class BaseHandler(webapp2.RequestHandler):
