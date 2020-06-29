@@ -15248,8 +15248,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for reference check of '
                 'PlaythroughModel\', [u\'Entity id %s: not referenced'
-                ' by any issue for the corresponding exploration '
-                '(id=%s, version=%s)\']]' % (
+                ' by any issue of the corresponding exploration '
+                '(id=%s, version=%s).\']]' % (
                     playthrough.id, playthrough.exp_id, playthrough.exp_version
                 )
             )
@@ -15267,7 +15267,9 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for reference check of '
                 'PlaythroughModel\', [u\'Entity id %s: referenced by '
-                'more than one issues.\']]' % (playthrough.id,)
+                'more than one issues of the corresponding exploration '
+                '(id=%s, version=%s), issue indices: [0, 1].\']]' % (
+                    playthrough.id, self.exp.id, self.exp.version)
             )
         ]
         run_job_and_check_output(self, expected_output)
@@ -15283,7 +15285,9 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for reference check of '
                 'PlaythroughModel\', [u\'Entity id %s: referenced multiple '
-                'times in an issue.\']]' % (playthrough.id,)
+                'times in an issue (index=0) of the corresponding exploration '
+                '(id=%s, version=%s), duplicated id indices: [0, 1].\']]' % (
+                    playthrough.id, self.exp.id, self.exp.version)
             )
         ]
         run_job_and_check_output(self, expected_output)

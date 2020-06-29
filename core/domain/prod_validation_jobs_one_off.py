@@ -5105,7 +5105,7 @@ class PlaythroughModelValidator(BaseModelValidator):
             exp_version = item.exp_version
 
             issues = []
-            for issue in exp_issues.unresolved_issues:
+            for issue_index, issue in enumerate(exp_issues.unresolved_issues):
                 issue_type = issue['issue_type']
                 if (
                         item.id in issue['playthrough_ids']
@@ -5116,29 +5116,38 @@ class PlaythroughModelValidator(BaseModelValidator):
                     if (
                             issue_customization_args[identifying_arg] ==
                             item.issue_customization_args[identifying_arg]):
-                        issues.append(issue)
+                        issues.append((issue_index, issue))
 
             if len(issues) == 0:
                 cls.errors['reference check'].append(
-                    'Entity id %s: not referenced by any issue for the'
-                    ' corresponding exploration (id=%s, version=%s)' % (
+                    'Entity id %s: not referenced by any issue of the'
+                    ' corresponding exploration (id=%s, version=%s).' % (
                         item.id, exp_id, exp_version)
                 )
             elif len(issues) > 1:
+                issue_indices = [index for index, _ in issues]
                 cls.errors['reference check'].append(
-                    'Entity id %s: referenced by more than one issues.' % (
-                        item.id,)
+                    'Entity id %s: referenced by more than one issues of the '
+                    'corresponding exploration (id=%s, version=%s), '
+                    'issue indices: %s.' % (
+                        item.id, exp_id, exp_version, issue_indices)
                 )
             else:
-                issue = issues[0]
+                issue_index, issue = issues[0]
+                id_indices = []
                 reference_count = 0
-                for playthrough_id in issue['playthrough_ids']:
+                for id_index, playthrough_id in enumerate(
+                        issue['playthrough_ids']):
                     if playthrough_id == item.id:
                         reference_count += 1
+                        id_indices.append(id_index)
                 if reference_count > 1:
                     cls.errors['reference check'].append(
                         'Entity id %s: referenced multiple times in an '
-                        'issue.' % (item.id,)
+                        'issue (index=%s) of the corresponding exploration '
+                        '(id=%s, version=%s), duplicated id indices: %s.' % (
+                            item.id, issue_index, exp_id, exp_version,
+                            id_indices)
                     )
 
     @classmethod
