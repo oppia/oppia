@@ -54,7 +54,6 @@ import argparse
 import fnmatch
 import multiprocessing
 import os
-import re
 import subprocess
 import sys
 import threading
@@ -555,12 +554,12 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(lint_messages, task, semaphore)
 
-    # lint_messages += codeowner_linter.check_codeowner_file(
-    #     verbose_mode_enabled)
-    #
-    # lint_messages += (
-    #     third_party_typings_linter.check_third_party_libs_type_defs(
-    #         verbose_mode_enabled))
+    lint_messages += codeowner_linter.check_codeowner_file(
+        verbose_mode_enabled)
+
+    lint_messages += (
+        third_party_typings_linter.check_third_party_libs_type_defs(
+            verbose_mode_enabled))
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
