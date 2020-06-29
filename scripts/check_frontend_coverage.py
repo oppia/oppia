@@ -414,7 +414,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-translation.directive.ts',
     'state-tutorial-first-time.service.ts',
     'StateCardObjectFactory.ts',
-    'StatesObjectFactory.ts',
     'statistics-tab.directive.ts',
     'stats-reporting.service.ts',
     'story-creation.service.ts',
