@@ -18,9 +18,10 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 
 import { AppConstants } from 'app.constants';
+import { ProfileLinkImageBackendApiService } from
+  './profile-link-image-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -37,7 +38,7 @@ export class ProfileLinkImageComponent implements OnInit {
   @Input() username: string;
 
   constructor(
-    private http: HttpClient,
+    private profileBackendApiService: ProfileLinkImageBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
 
   DEFAULT_PROFILE_IMAGE_PATH: string = (
@@ -50,13 +51,11 @@ export class ProfileLinkImageComponent implements OnInit {
     this.profileImageUrl = (
       '/preferenceshandler/profile_picture_by_username/' +
       this.username);
-
-    this.http.get(this.profileImageUrl).toPromise().then(
-      (response: IProfileResponse) => {
-        this.profilePicture = (
-          response.profile_picture_data_url_for_username ||
-          this.DEFAULT_PROFILE_IMAGE_PATH);
-      });
+    this.profileBackendApiService.fetchProfilePicture(
+      this.profileImageUrl).then((response: string) => {
+      this.profilePicture = (
+        response || this.DEFAULT_PROFILE_IMAGE_PATH);
+    });
   }
 
   isUsernameLinkable(): boolean {
