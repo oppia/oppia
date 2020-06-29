@@ -130,7 +130,6 @@ angular.module('oppia').controller('RteHelperModalController', [
           var caName = $scope.tmpCustomizationArgs[0].name;
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
-          $scope.currentRteIsMathExpressionEditor = false;
           return;
         }
         var resampledFile = (
@@ -145,12 +144,10 @@ angular.module('oppia').controller('RteHelperModalController', [
           var caName = $scope.tmpCustomizationArgs[0].name;
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
-          $scope.currentRteIsMathExpressionEditor = false;
         }, function(errorResponse) {
           AlertsService.addWarning(
             errorResponse.error || 'Error communicating with server.');
           $uibModalInstance.dismiss('cancel');
-          $scope.currentRteIsMathExpressionEditor = false;
         });
       } else {
         for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
