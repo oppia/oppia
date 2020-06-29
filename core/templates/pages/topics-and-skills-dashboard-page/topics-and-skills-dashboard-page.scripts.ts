@@ -22,6 +22,7 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/navbar/' +
@@ -33,4 +34,4 @@ require(
 );
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.controller.ts');
+  'topics-and-skills-dashboard-page.component.ts');

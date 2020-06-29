@@ -16,25 +16,9 @@
  * @fileoverview Directive for the SortedTiles visualization.
  */
 
-require('services/html-escaper.service.ts');
-
-angular.module('oppia').directive('oppiaVisualizationSortedTiles', function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    template: require('./oppia-visualization-sorted-tiles.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$attrs', 'HtmlEscaperService',
-      function($attrs, HtmlEscaperService) {
-        this.$onInit = () => {
-          this.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-          this.options = (
-            HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions));
-          this.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
-        };
-      }
-    ]
-  };
-});
+angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
+  restrict: 'E',
+  scope: { data: '<', options: '<' },
+  template: require('./oppia-visualization-sorted-tiles.directive.html'),
+  style: require('./oppia-visualization-sorted-tiles.directive.css'),
+}));

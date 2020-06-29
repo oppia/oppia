@@ -126,18 +126,21 @@ angular.module('oppia').directive('stateInteractionEditor', [
               interactionCustomizationArgs, false);
           };
 
-          var _updateInteractionPreviewAndAnswerChoices = function() {
+          var _updateInteractionPreview = function() {
             $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =
               StateCustomizationArgsService.savedMemento;
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
+          };
 
+          var _updateAnswerChoices = function() {
             $rootScope.$broadcast(
               'updateAnswerChoices',
               StateEditorService.getAnswerChoices(
-                $scope.interactionId, currentCustomizationArgs));
+                $scope.interactionId,
+                StateCustomizationArgsService.savedMemento));
           };
 
           // If a terminal interaction is selected for a state with no content,
@@ -188,7 +191,12 @@ angular.module('oppia').directive('stateInteractionEditor', [
             }
 
             $scope.recomputeGraph();
-            _updateInteractionPreviewAndAnswerChoices();
+            _updateInteractionPreview();
+            $rootScope.$broadcast(
+              'handleCustomArgsUpdate',
+              StateEditorService.getAnswerChoices(
+                $scope.interactionId,
+                StateCustomizationArgsService.savedMemento));
           };
 
           $scope.openInteractionCustomizerModal = function() {
@@ -238,22 +246,19 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 'onInteractionIdChanged',
                 StateInteractionIdService.savedMemento);
               $scope.recomputeGraph();
-              _updateInteractionPreviewAndAnswerChoices();
+              _updateInteractionPreview();
+              _updateAnswerChoices();
             }, function() {
               AlertsService.clearWarnings();
             });
           };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
 
             $scope.StateInteractionIdService = StateInteractionIdService;
             $scope.hasLoaded = false;
             $scope.customizationModalReopened = false;
-
-            $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.png');
-            $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_black_72px.png');
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {
                 throw new Error(
@@ -270,9 +275,14 @@ angular.module('oppia').directive('stateInteractionEditor', [
                   stateData.interaction.confirmedUnclassifiedAnswers)
               });
 
-              _updateInteractionPreviewAndAnswerChoices();
+              _updateInteractionPreview();
+              _updateAnswerChoices();
               $scope.hasLoaded = true;
             });
+
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
 
             $rootScope.$broadcast('interactionEditorInitialized');
             StateEditorService.updateStateInteractionEditorInitialised();

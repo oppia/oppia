@@ -135,7 +135,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         } else {
           // For computer users or users operating in larger screen size
           // the creator exploration list will come back to its previously
-          // selected view (card or list) when resized from mobile view
+          // selected view (card or list) when resized from mobile view.
           ctrl.myExplorationsView = userDashboardDisplayPreference;
           ctrl.publishText = EXP_PUBLISH_TEXTS.defaultText;
         }
@@ -294,7 +294,7 @@ angular.module('oppia').component('creatorDashboardPage', {
             for (var i = 0; i < numberOfCreatedSuggestions; i++) {
               if (responseData.created_suggestions_list.length !==
                   numberOfCreatedSuggestions) {
-                $log.error('Number of suggestions does not match number' +
+                $log.error('Number of suggestions does not match number ' +
                           'of suggestion threads');
               }
               for (var j = 0; j < numberOfCreatedSuggestions; j++) {

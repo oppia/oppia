@@ -310,12 +310,31 @@ class SetOfNormalizedString(BaseObject):
     }
 
 
-class MathLatexString(BaseObject):
-    """Math LaTeX string class."""
+class MathExpressionContent(BaseObject):
+    """Math Expression Content class."""
 
-    description = 'A LaTeX string.'
+    description = 'The Math Expression to be displayed.'
+    default_value = {
+        'raw_latex': '',
+        'svg_filename': ''
+    }
 
-    SCHEMA = UnicodeString.SCHEMA
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'raw_latex',
+            'description': 'Latex value',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'svg_filename',
+            'description': 'SVG filename',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
 
 
 class SanitizedUrl(BaseObject):
@@ -450,7 +469,7 @@ class Filepath(BaseObject):
 
 class SvgFilename(BaseObject):
     """A string representing a filename of the saved
-    svg file created using literallyCanvas.
+    svg file created using svg editor.
     """
 
     description = 'A string representing the saved svg filename'

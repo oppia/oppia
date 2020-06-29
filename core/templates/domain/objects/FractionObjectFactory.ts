@@ -137,7 +137,7 @@ export class FractionObjectFactory {
       numerator = parseInt(numbers[0]);
       denominator = parseInt(numbers[1]);
     } else {
-      // numbers.length == 3
+      // The numbers.length == 3.
       wholeNumber = parseInt(numbers[0]);
       numerator = parseInt(numbers[1]);
       denominator = parseInt(numbers[2]);
