@@ -22,6 +22,7 @@ describe('New Story Title Editor Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
 
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

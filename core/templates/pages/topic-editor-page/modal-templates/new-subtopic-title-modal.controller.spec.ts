@@ -23,6 +23,7 @@ describe('New Subtopic Title Modal Controller', function() {
   var $uibModalInstance = null;
   var subtopicTitles = ['Subtopic 1', 'Subtopic 2', 'Subtopic 3'];
 
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
@@ -61,7 +62,7 @@ describe('New Subtopic Title Modal Controller', function() {
     $scope.resetErrorMsg();
 
     $scope.save('Subtopic 5');
-    expect($scope.errorMsg).toBe('');
+    expect($scope.errorMsg).toBe(null);
     expect($uibModalInstance.close).toHaveBeenCalledWith('Subtopic 5');
   });
 });
