@@ -49,10 +49,30 @@ import pycodestyle # isort:skip
 # pylint: enable=wrong-import-position
 
 
-def _trimmer(lint_messages):
-    python_utils.PRINT('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK')
-    # message_list = lint_messages.split('\n')
-    python_utils.PRINT(lint_messages)
+def _pylint_trimmer(lint_messages):
+    summary_messages = ''
+    for message in lint_messages:
+        python_utils.PRINT(message)
+        # Remove extra bits from end of the message.
+        if message.endswith(')'):
+            last_string_length = len(message.split()[-1])
+            summary_messages += (message[:-last_string_length])
+        else:
+            summary_messages += (message)
+    return summary_messages
+
+def _pycodestyle_trimmer(lint_messages):
+    # Remove the error message count from the end of lint_messages.
+    messages = python_utils.convert_to_bytes(lint_messages)
+    messages = messages.split('\n')
+    python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOO')
+    python_utils.PRINT(messages)
+    python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOO')
+    summary_messages = ''
+    for message in messages:
+        python_utils.PRINT(messages)
+        summary_messages += message
+    return summary_messages
 
 
 class WritableObject(object):
@@ -378,21 +398,23 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pylinter = lint.Run(
                     current_files_to_lint + [config_pylint],
                     reporter=TextReporter(pylint_output), exit=False).linter
-                _trimmer(pylint_output.read())
                 # These lines invoke Pycodestyle and print its outputvvvvvvvvvvvv
                 # to the target stdout.
                 style_guide = pycodestyle.StyleGuide(
                     config_file=config_pycodestyle)
                 pycodestyle_report = style_guide.check_files(
                     paths=current_files_to_lint)
-                python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOOOOOO')
-                python_utils.PRINT(pycodestyle_report.get_file_results())
-                python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOOOOOO')
+                summary_messages.append(pycodestyle_report.get_file_results())
 
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+                pylint_messages = _pylint_trimmer(pylint_output.read())
+                summary_messages.append(pylint_messages)
+                pycodestyle_messages = _pycodestyle_trimmer(
+                    pycodestyle_report.get_file_results())
+                summary_messages.append(pycodestyle_messages)
                 summary_message = stdout.getvalue()
                 python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
+                # summary_messages.append(summary_message)
                 are_there_errors = True
 
             current_batch_start_index = current_batch_end_index
