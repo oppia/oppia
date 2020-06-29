@@ -1061,7 +1061,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
-        # Clear temp compiled typescipt files from previous runs.
+        # Clear temp compiled typescipt files from the previous runs.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
         compile_all_ts_files()
