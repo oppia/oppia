@@ -58,7 +58,7 @@ angular.module('oppia').factory('AudioPlayerService', [
                 };
               }
             }, 100);
-  
+
             successCallback();
           }, function(reason) {
             errorCallback(reason);
