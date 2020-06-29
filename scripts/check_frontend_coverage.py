@@ -138,7 +138,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'donate-page.component.ts',
     'drag-and-drop-html-string-editor.directive.ts',
     'drag-and-drop-positive-int-editor.directive.ts',
-    'drag-and-drop-sort-input-validation.service.ts',
     'early-quit-issue.directive.ts',
     'edit-profile-picture-modal.controller.ts',
     'edit-thumbnail-modal.controller.ts',

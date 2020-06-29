@@ -21,6 +21,11 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { UrlService } from
   'services/contextual/url.service';
+import { of } from 'rxjs';
+
+require(
+  'pages/landing-pages/stewards-landing-page/' +
+  'stewards-landing-page.component.ts');
 
 describe('Stewards Landing Page', function() {
   var $scope = null, ctrl = null;
@@ -40,21 +45,19 @@ describe('Stewards Landing Page', function() {
       }
     });
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    var directive = $injector.get('stewardsLandingPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+    ctrl = $componentController('stewardsLandingPage', {
       $scope: $scope
     });
   }));
 
   afterEach(function() {
-    // This is to avoid functions from other test blocks to be executated.
-    windowDimensions.onResizeHooks = [];
+    ctrl.$onDestroy();
   });
 
   it('should change to parents tab', function() {
@@ -66,7 +69,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.activeTabName).toBe(activeTabName);
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
@@ -88,7 +91,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.activeTabName).toBe(activeTabName);
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
@@ -114,7 +117,7 @@ describe('Stewards Landing Page', function() {
         'https://www.oppiafoundation.org/partnerships#get-in-touch')
     }, {
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }]);
     expect(ctrl.isActiveTab(activeTabName)).toBe(true);
     expect(ctrl.isActiveTab('Teachers')).toBe(false);
@@ -174,7 +177,7 @@ describe('Stewards Landing Page', function() {
     var activeTabName = 'Parents';
     var buttonDefinition = {
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     };
     ctrl.setActiveTabName(activeTabName);
     ctrl.onClickButton(buttonDefinition);
@@ -203,6 +206,8 @@ describe('Stewards Landing Page', function() {
       },
       innerWidth: 100
     });
+    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
+      of(new Event('resize')));
     ctrl.$onInit();
 
     expect(ctrl.activeTabName).toBe('Parents');
@@ -210,7 +215,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.getActiveTabNameInSingularForm()).toBe('Parent');
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
@@ -225,8 +230,9 @@ describe('Stewards Landing Page', function() {
       },
       innerWidth: 998
     });
+    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
+      of(new Event('resize')));
     ctrl.$onInit();
-    windowDimensions.onResize(new Event(''));
     expect(ctrl.windowIsNarrow).toBe(false);
   });
 
@@ -237,8 +243,9 @@ describe('Stewards Landing Page', function() {
       },
       innerWidth: 768
     });
+    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
+      of(new Event('resize')));
     ctrl.$onInit();
-    windowDimensions.onResize(new Event(''));
     expect(ctrl.windowIsNarrow).toBe(true);
   });
 });

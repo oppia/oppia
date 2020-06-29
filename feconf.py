@@ -88,7 +88,9 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
-
+HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'html_field_types_to_rule_specs.json')
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
@@ -125,11 +127,24 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+# Allowed formats of how HTML is present in rule specs.
+HTML_RULE_VARIABLE_FORMAT_SET = 'set'
+HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
+HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
+
+ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
+    HTML_RULE_VARIABLE_FORMAT_SET,
+    HTML_RULE_VARIABLE_FORMAT_STRING,
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+]
+
+ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
+ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
+
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
-ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
@@ -433,6 +448,9 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
+# Whether community dashboard is ready to use for contributors.
+COMMUNITY_DASHBOARD_ENABLED = False
+
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -657,6 +675,7 @@ COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
+COMMUNITY_DASHBOARD_URL = '/community-dashboard'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'

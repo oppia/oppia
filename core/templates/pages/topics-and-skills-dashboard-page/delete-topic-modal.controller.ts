@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for all the visualization directives.
+ * @fileoverview Controller for the delete topic confirmation modal.
  */
 
-require('visualizations/oppia-visualization-bar-chart.directive.ts');
-require(
-  'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
-require('visualizations/oppia-visualization-frequency-table.directive.ts');
-require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
+angular.module('oppia').controller('DeleteTopicModalController', [
+  '$controller', '$scope', '$uibModalInstance', 'topicName',
+  function($controller, $scope, $uibModalInstance, topicName) {
+    $controller('ConfirmOrCancelModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance
+    });
+
+    $scope.init = function() {
+      $scope.topicName = topicName;
+    };
+    $scope.init();
+  }
+]);

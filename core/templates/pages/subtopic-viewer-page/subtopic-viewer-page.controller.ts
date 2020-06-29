@@ -28,6 +28,7 @@ require('components/summary-tile/subtopic-summary-tile.directive.ts');
 
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
@@ -43,13 +44,15 @@ angular.module('oppia').directive('subtopicViewerPage', [
         '/pages/subtopic-viewer-page/subtopic-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService', 'LoaderService',
-        'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
-        'WindowDimensionsService', 'FATAL_ERROR_CODES',
+        '$rootScope', '$window', 'AlertsService', 'ContextService',
+        'LoaderService', 'PageTitleService', 'SubtopicViewerBackendApiService',
+        'UrlService', 'WindowDimensionsService', 'ENTITY_TYPE',
+        'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService, LoaderService,
-            PageTitleService, SubtopicViewerBackendApiService, UrlService,
-            WindowDimensionsService, FATAL_ERROR_CODES) {
+            $rootScope, $window, AlertsService, ContextService,
+            LoaderService, PageTitleService, SubtopicViewerBackendApiService,
+            UrlService, WindowDimensionsService, ENTITY_TYPE,
+            FATAL_ERROR_CODES) {
           var ctrl = this;
           ctrl.nextSubtopicSummaryIsShown = false;
 
@@ -67,12 +70,14 @@ angular.module('oppia').directive('subtopicViewerPage', [
                 ctrl.pageContents = (
                   subtopicDataObject.getPageContents().getSubtitledHtml());
                 ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+                ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
+                ContextService.setCustomEntityContext(
+                  ENTITY_TYPE.TOPIC, ctrl.parentTopicId);
                 PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
 
                 let nextSubtopic = (
                   subtopicDataObject.getNextSubtopic());
                 if (nextSubtopic) {
-                  ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
                   ctrl.nextSubtopic = nextSubtopic;
                   ctrl.nextSubtopicSummaryIsShown = true;
                 }
@@ -86,6 +91,10 @@ angular.module('oppia').directive('subtopicViewerPage', [
                 }
               }
             );
+          };
+
+          ctrl.$onDestroy = function() {
+            ContextService.removeCustomEntityContext();
           };
         }
       ]
