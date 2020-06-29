@@ -212,7 +212,7 @@ describe('Assets Backend API Service', function() {
       $rootScope.$apply();
     });
 
-    it('should successfully save a math Svg', function(done) {
+    it('should successfully save a math SVG', function(done) {
       var successMessage = 'Math SVG was successfully saved.';
       // @ts-ignore in order to ignore JQuery properties that should
       // be declarated.
@@ -223,8 +223,28 @@ describe('Assets Backend API Service', function() {
       });
       var imageFile = new Blob();
       AssetsBackendApiService.saveMathExpresionImage(
-        imageFile, 'new.svg', 'exploration', 'expid12345')
+        imageFile, 'newMathExpression.svg', 'exploration', 'expid12345')
         .then(function(response) {
+          // Below checks assert that the correct data is sent to the backend.
+          var dataArguementForAjaxCall = (
+            // @ts-ignore in order to ignore JQuery properties that should
+            // be declarated.
+            $.ajax.calls.mostRecent().args[0].data);
+          expect(dataArguementForAjaxCall instanceof FormData).toBeTruthy();
+          var rawImageSentToBackend = null;
+          var payLoadSentoBackend = null;
+          dataArguementForAjaxCall.forEach((value, key) => {
+            if (key === 'image') {
+              rawImageSentToBackend = value;
+            } else if (key === 'payload') {
+              payLoadSentoBackend = value;
+            }
+          });
+          expect(rawImageSentToBackend instanceof File).toBeTruthy();
+          expect(payLoadSentoBackend).toEqual(JSON.stringify({
+            filename: 'newMathExpression.svg',
+            filename_prefix: 'image'
+          }));
           expect(response).toBe(successMessage);
         }).then(done, done.fail);
 
