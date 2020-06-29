@@ -75,6 +75,7 @@
     "postcss-syntax": "^0.36.2",
     "protractor": "^7.0.0",
     "protractor-jasmine2-screenshot-reporter": "^0.5.0",
+    "puppeteer": "^4.0.1",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.4.0",
     "sourcemapped-stacktrace": "^1.1.11",
@@ -118,7 +119,6 @@
     "mathjs": "^7.0.0",
     "moment": "^2.24.0",
     "nerdamer": "^1.1.4",
-    "puppeteer": "^4.0.1",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^3.3.3"
   }
