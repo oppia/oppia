@@ -46,12 +46,15 @@ angular.module('oppia').directive('explorationFooter', [
             $scope.explorationId = ContextService.getExplorationId();
             $scope.iframed = UrlService.isIframed();
             $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            WindowDimensionsService.registerOnResizeHook(function() {
-              $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-              $scope.$apply();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                $scope.windowIsNarrow = (
+                  WindowDimensionsService.isWindowNarrow());
+                $scope.$applyAsync();
+              });
             $scope.contributorNames = [];
-            if (!ContextService.isInQuestionPlayerMode()) {
+            if (!ContextService.isInQuestionPlayerMode() ||
+                ContextService.getQuestionPlayerIsManuallySet()) {
               ExplorationSummaryBackendApiService
                 .loadPublicAndPrivateExplorationSummaries([
                   $scope.explorationId])
@@ -72,6 +75,12 @@ angular.module('oppia').directive('explorationFooter', [
                     );
                   }
                 });
+            }
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
             }
           };
         }

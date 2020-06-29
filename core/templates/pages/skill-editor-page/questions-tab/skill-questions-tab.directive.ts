@@ -21,7 +21,6 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.directive.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
@@ -47,14 +46,14 @@ angular.module('oppia').directive('questionsTab', [
         'skill-questions-tab.directive.html'),
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
+        'SkillEditorStateService', 'UrlService',
         'EditableQuestionBackendApiService', 'SkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionsListService',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
-            SkillEditorStateService, QuestionCreationService, UrlService,
+            SkillEditorStateService, UrlService,
             EditableQuestionBackendApiService, SkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionsListService,
@@ -77,7 +76,7 @@ angular.module('oppia').directive('questionsTab', [
           ctrl.$onInit = function() {
             _init();
             ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.getSkillChangedSubject().subscribe(
+              SkillEditorStateService.onSkillChange.subscribe(
                 () => _init())
             );
           };

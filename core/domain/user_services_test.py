@@ -66,7 +66,6 @@ class MockUserStatsMRJobManager(
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
-
     def test_set_and_get_username(self):
         gae_id = 'someUser'
         username = 'username'

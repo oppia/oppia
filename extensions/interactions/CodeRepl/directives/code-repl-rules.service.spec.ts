@@ -52,7 +52,7 @@ describe('Code REPL rules service', () => {
     });
 
     it('should remove extra newlines and trailing whitespace', () => {
-      // Extra newline with spaces
+      // Extra newline with spaces.
       expect(crrs.CodeEquals({
         code: (
           'def x():\n' +
@@ -62,7 +62,7 @@ describe('Code REPL rules service', () => {
         )
       }, RULE_INPUT)).toBe(true);
 
-      // Extra trailing whitespace on first line
+      // Extra trailing whitespace on first line.
       expect(crrs.CodeEquals({
         code: (
           'def x():        \n' +
@@ -71,7 +71,7 @@ describe('Code REPL rules service', () => {
         )
       }, RULE_INPUT)).toBe(true);
 
-      // Tab character
+      // ---- Tab character ----
       expect(crrs.CodeEquals({
         code: (
           'def x(): \t\n' +
