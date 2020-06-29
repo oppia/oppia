@@ -119,7 +119,7 @@ describe('Exploration Property Service', function() {
       child.saveDisplayedValue();
     }).toThrowError('this.displayed should have a valid value.');
 
-    // Then init with a value
+    // Then init with a value.
     child.init('initial value');
     child.saveDisplayedValue();
     expect(child.hasChanged()).toBe(false);
