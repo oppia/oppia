@@ -34,7 +34,7 @@ describe('PositionOfTerms', function() {
     PositionOfTermsCtrl.onChangePosition();
     expect(PositionOfTermsCtrl.value).toBe('both');
 
-    // Changing localValue should change ctrl.value
+    // Changing localValue should change ctrl.value.
     PositionOfTermsCtrl.localValue = PositionOfTermsCtrl.positionOfTerms[0];
     PositionOfTermsCtrl.onChangePosition();
     expect(PositionOfTermsCtrl.value).toBe('lhs');
