@@ -1,30 +1,37 @@
 <div class="ck-editor-copy-toolbar-container">
+  <div>
+    <p class="ck-editor-copy-toolbar-label">Copy Tool</p>
+    <span class="ck-editor-copy-toolbar-tip-sublabel">
+      Use the copy tool to easily copy content like images
+    </span>
+  </div>
   <button type="button"
           class="btn btn-secondary"
           [ngClass]="{'ck-editor-copy-toolbar-tip-button-active': toolActive}"
           (click)="toggleToolActive()">
-    Copy
+    {{toolActive ? "On" : "Off"}}
   </button>
-  <span *ngIf="!toolActive" class="ck-editor-copy-toolbar-tip-container">
-    Tip: Use the copy tool to easily copy content like images
-  </span>
-  <span *ngIf="toolActive" class="ck-editor-copy-toolbar-tip-container">
-    Click on outlined content above to copy
-  </span>
 </div>
 
 <style>
   .ck-editor-copy-toolbar-container {
     align-items: center;
     display: flex;
+    justify-content: space-between;
     margin-bottom: 14px;
-  }
-  .ck-editor-copy-toolbar-tip-container {
-    color: #505050;
-    margin-left: 12px;
   }
   .ck-editor-copy-toolbar-tip-button-active {
     color: #fff;
     background-color: black;
+  }
+  .ck-editor-copy-toolbar-label {
+    color: #505050;
+    font-weight: 600;
+    margin-bottom: 2px;
+    margin-left: 12px;
+  }
+  .ck-editor-copy-toolbar-tip-sublabel {
+    color: #757575;
+    margin-left: 12px;
   }
 </style>

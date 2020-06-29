@@ -30,12 +30,12 @@ require('services/context.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
-  'CkEditorCopyContentService', 'ContextService', 'TranslateTextService',
-  'TranslationLanguageService', 'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
+  'ContextService', 'TranslateTextService', 'TranslationLanguageService',
+  'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
-      CkEditorCopyContentService, ContextService, TranslateTextService,
-      TranslationLanguageService, opportunity, userIsLoggedIn, ENTITY_TYPE) {
+      ContextService, TranslateTextService, TranslationLanguageService,
+      opportunity, userIsLoggedIn, ENTITY_TYPE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -102,13 +102,6 @@ angular.module('oppia').controller('TranslationModalController', [
       }
       if (!$scope.moreAvailable) {
         $uibModalInstance.close();
-      }
-    };
-
-    $scope.onContentClick = function($event) {
-      if ($scope.copyMode.isActive) {
-        CkEditorCopyContentService.broadcastCopy($scope, $event.target);
-        $scope.copyMode.isActive = false;
       }
     };
   }

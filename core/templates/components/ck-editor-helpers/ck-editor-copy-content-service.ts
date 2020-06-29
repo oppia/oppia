@@ -20,13 +20,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { IRootScopeService } from 'angular';
+
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CkEditorCopyContentService {
-  readonly COPY_EVENT = 'copy-element-to-translation-editor';
+  private readonly COPY_EVENT = 'copy-element-to-translation-editor';
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
@@ -82,6 +83,7 @@ export class CkEditorCopyContentService {
   private _handlePaste(
       editor: CKEDITOR.editor,
       element: HTMLElement,
+      disabledWidgets: string[],
       containedWidgetTagName?: string
   ) {
     let tagName = (
@@ -111,6 +113,10 @@ export class CkEditorCopyContentService {
         }
       }
 
+      if (disabledWidgets.includes(widgetName)) {
+        return;
+      }
+
       if (widgetName === 'oppiatabs' && startupData.tab_contents) {
         editor.execCommand(
           widgetName,
@@ -129,12 +135,17 @@ export class CkEditorCopyContentService {
    * @param contentScope {IRootScopeService} scope of parent containing editor
    * @param target {HTMLElement} element to copy
    */
-  broadcastCopy(contentScope: IRootScopeService, target: HTMLElement) {
+  broadcastCopy(
+      contentScope: IRootScopeService,
+      target: HTMLElement,
+      disabledWidgets?: string[]
+  ) {
     const { rootElement, containedWidgetTagName } = this._handleCopy(target);
 
     contentScope.$broadcast(
       this.COPY_EVENT,
       rootElement,
+      disabledWidgets || [],
       containedWidgetTagName
     );
   }
@@ -151,8 +162,14 @@ export class CkEditorCopyContentService {
   ) {
     editorScope.$on(
       this.COPY_EVENT,
-      (_, element: HTMLElement, containedWidgetTagName?: string) =>
-        this._handlePaste(editor, element, containedWidgetTagName)
+      (
+          _,
+          element: HTMLElement,
+          disabledWidgets: string[],
+          containedWidgetTagName?: string
+      ) =>
+        this._handlePaste(
+          editor, element, disabledWidgets, containedWidgetTagName)
     );
   }
 }

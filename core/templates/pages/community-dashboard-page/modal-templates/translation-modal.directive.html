@@ -24,11 +24,7 @@
       </div>
     </div>
     <div ng-if="!loadingData && !uploadingTranslation">
-      <angular-html-bind ng-class="{'oppia-rte-editor-unfocused': !copyMode.isActive}"
-                         ng-click="onContentClick($event)"
-                         html-data="textToTranslate"
-                         class="oppia-rte-editor">
-      </angular-html-bind>
+      <angular-html-bind html-data="textToTranslate" class="oppia-rte-editor"></angular-html-bind>
     </div>
 
     <div class="oppia-login-required-to-translate" ng-if="!userIsLoggedIn">
@@ -41,8 +37,6 @@
 
     <div class="oppia-translation-editor-section" ng-if="userIsLoggedIn">
       <div class="protractor-test-state-translation-editor">
-        <ck-editor-copy-toolbar [tool-active]="copyMode.isActive" (set-tool-active)="setCopyMode($event)"></ck-editor-copy-toolbar>
-
         <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
         </schema-based-editor>
       </div>
