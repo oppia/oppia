@@ -95,7 +95,7 @@ angular.module('oppia').factory('RouterService', [
       }
 
       // TODO(oparry): Determine whether this is necessary, since
-      // _savePendingChanges() is called by each of the navigateTo... functions
+      // _savePendingChanges() is called by each of the navigateTo... functions.
       $rootScope.$broadcast('externalSave');
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {

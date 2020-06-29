@@ -151,6 +151,10 @@ interface IRuleTemplates {
     NotCorrect: IRuleDescription;
     NotCorrectByCategory: IRuleDescription;
   };
+  MathEquationInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+  };
   MathExpressionInput: {
     IsMathematicallyEquivalentTo: IRuleDescription;
   };
