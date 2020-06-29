@@ -247,7 +247,7 @@ export class AboutPageConstants {
     'Rajan Garg',
     'Rajat Patwa',
     'Rajat Talesra',
-    'Rajat',
+    'Rajat Kumar',
     'Rajendra Kadam',
     'Rajitha Warusavitarana',
     'Rakshit Kumar',
