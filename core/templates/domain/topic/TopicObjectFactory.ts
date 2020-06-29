@@ -103,7 +103,7 @@ export class Topic {
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
   }
 
-  // Instance methods
+  // ---- Instance methods ----
   getId(): string {
     return this._id;
   }
