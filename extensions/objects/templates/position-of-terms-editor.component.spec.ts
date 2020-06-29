@@ -34,9 +34,19 @@ describe('PositionOfTerms', function() {
     PositionOfTermsCtrl.onChangePosition();
     expect(PositionOfTermsCtrl.value).toBe('both');
 
-    // Changing localValue should change ctrl.value
+    // Changing localValue should change ctrl.value.
     PositionOfTermsCtrl.localValue = PositionOfTermsCtrl.positionOfTerms[0];
     PositionOfTermsCtrl.onChangePosition();
     expect(PositionOfTermsCtrl.value).toBe('lhs');
+  });
+
+  it('should initialize ctrl.localValue with ctrl.value', function() {
+    PositionOfTermsCtrl.value = 'rhs';
+    PositionOfTermsCtrl.$onInit();
+    expect(PositionOfTermsCtrl.localValue.name).toBe('rhs');
+
+    PositionOfTermsCtrl.value = 'irrelevant';
+    PositionOfTermsCtrl.$onInit();
+    expect(PositionOfTermsCtrl.localValue.name).toBe('irrelevant');
   });
 });

@@ -25,26 +25,34 @@ import { ContextService } from
   'services/context.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ExplorationPermissions, ExplorationPermissionsObjectFactory } from
+  'domain/exploration/exploration-permissions-object.factory';
 
 describe('User Exploration Permissions Service', () => {
   let ueps: UserExplorationPermissionsService = null;
   let contextService: ContextService = null;
   let httpTestingController: HttpTestingController = null;
+  let epof: ExplorationPermissionsObjectFactory;
 
   let sampleExplorationId = 'sample-exploration';
   let samplePermissionsData = {
-    canEdit: false,
-    canVoiceOver: true,
+    can_edit: false,
+    can_voiceover: true,
   };
+  let permissionsResponse: ExplorationPermissions;
+
 
   beforeEach(angular.mock.inject(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [ExplorationPermissionsObjectFactory]
     });
 
     httpTestingController = TestBed.get(HttpTestingController);
     ueps = TestBed.get(UserExplorationPermissionsService);
     contextService = TestBed.get(ContextService);
+    epof = TestBed.get(ExplorationPermissionsObjectFactory);
+    permissionsResponse = epof.createFromBackendDict(samplePermissionsData);
     spyOn(contextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
     UserExplorationPermissionsService.permissionsPromise = null;
@@ -56,7 +64,7 @@ describe('User Exploration Permissions Service', () => {
 
   it('should fetch the correct data', fakeAsync(() => {
     ueps.getPermissionsAsync().then(function(response) {
-      expect(response).toEqual(samplePermissionsData);
+      expect(response).toEqual(permissionsResponse);
     });
 
     let req = httpTestingController.expectOne(

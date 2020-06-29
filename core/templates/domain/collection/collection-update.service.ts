@@ -19,7 +19,7 @@
  * undo/redo service.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/collection/collection-node-object.factory.ts');
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 
@@ -173,11 +173,11 @@ angular.module('oppia').factory('CollectionUpdateService', [
         _applyPropertyChange(
           collection, COLLECTION_PROPERTY_TITLE, title, oldTitle,
           function(changeDict, collection) {
-            // Apply
+            // ---- Apply ----
             var title = _getNewPropertyValueFromChangeDict(changeDict);
             collection.setTitle(title);
           }, function(changeDict, collection) {
-            // Undo.
+            // ---- Undo ----
             collection.setTitle(oldTitle);
           });
       },

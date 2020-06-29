@@ -16,11 +16,18 @@
  * @fileoverview Controller for upload activity modal.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').controller('UploadActivityModalController', [
-  '$scope', '$uibModalInstance', 'AlertsService',
-  function($scope, $uibModalInstance, AlertsService) {
+  '$controller', '$scope', '$uibModalInstance', 'AlertsService',
+  function($controller, $scope, $uibModalInstance, AlertsService) {
+    $controller('ConfirmOrCancelModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance
+    });
     $scope.save = function() {
       var returnObj = {
         yamlFile: null
@@ -35,11 +42,6 @@ angular.module('oppia').controller('UploadActivityModalController', [
       returnObj.yamlFile = file;
 
       $uibModalInstance.close(returnObj);
-    };
-
-    $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
-      AlertsService.clearWarnings();
     };
   }
 ]);
