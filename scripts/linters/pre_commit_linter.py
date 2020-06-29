@@ -50,6 +50,7 @@ Note that the root folder MUST be named 'oppia'.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import __builtin__
 import argparse
 import fnmatch
 import multiprocessing
@@ -579,7 +580,7 @@ def main(args=None):
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = FileCache()
-__builtins__.FILE_CACHE = NAME_SPACE.files
+__builtin__.FILE_CACHE = NAME_SPACE.files
 
 
 if __name__ == '__main__':
