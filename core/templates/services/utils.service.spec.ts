@@ -41,7 +41,7 @@ describe('Utils Service', () => {
     expect(uts.isString('xyz')).toEqual(true);
     expect(uts.isString(new String())).toEqual(true);
 
-    // Test against invalid inputs
+    // Test against invalid inputs.
     expect(uts.isString(NaN)).toEqual(false);
     expect(uts.isString(undefined)).toEqual(false);
     expect(uts.isString(null)).toEqual(false);

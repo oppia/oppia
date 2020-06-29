@@ -173,7 +173,7 @@ describe('State Object Factory', () => {
 
     expect(stateObjectBackend.toBackendDict()).toEqual({
       ...stateObject,
-      // Overrides the param_changes from stateObject
+      // Overrides the param_changes from stateObject.
       param_changes: paramChanges
     });
   });

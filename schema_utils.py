@@ -64,7 +64,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         schema: dict(str, *). The schema to validate and normalize the value
             against.
         apply_custom_validators: bool. Whether to validate the normalized
-             object using the validators defined in the schema.
+            object using the validators defined in the schema.
 
     Returns:
         *. The normalized object.
@@ -182,7 +182,7 @@ def get_validator(validator_id):
 
     Returns:
         function. The validator method corresponding to the given
-            validator_id.
+        validator_id.
     """
     return _Validators.get(validator_id)
 
@@ -213,7 +213,7 @@ class Normalizers(python_utils.OBJECT):
 
         Returns:
             function. The normalizer method corresponding to the given
-                normalizer_id.
+            normalizer_id.
 
         Raises:
             Exception: The normalizer_id is not valid.
@@ -240,7 +240,7 @@ class Normalizers(python_utils.OBJECT):
 
         Raises:
             AssertionError: The string is non-empty and does not start with
-            http:// or https://
+                http:// or https://
         """
         if obj == '':
             return obj
@@ -292,7 +292,7 @@ class _Validators(python_utils.OBJECT):
 
         Returns:
             function. The validator method corresponding to the specified
-                validator_id.
+            validator_id.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)

@@ -42,7 +42,7 @@ describe('Teach Page', function() {
   }));
 
   afterEach(function() {
-    // onhashchange and location.hash are reassigned because it shares
+    // Property onhashchange and location.hash are reassigned because it shares
     // same memory reference to all test blocks and the controller itself
     // because $provide.value of WindowRef refers to windowRef as well.
     // Once location.hash or onhashchange is setted in the controller,
@@ -58,8 +58,8 @@ describe('Teach Page', function() {
 
     ctrl.onTabClick('teach');
 
-    // setTimeout is being used here in order to wait onhashchange event to
-    // finish. setTimeout is executed only after call stack is empty.
+    // Function setTimeout is being used here in order to wait onhashchange
+    // event to finish. setTimeout is executed only after call stack is empty.
     // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
     setTimeout(function() {
       expect(windowRef.nativeWindow.location.hash).toBe('#teach');
@@ -74,8 +74,8 @@ describe('Teach Page', function() {
 
     ctrl.onTabClick('participation');
 
-    // setTimeout is being used here in order to wait onhashchange event to
-    // finish. setTimeout is executed only after call stack is empty.
+    // Function setTimeout is being used here in order to wait onhashchange
+    // event to finish. setTimeout is executed only after call stack is empty.
     // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
     setTimeout(function() {
       expect(windowRef.nativeWindow.location.hash).toBe('#participation');
