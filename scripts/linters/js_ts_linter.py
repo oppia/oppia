@@ -105,6 +105,18 @@ def _get_expression_from_node_if_one_exists(
     return expression
 
 
+def compile_all_ts_files():
+    """Compiles all project typescript files into
+    COMPILED_TYPESCRIPT_TMP_PATH. Previously, we only compiled
+    the TS files that were needed, but when a relative import was used, the
+    linter would crash with a FileNotFound exception before being able to
+    run. For more details, please see issue #9458.
+    """
+    cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
+        './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+
 class JsTsLintChecksManager(python_utils.OBJECT):
     """Manages all the Js and Ts linting functions.
 
@@ -225,17 +237,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             COMPILED_TYPESCRIPT_TMP_PATH,
             os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
-
-    def _compile_all_ts_files(self):
-        """Compiles all project typescript files into
-        COMPILED_TYPESCRIPT_TMP_PATH. Previously, we only compiled
-        the TS files that were needed, but when a relative import was used, the
-        linter would crash with a FileNotFound exception before being able to
-        run. For more details, please see issue #9458.
-        """
-        cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
-            './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
     def _check_any_type(self):
         """Checks if the type of any variable is declared as 'any'
@@ -1063,7 +1064,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         # Clear temp compiled typescipt files from previous runs.
         clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
         # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
-        self._compile_all_ts_files()
+        compile_all_ts_files()
 
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
@@ -1164,7 +1165,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for error in result_list:
-                python_utils.PRINT(python_utils.convert_to_bytes(error))
+                python_utils.PRINT(error)
                 summary_messages.append(error)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (
