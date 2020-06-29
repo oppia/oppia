@@ -40,7 +40,6 @@ require('pages/topic-editor-page/modal-templates/' +
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
-require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('domain/question/question-backend-api.service.ts');
 
@@ -58,8 +57,7 @@ angular.module('oppia').directive('topicEditorTab', [
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService',
-        'ContextService', 'CsrfTokenService', 'WindowDimensionsService',
-        'ImageUploadHelperService',
+        'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
         'SkillCreationService', 'StoryCreationService',
         'EntityCreationService', 'TopicEditorRoutingService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
@@ -69,8 +67,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, AlertsService,
-            ContextService, CsrfTokenService, WindowDimensionsService,
-            ImageUploadHelperService,
+            ContextService, CsrfTokenService, ImageUploadHelperService,
             SkillCreationService, StoryCreationService,
             EntityCreationService, TopicEditorRoutingService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
@@ -242,29 +239,8 @@ angular.module('oppia').directive('topicEditorTab', [
             return '1 Story';
           };
 
-          $scope.togglePreviewListCards = function(listType) {
-            if (listType === $scope.SUBTOPIC_LIST) {
-              $scope.subtopicsListIsShown = !$scope.subtopicsListIsShown;
-            }
-            if (listType === $scope.SKILL_LIST) {
-              $scope.skillsListIsShown = !$scope.skillsListIsShown;
-            }
-            if (listType === $scope.STORY_LIST) {
-              $scope.storiesListIsShown = !$scope.storiesListIsShown;
-            }
-          };
-
           ctrl.$onInit = function() {
             $scope.topicPreviewCardIsShown = false;
-            $scope.SUBTOPIC_LIST = 'subtopic';
-            $scope.SKILL_LIST = 'skill';
-            $scope.STORY_LIST = 'story';
-            $scope.subtopicsListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.skillsListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.storiesListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);

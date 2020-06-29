@@ -31,6 +31,7 @@ require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
 require(
   'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
+require('domain/bottom_navbar/bottom-navbar-status.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
@@ -39,10 +40,12 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
-    '$uibModal', 'SkillEditorRoutingService', 'SkillEditorStateService',
+    '$uibModal', 'BottomNavbarStatusService',
+    'SkillEditorRoutingService', 'SkillEditorStateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService',
     function(
-        $uibModal, SkillEditorRoutingService, SkillEditorStateService,
+        $uibModal, BottomNavbarStatusService,
+        SkillEditorRoutingService, SkillEditorStateService,
         UndoRedoService, UrlInterpolationService, UrlService) {
       var ctrl = this;
       ctrl.getActiveTabName = function() {
@@ -80,6 +83,7 @@ angular.module('oppia').component('skillEditorPage', {
         return ctrl.skill.getValidationIssues().length;
       };
       ctrl.$onInit = function() {
+        BottomNavbarStatusService.markBottomNavbarStatus(true);
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
       };

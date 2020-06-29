@@ -34,8 +34,10 @@ angular.module('oppia').directive('selectSkill', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/skill-selector/skill-selector.directive.html'),
-      controller: ['$scope',
-        function($scope) {
+      controller: [
+        '$scope', '$uibModal', '$rootScope',
+        function(
+            $scope, $uibModal, $rootScope) {
           var ctrl = this;
           ctrl.$onInit = function() {
             $scope.selectedSkill = null;

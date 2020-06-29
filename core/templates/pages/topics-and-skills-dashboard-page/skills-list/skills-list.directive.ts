@@ -90,7 +90,6 @@ angular.module('oppia').directive('skillsList', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
-              windowClass: 'delete-skill-modal',
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               SkillBackendApiService.deleteSkill(skillId).then(
@@ -98,8 +97,6 @@ angular.module('oppia').directive('skillsList', [
                   $timeout(function() {
                     $rootScope.$broadcast(
                       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                    var successToast = 'The skill has been deleted.';
-                    AlertsService.addSuccessMessage(successToast, 1000);
                   }, 100);
                 }
               );
@@ -108,6 +105,8 @@ angular.module('oppia').directive('skillsList', [
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             }).then(function() {
+              var successToast = 'The skill has been deleted.';
+              AlertsService.addSuccessMessage(successToast, 1000);
             });
           };
 
@@ -118,7 +117,6 @@ angular.module('oppia').directive('skillsList', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
-              windowClass: 'assign-skill-to-topic-modal',
               resolve: {
                 topicSummaries: () => topicSummaries
               },
