@@ -1535,20 +1535,6 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
                 if file_content[line_num] == b'\n':
                     blank_line_counter += 1
 
-                # Skips the check for the class if it does not have a body.
-                # @ here is for the decorator. We need this becuase some files
-                # do not have a body. See example below:
-                # class ClassName(BaseClass):
-                #   """Some docstring."""
-                #
-                # class ClassNameEx(BaseClass):
-                #   """Some docstring."""
-                elif (
-                        line.startswith(('class ', 'def', '@')) and
-                        not blank_line_counter == 0):
-                    blank_line_counter = 0
-                    class_has_docstring = False
-
                 # Checks if we reached to a non-empty line. If that's true it
                 # sets the variable blank_line_counter to zero and sets the
                 # variable class_has_docstring to false so that we can skip

@@ -71,7 +71,6 @@ class EditorHandler(base.BaseHandler):
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
 
-
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
         """Handles GET requests."""

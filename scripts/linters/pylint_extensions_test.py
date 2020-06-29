@@ -2327,62 +2327,6 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-    def test_class_with_no_body(self):
-        node_class_with_no_body = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-                    def func():
-                        a = 1 + 2
-                """)
-        node_class_with_no_body.file = filename
-        node_class_with_no_body.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_class_with_no_body)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_decorated_function_after_class_docstring(self):
-        node_decorated_function_after_class_docstring = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        @decorator()
-                        def func():
-                            a = 1 + 2
-                """)
-        node_decorated_function_after_class_docstring.file = filename
-        node_decorated_function_after_class_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_decorated_function_after_class_docstring)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            line=4)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
     def test_inline_comment_after_class_docstring(self):
         node_inline_comment_after_class_docstring = (
             astroid.scoped_nodes.Module(
