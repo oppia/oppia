@@ -130,16 +130,33 @@ class EditableSkillDataHandler(base.BaseHandler):
 
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
+        # It might be the case that the requested skill is not assigned to any
+        # topic, or it might be assigned to a topic and not a subtopic, or
+        # it can be assigned to multiple topics, so this dict represents
+        # a key value pair where key is topic's name and value is subtopic
+        # name which might be None indicating that the skill is assigned
+        # to that topic but not to a subtopic.
+        assigned_skill_topic_data_dict = {}
 
         for topic in topics:
+            skill_ids_in_topic = topic.get_all_skill_ids()
+            if skill_id in skill_ids_in_topic:
+                subtopic_name = None
+                for subtopic in topic.subtopics:
+                    if skill_id in subtopic.skill_ids:
+                        subtopic_name = subtopic.title
+                        break
+                assigned_skill_topic_data_dict[topic.name] = subtopic_name
+
             skill_summaries = skill_services.get_multi_skill_summaries(
-                topic.get_all_skill_ids())
+                skill_ids_in_topic)
             skill_summary_dicts = [
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
 
         self.values.update({
             'skill': skill.to_dict(),
+            'assigned_skill_topic_data_dict': assigned_skill_topic_data_dict,
             'grouped_skill_summaries': grouped_skill_summary_dicts
         })
 

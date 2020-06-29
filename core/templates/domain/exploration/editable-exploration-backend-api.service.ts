@@ -62,7 +62,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
           var exploration = angular.copy(response.data);
 
           // Delete from the ReadOnlyExplorationBackendApiService's cache
-          // As the two versions of the data (learner and editor) now differ
+          // As the two versions of the data (learner and editor) now differ.
           ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
             explorationId, exploration);
 
@@ -82,7 +82,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
       var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
 
       $http['delete'](editableExplorationDataUrl).then(function() {
-        // Delete item from the ReadOnlyExplorationBackendApiService's cache
+        // Delete item from the ReadOnlyExplorationBackendApiService's cache.
         ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
           explorationId);
         if (successCallback) {

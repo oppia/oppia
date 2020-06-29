@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class ReviewTestEngineService {
   getReviewTestQuestionCount(numOfSkills: number): number {
-    // numOfSkills should be a non-negative integer.
+    // Variable numOfSkills should be a non-negative integer.
     if (numOfSkills < 0) {
       return 0;
     } else if (numOfSkills < 6) {

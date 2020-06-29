@@ -162,7 +162,7 @@ export class LostChange {
 })
 export class LostChangeObjectFactory {
   constructor(private utilsService: UtilsService) {
-    // createNew function needs to be binded because it's used a lot in
+    // The createNew function needs to be binded because it's used a lot in
     // calbacks and then `this` would refer to window instead of the service
     // itself.
     this.createNew = this.createNew.bind(this);
