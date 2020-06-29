@@ -131,6 +131,7 @@ describe('Skills List Directive', function() {
       $httpBackend.expectDELETE(url).respond(200);
       ctrl.deleteSkill(skillId);
 
+      $timeout.flush();
       expect($rootScope.$broadcast).toHaveBeenCalledWith(
         'topicsAndSkillsDashboardReinitialized');
     });
