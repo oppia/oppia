@@ -93,16 +93,16 @@ def main(args=None):
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
         line = task.stdout.readline()
-        line = python_utils.UNICODE(line, 'utf-8')
 
         # No more output from the subprocess, and the subprocess has ended.
         if len(line) == 0 and task.poll() is not None:
             break
 
         if line:
-            python_utils.PRINT(line, end='')
+            python_utils.PRINT(line, end=u'')
             output_lines.append(line)
-    concatenated_output = ''.join(output_lines)
+    concatenated_output = ''.join(
+        python_utils.UNICODE(line, 'utf-8') for line in output_lines)
 
     python_utils.PRINT('Done!')
 
