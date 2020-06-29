@@ -21,6 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+require('pages/maintenance-page/maintenance-page.component.ts');
+
 describe('Maintenance page', function() {
   var $scope = null;
   var ctrl = null;
@@ -33,13 +35,13 @@ describe('Maintenance page', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     DocumentAttributeCustomizationService = $injector.get(
       'DocumentAttributeCustomizationService');
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
-    ctrl = $controller('Maintenance', {
+    ctrl = $componentController('maintenancePage', {
       $scope: $scope
     });
   }));

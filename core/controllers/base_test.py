@@ -219,7 +219,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 self.get_html_response(
                     '/community-library', expected_status_int=503))
             self.assertIn(
-                'The Oppia site is temporarily unavailable', response.body)
+                '<maintenance-page>', response.body)
             self.assertNotIn('<library-page>', response.body)
 
     def test_maintenance_mode_when_enabled_and_super_admin_html(self):
