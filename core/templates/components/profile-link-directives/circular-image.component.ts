@@ -25,7 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class CircularImageComponent implements OnInit {
-  @Input() username: string;
+  @Input() src: string;
   @Input() link: string;
 
   ngOnInit() {}
