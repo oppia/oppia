@@ -19,8 +19,9 @@
 require('base-components/loading-message.component.ts');
 require('base-components/warnings-and-alerts.directive.ts');
 require('pages/OppiaFooterDirective.ts');
-require('domain/bottom_navbar/bottom-navbar-status.service.ts');
 require('domain/sidebar/sidebar-status.service.ts');
+
+require('services/bottom-navbar-status.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/background-mask.service.ts');
 

@@ -28,18 +28,18 @@ import { WindowDimensionsService } from
   providedIn: 'root'
 })
 export class BottomNavbarStatusService {
+  bottomNavbarIsEnabled: boolean = false;
   constructor(private windowDimensionsService: WindowDimensionsService) {}
-    bottomNavbarIsEnabled: boolean = false;
 
-    markBottomNavbarStatus(status: boolean): void {
-      this.bottomNavbarIsEnabled = status;
-    }
+  markBottomNavbarStatus(status: boolean): void {
+    this.bottomNavbarIsEnabled = status;
+  }
 
-    isBottomNavbarEnabled(): boolean {
-      return (
-        this.bottomNavbarIsEnabled &&
+  isBottomNavbarEnabled(): boolean {
+    return (
+      this.bottomNavbarIsEnabled &&
           this.windowDimensionsService.isWindowNarrow());
-    }
+  }
 }
 
 angular.module('oppia').factory(

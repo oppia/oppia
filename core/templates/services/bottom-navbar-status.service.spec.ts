@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { BottomNavbarStatusService } from
-  'domain/bottom_navbar/bottom-navbar-status.service';
+  'services/bottom-navbar-status.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 

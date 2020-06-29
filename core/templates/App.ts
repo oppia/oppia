@@ -36,12 +36,12 @@ require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
 
-require('domain/bottom_navbar/bottom-navbar-status.service.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 require('pages/Base.ts');
 
+require('services/bottom-navbar-status.service.ts');
 require('services/construct-translation-ids.service.ts');
 require('services/context.service.ts');
 require('services/contextual/device-info.service.ts');

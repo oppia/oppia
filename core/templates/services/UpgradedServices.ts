@@ -71,7 +71,7 @@ import { BackgroundMaskService } from
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { BottomNavbarStatusService } from
-  'domain/bottom_navbar/bottom-navbar-status.service';
+  'services/bottom-navbar-status.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from

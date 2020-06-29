@@ -1,7 +1,7 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <div class="misconception-card-header">
+      <div class="oppia-misconception-card-header">
         <strong class="heading-text">Misconceptions</strong>
         <i ng-click="toggleMisconceptionLists()"
            class="fa fa-angle-down"
@@ -86,17 +86,17 @@
     font-size: 16px;
   }
 
-  skill-misconceptions-editor .misconception-card-header {
+  skill-misconceptions-editor .oppia-misconception-card-header {
     display: flex;
     justify-content: space-between;
   }
 
-  skill-misconceptions-editor .misconception-card-header i {
+  skill-misconceptions-editor .oppia-misconception-card-header i {
     display: none;
   }
 
   @media screen and (max-width: 768px) {
-    skill-misconceptions-editor .misconception-card-header i {
+    skill-misconceptions-editor .oppia-misconception-card-header i {
       display: block;
     }
   }
