@@ -26,7 +26,11 @@
             <img ng-if="$ctrl.profilePictureDataUrl"
                  ng-src="<[$ctrl.profilePictureDataUrl]>"
                  class="img-thumbnail protractor-test-custom-photo">
-            <img ng-if="!$ctrl.profilePictureDataUrl" ng-src="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
+            <picture ng-if="!$ctrl.profilePictureDataUrl">
+              <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.webp')]>">
+              <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>">
+              <img ng-src="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
+            </picture>
           </div>
         </div>
       </div>
@@ -252,8 +256,8 @@
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 3em;
-    margin-top: 0;
     margin-bottom: 10px;
+    margin-top: 0;
     padding-top: 45px;
     position: relative;
     text-align: center;
@@ -268,7 +272,7 @@
   }
 
   .oppia-bio-border {
-    border-width: 0.01em;
     border-color: rgb(156,156,156);
+    border-width: 0.01em;
   }
 </style>

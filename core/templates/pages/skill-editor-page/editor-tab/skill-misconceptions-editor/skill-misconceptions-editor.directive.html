@@ -1,9 +1,9 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <strong style="font-size: 1.4em;">Misconceptions</strong>
-      <div style="padding-bottom: 12px; color: #595959;">
-        <span style="font-size:.79em;">
+      <strong class="heading-text" style="font-size: 1.4em;">Misconceptions</strong>
+      <div class="helper-text">
+        <span>
           <i>
             These misconceptions represent common mistakes that are made by students when trying to apply this skill.
           </i>
@@ -42,10 +42,9 @@
         </ul>
       </div>
       <button type="button"
-              class="btn protractor-test-add-misconception-modal-button"
-              style="background-color: rgba(5,140,166,0.9); color: white;"
+              class="btn btn-add-skill-misconception protractor-test-add-misconception-modal-button"
               ng-click="openAddMisconceptionModal()">
-        + Add Misconception
+        + ADD MISCONCEPTION
       </button>
     </div>
   </div>
@@ -53,5 +52,23 @@
 <style>
   skill-misconceptions-editor .last-element {
     border-bottom: 1px solid #ccc;
+  }
+
+  skill-misconceptions-editor .btn-add-skill-misconception {
+    background-color: #058CA6;
+    color: #FFFFFF;
+  }
+
+  skill-misconceptions-editor .helper-text {
+    color: #595959;
+    padding-bottom: 12px;
+  }
+
+  skill-misconceptions-editor .helper-text span {
+    font-size: 13px;
+  }
+
+  skill-misconceptions-editor .heading-text span {
+    font-size: 14px;
   }
 </style>

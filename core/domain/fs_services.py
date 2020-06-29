@@ -117,7 +117,7 @@ def read_classifier_data(exp_id, job_id):
 
     Returns:
         dict|None. The classifier data read from the file. Returns None
-            if no classifier data is stored for the given job.
+        if no classifier data is stored for the given job.
     """
     filepath = '%s-classifier-data.json' % (job_id)
     file_system_class = get_entity_file_system_class()

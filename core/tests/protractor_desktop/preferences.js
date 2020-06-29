@@ -33,7 +33,7 @@ describe('Preferences', function() {
     await preferencesPage.get();
     var defaultProfilePhotoSource = (
       await preferencesPage.getProfilePhotoSource());
-    await preferencesPage.submitProfilePhoto('../data/img.png');
+    await preferencesPage.submitProfilePhoto('../data/img.png', false);
     var newProfilePhotoSource = await preferencesPage.getProfilePhotoSource();
     expect(defaultProfilePhotoSource).not.toEqual(newProfilePhotoSource);
   });
@@ -43,7 +43,8 @@ describe('Preferences', function() {
     await users.login('lou@preferences.com');
     await preferencesPage.get();
     await waitFor.pageToFullyLoad();
-    await preferencesPage.uploadProfilePhoto('../data/dummyLargeImage.jpg');
+    await preferencesPage.uploadProfilePhoto(
+      '../data/dummyLargeImage.jpg', false);
     await preferencesPage.expectUploadError();
   });
 
