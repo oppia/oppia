@@ -82,7 +82,7 @@ angular.module('oppia').config([
         suffix: '.json'
       })
       // The use of default translation improves the loading time when English
-      // is selected
+      // is selected.
       .translations('en', DEFAULT_TRANSLATIONS)
       .fallbackLanguage('en')
       .determinePreferredLanguage()
@@ -93,7 +93,8 @@ angular.module('oppia').config([
       .addInterpolation('$translateMessageFormatInterpolation')
       // The strategy 'sanitize' does not support utf-8 encoding.
       // https://github.com/angular-translate/angular-translate/issues/1131
-      // The strategy 'escape' will brake strings with raw html, like hyperlinks
+      // The strategy 'escape' will brake strings with raw html, like
+      // hyperlinks.
       .useSanitizeValueStrategy('sanitizeParameters')
       .forceAsyncReload(true);
   }

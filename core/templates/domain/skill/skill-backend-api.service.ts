@@ -71,10 +71,13 @@ export class SkillBackendApiService {
         let skill = cloneDeep(response.skill);
         let groupedSkillSummaryDicts = cloneDeep(
           response.grouped_skill_summaries);
+        let assignedSkillTopicData = cloneDeep(
+          response.assigned_skill_topic_data_dict);
         if (successCallback) {
           successCallback(this.skillResponseObjectFactory.createFromBackendDict(
             {skill: skill,
-              grouped_skill_summaries: groupedSkillSummaryDicts}));
+              grouped_skill_summaries: groupedSkillSummaryDicts,
+              assigned_skill_topic_data_dict: assignedSkillTopicData}));
         }
       }, (errorResponse) => {
         if (errorCallback) {

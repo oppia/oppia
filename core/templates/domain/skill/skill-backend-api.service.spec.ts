@@ -151,7 +151,8 @@ describe('Skill backend API service', () => {
 
     sampleResponse = {
       skill: skillDict,
-      grouped_skill_summaries: {}
+      grouped_skill_summaries: {},
+      assigned_skill_topic_data_dict: {}
     };
 
     sampleResponse2 = {
@@ -180,7 +181,8 @@ describe('Skill backend API service', () => {
       expect(successHandler).toHaveBeenCalledWith(skillResponseObjectFactory.
         createFromBackendDict({
           skill: sampleResponse.skill,
-          grouped_skill_summaries: sampleResponse.grouped_skill_summaries
+          grouped_skill_summaries: sampleResponse.grouped_skill_summaries,
+          assigned_skill_topic_data_dict: sampleResponse.assigned_skill_topic_data_dict
         }));
       expect(failHandler).not.toHaveBeenCalled();
     }));

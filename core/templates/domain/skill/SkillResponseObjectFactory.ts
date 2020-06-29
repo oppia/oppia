@@ -24,15 +24,18 @@ import { SkillObjectFactory, Skill, ISkillBackendDict } from
 
 export interface ISkillResponseBackendDict {
   'skill': ISkillBackendDict;
-  'grouped_skill_summaries': string;
+  'grouped_skill_summaries': Object;
+  'assigned_skill_topic_data_dict': Object;
 }
 
 export class SkillResponse {
   _skill: Skill;
-  _groupedSkillSummaries: string;
-  constructor(skill: Skill, groupedSkillSummaries: string) {
+  _groupedSkillSummaries: Object;
+  _assignedSkillTopicDataDict: Object;
+  constructor(skill: Skill, groupedSkillSummaries: Object, assignedSkillTopicDataDict: Object) {
     this._skill = skill;
     this._groupedSkillSummaries = groupedSkillSummaries;
+    this._assignedSkillTopicDataDict = assignedSkillTopicDataDict;
   }
 
   copyFromSkillResponse(skillResponse: SkillResponse): void {
@@ -44,14 +47,19 @@ export class SkillResponse {
     return this._skill;
   }
 
-  getGroupedSkillSummaries(): string {
+  getGroupedSkillSummaries(): Object {
     return this._groupedSkillSummaries;
+  }
+
+  getAssignedSkillTopicDataDict(): Object {
+    return this._assignedSkillTopicDataDict;
   }
 
   toBackendDict(): ISkillResponseBackendDict {
     return {
       skill: this._skill.toBackendDict(),
-      grouped_skill_summaries: this._groupedSkillSummaries
+      grouped_skill_summaries: this._groupedSkillSummaries,
+      assigned_skill_topic_data_dict: this._assignedSkillTopicDataDict
     };
   }
 }
@@ -67,7 +75,8 @@ export class SkillResponseObjectFactory {
     return new SkillResponse (
       this.skillObjectFactory.createFromBackendDict(
         skillResponseBackendDict.skill),
-      skillResponseBackendDict.grouped_skill_summaries
+      skillResponseBackendDict.grouped_skill_summaries,
+      skillResponseBackendDict.assigned_skill_topic_data_dict
     );
   }
 }

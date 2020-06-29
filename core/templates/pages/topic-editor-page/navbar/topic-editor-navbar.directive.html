@@ -51,50 +51,6 @@
       Unpublish Topic
     </button>
   </li>
-  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getTotalWarningsCount()}" ng-attr-uib-dropdown="<[getTotalWarningsCount()]>" class="nav-item icon">
-    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()"
-       class="nav-link">
-      <i class="material-icons">&#xE254;</i> <span style="font-size: 0.8em;">Topic</span>
-    </a>
-    <div ng-show="getTotalWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-         ng-click="selectMainTab()">
-      <span class="oppia-editor-warnings-count">
-        <[getTotalWarningsCount()]>
-      </span>
-    </div>
-    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
-      <span class="oppia-editor-warnings-header">Warnings</span>
-      <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in validationIssues track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-      <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in prepublishValidationIssues track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-    </ul>
-  </li>
-
-  <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="nav-item icon">
-    <a class="nav-link protractor-test-subtopics-tab-button" uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
-      <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Subtopics</span>
-    </a>
-  </li>
-
-  <li ng-class="{'active': getActiveTabName() === 'questions'}" class="nav-item icon">
-    <a class="nav-link protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
-      <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Questions</span>
-    </a>
-  </li>
-
-  <li class="nav-item icon">
-    <a ng-click="openTopicViewer()" class="nav-link" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
-      <i class="material-icons">&#xE037;</i><span style="font-size: 0.7em;">Preview</span>
-    </a>
-  </li>
 </ul>
 
 <style>
