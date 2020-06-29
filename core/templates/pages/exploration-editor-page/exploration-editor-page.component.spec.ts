@@ -86,9 +86,9 @@ describe('Exploration editor page component', function() {
             param_changes: [],
             dest: 'Final',
             feedback: {
-              html: '',
-              audio_translations: {}
-            }
+              content_id: 'content_1',
+              html: ''
+            },
           },
           confirmed_unclassified_answers: [],
           id: null,
