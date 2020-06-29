@@ -36,20 +36,17 @@ import collections
 import re
 import string
 
+from constants import constants
 import python_utils
 
-_GREEK_LETTERS = [
-    'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta',
-    'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'pi', 'rho', 'sigma', 'tau',
-    'upsilon', 'phi', 'chi', 'psi', 'omega', 'Gamma', 'Delta', 'Theta',
-    'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Psi', 'Omega']
 _MATH_FUNCTION_NAMES = [
     'log', 'ln', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
     'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
 _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']
 _VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
-VALID_ALGEBRAIC_IDENTIFIERS = list(string.ascii_letters) + _GREEK_LETTERS
+VALID_ALGEBRAIC_IDENTIFIERS = (
+    list(string.ascii_letters) + constants.GREEK_LETTERS)
 
 _TOKEN_CATEGORY_IDENTIFIER = 'identifier'
 _TOKEN_CATEGORY_FUNCTION = 'function'
@@ -135,11 +132,17 @@ def tokenize(expression):
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
-            _GREEK_LETTERS + _MATH_FUNCTION_NAMES, reverse=True, key=len)),
+            constants.GREEK_LETTERS + _MATH_FUNCTION_NAMES,
+            reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))
 
     token_texts = re.findall(re_string, expression)
 
+    # There is a possibility that the regex string skips past an invalid
+    # character. In that case, we must raise an error and display the invalid
+    # character. The invalid character is the one who's frequency in the
+    # original expression does not match with the frequency in the tokenized
+    # expression. The counter is being used to verify that frequencies match.
     original_exp_frequency = collections.Counter(expression)
     tokenized_exp_frequency = collections.Counter(''.join(token_texts))
 
