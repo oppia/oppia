@@ -59,7 +59,7 @@ var PreferencesPage = function() {
 
   var checkIfFieldHasBeenSaved = async function(fieldName) {
     await waitFor.visibilityOf(
-      toastMessageElement,  `${fieldName} takes too long to get saved.`);
+      toastMessageElement, `${fieldName} takes too long to get saved.`);
   };
 
   this.expectUploadError = async function() {
