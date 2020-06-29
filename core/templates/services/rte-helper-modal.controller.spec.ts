@@ -65,6 +65,7 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should save modal customization args when closing it', function() {
       var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+      expect($scope.disableSaveButtonForMathRte()).toBe(false);
       $scope.save();
       expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
       expect($uibModalInstance.close).toHaveBeenCalledWith({
@@ -132,9 +133,14 @@ describe('Rte Helper Modal Controller', function() {
         value: {
           raw_latex: 'x^2',
           svgFile: 'Svg Data',
-          svg_filename: 'mathImage.svg'
+          svg_filename: 'mathImage.svg',
+          mathExpressionSvgIsBeingProcessed: true
         }
       }];
+      expect($scope.disableSaveButtonForMathRte()).toBe(true);
+      $scope.tmpCustomizationArgs[0].value.mathExpressionSvgIsBeingProcessed = (
+        false);
+      expect($scope.disableSaveButtonForMathRte()).toBe(false);
       var response = {
         filename: 'mathImage.svg'
       };
