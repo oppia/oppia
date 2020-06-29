@@ -53,8 +53,8 @@ def update_featured_activity_references(featured_activity_references):
             objects representing the full list of 'featured' activities.
 
     Raises:
-         Exception: The input list of ActivityReference
-            domain objects has duplicates.
+        Exception: The input list of ActivityReference domain objects has
+            duplicates.
     """
     for activity_reference in featured_activity_references:
         activity_reference.validate()

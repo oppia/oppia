@@ -702,7 +702,7 @@ def add_caption_attr_to_image(html_string):
 
     Returns:
         str. Updated HTML string with the caption attribute for all
-            oppia-noninteractive-image tags.
+        oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
@@ -724,7 +724,7 @@ def validate_customization_args(html_list):
 
     Returns:
         dict: Dictionary of all the invalid customisation args where
-            key is a Rich Text Component and value is the invalid html string.
+        key is a Rich Text Component and value is the invalid html string.
     """
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
@@ -833,7 +833,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
 
     Returns:
         str. Updated HTML string with the dimensions for all
-            oppia-noninteractive-image tags.
+        oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):

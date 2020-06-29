@@ -74,7 +74,8 @@ class Registry(python_utils.OBJECT):
         """Get a list of instances of all actions.
 
         Returns:
-            list. A list of all action class instances.
+            list(*). A list of all action class instances. Classes all have
+            "BaseLearnerActionSpec" as an ancestor class.
         """
         if len(cls._actions) == 0:
             cls._refresh()
@@ -91,7 +92,8 @@ class Registry(python_utils.OBJECT):
             action_type: str. Type of the action.
 
         Returns:
-            An instance of the corresponding action class.
+            *. An instance of the corresponding action class. This class has
+            "BaseLearnerActionSpec" as an ancestor class.
         """
         if action_type not in cls._actions:
             cls._refresh()

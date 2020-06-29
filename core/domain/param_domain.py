@@ -50,7 +50,7 @@ class ParamSpec(python_utils.OBJECT):
 
         Returns:
             dict. A dict with a single key, whose value is the type
-                of the parameter represented by this ParamSpec.
+            of the parameter represented by this ParamSpec.
         """
         return {
             'obj_type': self.obj_type,
@@ -68,7 +68,7 @@ class ParamSpec(python_utils.OBJECT):
 
         Returns:
             ParamSpec. A ParamSpec object created from the specified
-                object type.
+            object type.
         """
         return cls(param_spec_dict['obj_type'])
 
@@ -178,8 +178,8 @@ class ParamChange(python_utils.OBJECT):
 
         Returns:
             ParamChange. The ParamChange object created from the
-                `param_change_dict` dict, which specifies the name,
-                customization arguments and the generator used.
+            `param_change_dict` dict, which specifies the name,
+            customization arguments and the generator used.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],

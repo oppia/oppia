@@ -216,8 +216,8 @@ def get_recently_published_exp_summaries(limit):
 
     Returns:
         dict. The dict contains recently published ExplorationSummary model
-            instances as a value keyed by their exploration id. At most 'limit'
-            entries are returned.
+        instances as a value keyed by their exploration id. At most 'limit'
+        entries are returned.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published(limit))
@@ -232,7 +232,7 @@ def get_story_id_linked_to_exploration(exp_id):
 
     Returns:
         str|None. The ID of the story if the exploration is linked to some
-            story, otherwise None.
+        story, otherwise None.
     """
     exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
         exp_id)
@@ -1409,7 +1409,7 @@ def get_image_filenames_from_exploration(exploration):
         exploration: Exploration object. The exploration itself.
 
     Returns:
-       list(str). List containing the name of the image files in exploration.
+        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
     for state in exploration.states.values():

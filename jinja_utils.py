@@ -78,7 +78,7 @@ def parse_string(string, params, autoescape=True):
 
     Returns:
         str. The string parsed using Jinja templating. Returns an error string
-            in case of error in parsing.
+        in case of error in parsing.
 
     Raises:
         Exception: Unable to parse string with Jinja.

@@ -55,7 +55,7 @@ class UserGlobalPrefs(python_utils.OBJECT):
             can_receive_feedback_message_email: bool. Whether the user can
                 receive emails when users submit feedback to their explorations.
             can_receive_subscription_email: bool. Whether the user can receive
-                 subscription emails notifying them about new explorations.
+                subscription emails notifying them about new explorations.
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
@@ -106,7 +106,7 @@ class UserExplorationPrefs(python_utils.OBJECT):
     def to_dict(self):
         """Return dictionary representation of UserExplorationPrefs.
 
-        Return:
+        Returns:
             dict. The keys of the dict are:
                 'mute_feedback_notifications': bool. Whether the given user has
                     muted feedback emails.

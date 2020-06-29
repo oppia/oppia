@@ -439,8 +439,8 @@ def get_exploration_opportunity_summaries_by_ids(ids):
 
     Returns:
         list(ExplorationOpportunitySummary). A list of
-            ExplorationOpportunitySummary domain objects corresponding to the
-            supplied ids.
+        ExplorationOpportunitySummary domain objects corresponding to the
+        supplied ids.
     """
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
@@ -532,7 +532,7 @@ def get_skill_opportunities_by_ids(ids):
 
     Returns:
         list(SkillOpportunity). A list of SkillOpportunity domain objects
-            corresponding to the supplied ids.
+        corresponding to the supplied ids.
     """
     skill_opportunity_models = (
         opportunity_models.SkillOpportunityModel.get_multi(ids))
@@ -616,8 +616,8 @@ def _get_skill_opportunity(skill_id):
 
     Returns:
         SkillOpportunity or None. The domain object representing a
-            SkillOpportunity with the supplied skill_id, or None if it does not
-            exist.
+        SkillOpportunity with the supplied skill_id, or None if it does not
+        exist.
     """
     skill_opportunity_model = (
         opportunity_models.SkillOpportunityModel.get_by_id(skill_id))

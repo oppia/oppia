@@ -322,10 +322,10 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
         Returns:
             tuple(str, list(tuple), dict). A tuple with first element as
-                external model name, second element as a tuple of
-                cls.external_instance_details and the third element
-                as a properties dict with key as property name in summary
-                model and value as property name in external model.
+            external model name, second element as a tuple of
+            cls.external_instance_details and the third element
+            as a properties dict with key as property name in summary
+            model and value as property name in external model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -487,7 +487,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
 
         Returns:
             change_domain.BaseChange. A domain object class for the
-                changes made by commit commands of the model.
+            changes made by commit commands of the model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -687,10 +687,10 @@ class BaseUserModelValidator(BaseModelValidator):
 
         Returns:
             list(tuple(str, str, list, str, list).
-                A list of tuple which consists of External model name,
-                property name in model, list of property value in model,
-                property name in external model, list of property value
-                in external model.
+            A list of tuple which consists of External model name,
+            property name in model, list of property value in model,
+            property name in external model, list of property value
+            in external model.
         """
         return []
 

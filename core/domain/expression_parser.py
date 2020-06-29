@@ -70,8 +70,7 @@ def contains_balanced_brackets(expression):
         expression: str. A math expression (algebraic/numeric).
 
     Returns:
-        bool. Whether the given expression contains a balanced
-            bracket sequence.
+        bool. Whether the given expression contains a balanced bracket sequence.
     """
     openers, closers = '({[', ')}]'
     stack = []
@@ -95,8 +94,8 @@ def is_algebraic(expression):
         expression: str. A math expression.
 
     Returns:
-        bool. Whether the given expression contains at least one single
-            latin letter or greek symbol name.
+        bool. Whether the given expression contains at least one single latin
+        letter or greek symbol name.
 
     Raises:
         Exception: Invalid syntax.
@@ -119,7 +118,7 @@ def tokenize(expression):
 
     Returns:
         list(Token). A list containing token objects formed from the given math
-            expression.
+        expression.
 
     Raises:
         Exception: Invalid token.
@@ -579,8 +578,8 @@ class Parser(python_utils.OBJECT):
 
         Returns:
             Token|None. Token at the next position. Returns None if there are no
-                more tokens left or the next token text is not in the
-                allowed_token_texts.
+            more tokens left or the next token text is not in the
+            allowed_token_texts.
         """
         if self._next_token_index < len(token_list):
             text = token_list[self._next_token_index].text

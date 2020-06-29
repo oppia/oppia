@@ -75,7 +75,7 @@ def _get_expression_from_node_if_one_exists(
 
     Returns:
         expression: dict or None. Expression part of the node if the node
-            represents a component else None.
+        represents a component else None.
     """
     if parsed_node.type != 'ExpressionStatement':
         return

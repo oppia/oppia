@@ -62,7 +62,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
     Returns:
         int. The number of exploration summaries that are at least editable
-            by the given user.
+        by the given user.
     """
     return len(exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(

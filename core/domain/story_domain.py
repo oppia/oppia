@@ -265,7 +265,7 @@ class StoryNode(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -335,7 +335,7 @@ class StoryNode(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the story node are
-            invalid.
+                invalid.
         """
         if self.exploration_id:
             if not isinstance(self.exploration_id, python_utils.BASESTRING):
@@ -465,7 +465,7 @@ class StoryContents(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the story contents are
-            invalid.
+                invalid.
         """
         if not isinstance(self.nodes, list):
             raise utils.ValidationError(
@@ -624,7 +624,7 @@ class StoryContents(python_utils.OBJECT):
 
         Returns:
             StoryNode or None. The StoryNode object of the corresponding
-                exploration id if exist else None.
+            exploration id if exist else None.
         """
         for node in self.nodes:
             if node.exploration_id == exp_id:
@@ -735,7 +735,7 @@ class Story(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -845,7 +845,7 @@ class Story(python_utils.OBJECT):
 
         Returns:
             list(str). The union of the acquired skill IDs corresponding to
-                each of the node IDs.
+            each of the node IDs.
         """
         acquired_skill_ids = []
         for node in self.story_contents.nodes:
@@ -864,7 +864,7 @@ class Story(python_utils.OBJECT):
 
         Returns:
             list(str)|None. The list of prerequisite skill ids for the
-                exploration or None, if no node is linked to it.
+            exploration or None, if no node is linked to it.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exp_id:
@@ -1087,7 +1087,7 @@ class Story(python_utils.OBJECT):
 
         Returns:
             bool. Whether a node with the given exploration ID is already
-                present.
+            present.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exploration_id:

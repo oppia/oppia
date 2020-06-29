@@ -90,7 +90,7 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
     def to_dict(self):
         """Return dictionary representation of ActivityIdsInLearnerDashboard.
 
-        Return:
+        Returns:
             dict. The keys of the dict are:
                 'completed_exploration_ids': list(str). The ids of the
                     explorations that are completed.

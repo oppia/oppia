@@ -272,7 +272,7 @@ class StoryReference(python_utils.OBJECT):
 
         Returns:
             StoryReference. A story reference object with given story_id and
-                'not published' status.
+            'not published' status.
         """
         return cls(story_id, False)
 
@@ -357,7 +357,7 @@ class Subtopic(python_utils.OBJECT):
 
         Returns:
             Subtopic. A subtopic object with given id, title and empty skill ids
-                list.
+            list.
         """
         return cls(subtopic_id, title, [], None, None)
 
@@ -378,7 +378,7 @@ class Subtopic(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -582,7 +582,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -1003,7 +1003,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_abbreviated_name: str. The updated abbreviated_name
-            for the topic.
+                for the topic.
         """
         self.abbreviated_name = new_abbreviated_name
 
@@ -1012,7 +1012,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
-            for the topic.
+                for the topic.
         """
         self.thumbnail_filename = new_thumbnail_filename
 
@@ -1021,7 +1021,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_bg_color: str|None. The updated thumbnail background
-            color for the topic.
+                color for the topic.
         """
         self.thumbnail_bg_color = new_thumbnail_bg_color
 
@@ -1086,7 +1086,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             list(dict). The list of all subtopics present
-                in topic.
+            in topic.
         """
         subtopics = []
         for _, subtopic in enumerate(self.subtopics):
@@ -1103,7 +1103,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             int or None. Returns the index of the subtopic if it exists or else
-                None.
+            None.
         """
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
@@ -1459,7 +1459,7 @@ class TopicRights(python_utils.OBJECT):
 
         Returns:
             dict. A dict version of TopicRights suitable for use by the
-                frontend.
+            frontend.
         """
         return {
             'topic_id': self.id,

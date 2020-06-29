@@ -174,7 +174,7 @@ def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
-    Return:
+    Returns:
         bool: Whether there is a running Oppia instance.
     """
     running = False
@@ -271,9 +271,9 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
-        in dev mode.
+            in dev mode.
         deparallelize_terser: bool. Represents whether to use webpack
-        compilation config that disables parallelism on terser plugin.
+            compilation config that disables parallelism on terser plugin.
     """
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')

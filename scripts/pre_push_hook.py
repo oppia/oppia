@@ -235,7 +235,7 @@ def collect_files_being_pushed(ref_list, remote):
 
     Returns:
         dict: Dict mapping branch names to 2-tuples of the form (list of
-            changed files, list of files to lint).
+        changed files, list of files to lint).
     """
     if not ref_list:
         return {}
@@ -345,7 +345,7 @@ def does_diff_include_js_or_ts_files(diff_files):
 
     Returns:
         bool. Whether the diff contains changes in any JavaScript or TypeScript
-            files.
+        files.
     """
 
     for file_path in diff_files:

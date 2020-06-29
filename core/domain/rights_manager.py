@@ -119,9 +119,9 @@ class ActivityRights(python_utils.OBJECT):
         """Validates an ActivityRights object.
 
         Raises:
-          utils.ValidationError: if any of the owners, editors, voice artists
-          and viewers lists overlap, or if a community-owned exploration has
-          owners, editors, voice artists or viewers specified.
+            utils.ValidationError: if any of the owners, editors, voice artists
+                and viewers lists overlap, or if a community-owned exploration
+                has owners, editors, voice artists or viewers specified.
         """
         if self.community_owned:
             if (self.owner_ids or self.editor_ids or self.voice_artist_ids or
@@ -174,7 +174,7 @@ class ActivityRights(python_utils.OBJECT):
 
         Returns:
             dict. A dict version of ActivityRights suitable for use by the
-                frontend.
+            frontend.
         """
         if self.community_owned:
             return {
@@ -513,8 +513,8 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
         exp_ids: list(str). List of exploration ids.
 
     Returns:
-        list(ActivityRights or None). List of rights object containing
-            ActivityRights object for existing exploration or None.
+        list(ActivityRights or None). List of rights object --> ActivityRights
+        objects for existing exploration or None.
     """
     exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
         exp_ids)
@@ -627,7 +627,7 @@ def get_collection_owner_names(collection_id):
 
     Returns:
         list(str). Human-readable usernames (or truncated email addresses) of
-            owners for this collection.
+        owners for this collection.
     """
     collection_rights = get_collection_rights(collection_id)
     return user_services.get_human_readable_user_ids(

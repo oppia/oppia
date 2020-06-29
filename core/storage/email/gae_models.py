@@ -212,7 +212,7 @@ class SentEmailModel(base_models.BaseModel):
 
         Returns:
             list(SentEmailModel). A list of emails which have the given hash
-                value and sent more recently than sent_datetime_lower_bound.
+            value and sent more recently than sent_datetime_lower_bound.
 
         Raises:
             Exception: sent_datetime_lower_bound is not a valid
@@ -261,14 +261,14 @@ class SentEmailModel(base_models.BaseModel):
         email_body, whether a similar message has been sent in the last
         DUPLICATE_EMAIL_INTERVAL_MINS.
 
-         Args:
+        Args:
             recipient_id: str. The user ID of the email recipient.
             email_subject: str. The subject line of the email.
             email_body: str. The HTML content of the email body.
 
         Returns:
             bool. Whether a similar message has been sent to the same recipient
-                in the last DUPLICATE_EMAIL_INTERVAL_MINS.
+            in the last DUPLICATE_EMAIL_INTERVAL_MINS.
         """
 
         email_hash = cls._generate_hash(
@@ -449,7 +449,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         Returns:
             str. The unique id used in the reply-to email address in outgoing
-                feedback and suggestion emails.
+            feedback and suggestion emails.
         """
         return '.'.join([user_id, thread_id])
 
@@ -532,8 +532,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                 instance id exists in the datastore. Default is True.
 
         Returns:
-            A FeedbackEmailReplyToIdModel instance that corresponds to the given
-                instance id if it is present in the datastore. Otherwise, None.
+            FeedbackEmailReplyToIdModel|None. An instance that corresponds to
+            the given instance id if it is present in the datastore.
         """
         instance_id = cls._generate_id(user_id, thread_id)
         return super(
@@ -551,9 +551,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         Returns:
             dict. The FeedbackEmailReplyToIdModel instances corresponding to the
-                given list of user ids in dict format. The key is the unique
-                user id, and the corresponding value is the list of
-                FeedbackEmailReplyToIdModel instances.
+            given list of user ids in dict format. The key is the unique user id
+            and the corresponding value is the list of
+            FeedbackEmailReplyToIdModel instances.
         """
         instance_ids = [cls._generate_id(user_id, thread_id)
                         for user_id in user_ids]
@@ -570,9 +570,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict. A dict whose keys are IDs of threads the user is
-            involved in. The corresponding value is the reply_to_id of that
-            thread.
+            dict. A dict whose keys are IDs of threads the user is involved in.
+            The corresponding value is the reply_to_id of that thread.
         """
         user_data = {}
         email_reply_models = cls.get_all().filter(cls.user_id == user_id)
