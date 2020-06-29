@@ -119,7 +119,7 @@ describe('Skills List Directive', function() {
     expect(ctrl.getSerialNumberForSkill(2)).toEqual(48);
   });
 
-  fit('should reinitialize the page after successfully deleting the skill',
+  it('should reinitialize the page after successfully deleting the skill',
     function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
