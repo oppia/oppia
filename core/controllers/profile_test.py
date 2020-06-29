@@ -29,7 +29,11 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import json
+import os
+import python_utils
 import utils
+import zipfile
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -854,7 +858,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             user_services, 'record_user_logged_in', lambda *args: None)
 
         with constants_swap, time_swap:
-            data = self.get_json('/export-account-handler')
+            data = self.get_custom_response('/export-account-handler', 'text/plain')
             expected_data = {
                 u'topic_rights_data': {
                     u'managed_topic_ids': []
@@ -922,7 +926,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                     u'preferred_site_language_code': None,
                     u'user_bio': u'',
                     u'profile_picture_data_url':
-                        user_services.DEFAULT_IDENTICON_DATA_URL,
+                        'images/user_settings_profile_picture.png',
                     u'role': u'EXPLORATION_EDITOR',
                     u'last_edited_an_exploration': None,
                     u'email': u'editor@example.com',
@@ -937,9 +941,33 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                     u'task_ids_closed_by_user': [],
                 },
             }
+            # Check downloaded zip file.
+            filename = 'oppia_data.zip'
+            self.assertEqual(data.headers['Content-Disposition'],
+                'attachment; filename=%s' % filename)
+            zf_saved = zipfile.ZipFile(
+                python_utils.string_io(buffer_value=data.body))
             self.assertEqual(
-                data,
-                expected_data
+                zf_saved.namelist(),
+                ['oppia_data.json', 'images/user_settings_profile_picture.png'])
+
+            # Load golden zip file.
+            golden_zip_filepath = os.path.join(
+                feconf.TESTS_DATA_DIR,
+                'oppia_data.zip')
+            with python_utils.open_file(
+                golden_zip_filepath, 'rb', encoding=None) as f:
+                golden_zipfile = f.read()
+            zf_gold = zipfile.ZipFile(
+                python_utils.string_io(buffer_value=golden_zipfile))
+            
+            self.assertEqual(
+                zf_saved.open('oppia_data.json').read(),
+                zf_gold.open('oppia_data.json').read()
+            )
+            self.assertEqual(
+                zf_saved.open('images/user_settings_profile_picture.png').read(),
+                zf_gold.open('images/user_settings_profile_picture.png').read()
             )
 
     def test_export_account_handler_disabled_logged_in(self):

@@ -607,11 +607,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         # Perform export and compare.
-        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        observed_data, observed_images = takeout_service.export_data_for_user(
+            self.USER_ID_1)
         self.assertEqual(expected_data, observed_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
+        expected_images = []
+        self.assertEqual(expected_images, observed_images)
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
@@ -783,7 +786,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
             'last_logged_in': self.GENERIC_EPOCH,
             'last_edited_an_exploration': self.GENERIC_EPOCH,
-            'profile_picture_data_url': self.GENERIC_IMAGE_URL,
+            'profile_picture_data_url': 'user_settings_profile_picture.png',
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': self.GENERIC_USER_BIO,
@@ -998,8 +1001,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        observed_data, observed_images = takeout_service.export_data_for_user(
+            self.USER_ID_1)
         self.assertEqual(observed_data, expected_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
         self.assertEqual(json.loads(observed_json), json.loads(expected_json))
+        expected_images = [
+            (self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
+        ]
+        self.assertEqual(expected_images, observed_images)

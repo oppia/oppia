@@ -66,5 +66,22 @@ def export_data_for_user(user_id):
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
         exported_data[final_name] = model.export_data(user_id)
 
-    # Combine the data into a single dictionary.
-    return exported_data
+    # Separate out images
+    IMAGE_PATHS = {
+        ('user_settings_data', 'profile_picture_data_url'):
+            'user_settings_profile_picture.png'
+    }
+    image_files = []
+    for image_path in IMAGE_PATHS:
+        # Iterate to the position indicated by the tuple.
+        data_pointer = exported_data
+        for key in image_path[:-1]:
+            data_pointer = data_pointer[key]
+        if (data_pointer[image_path[-1]] != None):
+            # Append (original value, desired filename).
+            image_files.append(
+                (data_pointer[image_path[-1]], IMAGE_PATHS[image_path])
+            )
+            data_pointer[image_path[-1]] = IMAGE_PATHS[image_path]
+
+    return (exported_data, image_files)
