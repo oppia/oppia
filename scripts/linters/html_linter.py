@@ -33,6 +33,16 @@ import html.parser # isort:skip
 # pylint: enable=wrong-import-position
 
 
+def _htmllint_trimmer(lint_messages):
+    """Remove extra bits from htmllint messages."""
+    summary_messages = ''
+    # Extracting messages and removing extra bits.
+    messages = lint_messages.split('\n')[:-2]
+    for message in messages:
+        summary_messages += message + '\n'
+    return summary_messages
+
+
 class TagMismatchException(Exception):
     """Error class for mismatch between start and end tags."""
     pass
@@ -377,7 +387,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 if error_count:
                     error_summary.append(error_count)
                     python_utils.PRINT(linter_stdout)
-                    summary_messages.append(linter_stdout)
+                    summary_messages.append(_htmllint_trimmer(linter_stdout))
 
         with linter_utils.redirect_stdout(stdout):
             if self.verbose_mode_enabled:

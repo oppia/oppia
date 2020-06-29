@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import re
 import subprocess
 import sys
 import time
@@ -28,6 +29,22 @@ import python_utils
 
 from . import linter_utils
 from .. import common
+
+
+def _stylelint_trimmer(lint_messages):
+    """Remove extra bits from stylelint messages."""
+    summary_messages = ''
+    # Extracting messages.
+    messages = lint_messages[0].split('\n')
+    for message in messages:
+        if re.search(r'^\d+:\d+', message.lstrip()):
+            message_list = message.split()
+            new_message = ' '.join(
+                message_list[:1] + message_list[2:-1])
+            summary_messages += new_message + '\n'
+        else:
+            summary_messages += message + '\n'
+    return summary_messages
 
 
 class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
@@ -108,7 +125,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-                summary_messages.append(error)
+            summary_messages.append(_stylelint_trimmer(result_list))
             summary_message = ('%s %s CSS file' % (
                 linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:

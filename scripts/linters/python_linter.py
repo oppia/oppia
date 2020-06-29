@@ -53,7 +53,6 @@ def _pylint_trimmer(lint_messages):
     """Remove extra bits from pylint messages."""
     summary_messages = ''
     # Remove extra bits from end of pylint messages.
-    python_utils.PRINT(lint_messages)
     lint_messages = lint_messages[:-5]
     for message in lint_messages:
         python_utils.PRINT(message)

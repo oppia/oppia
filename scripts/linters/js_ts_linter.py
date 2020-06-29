@@ -57,7 +57,7 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
 def _eslint_trimmer(lint_messages):
     """Remove extra bits from eslint messages."""
     summary_messages = ''
-    # Remove extra bits from the end of message output.
+    # Extracting messages.
     messages = lint_messages[0].split('\n')[:-4]
     for message in messages:
         if re.search(r'^\d+:\d+', message.lstrip()):

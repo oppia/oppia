@@ -16,7 +16,7 @@
   in order to work in IE.
 */
 @-webkit-keyframes dot {
-  0% { opacity: 0; }
+  0% { opacity : 0; }
   100% { opacity: 1; }
 }
 @-moz-keyframes dot {
