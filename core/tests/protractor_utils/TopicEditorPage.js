@@ -106,6 +106,7 @@ var TopicEditorPage = function() {
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
+  var toastSuccessElement = element(by.css('.toast-success'));
 
   this.get = async function(topicId) {
     await browser.get(EDITOR_URL_PREFIX + topicId);
@@ -389,7 +390,8 @@ var TopicEditorPage = function() {
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
     await closeSaveModalButton.click();
-    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      toastSuccessElement, 'Topic takes too long to get saved.');
   };
 };
 
