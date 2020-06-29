@@ -16,6 +16,7 @@
  * @fileoverview Requires for all the object templates.
  */
 
+require('objects/templates/algebraic-expression-editor.component.ts');
 require('objects/templates/boolean-editor.directive.ts');
 require('objects/templates/code-string-editor.directive.ts');
 require('objects/templates/coord-two-dim-editor.directive.ts');
@@ -33,8 +34,8 @@ require('objects/templates/list-of-tabs-editor.directive.ts');
 require('objects/templates/list-of-unicode-string-editor.directive.ts');
 require('objects/templates/logic-error-category-editor.directive.ts');
 require('objects/templates/logic-question-editor.directive.ts');
-require('objects/templates/math-editor.component.ts');
-require('objects/templates/math-latex-string-editor.directive.ts');
+require('objects/templates/math-equation-editor.component.ts');
+require('objects/templates/math-expression-content-editor.directive.ts');
 require('objects/templates/music-phrase-editor.directive.ts');
 require('objects/templates/nonnegative-int-editor.directive.ts');
 require('objects/templates/normalized-string-editor.directive.ts');

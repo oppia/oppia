@@ -54,7 +54,7 @@ export class GraphUtilsService {
       adjacencyLists.push([]);
     }
 
-    // If a graph is undirected, all modes work the same way anyway
+    // If a graph is undirected, all modes work the same way anyway.
     if (!graph.isDirected) {
       adjacencyListMode = this.GRAPH_ADJACENCY_MODE.UNDIRECTED;
     }
@@ -151,9 +151,9 @@ export class GraphUtilsService {
 
   nextPermutation(permutation: number[]): number[] {
     // Generates (in place) the next lexicographical permutation.
-    // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
+    // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1].
 
-    // Find the pivot to longest decreasing suffix and successor
+    // Find the pivot to longest decreasing suffix and successor.
     var pivot = null;
     var successor = null;
     permutation.reduce((
@@ -171,7 +171,7 @@ export class GraphUtilsService {
       return null;
     }
 
-    // Swap the pivot and successor and reverse the suffix
+    // Swap the pivot and successor and reverse the suffix.
     var tmp = permutation[pivot];
     permutation[pivot] = permutation[successor];
     permutation[successor] = tmp;

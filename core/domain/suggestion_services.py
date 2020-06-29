@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
+from core.domain import html_validation_service
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
@@ -233,6 +234,13 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
     suggestion.pre_accept_validate()
+    html_string = ''.join(suggestion.get_all_html_content_strings())
+    error_list = (
+        html_validation_service.
+        validate_math_tags_in_html_with_attribute_math_content(
+            html_string))
+    if len(error_list) > 0:
+        raise Exception('Invalid math tags found in the suggestion.')
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
