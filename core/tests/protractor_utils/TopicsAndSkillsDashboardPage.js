@@ -325,12 +325,12 @@ var TopicsAndSkillsDashboardPage = function() {
       await createSkillButton.click();
     } else {
       await this.navigateToSkillsTab();
-      var createSkillButtonSecondaryButton = element(
+      var createSkillButtonSecondary = element(
         by.css('.protractor-test-create-skill-button-circle'));
       await waitFor.elementToBeClickable(
-        createSkillButtonSecondaryButton,
+        createSkillButtonSecondary,
         'Create Skill button takes too long to be clickable');
-      await createSkillButtonSecondaryButton.click();
+      await createSkillButtonSecondary.click();
     }
 
     await waitFor.visibilityOf(

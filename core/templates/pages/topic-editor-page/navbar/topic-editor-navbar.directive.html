@@ -55,7 +55,7 @@
 <div class="topic-nav-mobile">
   <div class="topic-navbar-mobile-tabs">
     <div class="save-change-btn-container">
-      <button class="btn btn-save-changes"
+      <button class="btn save-changes-btn"
               ng-click="saveChanges()">
         <span ng-if="isSaveInProgress()">
           <span>Saving</span>
@@ -71,7 +71,7 @@
       <div class="arrow-up-container" ng-click="toggleDiscardChangeButton()">
         <i class="fa fa-arrow-up"></i>
       </div>
-      <button type="button" class="btn btn-discard-changes"
+      <button type="button" class="btn discard-changes-btn"
               ng-if="discardChangesButtonIsShown"
               ng-click="discardChanges()">
         Discard Changes
@@ -124,13 +124,13 @@
       flex-wrap: wrap;
       width: 50%;
     }
-    topic-editor-navbar .btn-save-changes {
+    topic-editor-navbar .save-changes-btn {
       background-color: #008098;
       color: #FFFFFF;
       font-weight: bold;
       width: 80%;
     }
-    topic-editor-navbar .btn-discard-changes {
+    topic-editor-navbar .discard-changes-btn {
       background-color: #008098;
       bottom: 47px;
       color: #FFFFFF;
