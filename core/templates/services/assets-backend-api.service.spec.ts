@@ -43,10 +43,10 @@ interface ErrorResponseType {
 
 fdescribe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
-    var serviceInstance = null;
-    var httpTestingController = null;
-    var audioRequestUrl = null;
-    var imageRequestUrl = null;
+    let serviceInstance = null;
+    let httpTestingController = null;
+    let audioRequestUrl = null;
+    let imageRequestUrl = null;
     const EXAMPLE_AUDIO = new Blob(['audio data'], {type: 'audiotype'});
     const EXAMPLE_IMAGE = new Blob(['image data'], {type: 'imagetype'});
 
@@ -101,15 +101,15 @@ fdescribe('Assets Backend API Service', () => {
     });
 
     it('should successfully fetch and cache audio', fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
 
 
       serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(audioRequestUrl);
+      const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
       expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .audio.length).toBe(1);
@@ -123,13 +123,13 @@ fdescribe('Assets Backend API Service', () => {
     }));
 
     it('should not fetch an audio if it is already cached', fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
       serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(audioRequestUrl);
+      const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
       req.flush(EXAMPLE_AUDIO);
       flushMicrotasks();
@@ -150,14 +150,14 @@ fdescribe('Assets Backend API Service', () => {
     }));
 
     it('should handler rejection when fetching a file fails', fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
 
       serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(audioRequestUrl);
+      const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
       req.error();
       flushMicrotasks();
@@ -167,12 +167,12 @@ fdescribe('Assets Backend API Service', () => {
     }));
 
     it('should successfully save an audio', () => {
-      var successMessage = 'Audio was successfully saved.';
+      const successMessage = 'Audio was successfully saved.';
       serviceInstance.csrfTokenService.initializeToken();
       // @ts-ignore in order to ignore JQuery properties that should
       // be declarated.
       spyOn($, 'ajax').and.callFake(() => {
-        var d = $.Deferred();
+        const d = $.Deferred();
         d.resolve(successMessage);
         return d.promise();
       });
@@ -184,12 +184,12 @@ fdescribe('Assets Backend API Service', () => {
     });
 
     it('should handle rejection when saving a file fails', () => {
-      var errorMessage = 'Error on saving audio';
+      const errorMessage = 'Error on saving audio';
       serviceInstance.csrfTokenService.initializeToken();
       // @ts-ignore in order to ignore JQuery properties that should
       // be declarated.
       spyOn($, 'ajax').and.callFake(() => {
-        var d = $.Deferred();
+        const d = $.Deferred();
         d.reject({
           // responseText contains a XSSI Prefix, which is represented by )]}'
           // string. That's why double quotes is being used here. It's not
@@ -211,15 +211,15 @@ fdescribe('Assets Backend API Service', () => {
     });
 
     it('should successfully fetch and cache image', fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       expect(serviceInstance.isCached('myfile.png')).toBe(false);
 
       serviceInstance.loadImage(
         AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(imageRequestUrl);
+      const req = httpTestingController.expectOne(imageRequestUrl);
       expect(req.request.method).toEqual('GET');
       expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .image.length).toBe(1);
@@ -281,8 +281,8 @@ fdescribe('Assets Backend API Service', () => {
 
     it('should call the provided failure handler on HTTP failure for an image',
       fakeAsync(() => {
-        var successHandler = jasmine.createSpy('success');
-        var failHandler = jasmine.createSpy('fail');
+        const successHandler = jasmine.createSpy('success');
+        const failHandler = jasmine.createSpy('fail');
 
         serviceInstance.loadImage(
           AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
@@ -298,8 +298,8 @@ fdescribe('Assets Backend API Service', () => {
 
     it('should successfully abort the download of all the audio files',
       fakeAsync(() => {
-        var successHandler = jasmine.createSpy('success');
-        var failHandler = jasmine.createSpy('fail');
+        const successHandler = jasmine.createSpy('success');
+        const failHandler = jasmine.createSpy('fail');
 
         serviceInstance.loadAudio('0', 'myfile.mp3').then(
           successHandler, failHandler);
@@ -316,8 +316,8 @@ fdescribe('Assets Backend API Service', () => {
 
     it('should successfully abort the download of the all the image files',
       fakeAsync(() => {
-        var successHandler = jasmine.createSpy('success');
-        var failHandler = jasmine.createSpy('fail');
+        const successHandler = jasmine.createSpy('success');
+        const failHandler = jasmine.createSpy('fail');
 
         serviceInstance.loadImage(
           AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
@@ -334,8 +334,8 @@ fdescribe('Assets Backend API Service', () => {
       }));
 
     it('should use the correct blob type for audio assets', fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
@@ -356,8 +356,8 @@ fdescribe('Assets Backend API Service', () => {
   });
 
   describe('without dev mode settings', () => {
-    var oldGcsResourceBucketName: string = null;
-    var oldDevMode: boolean = null;
+    let oldGcsResourceBucketName: string = null;
+    let oldDevMode: boolean = null;
     beforeAll(() => {
       oldGcsResourceBucketName = Constants.GCS_RESOURCE_BUCKET_NAME;
       Constants.GCS_RESOURCE_BUCKET_NAME = '';
@@ -386,10 +386,10 @@ fdescribe('Assets Backend API Service', () => {
   });
 
   describe('on production mode', () => {
-    var serviceInstance: AssetsBackendApiService = null;
-    var httpTestingController: HttpTestingController = null;
+    let serviceInstance: AssetsBackendApiService = null;
+    let httpTestingController: HttpTestingController = null;
     const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
-    var oldDevMode: boolean = null;
+    let oldDevMode: boolean = null;
 
     beforeAll(() => {
       oldDevMode = Constants.DEV_MODE;

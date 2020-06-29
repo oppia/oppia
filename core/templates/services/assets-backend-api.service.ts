@@ -17,20 +17,21 @@
  * assets from Google Cloud Storage.
  */
 // Jquery import is needed here in order to spy ajax method on unit tests.
-import $ from 'jquery';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { AppConstants } from 'app.constants';
 import { AudioFileObjectFactory, AudioFile } from
   'domain/utilities/AudioFileObjectFactory';
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { FileDownloadRequestObjectFactory, FileDownloadRequest } from
   'domain/utilities/FileDownloadRequestObjectFactory';
+import { HttpClient } from '@angular/common/http';
 import { ImageFileObjectFactory, ImageFile } from
   'domain/utilities/ImageFileObjectFactory';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import { Injectable } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { AppConstants } from 'app.constants'; // For ENTITY_TYPE
+import { downgradeInjectable } from '@angular/upgrade/static';
+import $ from 'jquery';
 
 require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
@@ -38,7 +39,6 @@ require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/csrf-token.service.ts');
 
-// For DEV_MODE and GCS_RESOURCE_BUCKET_NAME
 const Constants = require('constants.ts');
 
 interface PendingRequestsType {
@@ -119,7 +119,7 @@ export class AssetsBackendApiService {
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void
   ): void {
-    var subscription = this.http.get(
+    const subscription: Subscription = this.http.get(
       this._getDownloadUrl(entityType, entityId, filename, assetType),
       {
         responseType: 'blob',
@@ -127,7 +127,7 @@ export class AssetsBackendApiService {
       }
     ).subscribe(
       data => {
-        var assetBlob = new Blob([data], {type: data.type});
+        const assetBlob: Blob = new Blob([data], {type: data.type});
         this.assetsCache[filename] = assetBlob;
         if (assetType === this.ASSET_TYPE_AUDIO) {
           this.audioFileObjectFactory.createNew(filename, assetBlob);
@@ -157,10 +157,9 @@ export class AssetsBackendApiService {
     }
   }
 
-  // TODO: Figure out return type
-  private _removeXSSIPrefix(data: string) {
-    var transformedData = data.substring(5);
-    var parsedResponse = JSON.parse(transformedData);
+  private _removeXSSIPrefix(data: string): any {
+    const transformedData: string = data.substring(5);
+    const parsedResponse: any = JSON.parse(transformedData);
     return parsedResponse;
   }
 
@@ -181,7 +180,7 @@ export class AssetsBackendApiService {
   private _removeFromFilesCurrentlyBeingRequested(
       filename: string, assetType: string): void {
     if (this._isAssetCurrentlyBeingRequested(filename, this.ASSET_TYPE_AUDIO)) {
-      for (var index = 0; index <
+      for (let index: number = 0; index <
            this._audioFilesCurrentlyBeingRequested.length; index++) {
         if (
           this._audioFilesCurrentlyBeingRequested[index].filename === filename
@@ -193,7 +192,7 @@ export class AssetsBackendApiService {
     } else if (
       this._isAssetCurrentlyBeingRequested(filename, this.ASSET_TYPE_IMAGE)
     ) {
-      for (var index = 0; index <
+      for (let index: number = 0; index <
            this._imageFilesCurrentlyBeingRequested.length; index++) {
         if (
           this._imageFilesCurrentlyBeingRequested[index].filename === filename
@@ -205,21 +204,20 @@ export class AssetsBackendApiService {
     }
   }
 
-  // TODO: Figure out rawAssetData type
   private _saveAudio(
       explorationId: string,
       filename: string,
-      rawAssetData,
+      rawAssetData: File,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void
   ): void {
-    var form = new FormData();
+    const form: FormData = new FormData();
 
     form.append('raw_audio_file', rawAssetData);
     form.append('payload', JSON.stringify({
       filename: filename
     }));
-    this.csrfTokenService.getTokenAsync().then(function(token) {
+    this.csrfTokenService.getTokenAsync().then(function(token: string) {
       form.append('csrf_token', token);
       $.ajax({
         url: this._getAudioUploadUrl(explorationId),
@@ -235,7 +233,7 @@ export class AssetsBackendApiService {
         }
       }).fail(function(data) {
         // Remove the XSSI prefix.
-        var parsedResponse = this._removeXSSIPrefix(data.responseText);
+        const parsedResponse: any = this._removeXSSIPrefix(data.responseText);
         if (errorCallback) {
           errorCallback(parsedResponse);
         }
@@ -244,10 +242,13 @@ export class AssetsBackendApiService {
   }
 
   private _getDownloadUrl(
-      entityType: string, entityId: string, filename: string,
-      assetType: string): string {
-    var urlTemplate = null;
-    urlTemplate = this.ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
+      entityType: string,
+      entityId: string,
+      filename: string,
+      assetType: string
+  ): string {
+    const urlTemplate: string =
+      this.ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
     return this.urlInterpolationService.interpolateUrl(
       urlTemplate, {
         entity_id: entityId,
@@ -294,8 +295,10 @@ export class AssetsBackendApiService {
   }
 
   loadImage(
-      entityType: string, entityId: string,
-      filename: string): Promise<ImageFile> {
+      entityType: string,
+      entityId: string,
+      filename: string
+  ): Promise<ImageFile> {
     return new Promise((resolve, reject) => {
       if (this._isCached(filename)) {
         resolve(this.imageFileObjectFactory.createNew(
@@ -307,11 +310,9 @@ export class AssetsBackendApiService {
     });
   }
 
-  // TODO: Figure out type of rawAssetData
-  // TODO: Figure out type of returned promise (string?)
   saveAudio(
       explorationId: string, filename: string,
-      rawAssetData): Promise<string> {
+      rawAssetData: File): Promise<string> {
     return new Promise((resolve, reject) => {
       this._saveAudio(explorationId, filename, rawAssetData, resolve, reject);
     });
