@@ -1,4 +1,4 @@
-<ul class="navbar-desktop nav navbar-nav oppinavbar-desktopa-navbar-nav float-right ng-cloak"
+<ul class="navbar-desktop nav navbar-nav oppina-navbar-nav float-right ng-cloak"
     ng-if="topicRights.canEditTopic()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
@@ -63,8 +63,7 @@
         <span ng-if="!isSaveInProgress()">
           Save Changes
         </span>
-        <span style="opacity: 0.5;margin-left: 2px;"
-              ng-if="getChangeListLength() > 0">
+        <span ng-if="getChangeListLength() > 0">
               (<[getChangeListLength()]>)
         </span>
       </button>

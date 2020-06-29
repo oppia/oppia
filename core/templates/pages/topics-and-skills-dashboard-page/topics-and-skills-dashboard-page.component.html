@@ -68,10 +68,10 @@
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value"
                       ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
-                  <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active">
+                  <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active">
                     <span><[$index+1]></span>
                   </span>
-                  <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
+                  <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
                 </span>
                 <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
               </div>
@@ -117,8 +117,8 @@
               <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-value"
                     ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
-                <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
-                <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
+                <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active"><[$index+1]></span>
+                <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
               </span>
               <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
             </div>
@@ -144,11 +144,11 @@
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Topic</span>
             </div>
-            <div ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_SKILLS"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Skill</span>
             </div>
