@@ -925,7 +925,34 @@ class DeployTests(test_utils.GenericTestBase):
                 'https://travis-ci.org/username/oppia/branches',
                 'https://circleci.com/gh/username/workflows/oppia'])
 
-    def test_check_release_doc(self):
+    def test_check_release_doc_with_hotfix_branch(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
+        def mock_get_branch():
+            return 'release-1.2.3-hotfix-1'
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with open_tab_swap, ask_user_swap, get_branch_swap:
+            deploy.check_release_doc()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_check_release_doc_with_non_hotfix_branch(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
             'ask_user_to_confirm_is_called': False
@@ -944,6 +971,6 @@ class DeployTests(test_utils.GenericTestBase):
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
-        with open_tab_swap, ask_user_swap:
+        with open_tab_swap, ask_user_swap, self.get_branch_swap:
             deploy.check_release_doc()
         self.assertEqual(check_function_calls, expected_check_function_calls)

@@ -316,10 +316,17 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 pre_push_hook.get_remote_branch_name(), 'develop')
 
     def test_collect_files_being_pushed_with_empty_ref_list(self):
-        self.assertEqual(
-            pre_push_hook.collect_files_being_pushed([], 'remote'), {})
+        def mock_get_branch():
+            return 'branch-1'
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with get_branch_swap:
+            self.assertEqual(
+                pre_push_hook.collect_files_being_pushed([], 'remote'), {})
 
     def test_collect_files_being_pushed_with_non_empty_ref_list(self):
+        def mock_get_branch():
+            return 'branch-1'
         # pylint: disable=unused-argument
         def mock_compare_to_remote(
                 unused_remote, unused_local_branch, remote_branch=None):
@@ -328,12 +335,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_extract_files_to_lint(unused_file_diffs):
             return ['file1', 'file2']
 
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
         compare_to_remote_swap = self.swap(
             pre_push_hook, 'compare_to_remote', mock_compare_to_remote)
         extract_files_swap = self.swap(
             pre_push_hook, 'extract_files_to_lint', mock_extract_files_to_lint)
 
-        with compare_to_remote_swap, extract_files_swap:
+        with compare_to_remote_swap, extract_files_swap, get_branch_swap:
             self.assertEqual(
                 pre_push_hook.collect_files_being_pushed([
                     pre_push_hook.GitRef(
