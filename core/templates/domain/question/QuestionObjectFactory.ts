@@ -17,8 +17,6 @@
  * question domain objects.
  */
 
-// require('domain/state/StateObjectFactory.ts');
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';

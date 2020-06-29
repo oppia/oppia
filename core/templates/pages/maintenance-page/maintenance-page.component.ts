@@ -13,24 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview The controller for the maintenance page.
+ * @fileoverview The component for the maintenance page.
  */
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/document-attribute-customization.service.ts');
 
-angular.module('oppia').controller('Maintenance', [
-  '$scope', 'DocumentAttributeCustomizationService', 'UrlInterpolationService',
-  function(
-      $scope, DocumentAttributeCustomizationService, UrlInterpolationService) {
-    let ctrl = this;
-    $scope.getStaticImageUrl = function(imagePath) {
-      return UrlInterpolationService.getStaticImageUrl(imagePath);
-    };
-    ctrl.$onInit = function() {
-      $scope.currentLang = 'en';
-      DocumentAttributeCustomizationService.addAttribute(
-        'lang', $scope.currentLang);
-    };
-  }
-]);
+angular.module('oppia').component('maintenancePage', {
+  template: require('./maintenance-page.component.html'),
+  controller: [
+    '$scope', 'DocumentAttributeCustomizationService',
+    'UrlInterpolationService',
+    function(
+        $scope, DocumentAttributeCustomizationService,
+        UrlInterpolationService) {
+      let ctrl = this;
+      $scope.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
+      ctrl.$onInit = function() {
+        $scope.currentLang = 'en';
+        DocumentAttributeCustomizationService.addAttribute(
+          'lang', $scope.currentLang);
+      };
+    }
+  ]
+});
