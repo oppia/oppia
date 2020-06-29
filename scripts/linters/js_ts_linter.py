@@ -23,6 +23,7 @@ import collections
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -30,7 +31,6 @@ import time
 import python_utils
 
 from . import linter_utils
-from .. import clean
 from .. import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -1062,7 +1062,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             return []
 
         # Clear temp compiled typescipt files from previous runs.
-        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
+        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
         compile_all_ts_files()
 
@@ -1083,7 +1083,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         comments_style_messages = self._check_comments()
 
         # Clear temp compiled typescipt files.
-        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
+        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         all_messages = (
             any_type_messages + extra_js_files_messages +
