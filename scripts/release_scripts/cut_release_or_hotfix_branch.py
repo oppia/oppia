@@ -175,7 +175,7 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
 
     Raises:
         Exception: The difference between two continuous hotfix numbers
-             is not one.
+            is not one.
     """
     all_branches = subprocess.check_output([
         'git', 'branch', '-a'])[:-1].split('\n')
