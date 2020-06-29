@@ -38,6 +38,7 @@ describe('Skills List Directive', function() {
   var $timeout = null;
   var EditableTopicBackendApiService = null;
   var TopicsAndSkillsDashboardBackendApiService = null;
+  var SkillBackendApiService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $uibModal = $injector.get('$uibModal');
@@ -48,8 +49,17 @@ describe('Skills List Directive', function() {
     $q = $injector.get('$q');
     TopicsAndSkillsDashboardBackendApiService = (
       $injector.get('TopicsAndSkillsDashboardBackendApiService'));
+    SkillBackendApiService = (
+      $injector.get('SkillBackendApiService'));
     var MockTopicsAndSkillsDashboardBackendApiService = {
       mergeSkills: () => {
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      }
+    };
+    var MockSkillBackendApiService = {
+      deleteSkill: () => {
         var deferred = $q.defer();
         deferred.resolve();
         return deferred.promise;
@@ -63,6 +73,7 @@ describe('Skills List Directive', function() {
       $scope: $scope,
       TopicsAndSkillsDashboardBackendApiService:
       MockTopicsAndSkillsDashboardBackendApiService,
+      SkillBackendApiService: MockSkillBackendApiService,
       $uibModal
     });
   }));
@@ -108,7 +119,7 @@ describe('Skills List Directive', function() {
     expect(ctrl.getSerialNumberForSkill(2)).toEqual(48);
   });
 
-  it('should reinitialize the page after successfully deleting the skill',
+  fit('should reinitialize the page after successfully deleting the skill',
     function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -120,8 +131,6 @@ describe('Skills List Directive', function() {
       $httpBackend.expectDELETE(url).respond(200);
       ctrl.deleteSkill(skillId);
 
-      $httpBackend.flush();
-      $timeout.flush();
       expect($rootScope.$broadcast).toHaveBeenCalledWith(
         'topicsAndSkillsDashboardReinitialized');
     });

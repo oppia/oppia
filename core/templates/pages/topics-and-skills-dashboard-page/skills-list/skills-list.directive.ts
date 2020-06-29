@@ -94,10 +94,8 @@ angular.module('oppia').directive('skillsList', [
             }).result.then(function() {
               SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
-                  $timeout(function() {
-                    $rootScope.$broadcast(
-                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                  }, 100);
+                  $rootScope.$broadcast(
+                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 }
               );
             }, function() {
