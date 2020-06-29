@@ -97,11 +97,9 @@
   },
   "keywords": [],
   "dependencies": {
-    "@angular/cdk": "^8.2.3",
     "@angular/common": "^8.0.0",
     "@angular/compiler": "^8.0.0",
     "@angular/core": "^8.0.0",
-    "@angular/flex-layout": "8.0.0-beta.27",
     "@angular/forms": "^8.0.0",
     "@angular/platform-browser": "^8.0.0",
     "@angular/platform-browser-dynamic": "^8.0.0",

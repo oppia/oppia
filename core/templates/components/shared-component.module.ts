@@ -21,8 +21,6 @@ import 'zone.js';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { FlexLayoutModule } from '@angular/flex-layout';
-
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
@@ -34,7 +32,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
-  imports: [CommonModule, FlexLayoutModule, NgbModalModule],
+  imports: [CommonModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
@@ -42,7 +40,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     ExplorationEmbedButtonModalComponent
   ],
   exports: [
-    BackgroundBannerComponent, FlexLayoutModule, TranslatePipe,
+    BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent,
   ],
 })

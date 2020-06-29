@@ -73,6 +73,15 @@ export class SharingLinksComponent implements OnInit {
       '/general/classroom.png');
   }
 
+  getFontAndFlexClass() {
+    let classes = '';
+    classes += this.smallFont ? 'font-small' : 'font-big';
+    classes += ' fx-' + this.layoutType;
+    classes += ' fx-main-' + this.layoutAlignType.split('-')[0];
+    classes += ' fx-cross-' + this.layoutAlignType.split('-')[1];
+    return classes;
+  }
+
   getUrl(network: SharingPlatform) {
     if (network === 'facebook') {
       return `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=${this.serverName}/${this.shareType}/${this.activityId}&display=popup&ref=plugin&src=share_button`;
