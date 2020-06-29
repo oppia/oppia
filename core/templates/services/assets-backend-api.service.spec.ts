@@ -41,7 +41,7 @@ interface ErrorResponseType {
   errorMessage: string;
 }
 
-fdescribe('Assets Backend API Service', () => {
+describe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
     let serviceInstance = null;
     let httpTestingController = null;
