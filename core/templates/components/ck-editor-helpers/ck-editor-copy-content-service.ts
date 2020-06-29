@@ -32,10 +32,6 @@ export class CkEditorCopyContentService {
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
-  toggleCopyMode() {
-    this.copyModeActive = !this.copyModeActive;
-  }
-
   /**
    * Traverses up and down element ancestors/descendants, searching for widget
    * tags
@@ -86,9 +82,8 @@ export class CkEditorCopyContentService {
    *    in which element contains, if so
    */
   private _handlePaste(
-      editor: CKEDITOR.editor,
+      editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
       element: HTMLElement,
-      disabledWidgets: string[],
       containedWidgetTagName?: string
   ) {
     let tagName = (
@@ -118,10 +113,6 @@ export class CkEditorCopyContentService {
         }
       }
 
-      if (disabledWidgets.includes(widgetName)) {
-        return;
-      }
-
       if (widgetName === 'oppiatabs' && startupData.tab_contents) {
         editor.execCommand(
           widgetName,
@@ -143,7 +134,6 @@ export class CkEditorCopyContentService {
   broadcastCopy(
       contentScope: IRootScopeService,
       target: HTMLElement,
-      disabledWidgets?: string[]
   ) {
     if (!this.copyModeActive) {
       return;
@@ -154,9 +144,12 @@ export class CkEditorCopyContentService {
     contentScope.$broadcast(
       this.COPY_EVENT,
       rootElement,
-      disabledWidgets || [],
       containedWidgetTagName
     );
+  }
+
+  toggleCopyMode() {
+    this.copyModeActive = !this.copyModeActive;
   }
 
   /**
@@ -167,18 +160,14 @@ export class CkEditorCopyContentService {
    */
   bindPasteHandler(
       editorScope: IRootScopeService,
-      editor: CKEDITOR.editor,
+      editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
   ) {
     editorScope.$on(
       this.COPY_EVENT,
-      (
-          _,
-          element: HTMLElement,
-          disabledWidgets: string[],
-          containedWidgetTagName?: string
+      (_, element: HTMLElement, containedWidgetTagName?: string
       ) =>
         this._handlePaste(
-          editor, element, disabledWidgets, containedWidgetTagName)
+          editor, element, containedWidgetTagName)
     );
   }
 }

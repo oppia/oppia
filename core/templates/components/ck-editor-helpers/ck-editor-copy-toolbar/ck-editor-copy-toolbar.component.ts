@@ -24,7 +24,7 @@ import { CkEditorCopyContentService } from '../ck-editor-copy-content-service';
   selector: 'ck-editor-copy-toolbar',
   templateUrl: './ck-editor-copy-toolbar.component.html'
 })
-export class CkEditorCopyToolbar {
+export class CkEditorCopyToolbarComponent {
   constructor(private ckEditorCopyContentService: CkEditorCopyContentService) {
     ckEditorCopyContentService.copyModeActive = false;
   }
@@ -39,7 +39,7 @@ export class CkEditorCopyToolbar {
           editor.focus();
         });
     } else {
-      document.body.style.cursor = 'auto';
+      document.body.style.cursor = '';
       document.querySelectorAll('.oppia-rte-editor')
         .forEach((editor: HTMLElement) => {
           editor.blur();
@@ -50,4 +50,4 @@ export class CkEditorCopyToolbar {
 
 angular.module('oppia').directive(
   'ckEditorCopyToolbar',
-  downgradeComponent({component: CkEditorCopyToolbar}));
+  downgradeComponent({component: CkEditorCopyToolbarComponent}));
