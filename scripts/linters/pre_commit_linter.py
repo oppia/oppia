@@ -422,45 +422,14 @@ def categorize_files(file_paths):
 
 def _print_complete_summary_of_lint_messages(lint_messages):
     """Print summary of lint messages."""
-    excluded_phrases = ['SUCCESS', 'FAILED', '[htmllint]', 'Linting CSS files.',
-                        'There are no JavaScript or Typescript files to lint.',
-                        'Your code has been rated at', 'linting finished.',
-                        'warnings potentially fixable with the `--fix` option.',
-                        'Linting JS and TS files.', 'Tasks still running:',
-                        'Linting HTML files.', 'Total css files:']
     if lint_messages != '':
         python_utils.PRINT('Please fix errors below:')
         python_utils.PRINT('----------------------------------------')
-        for messages in lint_messages:
-            messages_list = messages.split('\n')
-            for message in messages_list:
-                excluded_phrase_present = any(
-                    word in message for word in excluded_phrases)
-                # Ignore if message contains only dashes(-).
-                if (message.lstrip().startswith('-') and
-                        message.rstrip().endswith('-')):
-                    continue
-                # Ignore lint messages that contain any excluded phrase.
-                if excluded_phrase_present:
-                    continue
-                # Ignore any message contains the cross-sign(\u2716).
-                if message.startswith('\u2716'):
-                    continue
-                # Ignore any message containing timestamp.
-                if re.search(r'\d\d:\d\d:\d\d', message):
-                    continue
-                if re.search(r'\d+ files checked', message):
-                    continue
-                # If error message starts with line number, then it must
-                # be stylelint or eslint error message. Remove extra bits
-                # from the message at the end of line and at index 1.
-                if re.search(r'^\d+:\d+', message.lstrip()):
-                    message_list = message.split()
-                    new_message = ' '.join(
-                        message_list[:1] + message_list[2:-1])
-                    python_utils.PRINT(new_message)
-                else:
-                    python_utils.PRINT(message)
+        for message in lint_messages:
+            if message.startswith(('SUCCESS', 'FAILED')):
+                continue
+            else:
+                python_utils.PRINT(message)
 
 
 def _get_task_output(lint_messages, task, semaphore):
@@ -599,7 +568,7 @@ def main(args=None):
 
     if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
             message in lint_messages]) or errors_stacktrace:
-        _print_complete_summary_of_lint_messages(set(lint_messages))
+        _print_complete_summary_of_lint_messages(lint_messages)
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')

@@ -56,9 +56,17 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
 
 def _eslint_trimmer(lint_messages):
     """Remove extra bits from eslint messages."""
-    summary_messages = []
-    # messages = lint_messages.split('\n')
-    python_utils.PRINT(lint_messages)
+    summary_messages = ''
+    # Remove extra bits from the end of message output.
+    messages = lint_messages[0].split('\n')[:-4]
+    for message in messages:
+        if re.search(r'^\d+:\d+', message.lstrip()):
+            message_list = message.split()
+            new_message = ' '.join(
+                message_list[:1] + message_list[2:-1])
+            summary_messages += new_message + '\n'
+        else:
+            summary_messages += message + '\n'
     return summary_messages
 
 
@@ -1017,7 +1025,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-            summary_message = _eslint_trimmer(result_list)
+            eslint_messages = _eslint_trimmer(result_list)
+            summary_messages.append(eslint_messages)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (
                     linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
