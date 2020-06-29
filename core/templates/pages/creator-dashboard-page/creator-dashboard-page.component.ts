@@ -377,7 +377,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           .getStaticImageUrl('/general/empty_dashboard.svg');
         ctrl.canReviewActiveThread = null;
         ctrl.updatesGivenScreenWidth();
-        angular.element($window).bind('resize', function() {
+        angular.element($window).on('resize', function() {
           ctrl.updatesGivenScreenWidth();
         });
       };
