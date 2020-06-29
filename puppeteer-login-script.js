@@ -25,7 +25,7 @@ module.exports = async(browser, context) => {
   // eslint-disable-next-line dot-notation
   await page.goto(context.url);
   try {
-    // Sign into Oppia
+    // Sign into Oppia.
     await page.click('#admin');
     await Promise.all([
       page.waitForNavigation(),
@@ -43,6 +43,6 @@ module.exports = async(browser, context) => {
 
     await page.close();
   } catch (e) {
-    // Logged in
+    // Logged in.
   }
 };
