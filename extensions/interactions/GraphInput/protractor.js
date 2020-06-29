@@ -57,11 +57,11 @@ var submitAnswer = async function(conversationInput, graphDict) {
 
 var answerObjectType = 'Graph';
 var initialGraph = {
-  vertices: [[277, 77], [248, 179], [405, 144]]
+  vertices: [[-20, 50], [10, 60], [40, -20]]
 };
 var responseGraphDict = {
   edges: [[0, 1], [1, 2], [0, 2]],
-  vertices: [[277, 77], [248, 179], [405, 144]]
+  vertices: [[-20, 50], [10, 60], [40, -20]]
 };
 var wrongAnswerGraph = {
   edges: [[0, 1], [1, 2]]
