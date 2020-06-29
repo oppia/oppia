@@ -330,7 +330,7 @@ var AdminPage = function() {
       'Topic similarities uploaded successfully.');
     return true;
   };
-  
+
   this.expectUploadError = async function() {
     var text = await statusMessage.getText();
     if (text === 'Server error: \'ascii\' codec can\'t encode characters in ' +
