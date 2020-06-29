@@ -257,7 +257,7 @@ angular.module('oppia').factory('ThreadDataService', [
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
           openThreadsCount -= 1;
           // TODO(#8678): Update the cache with the message
-          // instead of fetching the messages every time from the backend
+          // instead of fetching the messages every time from the backend.
           return this.getMessagesAsync(thread);
         });
       }

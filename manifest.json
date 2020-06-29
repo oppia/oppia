@@ -111,6 +111,14 @@
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
       },
+      "pylatexenc": {
+        "version": "2.5",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/a9/ce/13c6ec826af2a5a17e1d6e8b9915965f44993b5949cbf75f86317e2128c4/pylatexenc-2.5.tar.gz#md5=7bcdb761214f15003479638d86b5d6e6",
+        "tarRootDirPrefix": "pylatexenc-",
+        "rootDirPrefix": "pylatexenc-",
+        "targetDirPrefix": "pylatexenc-"
+      },
       "soupsieve": {
         "version": "1.9.5",
         "downloadFormat": "tar",
@@ -433,14 +441,6 @@
           "css": ["dist/css/select2.css"],
           "js": ["dist/js/select2.full.js"]
         }
-      },
-      "literallycanvas": {
-        "version": "0.5.2",
-        "downloadFormat": "tar",
-        "url": "https://github.com/literallycanvas/literallycanvas/archive/v0.5.2.tar.gz",
-        "tarRootDirPrefix": "literallycanvas-",
-        "rootDirPrefix": "literallycanvas-",
-        "targetDirPrefix": "literallycanvas-"
       },
       "ckeditor": {
         "version": "4.12.1",

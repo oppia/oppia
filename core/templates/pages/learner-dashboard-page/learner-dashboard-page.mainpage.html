@@ -4,26 +4,27 @@
     @load('base-components/header.template.html', {"title": "Learner Dashboard | Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-            <li>
-              <span class="oppia-navbar-breadcrumb-separator"></span>
-              <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
-            </li>
-          </ul>
-        </navbar-breadcrumb>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
+              </li>
+            </ul>
+          </navbar-breadcrumb>
 
-        <content>
-          <learner-dashboard-page></learner-dashboard-page>
-        </content>
+          <content>
+            <learner-dashboard-page></learner-dashboard-page>
+          </content>
 
-        <page-footer></page-footer>
-      </base-content>
-    </div>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>
