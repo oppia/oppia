@@ -223,6 +223,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/communityreviewerrightsdatahandler',
         admin.CommunityReviewerRightsDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
+        community_dashboard.CommunityDashboardPage),
 
     get_redirect_route(
         '/notifications_dashboard',
@@ -342,6 +345,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.SKILL_DASHBOARD_DATA_URL,
+        topics_and_skills_dashboard.SkillsDashboardPageDataHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' %

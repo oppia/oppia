@@ -191,8 +191,8 @@ fdescribe('Assets Backend API Service', () => {
       spyOn($, 'ajax').and.callFake(() => {
         const d = $.Deferred();
         d.reject({
-          // responseText contains a XSSI Prefix, which is represented by )]}'
-          // string. That's why double quotes is being used here. It's not
+          // The responseText contains a XSSI Prefix, which is represented by
+          // )]}' string. That's why double quotes is being used here. It's not
           // possible to use \' instead of ' so the XSSI Prefix won't be
           // evaluated correctly.
           /* eslint-disable quotes */

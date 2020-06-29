@@ -43,8 +43,8 @@
           </span>
         </div>
       </div>
-      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-show="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : '', width: aspectRatio === '4:3' ? '248px' : '320px' }">
-        <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
+      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-if="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : '', width: aspectRatio === '4:3' ? '248px' : '320px' }">
+        <button class="btn btn-secondary oppia-thumbnail-reset-button protractor-thumbnail-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>
         <div>
@@ -74,12 +74,12 @@
 </div>
 <style>
   .oppia-thumbnail-container {
-    height: 260px;
-    max-width: 100%;
-    margin: 0 auto 15px auto;
-    position: relative;
     border-radius: 4px 4px 4px 4px;
     box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
+    height: 260px;
+    margin: 0 auto 15px auto;
+    max-width: 100%;
+    position: relative;
   }
   .oppia-thumbnail-container img {
     border-radius: 4px 4px 0 0;
@@ -99,9 +99,9 @@
   }
   .oppia-thumbnail-colour-select {
     display: grid;
+    grid-gap: 5px;
     grid-template-columns: 25px 25px 25px 25px;
     grid-template-rows: 20px;
-    grid-gap: 5px;
     margin-bottom: 7px;
   }
 

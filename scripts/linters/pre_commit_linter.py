@@ -136,6 +136,7 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
     os.path.join('third_party', 'mutagen-1.43.0'),
     os.path.join('third_party', 'packaging-20.3'),
+    os.path.join('third_party', 'pylatexenc-2.5'),
     os.path.join('third_party', 'soupsieve-1.9.5'),
     os.path.join('third_party', 'six-1.12.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),
@@ -195,7 +196,7 @@ class FileCache(python_utils.OBJECT):
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with python_utils.open_file(filepath, mode) as f:
+            with python_utils.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]

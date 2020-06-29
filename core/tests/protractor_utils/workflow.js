@@ -30,25 +30,27 @@ var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
+var thumbnailResetButton = element(by.css(
+  '.protractor-thumbnail-reset-button'));
 
-// check if the save roles button is clickable
+// Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
   return await element(by.css('.protractor-test-save-role')).isEnabled();
 };
 
-// check if the warning message is visible when the title is ''
+// Check if the warning message is visible when the title is ''.
 var checkForAddTitleWarning = async function() {
   return await element(
     by.className('protractor-test-title-warning')).isDisplayed();
 };
 
-// trigger onblur event for title
+// Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
   await element(by.css('.protractor-test-exploration-title-input')).click();
   await element(by.css('.protractor-test-exploration-objective-input')).click();
 };
 
-// open edit roles
+// Open edit roles.
 var openEditRolesForm = async function() {
   await element(by.css('.protractor-test-edit-roles')).click();
   await element(by.css('.protractor-test-role-username')).sendKeys(
@@ -140,7 +142,7 @@ var publishExploration = async function() {
   await closePublishModalButton.click();
 };
 
-// Creates and publishes a minimal exploration
+// Creates and publishes a minimal exploration.
 var createAndPublishExploration = async function(
     title, category, objective, language) {
   await createExploration();
@@ -175,7 +177,7 @@ var createAddExpDetailsAndPublishExp = async function(
     title, objective, category, language, tags);
 };
 
-// Creates and publishes a exploration with two cards
+// Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
     title, category, objective, language) {
   await createExploration();
@@ -202,7 +204,7 @@ var createAndPublishTwoCardExploration = async function(
   await publishExploration();
 };
 
-// Role management (state editor settings tab)
+// ---- Role management (state editor settings tab) ----
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {
@@ -265,7 +267,8 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
     skillDescription, material, true);
   await topicsAndSkillsDashboardPage.get();
-  await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+  await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+  await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
   await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
   await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
     0, topicName);
@@ -278,21 +281,33 @@ var getImageSource = async function(customImageElement) {
   return await customImageElement.getAttribute('src');
 };
 
-var uploadImage = async function(imageClickableElement, imgPath) {
+var uploadImage = async function(
+    imageClickableElement, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
   await imageClickableElement.click();
+
+  if (resetExistingImage) {
+    expect(await thumbnailResetButton.isPresent()).toBe(true);
+    await waitFor.elementToBeClickable(
+      thumbnailResetButton,
+      'Topic thumbnail reset button taking too long to appear.');
+    await thumbnailResetButton.click();
+  } else {
+    expect(await thumbnailResetButton.isPresent()).toBe(false);
+  }
+
   absPath = path.resolve(__dirname, imgPath);
   return await imageUploadInput.sendKeys(absPath);
 };
 
 var submitImage = async function(
-    imageClickableElement, imageContainer, imgPath) {
+    imageClickableElement, imageContainer, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
-  await uploadImage(imageClickableElement, imgPath);
+  await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
   await imageSubmitButton.click();

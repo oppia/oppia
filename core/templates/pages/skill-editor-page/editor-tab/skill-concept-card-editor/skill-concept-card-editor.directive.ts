@@ -31,6 +31,8 @@ require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
   'worked-example-editor.directive.ts');
 require(
+  'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
+require(
   'pages/skill-editor-page/modal-templates/' +
   'add-worked-example-modal.controller.ts');
 
@@ -65,6 +67,11 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         '$scope', '$filter', '$uibModal',
         function($scope, $filter, $uibModal) {
           var ctrl = this;
+
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
           ctrl.directiveSubscriptions = new Subscription();
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
@@ -153,10 +160,29 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             });
           };
 
+          $scope.showSkillPreview = function() {
+            var skillDescription = (
+              SkillEditorStateService.getSkill().getDescription());
+            var skillExplanation = (
+              $scope.bindableFieldsDict.displayedConceptCardExplanation);
+            var skillWorkedExamples = (
+              $scope.bindableFieldsDict.displayedWorkedExamples);
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill-editor-page/editor-tab/' +
+                'skill-preview-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                skillDescription: () => skillDescription,
+                skillExplanation: () => skillExplanation,
+                skillWorkedExamples: () => skillWorkedExamples
+              },
+              controller: 'SkillPreviewModalController'
+            });
+          };
+
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
             initBindableFieldsDict();
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.onSkillChange.subscribe(

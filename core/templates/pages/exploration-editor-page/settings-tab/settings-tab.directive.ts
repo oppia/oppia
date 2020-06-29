@@ -49,7 +49,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
+require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
@@ -392,10 +392,10 @@ angular.module('oppia').directive('settingsTab', [
 
             UserExplorationPermissionsService.getPermissionsAsync()
               .then(function(permissions) {
-                ctrl.canDelete = permissions.can_delete;
-                ctrl.canModifyRoles = permissions.can_modify_roles;
-                ctrl.canReleaseOwnership = permissions.can_release_ownership;
-                ctrl.canUnpublish = permissions.can_unpublish;
+                ctrl.canDelete = permissions.canDelete;
+                ctrl.canModifyRoles = permissions.canModifyRoles;
+                ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                ctrl.canUnpublish = permissions.canUnpublish;
               });
 
             ctrl.explorationTitleService = ExplorationTitleService;

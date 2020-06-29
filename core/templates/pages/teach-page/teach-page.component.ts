@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the teach page.
+ * @fileoverview Component for the teach page.
  */
 
 require('base-components/base-content.directive.ts');
@@ -44,7 +44,7 @@ angular.module('oppia').component('teachPage', {
       ctrl.activeTabName = ctrl.TAB_ID_TEACH;
 
       ctrl.onTabClick = function(tabName) {
-        // Update hash
+        // ---- Update hash ----
         WindowRef.nativeWindow.location.hash = '#' + tabName;
         ctrl.activeTabName = tabName;
       };
