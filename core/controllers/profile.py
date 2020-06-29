@@ -17,7 +17,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
+import json
 import re
+import zipfile
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -30,12 +33,9 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
-import base64
 import feconf
-import json
 import python_utils
 import utils
-import zipfile
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -372,15 +372,18 @@ class ExportAccountHandler(base.BaseHandler):
         if not constants.ENABLE_ACCOUNT_EXPORT:
             raise self.PageNotFoundException
 
-        user_data, user_images = takeout_service.export_data_for_user(self.user_id)
+        user_data, user_images = takeout_service.export_data_for_user(
+            self.user_id)
         memfile = python_utils.string_io()
         with zipfile.ZipFile(
             memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
             zfile.writestr('oppia_data.json', json.dumps(user_data))
             for image in user_images:
-                image_decoded = base64.b64decode(python_utils.url_unquote_plus(image[0].split(',')[1]))
+                image_decoded = base64.b64decode(
+                    python_utils.url_unquote_plus(image[0].split(',')[1]))
                 zfile.writestr('images/' + image[1], image_decoded)
-        self.render_downloadable_file(memfile.getvalue(), 'oppia_data.zip', 'text/plain')
+        self.render_downloadable_file(
+            memfile.getvalue(), 'oppia_data.zip', 'text/plain')
 
 
 class PendingAccountDeletionPage(base.BaseHandler):
