@@ -317,10 +317,22 @@ var TopicsAndSkillsDashboardPage = function() {
     var handles = await browser.getAllWindowHandles();
     initialHandles = handles;
     var parentHandle = await browser.getWindowHandle();
-    await waitFor.elementToBeClickable(
-      createSkillButton,
-      'Create Skill button takes too long to be clickable');
-    await createSkillButton.click();
+    var introCardCreateSkillButtonPresent = await createSkillButton.isPresent();
+    if (introCardCreateSkillButtonPresent) {
+      await waitFor.elementToBeClickable(
+        createSkillButton,
+        'Create Skill button takes too long to be clickable');
+      await createSkillButton.click();
+    } else {
+      await this.navigateToSkillsTab();
+      var createSkillButtonSecondaryButton = element(
+        by.css('.protractor-test-create-skill-button-circle'));
+      await waitFor.elementToBeClickable(
+        createSkillButtonSecondaryButton,
+        'Create Skill button takes too long to be clickable');
+      await createSkillButtonSecondaryButton.click();
+    }
+
     await waitFor.visibilityOf(
       skillNameField,
       'Create Skill modal takes too long to appear.');
@@ -366,7 +378,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.navigateToSkillsTab = async function() {
     await waitFor.elementToBeClickable(
       skillsTabButton,
-      'Unused skills tab button taking too long to be clickable');
+      'Skills tab button taking too long to be clickable');
     await skillsTabButton.click();
   };
 

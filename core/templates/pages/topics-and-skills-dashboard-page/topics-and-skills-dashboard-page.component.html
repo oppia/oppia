@@ -144,11 +144,11 @@
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS"  ng-click="$ctrl.createTopic()">
+            <div ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Topic</span>
             </div>
-            <div ng-if="!($ctrl.activeTab===$ctrl.TAB_NAME_TOPICS)"  ng-click="$ctrl.createSkill()">
+            <div ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_SKILLS"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Skill</span>
             </div>
@@ -258,7 +258,7 @@
       <p class="intro-card-message">
         No topics or skills have been created yet.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-topic-button"
               style="color: white; text-decoration: none;"
               ng-click="$ctrl.createTopic()"
               ng-if="$ctrl.userCanCreateTopic">
