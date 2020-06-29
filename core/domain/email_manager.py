@@ -502,8 +502,8 @@ def get_moderator_unpublish_exploration_email():
 
     Returns:
         str. Draft of the email body for an email sent after the moderator
-            unpublishes an exploration, or an empty string if no email should
-            be sent.
+        unpublishes an exploration, or an empty string if no email should
+        be sent.
     """
 
     try:

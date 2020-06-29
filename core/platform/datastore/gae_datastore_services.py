@@ -32,8 +32,8 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
 
     Returns:
         list(list(ndb.Model)). The model instances corresponding to the ids and
-            models. The models corresponding to the same tuple in the input are
-            grouped together.
+        models. The models corresponding to the same tuple in the input are
+        grouped together.
     """
     entity_keys = []
     for (model_name, entity_ids) in ids_and_models:
