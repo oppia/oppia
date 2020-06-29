@@ -23,6 +23,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
 
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
 export class Question {
   id: number;
   stateData: State;
@@ -77,7 +79,8 @@ export class Question {
       return 'At least 1 hint should be specfied';
     }
     if (
-      !interaction.solution) {
+      !interaction.solution &&
+      INTERACTION_SPECS[interaction.id].can_have_solution) {
       return 'A solution must be specified';
     }
     var answerGroups = this.stateData.interaction.answerGroups;
