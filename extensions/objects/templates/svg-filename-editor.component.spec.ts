@@ -331,7 +331,7 @@ describe('SvgFilenameEditor', function() {
   it('should save svg file created by the editor', function() {
     svgFilenameCtrl.createText();
 
-    // responseText contains a XSSI Prefix, which is represented by )]}'
+    // The responseText contains a XSSI Prefix, which is represented by )]}'
     // string. That's why double quotes is being used here. It's not
     // possible to use \' instead of ' so the XSSI Prefix won't be
     // evaluated correctly.
@@ -369,8 +369,8 @@ describe('SvgFilenameEditor', function() {
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.reject({
-        // responseText contains a XSSI Prefix, which is represented by )]}'
-        // string. That's why double quotes is being used here. It's not
+        // Variable responseText contains a XSSI Prefix, which is represented by
+        // )]}' string. That's why double quotes is being used here. It's not
         // possible to use \' instead of ' so the XSSI Prefix won't be
         // evaluated correctly.
         /* eslint-disable quotes */

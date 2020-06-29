@@ -21,7 +21,7 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
 // The 'tabArray' arg should be an array of dictionaries with keys:
 //   'title': a string
-//   'content': a function that gives rich text editing instructions
+//   'content': a function that gives rich text editing instructions.
 var customizeComponent = async function(modal, tabArray) {
   var listEditor = await forms.ListEditor(modal);
 
@@ -42,7 +42,7 @@ var expectComponentDetailsToMatch = async function(elem, tabArray) {
   var contentElems = elem.element(by.css('.tab-content')).all(by.xpath('./*'));
 
   for (var i = 0; i < tabArray.length; i++) {
-    // Click on each tab in turn to check its contents
+    // Click on each tab in turn to check its contents.
     expect(await (await titleElems.get(i)).getText()).toMatch(
       tabArray[i].title);
     await (await titleElems.get(i)).click();

@@ -743,7 +743,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.initializeMouseEvents = function() {
-        // Adding event listener for polygon tool
+        // Adding event listener for polygon tool.
         ctrl.canvas.on('mouse:dblclick', function() {
           if (ctrl.drawMode === DRAW_MODE_POLY) {
             ctrl.drawMode = DRAW_MODE_NONE;
