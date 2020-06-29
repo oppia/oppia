@@ -42,7 +42,7 @@ for path in _PATHS_TO_INSERT:
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 from pylint import lint  # isort:skip
-from pylint.reporters.text import TextReporter # isort:skip
+from pylint.reporters import text# isort:skip
 import isort  # isort:skip
 import pycodestyle # isort:skip
 # pylint: enable=wrong-import-order
@@ -50,6 +50,7 @@ import pycodestyle # isort:skip
 
 
 def _pylint_trimmer(lint_messages):
+    """Remove extra bits from pylint messages."""
     summary_messages = ''
     for message in lint_messages:
         python_utils.PRINT(message)
@@ -61,29 +62,20 @@ def _pylint_trimmer(lint_messages):
             summary_messages += (message)
     return summary_messages
 
-def _pycodestyle_trimmer(lint_messages):
-    # Remove the error message count from the end of lint_messages.
-    messages = python_utils.convert_to_bytes(lint_messages)
-    messages = messages.split('\n')
-    python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOO')
-    python_utils.PRINT(messages)
-    python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOO')
-    summary_messages = ''
-    for message in messages:
-        python_utils.PRINT(messages)
-        summary_messages += message
-    return summary_messages
 
+class WritableObject(python_utils.OBJECT):
+    """Output stream for pylint."""
 
-class WritableObject(object):
-    "dummy output stream for pylint"
     def __init__(self):
+        """Constructs a WritableObject object."""
         self.content = []
+
     def write(self, st):
-        "dummy write"
+        """Write method for pylint."""
         self.content.append(st)
+
     def read(self):
-        "dummy read"
+        """Read method for pylint."""
         return self.content
 
 
@@ -397,24 +389,20 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pylint_output = WritableObject()
                 pylinter = lint.Run(
                     current_files_to_lint + [config_pylint],
-                    reporter=TextReporter(pylint_output), exit=False).linter
-                # These lines invoke Pycodestyle and print its outputvvvvvvvvvvvv
+                    reporter=text.TextReporter(pylint_output),
+                    exit=False).linter
+                # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
                 style_guide = pycodestyle.StyleGuide(
                     config_file=config_pycodestyle)
                 pycodestyle_report = style_guide.check_files(
                     paths=current_files_to_lint)
-                summary_messages.append(pycodestyle_report.get_file_results())
 
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+                summary_message = stdout.getvalue()
                 pylint_messages = _pylint_trimmer(pylint_output.read())
                 summary_messages.append(pylint_messages)
-                pycodestyle_messages = _pycodestyle_trimmer(
-                    pycodestyle_report.get_file_results())
-                summary_messages.append(pycodestyle_messages)
-                summary_message = stdout.getvalue()
                 python_utils.PRINT(summary_message)
-                # summary_messages.append(summary_message)
                 are_there_errors = True
 
             current_batch_start_index = current_batch_end_index
@@ -484,13 +472,17 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
                 python_utils.PRINT('Messages for Python 3 support:')
+                pylint_output = WritableObject()
                 pylinter_for_python3 = lint.Run(
-                    current_files_to_lint + ['--py3k'], exit=False).linter
+                    current_files_to_lint + ['--py3k'],
+                    reporter=text.TextReporter(pylint_output),
+                    exit=False).linter
 
             if pylinter_for_python3.msg_status != 0:
                 summary_message = stdout.getvalue()
+                pylint_messages = _pylint_trimmer(pylint_output.read())
+                summary_messages.append(pylint_messages)
                 python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
                 any_errors = True
 
             current_batch_start_index = current_batch_end_index

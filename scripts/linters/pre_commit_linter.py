@@ -459,12 +459,6 @@ def _print_complete_summary_of_lint_messages(lint_messages):
                     new_message = ' '.join(
                         message_list[:1] + message_list[2:-1])
                     python_utils.PRINT(new_message)
-                # If error message ends with a closed bracket ')', then it
-                # must be pylint error message. Remove extra bits from
-                # end of the message.
-                elif message.endswith(')'):
-                    last_string_length = len(message.split()[-1])
-                    python_utils.PRINT(message[:-last_string_length])
                 else:
                     python_utils.PRINT(message)
 

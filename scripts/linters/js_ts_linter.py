@@ -54,6 +54,14 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
     FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
 
+def _eslint_trimmer(lint_messages):
+    """Remove extra bits from eslint messages."""
+    summary_messages = []
+    # messages = lint_messages.split('\n')
+    python_utils.PRINT(lint_messages)
+    return summary_messages
+
+
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
     """This function first checks whether the parsed node represents
@@ -1009,7 +1017,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-                summary_messages.append(error)
+            summary_message = _eslint_trimmer(result_list)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (
                     linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
