@@ -20,9 +20,9 @@
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeComponent = async function(modal, rawLatex) {
-  await objects.MathExpressionContentEditor(
-    modal.element(by.tagName('math-expression-content-editor'))
-  ).setValue(rawLatex);
+  await (objects.MathExpressionContentEditor(
+    await modal.element(by.tagName('math-expression-content-editor'))
+  ).setValue(rawLatex));
 };
 
 // This function is used to convert the escaped Json to unescaped object.

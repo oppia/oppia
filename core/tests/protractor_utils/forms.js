@@ -249,14 +249,15 @@ var RichTextEditor = async function(elem) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      await richTextComponents.getComponent(componentName)
-        .customizeComponent.apply(null, args);
-      await waitFor.elementToBeClickable(await modal.element(
+      await ((await richTextComponents.getComponent(componentName))
+        .customizeComponent.apply(null, args));
+      var doneButton = await modal.element(
         by.css(
-          '.protractor-test-close-rich-text-component-editor')),
-      'save button taking too long to be clickable');
-      await modal.element(
-        by.css('.protractor-test-close-rich-text-component-editor')).click();
+          '.protractor-test-close-rich-text-component-editor'));
+      await waitFor.elementToBeClickable(
+        doneButton,
+        'save button taking too long to be clickable');
+      await doneButton.click();
       await waitFor.invisibilityOf(
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that

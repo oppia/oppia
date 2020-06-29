@@ -54,10 +54,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           outputElement.html('');
           outputElement.append($script);
           // Naturally MathJax works asynchronously, but we can add processes
-          // whihc we want to happen synchronously into the MathJax Hub Queue.
-          MathJax.Hub.Queue(function() {
-            ctrl.value.mathExpressionSvgIsBeingProcessed = true;
-          });
+          // which we want to happen synchronously into the MathJax Hub Queue.
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
           MathJax.Hub.Queue(function() {
             if (outputElement[0].getElementsByTagName('svg')[0] !== undefined) {
@@ -122,6 +119,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
 
           if (ctrl.alwaysEditable) {
             $scope.$watch('$ctrl.localValue.label', function(newValue) {
+              ctrl.value.mathExpressionSvgIsBeingProcessed = true;
               ctrl.value.raw_latex = newValue;
               convertLatexStringToSvg(ctrl.localValue.label);
             });
