@@ -143,11 +143,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 component_id)
             self.assertTrue(self._is_camel_cased(component_id))
 
-            # TODO(#9356): Remove this if condition once the Svgdiagram
-            # directive is created in the second part of 1st milestone.
-            if component_id == 'Svgdiagram':
-                continue
-
             # Check that the component directory exists.
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)

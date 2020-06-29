@@ -118,7 +118,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         bold: false,
         italic: false
       };
-      ctrl.enableRemoveButton = false;
+      ctrl.isObjectSelected = false;
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
@@ -590,6 +590,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.canvas.renderAll();
       };
 
+      ctrl.bringObjectForward = function() {
+        ctrl.canvas.bringForward(ctrl.canvas.getActiveObject());
+      }
+
+      ctrl.sendObjectBackward = function() {
+        ctrl.canvas.sendBackwards(ctrl.canvas.getActiveObject());
+      }
+
       var undoStackPush = function(object) {
         if (ctrl.objectUndoStack.length === ctrl.undoLimit) {
           ctrl.objectUndoStack.shift();
@@ -764,10 +772,14 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.polyOptions.bboxPoints.push(new polyPoint(x, y));
             var points = [x, y, x, y];
             var size = ctrl.fabricjsOptions.size;
+            var stroke = ctrl.fabricjsOptions.stroke;
+            if(stroke.slice(-2, -1) === '0') {
+              stroke = 'rgba(0, 0, 0, 1)';
+            }
             var line = new fabric.Line(points, {
               strokeWidth: parseInt(size.substring(0, size.length - 2)),
               selectable: false,
-              stroke: ctrl.fabricjsOptions.stroke,
+              stroke: stroke,
               strokeLineCap: 'round'
             });
             ctrl.polyOptions.lines.push(line);
@@ -819,14 +831,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('selection:created', function() {
-          ctrl.enableRemoveButton = true;
+          ctrl.isObjectSelected = true;
           if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
             ctrl.displayFontStyles = true;
           }
         });
 
         ctrl.canvas.on('selection:cleared', function() {
-          ctrl.enableRemoveButton = false;
+          ctrl.isObjectSelected = false;
           ctrl.displayFontStyles = false;
         });
       };

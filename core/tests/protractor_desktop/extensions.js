@@ -66,6 +66,7 @@ describe('rich-text components', function() {
         title: 'title 1',
         content: await forms.toRichText('contents 2')
       }]);
+      await richTextEditor.addRteComponent('Svgdiagram');
     });
 
     await explorationEditorPage.navigateToPreviewTab();
@@ -88,6 +89,7 @@ describe('rich-text components', function() {
           title: 'title 1',
           content: await forms.toRichText('contents 2')
         }]);
+        await richTextChecker.readRteComponent('Svgdiagram');
       });
 
     await explorationEditorPage.discardChanges();

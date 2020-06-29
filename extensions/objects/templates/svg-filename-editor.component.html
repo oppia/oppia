@@ -24,8 +24,8 @@
                 tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-slash" style="font-size: 19px;"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                ng-click="$ctrl.createRect()"
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
+                ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createRect()"
                 tooltip-placement="left" uib-tooltip="Rectangle" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="far fa-square"></i>
         </button>
@@ -70,6 +70,16 @@
             </div>
           </div>
           <div>
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isObjectSelected}"
+                style="background-image:url(/assets/svg_diagram_editor/bring_forward.svg);"
+                ng-click="$ctrl.bringObjectForward()" tooltip-placement="left" uib-tooltip="Bring Forward"
+                ng-disabled="!$ctrl.isObjectSelected">
+          </button>
+          <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isObjectSelected}"
+                  style="background-image:url(/assets/svg_diagram_editor/send_backward.svg);"
+                  ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
+                  ng-disabled="!$ctrl.isObjectSelected">
+          </button>
             <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectUndoStack.length}"
                     ng-click="$ctrl.onUndo()"
                     ng-disabled="!$ctrl.objectUndoStack.length">
@@ -82,7 +92,7 @@
             </button>
           </div>
           <button class="toolbar-button fat-button" ng-click="$ctrl.removeShape()"
-                  ng-disabled="!$ctrl.enableRemoveButton">
+                  ng-disabled="!$ctrl.isObjectSelected">
             Remove
           </button>
           <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()">
@@ -119,7 +129,7 @@
     </div>
   </div>
   <div ng-if="$ctrl.isDiagramSaved()">
-    <div class="diagram-editor-saved-image-container">
+    <div class="diagram-editor-saved-image-container protractor-test-saved-diagram-container">
       <i class="material-icons diagram-editor-edit edit-icon" ng-click="$ctrl.continueDiagramEditing()"
          title="Continue editing the diagram">
         &#xE254;
@@ -128,7 +138,7 @@
     </div>
   </div>
   <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
-    <button type="button" class="btn btn-success" ng-click="$ctrl.saveSVGFile()" ng-disabled="$ctrl.isUserDrawing()">
+    <button type="button" class="btn btn-success protractor-test-save-diagram" ng-click="$ctrl.saveSVGFile()" ng-disabled="$ctrl.isUserDrawing()">
       Use This Image
     </button>
   </div>
