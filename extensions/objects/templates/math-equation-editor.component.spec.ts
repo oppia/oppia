@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the algebraic expression editor.
+ * @fileoverview Unit tests for the math equation editor.
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
@@ -24,7 +24,7 @@ import { GuppyInitializationService } from
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
-describe('AlgebraicExpressionEditor', function() {
+describe('MathEquationEditor', function() {
   var ctrl = null, $window = null;
   var mockGuppyObject = {
     guppyInstance: {
@@ -62,7 +62,7 @@ describe('AlgebraicExpressionEditor', function() {
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
-    ctrl = $componentController('algebraicExpressionEditor');
+    ctrl = $componentController('mathEquationEditor');
     $window.Guppy = MockGuppy;
   }));
 

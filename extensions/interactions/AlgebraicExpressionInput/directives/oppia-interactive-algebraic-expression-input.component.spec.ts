@@ -17,11 +17,13 @@
  * component.
  */
 
+import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
@@ -36,7 +38,7 @@ describe('AlgebraicExpressionInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
     onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, validateAnswerFn) {
+    registerCurrentInteraction: function(submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
     }
   };
@@ -67,7 +69,8 @@ describe('AlgebraicExpressionInputInteractive', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService();
+    guppyConfigurationService = new GuppyConfigurationService(
+      new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
 
@@ -100,6 +103,7 @@ describe('AlgebraicExpressionInputInteractive', function() {
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(ctrl.warningText).toBe('/ is not a valid postfix operator.');
   });
 
   it('should correctly validate current answer', function() {

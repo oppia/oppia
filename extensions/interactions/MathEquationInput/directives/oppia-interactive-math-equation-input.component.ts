@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the AlgebraicExpressionInput interaction.
+ * @fileoverview Component for the MathEquationInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -21,23 +21,23 @@
  */
 
 require(
-  'interactions/AlgebraicExpressionInput/directives/' +
-  'algebraic-expression-input-rules.service.ts');
+  'interactions/MathEquationInput/directives/' +
+  'math-equation-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
 require('services/math-interactions.service.ts');
 
-angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
-  template: require('./algebraic-expression-input-interaction.component.html'),
+angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
+  template: require('./math-equation-input-interaction.component.html'),
   controller: [
     '$scope', 'CurrentInteractionService', 'GuppyConfigurationService',
-    'AlgebraicExpressionInputRulesService', 'MathInteractionsService',
+    'MathEquationInputRulesService', 'MathInteractionsService',
     'GuppyInitializationService',
     function(
         $scope, CurrentInteractionService, GuppyConfigurationService,
-        AlgebraicExpressionInputRulesService, MathInteractionsService,
+        MathEquationInputRulesService, MathInteractionsService,
         GuppyInitializationService) {
       const ctrl = this;
       ctrl.value = '';
@@ -50,7 +50,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           // is not compatible with nerdamer or with the backend validations.
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
-          let answerIsValid = MathInteractionsService.validateExpression(
+          let answerIsValid = MathInteractionsService.validateEquation(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
@@ -64,7 +64,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           return;
         }
         CurrentInteractionService.onSubmit(
-          ctrl.value, AlgebraicExpressionInputRulesService);
+          ctrl.value, MathEquationInputRulesService);
       };
 
       ctrl.$onInit = function() {

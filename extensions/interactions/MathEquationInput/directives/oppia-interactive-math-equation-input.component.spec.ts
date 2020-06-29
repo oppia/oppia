@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the algebraic expression editor.
+ * @fileoverview Unit tests for the MathEquationInput interactive
+ * component.
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
@@ -24,18 +25,34 @@ import { GuppyInitializationService } from
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
-describe('AlgebraicExpressionEditor', function() {
-  var ctrl = null, $window = null;
-  var mockGuppyObject = {
+require(
+  'interactions/MathEquationInput/directives/' +
+  'math-equation-input-rules.service.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/MathEquationInput/directives/' +
+  'oppia-interactive-math-equation-input.component.ts');
+
+describe('MathEquationInputInteractive', function() {
+  let ctrl = null, $window = null;
+  let mockCurrentInteractionService = {
+    onSubmit: function(answer, rulesService) {},
+    registerCurrentInteraction: function(submitAnswerFn, validateEquationFn) {
+      submitAnswerFn();
+    }
+  };
+  let mockMathEquationInputRulesService = {};
+  let mockGuppyObject = {
     guppyInstance: {
       asciimath: function() {
         return 'Dummy value';
       }
     }
   };
-  var guppyConfigurationService = null;
-  var mathInteractionsService = null;
-  var guppyInitializationService = null;
+  let guppyConfigurationService = null;
+  let mathInteractionsService = null;
+  let guppyInitializationService = null;
 
   class MockGuppy {
     constructor(id: string, config: Object) {}
@@ -56,13 +73,18 @@ describe('AlgebraicExpressionEditor', function() {
       new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
+
+    $provide.value('CurrentInteractionService',
+      mockCurrentInteractionService);
+    $provide.value('MathEquationInputRulesService',
+      mockMathEquationInputRulesService);
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
-    ctrl = $componentController('algebraicExpressionEditor');
+    ctrl = $componentController('oppiaInteractiveMathEquationInput');
     $window.Guppy = MockGuppy;
   }));
 
@@ -73,10 +95,26 @@ describe('AlgebraicExpressionEditor', function() {
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
-  it('should initialize ctrl.value with an empty string', function() {
-    ctrl.value = null;
-    ctrl.$onInit();
-    expect(ctrl.value).not.toBeNull();
+  it('should not submit the answer if invalid', function() {
+    ctrl.hasBeenTouched = true;
+    // Invalid answer.
+    ctrl.value = '(x + y)) = 3';
+
+    spyOn(mockCurrentInteractionService, 'onSubmit');
+    ctrl.submitAnswer();
+    expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(ctrl.warningText).toBe(
+      'It looks like your answer has an invalid bracket pairing.');
+  });
+
+  it('should submit the answer if valid', function() {
+    ctrl.hasBeenTouched = true;
+    // Invalid answer.
+    ctrl.value = '(x + y) = 3';
+
+    spyOn(mockCurrentInteractionService, 'onSubmit');
+    ctrl.submitAnswer();
+    expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
   });
 
   it('should correctly validate current answer', function() {

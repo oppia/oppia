@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end testing utilities for Algebraic Expression Input
+ * @fileoverview End-to-end testing utilities for Math Equation Input
  * interaction
  */
 
@@ -26,47 +26,49 @@ var customizeInteraction = function() {
 var expectInteractionDetailsToMatch = async function(elem) {
   expect(
     await elem.element(by.tagName(
-      'oppia-interactive-algebraic-expression-input')).isPresent()
+      'oppia-interactive-math-equation-input')).isPresent()
   ).toBe(true);
   // Testing editor's value in default state.
   expect(
     await objects.MathEditor(elem.element(by.tagName(
-      'oppia-interactive-algebraic-expression-input'))).getValue()
+      'oppia-interactive-math-equation-input'))).getValue()
   ).toBe('\\color{grey}{\\text{\\small{Type a formula here.}}}');
 };
 
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.element(by.tagName(
-    'oppia-interactive-algebraic-expression-input'))).setValue(answer);
+    'oppia-interactive-math-equation-input'))).setValue(answer);
   await element(by.css('.protractor-test-submit-answer-button')).click();
 };
 
-var answerObjectType = 'AlgebraicExpression';
+var answerObjectType = 'MathEquation';
 
 var testSuite = [{
   interactionArguments: [],
-  ruleArguments: ['MatchesExactlyWith', '((a+b))^(2)'],
+  ruleArguments: ['IsEquivalentTo', 'y=m*x+c'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['(a-b)^2', '(a-b)^3', 'a^2+2*a*b+b^2'],
-  correctAnswers: ['(a+b)^2', '(b+a)^2', '(a+b)*(a+b)']
+  wrongAnswers: ['x=m*y+c', 'y+m*x+c=0', 'y=m*x+b', 'y=m*x'],
+  correctAnswers: ['y=m*x+c', 'y=c+m*x', 'm*x+c=y', 'y-m*x=c', 'y-m*x-c=0']
 }, {
   interactionArguments: [],
-  ruleArguments: ['MatchesExactlyWith', '((x^2)-x)/z'],
+  ruleArguments: ['IsEquivalentTo', '(2*x+1)*(x-3)=0'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z'],
-  correctAnswers: ['((x^2)-x)/z', '((x*x)-x)*z^(-1)']
+  wrongAnswers: ['x-y=x-y', 'x=3', '2*x+1=0', 'x=-1/2'],
+  correctAnswers: [
+    '(2*x+1)*(x-3)=0', '0=(2*x+1)*(x-3)', '2*x*x-6*x=3-x', '-2*x*x+5*x+3=0',
+    '(2*x+1)*(-x+3)=0']
 }, {
   interactionArguments: [],
-  ruleArguments: ['IsEquivalentTo', 'pi*r^2'],
+  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on LHS'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['pi*r', 'pi*r*2', 'pi', 'pi/r^2'],
-  correctAnswers: ['pi*r^2', 'pi*r*r', '(pi*r^3)/(2*r-r)']
+  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
+  correctAnswers: ['y=m*x+c', 'y=m*x^2+c', '2*y-y=m*x+c', 'y=0', 'y=m*x-c']
 }, {
   interactionArguments: [],
-  ruleArguments: ['IsEquivalentTo', '(9*x^2)-6*x+1'],
+  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['sqrt((3x-1)^(2))', '9*(x)^(2)-6*x-1', '((3*x-1))^(4)'],
-  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^(2)']
+  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
+  correctAnswers: ['y=m*x+c', 'y=c+m*x']
 }];
 
 exports.customizeInteraction = customizeInteraction;
