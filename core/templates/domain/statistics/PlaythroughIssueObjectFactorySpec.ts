@@ -16,22 +16,39 @@
  * @fileoverview Unit tests for the PlaythroughIssueObjectFactory.
  */
 
-import { PlaythroughIssueObjectFactory, PlaythroughIssue } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
+import {
+  IPlaythroughIssueBackendDict,
+  PlaythroughIssueObjectFactory,
+  EarlyQuitPlaythroughIssue
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('Playthrough Issue Object Factory', () => {
   let piof: PlaythroughIssueObjectFactory;
-  let playthroughIssueObject: PlaythroughIssue;
+  let playthroughIssueObject: EarlyQuitPlaythroughIssue;
   beforeEach(() => {
     piof = new PlaythroughIssueObjectFactory();
   });
 
   it('should create a new exploration issue', () => {
-    playthroughIssueObject = new PlaythroughIssue(
-      'EarlyQuit', {}, [], 1, true);
+    playthroughIssueObject = new EarlyQuitPlaythroughIssue(
+      'EarlyQuit', {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      }, [], 1, true);
 
     expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state'
+      },
+      time_spent_in_exp_in_msecs: {
+        value: 1.2
+      }
+    });
     expect(playthroughIssueObject.playthroughIds).toEqual([]);
     expect(playthroughIssueObject.schemaVersion).toEqual(1);
     expect(playthroughIssueObject.isValid).toEqual(true);
@@ -40,23 +57,44 @@ describe('Playthrough Issue Object Factory', () => {
   it('should create a new exploration issue from a backend dict', () => {
     const playthroughIssueObject = piof.createFromBackendDict({
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      },
       playthrough_ids: [],
       schema_version: 1,
       is_valid: true
     });
 
     expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughIssueObject.issueCustomizationArgs).toEqual( {
+      state_name: {
+        value: 'state'
+      },
+      time_spent_in_exp_in_msecs: {
+        value: 1.2
+      }
+    });
     expect(playthroughIssueObject.playthroughIds).toEqual([]);
     expect(playthroughIssueObject.schemaVersion).toEqual(1);
     expect(playthroughIssueObject.isValid).toEqual(true);
   });
 
   it('should convert exploration issue to backend dict', () => {
-    const playthroughDict = {
+    const playthroughDict: IPlaythroughIssueBackendDict = {
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      },
       playthrough_ids: [],
       schema_version: 1,
       is_valid: true
@@ -64,5 +102,31 @@ describe('Playthrough Issue Object Factory', () => {
     const playthroughIssueObject = piof.createFromBackendDict(playthroughDict);
 
     expect(playthroughIssueObject.toBackendDict()).toEqual(playthroughDict);
+  });
+
+  it('should throw error on invalid backend dict', () => {
+    const playthroughDict = {
+      issue_type: 'InvalidType',
+      issue_customization_args: {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      },
+      playthrough_ids: [],
+      schema_version: 1,
+      is_valid: true
+    };
+
+    expect(() => {
+      // TS ignore is used because playthrough dict is assigned a invalid type
+      // to test errors.
+      // @ts-ignore
+      piof.createFromBackendDict(playthroughDict);
+    }).toThrowError(
+      'Backend dict does not match any known issue type: ' +
+      JSON.stringify(playthroughDict));
   });
 });

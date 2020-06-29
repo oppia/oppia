@@ -95,7 +95,7 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
               ctrl.schema.ui_config.add_element_text = ctrl.buttonText;
             }
 
-            // Adds an input field by default
+            // Adds an input field by default.
             ctrl.answer = [''];
 
             CurrentInteractionService.registerCurrentInteraction(

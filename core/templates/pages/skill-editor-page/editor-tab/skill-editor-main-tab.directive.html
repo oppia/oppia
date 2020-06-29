@@ -1,7 +1,127 @@
-<div ng-if="hasLoadedSkill()">
-  <skill-description-editor></skill-description-editor>
-  <skill-prerequisite-skills-editor></skill-prerequisite-skills-editor>
-  <skill-concept-card-editor></skill-concept-card-editor>
-  <skill-misconceptions-editor></skill-misconceptions-editor>
-  <skill-rubrics-editor></skill-rubrics-editor>
+<div class="skill-editor">
+  <div class="skill-editor-content" ng-if="hasLoadedSkill()">
+    <div class="skill-editor-components-container">
+      <skill-concept-card-editor></skill-concept-card-editor>
+      <skill-misconceptions-editor></skill-misconceptions-editor>
+      <skill-prerequisite-skills-editor></skill-prerequisite-skills-editor>
+      <skill-rubrics-editor></skill-rubrics-editor>
+    </div>
+    <div class="skill-editor-info-container">
+      <md-card class="oppia-editor-card-section">
+        <strong class="status-heading">
+          Status
+        </strong>
+        <div class="status-box">
+          <strong class="status-key">
+            Topic:
+          </strong>
+          <select class="form-control"
+                  ng-model="topicName"
+                  ng-options="topic as topic for (topic, subtopic) in getAssignedSkillTopicData()"
+                  ng-change="changeSelectedTopic(topicName)"
+                  ng-disabled="!isTopicDropdownEnabled()">
+          </select>
+        </div>
+        <div class="status-box" ng-if="isTopicDropdownEnabled()">
+          <strong class="status-key">
+            Subtopic:
+          </strong>
+          <span ng-if="getSubtopicName()" class="status-value">
+            <[getSubtopicName()]>
+          </span>
+          <span ng-if="!getSubtopicName()" class="status-value">
+            Unassigned
+          </span>
+        </div>
+      </md-card>
+      <md-card>
+        <div class="skill-details-container">
+          <div class="misconception-count">
+            <div class="count-value"><[skill.getMisconceptions().length]></div>
+            <div class="count-text">Misconceptions</div>
+          </div>
+          <div class="example-count">
+            <div class="count-value"><[skill.getConceptCard().getWorkedExamples().length]></div>
+            <div class="count-text">Worked Examples</div>
+          </div>
+          <div class="create-question" ng-click="createQuestion()">
+            <i class="fa fa-plus-circle"></i>
+            <div class="count-text create-text">Create New Question</div>
+          </div>
+        </div>
+      </md-card>
+    </div>
+  </div>
 </div>
+<style>
+  .skill-editor .skill-editor-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .skill-editor .skill-editor-components-container {
+    width: 40%;
+  }
+
+  .skill-editor .skill-editor-info-container {
+    width: 35%;
+  }
+
+  .skill-editor .status-heading {
+    font-size: 22px
+  }
+
+  .skill-editor .status-key {
+    font-size: 18px
+  }
+
+  .skill-editor .status-box {
+    margin: 12px 0;
+  }
+
+  .skill-editor .status-value {
+    font-size: 18px;
+  }
+
+  .skill-editor .skill-details-container {
+    align-items: center;
+    border-radius: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 35px 0;
+    text-align: center;
+  }
+
+  .skill-editor .misconception-count,
+  .skill-editor .example-count,
+  .skill-editor .create-question {
+    border-right: 2px solid #707070;
+    display: inline-block;
+    width: 30%;
+  }
+
+  .skill-editor .count-value {
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+  .skill-editor .count-text {
+    font-size: 16px;
+  }
+
+  .skill-editor .create-question {
+    border-right: none;
+    cursor: pointer;
+  }
+
+  .skill-editor .create-question i {
+    color: #0b6c63;
+    font-size: 30px;
+  }
+
+  .skill-editor .create-text {
+    color: #0b6c63;
+  }
+</style>

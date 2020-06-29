@@ -135,7 +135,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         } else {
           // For computer users or users operating in larger screen size
           // the creator exploration list will come back to its previously
-          // selected view (card or list) when resized from mobile view
+          // selected view (card or list) when resized from mobile view.
           ctrl.myExplorationsView = userDashboardDisplayPreference;
           ctrl.publishText = EXP_PUBLISH_TEXTS.defaultText;
         }
@@ -377,7 +377,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           .getStaticImageUrl('/general/empty_dashboard.svg');
         ctrl.canReviewActiveThread = null;
         ctrl.updatesGivenScreenWidth();
-        angular.element($window).bind('resize', function() {
+        angular.element($window).on('resize', function() {
           ctrl.updatesGivenScreenWidth();
         });
       };

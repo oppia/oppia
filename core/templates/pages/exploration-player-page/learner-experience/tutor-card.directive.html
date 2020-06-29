@@ -6,7 +6,8 @@
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
       <img class="conversation-skin-oppia-avatar"
-           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt=""
+           ng-if="isAvatarImageShown()">
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
@@ -103,8 +104,8 @@
 
 <style>
   .oppia-learner-view-card-content .oppia-learner-confirm-button {
-    margin-left: 10px;
     margin-bottom: 10px;
+    margin-left: 10px;
   }
   .oppia-learner-view-card {
     max-width: 100vw;
@@ -151,9 +152,9 @@
   .conversation-skin-future-tutor-card {
     background: #fff;
     border-radius: 2px;
+    margin-left: 87px;
     padding-top: 20px;
     text-align: left;
-    margin-left: 87px;
   }
 
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
@@ -190,11 +191,11 @@
   }
 
   .conversation-skin-responses-dropdown-icon {
+    font-size: 20px;
+    margin-bottom: -2px;
     -moz-transition: all 0.2s;
     -o-transition: all 0.2s;
     -webkit-transition: all 0.2s;
-    font-size: 20px;
-    margin-bottom: -2px;
   }
 
   .conversation-skin-responses-dropdown-icon-rotated {
