@@ -98,7 +98,7 @@ describe('Admin misc test tab', function() {
     });
 
   it('should fill out extract data form and extract data', async function() {
-    await adminPage.fillExtractDataFormAndExpectData(0, 0, 0, 0);
+    await adminPage.fillExtractDataForm(0, 0, 0, 0);
   });
 
   afterEach(async function() {

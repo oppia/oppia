@@ -333,7 +333,7 @@ var AdminPage = function() {
   
   this.expectUploadError = async function() {
     var text = await statusMessage.getText();
-    if (text == 'Server error: \'ascii\' codec can\'t encode characters in ' +
+    if (text === 'Server error: \'ascii\' codec can\'t encode characters in ' +
           'position 1024-1025: ordinal not in range (128)') {
       return true;
     }
@@ -373,7 +373,7 @@ var AdminPage = function() {
     return true;
   };
 
-  this.fillExtractDataFormAndExpectData = async function(expID, expVer, state, ans) {
+  this.fillExtractDataForm = async function(expID, expVer, state, ans) {
     await waitFor.pageToFullyLoad();
     await extractDataExplorationIdInput.sendKeys(expID);
     await extractDataExplorationVersionInput.sendKeys(expVer);
@@ -382,7 +382,9 @@ var AdminPage = function() {
     await waitFor.elementToBeClickable(extractDataFormSubmitButton,
       'Extract data form submit button not clickable');
     await extractDataFormSubmitButton.click();
-    expect(protractor.ExpectedConditions.urlContains('/explorationdataextractionhandler?exp_id=0&exp_version=0&state_name=0&num_answers=0')).toBeTruthy();
+    var url = '/explorationdataextractionhandler?exp_id=0&exp_version' +
+      '=0&state_name=0&num_answers=0';
+    expect(protractor.ExpectedConditions.urlContains(url)).toBeTruthy();
     browser.getAllWindowHandles().then((handles) => {
       browser.driver.switchTo().window(handles[2]);
       browser.driver.close();
