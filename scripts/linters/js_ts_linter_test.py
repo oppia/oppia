@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import multiprocessing
 import os
+import shutil
 import subprocess
 import sys
 
@@ -136,6 +137,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_ANY_TYPE_FILEPATH, VALID_TS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             '\'any\' type found at line 20. Please do not declare variable'
             ' as \'any\' type'], self.linter_stdout)
@@ -159,6 +162,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [EXTRA_JS_FILEPATH], [], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
             ['Found extra .js file'],
             self.linter_stdout)
@@ -186,6 +191,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_COMPONENT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'Please ensure that there is exactly one component '
             'in the file.'], self.linter_stdout)
@@ -209,6 +216,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_SCOPE_TRUE_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'Please ensure that baseContent directive in ',
             ' file does not have scope set to true.'], self.linter_stdout)
@@ -232,6 +241,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_SCOPE_FILEPATH], FILE_CACHE,
                 False).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'Please ensure that baseContent directive in ',
             ' file has a scope: {}.'], self.linter_stdout)
@@ -255,6 +266,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_SORTED_DEPENDENCIES_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'Please ensure that in SuggestionModalForCreatorViewController'
             ' in file', 'the injected dependencies should be in the '
@@ -285,6 +298,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH],
                 FILE_CACHE, True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'Please ensure that in file',
             'the line breaks pattern between the dependencies mentioned as'
@@ -315,6 +330,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
             ['Duplicate constant declaration found.'],
             self.linter_stdout)
@@ -345,6 +362,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_CONSTANT_IN_TS_FILEPATH,
                      INVALID_CONSTANT_IN_TS_FILEPATH],
                 FILE_CACHE, True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared '
             'in', 'Please import the file where the constant is declared '
@@ -370,6 +389,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
             ['Duplicate constant declaration found.'],
             self.linter_stdout)
@@ -394,6 +415,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
             ['SUCCESS  Constants declaration check passed'],
             self.linter_stdout)
@@ -417,6 +440,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_CONSTANT_IN_TS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'Constant declaration found at line 19. Please declare the '
             'constants in a separate constants file.'], self.linter_stdout)
@@ -496,6 +521,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [excluded_file], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
             ['SUCCESS  HTTP requests check passed'], self.linter_stdout)
 
@@ -518,6 +545,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_BACKEND_API_SERVICE_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
             ['SUCCESS  HTTP requests check passed'], self.linter_stdout)
 
@@ -540,6 +569,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_HTTP_CLIENT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'An instance of HttpClient is found in this file. You are not '
             'allowed to create http requests from files that are not '
@@ -564,6 +595,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_FORMATTED_COMMENT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'Line 39: Invalid punctuation used at '
             'the end of the comment.'], self.linter_stdout)
