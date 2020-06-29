@@ -60,9 +60,8 @@ angular.module('oppia').directive('graphViz', [
             ADD_VERTEX: 2,
             DELETE: 3
           };
-          var vizContainer = (
-            <SVGSVGElement><any>$($element).find('.oppia-graph-viz-svg'));
-          // Styling functions
+          var vizContainer = $($element).find('.oppia-graph-viz-svg');
+          // Styling functions.
           var DELETE_COLOR = 'red';
           var HOVER_COLOR = 'aqua';
           var SELECT_COLOR = 'orange';
@@ -220,7 +219,7 @@ angular.module('oppia').directive('graphViz', [
                 ' ' + (viewBoxHeight));
           };
           ctrl.toggleGraphOption = function(option) {
-            // Handle the case when we have two edges s -> d and d -> s
+            // Handle the case when we have two edges s -> d and d -> s.
             if (option === 'isDirected' && ctrl.graph[option]) {
               _deleteRepeatedUndirectedEdges();
             }
@@ -257,9 +256,9 @@ angular.module('oppia').directive('graphViz', [
 
           // TODO(czx): Consider if there's a neat way to write a reset()
           // function to clear bits of ctrl.state
-          // (e.g. currentlyDraggedVertex, addEdgeVertex)
+          // (e.g. currentlyDraggedVertex, addEdgeVertex).
 
-          // Vertex events
+          // ---- Vertex events ----
           ctrl.onClickVertex = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteVertex) {
@@ -350,7 +349,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Edge events
+          // ---- Edge events ----
           ctrl.onClickEdge = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteEdge) {
@@ -369,7 +368,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Document event
+          // ---- Document event ----
           ctrl.onMouseupDocument = function() {
             if (ctrl.isMobile) {
               return;
@@ -386,7 +385,7 @@ angular.module('oppia').directive('graphViz', [
               }
             }
           };
-          // Actions
+          // ---- Actions ----
           var beginAddEdge = function(startIndex) {
             ctrl.state.addEdgeVertex = startIndex;
           };
@@ -476,7 +475,7 @@ angular.module('oppia').directive('graphViz', [
 
           var deleteVertex = function(index) {
             // Using jQuery's map instead of normal array.map because
-            // it removes elements for which the callback returns null
+            // it removes elements for which the callback returns null.
             ctrl.graph.edges = $.map(ctrl.graph.edges, function(edge) {
               if (edge.src === index || edge.dst === index) {
                 return null;
