@@ -67,6 +67,7 @@ angular.module('oppia').controller('RteHelperModalController', [
         // rawLatex value and then this file can be saved to the backend when
         // the user clicks on the save button.
         mathValueDict.value.svgFile = null;
+        mathValueDict.value.mathExpressionSvgIsBeingProcessed = false;
         $scope.tmpCustomizationArgs.push(mathValueDict);
       } else {
         $scope.tmpCustomizationArgs.push({
@@ -83,6 +84,17 @@ angular.module('oppia').controller('RteHelperModalController', [
       $uibModalInstance.dismiss('cancel');
     };
 
+    $scope.disableSaveButtonForMathRte = function() {
+      // This method disables the save button when the Math SVG has not yet
+      // been generated but being processed.
+      if (!$scope.currentRteIsMathExpressionEditor) {
+        return false;
+      } else {
+        return (
+          $scope.tmpCustomizationArgs[0].value.
+            mathExpressionSvgIsBeingProcessed);
+      }
+    };
     $scope.save = function() {
       $scope.$broadcast('externalSave');
 

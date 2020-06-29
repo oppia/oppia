@@ -24,6 +24,8 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -249,9 +251,14 @@ var RichTextEditor = async function(elem) {
       }
       await richTextComponents.getComponent(componentName)
         .customizeComponent.apply(null, args);
+      await waitFor.elementToBeClickable(await modal.element(
+        by.css(
+          '.protractor-test-close-rich-text-component-editor')),
+      'save button taking too long to be clickable');
       await modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
-
+      await waitFor.invisibilityOf(
+        modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
       if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
