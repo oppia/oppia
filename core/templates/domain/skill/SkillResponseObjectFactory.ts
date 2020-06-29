@@ -32,7 +32,8 @@ export class SkillResponse {
   _skill: Skill;
   _groupedSkillSummaries: Object;
   _assignedSkillTopicDataDict: Object;
-  constructor(skill: Skill, groupedSkillSummaries: Object, assignedSkillTopicDataDict: Object) {
+  constructor(skill: Skill, groupedSkillSummaries: Object,
+      assignedSkillTopicDataDict: Object) {
     this._skill = skill;
     this._groupedSkillSummaries = groupedSkillSummaries;
     this._assignedSkillTopicDataDict = assignedSkillTopicDataDict;

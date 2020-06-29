@@ -182,7 +182,8 @@ describe('Skill backend API service', () => {
         createFromBackendDict({
           skill: sampleResponse.skill,
           grouped_skill_summaries: sampleResponse.grouped_skill_summaries,
-          assigned_skill_topic_data_dict: sampleResponse.assigned_skill_topic_data_dict
+          assigned_skill_topic_data_dict:
+            sampleResponse.assigned_skill_topic_data_dict
         }));
       expect(failHandler).not.toHaveBeenCalled();
     }));
