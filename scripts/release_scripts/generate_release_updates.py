@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import subprocess
 
 import python_utils
 import release_constants
@@ -193,6 +194,27 @@ def prepare_for_next_release():
         'the next release\n' % release_constants.JOBS_FORM_URL)
 
 
+def draft_new_release():
+    """Drafts a new release tag on github."""
+    release_version = common.get_current_release_version_number(
+        common.get_current_branch_name())
+    remote_alias = common.get_remote_alias(release_constants.REMOTE_URL)
+    subprocess.check_call([
+        'git', 'tag', '-a', 'v%s' % release_version,
+        '-m', 'Version %s' % release_version])
+    subprocess.check_call([
+        'git', 'push', remote_alias, 'v%s' % release_version])
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.NEW_RELEASE_URL)
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.EXAMPLE_RELEASE_URL)
+    common.ask_user_to_confirm(
+        'Please draft a new release on GitHub pointing to the '
+        'new tag and including relevant changelog information.\n'
+        'The two tabs in your browser point to: '
+        'Page to draft a new release, examples of previous releases.')
+
+
 def main():
     """Performs task to generate message for release announcement."""
     if not common.is_current_branch_a_release_branch():
@@ -204,6 +226,8 @@ def main():
             'Release summary file %s is missing. Please run the '
             'release_info.py script and re-run this script.' % (
                 release_constants.RELEASE_SUMMARY_FILEPATH))
+
+    draft_new_release()
 
     try:
         create_new_file_with_release_message_template()
