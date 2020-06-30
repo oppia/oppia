@@ -22,6 +22,7 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
       $location, $rootScope) {
     var MAIN_TAB = 'main';
     var QUESTIONS_TAB = 'questions';
+    var PREVIEW_TAB = 'preview';
 
     var activeTab = MAIN_TAB;
 
@@ -43,6 +44,8 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
         activeTab = MAIN_TAB;
       } else if (newPath === '/questions') {
         activeTab = QUESTIONS_TAB;
+      } else if (newPath === '/preview') {
+        activeTab = PREVIEW_TAB;
       }
     });
 
@@ -58,6 +61,9 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
       },
       navigateToQuestionsTab: function() {
         $location.path('/questions');
+      },
+      navigateToPreviewTab: function() {
+        $location.path('/preview');
       }
     };
 

@@ -179,7 +179,7 @@ def remove_repetition_from_changelog(
 
     Returns:
         list(str). Changelog lines with no information on current release
-            version.
+        version.
     """
     current_version_start = 0
     previous_version_start = 0
