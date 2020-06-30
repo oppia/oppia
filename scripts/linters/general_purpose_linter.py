@@ -536,12 +536,12 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
     Args:
         filepath: str. Path of the file.
         file_content: str. Contents of the file.
-        pattern: dict. (regexp(regex pattern) : pattern to match,
-            message(str) : message to show if pattern matches,
-            excluded_files(tuple(str)) : files to be excluded from matching,
-            excluded_dirs(tuple(str)) : directories to be excluded from
-                matching).
-            Object containing details for the pattern to be checked.
+        pattern: dict. (regexp(regex pattern) : Object containing details for
+            the pattern to be checked. Pattern to match:
+                message: str. Message to show if pattern matches.
+                excluded_files: tuple(str). Files to be excluded from matching.
+                excluded_dirs: tuple(str). Directories to be excluded from
+                    matching).
 
     Returns:
         tuple(bool, list(str)). A 2-tuple whose first element is a bool
@@ -583,11 +583,9 @@ def check_file_type_specific_bad_pattern(filepath, content):
         filepath: str. Path of the file.
         content: str. Contents of the file.
 
-     Returns:
-        tuple(bool, int, list(str)). A 3-tuple whose
-        first element is a bool which is True if there is a bad pattern found,
-        second element is an int which gives the number of errors and third
-        element is a list of failed messages.
+    Returns:
+        failed: bool. True if there is bad pattern else false.
+        total_error_count: int. The number of errors.
     """
     summary_messages = []
     failed = False
