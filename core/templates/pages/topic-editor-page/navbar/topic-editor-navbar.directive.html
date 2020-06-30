@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak"
+<ul class="navbar-desktop nav navbar-nav oppina-navbar-nav float-right ng-cloak"
     ng-if="topicRights.canEditTopic()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
@@ -51,52 +51,49 @@
       Unpublish Topic
     </button>
   </li>
-  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getTotalWarningsCount()}" ng-attr-uib-dropdown="<[getTotalWarningsCount()]>" class="nav-item icon">
-    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()"
-       class="nav-link">
-      <i class="material-icons">&#xE254;</i> <span style="font-size: 0.8em;">Topic</span>
-    </a>
-    <div ng-show="getTotalWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-         ng-click="selectMainTab()">
-      <span class="oppia-editor-warnings-count">
-        <[getTotalWarningsCount()]>
-      </span>
-    </div>
-    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
-      <span class="oppia-editor-warnings-header">Warnings</span>
-      <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in validationIssues track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-      <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in prepublishValidationIssues track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-    </ul>
-  </li>
-
-  <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="nav-item icon">
-    <a class="nav-link protractor-test-subtopics-tab-button" uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
-      <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Subtopics</span>
-    </a>
-  </li>
-
-  <li ng-class="{'active': getActiveTabName() === 'questions'}" class="nav-item icon">
-    <a class="nav-link protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
-      <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Questions</span>
-    </a>
-  </li>
-
-  <li class="nav-item icon">
-    <a ng-click="openTopicViewer()" class="nav-link" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
-      <i class="material-icons">&#xE037;</i><span style="font-size: 0.7em;">Preview</span>
-    </a>
-  </li>
 </ul>
+<div class="topic-nav-mobile">
+  <div class="topic-navbar-mobile-tabs">
+    <div class="save-change-btn-container">
+      <button class="btn save-changes-btn"
+              ng-click="saveChanges()">
+        <span ng-if="isSaveInProgress()">
+          <span>Saving</span>
+        </span>
+        <span ng-if="!isSaveInProgress()">
+          Save Changes
+        </span>
+        <span ng-if="getChangeListLength() > 0">
+              (<[getChangeListLength()]>)
+        </span>
+      </button>
+      <div class="arrow-up-container" ng-click="toggleDiscardChangeButton()">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+      <button type="button" class="btn discard-changes-btn"
+              ng-if="discardChangesButtonIsShown"
+              ng-click="discardChanges()">
+        Discard Changes
+      </button>
+    </div>
+    <div class="publish-button-container">
+      <button type="button" ng-if="!topicRights.isPublished()"
+              class="btn btn-publish-topic"
+              ng-click="publishTopic()"
+              ng-class="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
+              ng-disabled="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+        <span>Publish Topic</span>
+      </button>
 
+      <button type="button" ng-click="unpublishTopic()"
+              ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
+              class="btn"
+              ng-disabled="isTopicSaveable()">
+        Unpublish Topic
+      </button>
+    </div>
+  </div>
+</div>
 <style>
   topic-editor-navbar .icon {
     width: 3.5em;
@@ -104,5 +101,66 @@
   topic-editor-navbar .icon .material-icons {
     font-size: 1.4em;
     margin-left: 0.3vw;
+  }
+  topic-editor-navbar .topic-nav-mobile {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    topic-editor-navbar .navbar-desktop {
+      display: none;
+    }
+    topic-editor-navbar .topic-nav-mobile {
+      display: block;
+    }
+    topic-editor-navbar .topic-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    topic-editor-navbar .save-change-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    topic-editor-navbar .save-changes-btn {
+      background-color: #008098;
+      color: #FFFFFF;
+      font-weight: bold;
+      width: 80%;
+    }
+    topic-editor-navbar .discard-changes-btn {
+      background-color: #008098;
+      bottom: 47px;
+      color: #FFFFFF;
+      font-weight: bold;
+      left: 12px;
+      position: absolute;
+      width: 144px;
+    }
+    topic-editor-navbar .btn-publish-topic {
+      background-color: white;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+    .arrow-up-container {
+      align-items: center;
+      background-color: #FFFFFF;
+      border: 1px solid #808080;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      width: 20%;
+    }
+    .arrow-up-container i {
+      color: #008098;
+    }
+    .publish-button-container {
+      width: 40%;
+    }
+    .publish-button-container button {
+      width: 100%;
+    }
   }
 </style>

@@ -30,6 +30,7 @@ import time
 import python_utils
 
 from . import linter_utils
+from .. import clean
 from .. import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -53,6 +54,8 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
     FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
+COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
+
 
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
@@ -72,7 +75,7 @@ def _get_expression_from_node_if_one_exists(
 
     Returns:
         expression: dict or None. Expression part of the node if the node
-            represents a component else None.
+        represents a component else None.
     """
     if parsed_node.type != 'ExpressionStatement':
         return
@@ -175,13 +178,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if filepath.endswith('.js'):
                     raise
                 # Compile typescript file which has syntax invalid for JS file.
-                with linter_utils.temp_dir(prefix='tmpcompiledjs',
-                                           parent=os.getcwd()) as temp_dir:
-                    compiled_js_filepath = self._compile_ts_file(
-                        filepath, temp_dir)
-                    file_content = FILE_CACHE.read(compiled_js_filepath)
-                    parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                        file_content)
+                compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
+
+                file_content = FILE_CACHE.read(compiled_js_filepath)
+                parsed_js_and_ts_files[filepath] = esprima.parseScript(
+                    file_content)
 
         return parsed_js_and_ts_files
 
@@ -210,20 +211,31 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         return parsed_expressions_in_files
 
-    def _compile_ts_file(self, filepath, dir_path):
-        """Compiles a typescript file and returns the path for compiled
-        js file.
+    def _get_compiled_ts_filepath(self, filepath):
+        """Returns the path for compiled ts file.
+
+        Args:
+            filepath: str. filepath of ts file
+
+        Returns:
+            str. filepath of compiled ts file.
         """
-        cmd = (
-            './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-            '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-            '%s -target %s -typeRoots %s %s typings/*') % (
-                dir_path, 'true', 'es2017,dom', 'true',
-                'true', 'es5', './node_modules/@types', filepath)
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
-            dir_path, os.path.basename(filepath).replace('.ts', '.js'))
+            os.getcwd(),
+            COMPILED_TYPESCRIPT_TMP_PATH,
+            os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
+
+    def _compile_all_ts_files(self):
+        """Compiles all project typescript files into
+        COMPILED_TYPESCRIPT_TMP_PATH. Previously, we only compiled
+        the TS files that were needed, but when a relative import was used, the
+        linter would crash with a FileNotFound exception before being able to
+        run. For more details, please see issue #9458.
+        """
+        cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
+            './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
     def _check_any_type(self):
         """Checks if the type of any variable is declared as 'any'
@@ -756,64 +768,64 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     filename_without_extension = filepath[:-3]
                     corresponding_angularjs_filepath = (
                         filename_without_extension + '.ajs.ts')
-                    with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir:
-                        if os.path.isfile(corresponding_angularjs_filepath):
-                            compiled_js_filepath = self._compile_ts_file(
-                                corresponding_angularjs_filepath, temp_dir)
-                            file_content = FILE_CACHE.read(
-                                compiled_js_filepath).decode('utf-8')
 
-                            parsed_script = esprima.parseScript(file_content)
-                            parsed_nodes = parsed_script.body
-                            angularjs_constants_list = []
-                            components_to_check = ['constant']
-                            for parsed_node in parsed_nodes:
-                                expression = (
-                                    _get_expression_from_node_if_one_exists(
-                                        parsed_node, components_to_check))
-                                if not expression:
-                                    continue
-                                else:
-                                    # The following block populates a set to
-                                    # store constants for the Angular-AngularJS
-                                    # constants file consistency check.
-                                    angularjs_constants_name = (
-                                        expression.arguments[0].value)
-                                    angularjs_constants_value = (
-                                        expression.arguments[1].property.name)
-                                    if angularjs_constants_value != (
-                                            angularjs_constants_name):
-                                        failed = True
-                                        python_utils.PRINT(
-                                            '%s --> Please ensure that the '
-                                            'constant %s is initialized '
-                                            'from the value from the '
-                                            'corresponding Angular constants'
-                                            ' file (the *.constants.ts '
-                                            'file). Please create one in the'
-                                            ' Angular constants file if it '
-                                            'does not exist there.' % (
-                                                filepath,
-                                                angularjs_constants_name))
-                                    angularjs_constants_list.append(
-                                        angularjs_constants_name)
-                            angularjs_constants_set = set(
-                                angularjs_constants_list)
-                            if len(angularjs_constants_set) != len(
-                                    angularjs_constants_list):
-                                failed = True
-                                python_utils.PRINT(
-                                    '%s --> Duplicate constant declaration '
-                                    'found.' % (
-                                        corresponding_angularjs_filepath))
-                            angularjs_source_filepaths_to_constants_dict[
-                                corresponding_angularjs_filepath] = (
-                                    angularjs_constants_set)
-                        else:
+                    if os.path.isfile(corresponding_angularjs_filepath):
+                        compiled_js_filepath = self._get_compiled_ts_filepath(
+                            corresponding_angularjs_filepath)
+                        file_content = FILE_CACHE.read(
+                            compiled_js_filepath).decode('utf-8')
+
+                        parsed_script = esprima.parseScript(file_content)
+                        parsed_nodes = parsed_script.body
+                        angularjs_constants_list = []
+                        components_to_check = ['constant']
+                        for parsed_node in parsed_nodes:
+                            expression = (
+                                _get_expression_from_node_if_one_exists(
+                                    parsed_node, components_to_check))
+                            if not expression:
+                                continue
+                            else:
+                                # The following block populates a set to
+                                # store constants for the Angular-AngularJS
+                                # constants file consistency check.
+                                angularjs_constants_name = (
+                                    expression.arguments[0].value)
+                                angularjs_constants_value = (
+                                    expression.arguments[1].property.name)
+                                if angularjs_constants_value != (
+                                        angularjs_constants_name):
+                                    failed = True
+                                    python_utils.PRINT(
+                                        '%s --> Please ensure that the '
+                                        'constant %s is initialized '
+                                        'from the value from the '
+                                        'corresponding Angular constants'
+                                        ' file (the *.constants.ts '
+                                        'file). Please create one in the'
+                                        ' Angular constants file if it '
+                                        'does not exist there.' % (
+                                            filepath,
+                                            angularjs_constants_name))
+                                angularjs_constants_list.append(
+                                    angularjs_constants_name)
+                        angularjs_constants_set = set(
+                            angularjs_constants_list)
+                        if len(angularjs_constants_set) != len(
+                                angularjs_constants_list):
                             failed = True
                             python_utils.PRINT(
-                                '%s --> Corresponding AngularJS constants '
-                                'file not found.' % filepath)
+                                '%s --> Duplicate constant declaration '
+                                'found.' % (
+                                    corresponding_angularjs_filepath))
+                        angularjs_source_filepaths_to_constants_dict[
+                            corresponding_angularjs_filepath] = (
+                                angularjs_constants_set)
+                    else:
+                        failed = True
+                        python_utils.PRINT(
+                            '%s --> Corresponding AngularJS constants '
+                            'file not found.' % filepath)
 
                 # Check that the constants are declared only in a
                 # *.constants.ajs.ts file.
@@ -901,6 +913,107 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         return summary_messages
 
+    def _check_comments(self):
+        """This function ensures that comments follow correct style. Below are
+        some formats of correct comment style:
+        1. A comment can end with the following symbols: ('.', '?', ';', ',',
+        '{', '^', ')', '}', '>'). Example: // Is this is comment?
+        2. If a line contain any of the following words or phrases('@ts-ignore',
+        '--params', 'eslint-disable', 'eslint-enable', 'http://', 'https://')
+        in the comment.
+        """
+        if self.verbose_mode_enabled:
+            python_utils.PRINT(
+                'Starting comment checks\n'
+                '----------------------------------------')
+        summary_messages = []
+        files_to_check = self.all_filepaths
+        allowed_terminating_punctuations = [
+            '.', '?', ';', ',', '{', '^', ')', '}', '>']
+
+        # We allow comments to not have a terminating punctuation if any of the
+        # below phrases appears at the beginning of the comment.
+        # Example: // eslint-disable max-len
+        # This comment will be excluded from this check.
+        allowed_start_phrases = [
+            '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable']
+
+        # We allow comments to not have a terminating punctuation if any of the
+        # below phrases appears in the last word of a comment.
+        # Example: // Ref: https://some.link.com
+        # This comment will be excluded from this check.
+        allowed_end_phrases = ['http://', 'https://']
+
+        failed = False
+        with linter_utils.redirect_stdout(sys.stdout):
+            for filepath in files_to_check:
+                file_content = FILE_CACHE.readlines(filepath)
+                file_length = len(file_content)
+                for line_num in python_utils.RANGE(file_length):
+                    line = file_content[line_num].strip()
+                    next_line = ''
+                    previous_line = ''
+                    if line_num + 1 < file_length:
+                        next_line = file_content[line_num + 1].strip()
+
+                    # Exclude comment line containing heading.
+                    # Example: // ---- Heading ----
+                    # These types of comments will be excluded from this check.
+                    if (
+                            line.startswith('//') and line.endswith('-')
+                            and not (
+                                next_line.startswith('//') and
+                                previous_line.startswith('//'))):
+                        continue
+
+                    if line.startswith('//') and not next_line.startswith('//'):
+                        # Check if any of the allowed starting phrase is present
+                        # in comment and exclude that line from check.
+                        allowed_start_phrase_present = any(
+                            line.split()[1].startswith(word) for word in
+                            allowed_start_phrases)
+
+                        if allowed_start_phrase_present:
+                            continue
+
+                        # Check if any of the allowed ending phrase is present
+                        # in comment and exclude that line from check. Used 'in'
+                        # instead of 'startswith' because we have some comments
+                        # with urls inside the quotes.
+                        # Example: 'https://oppia.org'
+                        allowed_end_phrase_present = any(
+                            word in line.split()[-1] for word in
+                            allowed_end_phrases)
+
+                        if allowed_end_phrase_present:
+                            continue
+
+                        # Check that the comment ends with the proper
+                        # punctuation.
+                        last_char_is_invalid = line[-1] not in (
+                            allowed_terminating_punctuations)
+                        if last_char_is_invalid:
+                            failed = True
+                            summary_message = (
+                                '%s --> Line %s: Invalid punctuation used at '
+                                'the end of the comment.' % (
+                                    filepath, line_num + 1))
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
+                            python_utils.PRINT('')
+
+            if failed:
+                summary_message = (
+                    '%s Comments check failed, fix files that have bad '
+                    'comment formatting.' % linter_utils.FAILED_MESSAGE_PREFIX)
+            else:
+                summary_message = (
+                    '%s Comments check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -915,6 +1028,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
+        # Clear temp compiled typescipt files from previous runs.
+        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
+        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
+        self._compile_all_ts_files()
+
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
@@ -928,12 +1046,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
+        comments_style_messages = self._check_comments()
+
+        # Clear temp compiled typescipt files.
+        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
 
         all_messages = (
             any_type_messages + extra_js_files_messages +
             http_requests_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages)
+            controller_dependency_messages + comments_style_messages)
         return all_messages
 
 
@@ -1008,7 +1130,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for error in result_list:
-                python_utils.PRINT(error)
+                python_utils.PRINT(python_utils.convert_to_bytes(error))
                 summary_messages.append(error)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (

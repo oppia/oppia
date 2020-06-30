@@ -39,18 +39,12 @@ describe('Creator dashboard controller', () => {
   var userInfo = {
     canCreateCollections: () => true
   };
-  var mockWindow = angular.element(window)[0];
-  var resizeEvent = new Event('resize');
 
   beforeEach(angular.mock.module('oppia', $provide => {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-  }));
-
-  beforeEach(angular.mock.module('oppia', $provide => {
-    $provide.value('$window', mockWindow);
   }));
 
   beforeEach(angular.mock.inject(($injector, $componentController) => {
@@ -84,7 +78,8 @@ describe('Creator dashboard controller', () => {
     // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty($window, 'innerWidth', {
-      get: () => undefined
+      get: () => undefined,
+      set: () => {}
     });
   }));
 
@@ -122,7 +117,7 @@ describe('Creator dashboard controller', () => {
         last_week_stats: {
           total_plays: 5
         },
-        display_preference: [],
+        display_preference: 'card',
         threads_for_created_suggestions_list: [{
           status: '',
           subject: '',
@@ -311,19 +306,27 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should update screen width on window resize', function() {
-        var innerWidthSpy = spyOnProperty($window, 'innerWidth', 'get');
+        var innerWidthSpy = spyOnProperty($window, 'innerWidth');
+        $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
+          200);
+        ctrl.setMyExplorationsView('list');
+        $httpBackend.flush();
 
-        innerWidthSpy.and.returnValue(480);
-        mockWindow.dispatchEvent(resizeEvent);
+        expect(ctrl.myExplorationsView).toBe('list');
+
+        innerWidthSpy.and.callFake(() => 480);
+        $rootScope.$apply();
+        angular.element($window).triggerHandler('resize');
 
         expect(ctrl.myExplorationsView).toBe('card');
         expect(ctrl.publishText).toBe(
           'Publish the exploration to receive statistics.');
 
-        innerWidthSpy.and.returnValue(768);
-        mockWindow.dispatchEvent(resizeEvent);
+        innerWidthSpy.and.callFake(() => 768);
+        $rootScope.$apply();
+        angular.element($window).triggerHandler('resize');
 
-        expect(ctrl.myExplorationsView).toBe('card');
+        expect(ctrl.myExplorationsView).toBe('list');
         expect(ctrl.publishText).toBe(
           'This exploration is private. Publish it to receive statistics.');
       });
@@ -382,8 +385,13 @@ describe('Creator dashboard controller', () => {
         ctrl.setActiveThread(threadId);
         $httpBackend.flush();
 
+        // Method showSuggestionModal is mocked otherwise using its original
+        // implementation will throw an error: 'appendTo element not found.
+        // Make sure that the element passed is in DOM.'
+        // This error does not happen often and it's related to the usage of
+        // angular.element in above specs.
         spyOn(SuggestionModalForCreatorDashboardService, 'showSuggestionModal')
-          .and.callThrough();
+          .and.callFake(() => {});
         ctrl.showSuggestionModal();
 
         expect(SuggestionModalForCreatorDashboardService.showSuggestionModal)

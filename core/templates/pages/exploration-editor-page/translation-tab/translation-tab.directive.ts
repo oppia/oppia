@@ -155,7 +155,7 @@ angular.module('oppia').directive('translationTab', [
             $scope.$on('refreshTranslationTab', function() {
               initTranslationTab();
             });
-            // Toggles the translation tab tutorial on/off
+            // Toggles the translation tab tutorial on/off.
             $scope.translationTutorial = false;
             $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
               type: 'title',

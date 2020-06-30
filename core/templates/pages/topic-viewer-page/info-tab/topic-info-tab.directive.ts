@@ -64,7 +64,7 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
                 ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
 
                 // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular
+                // once the directive is migrated to angular.
                 $rootScope.$applyAsync();
               });
           };
