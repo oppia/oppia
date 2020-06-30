@@ -62,7 +62,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
 
             Args:
                 *args: str. Variable length argument list of values to print in
-                the same line of output.
+                    the same line of output.
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))

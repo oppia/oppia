@@ -46,7 +46,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
 
             Args:
                 *args(str): Variable length argument list of values to print in
-                the same line of output.
+                    the same line of output.
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
@@ -55,6 +55,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
 
 class CreateTaskTests(ConcurrentTaskUtilsTests):
     """Tests for create_task method."""
+
     def test_create_task_with_success(self):
         task = concurrent_task_utils.create_task(
             test_function, True, self.semaphore)
@@ -63,6 +64,7 @@ class CreateTaskTests(ConcurrentTaskUtilsTests):
 
 class TaskThreadTests(ConcurrentTaskUtilsTests):
     """Tests for TaskThread class."""
+
     def test_task_thread_with_success(self):
         task = concurrent_task_utils.TaskThread(
             test_function('unused_arg'), True, self.semaphore, name='test')
@@ -87,6 +89,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
 class ExecuteTasksTests(ConcurrentTaskUtilsTests):
     """Tests for execute_tasks method."""
+
     def test_execute_task_with_single_task(self):
         task = concurrent_task_utils.create_task(
             test_function('unused_arg'), True, self.semaphore, name='test')
