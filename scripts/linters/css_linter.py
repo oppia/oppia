@@ -59,11 +59,12 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
-    def _get_trimmed_error_messages(self, lint_messages):
+    @staticmethod
+    def _get_trimmed_error_messages(lint_messages):
         """Remove extra bits from stylelint error messages.
 
         Args:
-            lint_messages: list(str). Messages returned by the css linter.
+            lint_messages: str. Messages returned by the css linter.
 
         Returns:
             str. A string with the trimmed error messages.
@@ -71,7 +72,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         error_messages = ''
         # We need to extract messages from the list and split them line by
         # line so we can loop through them.
-        messages = lint_messages[0].split('\n')
+        messages = lint_messages.split('\n')
         for message in messages:
             # Stylelint messages start with line numbers and then a
             # cross(x) and a message-id in the end. We are matching
@@ -83,9 +84,9 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 message_list = message.split()
                 new_message = ' '.join(
                     message_list[:1] + message_list[2:-1])
-                error_messages += new_message + '\n'
             else:
-                error_messages += message + '\n'
+                new_message = message
+            error_messages += new_message + '\n'
         return error_messages
 
     def _lint_css_files(self):
@@ -139,7 +140,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             for error in result_list:
                 python_utils.PRINT(error)
             summary_messages.append(
-                self._get_trimmed_error_messages(result_list))
+                self._get_trimmed_error_messages(result_list[0]))
             summary_message = ('%s %s CSS file' % (
                 linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:

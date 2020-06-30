@@ -341,7 +341,8 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.html_filepaths
 
-    def _get_trimmed_error_messages(self, lint_messages):
+    @staticmethod
+    def _get_trimmed_error_messages(lint_messages):
         """Remove extra bits from htmllint error messages.
 
         Args:

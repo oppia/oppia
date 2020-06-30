@@ -338,11 +338,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
-    def _get_trimmed_error_messages(self, lint_messages):
+    @staticmethod
+    def _get_trimmed_error_messages(lint_messages):
         """Remove extra bits from pylint error messages.
 
         Args:
-            lint_messages: list. Messages returned by the python linter.
+            lint_messages: list(str). Messages returned by the python linter.
 
         Returns:
             str. A string with the trimmed error messages.
@@ -360,11 +361,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             # so we need to check if it is true and if case is true then
             # remove the message-id from the end of original message.
             if message.endswith(')'):
-                python_utils.PRINT(message)
                 last_string_length = len(message.split()[-1])
                 error_messages += message[:-last_string_length]
             else:
-                python_utils.PRINT(message)
                 error_messages += message
         return error_messages
 
@@ -420,6 +419,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
                 pylint_error_messages = (
                     self._get_trimmed_error_messages(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)

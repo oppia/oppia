@@ -1082,11 +1082,12 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
-    def _get_trimmed_error_messages(self, lint_messages):
+    @staticmethod
+    def _get_trimmed_error_messages(lint_messages):
         """Remove extra bits from eslint messages.
 
         Args:
-            lint_messages: list. Messages returned by the js_ts linter.
+            lint_messages: str. Messages returned by the js_ts linter.
 
         Returns:
             str. A string with the trimmed messages.
@@ -1099,21 +1100,21 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         # 1 errors found in 1 file
         # and fourth one with a message to fix automatically.
         # These error can be fixed with the use of --fix.
-        messages = lint_messages[0].split('\n')[:-4]
+        messages = lint_messages.split('\n')[:-4]
         for message in messages:
             # ESlint messages start with line numbers and then a
             # cross(x) and a message-id in the end. We are matching
             # if the line contains line number becuase every message start with
-            # num:num and we are matching it with regex and if that is True then
-            # we are removing cross(x) which is at the index 1 and message-id
-            # from the end.
+            # num:num where num is of type int and we are matching it with regex
+            # and if that is True then we are removing cross(x) which is at the
+            # index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', message.lstrip()):
                 message_list = message.split()
                 new_message = ' '.join(
                     message_list[:1] + message_list[2:-1])
-                error_messages += new_message + '\n'
             else:
-                error_messages += message + '\n'
+                new_message = message
+            error_messages += new_message + '\n'
         return error_messages
 
     def _lint_js_and_ts_files(self):
@@ -1165,7 +1166,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-            eslint_messages = self._get_trimmed_error_messages(result_list)
+            eslint_messages = self._get_trimmed_error_messages(result_list[0])
             summary_messages.append(eslint_messages)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (
