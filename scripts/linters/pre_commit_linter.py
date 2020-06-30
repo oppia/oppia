@@ -77,7 +77,7 @@ install_third_party_libs.main()
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
-_EXCLUSIVE_GROUP.add_argument(
+_PARSER.add_argument(
     '--path',
     help='path to the directory with files to be linted',
     action='store')
@@ -86,11 +86,11 @@ _EXCLUSIVE_GROUP.add_argument(
     nargs='+',
     help='specific files to be linted. Space separated list',
     action='store')
-_PARSER.add_argument(
+_EXCLUSIVE_GROUP.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
-_EXCLUSIVE_GROUP.add_argument(
+_PARSER.add_argument(
     '--only-check-file-extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
@@ -177,7 +177,7 @@ class FileCache(python_utils.OBJECT):
 
         Returns:
             tuple(str). The tuple containing data line by line as read from the
-                file.
+            file.
         """
         return self._get_data(filepath, mode)[1]
 
@@ -191,8 +191,8 @@ class FileCache(python_utils.OBJECT):
 
         Returns:
             tuple(str, tuple(str)). The tuple containing data read from the file
-                as first element and tuple containing the text line by line as
-                second element.
+            as first element and tuple containing the text line by line as
+            second element.
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
@@ -315,7 +315,7 @@ def _get_file_extensions(file_extensions_to_lint):
 
     Args:
         file_extensions_to_lint: list(str). The list of file extensions to be
-        linted checked.
+            linted and checked.
 
     Returns:
         all_file_extensions_type: list(str). The list of all file extensions
@@ -352,7 +352,7 @@ def _get_all_filepaths(input_path, input_filenames):
 
     Returns:
         all_filepaths: list(str). The list of filepaths to be linted and
-            checked.
+        checked.
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     if input_path:
