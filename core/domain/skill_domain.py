@@ -361,7 +361,7 @@ class WorkedExample(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the worked example are
-            invalid.
+                invalid.
         """
         if not isinstance(self.question, state_domain.SubtitledHtml):
             raise utils.ValidationError(
@@ -437,7 +437,7 @@ class SkillContents(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of skill contents are
-            invalid.
+                invalid.
         """
         available_content_ids = set([])
         if not isinstance(self.explanation, state_domain.SubtitledHtml):
@@ -1035,7 +1035,7 @@ class Skill(python_utils.OBJECT):
 
         Args:
             all_questions_merged: bool. Flag indicating if all questions are
-            merged to the superseding skill.
+                merged to the superseding skill.
         """
         self.all_questions_merged = all_questions_merged
 
@@ -1110,7 +1110,7 @@ class Skill(python_utils.OBJECT):
 
         Returns:
             int or None. The index of the corresponding misconception, or None
-                if there is no such misconception.
+            if there is no such misconception.
         """
         for ind, misconception in enumerate(self.misconceptions):
             if misconception.id == misconception_id:

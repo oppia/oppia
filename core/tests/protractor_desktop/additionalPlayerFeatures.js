@@ -505,7 +505,7 @@ describe('Full exploration editor', function() {
     await explorationEditorPage.saveChanges();
     await workflow.publishExploration();
 
-    // Play-test the exploration and visit the recommended exploration
+    // Play-test the exploration and visit the recommended exploration.
     await libraryPage.get();
     await libraryPage.findExploration('Exploration with Recommendation');
     await libraryPage.playExploration('Exploration with Recommendation');
