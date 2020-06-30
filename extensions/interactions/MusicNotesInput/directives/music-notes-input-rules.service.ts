@@ -56,14 +56,14 @@ export class MusicNotesInputRulesService {
   }
   IsLongerThan(
       answer: IMusicNotesAnswer[],
-      inputs: {x: IMusicNotesAnswer[], k: number}): boolean {
+      inputs: {k: number}): boolean {
     return MusicNotesInputRulesService._convertSequenceToMidi(
       answer).length > inputs.k;
   }
   // TODO(wxy): Validate that inputs.a <= inputs.b.
   HasLengthInclusivelyBetween(
       answer: IMusicNotesAnswer[],
-      inputs: {x: IMusicNotesAnswer[], a: number, b: number}): boolean {
+      inputs: {a: number, b: number}): boolean {
     var answerLength:number = (
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
     return answerLength >= inputs.a && answerLength <= inputs.b;
