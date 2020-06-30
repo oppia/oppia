@@ -1014,6 +1014,142 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             summary_messages.append(summary_message)
         return summary_messages
 
+    def _check_oppia_angular_root(self):
+        """Finds all @Injectable classes and makes sure that they are added to
+            Oppia root and Oppia Angular Root.
+
+        Returns:
+            all_messages: str. All the messages returned by the lint checks.
+        """
+        def get_injectable_class_name(file_content):
+            """Extarcts the class name from a file that has an Injectable
+                class.
+
+            Args:
+                file_content: str. File content of the file that has an
+                    Injectable class.
+
+            Returns:
+                tuple(str, str). A two-tuple of class name and class name in
+                camelCase.
+            """
+
+            # Going through all ts files and looking for @Injectable classes.
+            class_name = file_content.split(
+                '@Injectable({')[1].split(
+                    'export class ')[1].split('{')[0].replace(' ', '')
+            camel_case_class_name = class_name[0].lower() + class_name[1:]
+            return class_name, camel_case_class_name
+
+        #pylint: disable=invalid-name
+        OPPIA_ANGULAR_ROOT_PATH = (
+            './core/templates/components/oppia-angular-root.component.ts')
+        #pylint: disable=invalid-name
+        OPPIA_ROOT_DIRECTIVE_PATH = (
+            './core/templates/base-components/oppia-root.directive.ts')
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting Oppia Angular Root file check')
+            python_utils.PRINT('----------------------------------------')
+        oppia_angular_root = FILE_CACHE.read(OPPIA_ANGULAR_ROOT_PATH)
+        oppia_root_directive = FILE_CACHE.read(OPPIA_ROOT_DIRECTIVE_PATH)
+        summary_messages = []
+        total_error_count = 0
+        total_files_checked = 0
+        for file_path in self.ts_files:
+            file_content = FILE_CACHE.read(file_path)
+            if '@Injectable({' in file_content:
+                total_files_checked += 1
+                class_name, camel_case_class_name = (
+                    get_injectable_class_name(file_content))
+                if not 'import { ' + class_name in oppia_angular_root:
+                    summary_message = (
+                        'Please import %s to Oppia Angular Root'
+                        % (class_name))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    python_utils.PRINT('')
+                    total_error_count += 1
+
+                if not (
+                        'static ' + camel_case_class_name + ': ' + class_name
+                        in oppia_angular_root):
+                    total_error_count += 1
+                    summary_message = (
+                        'Please add a static class member %s '
+                        'to Oppia Angular Root:' % (camel_case_class_name))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    summary_message = (
+                        ' static %s: %s;' % (
+                            camel_case_class_name, class_name))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    python_utils.PRINT('')
+
+                if not (
+                        'private ' + camel_case_class_name + ': ' + class_name
+                        in oppia_angular_root):
+                    total_error_count += 1
+                    summary_message = (
+                        'Please add the class %s to Oppia Angular'
+                        ' Root constructor:' % (class_name)
+                    )
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    summary_message = (
+                        'private %s: %s' % (camel_case_class_name, class_name))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    python_utils.PRINT('')
+
+                if not (
+                        'OppiaAngularRootComponent.' + camel_case_class_name +
+                        ' = ' + 'this.' + camel_case_class_name + ';' in
+                        oppia_angular_root):
+                    total_error_count += 1
+                    summary_message = (
+                        'The static variable hasn\'t been assigned value:')
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    summary_message = (
+                        '  OppiaAngularRootComponent.%s = this.%s' % (
+                            camel_case_class_name, camel_case_class_name))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    python_utils.PRINT('')
+
+                if not '\'' + class_name + '\'' in oppia_root_directive:
+                    total_error_count += 1
+                    summary_message = (
+                        'The class %s hasn\'t been added to ANGULAR_SERVICES'
+                        ' in  oppia-root.directive.ts.' % (
+                            class_name))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    python_utils.PRINT('')
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            if self.verbose_mode_enabled:
+                python_utils.PRINT('----------------------------------------')
+            if total_error_count:
+                python_utils.PRINT('(%s files checked, %s errors found)' % (
+                    total_files_checked, total_error_count))
+                summary_message = linter_utils.FAILED_MESSAGE_PREFIX
+                summary_message += 'OppiaAngularRootComponent linting failed,'
+                summary_message += ' fix the errors listed above'
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s OppiaAngularRootComponent linting linting passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+                summary_messages.append(summary_message)
+
+            python_utils.PRINT('')
+            python_utils.PRINT(summary_message)
+            python_utils.PRINT('OppiaAngularRootComponent linting finished.')
+            python_utils.PRINT('')
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -1047,6 +1183,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
         comments_style_messages = self._check_comments()
+        oppia_angular_root_messages = self._check_oppia_angular_root()
 
         # Clear temp compiled typescipt files.
         clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
@@ -1055,7 +1192,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             any_type_messages + extra_js_files_messages +
             http_requests_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages + comments_style_messages)
+            controller_dependency_messages + comments_style_messages +
+            oppia_angular_root_messages)
         return all_messages
 
 

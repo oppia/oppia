@@ -67,7 +67,6 @@ from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
 from . import linter_utils
-from . import oppia_angular_root_linter
 from . import python_linter
 from . import third_party_typings_linter
 from .. import common
@@ -554,10 +553,6 @@ def main(args=None):
 
     lint_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
-
-    lint_messages += oppia_angular_root_linter.oppia_angular_root_linter(
-        _FILES['.ts'], verbose_mode_enabled
-    )
 
     lint_messages += (
         third_party_typings_linter.check_third_party_libs_type_defs(
