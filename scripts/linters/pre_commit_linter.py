@@ -240,11 +240,6 @@ def _get_linters_for_file_extension(
             verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
-        custom_linter, third_party_linter = (
-            oppia_angular_root_linter.get_linters(_FILES['.ts'])
-        )
-        custom_linters.append(custom_linter)
-        third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'html':
         custom_linter, third_party_linter = html_linter.get_linters(
@@ -563,6 +558,12 @@ def main(args=None):
 
     lint_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
+
+    python_utils.PRINT(_FILES['.ts'])
+
+    lint_messages += oppia_angular_root_linter.oppia_angular_root_linter(
+        _FILES['.ts'], verbose_mode_enabled
+    )
 
     lint_messages += (
         third_party_typings_linter.check_third_party_libs_type_defs(
