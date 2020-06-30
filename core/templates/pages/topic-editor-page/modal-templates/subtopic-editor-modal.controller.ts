@@ -103,7 +103,6 @@ angular.module('oppia').controller('SubtopicEditorModalController', [
 
     $scope.updateHtmlData = function(htmlData) {
       $scope.subtopicPage.getPageContents().setHtml(htmlData);
-      $scope.openPreviewSubtopicPage(htmlData);
     };
 
     $scope.save = function() {
