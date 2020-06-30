@@ -284,6 +284,41 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'from_index': 1
             })
 
+    def test_rearrange_canonical_stories_in_topic(self):
+        story_id_new = 'story_id_new'
+        topic_services.add_canonical_story(
+            self.user_id_admin, self.TOPIC_ID, 'story_id_new')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, self.story_id_1)
+        self.assertEqual(
+            topic.canonical_story_references[1].story_id, self.story_id_2)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, story_id_new)
+
+        topic_services.rearrange_canonical_story(
+            self.user_id_admin, self.TOPIC_ID, 2, 0)
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, story_id_new)
+        self.assertEqual(
+            topic.canonical_story_references[1].story_id, self.story_id_1)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, self.story_id_2)
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 4)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Rearranged canonical story on index 2 to index 0')
+
     def test_cannot_update_topic_property_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
             Exception, (
