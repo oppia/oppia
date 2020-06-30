@@ -1082,7 +1082,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
-    def _get_trimmed_summary_message(self, lint_messages):
+    def _get_trimmed_error_messages(self, lint_messages):
         """Remove extra bits from eslint messages.
 
         Args:
@@ -1094,11 +1094,17 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         error_messages = ''
         # Extract the message from list and split the message by newline
         # so that we can use them and remove last four lines from the end.
+        # Becuase last two lines are empty with a newline character and
+        # third one have a message with number of errors.
+        # 1 errors found in 1 file
+        # and fourth one with a message to fix automatically.
+        # These error can be fixed with the use of --fix.
         messages = lint_messages[0].split('\n')[:-4]
         for message in messages:
             # ESlint messages start with line numbers and then a
             # cross(x) and a message-id in the end. We are matching
-            # if the line contains line number and if that is True then we
+            # if the line contains line number becuase every message start with
+            # num:num and we are matching it with regex and if that is True then
             # we are removing cross(x) which is at the index 1 and message-id
             # from the end.
             if re.search(r'^\d+:\d+', message.lstrip()):
@@ -1159,7 +1165,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-            eslint_messages = self._get_trimmed_summary_message(result_list)
+            eslint_messages = self._get_trimmed_error_messages(result_list)
             summary_messages.append(eslint_messages)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (

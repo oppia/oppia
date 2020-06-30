@@ -341,18 +341,22 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.html_filepaths
 
-    def _get_trimmed_error_message(self, lint_messages):
-        """Remove extra bits from htmllint messages.
+    def _get_trimmed_error_messages(self, lint_messages):
+        """Remove extra bits from htmllint error messages.
 
         Args:
             lint_messages: str. Messages returned by the html linter.
 
         Returns:
-            str. A string with the trimmed messages.
+            str. A string with the trimmed error messages.
         """
         error_messages = ''
-        # Extracting messages and removing extra bits from the end of message.
-        # which is the number of files that are linted and a newline.
+        # Extracting messages by removing number of files linted and number of
+        # error messages from the end of message. Becuase we last two lines
+        # like this:
+        # 1 error found.
+        # [htmllint] 1 files linted.
+        # Hence removing last two lines from the message.
         messages = lint_messages.split('\n')[:-2]
         for message in messages:
             error_messages += message + '\n'
@@ -395,7 +399,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                     error_summary.append(error_count)
                     python_utils.PRINT(linter_stdout)
                     summary_messages.append(
-                        self._get_trimmed_error_message(linter_stdout))
+                        self._get_trimmed_error_messages(linter_stdout))
 
         with linter_utils.redirect_stdout(stdout):
             if self.verbose_mode_enabled:

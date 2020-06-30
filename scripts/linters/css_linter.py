@@ -59,14 +59,14 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
-    def _get_trimmed_error_message(self, lint_messages):
-        """Remove extra bits from stylelint messages.
+    def _get_trimmed_error_messages(self, lint_messages):
+        """Remove extra bits from stylelint error messages.
 
         Args:
-            lint_messages: list. Messages returned by the css linter.
+            lint_messages: list(str). Messages returned by the css linter.
 
         Returns:
-            str. A string with the trimmed messages.
+            str. A string with the trimmed error messages.
         """
         error_messages = ''
         # We need to extract messages from the list and split them line by
@@ -75,7 +75,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         for message in messages:
             # Stylelint messages start with line numbers and then a
             # cross(x) and a message-id in the end. We are matching
-            # if the line contains line number and if that is True then we
+            # if the line contains line number becuase every message start with
+            # num:num and we are matching it with regex and if that is True then
             # we are removing cross(x) which is at the index 1 and message-id
             # from the end.
             if re.search(r'^\d+:\d+', message.lstrip()):
@@ -138,7 +139,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             for error in result_list:
                 python_utils.PRINT(error)
             summary_messages.append(
-                self._get_trimmed_error_message(result_list))
+                self._get_trimmed_error_messages(result_list))
             summary_message = ('%s %s CSS file' % (
                 linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:

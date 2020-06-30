@@ -49,11 +49,11 @@ import pycodestyle # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class WritableObject(python_utils.OBJECT):
+class PylintReport(python_utils.OBJECT):
     """Output stream for pylint."""
 
     def __init__(self):
-        """Constructs a WritableObject object."""
+        """Constructs a PylintReport object."""
         self.messages = []
 
     def write(self, message):
@@ -339,27 +339,33 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return self.files_to_lint
 
     def _get_trimmed_error_messages(self, lint_messages):
-        """Remove extra bits from pylint messages.
+        """Remove extra bits from pylint error messages.
 
         Args:
             lint_messages: list. Messages returned by the python linter.
 
         Returns:
-            str. A string with the trimmed messages.
+            str. A string with the trimmed error messages.
         """
         error_messages = ''
         # Remove newlines and coverage report from the end of message.
+        # we need to remove last five items from the list becuase starting from
+        # end we have three lines with just newline characters, fourth line
+        # contains the coverage report i.e.
+        # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
+        # and one line with dashes(---).
         lint_messages = lint_messages[:-5]
         for message in lint_messages:
-            python_utils.PRINT(message)
             # Every pylint message has a message id inside the brackets
             # so we need to check if it is true and if case is true then
             # remove the message-id from the end of original message.
             if message.endswith(')'):
+                python_utils.PRINT(message)
                 last_string_length = len(message.split()[-1])
-                error_messages += (message[:-last_string_length])
+                error_messages += message[:-last_string_length]
             else:
-                error_messages += (message)
+                python_utils.PRINT(message)
+                error_messages += message
         return error_messages
 
     def _lint_py_files(self, config_pylint, config_pycodestyle):
@@ -400,10 +406,10 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             with linter_utils.redirect_stdout(stdout):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
-                pylint_output = WritableObject()
+                pylint_report = PylintReport()
                 pylinter = lint.Run(
                     current_files_to_lint + [config_pylint],
-                    reporter=text.TextReporter(pylint_output),
+                    reporter=text.TextReporter(pylint_report),
                     exit=False).linter
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
@@ -414,9 +420,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
-                pylint_messages = (
-                    self._get_trimmed_error_messages(pylint_output.read()))
-                summary_messages.append(pylint_messages)
+                pylint_error_messages = (
+                    self._get_trimmed_error_messages(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
                 python_utils.PRINT(summary_message)
                 are_there_errors = True
 
@@ -487,17 +493,17 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
                 python_utils.PRINT('Messages for Python 3 support:')
-                pylint_output = WritableObject()
+                pylint_report = PylintReport()
                 pylinter_for_python3 = lint.Run(
                     current_files_to_lint + ['--py3k'],
-                    reporter=text.TextReporter(pylint_output),
+                    reporter=text.TextReporter(pylint_report),
                     exit=False).linter
 
             if pylinter_for_python3.msg_status != 0:
                 summary_message = stdout.getvalue()
-                pylint_messages = (
-                    self._get_trimmed_error_messages(pylint_output.read()))
-                summary_messages.append(pylint_messages)
+                pylint_error_messages = (
+                    self._get_trimmed_error_messages(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
                 python_utils.PRINT(summary_message)
                 any_errors = True
 
