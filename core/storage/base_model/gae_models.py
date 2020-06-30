@@ -147,8 +147,8 @@ class BaseModel(ndb.Model):
 
         Raises:
             NotImplementedError: This method is needed when the migration
-            policy is ONE_FIELD, it is only overwritten in classes that have
-            that policy.
+                policy is ONE_FIELD, it is only overwritten in classes that have
+                that policy.
         """
         raise NotImplementedError
 
@@ -354,7 +354,7 @@ class BaseModel(ndb.Model):
                 list of entities.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: List of query results.
@@ -461,7 +461,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
         Returns:
             CommitLogEntryModel. Returns the respective CommitLogEntryModel
-                instance of the construct from which this is called.
+            instance of the construct from which this is called.
         """
         return cls(
             id=cls._get_instance_id(entity_id, version),
@@ -506,7 +506,7 @@ class BaseCommitLogEntryModel(BaseModel):
                 of the full list of entities.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: List of query results.
@@ -534,7 +534,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
         Returns:
             BaseCommitLogEntryModel. The commit with the target entity id and
-                version number.
+            version number.
         """
         commit_id = cls._get_instance_id(target_entity_id, version)
         return cls.get_by_id(commit_id)
@@ -611,7 +611,7 @@ class VersionedModel(BaseModel):
 
         Returns:
             VersionedModel. The instance of the VersionedModel class populated
-                with the the snapshot.
+            with the the snapshot.
         """
         self.populate(**snapshot_dict)
         return self
@@ -960,7 +960,7 @@ class VersionedModel(BaseModel):
 
         Returns:
             list(VersionedModel). Model instances representing the given
-                versions.
+            versions.
 
         Raises:
             ValueError. The given entity_id is invalid.
