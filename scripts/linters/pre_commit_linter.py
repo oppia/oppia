@@ -420,7 +420,7 @@ def categorize_files(file_paths):
 
 
 def _print_summary_of_error_messages(lint_messages):
-    """Print summary of lint messages."""
+    """Print summary of linter error messages."""
     if lint_messages != '':
         python_utils.PRINT('Please fix errors below:')
         python_utils.PRINT('----------------------------------------')
