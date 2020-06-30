@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 20 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,6 @@
  * tests.
  */
 
-var SKILL_STATUS_UNASSIGNED = 'Unassigned';
-
-exports.SKILL_STATUS_UNASSIGNED = SKILL_STATUS_UNASSIGNED;
+exports.protractorConstants = {
+  SKILL_STATUS_UNASSIGNED: 'Unassigned'
+};
