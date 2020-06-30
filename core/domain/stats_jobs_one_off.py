@@ -220,9 +220,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Returns:
             tuple(str, dict(str, str)). The first element of the tuple is the
-                exploration id corresponding to the item. The second element of
-                the tuple is the dict containing information about the event
-                associated with the map.
+            exploration id corresponding to the item. The second element of
+            the tuple is the dict containing information about the event
+            associated with the map.
 
         Raises:
             Exception: The item type is wrong.
@@ -525,8 +525,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 the old_stats_model up to the next version.
 
         Returns:
-            dict. A dict representation of an ExplorationStatsModel
-                with updated state_stats_mapping and version.
+            dict. A dict representation of an ExplorationStatsModel with
+            updated state_stats_mapping and version.
         """
         relevant_commit_cmds = [
             exp_domain.CMD_ADD_STATE,
@@ -617,28 +617,28 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
-                (exp_id, value) where value is of the form:
-                    {
-                        'version': int. Version of the exploration.
-                        'num_starts_v1': int. # of times exploration was
-                            started.
-                        'num_completions_v1': int. # of times exploration was
-                            completed.
-                        'num_actual_starts_v1': int. # of times exploration was
-                            actually started.
-                        'state_stats_mapping': A dict containing the values of
-                            stats for the states of the exploration. It is
-                            formatted as follows:
-                            {
-                                state_name: {
-                                    'total_answers_count_v1',
-                                    'useful_feedback_count_v1',
-                                    'total_hit_count_v1',
-                                    'first_hit_count_v1',
-                                    'num_completions_v1'
-                                }
+            (exp_id, value) where value is of the form:
+                {
+                    'version': int. Version of the exploration.
+                    'num_starts_v1': int. # of times exploration was
+                        started.
+                    'num_completions_v1': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v1': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v1',
+                                'useful_feedback_count_v1',
+                                'total_hit_count_v1',
+                                'first_hit_count_v1',
+                                'num_completions_v1'
                             }
-                    }
+                        }
+                }
         """
         reduced_state_stats_mapping = {
             state_name: {
@@ -793,29 +793,29 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
-                (exp_id, value) where value is of the form:
-                    {
-                        'version': int. Version of the exploration.
-                        'num_starts_v2': int. # of times exploration was
-                            started.
-                        'num_completions_v2': int. # of times exploration was
-                            completed.
-                        'num_actual_starts_v2': int. # of times exploration was
-                            actually started.
-                        'state_stats_mapping': A dict containing the values of
-                            stats for the states of the exploration. It is
-                            formatted as follows:
-                            {
-                                state_name: {
-                                    'total_answers_count_v2',
-                                    'useful_feedback_count_v2',
-                                    'total_hit_count_v2',
-                                    'first_hit_count_v2',
-                                    'num_times_solution_viewed_v2',
-                                    'num_completions_v2'
-                                }
+            (exp_id, value) where value is of the form:
+                {
+                    'version': int. Version of the exploration.
+                    'num_starts_v2': int. # of times exploration was
+                        started.
+                    'num_completions_v2': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v2': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v2',
+                                'useful_feedback_count_v2',
+                                'total_hit_count_v2',
+                                'first_hit_count_v2',
+                                'num_times_solution_viewed_v2',
+                                'num_completions_v2'
                             }
-                    }
+                        }
+                }
         """
         reduced_state_stats_mapping = {
             state_name: {
@@ -992,9 +992,10 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 StateCounterModel.
 
         Yields:
-            tuple. For StateCounterModel, a 2-tuple in the form
+            tuple. Different for different models:
+            For StateCounterModel, a 2-tuple in the form
                 (_STATE_COUNTER_ERROR_KEY, error message).
-            tuple. For ExplorationAnnotationModel, a 2-tuple in the form
+            For ExplorationAnnotationModel, a 2-tuple in the form
                 ('exploration_id', value).
                 'exploration_id': str. The id of the exploration.
                 'value': dict. Its structure is as follows:
