@@ -71,19 +71,19 @@ describe('Topics List Directive', function() {
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
 
-    ctrl.toggleEditOptions(topicId1);
+    ctrl.changeEditOptions(topicId1);
     expect(ctrl.showEditOptions(topicId1)).toEqual(true);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
 
-    ctrl.toggleEditOptions(topicId1);
+    ctrl.changeEditOptions(topicId1);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
 
-    ctrl.toggleEditOptions(topicId2);
+    ctrl.changeEditOptions(topicId2);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(true);
 
-    ctrl.toggleEditOptions(topicId2);
+    ctrl.changeEditOptions(topicId2);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
   });

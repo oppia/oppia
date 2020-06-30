@@ -205,7 +205,7 @@ angular.module('oppia').directive('skillsList', [
             return (skillSerialNumber + 1);
           };
 
-          ctrl.toggleEditOptions = function(skillId) {
+          ctrl.changeEditOptions = function(skillId) {
             ctrl.selectedIndex = ctrl.selectedIndex ? null : skillId;
           };
 

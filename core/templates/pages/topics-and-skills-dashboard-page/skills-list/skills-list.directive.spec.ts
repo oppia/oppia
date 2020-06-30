@@ -132,19 +132,19 @@ describe('Skills List Directive', function() {
     expect(ctrl.showEditOptions(skillId1)).toEqual(false);
     expect(ctrl.showEditOptions(skillId1)).toEqual(false);
 
-    ctrl.toggleEditOptions(skillId1);
+    ctrl.changeEditOptions(skillId1);
     expect(ctrl.showEditOptions(skillId1)).toEqual(true);
     expect(ctrl.showEditOptions(skillId2)).toEqual(false);
 
-    ctrl.toggleEditOptions(skillId1);
+    ctrl.changeEditOptions(skillId1);
     expect(ctrl.showEditOptions(skillId1)).toEqual(false);
     expect(ctrl.showEditOptions(skillId2)).toEqual(false);
 
-    ctrl.toggleEditOptions(skillId2);
+    ctrl.changeEditOptions(skillId2);
     expect(ctrl.showEditOptions(skillId1)).toEqual(false);
     expect(ctrl.showEditOptions(skillId2)).toEqual(true);
 
-    ctrl.toggleEditOptions(skillId2);
+    ctrl.changeEditOptions(skillId2);
     expect(ctrl.showEditOptions(skillId1)).toEqual(false);
     expect(ctrl.showEditOptions(skillId2)).toEqual(false);
   });

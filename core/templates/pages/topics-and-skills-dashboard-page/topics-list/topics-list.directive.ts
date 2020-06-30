@@ -76,7 +76,7 @@ angular.module('oppia').directive('topicsList', [
           /**
            * @param {String} topicId - ID of the topic.
            */
-          ctrl.toggleEditOptions = function(topicId) {
+          ctrl.changeEditOptions = function(topicId) {
             ctrl.selectedIndex = ctrl.selectedIndex ? null : topicId;
           };
 

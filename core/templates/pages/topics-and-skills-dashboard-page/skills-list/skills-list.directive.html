@@ -58,8 +58,8 @@
           </span>
         </span>
         <div class="skill-list-options-container">
-          <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.toggleEditOptions(skill.id)"></p>
-          <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.toggleEditOptions(null)">
+          <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
+          <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
             <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
               <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
                 <i class="fa fa-wrench"></i>
@@ -96,8 +96,8 @@
               </a>
             </div>
             <div class="skill-list-options-container">
-              <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.toggleEditOptions(skill.id)"></p>
-              <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.toggleEditOptions(null)">
+              <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
+              <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
                 <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
                   <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
                     <i class="fa fa-wrench"></i>
