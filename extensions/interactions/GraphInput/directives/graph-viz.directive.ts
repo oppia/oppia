@@ -62,7 +62,7 @@ angular.module('oppia').directive('graphViz', [
           };
           var vizContainer = (
             <SVGSVGElement><any>$($element).find('.oppia-graph-viz-svg'));
-          // Styling functions
+          // Styling functions.
           var DELETE_COLOR = 'red';
           var HOVER_COLOR = 'aqua';
           var SELECT_COLOR = 'orange';
