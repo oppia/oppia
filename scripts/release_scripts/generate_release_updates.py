@@ -28,6 +28,8 @@ from scripts import common
 
 SECTIONS_TO_ADD = [
     '[Add main changes]',
+    '[Add screenshots/celebration text for major changes. You can '
+    'collect these from project leads]',
     '[Add editorials/announcements if required]',
     '[Add Author details (Use Email C&P Blurbs about authors from '
     'release_summary.md)]',
@@ -38,6 +40,7 @@ RELEASE_MAIL_MESSAGE_TEMPLATE = (
     'Hi all,\n\n'
     '   We are happy to announce the release of v%s of Oppia.\n'
     '   The main changes in this release are %s.\n'
+    '   %s.\n'
     '   %s.\n'
     '   %s\n'
     '   Finally, I\'d like to thank %s for their help with pre-release '
@@ -63,11 +66,13 @@ def create_new_file_with_release_message_template():
         'Please make updates to following file %s for generating the '
         'release announcement mail by adding:\n'
         '   1. Main changes for release\n'
-        '   2. Editorials/announcements if required\n'
-        '   3. Author details from release_summary.md\n'
-        '   4. Names of release testers\n'
-        '   5. Name of QA Team lead\n'
-        '   6. Your name\n' % RELEASE_MAIL_MESSAGE_FILEPATH)
+        '   2. Screenshots/celebration text for major changes. You can '
+        'collect these from project leads\n'
+        '   3. Editorials/announcements if required\n'
+        '   4. Author details from release_summary.md\n'
+        '   5. Names of release testers\n'
+        '   6. Name of QA Team lead\n'
+        '   7. Your name\n' % RELEASE_MAIL_MESSAGE_FILEPATH)
     common.ask_user_to_confirm('Please save the file.')
 
 
