@@ -155,6 +155,10 @@ export interface ILogicCustomizationArgs {
   };
 }
 
+export interface IMathEquationInputCustomizationArgs {
+
+}
+
 export interface IMultipleChoiceInputCustomizationArgs {
   showChoicesInShuffledOrder?: {
     value: string;
@@ -214,6 +218,7 @@ export type IInteractionCustomizationArgs = (
   IInteractiveMapCustomizationArgs |
   IItemSelectionInputCustomizationArgs |
   ILogicCustomizationArgs |
+  IMathEquationInputCustomizationArgs |
   IMultipleChoiceInputCustomizationArgs |
   IMusicNotesInputCustomizationArgs |
   IPencilCodeCustomizationArgs |

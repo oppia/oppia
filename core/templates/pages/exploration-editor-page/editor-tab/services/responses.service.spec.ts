@@ -320,7 +320,7 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'ItemSelectionInput');
 
-    // Set _answerChoices variable
+    // Set _answerChoices variable.
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {

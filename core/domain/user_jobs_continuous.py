@@ -80,7 +80,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
             user_id: str. The unique id of the user.
 
         Returns:
-            tuple(job_queued_msec, recent_user_changes), where:
+            tuple(job_queued_msec, recent_user_changes). Where:
                 job_queued_msec: float or None. The time when the job was
                     queued in milliseconds since the epoch, or None if the job
                     does not exist.
@@ -140,7 +140,7 @@ class RecentUpdatesMRJobManager(
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED.
 
         Returns:
-            tuple(most_recent_commits, tracked_models_for_feedback), where:
+            tuple(most_recent_commits, tracked_models_for_feedback). Where:
                 most_recent_commits: list(dict). Each dict has the keys:
                     type: str. The value of the commit_type argument.
                     activity_id: str. The id of the activity for this commit.
@@ -216,7 +216,7 @@ class RecentUpdatesMRJobManager(
             item: UserSubscriptionsModel. An instance of UserSubscriptionsModel.
 
         Yields:
-            tuple(key, recent_activity_commits), where:
+            tuple(key, recent_activity_commits). Where:
                 key: str. Uses the form 'user_id@job_queued_msec'.
                 recent_activity_commits: dict. Has the keys:
                     type: str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
@@ -531,7 +531,7 @@ class UserStatsMRJobManager(
             item: ExpSummaryModel. An instance of ExpSummaryModel.
 
         Yields:
-            tuple(owner_id, exploration_data), where:
+            tuple(owner_id, exploration_data). Where:
                 owner_id: str. The unique id of the user.
                 exploration_data: dict. Has the keys:
                     exploration_impact_score: float. The impact score of all the

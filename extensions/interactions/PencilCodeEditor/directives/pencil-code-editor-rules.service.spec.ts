@@ -56,7 +56,7 @@ describe('Pencil Code Editor rules service', () => {
     });
 
     it('should remove extra newlines and trailing whitespace', () => {
-      // Extra newline with spaces
+      // Extra newline with spaces.
       expect(pcers.CodeEquals({
         code: (
           'def x():\n' +
@@ -66,7 +66,7 @@ describe('Pencil Code Editor rules service', () => {
         )
       }, RULE_INPUT)).toBe(true);
 
-      // Extra trailing whitespace on first line
+      // Extra trailing whitespace on first line.
       expect(pcers.CodeEquals({
         code: (
           'def x():        \n' +
@@ -75,7 +75,7 @@ describe('Pencil Code Editor rules service', () => {
         )
       }, RULE_INPUT)).toBe(true);
 
-      // Tab character
+      // ---- Tab character ----
       expect(pcers.CodeEquals({
         code: (
           'def x(): \t\n' +
