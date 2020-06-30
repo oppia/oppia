@@ -62,8 +62,8 @@ def create_enum(*sequential, **names):
     """Creates a enumerated constant.
 
     Args:
-        sequential: *. Sequence List to generate the enumerations.
-        names: *. Names of the enumerration.
+        *sequential: *. Sequence List to generate the enumerations.
+        **names: *. Names of the enumerration.
 
     Returns:
         dict. Dictionary containing the enumerated constants.
@@ -82,7 +82,7 @@ def get_file_contents(filepath, raw_bytes=False, mode='r'):
 
     Returns:
         *. Either the raw_bytes stream if the flag is set or the
-            decoded stream in utf-8 format.
+        decoded stream in utf-8 format.
     """
     if raw_bytes:
         mode = 'rb'
@@ -106,8 +106,9 @@ def get_exploration_components_from_dir(dir_path):
         The filepath does not include the assets/ prefix.
 
     Raises:
-      Exception: if the following condition doesn't hold: "There is exactly one
-        file not in assets/, and this file has a .yaml suffix".
+        Exception: if the following condition doesn't hold: "There
+            is exactly one file not in assets/, and this file has a
+            .yaml suffix".
     """
     yaml_content = None
     assets_list = []
@@ -157,7 +158,7 @@ def get_comma_sep_string_from_list(items):
     """Turns a list of items into a comma-separated string.
 
     Args:
-        items: list. List of the items.
+        items: list(str). List of the items.
 
     Returns:
         str. String containing the items in the list separated by commas.
@@ -248,10 +249,10 @@ def get_random_choice(alist):
     """Gets a random element from a list.
 
     Args:
-       alist: list(*). Input to get a random choice.
+        alist: list(*). Input to get a random choice.
 
     Returns:
-       *. Random element choosen from the passed input list.
+        *. Random element choosen from the passed input list.
     """
     assert isinstance(alist, list) and len(alist) > 0
 
@@ -371,7 +372,7 @@ def convert_to_hash(input_string, max_length):
 
     Returns:
         str. Hash Value generated from the input_String of the
-            specified length.
+        specified length.
 
     Raises:
         Exception: If the input string is not the instance of the str,
@@ -451,7 +452,7 @@ def are_datetimes_close(later_datetime, earlier_datetime):
 
     Returns:
         bool. True if difference between two datetimes is less than
-            feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
+        feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -483,7 +484,7 @@ def vfs_construct_path(base_path, *path_components):
 
     Args:
         base_path: str. The initial path upon which components would be added.
-        path_components: list(str). Components that would be added to the path.
+        *path_components: list(str). Components that would be added to the path.
 
     Returns:
         str. The path that is obtained after adding the components.
@@ -681,8 +682,7 @@ def unescape_encoded_uri_component(escaped_string):
         escaped_string: str. String that is encoded with encodeURIComponent.
 
     Returns:
-        str. Decoded string that was initially encoded with
-            encodeURIComponent.
+        str. Decoded string that was initially encoded with encodeURIComponent.
     """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
@@ -708,7 +708,7 @@ def get_asset_dir_prefix():
 
     Returns:
         str. Prefix '/build' if constants.DEV_MODE is false, otherwise
-            null string.
+        null string.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
@@ -732,7 +732,7 @@ def get_hashable_value(value):
 
     Returns:
         hashed_value: *. A new object that will always have the same hash for
-            "equivalent" values.
+        "equivalent" values.
     """
     if isinstance(value, list):
         return tuple(get_hashable_value(e) for e in value)
