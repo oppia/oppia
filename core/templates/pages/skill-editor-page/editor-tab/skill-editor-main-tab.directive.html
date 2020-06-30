@@ -1,13 +1,19 @@
 <div class="skill-editor">
   <div class="skill-editor-content" ng-if="hasLoadedSkill()">
     <div class="skill-editor-components-container">
+      <p class="topic-dashboard-link">
+        <a href="/topics-and-skills-dashboard">
+          Back to Topics Dashboard <i class="fa fa-angle-left"></i>
+        </a>
+        <span><[skill.getDescription()]></span>
+      </p>
       <skill-concept-card-editor></skill-concept-card-editor>
       <skill-misconceptions-editor></skill-misconceptions-editor>
       <skill-prerequisite-skills-editor></skill-prerequisite-skills-editor>
       <skill-rubrics-editor></skill-rubrics-editor>
     </div>
     <div class="skill-editor-info-container">
-      <md-card class="oppia-editor-card-section">
+      <md-card class="oppia-editor-card-section skill-editor-status">
         <strong class="status-heading">
           Status
         </strong>
@@ -34,7 +40,7 @@
           </span>
         </div>
       </md-card>
-      <md-card>
+      <md-card class="skill-editor-helper-box">
         <div class="skill-details-container">
           <div class="misconception-count">
             <div class="count-value"><[skill.getMisconceptions().length]></div>
@@ -65,6 +71,7 @@
   }
 
   .skill-editor .skill-editor-info-container {
+    margin-top: 30px;
     width: 35%;
   }
 
@@ -82,6 +89,15 @@
 
   .skill-editor .status-value {
     font-size: 18px;
+  }
+
+  .skill-editor .topic-dashboard-link {
+    font-weight: bold;
+  }
+
+  .skill-editor .topic-dashboard-link a {
+    margin-left: 1%;
+    text-decoration: none;
   }
 
   .skill-editor .skill-details-container {
@@ -123,5 +139,71 @@
 
   .skill-editor .create-text {
     color: #0b6c63;
+  }
+
+  @media screen and (max-width: 1250px) {
+    .skill-editor .skill-editor-components-container {
+      width: 50%;
+    }
+  }
+
+  @media screen and (max-width: 1000px) {
+    .skill-editor .skill-editor-components-container {
+      width: 55%;
+    }
+
+    .skill-editor .skill-editor-info-container {
+      width: 45%;
+    }
+
+    .skill-editor .misconception-count,
+    .skill-editor .example-count,
+    .skill-editor .create-question {
+      height: 80px;
+    }
+  }
+
+  @media screen and (max-width: 800px) {
+    .skill-editor .skill-editor-components-container {
+      width: 90%;
+    }
+
+    .skill-editor .skill-editor-info-container {
+      margin-bottom: 15px;
+      margin-top: -18px;
+      width: 92%;
+    }
+
+    .skill-editor .misconception-count,
+    .skill-editor .example-count,
+    .skill-editor .create-question {
+      height: auto;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .skill-editor .skill-editor-components-container {
+      width: 100%;
+    }
+
+    .skill-editor .skill-editor-info-container {
+      width: 100%;
+    }
+
+    .skill-editor .skill-editor-status {
+      display: none;
+    }
+
+    .skill-editor .skill-editor-helper-box {
+      margin: 0;
+      width: 100%;
+    }
+
+    .skill-editor .misconception-count,
+    .skill-editor .example-count,
+    .skill-editor .create-question {
+      height: 80px;
+      width: 33%;
+    }
   }
 </style>

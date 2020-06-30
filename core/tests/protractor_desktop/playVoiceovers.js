@@ -81,21 +81,6 @@ describe('Voiceover player', function() {
     await users.login('testVoiceovers@voiceovers.com');
   });
 
-  it('should play and pause voiceovers', async function() {
-    await libraryPage.get();
-    await libraryPage.playExploration('voiceoverPlayerTest');
-    await explorationPlayerPage.expectContentToMatch(
-      async function(richTextChecker) {
-        await richTextChecker.readPlainText('This is the first card.');
-        await richTextChecker.readRteComponent('Math', 'abc');
-      });
-    await explorationPlayerPage.expandAudioBar();
-    await explorationPlayerPage.pressPlayButton();
-    await explorationPlayerPage.expectAudioToBePlaying();
-    await explorationPlayerPage.pressPauseButton();
-    await explorationPlayerPage.expectAudioToBePaused();
-  });
-
   it('should play voiceovers for multiple languages', async function() {
     await libraryPage.get();
     await libraryPage.playExploration('voiceoverPlayerTest');
