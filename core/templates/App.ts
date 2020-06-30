@@ -15,7 +15,7 @@
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
-
+require('@angular/material/prebuilt-themes/deeppurple-amber.css');
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.directive.ts');

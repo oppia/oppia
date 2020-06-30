@@ -13,25 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the shared components.
+ * @fileoverview Module for the Angular Material.
  */
-import 'core-js/es7/reflect';
-import 'zone.js';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { BackgroundBannerComponent } from
-  './common-layout-directives/common-elements/background-banner.component';
-import { MaterialModule } from './material.module';
-import { TranslatePipe } from 'filters/translate.pipe';
-
+import { MatCardModule } from '@angular/material';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
-  imports: [CommonModule, MaterialModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe],
-  entryComponents: [BackgroundBannerComponent],
-  exports: [MaterialModule, BackgroundBannerComponent, TranslatePipe]
+  imports: [CommonModule, BrowserAnimationsModule,
+    MatCardModule, MatButtonModule
+  ],
+  exports: [BrowserAnimationsModule, MatCardModule, MatButtonModule]
 })
-
-export class SharedComponentsModule { }
+export class MaterialModule {}
