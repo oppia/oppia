@@ -41,7 +41,7 @@ export class NumericInputRulesService {
   IsInclusivelyBetween(
       answer: number, inputs: {a: number, b: number}): boolean {
     // TODO(wxy): Have frontend validation at creation time to check that
-    // inputs.a <= inputs.b
+    // inputs.a <= inputs.b.
     return answer >= inputs.a && answer <= inputs.b;
   }
   IsWithinTolerance(

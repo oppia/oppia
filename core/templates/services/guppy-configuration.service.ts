@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
+
 const SYMBOLS_TO_REMOVE = [
   'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
   'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point',
@@ -30,10 +32,24 @@ const SYMBOLS_TO_REMOVE = [
 export class GuppyConfigurationService {
   static serviceIsInitialized = false;
 
+  constructor(private deviceInfoService: DeviceInfoService) {}
+
   init(): void {
     if (GuppyConfigurationService.serviceIsInitialized) {
       return;
     }
+
+    if (
+      this.deviceInfoService.isMobileUserAgent() &&
+      this.deviceInfoService.hasTouchEvents()) {
+      // Use on-screen keyboard for mobile.
+      var osk = new GuppyOSK({
+        goto_tab: 'arithmetic',
+        attach: 'focus'
+      });
+      Guppy.use_osk(osk);
+    }
+
     // Remove symbols since they are not supported.
     for (let symbol of SYMBOLS_TO_REMOVE) {
       Guppy.remove_global_symbol(symbol);

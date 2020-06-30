@@ -330,7 +330,7 @@ class SuggestionEditStateContent(BaseSuggestion):
 
         Returns:
             list(ExplorationChange). The change_list corresponding to the
-                suggestion.
+            suggestion.
         """
         change = self.change
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
