@@ -56,14 +56,17 @@ class PythonLintChecksManager(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self, files_to_lint, verbose_mode_enabled):
+            self, files_to_lint, file_cache, verbose_mode_enabled):
         """Constructs a PythonLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
+            file_cache: object(FileCache). Provides thread-safe access to cached
+                file content.
             verbose_mode_enabled: bool. True if mode is enabled.
         """
         self.files_to_lint = files_to_lint
+        self.file_cache = file_cache
         self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
@@ -129,7 +132,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             for filepath in files_to_check:
                 if filepath.endswith('_test.py'):
                     continue
-                for line_num, line in enumerate(FILE_CACHE.readlines(
+                for line_num, line in enumerate(self.file_cache.readlines(
                         filepath)):
                     line = line.strip()
                     words = line.split()
@@ -494,12 +497,14 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return all_messages
 
 
-def get_linters(files_to_lint, verbose_mode_enabled=False):
+def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
     """Creates PythonLintChecksManager and ThirdPartyPythonLintChecksManager
         objects and return them.
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
+        file_cache: object(FileCache). Provides thread-safe access to cached
+            file content.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -507,7 +512,7 @@ def get_linters(files_to_lint, verbose_mode_enabled=False):
         2-tuple of custom and third_party linter objects.
     """
     custom_linter = PythonLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
+        files_to_lint, file_cache, verbose_mode_enabled)
 
     third_party_linter = ThirdPartyPythonLintChecksManager(
         files_to_lint, verbose_mode_enabled)
