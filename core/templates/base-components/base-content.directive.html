@@ -44,7 +44,14 @@
 
             <div class="oppia-top-of-page-padding">
             </div>
-
+            <div class="navbar-mobile-container" ng-if="$ctrl.isBottomNavbarShown()">
+              <i class="fa fa-book show-mobile-navbar-icon" ng-click="$ctrl.toggleMobileNavOptions()"></i>
+              <div class="navbar-mobile-options" ng-if="$ctrl.mobileNavOptionsAreShown">
+                <div>
+                  <div ng-transclude="mobileNavOptions"></div>
+                </div>
+              </div>
+            </div>
             <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
                  class="protractor-test-main-content" ng-cloak>
               <loading-message message="$ctrl.loadingMessage"></loading-message>
@@ -80,5 +87,27 @@
     height: 56px;
     transform: translateX(50%);
     width: 20px;
+  }
+  .navbar-mobile-container {
+    bottom: 0;
+    display: block;
+    position: fixed;
+    right: 0;
+    text-align: right;
+    width: 100%;
+    z-index: 999;
+  }
+  .navbar-mobile-options {
+    background-color: #e6e6e6;
+    border-top: 1px solid #000;
+  }
+  .show-mobile-navbar-icon {
+    background-color: #e6e6e6;
+    border-left: 1.5px solid #000;
+    border-radius: 10px 0;
+    border-top: 1.5px solid #000;
+    color: #000;
+    font-size: 25px;
+    padding: 10px;
   }
 </style>

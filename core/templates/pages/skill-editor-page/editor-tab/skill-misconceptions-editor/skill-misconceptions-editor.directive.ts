@@ -35,6 +35,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -49,13 +50,9 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'MisconceptionObjectFactory',
-        'MAX_CHARS_IN_MISCONCEPTION_NAME',
+        '$scope', '$filter', '$uibModal', 'WindowDimensionsService',
         function(
-            $scope, $filter, $uibModal, $rootScope,
-            MisconceptionObjectFactory,
-            MAX_CHARS_IN_MISCONCEPTION_NAME) {
+            $scope, $filter, $uibModal, WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.isEditable = function() {
@@ -112,8 +109,16 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               // No further action is needed.
             });
           };
+
+          $scope.toggleMisconceptionLists = function() {
+            $scope.misconceptionsListIsShown = (
+              !$scope.misconceptionsListIsShown);
+          };
+
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
+            $scope.misconceptionsListIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.misconceptions = $scope.skill.getMisconceptions();
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.onSkillChange.subscribe(

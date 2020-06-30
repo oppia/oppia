@@ -1,7 +1,7 @@
 <div>
   <div class="skill-editor-preview">
     <div class="content-box">
-      <div class="left-box">
+      <div class="question-filter-box">
         <div><span class="headings">Selection</span></div>
         <div class="question-box">
           <div><span class="heading-secondary">Questions</span></div>
@@ -52,7 +52,7 @@
       <div class="seperator-block">
         <div class="seperator"></div>
       </div>
-      <div class="right-box">
+      <div class="skill-question-container">
         <div><span class="headings">Preview</span></div>
         <div class="preview-box" ng-if="$ctrl.displayCardIsInitialized">
           <tutor-card displayed-card="$ctrl.displayedCard"
@@ -75,7 +75,7 @@
     margin-top: 50px;
   }
 
-  .skill-editor-preview .left-box {
+  .skill-editor-preview .question-filter-box {
     width: 25%;
   }
 
@@ -115,7 +115,7 @@
     padding: 30px;
   }
 
-  .skill-editor-preview .right-box {
+  .skill-editor-preview .skill-question-container {
     width: 40%;
   }
 
@@ -169,8 +169,41 @@
     font-size: 30px;
     font-weight: bold;
   }
+
   .skill-editor-preview .heading-secondary {
     font-size: 20px;
     font-weight: bold;
+  }
+
+  @media screen and (max-width: 1250px) {
+    .skill-editor-preview .question-filter-box {
+      width: 35%;
+    }
+
+    .skill-editor-preview .skill-question-container {
+      width: 45%;
+    }
+  }
+
+  @media screen and (max-width: 1000px) {
+    .skill-editor-preview .seperator-block {
+      width: 5%;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .skill-editor-preview .question-filter-box {
+      width: 90%;
+    }
+
+    .skill-editor-preview .seperator-block,
+    .skill-editor-preview .skill-description-box {
+      display: none;
+    }
+
+    .skill-editor-preview .skill-question-container {
+      margin: 0;
+      width: 90%;
+    }
   }
 </style>
