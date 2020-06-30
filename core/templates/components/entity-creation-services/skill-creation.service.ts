@@ -63,11 +63,11 @@ angular.module('oppia').factory('SkillCreationService', [
         skillDescriptionStatusMarker = (
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
       },
-      createNewSkill: function() {
+      createNewSkill: function(topicIds) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
-              'create-new-skill-modal.template.html'),
+            'create-new-skill-modal.template.html'),
           backdrop: 'static',
           controller: 'CreateNewSkillModalController'
         }).result.then(function(result) {
@@ -91,7 +91,7 @@ angular.module('oppia').factory('SkillCreationService', [
           var imagesData = ImageLocalStorageService.getStoredImagesData();
           SkillCreationBackendApiService.createSkill(
             result.description, rubrics, result.explanation,
-            [], imagesData).then(function(response) {
+            topicIds || [], imagesData).then(function(response) {
             $timeout(function() {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);

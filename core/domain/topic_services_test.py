@@ -258,6 +258,32 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New Description'
             })
 
+    def test_cannot_rearrange_story_with_missing_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'from_index, to_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+            })
+
+    def test_cannot_rearrange_story_with_missing_from_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'from_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+                'to_index': 1
+            })
+
+    def test_cannot_rearrange_story_with_missing_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'to_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+                'from_index': 1
+            })
+
     def test_cannot_update_topic_property_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
             Exception, (

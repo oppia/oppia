@@ -90,7 +90,7 @@ describe('Topic and Skill dashboard page service', () => {
       language_code: 'en',
       $$hashKey: 'object:63',
     };
-    const topicsArray = [topic1, topic2, topic3];
+    let topicsArray = [topic1, topic2, topic3];
     let filterOptions = dfof.createDefault();
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual(topicsArray);
@@ -129,6 +129,14 @@ describe('Topic and Skill dashboard page service', () => {
     filterOptions.classroom = 'Math';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2, topic1]);
+
+    filterOptions.classroom = 'Unassigned';
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([]);
+
+    topic3.classroom = null;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic3]);
 
     // @ts-ignore
     // since sort is an ENUM, we can't assign any random value.
