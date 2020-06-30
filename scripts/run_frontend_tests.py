@@ -91,20 +91,16 @@ def main(args=None):
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
     # Reads and prints realtime output from the subprocess until it terminates.
-    import sys
-    python_utils.PRINT('stdout encoding: %s' % sys.stdout.encoding)
     while True:
         line = task.stdout.readline()
-        line = line.decode('utf-8')
-
         # No more output from the subprocess, and the subprocess has ended.
         if len(line) == 0 and task.poll() is not None:
             break
-
         if line:
             python_utils.PRINT(line, end='')
             output_lines.append(line)
-    concatenated_output = ''.join(output_lines)
+    concatenated_output = ''.join(
+        line.decode('utf-8') for line in output_lines)
 
     python_utils.PRINT('Done!')
 
