@@ -81,6 +81,7 @@ var PreferencesPage = function() {
   };
 
   this.editUserBio = async function(bio) {
+    await userBioElement.click();
     await userBioElement.sendKeys(bio);
     await navBar.click();
     await checkIfFieldHasBeenSaved('User Bio');
@@ -122,6 +123,7 @@ var PreferencesPage = function() {
     await waitFor.visibilityOf(
       userBioElement, 'User bio field takes too long to appear.');
     await userBioElement.clear();
+    await userBioElement.click();
     await userBioElement.sendKeys(bio);
     await navBar.click();
     await checkIfFieldHasBeenSaved('User Bio');
