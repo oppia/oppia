@@ -444,6 +444,7 @@ def start_google_app_engine_server(dev_mode_setting):
 def get_chrome_driver_version():
     """Fetches the latest supported version of chromedriver depending on the
     Chrome version.
+    This method follows the steps mentioned here:
     https://chromedriver.chromium.org/downloads/version-selection
     """
     output = os.popen('google-chrome --version').read()
