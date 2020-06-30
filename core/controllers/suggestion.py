@@ -246,8 +246,8 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             suggestions = suggestion_services.get_reviewable_suggestions(
                 self.user_id, suggestion_type)
             self._render_suggestions(target_type, suggestions)
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        except Exception:
+            raise self.InvalidInputException(traceback.format_exc())
 
 
 class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
@@ -264,8 +264,8 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
             suggestions = suggestion_services.get_submitted_suggestions(
                 self.user_id, suggestion_type)
             self._render_suggestions(target_type, suggestions)
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        except Exception:
+            raise self.InvalidInputException(traceback.format_exc())
 
 
 class SuggestionListHandler(base.BaseHandler):
