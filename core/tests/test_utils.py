@@ -103,7 +103,7 @@ def get_filepath_from_filename(filename, rootdir):
 
     Returns:
         str | None. The path of the file if file is found otherwise
-            None.
+        None.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled
@@ -389,7 +389,10 @@ class TestBase(unittest.TestCase):
 
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -403,7 +406,10 @@ class TestBase(unittest.TestCase):
 
     VERSION_2_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -419,7 +425,30 @@ class TestBase(unittest.TestCase):
 
     VERSION_3_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+    VERSION_4_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
+                ': &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -595,7 +624,7 @@ tags: []
 
         Returns:
             str. A string that contains unicode characters and ends with the
-                given suffix.
+            given suffix.
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
@@ -1361,7 +1390,7 @@ tags: []
 
         Returns:
             Collection. A newly-created collection containing the corresponding
-                exploration details.
+            exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id,
@@ -1955,8 +1984,8 @@ tags: []
             invoked.
 
             Args:
-                args: tuple. The args passed into `attr` function.
-                kwargs: dict. The key word args passed into `attr` function.
+                *args: tuple. The args passed into `attr` function.
+                **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
                 Result of `new_value`.

@@ -26,8 +26,12 @@ import { AppConstants } from 'app.constants';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from
+import { IBindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { IInteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -70,14 +74,14 @@ export class StateCard {
   getInteraction(): Interaction {
     return this._interaction;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  getVoiceovers(): any {
+
+  getVoiceovers(): IBindableVoiceovers {
     let recordedVoiceovers = this._recordedVoiceovers;
     let contentId = this._contentId;
     if (recordedVoiceovers) {
       return recordedVoiceovers.getBindableVoiceovers(contentId);
     }
-    return [];
+    return {};
   }
 
   getRecordedVoiceovers(): RecordedVoiceovers {
@@ -102,12 +106,12 @@ export class StateCard {
     return (
       interactionId && INTERACTION_SPECS[interactionId].is_terminal);
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  getHints(): any {
+
+  getHints(): Hint[] {
     return this.getInteraction().hints;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  getSolution(): any {
+
+  getSolution(): Solution {
     return this.getInteraction().solution;
   }
 
@@ -135,8 +139,8 @@ export class StateCard {
     return (
         interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  getInteractionCustomizationArgs(): any {
+
+  getInteractionCustomizationArgs(): IInteractionCustomizationArgs {
     let interaction = this.getInteraction();
     if (!interaction) {
       return null;
@@ -189,11 +193,11 @@ export class StateCard {
     return this.getLastInputResponsePair().oppiaResponse;
   }
 
-  addInputResponsePair(inputResponsePair: any): void {
+  addInputResponsePair(inputResponsePair: IInputResponsePair): void {
     this._inputResponsePairs.push(cloneDeep(inputResponsePair));
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  setLastOppiaResponse(response: any): void {
+
+  setLastOppiaResponse(response: string): void {
     // This check is added here to ensure that this._inputReponsePairs is
     // accessed only if there is atleast one input response pair present.
     // In the editor preview tab if a user clicks on restart from beginning
