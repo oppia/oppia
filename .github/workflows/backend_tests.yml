@@ -8,6 +8,8 @@ on:
     branches:
       - develop
       - release-*
+    branches-ignore:
+      - update-changelog-for-release*
 
 jobs:
   backend:
