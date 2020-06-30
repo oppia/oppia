@@ -34,8 +34,8 @@ export class CkEditorCopyContentService {
 
   /**
    * Traverses up and down element ancestors/descendants, searching for widget
-   * tags
-   * @param target {HTMLElement} target to copy
+   * tags.
+   * @param {HTMLElement} target target to copy.
    */
   private _handleCopy(target: HTMLElement): {
       rootElement: HTMLElement,
@@ -74,12 +74,12 @@ export class CkEditorCopyContentService {
 
   /**
    * Detects if element is to be copied as a widget or as a HTML element, and
-   * inserts into editor
-   * @param editor {CKEDITOR.editor} editor in which to
-   *    create widget or insert HTML
-   * @param element {HTMLElement} the element to be copied
-   * @param containedWidgetTagName {string|undefined} the name of the widget
-   *    in which element contains, if so
+   * inserts into editor.
+   * @param {CKEDITOR.editor} editor {CKEDITOR.editor} editor in which to
+   *    create widget or insert HTML.
+   * @param {HTMLElement} element the element to be copied.
+   * @param {string|undefined} containedWidgetTagName the name of the widget
+   *    in which element contains, if so.
    */
   private _handlePaste(
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
@@ -102,34 +102,24 @@ export class CkEditorCopyContentService {
 
       while ((match = valueMatcher.exec(html)) !== null) {
         const key = match[1];
-        const value = match[3].replace(/&amp;/g, '&').replace('\\\\', '\\');
+        const value = match[3].replace(/&amp;/g, '&');
 
-        startupData[key] = this.htmlEscaperService
-          .escapedStrToUnescapedStr(value);
-
-        if (widgetName !== 'oppiatabs') {
-          startupData[key] = startupData[key]
-            .substring(1, startupData[key].length - 1);
-        }
+        startupData[key] = JSON.parse(
+          this.htmlEscaperService.escapedStrToUnescapedStr(value));
       }
 
-      if (widgetName === 'oppiatabs' && startupData.tab_contents) {
-        editor.execCommand(
-          widgetName,
-          {startupData: {
-            tab_contents: JSON.parse(startupData.tab_contents)
-          }}
-        );
-      } else {
-        editor.execCommand(widgetName, { startupData });
-      }
+      editor.execCommand(widgetName, { startupData });
     }
   }
 
+  toggleCopyMode() {
+    this.copyModeActive = !this.copyModeActive;
+  }
+
   /**
-   * Broadcasts to editor to copy target
-   * @param contentScope {IRootScopeService} scope of parent containing editor
-   * @param target {HTMLElement} element to copy
+   * Broadcasts to editor to copy target.
+   * @param {IRootScopeService} contentScope scope of parent containing editor.
+   * @param {HTMLElement} target element to copy.
    */
   broadcastCopy(
       contentScope: IRootScopeService,
@@ -148,15 +138,11 @@ export class CkEditorCopyContentService {
     );
   }
 
-  toggleCopyMode() {
-    this.copyModeActive = !this.copyModeActive;
-  }
-
   /**
-   * Binds editor and editor scope to listen for copy events
-   * @param editorScope {IRootScopeService} scope to bind listener on to respond
-   *    to copy event
-   * @param editor {CKEDITOR.editor} editor to add copied content to
+   * Binds editor and editor scope to listen for copy events.
+   * @param {IRootScopeService} editorScope scope to bind listener on to respond
+   *    to copy event.
+   * @param {CKEDITOR.editor} editor editor to add copied content to.
    */
   bindPasteHandler(
       editorScope: IRootScopeService,
