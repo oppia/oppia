@@ -51,7 +51,7 @@ Data handling
 * Fix part of #5914: Complete Takeout Frontend (#9424)
 * Fix part of #5914: Add JSON rendering testing to Takeout (#9301)
 * Fixed user updates. (#9252)
-*  Added update username functionality in the admin tab. (#9191)
+* Added update username functionality in the admin tab. (#9191)
 * Wipeout 3.10: Add new field to rights models (#8505)
 
 QA Team
@@ -87,7 +87,7 @@ Angular Migration
 * Milestone 1.4.3: Add type definitions for __fixtures__ (#9307)
 * Fix #8472: Collection creation service upgrade (#9303)
 * Fix part of #8472: Upgrades StatsReportingService and MessengerService to Angular (#9299)
-*  Milestone 1.4.2: Split ICustomScope to respective directives (#9298)
+* Milestone 1.4.2: Split ICustomScope to respective directives (#9298)
 * Fix part of #8472: Upgrades PlaythroughService to Angular (#9290)
 * Fix part of #8472: Upgrades PredictionAlgorithmRegistryService to Angular 8 (#9289)
 * Migrates donate-page directive to angular component (#9202)
