@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ILogicProofAnswer } from 'interactions/answer-defs';
+import { ILogicProofRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,7 @@ export class LogicProofRulesService {
     return !answer.correct;
   }
   NotCorrectByCategory(
-      answer: ILogicProofAnswer, inputs: {c: string}): boolean {
+      answer: ILogicProofAnswer, inputs: ILogicProofRuleInputs): boolean {
     return !answer.correct && answer.error_category === inputs.c;
   }
 }

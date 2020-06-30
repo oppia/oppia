@@ -71,7 +71,9 @@ describe('GraphInputValidationService', () => {
         value: {
           vertices: new Array(10),
           isWeighted: false,
-          isLabeled: false
+          isLabeled: false,
+          isDirected: false,
+          edges: []
         }
       },
       canEditEdgeWeight: {

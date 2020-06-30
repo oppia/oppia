@@ -52,20 +52,6 @@
     "core/templates/services/schema-undefined-last-element.service.ts",
     "core/templates/services/suggestion-modal.service.ts",
     "core/templates/services/suggestions.service.ts",
-    "extensions/interactions/CodeRepl/code-repl-prediction.service.ts",
-    "extensions/interactions/CodeRepl/directives/code-repl-validation.service.spec.ts",
-    "extensions/interactions/Continue/directives/continue-validation.service.spec.ts",
-    "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service.spec.ts",
     "extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts",
-    "extensions/interactions/GraphInput/directives/graph-input-rules.service.spec.ts",
-    "extensions/interactions/GraphInput/directives/graph-input-rules.service.ts",
-    "extensions/interactions/ImageClickInput/directives/image-click-input-rules.service.ts",
-    "extensions/interactions/InteractiveMap/directives/interactive-map-validation.service.spec.ts",
-    "extensions/interactions/ItemSelectionInput/directives/item-selection-input-validation.service.spec.ts",
-    "extensions/interactions/MathExpressionInput/directives/math-expression-input-rules.service.ts",
-    "extensions/interactions/NumberWithUnits/directives/number-with-units-rules.service.ts",
-    "extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.ts",
-    "extensions/interactions/TextInput/directives/text-input-validation.service.ts",
-    "extensions/interactions/base-interaction-validation.service.ts",
-    "extensions/interactions/rules.spec.ts"
+    "extensions/interactions/base-interaction-validation.service.ts"
 ]

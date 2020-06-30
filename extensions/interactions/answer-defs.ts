@@ -81,6 +81,8 @@ export interface ILogicProofAnswer {
   'error_line_number'?: number
 }
 
+export type IMathEquationAnswer = string;
+
 export interface IMathExpressionAnswer {
   ascii: string;
   latex: string;
@@ -134,4 +136,5 @@ export type IInteractionAnswer = (
   INumericInputAnswer |
   IPencilCodeEditorAnswer |
   ISetInputAnswer |
-  ITextInputAnswer);
+  ITextInputAnswer |
+  IMathEquationAnswer);

@@ -63,8 +63,8 @@ export interface IDragAndDropSortInputCustomizationArgs {
   choices?: {
     value: string[];
   };
-  allowMultipleItemsInSamePosition?: {
-    value: string;
+  allowMultipleItemsInSamePosition: {
+    value: boolean;
   }
 }
 
@@ -206,6 +206,10 @@ export interface INumericInputCustomizationArgs {
 
 }
 
+export interface INumberWithUnitsCustomizationArgs {
+
+}
+
 export type IInteractionCustomizationArgs = (
   IAlgebraicExpressionInputCustomizationArgs |
   ICodeReplCustomizationArgs |
@@ -225,4 +229,5 @@ export type IInteractionCustomizationArgs = (
   ISetInputCustomizationArgs |
   ITextInputCustomizationArgs |
   IMathExpressionCustomizationArgs |
-  INumericInputCustomizationArgs);
+  INumericInputCustomizationArgs |
+  INumberWithUnitsCustomizationArgs);

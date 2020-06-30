@@ -16,10 +16,14 @@
  * @fileoverview Type definiitions for Rule inputs.
  */
 
-import { IFractionAnswer, INumberWithUnitsAnswer, IMusicNotesAnswer } from
+import {
+  IFractionAnswer,
+  INumberWithUnitsAnswer,
+  IMusicNotesAnswer,
+  IGraphAnswer } from
   'interactions/answer-defs';
 
-export interface IAlgebraicExpressionMatchesExactlyWithRuleInputs {
+export interface IAlgebraicExpressionRuleInputs {
   x: string;
 }
 
@@ -68,7 +72,17 @@ export type IFractionRuleInputs = (
 
 // GraphInput interaction has multiple types of inputs based on
 // rule type.
-export interface IGraph {} #TODO
+export interface IGraphPropertyRuleInputs {
+  p: string;
+}
+
+export interface IGraphIsomorphicRuleInputs {
+  g: IGraphAnswer;
+}
+
+export type IGraphRuleInputs = (
+  IGraphPropertyRuleInputs |
+  IGraphIsomorphicRuleInputs);
 
 export interface IImageClickRuleInputs {
   x: string;
@@ -185,3 +199,25 @@ export interface ISetInputRuleInputs {
 export interface ITextInputRuleInputs {
   x: string;
 }
+
+export type IInteractionRuleInputs = (
+  IAlgebraicExpressionRuleInputs |
+  ICodeReplRuleInputs |
+  IContinueRuleInputs |
+  IDragAndDropRuleInputs |
+  IEndExplorationRuleInputs |
+  IFractionRuleInputs |
+  IGraphRuleInputs |
+  IImageClickRuleInputs |
+  IInteractiveMapRuleInputs |
+  IItemSelectionRuleInputs |
+  ILogicProofRuleInputs |
+  IMathEquationRuleInputs |
+  IMathExpressionRuleInputs |
+  IMultipleChoiceRuleInputs |
+  IMusicNotesRuleInputs |
+  INumberWithUnitsRuleInputs |
+  INumericInputRuleInputs |
+  IPencilCodeEditorRuleInputs |
+  ISetInputRuleInputs |
+  ITextInputRuleInputs);
