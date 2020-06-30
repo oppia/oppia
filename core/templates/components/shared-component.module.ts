@@ -36,7 +36,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
-    // These elements will remain here even after migration
+    // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent
   ],
   exports: [
