@@ -70,9 +70,9 @@
         <form class="form-horizontal" ng-submit="$ctrl.submitUpdateRoleForm($ctrl.formData.updateRole)">
           <legend class="text-center">Update Role</legend>
           <div class="d-xl-inline-flex form-group">
-            <label for="update-role-username-textbook" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <label for="update-role-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" id="update-role-username-textbook" placeholder="Enter username" ng-model="$ctrl.formData.updateRole.username" class="form-control protractor-update-form-name">
+              <input type="text" id="update-role-username-input" placeholder="Enter username" ng-model="$ctrl.formData.updateRole.username" class="form-control protractor-update-form-name">
             </div>
           </div>
 
@@ -173,9 +173,9 @@
         <form class="form-horizontal" ng-submit="$ctrl.submitAddCommunityReviewerForm($ctrl.formData.addCommunityReviewer)">
           <legend class="text-center">Add Reviewer For Community</legend>
           <div class="d-xl-inline-flex form-group">
-            <label for="add-community-reviewer-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <label for="add-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" id="add-community-reviewer-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control">
+              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control">
             </div>
           </div>
 
@@ -209,9 +209,9 @@
         <form class="form-horizontal" ng-submit="$ctrl.submitRemoveCommunityReviewerForm($ctrl.formData.removeCommunityReviewer)">
           <legend class="text-center">Remove Reviewer From Community</legend>
           <div class="d-xl-inline-flex form-group">
-            <label for="add-reviewer-username-textbox" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <label for="remove-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-4 col-lg-4 col-sm-4 ml-auto">
-              <input type="text" id="add-reviewer-username-textbox" placeholder="Enter username" ng-model="$ctrl.formData.removeCommunityReviewer.username" class="form-control">
+              <input type="text" id="remove-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.removeCommunityReviewer.username" class="form-control">
             </div>
             <div class="col-md-4 ml-auto">
               <select ng-model="$ctrl.formData.removeCommunityReviewer.method" class="form-control">
