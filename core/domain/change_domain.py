@@ -141,7 +141,7 @@ class BaseChange(python_utils.OBJECT):
 
         Args:
             change_dict: dict. A dict of changes with keys as a cmd and the
-            attributes of a command.
+                attributes of a command.
 
         Raises:
             ValidationError. The change dict does not contain the cmd key,

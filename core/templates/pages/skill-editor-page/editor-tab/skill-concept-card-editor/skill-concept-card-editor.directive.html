@@ -17,58 +17,69 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <div>
+      <div class="oppia-worked-examples-header">
         <strong class="heading-text">Worked Examples</strong>
+        <i ng-click="toggleWorkedExampleList()"
+           class="fa fa-angle-down"
+           ng-if="!workedExamplesListIsShown"
+           aria-hidden="true">
+        </i>
+        <i ng-click="toggleWorkedExampleList()"
+           class="fa fa-angle-up"
+           ng-if="workedExamplesListIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div ng-if="workedExamplesListIsShown">
         <div class="concept-card-subtitle">
           These will be displayed one-by-one to the learner, in order, if they ask for them.
         </div>
-      </div>
-      <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0">
-        <ul class="nav oppia-option-list nav-stacked nav-pills worked-examples-list"
-            role="tablist"
-            ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
-            ng-model="bindableFieldsDict.displayedWorkedExamples">
-          <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
-              ng-class="{'active': activeWorkedExampleIndex === $index, 'last-element': $index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
-              class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
-            <span class="oppia-worked-example-sort-handle"
-                  ng-if="bindableFieldsDict.displayedWorkedExamples.length > 1"
-                  ng-mousedown="changeActiveWorkedExampleIndex(-1)">
-              <picture>
-                <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
-                <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
-                <img ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>" width="10">
-              </picture>
-            </span>
-            <a ng-click="changeActiveWorkedExampleIndex($index)"
-               class="oppia-rule-tab protractor-test-worked-example-<[$index]>"
-               ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
-              <summary-list-header index="$index"
-                                   disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
-                                   summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
-                                   short-summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
-                                   is-active="$index === activeWorkedExampleIndex"
-                                   is-delete-available="isEditable"
-                                   on-delete-fn="deleteWorkedExample">
-              </summary-list-header>
-            </a>
-
-            <div ng-if="activeWorkedExampleIndex === $index">
-              <div class="oppia-editor-card-section">
-                <worked-example-editor worked-example="workedExample"
-                                       index="$index"
-                                       is-editable="isEditable">
-                </worked-example-editor>
+        <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0">
+          <ul class="nav oppia-option-list nav-stacked nav-pills worked-examples-list"
+              role="tablist"
+              ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
+              ng-model="bindableFieldsDict.displayedWorkedExamples">
+            <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
+                ng-class="{'active': activeWorkedExampleIndex === $index, 'last-element': $index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
+                class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
+              <span class="oppia-worked-example-sort-handle"
+                    ng-if="bindableFieldsDict.displayedWorkedExamples.length > 1"
+                    ng-mousedown="changeActiveWorkedExampleIndex(-1)">
+                <picture>
+                  <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
+                  <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
+                  <img ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>" width="10">
+                </picture>
+              </span>
+              <a ng-click="changeActiveWorkedExampleIndex($index)"
+                 class="oppia-rule-tab protractor-test-worked-example-<[$index]>"
+                 ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
+                <summary-list-header index="$index"
+                                     disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
+                                     summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
+                                     short-summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
+                                     is-active="$index === activeWorkedExampleIndex"
+                                     is-delete-available="isEditable"
+                                     on-delete-fn="deleteWorkedExample">
+                </summary-list-header>
+              </a>
+              <div ng-if="activeWorkedExampleIndex === $index">
+                <div class="oppia-editor-card-section">
+                  <worked-example-editor worked-example="workedExample"
+                                         index="$index"
+                                         is-editable="isEditable">
+                  </worked-example-editor>
+                </div>
               </div>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
+        <button type="button"
+                class="btn btn-add-skill-example protractor-test-add-worked-example"
+                ng-click="openAddWorkedExampleModal()">
+          + ADD WORKED EXAMPLE
+        </button>
       </div>
-      <button type="button"
-              class="btn btn-add-skill-example protractor-test-add-worked-example"
-              ng-click="openAddWorkedExampleModal()">
-        + ADD WORKED EXAMPLE
-      </button>
     </div>
   </div>
 </md-card>
@@ -81,7 +92,7 @@
   }
 
   skill-concept-card-editor .heading-text {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   skill-concept-card-editor .review-material-text {
@@ -106,5 +117,20 @@
 
   skill-concept-card-editor .last-element {
     border-bottom: 1px solid #ccc;
+  }
+
+  skill-concept-card-editor .oppia-worked-examples-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  skill-concept-card-editor .oppia-worked-examples-header i {
+    display: none;
+  }
+
+  @media screen and (max-width: 710px) {
+    skill-concept-card-editor .oppia-worked-examples-header i {
+      display: block;
+    }
   }
 </style>

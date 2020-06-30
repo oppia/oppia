@@ -198,7 +198,7 @@ class CollectionNode(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the collection node are
-            invalid.
+                invalid.
         """
         if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -452,11 +452,11 @@ class Collection(python_utils.OBJECT):
 
         Returns:
             str. The YAML representation of the collection, in the latest
-                schema format.
+            schema format.
 
         Raises:
             Exception: 'yaml_content' or the collection schema version is not
-            valid.
+                valid.
         """
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
@@ -638,7 +638,7 @@ class Collection(python_utils.OBJECT):
 
         Raises:
             Exception: The value of the key 'schema_version' in
-            versioned_collection_contents is not valid.
+                versioned_collection_contents is not valid.
         """
         if (versioned_collection_contents['schema_version'] + 1 >
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
@@ -673,8 +673,8 @@ class Collection(python_utils.OBJECT):
            the collection is empty, returns None.
 
         Returns:
-            str|None. The exploration ID of the first node,
-                or None if the collection is empty.
+            str|None. The exploration ID of the first node, or None if the
+            collection is empty.
         """
         if len(self.nodes) > 0:
             return self.nodes[0].exploration_id
@@ -692,7 +692,7 @@ class Collection(python_utils.OBJECT):
 
         Returns:
             str|None. The exploration ID of the next node,
-                or None if the collection is completed.
+            or None if the collection is completed.
         """
         for exp_id in self.exploration_ids:
             if exp_id not in completed_exp_ids:
@@ -710,7 +710,7 @@ class Collection(python_utils.OBJECT):
 
         Returns:
             str|None. The exploration ID of the next node,
-                or None if the passed id is the last one in the collection.
+            or None if the passed id is the last one in the collection.
         """
         exploration_just_unlocked = None
 
@@ -870,7 +870,7 @@ class Collection(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the Collection are not
-            valid.
+                valid.
         """
 
         # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
