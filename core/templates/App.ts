@@ -42,6 +42,7 @@ require('domain/utilities/url-interpolation.service.ts');
 
 require('pages/Base.ts');
 
+require('services/bottom-navbar-status.service.ts');
 require('services/construct-translation-ids.service.ts');
 require('services/context.service.ts');
 require('services/contextual/device-info.service.ts');
