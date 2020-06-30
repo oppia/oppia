@@ -4,7 +4,6 @@ on:
   issues:
     types:
       - labeled
-      - assigned
 
 jobs:
   oppiabot:
@@ -15,5 +14,3 @@ jobs:
         uses: oppia/oppiabot@1.0.0
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
-          google-api-key: ${{secrets.GOOGLE_API_KEY}}
-          cla-sheet-id: ${{secrets.CLA_SHEET_ID}}
