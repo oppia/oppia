@@ -22,12 +22,12 @@ import { Injectable } from '@angular/core';
 
 import { States } from 'domain/exploration/StatesObjectFactory';
 
-interface IGraphLink {
+export interface IGraphLink {
   source: string;
   target: string;
 }
 
-interface IGraphNodes {
+export interface IGraphNodes {
   [stateName: string]: string;
 }
 
