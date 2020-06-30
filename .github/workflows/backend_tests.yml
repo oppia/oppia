@@ -8,8 +8,6 @@ on:
     branches:
       - develop
       - release-*
-    branches-ignore:
-      - update-*
 
 jobs:
   backend:
@@ -23,6 +21,7 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - if: startsWith(github.head_ref, 'update-changelog-for-release') == false
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - name: Install packages for optimized coverage

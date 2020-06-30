@@ -8,8 +8,6 @@ on:
     branches:
       - develop
       - release-*
-    branches-ignore:
-      - update-*
 
 jobs:
   lint:
@@ -23,6 +21,7 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - if: startsWith(github.head_ref, 'update-') == false
       - name: Install Third Party Dependencies
         run: python -m scripts.install_third_party_libs
       - name: Third Party Size Check
