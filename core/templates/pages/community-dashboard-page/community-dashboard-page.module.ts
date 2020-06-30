@@ -37,11 +37,9 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
-import { CkEditorCopyToolbarComponent } from
-  /* eslint-disable max-len */
-  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { CommunityDashboardConstants } from
   'pages/community-dashboard-page/community-dashboard-page.constants';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -49,11 +47,9 @@ import { CommunityDashboardConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    CkEditorCopyToolbarComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
-    CkEditorCopyToolbarComponent,
     OppiaAngularRootComponent
   ],
   providers: [

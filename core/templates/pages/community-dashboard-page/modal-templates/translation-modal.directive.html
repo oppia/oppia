@@ -24,7 +24,9 @@
       </div>
     </div>
     <div ng-if="!loadingData && !uploadingTranslation">
-      <angular-html-bind html-data="textToTranslate" class="oppia-rte-editor"></angular-html-bind>
+      <angular-html-bind html-data="textToTranslate"
+                         class="oppia-rte-editor">
+      </angular-html-bind>
     </div>
 
     <div class="oppia-login-required-to-translate" ng-if="!userIsLoggedIn">

@@ -87,7 +87,6 @@ angular.module('oppia').directive('stateTranslation', [
             RULE_SUMMARY_WRAP_CHARACTER_COUNT, CkEditorCopyContentService
         ) {
           var ctrl = this;
-
           $scope.isVoiceoverModeActive = (
             TranslationTabActiveModeService.isVoiceoverModeActive);
           var isTranslatedTextRequired = function() {
@@ -362,7 +361,6 @@ angular.module('oppia').directive('stateTranslation', [
             }
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
-
           ctrl.$onInit = function() {
             // Define tab constants.
             $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;

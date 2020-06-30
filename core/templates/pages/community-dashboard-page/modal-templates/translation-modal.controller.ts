@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Controller for the translation modal.
  */
@@ -54,7 +53,6 @@ angular.module('oppia').controller('TranslationModalController', [
         hide_complex_extensions: 'true'
       }
     };
-    $scope.copyMode = { isActive: false };
     $scope.subheading = opportunity.subheading;
     $scope.heading = opportunity.heading;
     $scope.loadingData = true;

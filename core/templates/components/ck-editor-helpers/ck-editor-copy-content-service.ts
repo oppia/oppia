@@ -23,6 +23,7 @@ import { IRootScopeService } from 'angular';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -112,6 +113,9 @@ export class CkEditorCopyContentService {
     }
   }
 
+  /**
+   * Toggles copy mode on/off.
+   */
   toggleCopyMode() {
     this.copyModeActive = !this.copyModeActive;
   }

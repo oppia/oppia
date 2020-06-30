@@ -18,7 +18,10 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { CkEditorCopyContentService } from '../ck-editor-copy-content-service';
+
+import { CkEditorCopyContentService } from
+  'components/ck-editor-helpers/ck-editor-copy-content-service';
+
 
 @Component({
   selector: 'ck-editor-copy-toolbar',

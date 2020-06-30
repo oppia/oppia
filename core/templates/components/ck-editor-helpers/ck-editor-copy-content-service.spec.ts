@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CkEditorCopyContentService } from './ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from
+  'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 
-
+/**
+ * Returns a HTMLElement containing the element to copy.
+ * @param {string} html hmtl to place in angular-html-bind.
+ */
 const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
   container.innerHTML = `<angular-html-bind>${html.trim()}</angular-html-bind>`;
