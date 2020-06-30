@@ -324,7 +324,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             config_pylint: str. Path to the .pylintrc file.
             config_pycodestyle: str. Path to the tox.ini file.
 
-        Return:
+        Returns:
             summary_messages: list(str). Summary messages of lint check.
         """
         files_to_lint = self.all_filepaths
