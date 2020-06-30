@@ -9,7 +9,7 @@ on:
       - develop
       - release-*
     branches-ignore:
-      - update-changelog-for-release*
+      - update-*
 
 jobs:
   backend:

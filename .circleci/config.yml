@@ -93,8 +93,7 @@ jobs:
           name: Check if all tests should be run
           command: |
             PR_BRANCH=$(curl -s https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER} | jq -r '.head.ref')
-            echo $PR_BRANCH
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [ "$PR_BRANCH" == "update-changelog-for-release*" ]; then
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [ "$PR_BRANCH" == "update-*" ]; then
               echo 'export RUN_TESTS=true' >> $BASH_ENV
             else
               echo 'export RUN_TESTS=false' >> $BASH_ENV
