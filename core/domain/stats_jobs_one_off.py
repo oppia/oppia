@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import collections
 import copy
-import datetime
 
 from core import jobs
 from core.domain import exp_domain
@@ -37,9 +36,6 @@ import python_utils
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
 ])
-
-
-PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
 
 
 def require_non_negative(
