@@ -38,6 +38,7 @@ EXCLUDED_PATHS = (
     'webpack_bundles/*', 'core/tests/services_sources/*',
     'core/tests/release_sources/tmp_unzip.zip', 'scripts/linters/test_files/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
+    'core/templates/combined-tests.spec.ts',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
