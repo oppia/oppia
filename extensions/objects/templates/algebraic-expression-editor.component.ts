@@ -21,8 +21,8 @@
 // in via initArgs.
 
 require('services/guppy-configuration.service.ts');
-require('services/math-interactions.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {
@@ -41,7 +41,11 @@ angular.module('oppia').component('algebraicExpressionEditor', {
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          var answerIsValid = MathInteractionsService.validateAnswer(
+          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
+          // is not compatible with nerdamer or with the backend validations.
+          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
+            ctrl.value);
+          var answerIsValid = MathInteractionsService.validateExpression(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;

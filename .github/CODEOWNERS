@@ -304,6 +304,7 @@
 /core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
 /core/templates/components/button-directives/create-activity-button.directive.html @nithusha21
 /core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
+/core/templates/services/bottom-navbar-status.service*.ts @nithusha21
 /core/templates/services/navigation.service*.ts @nithusha21
 
 

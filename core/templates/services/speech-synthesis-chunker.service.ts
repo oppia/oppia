@@ -70,7 +70,7 @@ export class SpeechSynthesisChunkerService {
    */
   _speechUtteranceChunker(
       utterance: SpeechSynthesisUtterance, offset: number,
-      callback: any): void {
+      callback: () => void): void {
     var newUtterance;
     var text = (offset !== undefined ?
       utterance.text.substring(offset) : utterance.text);
@@ -122,9 +122,7 @@ export class SpeechSynthesisChunkerService {
     }, 0);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the type of 'latex' needs to be determined correctly.
-  _formatLatexToSpeakableText(latex: any): string {
+  _formatLatexToSpeakableText(latex: string): string {
     return latex
       .replace(/&quot;/g, '')
       .replace(/\\/g, '')
@@ -161,17 +159,15 @@ export class SpeechSynthesisChunkerService {
       .trim();
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the type of 'html' needs to be determined correctly.
-  _convertToSpeakableText(html: any): string {
+  _convertToSpeakableText(html: string): string {
     Object.keys(ServicesConstants.RTE_COMPONENT_SPECS).forEach(
       (componentSpec) => {
         this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
     interface IMathExpressionContent {
-      'raw_latex': String,
-      'svg_filename': String
+      'raw_latex': string,
+      'svg_filename': string
     }
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
@@ -181,8 +177,8 @@ export class SpeechSynthesisChunkerService {
         if (element.attributes['text-with-value'] !== undefined) {
           const newTextContent = element.attributes[
             'text-with-value'].textContent.replace(/&quot;/g, '');
-          // newTextContent ends with a " character, so this is being ignored
-          // in the condition below.
+          // Variable newTextContent ends with a " character, so this is being
+          // ignored in the condition below.
           return newTextContent && newTextContent !== '"' ?
             newTextContent + ' ' : '';
         }
@@ -232,10 +228,7 @@ export class SpeechSynthesisChunkerService {
     return textToSpeak;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'callback' is a function and its type needs to be researched
-  // thoroughly.
-  speak(utterance: SpeechSynthesisUtterance, callback: any): void {
+  speak(utterance: SpeechSynthesisUtterance, callback: () => void): void {
     this.cancelRequested = false;
     this._speechUtteranceChunker(utterance, 0, callback);
   }
@@ -247,15 +240,11 @@ export class SpeechSynthesisChunkerService {
     }
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the type of 'html' needs to be determined correctly.
-  convertToSpeakableText(html: any): string {
+  convertToSpeakableText(html: string): string {
     return this._convertToSpeakableText(html);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the type of 'latex' needs to be determined correctly.
-  formatLatexToSpeakableText(latex: any): string {
+  formatLatexToSpeakableText(latex: string): string {
     return this._formatLatexToSpeakableText(latex);
   }
 }
