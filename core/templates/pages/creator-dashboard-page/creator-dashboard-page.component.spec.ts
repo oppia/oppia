@@ -22,6 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
+// lowercase
 describe('Creator dashboard controller', () => {
   var ctrl = null;
   var $httpBackend = null;
