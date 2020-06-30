@@ -419,7 +419,7 @@ def categorize_files(file_paths):
     _FILES.update(all_filepaths_dict)
 
 
-def _print_complete_summary_of_lint_messages(lint_messages):
+def _print_summary_of_error_messages(lint_messages):
     """Print summary of lint messages."""
     if lint_messages != '':
         python_utils.PRINT('Please fix errors below:')
@@ -567,7 +567,7 @@ def main(args=None):
 
     if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
             message in lint_messages]) or errors_stacktrace:
-        _print_complete_summary_of_lint_messages(lint_messages)
+        _print_summary_of_error_messages(lint_messages)
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')

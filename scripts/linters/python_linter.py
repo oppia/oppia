@@ -54,15 +54,19 @@ class WritableObject(python_utils.OBJECT):
 
     def __init__(self):
         """Constructs a WritableObject object."""
-        self.content = []
+        self.messages = []
 
-    def write(self, st):
-        """Write method for pylint."""
-        self.content.append(st)
+    def write(self, message):
+        """Write method for pylint.
+
+        Args:
+            message: str. Message returned by the pylinter.
+        """
+        self.messages.append(message)
 
     def read(self):
         """Read method for pylint."""
-        return self.content
+        return self.messages
 
 
 class PythonLintChecksManager(python_utils.OBJECT):
@@ -334,27 +338,29 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
-    def _get_trimmed_summary_message(self, lint_messages):
+    def _get_trimmed_error_messages(self, lint_messages):
         """Remove extra bits from pylint messages.
 
         Args:
-            lint_messages: str. Messages returned by the python linter.
+            lint_messages: list. Messages returned by the python linter.
 
         Returns:
             str. A string with the trimmed messages.
         """
-        summary_messages = ''
-        # Remove extra bits from end of pylint messages.
+        error_messages = ''
+        # Remove newlines and coverage report from the end of message.
         lint_messages = lint_messages[:-5]
         for message in lint_messages:
             python_utils.PRINT(message)
-            # Remove extra bits from end of the message.
+            # Every pylint message has a message id inside the brackets
+            # so we need to check if it is true and if case is true then
+            # remove the message-id from the end of original message.
             if message.endswith(')'):
                 last_string_length = len(message.split()[-1])
-                summary_messages += (message[:-last_string_length])
+                error_messages += (message[:-last_string_length])
             else:
-                summary_messages += (message)
-        return summary_messages
+                error_messages += (message)
+        return error_messages
 
     def _lint_py_files(self, config_pylint, config_pycodestyle):
         """Prints a list of lint errors in the given list of Python files.
@@ -409,7 +415,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
                 pylint_messages = (
-                    self._get_trimmed_summary_message(pylint_output.read()))
+                    self._get_trimmed_error_messages(pylint_output.read()))
                 summary_messages.append(pylint_messages)
                 python_utils.PRINT(summary_message)
                 are_there_errors = True
@@ -490,7 +496,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             if pylinter_for_python3.msg_status != 0:
                 summary_message = stdout.getvalue()
                 pylint_messages = (
-                    self._get_trimmed_summary_message(pylint_output.read()))
+                    self._get_trimmed_error_messages(pylint_output.read()))
                 summary_messages.append(pylint_messages)
                 python_utils.PRINT(summary_message)
                 any_errors = True
