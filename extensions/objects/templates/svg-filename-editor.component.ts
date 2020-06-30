@@ -768,9 +768,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             var points = [x, y, x, y];
             var size = ctrl.fabricjsOptions.size;
             var stroke = ctrl.fabricjsOptions.stroke;
-            if(stroke.slice(-2, -1) === '0') {
-              stroke = 'rgba(0, 0, 0, 1)';
-            }
+            stroke = stroke.slice(0, -2) + '1)';
             var line = new fabric.Line(points, {
               strokeWidth: parseInt(size.substring(0, size.length - 2)),
               selectable: false,
