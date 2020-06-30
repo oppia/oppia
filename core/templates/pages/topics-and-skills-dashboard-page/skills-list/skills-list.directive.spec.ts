@@ -71,7 +71,7 @@ describe('Skills List Directive', function() {
     ctrl.$onInit();
     const skillHeadings = [
       'index', 'description', 'worked_examples_count',
-      'misconception_count', 'status', 'options'];
+      'misconception_count', 'status'];
 
     expect(ctrl.SKILL_HEADINGS).toEqual(skillHeadings);
   });
