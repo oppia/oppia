@@ -58,6 +58,11 @@ describe('Voiceover player', function() {
       await richTextEditor.appendPlainText('This is the first card.');
       await richTextEditor.addRteComponent('Math', 'abc');
     });
+    await explorationEditorMainTab.expectContentToMatch(
+      async function(richTextChecker) {
+        await richTextChecker.readPlainText('This is the first card.');
+        await richTextChecker.readRteComponent('Math', 'abc');
+      });
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();
