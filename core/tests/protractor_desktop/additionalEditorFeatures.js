@@ -175,7 +175,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.expectStateNamesToBe([
       'final card', 'second']);
 
-    // Check behaviour of the back button
+    // Check behaviour of the back button.
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setObjective('do some stuff here');
     await explorationEditorPage.navigateToMainTab();
@@ -203,10 +203,10 @@ describe('Full exploration editor', function() {
       }
     );
     await explorationEditorMainTab.setInteraction('NumericInput');
-    // Check display of content & interaction in the editor
+    // Check display of content & interaction in the editor.
     await explorationEditorMainTab.expectInteractionToMatch('NumericInput');
 
-    // Check deletion of groups
+    // Check deletion of groups.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Farewell'));

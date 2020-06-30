@@ -44,7 +44,7 @@ def _yield_all_tasks_ordered_by_status(composite_entity_id):
 
     Yields:
         improvements_domain.TaskEntry. All of the tasks corresponding to the
-            given composite_entity_id.
+        given composite_entity_id.
     """
     query = improvements_models.TaskEntryModel.query(
         improvements_models.TaskEntryModel.composite_entity_id ==

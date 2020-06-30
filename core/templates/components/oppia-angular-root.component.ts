@@ -110,6 +110,8 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { BottomNavbarStatusService } from
+  'services/bottom-navbar-status.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
@@ -313,6 +315,12 @@ import { LogicProofValidationService } from
   'interactions/LogicProof/directives/logic-proof-validation.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { MathEquationInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
@@ -629,6 +637,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static autoplayedVideosService: AutoplayedVideosService;
   static backgroundMaskService: BackgroundMaskService;
   static baseInteractionValidationService: baseInteractionValidationService;
+  static bottomNavbarStatusService: BottomNavbarStatusService;
   static browserCheckerService: BrowserCheckerService;
   static camelCaseToHyphensPipe: CamelCaseToHyphensPipe;
   static changeObjectFactory: ChangeObjectFactory;
@@ -740,6 +749,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static loggerService: LoggerService;
   static logicProofValidationService: LogicProofValidationService;
   static lostChangeObjectFactory: LostChangeObjectFactory;
+  static mathEquationInputRulesService: MathEquationInputRulesService;
+  static mathEquationInputValidationService: MathEquationInputValidationService;
   static mathExpressionInputValidationService: MathExpressionInputValidationService;
   static mathInteractionsService: MathInteractionsService;
   static messengerService: MessengerService;
@@ -909,6 +920,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private autoplayedVideosService: AutoplayedVideosService,
     private backgroundMaskService: BackgroundMaskService,
     private baseInteractionValidationService: baseInteractionValidationService,
+    private bottomNavbarStatusService: BottomNavbarStatusService,
     private browserCheckerService: BrowserCheckerService,
     private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
     private changeObjectFactory: ChangeObjectFactory,
@@ -1020,6 +1032,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private loggerService: LoggerService,
     private logicProofValidationService: LogicProofValidationService,
     private lostChangeObjectFactory: LostChangeObjectFactory,
+    private mathEquationInputRulesService: MathEquationInputRulesService,
+    private mathEquationInputValidationService: MathEquationInputValidationService,
     private mathExpressionInputValidationService: MathExpressionInputValidationService,
     private mathInteractionsService: MathInteractionsService,
     private messengerService: MessengerService,
@@ -1190,6 +1204,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.autoplayedVideosService = this.autoplayedVideosService;
     OppiaAngularRootComponent.backgroundMaskService = this.backgroundMaskService;
     OppiaAngularRootComponent.baseInteractionValidationService = this.baseInteractionValidationService;
+    OppiaAngularRootComponent.bottomNavbarStatusService = this.bottomNavbarStatusService;
     OppiaAngularRootComponent.browserCheckerService = this.browserCheckerService;
     OppiaAngularRootComponent.camelCaseToHyphensPipe = this.camelCaseToHyphensPipe;
     OppiaAngularRootComponent.changeObjectFactory = this.changeObjectFactory;
@@ -1302,6 +1317,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.loggerService = this.loggerService;
     OppiaAngularRootComponent.logicProofValidationService = this.logicProofValidationService;
     OppiaAngularRootComponent.lostChangeObjectFactory = this.lostChangeObjectFactory;
+    OppiaAngularRootComponent.mathEquationInputRulesService = this.mathEquationInputRulesService;
+    OppiaAngularRootComponent.mathEquationInputValidationService = this.mathEquationInputValidationService;
     OppiaAngularRootComponent.mathExpressionInputValidationService = this.mathExpressionInputValidationService;
     OppiaAngularRootComponent.mathInteractionsService = this.mathInteractionsService;
     OppiaAngularRootComponent.messengerService = this.messengerService;

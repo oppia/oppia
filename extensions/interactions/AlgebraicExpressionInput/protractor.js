@@ -30,13 +30,13 @@ var expectInteractionDetailsToMatch = async function(elem) {
   ).toBe(true);
   // Testing editor's value in default state.
   expect(
-    await objects.AlgebraicExpressionEditor(elem.element(by.tagName(
+    await objects.MathEditor(elem.element(by.tagName(
       'oppia-interactive-algebraic-expression-input'))).getValue()
   ).toBe('\\color{grey}{\\text{\\small{Type a formula here.}}}');
 };
 
 var submitAnswer = async function(elem, answer) {
-  await objects.AlgebraicExpressionEditor(elem.element(by.tagName(
+  await objects.MathEditor(elem.element(by.tagName(
     'oppia-interactive-algebraic-expression-input'))).setValue(answer);
   await element(by.css('.protractor-test-submit-answer-button')).click();
 };
