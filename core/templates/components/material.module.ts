@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the Angular Material.
+ * @fileoverview Module for Angular Material.
  */
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material';
-import {MatButtonModule} from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   imports: [CommonModule, BrowserAnimationsModule,
