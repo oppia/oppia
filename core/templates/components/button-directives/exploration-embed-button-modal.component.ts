@@ -37,15 +37,15 @@ export class ExplorationEmbedButtonModalComponent implements OnInit {
     this.siteAnalyticsService.registerOpenEmbedInfoEvent(this.explorationId);
   }
 
-  cancel() {
+  cancel(): void {
     this.activeModal.dismiss();
   }
 
-  selectText(event) {
+  selectText(event: MouseEvent): void {
     const codeDiv = event.currentTarget;
     const range = document.createRange();
-    range.setStartBefore(codeDiv.firstChild);
-    range.setEndAfter(codeDiv.lastChild);
+    range.setStartBefore((<HTMLDivElement>codeDiv).firstChild);
+    range.setEndAfter((<HTMLDivElement>codeDiv).lastChild);
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);

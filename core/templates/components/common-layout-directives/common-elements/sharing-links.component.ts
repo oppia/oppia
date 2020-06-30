@@ -73,7 +73,7 @@ export class SharingLinksComponent implements OnInit {
       '/general/classroom.png');
   }
 
-  getFontAndFlexClass() {
+  getFontAndFlexClass(): string {
     let classes = '';
     classes += this.smallFont ? 'font-small' : 'font-big';
     classes += ' fx-' + this.layoutType;
@@ -82,7 +82,7 @@ export class SharingLinksComponent implements OnInit {
     return classes;
   }
 
-  getUrl(network: SharingPlatform) {
+  getUrl(network: SharingPlatform): string {
     if (network === 'facebook') {
       return `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=${this.serverName}/${this.shareType}/${this.activityId}&display=popup&ref=plugin&src=share_button`;
     }
@@ -96,14 +96,14 @@ export class SharingLinksComponent implements OnInit {
     }
   }
 
-  showEmbedExplorationModal() {
+  showEmbedExplorationModal(): void {
     const modelRef = this.nbgModal.open(
       ExplorationEmbedButtonModalComponent, {backdrop: true});
     modelRef.componentInstance.serverName = this.serverName;
     modelRef.componentInstance.explorationId = this.explorationId;
   }
 
-  registerShareEvent(network: SharingPlatform) {
+  registerShareEvent(network: SharingPlatform): void {
     if (this.shareType === 'exploration') {
       this.siteAnalyticsService.registerShareExplorationEvent(network);
     } else if (this.shareType === 'collection') {
