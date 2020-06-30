@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for DisplaySolutionModalController.
+ * @fileoverview Unit tests for DisplayHintModalController.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -23,8 +23,10 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
-describe('Display Solution Modal Controller', function() {
+describe('Display Hint Modal Controller', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModalInstance = null;
@@ -36,11 +38,11 @@ describe('Display Solution Modal Controller', function() {
   var interactionObjectFactory = null;
   var playerTranscriptService = null;
   var recordedVoiceoversObjectFactory = null;
-  var SolutionObjectFactory = null;
   var stateCardObjectFactory = null;
+  var subtitledHtmlObjectFactory = null;
 
   var card = null;
-  var solution = null;
+  var hintContent = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -48,6 +50,7 @@ describe('Display Solution Modal Controller', function() {
     recordedVoiceoversObjectFactory = TestBed.get(
       RecordedVoiceoversObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -63,15 +66,14 @@ describe('Display Solution Modal Controller', function() {
     HintsAndSolutionManagerService = $injector.get(
       'HintsAndSolutionManagerService');
     playerTranscriptService = $injector.get('PlayerTranscriptService');
-    SolutionObjectFactory = $injector.get('SolutionObjectFactory');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    solution = SolutionObjectFactory.createNew(
-      true, 'Correct answer', 'Explanation html', 'exp1');
-    spyOn(HintsAndSolutionManagerService, 'displaySolution').and.returnValue(
-      solution);
+    hintContent = subtitledHtmlObjectFactory.createDefault(
+      'content_1', 'Hint Content');
+    spyOn(HintsAndSolutionManagerService, 'displayHint').and.returnValue(
+      hintContent);
 
     var interaction = interactionObjectFactory.createFromBackendDict({
       answer_groups: [],
@@ -89,21 +91,17 @@ describe('Display Solution Modal Controller', function() {
     spyOn($rootScope, '$broadcast').and.callThrough();
 
     $scope = $rootScope.$new();
-    $controller('DisplaySolutionModalController', {
+    $controller('DisplayHintModalController', {
       $rootScope: $rootScope,
       $scope: $scope,
-      $uibModalInstance: $uibModalInstance
+      $uibModalInstance: $uibModalInstance,
+      index: 0
     });
   }));
 
   it('should evaluate initialized properties', function() {
-    expect($scope.isHint).toBe(false);
-    expect($scope.shortAnswerHtml).toEqual({
-      prefix: 'The only',
-      answer: '<oppia-short-response-interaction_1 answer="&amp;quot;' +
-        'Correct answer&amp;quot;"></oppia-short-response-interaction_1>'
-    });
-    expect($scope.solutionExplanationHtml).toBe('Explanation html');
+    expect($scope.isHint).toBe(true);
+    expect($scope.hint).toEqual(hintContent);
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith('autoPlayAudio');
   });
