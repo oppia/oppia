@@ -59,6 +59,9 @@ def oppia_angular_root_linter(file_paths, verbose_mode_enabled):
     Returns:
         all_messages: str. All the messages returned by the lint checks.
     """
+    if verbose_mode_enabled:
+        python_utils.PRINT('Starting Oppia Angular Root file check')
+        python_utils.PRINT('----------------------------------------')
     oppia_angular_root = FILE_CACHE.read(OPPIA_ANGULAR_ROOT_PATH)
     oppia_root_directive = FILE_CACHE.read(OPPIA_ROOT_DIRECTIVE_PATH)
     summary_messages = []
@@ -125,7 +128,7 @@ def oppia_angular_root_linter(file_paths, verbose_mode_enabled):
                 total_files_checked, total_error_count))
             summary_message = linter_utils.FAILED_MESSAGE_PREFIX
             summary_message += 'OppiaAngularRootComponent linting failed,'
-            summary_message += ' fix the errors listed below'
+            summary_message += ' fix the errors listed at the end'
             summary_messages.append(summary_message)
         else:
             summary_message = (

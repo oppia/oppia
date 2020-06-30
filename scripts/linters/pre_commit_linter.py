@@ -486,10 +486,6 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
         return
     # Adding these files for OppiaAngularRoot Linter.
-    all_filepaths.append(
-        './core/templates/components/oppia-angular-root.component.ts')
-    all_filepaths.append(
-        './core/templates/base-components/oppia-root.directive.ts')
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
@@ -558,8 +554,6 @@ def main(args=None):
 
     lint_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
-
-    python_utils.PRINT(_FILES['.ts'])
 
     lint_messages += oppia_angular_root_linter.oppia_angular_root_linter(
         _FILES['.ts'], verbose_mode_enabled
