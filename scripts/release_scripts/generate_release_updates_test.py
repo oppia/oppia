@@ -76,6 +76,8 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
         def mock_ask_user_to_confirm(unused_msg):
             check_function_calls['ask_user_to_confirm_gets_called'] = True
+        def mock_get_remote_alias(unused_remote_url):
+            return 'upstream'
 
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         open_tab_swap = self.swap(
@@ -83,8 +85,10 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             mock_open_new_tab_in_browser_if_possible)
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        get_remote_alias_swap = self.swap(
+            common, 'get_remote_alias', mock_get_remote_alias)
         with self.branch_name_swap, check_call_swap, open_tab_swap:
-            with ask_user_swap:
+            with ask_user_swap, get_remote_alias_swap:
                 generate_release_updates.draft_new_release()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
