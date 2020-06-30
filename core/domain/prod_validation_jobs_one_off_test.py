@@ -9221,7 +9221,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_schema(self):
-        self.model_instance.score_category = 'invalid.invalid'
+        self.model_instance.score_category = 'invalid.Art'
         self.model_instance.put()
         expected_output = [
             (
@@ -9243,6 +9243,16 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             prod_validation_jobs_one_off, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
             run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_validate_score_category(self):
+        self.model_instance.score_category = 'content.invalid'
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for score category subtype check of '
+            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
+            'valid does not match target exploration category Art\']]') % (
+                self.model_instance.id)]
+        run_job_and_check_output(self, expected_output)
 
 
 class GeneralVoiceoverApplicationModelValidatorTests(
@@ -14557,18 +14567,6 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         run_job_and_check_output(self, expected_output)
-
-    def test_invalid_score_category(self):
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_id, 'invalid', 10)
-        expected_output = [
-            (
-                u'[u\'failed validation check for score category check '
-                'of UserContributionScoringModel\', [u\'Entity id invalid.%s: '
-                'Score category invalid is invalid\']]'
-            ) % self.user_id,
-            u'[u\'fully-validated UserContributionScoringModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_invalid_score(self):
         self.model_instance.score = -1

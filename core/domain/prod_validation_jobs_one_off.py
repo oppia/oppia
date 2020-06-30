@@ -106,16 +106,6 @@ TARGET_TYPE_TO_TARGET_MODEL = {
     suggestion_models.TARGET_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
-VALID_SCORE_CATEGORIES_FOR_TYPE_CONTENT = [
-    '%s\\.%s' % (
-        suggestion_models.SCORE_TYPE_CONTENT, category) for category in (
-            constants.ALL_CATEGORIES)]
-VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
-    '%s\\.[A-Za-z0-9-_]{1,%s}' % (
-        suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
-ALLOWED_SCORE_CATEGORIES = (
-    VALID_SCORE_CATEGORIES_FOR_TYPE_CONTENT +
-    VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION)
 
 
 class BaseModelValidator(python_utils.OBJECT):
@@ -3184,11 +3174,33 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                 'suggestion is in review' % (item.id, item.final_reviewer_id))
 
     @classmethod
+    def _validate_score_category(cls, item):
+        """Validate that the score_category subtype for suggestions match the
+        exploration category.
+
+        Args:
+            item: ndb.Model. GeneralSuggestionModel to validate.
+        """
+        if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+            score_category_sub_type = (
+                item.score_category.split(
+                    suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
+            target_exploration = (
+                exp_fetchers.get_exploration_by_id(item.target_id))
+            if target_exploration.category != score_category_sub_type:
+                cls.errors['score category subtype check'].append(
+                    'Entity id %s: score category sub %s does not match'
+                    ' target exploration category %s' % (
+                        item.id, score_category_sub_type,
+                        target_exploration.category))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_target_type,
             cls._validate_target_version_at_submission,
-            cls._validate_final_reveiwer_id]
+            cls._validate_final_reveiwer_id,
+            cls._validate_score_category]
 
 
 class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
@@ -4819,19 +4831,6 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
         }
 
     @classmethod
-    def _validate_score_category(cls, item):
-        """Validates that score category belongs to allowed score categories.
-
-        Args:
-            item: ndb.Model. UserContributionScoringModel to validate.
-        """
-        score_category_regex = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
-        if not re.compile(score_category_regex).match(item.score_category):
-            cls.errors['score category check'].append(
-                'Entity id %s: Score category %s is invalid' % (
-                    item.id, item.score_category))
-
-    @classmethod
     def _validate_score(cls, item):
         """Validates that score is non-negative.
 
@@ -4845,9 +4844,7 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_score_category,
-            cls._validate_score]
+        return [cls._validate_score]
 
 
 class UserCommunityRightsModelValidator(BaseUserModelValidator):
