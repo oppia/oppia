@@ -122,6 +122,12 @@ describe('Topic update service', function() {
         canonical_story_references: [{
           story_id: 'story_1',
           story_is_published: true
+        }, {
+          story_id: 'story_2',
+          story_is_published: true
+        }, {
+          story_id: 'story_3',
+          story_is_published: true
         }],
         additional_story_references: [{
           story_id: 'story_2',
@@ -205,14 +211,18 @@ describe('Topic update service', function() {
   });
 
   it('should remove/add a canonical story id from/to a topic', function() {
-    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
+    let canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds).toEqual(
+      ['story_1', 'story_2', 'story_3']);
     TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_1');
-    expect(_sampleTopic.getCanonicalStoryIds()).toEqual([]);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds).toEqual(['story_2', 'story_3']);
 
     UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
-  }
-  );
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds).toEqual(
+      ['story_2', 'story_3', 'story_1']);
+  });
 
   it('should create a proper backend change dict for removing a canonical ' +
     'story id', function() {
@@ -516,6 +526,45 @@ describe('Topic update service', function() {
 
     UndoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getSubtopics().length).toEqual(1);
+  });
+
+  it('should rearrange a canonical story', function() {
+    let canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds.length).toEqual(3);
+    expect(canonicalStoryIds[0]).toEqual('story_1');
+    expect(canonicalStoryIds[1]).toEqual('story_2');
+    expect(canonicalStoryIds[2]).toEqual('story_3');
+
+    TopicUpdateService.rearrangeCanonicalStory(_sampleTopic, 1, 0);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual('story_2');
+    expect(canonicalStoryIds[1]).toEqual('story_1');
+    expect(canonicalStoryIds[2]).toEqual('story_3');
+
+    TopicUpdateService.rearrangeCanonicalStory(_sampleTopic, 2, 1);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual('story_2');
+    expect(canonicalStoryIds[1]).toEqual('story_3');
+    expect(canonicalStoryIds[2]).toEqual('story_1');
+
+    TopicUpdateService.rearrangeCanonicalStory(_sampleTopic, 2, 0);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual('story_1');
+    expect(canonicalStoryIds[1]).toEqual('story_2');
+    expect(canonicalStoryIds[2]).toEqual('story_3');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getCanonicalStoryIds().length).toEqual(3);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual('story_2');
+    expect(canonicalStoryIds[1]).toEqual('story_3');
+    expect(canonicalStoryIds[2]).toEqual('story_1');
+
+    TopicUpdateService.rearrangeCanonicalStory(_sampleTopic, 2, 0);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual('story_1');
+    expect(canonicalStoryIds[1]).toEqual('story_2');
+    expect(canonicalStoryIds[2]).toEqual('story_3');
   });
 
   it('should create a proper backend change dict for adding a subtopic',

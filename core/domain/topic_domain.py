@@ -59,6 +59,7 @@ CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_CANONICAL_STORY = 'add_canonical_story'
 CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story'
+CMD_REARRANGE_CANONICAL_STORY = 'rearrange_canonical_story'
 CMD_ADD_ADDITIONAL_STORY = 'add_additional_story'
 CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
 CMD_PUBLISH_STORY = 'publish_story'
@@ -134,6 +135,10 @@ class TopicChange(change_domain.BaseChange):
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_REARRANGE_CANONICAL_STORY,
+        'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': []
     }, {
         'name': CMD_ADD_ADDITIONAL_STORY,
@@ -707,6 +712,40 @@ class Topic(python_utils.OBJECT):
             raise Exception(
                 'The story_id %s is not present in the canonical '
                 'story references list of the topic.' % story_id)
+
+    def rearrange_canonical_story(self, from_index, to_index):
+        """Rearranges or moves a canonical story to another position.
+
+        Args:
+            from_index: int. The index of canonical story to move.
+            to_index: int. The index at which to insert the moved canonical
+                story.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception('Expected from_index value to be a number, '
+                            'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception('Expected to_index value to be a number, '
+                            'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception('Expected from_index and to_index values '
+                            'to be different.')
+
+        if (from_index >= len(self.canonical_story_references) or
+                to_index >= len(self.canonical_story_references) or
+                from_index < 0 or to_index < 0):
+            raise Exception('Expected index values to be with-in bounds.')
+
+        canonical_story_reference_to_move = copy.deepcopy(
+            self.canonical_story_references[from_index])
+        del self.canonical_story_references[from_index]
+        self.canonical_story_references.insert(
+            to_index, canonical_story_reference_to_move)
 
     def add_canonical_story(self, story_id):
         """Adds a story to the canonical_story_references list.
