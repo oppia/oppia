@@ -12,7 +12,11 @@
       <p ng-if="key === 'publication_status'" class="text-center">Published?</p>
     </th>
   </tr>
-  <tr ng-repeat="summary in storySummaries"
+  <tr ng-repeat="summary in storySummaries track by $index"
+      dnd-list="storySummaries"
+      dnd-dragstart="onMoveStoryStart($index)"
+      dnd-drop="onMoveStoryFinish($index)"
+      dnd-draggable="summary"
       class="list-item protractor-test-story-list-item">
     <td>
       <a ng-click="openStoryEditor(summary.getId())" class="list-summary text-left">
