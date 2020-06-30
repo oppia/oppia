@@ -205,14 +205,13 @@ angular.module('oppia').directive('skillsList', [
             return (skillSerialNumber + 1);
           };
 
-          ctrl.enableEditOptions = function(topicId) {
-            ctrl.selectedIndex = topicId;
+          ctrl.toggleEditOptions = function(skillId) {
+            ctrl.selectedIndex = ctrl.selectedIndex ? null : skillId;
           };
 
-          ctrl.showEditOptions = function(topicId) {
-            return ctrl.selectedIndex === topicId;
+          ctrl.showEditOptions = function(skillId) {
+            return ctrl.selectedIndex === skillId;
           };
-
 
           ctrl.$onInit = function() {
             ctrl.getPageNumber = $scope.getPageNumber;

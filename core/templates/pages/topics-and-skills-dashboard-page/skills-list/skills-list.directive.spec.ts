@@ -126,6 +126,29 @@ describe('Skills List Directive', function() {
         'topicsAndSkillsDashboardReinitialized');
     });
 
+  it('should select and show edit options for a skill', function() {
+    const skillId1 = 'uXcdsad3f42';
+    const skillId2 = 'aEdf44DGfre';
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+
+    ctrl.toggleEditOptions(skillId1);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(true);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
+
+    ctrl.toggleEditOptions(skillId1);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
+
+    ctrl.toggleEditOptions(skillId2);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(true);
+
+    ctrl.toggleEditOptions(skillId2);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
+  });
+
   it('should reinitialize the page after merging the skill',
     function() {
       spyOn($uibModal, 'open').and.returnValue({

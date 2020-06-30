@@ -1,5 +1,5 @@
 <md-card layout="row" class="list-view-item">
-  <table class="dashboard-table">
+  <table class="dashboard-table protractor-test-skills-table">
     <colgroup>
       <col class="dashboard-table-index-column">
       <col class="dashboard-table-description-column">
@@ -58,13 +58,13 @@
           </span>
         </span>
         <div class="skill-list-options-container">
-          <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.enableEditOptions(skill.id)"></p>
-          <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
+          <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.toggleEditOptions(skill.id)"></p>
+          <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.toggleEditOptions(null)">
             <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-            <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
-              <i class="fa fa-wrench"></i>
-              <span> Assign to Topic </span>
-            </span>
+              <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+                <i class="fa fa-wrench"></i>
+                <span> Assign to Topic </span>
+              </span>
             </div>
             <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0">
               <div class="protractor-test-merge-skills-button"
@@ -89,10 +89,36 @@
       <div class="skill-item-header">
         <div class="skill-item-description-box">
           <div class="skill-item-description-name">
-            <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>">
-              <span><[$ctrl.getSerialNumberForSkill($index)]>.</span>
-              <span><[skill.description]></span>
-            </a>
+            <div class="skill-item-description-mobile">
+              <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>">
+                <span><[$ctrl.getSerialNumberForSkill($index)]>.</span>
+                <span><[skill.description]></span>
+              </a>
+            </div>
+            <div class="skill-list-options-container">
+              <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.toggleEditOptions(skill.id)"></p>
+              <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.toggleEditOptions(null)">
+                <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
+                  <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+                    <i class="fa fa-wrench"></i>
+                    <span> Assign to Topic </span>
+                  </span>
+                </div>
+                <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0">
+                  <div class="protractor-test-merge-skills-button"
+                       ng-click="$ctrl.mergeSkill(skill)">
+                    <i class="fa fa-plus"></i>
+                    <span>Merge Skill</span>
+                  </div>
+                </div>
+                <div class="delete-icon-box">
+                  <span ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+                    <i class="fa fa-trash-alt"></i>
+                    <span>Delete</span>
+                  </span>
+                </div>
+              </div>
+            </div>
             <div class="skill-topic">
               <span ng-if="!skill.topic_name">
                 Unassigned
@@ -118,26 +144,6 @@
           <div class="skill-item-key"><span>Status</span></div>
           <div ng-if="skill.topic_name" class="skill-item-value"><span> <[skill.topic_name]></span></div>
           <div ng-if="!skill.topic_name" class="skill-item-value"><span>Not Assigned</span></div>
-        </div>
-      </div>
-      <div class="skill-item-actions">
-        <div class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
-          <div class="merge-skill-icon"
-               ng-click="$ctrl.mergeSkill(skill)">
-            <span class="material-icons" title="Merge Skill">
-              merge_type
-            </span>
-          </div>
-        </div>
-        <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-          <button class="btn assign-btn" ng-click="$ctrl.assignSkillToTopic(skill.id)">
-            <span> Assign to Topic </span>
-          </button>
-        </div>
-        <div class="delete-icon">
-          <a ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)">
-            <span class="fas fa-trash-alt list-summary"></span>
-          </a>
         </div>
       </div>
     </div>
@@ -270,7 +276,7 @@
 
   skills-list .skill-edit-options {
     background-color: #fff;
-    border: 2px solid #000;
+    border: 1px solid #000;
     display: flex;
     flex-wrap: wrap;
     position: absolute;
@@ -284,8 +290,9 @@
   skills-list .merge-skill-box,
   skills-list .delete-icon-box {
     border-bottom: 1px solid #000;
+    cursor: pointer;
     font-size: 15px;
-    padding: 2px 0;
+    padding: 4px 0 4px 4px;
     width: 100%;
   }
 
@@ -339,6 +346,22 @@
     }
     skills-list .assign-btn {
       border: 2px solid #00645C;
+    }
+
+    skills-list .skill-item-description-mobile {
+      display: inline-block;
+      width: 90%;
+    }
+
+    skills-list .skill-edit-options {
+      right: 15px;
+      text-align: left;
+      top: -5px;
+      width: 140px;
+    }
+
+    skills-list .skill-edit-box-icon {
+      margin: 0;
     }
   }
 </style>

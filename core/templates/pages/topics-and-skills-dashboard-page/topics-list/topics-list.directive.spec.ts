@@ -69,17 +69,21 @@ describe('Topics List Directive', function() {
     const topicId1 = 'uXcdsad3f42';
     const topicId2 = 'aEdf44DGfre';
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
-    expect(ctrl.showEditOptions(topicId2)).toEqual(false);
+    expect(ctrl.showEditOptions(topicId1)).toEqual(false);
 
-    ctrl.enableEditOptions(topicId1);
+    ctrl.toggleEditOptions(topicId1);
     expect(ctrl.showEditOptions(topicId1)).toEqual(true);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
 
-    ctrl.enableEditOptions(topicId2);
+    ctrl.toggleEditOptions(topicId1);
+    expect(ctrl.showEditOptions(topicId1)).toEqual(false);
+    expect(ctrl.showEditOptions(topicId2)).toEqual(false);
+
+    ctrl.toggleEditOptions(topicId2);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(true);
 
-    ctrl.enableEditOptions(null);
+    ctrl.toggleEditOptions(topicId2);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
   });
@@ -138,14 +142,5 @@ describe('Topics List Directive', function() {
 
     expect(alertSpy).toHaveBeenCalledWith(
       'There was an error when deleting the topic.');
-  });
-
-  it('should toggle the visibility of topic edit box', function() {
-    ctrl.$onInit();
-    expect(ctrl.selectedIndex).toEqual(null);
-    ctrl.toggleEditOptionsInMobileView('1');
-    expect(ctrl.selectedIndex).toEqual('1');
-    ctrl.toggleEditOptionsInMobileView('1');
-    expect(ctrl.selectedIndex).toEqual(null);
   });
 });
