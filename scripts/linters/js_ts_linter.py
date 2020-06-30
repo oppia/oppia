@@ -57,22 +57,6 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
 
-def _eslint_trimmer(lint_messages):
-    """Remove extra bits from eslint messages."""
-    summary_messages = ''
-    # Extracting messages.
-    messages = lint_messages[0].split('\n')[:-4]
-    for message in messages:
-        if re.search(r'^\d+:\d+', message.lstrip()):
-            message_list = message.split()
-            new_message = ' '.join(
-                message_list[:1] + message_list[2:-1])
-            summary_messages += new_message + '\n'
-        else:
-            summary_messages += message + '\n'
-    return summary_messages
-
-
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
     """This function first checks whether the parsed node represents
@@ -1098,6 +1082,28 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
+    def _get_trimmed_summary_message(self, lint_messages):
+        """Remove extra bits from eslint messages.
+
+        Args:
+            lint_messages: str. Messages returned by the js_ts linter.
+
+        Returns:
+            str. A string with the trimmed messages.
+        """
+        summary_messages = ''
+        # Extracting messages.
+        messages = lint_messages[0].split('\n')[:-4]
+        for message in messages:
+            if re.search(r'^\d+:\d+', message.lstrip()):
+                message_list = message.split()
+                new_message = ' '.join(
+                    message_list[:1] + message_list[2:-1])
+                summary_messages += new_message + '\n'
+            else:
+                summary_messages += message + '\n'
+        return summary_messages
+
     def _lint_js_and_ts_files(self):
         """Prints a list of lint errors in the given list of JavaScript files.
 
@@ -1147,7 +1153,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-            eslint_messages = _eslint_trimmer(result_list)
+            eslint_messages = self._get_trimmed_summary_message(result_list)
             summary_messages.append(eslint_messages)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (

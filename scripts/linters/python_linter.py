@@ -49,22 +49,6 @@ import pycodestyle # isort:skip
 # pylint: enable=wrong-import-position
 
 
-def _pylint_trimmer(lint_messages):
-    """Remove extra bits from pylint messages."""
-    summary_messages = ''
-    # Remove extra bits from end of pylint messages.
-    lint_messages = lint_messages[:-5]
-    for message in lint_messages:
-        python_utils.PRINT(message)
-        # Remove extra bits from end of the message.
-        if message.endswith(')'):
-            last_string_length = len(message.split()[-1])
-            summary_messages += (message[:-last_string_length])
-        else:
-            summary_messages += (message)
-    return summary_messages
-
-
 class WritableObject(python_utils.OBJECT):
     """Output stream for pylint."""
 
@@ -350,6 +334,28 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
+    def _get_trimmed_summary_message(self, lint_messages):
+        """Remove extra bits from pylint messages.
+
+        Args:
+            lint_messages: str. Messages returned by the python linter.
+
+        Returns:
+            str. A string with the trimmed messages.
+        """
+        summary_messages = ''
+        # Remove extra bits from end of pylint messages.
+        lint_messages = lint_messages[:-5]
+        for message in lint_messages:
+            python_utils.PRINT(message)
+            # Remove extra bits from end of the message.
+            if message.endswith(')'):
+                last_string_length = len(message.split()[-1])
+                summary_messages += (message[:-last_string_length])
+            else:
+                summary_messages += (message)
+        return summary_messages
+
     def _lint_py_files(self, config_pylint, config_pycodestyle):
         """Prints a list of lint errors in the given list of Python files.
 
@@ -402,7 +408,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
-                pylint_messages = _pylint_trimmer(pylint_output.read())
+                pylint_messages = (
+                    self._get_trimmed_summary_message(pylint_output.read()))
                 summary_messages.append(pylint_messages)
                 python_utils.PRINT(summary_message)
                 are_there_errors = True
@@ -482,7 +489,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter_for_python3.msg_status != 0:
                 summary_message = stdout.getvalue()
-                pylint_messages = _pylint_trimmer(pylint_output.read())
+                pylint_messages = (
+                    self._get_trimmed_summary_message(pylint_output.read()))
                 summary_messages.append(pylint_messages)
                 python_utils.PRINT(summary_message)
                 any_errors = True

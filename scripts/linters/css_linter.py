@@ -31,22 +31,6 @@ from . import linter_utils
 from .. import common
 
 
-def _stylelint_trimmer(lint_messages):
-    """Remove extra bits from stylelint messages."""
-    summary_messages = ''
-    # Extracting messages.
-    messages = lint_messages[0].split('\n')
-    for message in messages:
-        if re.search(r'^\d+:\d+', message.lstrip()):
-            message_list = message.split()
-            new_message = ' '.join(
-                message_list[:1] + message_list[2:-1])
-            summary_messages += new_message + '\n'
-        else:
-            summary_messages += message + '\n'
-    return summary_messages
-
-
 class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
     """Manages all the third party Python linting functions.
 
@@ -74,6 +58,28 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.files_to_lint
+
+    def _get_trimmed_summary_message(self, lint_messages):
+        """Remove extra bits from stylelint messages.
+
+        Args:
+            lint_messages: str. Messages returned by the css linter.
+
+        Returns:
+            str. A string with the trimmed messages.
+        """
+        summary_messages = ''
+        # Extracting messages.
+        messages = lint_messages[0].split('\n')
+        for message in messages:
+            if re.search(r'^\d+:\d+', message.lstrip()):
+                message_list = message.split()
+                new_message = ' '.join(
+                    message_list[:1] + message_list[2:-1])
+                summary_messages += new_message + '\n'
+            else:
+                summary_messages += message + '\n'
+        return summary_messages
 
     def _lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
@@ -125,7 +131,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-            summary_messages.append(_stylelint_trimmer(result_list))
+            summary_messages.append(
+                self._get_trimmed_summary_message(result_list))
             summary_message = ('%s %s CSS file' % (
                 linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:

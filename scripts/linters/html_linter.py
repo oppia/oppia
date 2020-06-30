@@ -33,16 +33,6 @@ import html.parser # isort:skip
 # pylint: enable=wrong-import-position
 
 
-def _htmllint_trimmer(lint_messages):
-    """Remove extra bits from htmllint messages."""
-    summary_messages = ''
-    # Extracting messages and removing extra bits.
-    messages = lint_messages.split('\n')[:-2]
-    for message in messages:
-        summary_messages += message + '\n'
-    return summary_messages
-
-
 class TagMismatchException(Exception):
     """Error class for mismatch between start and end tags."""
     pass
@@ -351,6 +341,22 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.html_filepaths
 
+    def _get_trimmed_summary_message(self, lint_messages):
+        """Remove extra bits from htmllint messages.
+
+        Args:
+            lint_messages: str. Messages returned by the html linter.
+
+        Returns:
+            str. A string with the trimmed messages.
+        """
+        summary_messages = ''
+        # Extracting messages and removing extra bits.
+        messages = lint_messages.split('\n')[:-2]
+        for message in messages:
+            summary_messages += message + '\n'
+        return summary_messages
+
     def _lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
@@ -387,7 +393,8 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 if error_count:
                     error_summary.append(error_count)
                     python_utils.PRINT(linter_stdout)
-                    summary_messages.append(_htmllint_trimmer(linter_stdout))
+                    summary_messages.append(
+                        self._get_trimmed_summary_message(linter_stdout))
 
         with linter_utils.redirect_stdout(stdout):
             if self.verbose_mode_enabled:
