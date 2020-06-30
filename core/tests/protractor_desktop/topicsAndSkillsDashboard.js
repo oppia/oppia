@@ -20,7 +20,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 
-var Constants = require('../protractor_utils/Constants.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
