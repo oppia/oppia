@@ -123,11 +123,11 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_NAME, name, oldName,
           function(changeDict, topic) {
-            // Apply
+            // ---- Apply ----
             var name = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setName(name);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             topic.setName(oldName);
           });
       },
@@ -142,11 +142,11 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, TOPIC_PROPERTY_ABBREVIATED_NAME,
           abbreviatedName, oldAbbreviatedName,
           function(changeDict, topic) {
-            // Apply
+            // ---- Apply ----
             var name = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setAbbreviatedName(name);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             topic.setAbbreviatedName(oldAbbreviatedName);
           });
       },
@@ -161,12 +161,12 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, TOPIC_PROPERTY_THUMBNAIL_FILENAME,
           thumbnailFilename, oldThumbnailFilename,
           function(changeDict, topic) {
-            // Apply
+            // ---- Apply ----
             var thumbnailFilename = (
               _getNewPropertyValueFromChangeDict(changeDict));
             topic.setThumbnailFilename(thumbnailFilename);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             topic.setThumbnailFilename(oldThumbnailFilename);
           });
       },
@@ -181,12 +181,12 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
           thumbnailBgColor, oldThumbnailBgColor,
           function(changeDict, topic) {
-            // Apply
+            // ---- Apply ----
             var thumbnailBgColor = (
               _getNewPropertyValueFromChangeDict(changeDict));
             topic.setThumbnailBgColor(thumbnailBgColor);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             topic.setThumbnailBgColor(oldThumbnailBgColor);
           });
       },
@@ -200,11 +200,11 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_DESCRIPTION, description, oldDescription,
           function(changeDict, topic) {
-            // Apply
+            // ---- Apply ----
             var description = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setDescription(description);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             topic.setDescription(oldDescription);
           });
       },
@@ -219,11 +219,11 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, TOPIC_PROPERTY_LANGUAGE_CODE, languageCode,
           oldLanguageCode,
           function(changeDict, topic) {
-            // Apply.
+            // ---- Apply ----
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setLanguageCode(languageCode);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             topic.setLanguageCode(oldLanguageCode);
           });
       },
@@ -238,10 +238,10 @@ angular.module('oppia').factory('TopicUpdateService', [
           subtopic_id: nextSubtopicId,
           title: title
         }, function(changeDict, topic) {
-          // Apply.
+          // ---- Apply ----
           topic.addSubtopic(title);
         }, function(changeDict, topic) {
-          // Undo.
+          // ---- Undo ----
           var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
           topic.deleteSubtopic(subtopicId);
         });
@@ -355,10 +355,10 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
           subtopic_id: subtopicId
         }, function(changeDict, topic) {
-          // Apply.
+          // ---- Apply ----
           topic.deleteSubtopic(subtopicId, newlyCreated);
         }, function(changeDict, topic) {
-          // Undo.
+          // ---- Undo ----
           throw new Error('A deleted subtopic cannot be restored');
         });
       },
@@ -381,7 +381,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           new_subtopic_id: newSubtopicId,
           skill_id: skillSummary.getId()
         }, function(changeDict, topic) {
-          // Apply.
+          // ---- Apply ----
           if (oldSubtopicId === null) {
             topic.removeUncategorizedSkill(skillSummary.getId());
           } else {
@@ -390,7 +390,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           newSubtopic.addSkill(
             skillSummary.getId(), skillSummary.getDescription());
         }, function(changeDict, topic) {
-          // Undo.
+          // ---- Undo ----
           newSubtopic.removeSkill(skillSummary.getId());
           if (oldSubtopicId === null) {
             topic.addUncategorizedSkill(
@@ -412,14 +412,14 @@ angular.module('oppia').factory('TopicUpdateService', [
           subtopic_id: subtopicId,
           skill_id: skillSummary.getId()
         }, function(changeDict, topic) {
-          // Apply.
+          // ---- Apply ----
           subtopic.removeSkill(skillSummary.getId());
           if (!topic.hasUncategorizedSkill(skillSummary.getId())) {
             topic.addUncategorizedSkill(
               skillSummary.getId(), skillSummary.getDescription());
           }
         }, function(changeDict, topic) {
-          // Undo.
+          // ---- Undo ----
           subtopic.addSkill(
             skillSummary.getId(), skillSummary.getDescription());
           topic.removeUncategorizedSkill(skillSummary.getId());
@@ -442,12 +442,12 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, subtopicId,
           thumbnailFilename, oldThumbnailFilename,
           function(changeDict, topic) {
-            // Apply
+            // ---- Apply ----
             var thumbnailFilename = (
               _getNewPropertyValueFromChangeDict(changeDict));
             subtopic.setThumbnailFilename(thumbnailFilename);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             subtopic.setThumbnailFilename(oldThumbnailFilename);
           });
       },
@@ -468,12 +468,12 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR, subtopicId,
           thumbnailBgColor, oldThumbnailBgColor,
           function(changeDict, topic) {
-            // Apply
+            // ---- Apply ----
             var thumbnailBgColor = (
               _getNewPropertyValueFromChangeDict(changeDict));
             subtopic.setThumbnailBgColor(thumbnailBgColor);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             subtopic.setThumbnailBgColor(oldThumbnailBgColor);
           });
       },
@@ -491,11 +491,11 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applySubtopicPropertyChange(
           topic, SUBTOPIC_PROPERTY_TITLE, subtopicId, title, oldTitle,
           function(changeDict, topic) {
-            // Apply.
+            // ---- Apply ----
             var title = _getNewPropertyValueFromChangeDict(changeDict);
             subtopic.setTitle(title);
           }, function(changeDict, topic) {
-            // Undo.
+            // ---- Undo ----
             subtopic.setTitle(oldTitle);
           });
       },
@@ -508,10 +508,10 @@ angular.module('oppia').factory('TopicUpdateService', [
           subtopicPage, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, subtopicId,
           newSubtitledHtml.toBackendDict(), oldSubtitledHtml.toBackendDict(),
           function(changeDict, subtopicPage) {
-            // Apply.
+            // ---- Apply ----
             subtopicPage.getPageContents().setSubtitledHtml(newSubtitledHtml);
           }, function(changeDict, subtopicPage) {
-            // Undo.
+            // ---- Undo ----
             subtopicPage.getPageContents().setSubtitledHtml(oldSubtitledHtml);
           });
       },
@@ -525,11 +525,11 @@ angular.module('oppia').factory('TopicUpdateService', [
           newRecordedVoiceovers.toBackendDict(),
           oldRecordedVoiceovers.toBackendDict(),
           function(changeDict, subtopicPage) {
-            // Apply.
+            // ---- Apply ----
             subtopicPage.getPageContents().setRecordedVoiceovers(
               newRecordedVoiceovers);
           }, function(changeDict, subtopicPage) {
-            // Undo.
+            // ---- Undo ----
             subtopicPage.getPageContents().setRecordedVoiceovers(
               oldRecordedVoiceovers);
           });
@@ -543,10 +543,10 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyChange(topic, CMD_DELETE_ADDITIONAL_STORY, {
           story_id: storyId
         }, function(changeDict, topic) {
-          // Apply.
+          // ---- Apply ----
           topic.removeAdditionalStory(storyId);
         }, function(changeDict, topic) {
-          // Undo.
+          // ---- Undo ----
           topic.addAdditionalStory(storyId);
         });
       },
@@ -559,10 +559,10 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyChange(topic, CMD_DELETE_CANONICAL_STORY, {
           story_id: storyId
         }, function(changeDict, topic) {
-          // Apply.
+          // ---- Apply ----
           topic.removeCanonicalStory(storyId);
         }, function(changeDict, topic) {
-          // Undo.
+          // ---- Undo ----
           topic.addCanonicalStory(storyId);
         });
       },
@@ -575,12 +575,12 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyChange(topic, CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
           uncategorized_skill_id: skillSummary.getId()
         }, function(changeDict, topic) {
-          // Apply.
+          // ---- Apply ----
           var newSkillId = _getParameterFromChangeDict(
             changeDict, 'uncategorized_skill_id');
           topic.removeUncategorizedSkill(newSkillId);
         }, function(changeDict, topic) {
-          // Undo.
+          // ---- Undo ----
           var newSkillId = _getParameterFromChangeDict(
             changeDict, 'uncategorized_skill_id');
           topic.addUncategorizedSkill(

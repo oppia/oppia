@@ -37,7 +37,7 @@ def get_stuck_jobs(recency_msecs):
 
     Returns:
         list(job_models.JobModel). Jobs which have retried at least once and
-            haven't finished yet.
+        haven't finished yet.
     """
     threshold_time = (
         datetime.datetime.utcnow() -
@@ -77,7 +77,7 @@ class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
                 A shard or job which may still be running.
         Yields:
             tuple(str, int). Describes the action taken for the item, and the
-                number of items this action was applied to.
+            number of items this action was applied to.
         """
         max_start_time_msec = JobCleanupManager.get_mapper_param(
             jobs.MAPPER_PARAM_MAX_START_TIME_MSEC)
