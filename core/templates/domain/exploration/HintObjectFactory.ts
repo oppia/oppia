@@ -26,7 +26,7 @@ import {
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-interface IHintBackendDict {
+export interface IHintBackendDict {
   'hint_content': ISubtitledHtmlBackendDict;
 }
 

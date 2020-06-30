@@ -98,7 +98,7 @@ export class GraphInputRulesService {
   private isAcyclic(graph: any): boolean {
     // Uses depth first search to ensure that we never have an edge to an
     // ancestor in the search tree.
-    var isVisited = graph.vertices.map(() => {
+    var nodeStatus = graph.vertices.map(() => {
       return this.gus.DFS_STATUS.UNVISITED;
     });
     var adjacencyLists = this.gus.constructAdjacencyLists(
@@ -106,9 +106,9 @@ export class GraphInputRulesService {
     for (var startVertex = 0;
       startVertex < graph.vertices.length;
       startVertex++) {
-      if (isVisited[startVertex] === this.gus.DFS_STATUS.UNVISITED) {
+      if (nodeStatus[startVertex] === this.gus.DFS_STATUS.UNVISITED) {
         if (this.gus.findCycle(
-          startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
+          startVertex, -1, adjacencyLists, nodeStatus, graph.isDirected)) {
           return false;
         }
       }

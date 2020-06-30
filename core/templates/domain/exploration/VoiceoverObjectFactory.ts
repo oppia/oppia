@@ -18,7 +18,7 @@
  */
 export interface IVoiceoverDict {
   'duration_secs': number;
-  filename: string;
+  'filename': string;
   'file_size_bytes': number;
   'needs_update': boolean;
 }

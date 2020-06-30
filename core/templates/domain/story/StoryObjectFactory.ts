@@ -20,8 +20,24 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { StoryContents, StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
+import {
+  IStoryContentsBackendDict,
+  StoryContents,
+  StoryContentsObjectFactory
+} from 'domain/story/StoryContentsObjectFactory';
+
+interface IStoryBackendDict {
+  'id': string;
+  'title': string;
+  'description': string;
+  'notes': string;
+  'story_contents': IStoryContentsBackendDict;
+  'language_code': string;
+  'version': number;
+  'corresponding_topic_id': string;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+}
 
 export class Story {
   _id: string;
@@ -115,9 +131,7 @@ export class Story {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  validate(): any {
+  validate(): string[] {
     var issues = [];
     if (this._title === '') {
       issues.push('Story title should not be empty');
@@ -126,7 +140,7 @@ export class Story {
     return issues;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Story should have a thumbnail.');
@@ -156,7 +170,7 @@ export class Story {
 })
 export class StoryObjectFactory {
   constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
-  createFromBackendDict(storyBackendDict: any): Story {
+  createFromBackendDict(storyBackendDict: IStoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,
       storyBackendDict.description, storyBackendDict.notes,

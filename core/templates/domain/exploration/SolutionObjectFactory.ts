@@ -38,7 +38,7 @@ export interface ExplanationBackendDict {
   'html': string;
 }
 
-export interface SolutionBackendDict {
+export interface ISolutionBackendDict {
   'answer_is_exclusive': boolean;
   'correct_answer': string;
   'explanation': ExplanationBackendDict;
@@ -62,7 +62,7 @@ export class Solution {
     this.explanation = explanation;
   }
 
-  toBackendDict(): SolutionBackendDict {
+  toBackendDict(): ISolutionBackendDict {
     return {
       answer_is_exclusive: this.answerIsExclusive,
       correct_answer: this.correctAnswer,
@@ -131,7 +131,7 @@ export class SolutionObjectFactory {
   constructor(
     private shof: SubtitledHtmlObjectFactory,
     private ehfs: ExplorationHtmlFormatterService) {}
-  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
+  createFromBackendDict(solutionBackendDict: ISolutionBackendDict): Solution {
     return new Solution(
       this.ehfs,
       this.shof,

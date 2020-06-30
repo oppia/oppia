@@ -22,7 +22,7 @@ export interface IUnit {
 }
 
 export interface IUnitsBackendDict {
-  units: Array<IUnit>;
+  units: IUnit[];
 }
 
 interface UnitsDict {

@@ -19,18 +19,18 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface IAudioLanguageBackendDict {
+export interface IAudioLanguageBackendDict {
   id: string;
   description: string;
-  relatedLanguages: string;
+  relatedLanguages: string[];
 }
 
 export class AudioLanguage {
   id: string;
   description: string;
-  relatedLanguages: string;
+  relatedLanguages: string[];
 
-  constructor(id: string, description: string, relatedLanguages: string) {
+  constructor(id: string, description: string, relatedLanguages: string[]) {
     this.id = id;
     this.description = description;
     this.relatedLanguages = relatedLanguages;
