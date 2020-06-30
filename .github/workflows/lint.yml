@@ -21,10 +21,12 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
-      - if: startsWith(github.head_ref, 'update-') == false
       - name: Install Third Party Dependencies
+        if: startsWith(github.head_ref, 'update-') == false
         run: python -m scripts.install_third_party_libs
       - name: Third Party Size Check
+        if: startsWith(github.head_ref, 'update-') == false
         run: python -m scripts.third_party_size_check
       - name: Run Lint Checks
+        if: startsWith(github.head_ref, 'update-') == false
         run: python -m scripts.linters.pre_commit_linter --path=. --verbose
