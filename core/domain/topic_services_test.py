@@ -298,8 +298,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic.canonical_story_references[2].story_id, story_id_new)
 
-        topic_services.rearrange_canonical_story(
-            self.user_id_admin, self.TOPIC_ID, 2, 0)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+            'from_index': 2,
+            'to_index': 0
+        })]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Rearranged canonical story on index 2 to index 0.')
 
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(len(topic.canonical_story_references), 3)
@@ -317,7 +324,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
         self.assertEqual(
             topic_commit_log_entry.commit_message,
-            'Rearranged canonical story on index 2 to index 0')
+            'Rearranged canonical story on index 2 to index 0.')
 
     def test_cannot_update_topic_property_with_invalid_changelist(self):
         with self.assertRaisesRegexp(

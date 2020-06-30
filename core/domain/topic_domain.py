@@ -714,10 +714,10 @@ class Topic(python_utils.OBJECT):
                 'story references list of the topic.' % story_id)
 
     def rearrange_canonical_story(self, from_index, to_index):
-        """Rearranges or moves a canonical story to another position and
+        """Rearranges or moves a canonical story to another position.
 
         Args:
-            from_index: int. The index of canonical story index to move.
+            from_index: int. The index of canonical story to move.
             to_index: int. The index at which to insert the moved canonical
                 story.
 
@@ -735,6 +735,11 @@ class Topic(python_utils.OBJECT):
         if from_index == to_index:
             raise Exception('Expected from_index and to_index values '
                             'to be different.')
+
+        if (from_index >= len(self.canonical_story_references) or
+                to_index >= len(self.canonical_story_references) or
+                from_index < 0 or to_index < 0):
+            raise Exception('Expected index values to be with-in bounds.')
 
         canonical_story_reference_to_move = copy.deepcopy(
             self.canonical_story_references[from_index])

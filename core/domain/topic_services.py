@@ -704,26 +704,6 @@ def add_additional_story(user_id, topic_id, story_id):
         'Added %s to additional story ids' % story_id)
 
 
-def rearrange_canonical_story(user_id, topic_id, from_index, to_index):
-    """Adds a story to the additional story reference list of a topic.
-
-    Args:
-        user_id: str. The id of the user who is performing the action.
-        topic_id: str. The id of the topic to which the story is to be added.
-        from_index: int. The index of canonical story index to move.
-        to_index: int. The index at which to insert the moved canonical story.
-    """
-    change_list = [topic_domain.TopicChange({
-        'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
-        'from_index': from_index,
-        'to_index': to_index
-    })]
-    update_topic_and_subtopic_pages(
-        user_id, topic_id, change_list,
-        'Rearranged canonical story on index %s to index %s' % (
-            from_index, to_index))
-
-
 def delete_topic(committer_id, topic_id, force_deletion=False):
     """Deletes the topic with the given topic_id.
 

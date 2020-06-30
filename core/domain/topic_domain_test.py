@@ -140,6 +140,23 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                        'received a'):
             self.topic.rearrange_canonical_story(1, 'a')
 
+    def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected index values to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(1, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected index values to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(-1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected index values to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(10, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected index values to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(-1, -10)
+
     def test_rearrange_canonical_story_fail_with_identical_index_values(self):
         with self.assertRaisesRegexp(
             Exception, 'Expected from_index and to_index values to be '
