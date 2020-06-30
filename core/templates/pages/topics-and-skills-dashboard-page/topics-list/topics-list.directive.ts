@@ -98,6 +98,7 @@ angular.module('oppia').directive('topicsList', [
            * @param {String} topicName - Name of the topic.
            */
           ctrl.deleteTopic = function(topicId, topicName) {
+            ctrl.selectedIndex = null;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -108,6 +109,7 @@ angular.module('oppia').directive('topicsList', [
                   return topicName;
                 }
               },
+              windowClass: 'delete-topic-modal',
               controller: 'DeleteTopicModalController'
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
@@ -125,6 +127,15 @@ angular.module('oppia').directive('topicsList', [
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
+          };
+
+          /**
+           * This function is required to toggle the edit option
+           * box in mobile view.
+           * @param {String} topicId - ID of the topic.
+           */
+          ctrl.toggleEditOptionsInMobileView = function(topicId) {
+            ctrl.selectedIndex = ctrl.selectedIndex ? null : topicId;
           };
 
           ctrl.$onInit = function() {

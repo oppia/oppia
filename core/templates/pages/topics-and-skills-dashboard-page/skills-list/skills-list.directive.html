@@ -82,6 +82,64 @@
       </td>
     </tr>
   </table>
+  <div class="skills-list-mobile">
+    <div ng-repeat="skill in getSkillSummaries() track by $index" class="skill-item">
+      <div class="skill-item-header">
+        <div class="skill-item-description-box">
+          <div class="skill-item-description-name">
+            <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>">
+              <span><[$ctrl.getSerialNumberForSkill($index)]>.</span>
+              <span><[skill.description]></span>
+            </a>
+            <div class="skill-topic">
+              <span ng-if="!skill.topic_name">
+                Unassigned
+                <i class="fa fa-exclamation-triangle"></i>
+              </span>
+              <span ng-if="skill.topic_name">
+              <[skill.topic_name]>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="skill-item-entities">
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Worked Examples</span></div>
+          <div class="skill-item-value"><span> <[skill.worked_examples_count]></span></div>
+        </div>
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Misconceptions</span></div>
+          <div class="skill-item-value"><span> <[skill.misconception_count]></span></div>
+        </div>
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Status</span></div>
+          <div ng-if="skill.topic_name" class="skill-item-value"><span> <[skill.topic_name]></span></div>
+          <div ng-if="!skill.topic_name" class="skill-item-value"><span>Not Assigned</span></div>
+        </div>
+      </div>
+      <div class="skill-item-actions">
+        <div class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
+          <div class="merge-skill-icon"
+               ng-click="$ctrl.mergeSkill(skill)">
+            <span class="material-icons" title="Merge Skill">
+              merge_type
+            </span>
+          </div>
+        </div>
+        <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
+          <button class="btn assign-btn" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+            <span> Assign to Topic </span>
+          </button>
+        </div>
+        <div class="delete-icon">
+          <a ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)">
+            <span class="fas fa-trash-alt list-summary"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </md-card>
 <span ng-if="!canCreateSkill()" style="margin-left: 12.5%;">
   <em>To create new skills, please talk to one of the lesson creation admins.</em>
@@ -98,6 +156,10 @@
     height: 140px;
     text-align: left;
     vertical-align: baseline;
+  }
+
+  skills-list .skills-list-mobile {
+    display: none;
   }
 
   skills-list .dashboard-table-index-column {
@@ -201,9 +263,45 @@
   }
 
   @media (max-width: 768px) {
-    skills-list .list-view-item {
-      margin: 0;
+    skills-list .dashboard-table {
+      display: none;
+    }
+    skills-list .skills-list-mobile {
+      display: block;
       width: 100%;
+    }
+    skills-list .skill-item-description-name a {
+      color: inherit;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    skills-list .skill-item {
+      border-bottom: 1px solid #c0bebe;
+    }
+    skills-list .skill-item:not(:first-child) {
+      padding-top: 18px;
+    }
+    skills-list .skill-item-entities {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 10px auto;
+      width: 80%;
+    }
+    skills-list .skill-item-entity {
+      display: flex;
+      font-size: 15px;
+      justify-content: space-between;
+      width: 100%;
+    }
+    skills-list .skill-item-actions {
+      align-items: center;
+      display: flex;
+      justify-content: space-evenly;
+      margin: 7px 0;
+    }
+    skills-list .assign-btn {
+      border: 2px solid #00645C;
     }
   }
 </style>
