@@ -3883,9 +3883,9 @@ title: Old Title
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'language_code',
-                    'new_value': 'bn'
-                })], 'Changed language code.')
+                    'property_name': 'title',
+                    'new_value': 'New title'})],
+                'Changed language code.')
 
         self.assertIsNone(
             exp_fetchers.get_exploration_by_id(
@@ -4188,6 +4188,24 @@ title: Old Title
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):
             exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
+
+    def test_revert_exploration_does_nothing_if_create_stats_model_fails(self):
+        swap_create_stats_model = (
+            self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
+        assert_raises = self.assertRaises(Exception)
+
+        exploration = self.save_new_valid_exploration('exp_id', 'user_id')
+        exp_services.update_exploration(
+            'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'})], 'Changed interaction_solutions.')
+        with swap_create_stats_model, assert_raises:
+            exp_services.revert_exploration('user_id', 'exp_id', 2, 1)
+
+        self.assertIsNone(
+            exp_fetchers.get_exploration_by_id(
+                'exp_id', strict=False, version=3))
 
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):

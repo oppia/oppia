@@ -577,13 +577,15 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration.correctness_feedback_enabled)
 
     change_list_dict = [change.to_dict() for change in change_list]
-    exploration.version += 1
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
-    def commit_exploration_and_update_relationships_in_transaction():
+    def update_storage_models():
         """Commits all the newly created models in an atomic transaction. If any
         operation fails, every other operation will fail as well.
         """
+        exploration_model.commit(committer_id, commit_message, change_list_dict)
+        exploration.version += 1
+
         if feconf.ENABLE_ML_CLASSIFIERS:
             trainable_states_dict = exploration.get_trainable_states_dict(
                 old_states, exp_versions_diff)
@@ -613,12 +615,10 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             exploration, exp_versions_diff=exp_versions_diff,
             revert_to_version=None)
 
-        exploration_model.commit(committer_id, commit_message, change_list_dict)
         memcache_services.delete(
             exp_fetchers.get_exploration_memcache_key(exploration.id))
 
-    transaction_services.run_in_transaction(
-        commit_exploration_and_update_relationships_in_transaction)
+    transaction_services.run_in_transaction(update_storage_models)
 
 
 def _create_exploration(
@@ -1181,33 +1181,38 @@ def revert_exploration(
     else:
         exploration.validate()
 
-    exp_models.ExplorationModel.revert(
-        exploration_model, committer_id,
-        'Reverted exploration to version %s' % revert_to_version,
-        revert_to_version)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
+    def update_storage_models():
+        exp_models.ExplorationModel.revert(
+            exploration_model, committer_id,
+            'Reverted exploration to version %s' % revert_to_version,
+            revert_to_version)
 
-    # Update the exploration summary, but since this is just a revert do
-    # not add the committer of the revert to the list of contributors.
-    update_exploration_summary(exploration_id, None)
+        memcache_services.delete(
+            exp_fetchers.get_exploration_memcache_key(exploration.id))
 
-    exploration_stats = stats_services.get_stats_for_new_exp_version(
-        exploration.id, current_version + 1, exploration.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
-    stats_services.create_stats_model(exploration_stats)
+        # Update the exploration summary, but since this is just a revert do
+        # not add the committer of the revert to the list of contributors.
+        update_exploration_summary(exploration_id, None)
 
-    current_exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, version=current_version)
-    stats_services.update_exp_issues_for_new_exp_version(
-        current_exploration, exp_versions_diff=None,
-        revert_to_version=revert_to_version)
+        stats_services.create_stats_model(
+            stats_services.get_stats_for_new_exp_version(
+                exploration.id, current_version + 1, exploration.states,
+                exp_versions_diff=None, revert_to_version=revert_to_version))
 
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=revert_to_version)
-        classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
-            current_exploration, exploration_to_revert_to)
+        current_exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, version=current_version)
+        stats_services.update_exp_issues_for_new_exp_version(
+            current_exploration, exp_versions_diff=None,
+            revert_to_version=revert_to_version)
+
+        if feconf.ENABLE_ML_CLASSIFIERS:
+            exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=revert_to_version)
+            (classifier_services
+                .create_classifier_training_job_for_reverted_exploration(
+                    current_exploration, exploration_to_revert_to))
+
+    transaction_services.run_in_transaction(update_storage_models)
 
 
 # Creation and deletion methods.
