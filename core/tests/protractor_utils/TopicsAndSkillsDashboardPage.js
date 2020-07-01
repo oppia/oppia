@@ -33,9 +33,10 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-create-skill-button'));
   var createSkillButtonSecondary = element(
     by.css('.protractor-test-create-skill-button-circle'));
-  var deleteSkillButtons = element.all(
+  var deleteSkillButton = element(
     by.css('.protractor-test-delete-skill-button'));
   var topicsTable = element(by.css('.protractor-test-topics-table'));
+  var skillsTable = element(by.css('.protractor-test-skills-table'));
   var topicsListItems = element.all(
     by.css('.protractor-test-topics-list-item'));
   var skillsListItems = element.all(
@@ -50,6 +51,8 @@ var TopicsAndSkillsDashboardPage = function() {
     '.protractor-test-select-classroom-dropdown'));
   var topicEditOptions = element.all(
     by.css('.protractor-test-topic-edit-box'));
+  var skillEditOptions = element.all(
+    by.css('.protractor-test-skill-edit-box'));
   var topicResetFilters = element(by.css(
     '.protractor-test-topic-filter-reset'));
   var deleteTopicButton = element(
@@ -78,7 +81,7 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-assign-skill-to-topic-button'));
   var confirmMoveButton = element(
     by.css('.protractor-test-confirm-move-button'));
-  var mergeSkillsButtons = element.all(
+  var mergeSkillsButton = element(
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
     by.css('.protractor-test-confirm-skill-selection-button'));
@@ -132,10 +135,13 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(
       oldSkillIndex, newSkillIndex) {
+    await waitFor.visibilityOf(skillsTable,
+      'Skill table taking too long to appear.');
+    var skillEditOptionBox = skillEditOptions.get(oldSkillIndex);
+    await skillEditOptionBox.click();
     await waitFor.visibilityOf(
-      mergeSkillsButtons.first(), 'Merge button taking too long to appear.');
-    var elems = await mergeSkillsButtons;
-    await elems[oldSkillIndex].click();
+      mergeSkillsButton, 'Merge button taking too long to appear.');
+    await mergeSkillsButton.click();
     var skills = await skillsListItems;
     await skills[newSkillIndex].click();
     await confirmSkillsMergeButton.click();
@@ -301,7 +307,10 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.deleteSkillWithIndex = async function(index) {
-    var deleteSkillButton = await deleteSkillButtons.get(index);
+    await waitFor.visibilityOf(skillsTable,
+      'Skill table taking too long to appear.');
+    var skillEditOptionBox = skillEditOptions.get(index);
+    await skillEditOptionBox.click();
     await waitFor.elementToBeClickable(
       deleteSkillButton,
       'Delete skill button takes too long to be clickable');

@@ -76,12 +76,9 @@
                 <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
               </div>
               <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-                <button class="btn navigation-button" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)">
-                  <i class="fa fa-angle-left"></i>
-                </button>
-                <button class="btn navigation-button" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)">
-                  <i class="fa fa-angle-right"></i>
-                </button>
+                <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
+                <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
+                <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
               </div>
             </div>
           </div>
@@ -122,13 +119,10 @@
               </span>
               <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
             </div>
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.skillSummaries.length">
-              <button class="btn navigation-button" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)">
-                <i class="fa fa-angle-left"></i>
-              </button>
-              <button class="btn navigation-button" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)">
-                <i class="fa fa-angle-right"></i>
-              </button>
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+              <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
+              <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
+              <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
             </div>
           </div>
         </div>

@@ -76,8 +76,8 @@ angular.module('oppia').directive('topicsList', [
           /**
            * @param {String} topicId - ID of the topic.
            */
-          ctrl.enableEditOptions = function(topicId) {
-            ctrl.selectedIndex = topicId;
+          ctrl.changeEditOptions = function(topicId) {
+            ctrl.selectedIndex = ctrl.selectedIndex ? null : topicId;
           };
 
           /**
@@ -127,15 +127,6 @@ angular.module('oppia').directive('topicsList', [
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
-          };
-
-          /**
-           * This function is required to toggle the edit option
-           * box in mobile view.
-           * @param {String} topicId - ID of the topic.
-           */
-          ctrl.toggleEditOptionsInMobileView = function(topicId) {
-            ctrl.selectedIndex = ctrl.selectedIndex ? null : topicId;
           };
 
           ctrl.$onInit = function() {

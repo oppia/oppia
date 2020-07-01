@@ -65,8 +65,8 @@
       <td class="text-center topic-list-status">
         <span class="topic-list-status-text" ng-if="topic.is_published"> Published </span>
         <span class="topic-list-status-text" ng-if="!topic.is_published"> Not Published </span>
-        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.enableEditOptions(topic.id)"></p>
-        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
+        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
+        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
@@ -98,7 +98,7 @@
             </div>
           </div>
           <div class="topic-item-options">
-            <p class="fas fa-ellipsis-v topic-edit-box-icon" ng-click="$ctrl.toggleEditOptionsInMobileView(topic.id)"></p>
+            <p class="fas fa-ellipsis-v topic-edit-box-icon" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
             <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options">
               <a class="topic-edit-options-edit" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
                 <i class="fa fa-pen"></i>
@@ -191,8 +191,8 @@
     margin: 0;
   }
   topics-list .topic-edit-options {
-    background-color: #ffffff;
-    border: 1px solid black;
+    background-color: #fff;
+    border: 1px solid #000;
     display: flex;
     flex-wrap: wrap;
     left: 0;
@@ -211,7 +211,7 @@
     overflow: auto;
   }
   topics-list .topic-edit-options-edit {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #000;
     color: inherit;
     text-decoration: none;
   }

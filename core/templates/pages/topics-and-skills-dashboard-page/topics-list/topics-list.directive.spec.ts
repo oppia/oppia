@@ -71,15 +71,19 @@ describe('Topics List Directive', function() {
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
 
-    ctrl.enableEditOptions(topicId1);
+    ctrl.changeEditOptions(topicId1);
     expect(ctrl.showEditOptions(topicId1)).toEqual(true);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
 
-    ctrl.enableEditOptions(topicId2);
+    ctrl.changeEditOptions(topicId1);
+    expect(ctrl.showEditOptions(topicId1)).toEqual(false);
+    expect(ctrl.showEditOptions(topicId2)).toEqual(false);
+
+    ctrl.changeEditOptions(topicId2);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(true);
 
-    ctrl.enableEditOptions(null);
+    ctrl.changeEditOptions(topicId2);
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
   });
@@ -138,14 +142,5 @@ describe('Topics List Directive', function() {
 
     expect(alertSpy).toHaveBeenCalledWith(
       'There was an error when deleting the topic.');
-  });
-
-  it('should toggle the visibility of topic edit box', function() {
-    ctrl.$onInit();
-    expect(ctrl.selectedIndex).toEqual(null);
-    ctrl.toggleEditOptionsInMobileView('1');
-    expect(ctrl.selectedIndex).toEqual('1');
-    ctrl.toggleEditOptionsInMobileView('1');
-    expect(ctrl.selectedIndex).toEqual(null);
   });
 });
