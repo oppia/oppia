@@ -87,6 +87,17 @@ commands:
               fi
             fi
 
+  check_release_chaneglog_update_branch:
+    description: "Skip job for release changelog update PRs"
+    steps:
+      - run:
+          name: Skip build for release changelog update PRs
+          command: |
+            PR_BRANCH=$(curl -s https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER} | jq -r '.head.ref')
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ "$PR_BRANCH" == update-changelog-for-release* ]]; then
+              circleci-agent step halt
+            fi
+
 jobs:
   setup_and_typescript_tests:
     <<: *job_defaults
@@ -130,6 +141,7 @@ jobs:
           # up to 10 minutes. If this is not done, then the test may stall due
           # to lack of test output during this time.
           no_output_timeout: 20m
+      - check_release_chaneglog_update_branch
       - run:
           name: Run e2e admin page test
           command: |
@@ -148,6 +160,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_chaneglog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -181,6 +194,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_chaneglog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -213,6 +227,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_chaneglog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
