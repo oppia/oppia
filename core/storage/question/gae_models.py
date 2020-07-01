@@ -98,11 +98,11 @@ class QuestionModel(base_models.VersionedModel):
         of 12 chars.
 
         Returns:
-           new_id: int. ID of the new QuestionModel instance.
+            new_id: int. ID of the new QuestionModel instance.
 
         Raises:
             Exception: The ID generator for QuestionModel is
-            producing too many collisions.
+                producing too many collisions.
         """
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
@@ -187,7 +187,7 @@ class QuestionModel(base_models.VersionedModel):
 
         Args:
             questions: list(Question). The list of question objects
-            to put into the datastore.
+                to put into the datastore.
         """
         cls.put_multi(questions)
 
@@ -223,7 +223,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -262,7 +262,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel
-                entry.
+            entry.
         """
         question_skill_link_id = cls.get_model_id(question_id, skill_id)
         if cls.get(question_skill_link_id, strict=False) is not None:
@@ -292,9 +292,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(QuestionSkillLinkModel), str|None. The QuestionSkillLinkModels
-                corresponding to given skill_ids, the next cursor value to be
-                used for the next page (or None if no more pages are left). The
-                returned next cursor value is urlsafe.
+            corresponding to given skill_ids, the next cursor value to be
+            used for the next page (or None if no more pages are left). The
+            returned next cursor value is urlsafe.
         """
         question_skill_count = min(
             len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
@@ -338,11 +338,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(QuestionSkillLinkModel). A list of random
-                QuestionSkillLinkModels corresponding to given skill_ids, with
-                total_question_count/len(skill_ids) number of questions for
-                each skill. If not evenly divisible, it will be rounded up.
-                If not enough questions for a skill, just return all questions
-                it links to.
+            QuestionSkillLinkModels corresponding to given skill_ids, with
+            total_question_count/len(skill_ids) number of questions for
+            each skill. If not evenly divisible, it will be rounded up.
+            If not enough questions for a skill, just return all questions
+            it links to.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -470,11 +470,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(QuestionSkillLinkModel). A list of random
-                QuestionSkillLinkModels corresponding to given skill_ids, with
-                total_question_count/len(skill_ids) number of questions for
-                each skill. If not evenly divisible, it will be rounded up.
-                If not enough questions for a skill, just return all questions
-                it links to.
+            QuestionSkillLinkModels corresponding to given skill_ids, with
+            total_question_count/len(skill_ids) number of questions for
+            each skill. If not evenly divisible, it will be rounded up.
+            If not enough questions for a skill, just return all questions
+            it links to.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -539,7 +539,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(str). The list of all question ids corresponding to the given
-                skill id.
+            skill id.
         """
         question_skill_link_models = cls.query().filter(
             cls.skill_id == skill_id,
@@ -587,7 +587,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Args:
             question_skill_links: list(QuestionSkillLink). The list of
-            question skill link domain objects to put into the datastore.
+                question skill link domain objects to put into the datastore.
         """
         cls.put_multi(question_skill_links)
 
@@ -598,7 +598,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Args:
             question_skill_links: list(QuestionSkillLinkModel). The list of
-            question skill link domain objects to delete from the datastore.
+                question skill link domain objects to delete from the datastore.
         """
         cls.delete_multi(question_skill_links)
 
@@ -638,7 +638,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
         Returns:
             str. A string containing question ID and
-                question version.
+            question version.
         """
         return 'question-%s-%s' % (question_id, question_version)
 
@@ -691,7 +691,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The ID of the user whose data should be
-            checked.
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user_id.
