@@ -29,27 +29,27 @@ angular.module('oppia').component('emailDashboardPage', {
         UserService) {
       var ctrl = this;
       ctrl.resetForm = function() {
-        ctrl.has_not_logged_in_for_n_days = null;
-        ctrl.inactive_in_last_n_days = null;
-        ctrl.created_at_least_n_exps = null;
-        ctrl.created_fewer_than_n_exps = null;
-        ctrl.edited_at_least_n_exps = null;
-        ctrl.edited_fewer_than_n_exps = null;
+        ctrl.hasNotLoggedInForNDays = null;
+        ctrl.inactiveInLastNDays = null;
+        ctrl.createdAtLeastNExps = null;
+        ctrl.createdFewerThanNExps = null;
+        ctrl.editedAtLeastNExps = null;
+        ctrl.editedFewerThanNExps = null;
       };
 
       ctrl.submitQuery = function() {
         var data = {
-          has_not_logged_in_for_n_days: ctrl.has_not_logged_in_for_n_days,
-          inactive_in_last_n_days: ctrl.inactive_in_last_n_days,
-          created_at_least_n_exps: ctrl.created_at_least_n_exps,
-          created_fewer_than_n_exps: ctrl.created_fewer_than_n_exps,
-          edited_at_least_n_exps: ctrl.edited_at_least_n_exps,
-          edited_fewer_than_n_exps: ctrl.edited_fewer_than_n_exps
+          hasNotLoggedInForNDays: ctrl.hasNotLoggedInForNDays,
+          inactiveInLastNDays: ctrl.inactiveInLastNDays,
+          createdAtLeastNExps: ctrl.createdAtLeastNExps,
+          createdFewerThanNExps: ctrl.createdFewerThanNExps,
+          editedAtLeastNExps: ctrl.editedAtLeastNExps,
+          editedFewerThanNExps: ctrl.editedFewerThanNExps
         };
         EmailDashboardDataService.submitQuery(data).then(function(queries) {
           ctrl.currentPageOfQueries = queries;
           // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the directive is migrated to angular
+          // once the directive is migrated to angular.
           $rootScope.$apply();
         });
         ctrl.resetForm();
@@ -62,7 +62,7 @@ angular.module('oppia').component('emailDashboardPage', {
             function(queries) {
               ctrl.currentPageOfQueries = queries;
               // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         }
@@ -92,7 +92,7 @@ angular.module('oppia').component('emailDashboardPage', {
             function(query) {
               ctrl.currentPageOfQueries[index] = query;
               // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular
+              // once the directive is migrated to angular.
               $rootScope.$apply();
             });
         }
@@ -114,7 +114,7 @@ angular.module('oppia').component('emailDashboardPage', {
         EmailDashboardDataService.getNextQueries().then(function(queries) {
           ctrl.currentPageOfQueries = queries;
           // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the directive is migrated to angular
+          // once the directive is migrated to angular.
           $rootScope.$apply();
         });
       };

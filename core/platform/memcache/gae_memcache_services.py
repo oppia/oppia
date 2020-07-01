@@ -28,11 +28,11 @@ def get_multi(keys):
     """Looks up a list of keys in memcache.
 
     Args:
-      - keys: a list of keys (strings) to look up.
+        keys: list(str). A list of keys (strings) to look up.
 
     Returns:
-      A dict of key-value pairs for the keys/values that were present in
-      memcache.
+        dict. A dict of key-value pairs for the keys/values that were present in
+        memcache.
     """
     assert isinstance(keys, list)
     result = memcache.get_multi(keys)
@@ -43,13 +43,13 @@ def set_multi(key_value_mapping):
     """Sets multiple keys' values at once.
 
     Args:
-      - key_value_mapping: a dict of {key: value} pairs. The key is a string
-          and the value is anything that is serializable using the Python
-          pickle module. The combined size of each key and value must be
-          < 1 MB. The total size of key_value_mapping should be at most 32 MB.
+        key_value_mapping: a dict of {key: value} pairs. The key is a string
+            and the value is anything that is serializable using the Python
+            pickle module. The combined size of each key and value must be
+            < 1 MB. The total size of key_value_mapping should be at most 32 MB.
 
     Returns:
-      A list of the keys whose values were NOT set.
+        list(str). A list of the keys whose values were NOT set.
     """
     assert isinstance(key_value_mapping, dict)
     unset_keys = memcache.set_multi(key_value_mapping)
@@ -60,11 +60,11 @@ def delete(key):
     """Deletes a key in memcache.
 
     Args:
-      - key: a key (string) to delete.
+        key: str. A key (string) to delete.
 
     Returns:
-      0 on network failure, 1 if the item does not exist, and 2 for a
-      successful delete.
+        int. 0 on network failure, 1 if the item does not exist, and
+        2 for a successful delete.
     """
     assert isinstance(key, python_utils.BASESTRING)
     return_code = memcache.delete(key)
@@ -75,10 +75,11 @@ def delete_multi(keys):
     """Deletes multiple keys in memcache.
 
     Args:
-      - keys: the keys (strings) to delete.
+        keys: list(str). The keys (strings) to delete.
 
     Returns:
-      True if all operations complete successfully; False otherwise.
+        bool. True if all operations complete successfully; False
+        otherwise.
     """
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)
