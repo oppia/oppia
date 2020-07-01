@@ -17,7 +17,8 @@
  */
 
 import { Component } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
