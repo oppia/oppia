@@ -18,6 +18,7 @@
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -3881,10 +3882,10 @@ title: Old Title
         with swap_create_stats_model, assert_raises:
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'language_code',
-                'new_value': 'bn'
-            })], 'Changed language code.')
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'language_code',
+                    'new_value': 'bn'
+                })], 'Changed language code.')
 
         self.assertIsNone(
             exp_fetchers.get_exploration_by_id(
