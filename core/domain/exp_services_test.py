@@ -4194,7 +4194,7 @@ title: Old Title
             self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
         assert_raises = self.assertRaises(Exception)
 
-        exploration = self.save_new_valid_exploration('exp_id', 'user_id')
+        self.save_new_valid_exploration('exp_id', 'user_id')
         exp_services.update_exploration(
             'user_id', 'exp_id', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,

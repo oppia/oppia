@@ -1182,6 +1182,9 @@ def revert_exploration(
         exploration.validate()
 
     def update_storage_models():
+        """Commits all the newly created models in an atomic transaction. If any
+        operation fails, every other operation will fail as well.
+        """
         exp_models.ExplorationModel.revert(
             exploration_model, committer_id,
             'Reverted exploration to version %s' % revert_to_version,
@@ -1209,8 +1212,8 @@ def revert_exploration(
             exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=revert_to_version)
             (classifier_services
-                .create_classifier_training_job_for_reverted_exploration(
-                    current_exploration, exploration_to_revert_to))
+             .create_classifier_training_job_for_reverted_exploration(
+                 current_exploration, exploration_to_revert_to))
 
     transaction_services.run_in_transaction(update_storage_models)
 
