@@ -17,19 +17,21 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-
 import os
 import shutil
 import subprocess
 
-import python_utils
 from constants import constants
-from scripts import common
-from . import install_third_party_libs
 import feconf
+import python_utils
+from scripts import common
+
+from . import install_third_party_libs
+
 
 FECONF_FILE_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
+
 
 def setup_and_install_dependencies():
     """Runs the setup and installation scripts."""
@@ -59,6 +61,7 @@ def run_lighthouse_checks():
 
     for line in iter(process.stdout.readline, ''):
         python_utils.PRINT(line[:-1])
+
 
 def enable_webpages():
     """Enables deactivated webpages for testing."""

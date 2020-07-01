@@ -21,19 +21,16 @@
 
 module.exports = async(browser, context) => {
   const page = await browser.newPage();
-  const regex_admin = /admin/;
   await page.setDefaultNavigationTimeout(0);
-  // eslint-disable-next-line dot-notation
-  console.log(context.url);
     // Sign into Oppia.
   if(context.url.includes('admin')) {
     try {
-      console.log("Logging in")
+      // eslint-disable-next-line dot-notation
       await page.goto(context.url);
       await page.click('#admin');
       await Promise.all([
         page.waitForNavigation(),
-        page.click('#submit-login')
+        page.click('#submit-login'),
       ]);
 
       await page.type('#username', 'username1');
@@ -44,36 +41,35 @@ module.exports = async(browser, context) => {
         page.waitForNavigation(),
         await page.click('#signup-submit')
       ]);
-      console.log("Succesfully Logged into Oppia")
     } catch (e) {
-      console.log("Already Logged into Oppia")
+      // Already logged into Oppia
     }
   }
   else if(context.url.includes('emaildashboard')) {
+    // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
     await page.type('#update-role-username-textbook', 'username1');
-    await page.select('#update-role-input', 'string:ADMIN')
+    await page.select('#update-role-input', 'string:ADMIN');
     await page.waitFor(5000);
     await page.click('#update-button-id');
     await page.waitFor(2000);
-    console.log("succesfully changed roles to Admin")
   }
   else if(context.url.includes('collection/0')) {
+    // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
     await page.type('#update-role-username-textbook', 'username1');
-    await page.select('#update-role-input', 'string:COLLECTION_EDITOR')
+    await page.select('#update-role-input', 'string:COLLECTION_EDITOR');
     await page.waitFor(5000);
     await page.click('#update-button-id');
     await page.waitFor(2000);
-    console.log("succesfully changed roles to CollectionEditor")
     // Load in Collection
+    // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin');
     await page.waitFor(2000);
-    await page.evaluate(`window.confirm = () => true`)
+    await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
-    console.log("Succesfully reloaded collection welcome_to_collections.yaml")
   }
   await page.close();
 };
