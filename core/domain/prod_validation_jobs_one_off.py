@@ -106,6 +106,9 @@ TARGET_TYPE_TO_TARGET_MODEL = {
     suggestion_models.TARGET_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
+VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
+    '%s\\.[A-Za-z0-9-_]{1,%s}' % (
+        suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
 
 
 class BaseModelValidator(python_utils.OBJECT):
@@ -3181,18 +3184,39 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
         """
+        score_category_sub_type = (
+            item.score_category.split(
+                suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
+        score_category_type = (
+            item.score_category.split(
+                suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
         if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-            score_category_sub_type = (
-                item.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
-            target_exploration = (
-                exp_fetchers.get_exploration_by_id(item.target_id))
-            if target_exploration.category != score_category_sub_type:
-                cls.errors['score category subtype check'].append(
-                    'Entity id %s: score category sub %s does not match'
-                    ' target exploration category %s' % (
-                        item.id, score_category_sub_type,
-                        target_exploration.category))
+            if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
+                return
+            target_model_class_model_id_model_tuples = (
+                cls.external_instance_details['%s_ids' % item.target_type])
+
+            for (_, _, target_model) in (
+                    target_model_class_model_id_model_tuples):
+                # The case for missing target external model is ignored here
+                # since errors for missing target external model are already
+                # checked and stored in _validate_external_id_relationships
+                # function.
+                if target_model is None or target_model.deleted:
+                    continue
+                if target_model.category != score_category_sub_type:
+                    cls.errors['score category subtype check'].append(
+                        'Entity id %s: score category sub %s does not match'
+                        ' target exploration category %s' % (
+                            item.id, score_category_sub_type,
+                            target_model.category))
+        if score_category_type == suggestion_models.SCORE_TYPE_QUESTION:
+            score_category_regex = (
+                '^(%s)$' % ('|').join(VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION))
+            if not re.compile(score_category_regex).match(item.score_category):
+                cls.errors['score category check'].append(
+                    'Entity id %s: Score category %s is invalid' % (
+                        item.id, item.score_category))
 
     @classmethod
     def _get_custom_validation_functions(cls):
