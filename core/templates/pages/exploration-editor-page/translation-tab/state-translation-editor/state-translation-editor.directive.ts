@@ -154,7 +154,6 @@ angular.module('oppia').directive('stateTranslationEditor', [
             StateWrittenTranslationsService.restoreFromMemento();
             initEditor();
           };
-
           ctrl.$onInit = function() {
             $scope.HTML_SCHEMA = {
               type: 'html',

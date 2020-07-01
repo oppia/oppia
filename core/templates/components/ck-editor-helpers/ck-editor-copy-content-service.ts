@@ -36,7 +36,12 @@ export class CkEditorCopyContentService {
   /**
    * Traverses up and down element ancestors/descendants, searching for widget
    * tags.
-   * @param {HTMLElement} target target to copy.
+   * @param {HTMLElement} target The element target that contains or is a
+   *  descendant of a widget, or a plain HTML element/group.
+   * @returns {Object} Returns an object with keys rootElement and
+   *  containedWidgetTagName. rootElement is the root ancestor of target, and is
+   *  always a child of angular-html-bind. containedWidgetTagName is tag name
+   *  of a widget, if found in ancestors or descendants.
    */
   private _handleCopy(target: HTMLElement): {
       rootElement: HTMLElement,
@@ -76,11 +81,11 @@ export class CkEditorCopyContentService {
   /**
    * Detects if element is to be copied as a widget or as a HTML element, and
    * inserts into editor.
-   * @param {CKEDITOR.editor} editor {CKEDITOR.editor} editor in which to
-   *    create widget or insert HTML.
-   * @param {HTMLElement} element the element to be copied.
-   * @param {string|undefined} containedWidgetTagName the name of the widget
-   *    in which element contains, if so.
+   * @param {CKEDITOR.editor} editor The editor in which to create widget or
+   *  insert HTML.
+   * @param {HTMLElement} element The element to be copied.
+   * @param {string|undefined} containedWidgetTagName The name of the widget
+   *    in which element contains, if present.
    */
   private _handlePaste(
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
@@ -113,17 +118,15 @@ export class CkEditorCopyContentService {
     }
   }
 
-  /**
-   * Toggles copy mode on/off.
-   */
   toggleCopyMode() {
     this.copyModeActive = !this.copyModeActive;
   }
 
   /**
    * Broadcasts to editor to copy target.
-   * @param {IRootScopeService} contentScope scope of parent containing editor.
-   * @param {HTMLElement} target element to copy.
+   * @param {IRootScopeService} contentScope The scope of parent editor, in
+   *  which the copy event is broadcasted to.
+   * @param {HTMLElement} target The element to copy.
    */
   broadcastCopy(
       contentScope: IRootScopeService,
@@ -144,9 +147,9 @@ export class CkEditorCopyContentService {
 
   /**
    * Binds editor and editor scope to listen for copy events.
-   * @param {IRootScopeService} editorScope scope to bind listener on to respond
-   *    to copy event.
-   * @param {CKEDITOR.editor} editor editor to add copied content to.
+   * @param {IRootScopeService} editorScope The scope to bind listener on to
+   *  respond to copy event.
+   * @param {CKEDITOR.editor} editor The editor to add copied content to.
    */
   bindPasteHandler(
       editorScope: IRootScopeService,

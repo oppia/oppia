@@ -19,7 +19,8 @@ import { LoggerService } from 'services/contextual/logger.service';
 
 /**
  * Returns a HTMLElement containing the element to copy.
- * @param {string} html hmtl to place in angular-html-bind.
+ * @param {string} html The hmtl to place in angular-html-bind element.
+ * @returns {HTMLElement} The element created by param html.
  */
 const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
