@@ -278,7 +278,7 @@ export class PlaythroughService {
     this.cstTracker.recordStateTransition(destStateName);
 
     const answerSubmitAction = (
-      this.learnerActionObjectFactory.createAnswerSubmitAction({
+      this.learnerActionObjectFactory.createNewAnswerSubmitAction({
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
         interaction_id: {value: interactionId},

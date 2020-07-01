@@ -128,7 +128,7 @@ describe('PlaythroughService', () => {
           learnerActionObjectFactory.createNewExplorationStartAction({
             state_name: {value: 'A'}
           }),
-          learnerActionObjectFactory.createAnswerSubmitAction({
+          learnerActionObjectFactory.createNewAnswerSubmitAction({
             state_name: {value: 'A'},
             dest_state_name: {value: 'B'},
             interaction_id: {value: 'TextInput'},
