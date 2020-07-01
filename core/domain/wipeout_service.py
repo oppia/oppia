@@ -135,14 +135,15 @@ def _generate_activity_to_user_ids_mapping(activity_ids):
 
     Args:
         activity_ids: list(str). List of activity IDs for which to generate
-        new user IDs.
+            new user IDs.
 
     Returns:
-        dict(str, str). Mapping between the activity IDs and pseudonymized user
-        IDs.
+        dict(str, str). Mapping between the activity IDs and pseudonymized
+        user IDs.
     """
     return {
-        activity_id: user_models.PseudonymizedUserModel.get_new_id()
+        activity_id: user_models.PseudonymizedUserModel.get_new_id(
+            entity_name='')
         for activity_id in activity_ids
     }
 

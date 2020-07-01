@@ -1425,8 +1425,8 @@ tags: []
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
-            self, story_id, owner_id, title='Title', description='Description',
-            notes='Notes', corresponding_topic_id=None,
+            self, story_id, owner_id, corresponding_topic_id,
+            title='Title', description='Description', notes='Notes',
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
@@ -1449,12 +1449,6 @@ tags: []
         Returns:
             Story. A newly-created story.
         """
-        if corresponding_topic_id is None:
-            corresponding_topic_id = 'topic_id'
-            self.save_new_topic(
-                corresponding_topic_id,
-                owner_id,
-                canonical_story_ids=[story_id])
         story = story_domain.Story.create_default_story(
             story_id, title, corresponding_topic_id)
         story.title = title

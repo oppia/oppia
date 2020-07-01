@@ -312,7 +312,7 @@ class BaseModel(ndb.Model):
         return query
 
     @classmethod
-    def get_new_id(cls, entity_name=''):
+    def get_new_id(cls, entity_name):
         """Gets a new id for an entity, based on its name.
 
         The returned id is guaranteed to be unique among all instances of this

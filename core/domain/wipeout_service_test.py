@@ -366,7 +366,8 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.save_new_story(self.STORY_1_ID, self.user_1_id)
+        self.save_new_topic(self.TOPIC_1_ID, self.user_1_id)
+        self.save_new_story(self.STORY_1_ID, self.user_1_id, self.TOPIC_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
 
@@ -419,10 +420,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
 
     def test_delete_story_multiple_stories(self):
         self.save_new_topic(self.TOPIC_1_ID, self.user_1_id, name='Topic 2')
-        self.save_new_story(
-            self.STORY_2_ID,
-            self.user_1_id,
-            corresponding_topic_id=self.TOPIC_1_ID)
+        self.save_new_story(self.STORY_2_ID, self.user_1_id, self.TOPIC_1_ID)
 
         wipeout_service.delete_user(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
@@ -571,16 +569,14 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.save_new_story(self.STORY_1_ID, self.user_1_id)
+        self.save_new_topic(self.TOPIC_1_ID, self.user_1_id)
+        self.save_new_story(self.STORY_1_ID, self.user_1_id, self.TOPIC_1_ID)
         self.save_new_topic(
-            self.TOPIC_1_ID,
+            self.TOPIC_2_ID,
             self.user_2_id,
             name='Topic 2',
             canonical_story_ids=[self.STORY_2_ID])
-        self.save_new_story(
-            self.STORY_2_ID,
-            self.user_2_id,
-            corresponding_topic_id=self.TOPIC_1_ID)
+        self.save_new_story(self.STORY_2_ID, self.user_2_id, self.TOPIC_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
 
