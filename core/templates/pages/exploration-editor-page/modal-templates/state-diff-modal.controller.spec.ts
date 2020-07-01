@@ -129,7 +129,7 @@ describe('State Diff Modal Controller', function() {
     });
 
     it('should evaluate yaml strings object', function() {
-      $timeout.flush(200);
+      $timeout.flush(400);
       expect($scope.yamlStrs.leftPane).toBe('');
       expect($scope.yamlStrs.rightPane).toBe('');
     });
