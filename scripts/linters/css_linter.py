@@ -78,14 +78,14 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             # "x"(\u2716) and a message-id in the end. We are capturing these
             # and then replacing them with empty string('').
             if re.search(r'^\d+:\d+', line.lstrip()):
-                caputure_x = re.search(r'\u2716', line).group(0)
-                capture_message_id = re.search(r'(\w+-\w+-*)+', line).group(0)
-                python_utils.PRINT(caputure_x)
-                python_utils.PRINT(capture_message_id)
-            # else:
-            #     new_message = line
-            # error_messages += new_message + '\n'
-        return error_messages
+                unicode_x = re.search(r'\u2716', line).group(0)
+                message_id = re.search(r'(\w+-*)+$', line).group(0)
+                error_message = (
+                    line.replace(unicode_x, '').replace(message_id, ''))
+            else:
+                error_message = line
+            error_messages.append(error_message)
+        return '\n'.join(error_messages) + '\n'
 
     def _lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.

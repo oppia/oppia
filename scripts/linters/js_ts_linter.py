@@ -1118,39 +1118,47 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         return self.files_to_lint
 
     @staticmethod
-    def _get_trimmed_error_messages(lint_messages):
+    def _get_trimmed_error_messages(eslint_output):
         """Remove extra bits from eslint messages.
 
         Args:
-            lint_messages: str. Messages returned by the js_ts linter.
+            eslint_output: str. output returned by the eslint linter.
 
         Returns:
             str. A string with the trimmed messages.
         """
-        error_messages = ''
+        error_messages = []
         # Extract the message from list and split the message by newline
         # so that we can use them and remove last four lines from the end.
-        # Becuase last two lines are empty with a newline character and
-        # third one have a message with number of errors.
-        # 1 errors found in 1 file
-        # and fourth one with a message to fix automatically.
-        # These error can be fixed with the use of --fix.
-        messages = lint_messages.split('\n')[:-4]
-        for message in messages:
+        # Becuase last two lines are empty strings and third one have a message
+        # with number of errors.
+        # Example: \u2716 2 problems (2 errors, 0 warnings)
+        # 1 error and 0 warnings potentially fixable with the `--fix` option.
+        eslint_output_lines = eslint_output.split('\n')
+        newlines_present = eslint_output_lines[-1] == '' and (
+            eslint_output_lines[-2] == '')
+        fix_option_present = eslint_output_lines[-3].endswith('`--fix` option.')
+        unicode_x_present = eslint_output_lines[-4].startswith('\u2716')
+
+        if (newlines_present and fix_option_present and unicode_x_present):
+            eslint_output_lines = eslint_output_lines[:-4]
+
+        for line in eslint_output_lines:
             # ESlint messages start with line numbers and then a
             # cross(x) and a message-id in the end. We are matching
             # if the line contains line number becuase every message start with
             # num:num where num is of type int and we are matching it with regex
-            # and if that is True then we are removing cross(x) which is at the
-            # index 1 and message-id from the end.
-            if re.search(r'^\d+:\d+', message.lstrip()):
-                message_list = message.split()
-                new_message = ' '.join(
-                    message_list[:1] + message_list[2:-1])
+            # and if that is True then we are replacing "error" with empty
+            # string('') which is at the index 1 and message-id from the end.
+            if re.search(r'^\d+:\d+', line.lstrip()):
+                error_string = re.search(r'error', line).group(0)
+                message_id = re.search(r'(\w+-*)+$', line).group(0)
+                error_message = (
+                    line.replace(error_string, '').replace(message_id, ''))
             else:
-                new_message = message
-            error_messages += new_message + '\n'
-        return error_messages
+                error_message = line
+            error_messages.append(error_message)
+        return '\n'.join(error_messages) + '\n'
 
     def _lint_js_and_ts_files(self):
         """Prints a list of lint errors in the given list of JavaScript files.
