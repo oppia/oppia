@@ -24,12 +24,13 @@ import { CommonModule } from '@angular/common';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe],
-  entryComponents: [BackgroundBannerComponent],
+  declarations: [BackgroundBannerComponent, TranslatePipe, SkillMasteryViewerComponent],
+  entryComponents: [BackgroundBannerComponent, SkillMasteryViewerComponent],
   exports: [BackgroundBannerComponent, TranslatePipe]
 })
 
