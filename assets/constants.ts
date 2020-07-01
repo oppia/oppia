@@ -36,6 +36,17 @@ export = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  "SKILL_STATUS_OPTIONS": {
+    "ALL": "All",
+    "ASSIGNED": "Assigned",
+    "UNASSIGNED": "Unassigned"
+  },
+  "TOPIC_SKILL_DASHBOARD_SORT_OPTIONS": {
+    "IncreasingCreatedOn": "Newly Created",
+    "DecreasingCreatedOn": "Oldest Created",
+    "IncreasingUpdatedOn": "Most Recently Updated",
+    "DecreasingUpdatedOn": "Least Recently Updated"
+  },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
   "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
@@ -5114,6 +5125,8 @@ export = {
       "LogicProof",
       "NumericInput",
       "SetInput",
+      "AlgebraicExpressionInput",
+      "MathEquationInput",
       "MathExpressionInput",
       "NumberWithUnits"
     ]
@@ -5277,6 +5290,14 @@ export = {
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
     "floor", "if", "log", "or", "pow", "round", "then"
+  ],
+
+  // Greek letters allowed in math interactions.
+  "GREEK_LETTERS": [
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
+    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
+    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
   ],
 
   // Unfinished features.
