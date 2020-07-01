@@ -20,14 +20,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { ProfileLinkImageBackendApiService } from
+import { IProfileResponse, ProfileLinkImageBackendApiService } from
   './profile-link-image-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface IProfileResponse {
-  'profile_picture_data_url_for_username': string;
-}
+
 
 @Component({
   selector: 'profile-link-image',
@@ -52,10 +50,13 @@ export class ProfileLinkImageComponent implements OnInit {
       '/preferenceshandler/profile_picture_by_username/' +
       this.username);
     this.profileBackendApiService.fetchProfilePicture(
-      this.profileImageUrl).then((response: string) => {
-      this.profilePicture = (
-        response || this.DEFAULT_PROFILE_IMAGE_PATH);
-    });
+      this.profileImageUrl).then((response: IProfileResponse) => {
+        this.profilePicture = (
+          response.profile_picture_data_url_for_username ||
+          this.DEFAULT_PROFILE_IMAGE_PATH);
+      }, (error) => {
+        return error;
+      });
   }
 
   isUsernameLinkable(): boolean {

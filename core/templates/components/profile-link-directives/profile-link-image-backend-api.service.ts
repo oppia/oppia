@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-interface IProfileResponse {
+export interface IProfileResponse {
   'profile_picture_data_url_for_username': string;
 }
 
@@ -32,13 +32,8 @@ export class ProfileLinkImageBackendApiService {
     private http: HttpClient
   ) {}
 
-  fetchProfilePicture(profileImageUrl: string): Promise<string> {
-    return this.http.get(profileImageUrl).toPromise().then(
-      (response: IProfileResponse) => {
-        return response.profile_picture_data_url_for_username;
-      }, (error) => {
-        return error;
-      });
+  fetchProfilePicture(profileImageUrl: string): Promise<IProfileResponse> {
+    return this.http.get<IProfileResponse>(profileImageUrl).toPromise();
   }
 }
 
