@@ -2434,6 +2434,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_math_content_to_math_rte_components)
+        
         return states_dict
 
     @classmethod
@@ -2467,14 +2468,13 @@ class Exploration(python_utils.OBJECT):
                     obj_type
                 )
 
-
+            raise Exception(customization_arg)
             if isinstance(customization_arg['value'], str):
                 customization_arg['value'] = {
                     'content_id': '',
                     translation_value_key: customization_arg['value']
                 }
             elif isinstance(customization_arg['value'], list):
-                for i in range(len(customization_arg['value'])):
                     customization_arg['value'][i] = {
                         'content_id': '',
                         translation_value_key: customization_arg['value'][i]
@@ -3749,10 +3749,10 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 39
 
-        if exploration_schema_version == 39:
-            exploration_dict = cls._convert_v39_dict_to_v40_dict(
-                exploration_dict)
-            exploration_schema_version = 40
+        # if exploration_schema_version == 39:
+        #     exploration_dict = cls._convert_v39_dict_to_v40_dict(
+        #         exploration_dict)
+        #     exploration_schema_version = 40
         
         return (exploration_dict, initial_schema_version)
 
