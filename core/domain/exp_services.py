@@ -43,6 +43,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rights_manager
@@ -215,8 +216,8 @@ def get_recently_published_exp_summaries(limit):
 
     Returns:
         dict. The dict contains recently published ExplorationSummary model
-            instances as a value keyed by their exploration id. At most 'limit'
-            entries are returned.
+        instances as a value keyed by their exploration id. At most 'limit'
+        entries are returned.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published(limit))
@@ -231,7 +232,7 @@ def get_story_id_linked_to_exploration(exp_id):
 
     Returns:
         str|None. The ID of the story if the exploration is linked to some
-            story, otherwise None.
+        story, otherwise None.
     """
     exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
         exp_id)
@@ -403,7 +404,11 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    state.update_interaction_solution(change.new_value)
+                    new_solution = None
+                    if change.new_value is not None:
+                        new_solution = state_domain.Solution.from_dict(
+                            state.interaction.id, change.new_value)
+                    state.update_interaction_solution(new_solution)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
@@ -489,8 +494,18 @@ def apply_change_list(exploration_id, change_list):
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
                 # resaving the exploration is sufficient to apply the states
-                # schema update.
-                continue
+                # schema update. Thus, no action is needed here other than
+                # to make sure that the version that the user is trying to
+                # migrate to is the latest version.
+                target_version_is_current_state_schema_version = (
+                    change.to_version ==
+                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                if not target_version_is_current_state_schema_version:
+                    raise Exception(
+                        'Expected to migrate to the latest state schema '
+                        'version %s, received %s' % (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION,
+                            change.to_version))
         return exploration
 
     except Exception as e:
@@ -1369,6 +1384,7 @@ def get_next_page_of_all_non_private_commits(
             - bool. indicating whether there are (likely) more results after
               this batch. If False, there are no more results; if True, there
               are probably more results.
+
     Raises:
         ValueError: The argument max_age is not datetime.timedelta or None.
     """
@@ -1395,7 +1411,7 @@ def get_image_filenames_from_exploration(exploration):
         exploration: Exploration object. The exploration itself.
 
     Returns:
-       list(str). List containing the name of the image files in exploration.
+        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
     for state in exploration.states.values():
@@ -1680,12 +1696,27 @@ def get_exp_with_draft_applied(exp_id, user_id):
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
+    updated_exploration = None
 
-    return (
-        apply_change_list(exp_id, draft_change_list)
-        if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid(exp_id, draft_change_list_exp_version)
-        else None)
+    if (exp_user_data and exp_user_data.draft_change_list and
+            is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
+        updated_exploration = apply_change_list(exp_id, draft_change_list)
+        updated_exploration_has_no_invalid_math_tags = True
+        # verify that all the math-tags are valid before returning the
+        # updated exploration.
+        for state in updated_exploration.states.values():
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_with_attribute_math_content(
+                    html_string))
+            if len(error_list) > 0:
+                updated_exploration_has_no_invalid_math_tags = False
+                break
+        if not updated_exploration_has_no_invalid_math_tags:
+            updated_exploration = None
+
+    return updated_exploration
 
 
 def discard_draft(exp_id, user_id):

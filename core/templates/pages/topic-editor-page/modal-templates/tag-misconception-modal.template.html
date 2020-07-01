@@ -4,36 +4,13 @@
   </h3>
 </div>
 <div class="modal-body new-subtopic-title-editor">
-  Selected Misconception: <[selectedMisconception.getName()]>
-  <div ng-repeat="(skillId, misconceptions) in misconceptionsBySkill">
-    <div ng-repeat="misconception in misconceptions">
-      <button class="btn btn-secondary" style="width: 100%" ng-click="selectMisconception(misconception, skillId)">
-        <span ng-if="!misconception.isMandatory()"> (Optional) </span>
-        <[misconception.getName()]>
-      </button>
-      <div ng-if="selectedMisconceptionSkillId === skillId && selectedMisconception.getId() === misconception.getId()">
-        <label class="misconception-label"> Note to creators: </label>
-        <angular-html-bind html-data="misconception.getNotes()">
-        </angular-html-bind>
-        <label class="misconception-label"> Misconception Feedback: </label>
-        <angular-html-bind html-data="misconception.getFeedback()">
-        </angular-html-bind>
-      </div>
-    </div>
-  </div>
-  <span ng-click="toggleMisconceptionFeedbackUsage()" aria-hidden="true">
-    <i ng-if="!misconceptionFeedbackIsUsed" class="material-icons md-18">&#xE835;</i>
-    <i ng-if="misconceptionFeedbackIsUsed" class="material-icons md-18">&#xE834;</i>
-    Use misconception feedback as answer group feedback.
-  </span>
+  <question-misconception-selector misconception-feedback-is-used="tempMisconceptionFeedbackIsUsed"
+                                   selected-misconception="tempSelectedMisconception"
+                                   selected-misconception-skill-id="tempSelectedMisconceptionSkillId"
+                                   tagged-skill-misconception-id="taggedSkillMisconceptionId">
+  </question-misconception-selector>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
-  <button class="btn btn-success" ng-disabled="selectedMisconception === null" ng-click="done()"> Done </button>
+  <button class="btn btn-success" ng-disabled="tempSelectedMisconception === null" ng-click="done()"> Done </button>
 </div>
-
-<style>
-  .misconception-label {
-    margin-top: 2vh;
-  }
-</style>

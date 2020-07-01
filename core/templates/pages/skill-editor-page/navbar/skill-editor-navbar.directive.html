@@ -1,4 +1,5 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" ng-if="!isLoadingSkill()">
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" id="skill-editor-navbar-desktop"
+    ng-if="!isLoadingSkill()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
       <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
@@ -33,34 +34,65 @@
       </ul>
     </div>
   </li>
-  <li style="width: 40px;"
-      ng-class="{'uib-dropdown': getWarningsCount(), 'active': getActiveTabName() === 'main'}"
-      ng-attr-uib-dropdown="<[getWarningsCount()]>"
-      ng-click="selectMainTab()"
-      class="nav-item">
-    <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link protractor-test-main-tab">
-      <i class="material-icons">&#xE254;</i>
-    </a>
-    <div ng-show="getWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
-      <span class="oppia-editor-warnings-count">
-        <[getWarningsCount()]>
-      </span>
-    </div>
-    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
-      <span class="oppia-editor-warnings-header">Warnings</span>
-      <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in validationIssues track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-    </ul>
-  </li>
-  <li class="nav-item icon protractor-test-questions-tab"
-      ng-class="{'active': getActiveTabName() === 'questions'}"
-      ng-click="selectQuestionsTab()">
-    <a uib-tooltip="Questions" tooltip-placement="bottom" class="nav-link">
-      <i class="material-icons">library_books</i>
-    </a>
-  </li>
 </ul>
+
+<div class="skill-editor-nav-mobile">
+  <div class="skill-editor-navbar-mobile-tabs">
+    <div class="discard-changes-btn-container">
+      <button class="btn discard-changes-btn"
+              ng-click="discardChanges()">
+        Discard Changes
+        <span ng-if="getChangeListCount() > 0">
+              (<[getChangeListCount()]>)
+        </span>
+      </button>
+    </div>
+    <div class="publish-button-container">
+      <button type="button"
+              ng-click="saveChanges()"
+              class="btn publish-skill-btn">
+        <span>Publish Skill</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+  skill-editor-navbar .skill-editor-nav-mobile {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-editor-navbar #skill-editor-navbar-desktop {
+      display: none;
+    }
+    skill-editor-navbar .skill-editor-nav-mobile {
+      display: block;
+    }
+    skill-editor-navbar .skill-editor-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    skill-editor-navbar .discard-changes-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    skill-editor-navbar .discard-changes-btn {
+      background-color: #008098;
+      color: #FFFFFF;
+      font-weight: bold;
+      width: 100%;
+    }
+    skill-editor-navbar .publish-skill-btn {
+      background-color: #FFFFFF;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+  }
+</style>

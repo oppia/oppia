@@ -522,7 +522,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form '[user_id].[exploration_id]'.
+            of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -553,8 +553,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             ExpUserLastPlaythroughModel. The ExpUserLastPlaythroughModel
-                instance which matches with the given user_id and
-                exploration_id.
+            instance which matches with the given user_id and
+            exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExpUserLastPlaythroughModel, cls).get(
@@ -926,13 +926,20 @@ class UserSubscriptionsModel(base_models.BaseModel):
         if user_model is None:
             return {}
 
+        creator_user_models = UserSettingsModel.get_multi(
+            user_model.creator_ids)
+        creator_usernames = [
+            creator.username for creator in creator_user_models]
+
         user_data = {
             'activity_ids': user_model.activity_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
-            'creator_ids': user_model.creator_ids,
-            'last_checked': user_model.last_checked
+            'creator_usernames': creator_usernames,
+            'last_checked':
+                None if user_model.last_checked is None else
+                utils.get_time_in_millisecs(user_model.last_checked)
         }
 
         return user_data
@@ -1194,8 +1201,8 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             UserStatsModel. Either an existing one which matches the
-                given user_id, or the newly created one if it did not already
-                exist.
+            given user_id, or the newly created one if it did not already
+            exist.
         """
         entity = cls.get(user_id, strict=False)
         if not entity:
@@ -1212,7 +1219,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             dict. The user-relevant properties of UserStatsModel in a python
-                dict format.
+            dict format.
         """
         user_model = UserStatsModel.get(user_id, strict=False)
         if user_model is None:
@@ -1327,7 +1334,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form '[user_id].[exploration_id]'.
+            of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -1344,7 +1351,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The newly created
-                ExplorationUserDataModel instance.
+            ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -1361,7 +1368,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-                which matches with the given user_id and exploration_id.
+            which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
@@ -1378,7 +1385,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-                which matches with the given user_ids and exploration_id.
+            which matches with the given user_ids and exploration_id.
         """
         instance_ids = (
             cls._generate_id(user_id, exploration_id) for user_id in user_ids)
@@ -1499,7 +1506,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form '[user_id].[collection_id]'.
+            of the form '[user_id].[collection_id]'.
         """
         return '%s.%s' % (user_id, collection_id)
 
@@ -1516,7 +1523,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The newly created CollectionProgressModel
-                instance.
+            instance.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return cls(
@@ -1533,7 +1540,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The CollectionProgressModel instance which
-                matches the given user_id and collection_id.
+            matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
@@ -1570,8 +1577,8 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. Either an existing one which
-                matches the given user_id and collection_id, or the newly
-                created one if it does not already exist.
+            matches the given user_id and collection_id, or the newly
+            created one if it does not already exist.
         """
         instance_model = cls.get(user_id, collection_id)
         if instance_model:
@@ -1685,7 +1692,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The newly created StoryProgressModel
-                instance.
+            instance.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return cls(
@@ -1704,7 +1711,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The StoryProgressModel instance which
-                matches the given user_id and story_id.
+            matches the given user_id and story_id.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return super(StoryProgressModel, cls).get(
@@ -1721,7 +1728,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             list(StoryProgressModel). The list of StoryProgressModel
-                instances which matches the given user_id and story_ids.
+            instances which matches the given user_id and story_ids.
         """
         instance_ids = [cls._generate_id(user_id, story_id)
                         for story_id in story_ids]
@@ -1744,8 +1751,8 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. Either an existing one which
-                matches the given user_id and story_id, or the newly created
-                one if it does not already exist.
+            matches the given user_id and story_id, or the newly created
+            one if it does not already exist.
         """
         instance_model = cls.get(user_id, story_id, strict=False)
         if instance_model is not None:
@@ -1872,8 +1879,8 @@ class UserQueryModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            3-tuple of (query_models, cursor, more) as described in fetch_page()
-            at:
+            3-tuple of (query_models, cursor, more). As described in
+            fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 query_models: List of UserQueryModel instances.
@@ -2110,7 +2117,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(str). A list of score_categories where the user has score above
-                the threshold.
+            the threshold.
         """
         scoring_models = cls.get_all().filter(cls.user_id == user_id).filter(
             cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
@@ -2126,7 +2133,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(UserContributionsScoringModel). All instances for the given
-                user.
+            user.
         """
         return cls.get_all().filter(cls.user_id == user_id).fetch()
 
@@ -2141,7 +2148,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(UserContributionsScoringModel). All instances for the given
-                category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
+            category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
         """
         return cls.get_all().filter(
             cls.score_category == score_category).filter(

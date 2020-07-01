@@ -27,6 +27,10 @@ import { SkillOpportunity } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import {
+  FeaturedTranslationLanguageObjectFactory,
+  IFeaturedTranslationLanguageBackendDict,
+} from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 const constants = require('constants.ts');
 
@@ -34,9 +38,8 @@ type ContributionOpportunityCategoryType =
   'skill' | 'voiceover' | 'translation';
 
 type ContributionOpportunityParams = {
-  cursor: string;
-  // eslint-disable-next-line camelcase
-  language_code?: string;
+  'cursor': string;
+  'language_code'?: string;
 };
 
 @Injectable({
@@ -46,7 +49,9 @@ export class ContributionOpportunitiesBackendApiService {
   urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private featuredTranslationLanguageObjectFactory:
+      FeaturedTranslationLanguageObjectFactory
   ) {}
 
   // TODO(#7165): Replace any with exact type.
@@ -75,7 +80,7 @@ export class ContributionOpportunitiesBackendApiService {
       successCallback: (
         opportunities?: Array<any>, nextCursor?: string, more?: boolean
         ) => void,
-      errorCallback: (reason?: any) => void
+      errorCallback: (reason: string) => void
   ): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
@@ -129,6 +134,25 @@ export class ContributionOpportunitiesBackendApiService {
         constants.OPPORTUNITY_TYPE_VOICEOVER,
         params, resolve, reject);
     });
+  }
+
+  async fetchFeaturedTranslationLanguages(): Promise<Object> {
+    try {
+      const response = await this.http
+        .get('/retrivefeaturedtranslationlanguages')
+        .toPromise() as {
+          'featured_translation_languages':
+          IFeaturedTranslationLanguageBackendDict[]
+        };
+
+      return response.featured_translation_languages.map(
+        (backendDict: IFeaturedTranslationLanguageBackendDict) =>
+          this.featuredTranslationLanguageObjectFactory
+            .createFromBackendDict(backendDict)
+      );
+    } catch {
+      return [];
+    }
   }
 }
 

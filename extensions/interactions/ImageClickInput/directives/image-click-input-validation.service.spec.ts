@@ -17,12 +17,18 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IImageClickInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 /* eslint-disable max-len*/
 import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 /* eslint-enable max-len*/
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -32,13 +38,11 @@ describe('ImageClickInputValidationService', () => {
   let validatorService: ImageClickInputValidationService;
 
   let currentState: string;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
-  // to be researched thoroughly.
-  let badOutcome: Outcome, goodAnswerGroups: any;
+  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
-  var customizationArguments: any;
-  let oof: OutcomeObjectFactory;
+  var customizationArguments: IImageClickInputCustomizationArgs;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -47,6 +51,8 @@ describe('ImageClickInputValidationService', () => {
 
     validatorService = TestBed.get(ImageClickInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -54,7 +60,7 @@ describe('ImageClickInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -66,7 +72,7 @@ describe('ImageClickInputValidationService', () => {
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -86,15 +92,16 @@ describe('ImageClickInputValidationService', () => {
         }
       }
     };
-    goodAnswerGroups = [{
-      rules: [{
-        type: 'IsInRegion',
+    goodAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'IsInRegion',
         inputs: {
           x: 'SecondLabel'
         }
-      }],
-      outcome: goodDefaultOutcome
-    }];
+      })],
+      goodDefaultOutcome,
+      null,
+      null)];
   });
 
   it('should expect a customization argument for image and regions',

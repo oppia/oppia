@@ -113,12 +113,14 @@ def get_topic_memcache_key(topic_id, version=None):
 def get_topic_from_model(topic_model):
     """Returns a topic domain object given a topic model loaded
     from the datastore.
+
     Args:
         topic_model: TopicModel. The topic model loaded from the
             datastore.
+
     Returns:
         topic. A Topic domain object corresponding to the given
-            topic model.
+        topic model.
     """
     versioned_subtopics = {
         'schema_version': topic_model.subtopic_schema_version,
@@ -175,6 +177,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             id exists in the datastore.
         version: int or None. The version number of the topic to be
             retrieved. If it is None, the latest version will be retrieved.
+
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
@@ -204,7 +207,7 @@ def get_topics_by_ids(topic_ids):
 
     Returns:
         list(Topic|None). The list of topics corresponding to given ids
-            (with None in place of topic ids corresponding to deleted topics).
+        (with None in place of topic ids corresponding to deleted topics).
     """
     all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
     topics = [

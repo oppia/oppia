@@ -83,7 +83,7 @@ angular.module('oppia').directive('storiesList', [
               TopicUpdateService.removeCanonicalStory(
                 $scope.getTopic(), storyId);
               for (var i = 0; i < $scope.storySummaries.length; i++) {
-                if ($scope.storySummaries[i].id === storyId) {
+                if ($scope.storySummaries[i].getId() === storyId) {
                   $scope.storySummaries.splice(i, 1);
                 }
               }
@@ -92,6 +92,23 @@ angular.module('oppia').directive('storiesList', [
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
+          };
+
+          $scope.onMoveStoryFinish = function(toIndex) {
+            $scope.toIndex = toIndex;
+            if ($scope.fromIndex === $scope.toIndex) {
+              return;
+            }
+            TopicUpdateService.rearrangeCanonicalStory(
+              $scope.getTopic(), $scope.fromIndex, $scope.toIndex);
+            var storySummary = (
+              angular.copy($scope.storySummaries[$scope.fromIndex]));
+            $scope.storySummaries.splice($scope.fromIndex, 1);
+            $scope.storySummaries.splice($scope.toIndex, 0, storySummary);
+          };
+
+          $scope.onMoveStoryStart = function(fromIndex) {
+            $scope.fromIndex = fromIndex;
           };
 
           ctrl.$onInit = function() {
