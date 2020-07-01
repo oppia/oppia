@@ -47,7 +47,7 @@ describe('State hints service', () => {
         html: '<p>math</p>',
         content_id: 'hint_1'
       }
-    }].map(hof.createFromBackendDict);
+    }].map(item => hof.createFromBackendDict(item));
     shs.init(StateName, value);
     expect(shs.setActiveHintIndex).toHaveBeenCalled();
   });
