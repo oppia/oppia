@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import topic_fetchers
@@ -232,4 +233,18 @@ class UserCommunityRightsDataHandler(base.BaseHandler):
             'can_review_questions': (
                 community_rights.can_review_questions
                 if community_rights else False)
+        })
+
+
+class FeaturedTranslationLanguagesHandler(base.BaseHandler):
+    """Provides featured translation languages set in admin config."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'featured_translation_languages':
+                config_domain.FEATURED_TRANSLATION_LANGUAGES.value
         })

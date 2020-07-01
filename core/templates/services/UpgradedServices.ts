@@ -196,6 +196,8 @@ import { ExtensionTagAssemblerService } from
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { FeaturedTranslationLanguageObjectFactory } from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -645,6 +647,8 @@ export class UpgradedServices {
     upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
       new ExplorationOpportunitySummaryObjectFactory();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
+    upgradedServices['FeaturedTranslationLanguageObjectFactory'] =
+      new FeaturedTranslationLanguageObjectFactory();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =
       new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FeedbackThreadSummaryObjectFactory'] =
@@ -1140,7 +1144,8 @@ export class UpgradedServices {
     upgradedServices['ContributionOpportunitiesBackendApiService'] =
       new ContributionOpportunitiesBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['FeaturedTranslationLanguageObjectFactory']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['CurrentInteractionService'] =

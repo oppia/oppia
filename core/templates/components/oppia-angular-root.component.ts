@@ -233,6 +233,8 @@ import { ExtensionTagAssemblerService } from
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { FeaturedTranslationLanguageObjectFactory } from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -706,6 +708,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
+  static featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory;
   static feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
   static feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
   static feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;
@@ -989,6 +992,7 @@ private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
+private featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory,
 private feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory,
 private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
 private feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory,
@@ -1273,6 +1277,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
+    OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = this.featuredTranslationLanguageObjectFactory;
     OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = this.feedbackMessageSummaryObjectFactory;
     OppiaAngularRootComponent.feedbackThreadObjectFactory = this.feedbackThreadObjectFactory;
     OppiaAngularRootComponent.feedbackThreadSummaryObjectFactory = this.feedbackThreadSummaryObjectFactory;

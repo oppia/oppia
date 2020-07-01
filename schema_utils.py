@@ -33,6 +33,7 @@ import re
 from core.domain import expression_parser
 from core.domain import html_cleaner
 import python_utils
+import utils
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -447,3 +448,15 @@ class _Validators(python_utils.OBJECT):
         if lhs_is_numerically_valid and rhs_is_algebraically_valid:
             return True
         return False
+
+    @staticmethod
+    def is_supported_audio_language_code(obj):
+        """Checks if the given obj (a string) represents a valid language code.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid audio language code.
+        """
+        return utils.is_supported_audio_language_code(obj)

@@ -169,7 +169,8 @@ VALIDATOR_SPECS = {
                 'type': SCHEMA_TYPE_BOOL
             }
         },
-        'is_valid_math_equation': {}
+        'is_valid_math_equation': {},
+        'is_supported_audio_language_code': {}
     },
 }
 
@@ -537,6 +538,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_math_equation('5+3=8'))
         self.assertFalse(is_valid_math_equation('(a+(b)=0'))
         self.assertFalse(is_valid_math_equation('a+b=c:)'))
+
+    def test_is_supported_audio_language_code(self):
+        is_supported_audio_language_code = schema_utils.get_validator(
+            'is_supported_audio_language_code')
+
+        self.assertTrue(is_supported_audio_language_code('en'))
+        self.assertTrue(is_supported_audio_language_code('fr'))
+        self.assertTrue(is_supported_audio_language_code('de'))
+
+        self.assertFalse(is_supported_audio_language_code(''))
+        self.assertFalse(is_supported_audio_language_code('zz'))
+        self.assertFalse(is_supported_audio_language_code('test'))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

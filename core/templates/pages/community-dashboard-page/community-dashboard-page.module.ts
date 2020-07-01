@@ -26,7 +26,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -39,6 +39,8 @@ import { OppiaAngularRootComponent } from
 import { AppConstants } from 'app.constants';
 import { CommunityDashboardConstants } from
   'pages/community-dashboard-page/community-dashboard-page.constants';
+import { TranslationLanguageSelectorComponent } from
+  './translation-language-selector/translation-language-selector.component';
 
 @NgModule({
   imports: [
@@ -47,10 +49,12 @@ import { CommunityDashboardConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TranslationLanguageSelectorComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TranslationLanguageSelectorComponent
   ],
   providers: [
     AppConstants,
