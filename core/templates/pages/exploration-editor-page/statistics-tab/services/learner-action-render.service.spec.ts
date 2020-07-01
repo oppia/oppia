@@ -24,11 +24,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-import { PlaythroughService } from 'services/playthrough.service';
 
 require('pages/exploration-editor-page/services/exploration-states.service');
 require(
@@ -36,30 +33,23 @@ require(
   'learner-action-render.service.ts');
 
 describe('Learner Action Render Service', function() {
-  var explorationFeaturesService: ExplorationFeaturesService = null;
-  var explorationStatesService = null;
-  var learnerActionRenderService = null;
-  var playthroughService: PlaythroughService = null;
+  let explorationStatesService = null;
+  let learnerActionObjectFactory: LearnerActionObjectFactory = null;
+  let learnerActionRenderService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
   beforeEach(angular.mock.inject(function($injector) {
-    playthroughService = $injector.get('PlaythroughService');
     explorationStatesService = $injector.get('ExplorationStatesService');
-    explorationFeaturesService = $injector.get('ExplorationFeaturesService');
+    learnerActionObjectFactory = $injector.get('LearnerActionObjectFactory');
     learnerActionRenderService = $injector.get('LearnerActionRenderService');
   }));
 
-  beforeEach(function() {
-    playthroughService.initSession('expId1', 1, 1.0);
-
-    spyOn(explorationFeaturesService, 'isPlaythroughRecordingEnabled')
-      .and.returnValue(true);
-
+  beforeEach(() => {
     spyOn(explorationStatesService, 'getState')
       .withArgs('stateName1').and.returnValue({
         interaction: { id: 'Continue'}
@@ -77,16 +67,35 @@ describe('Learner Action Render Service', function() {
       });
   });
 
-  describe('Test learner action render service functions', function() {
-    it('should render correct learner actions', function() {
-      playthroughService.recordExplorationStartAction('stateName1');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordExplorationQuitAction('stateName2', 120);
+  describe('Test learner action render service functions', () => {
+    it('should render correct learner actions', () => {
+      let actions = [
+        learnerActionObjectFactory.createNewExplorationStartAction({
+          state_name: {value: 'stateName1'},
+        }),
+        learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {value: 'stateName1'},
+          dest_state_name: {value: 'stateName2'},
+          interaction_id: {value: 'Continue'},
+          submitted_answer: {value: ''},
+          feedback: {value: 'Welcome'},
+          time_spent_state_in_msecs: {value: 30000},
+        }),
+        learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {value: 'stateName2'},
+          dest_state_name: {value: 'stateName2'},
+          interaction_id: {value: 'TextInput'},
+          submitted_answer: {value: 'Hello'},
+          feedback: {value: 'Try again'},
+          time_spent_state_in_msecs: {value: 30000},
+        }),
+        learnerActionObjectFactory.createNewExplorationQuitAction({
+          state_name: {value: 'stateName2'},
+          time_spent_in_state_in_msecs: {value: 120000},
+        }),
+      ];
 
-      var renderedStatements = playthroughService.getPlaythrough().actions.map(
+      let renderedStatements = actions.map(
         (a, i) => learnerActionRenderService.renderLearnerAction(a, i + 1));
 
       expect(renderedStatements[0]).toEqual(
@@ -99,11 +108,11 @@ describe('Learner Action Render Service', function() {
     });
 
     it('should render the table for a Multiple Incorrect Submissions issue',
-      function() {
+      () => {
         // We pass a sample learner actions array just to find out whether
         // the directive rendered is being initialised with the right values.
-        var learnerActions = [{key: 'value'}];
-        var tableDirective = (
+        let learnerActions = [{key: 'value'}];
+        let tableDirective = (
           learnerActionRenderService.renderFinalDisplayBlockForMISIssueHTML(
             learnerActions, 1));
         expect(tableDirective).toEqual(

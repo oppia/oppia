@@ -23,19 +23,21 @@ import { AppConstants } from 'app.constants';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import {
-  ICyclicStateTransitionsCustomizationArgs,
-  IEarlyQuitCustomizationArgs,
-  IMultipleIncorrectSubmissionsCustomizationArgs,
   Playthrough,
   PlaythroughObjectFactory
 } from 'domain/statistics/PlaythroughObjectFactory';
-import { LearnerActionObjectFactory } from
+import { LearnerActionObjectFactory, LearnerAction } from
   'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import {
+  ICyclicStateTransitionsCustomizationArgs,
+  IMultipleIncorrectSubmissionsCustomizationArgs,
+  IEarlyQuitCustomizationArgs
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
 
 class MultipleIncorrectAnswersTracker {
   currStateName: string;
@@ -68,74 +70,77 @@ class MultipleIncorrectAnswersTracker {
 }
 
 class CyclicStateTransitionsTracker {
-  private currStateName: string;
-  private visitedStates: string[];
-  // Maps [fromState, destState] to their number of occurrences. Map is kept in
-  // insertion-order (most recent appears at the end).
-  private stateRegressionOccurrences: Map<string[], number>;
+  numLoops: number = 0;
+  // A path of visited states without any cycles/repeated states.
+  pathOfVisitedStates: string[];
+  // A cycle of visited states discovered by the tracker.
+  cycleOfVisitedStates: string[];
 
   constructor(initStateName: string) {
-    this.currStateName = initStateName;
-    this.visitedStates = [initStateName];
-    this.stateRegressionOccurrences = new Map();
-  }
-
-  recordStateTransition(destStateName: string): void {
-    if (this.currStateName === destStateName) {
-      return;
-    }
-    if (!this.visitedStates.includes(destStateName)) {
-      this.visitedStates.push(destStateName);
-    } else {
-      const newStateRegression = [this.currStateName, destStateName];
-      const stateRegressionOccurrences = (
-        this.stateRegressionOccurrences.entries());
-      let stateRegressionFound = false;
-      for (const [stateRegression, occurrences] of stateRegressionOccurrences) {
-        if (this.isSameStateRegression(stateRegression, newStateRegression)) {
-          this.stateRegressionOccurrences.set(stateRegression, occurrences + 1);
-          stateRegressionFound = true;
-          break;
-        }
-      }
-      if (!stateRegressionFound) {
-        this.stateRegressionOccurrences.set(newStateRegression, 1);
-      }
-    }
-    this.currStateName = destStateName;
-  }
-
-  private isSameStateRegression(
-      stateRegression: string[], otherStateRegression: string[]): boolean {
-    const [fromState, destState] = stateRegression;
-    const [otherFromState, otherDestState] = otherStateRegression;
-    return fromState === otherFromState && destState === otherDestState;
+    this.pathOfVisitedStates = [initStateName];
+    this.cycleOfVisitedStates = null;
   }
 
   foundAnIssue(): boolean {
-    const [_, occurrences] = this.getMostCommonStateRegression();
-    return occurrences >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
+    return this.numLoops >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
+  }
+
+  /**
+   * Records learner's transition to a new state into this tracker's path of
+   * visited states.
+   *
+   * If appending the new state would introduce a duplicate state name, then a
+   * cycle has been found. Specifically, if pusing the newest state (N) onto the
+   * path would result in the following pattern:
+   *
+   *    [ ... , N , ... , N ]
+   *
+   * then we update this tracker's latest cycle discovery.
+   *
+   * The cycle is defined as the current path of visited states with all states
+   * prior to the first occurrence of N discarded.
+   *
+   * If this *exact* cycle has been discovered before (NOTE: rotations of a
+   * cycle are considered to be different from each other), then we increase the
+   * tracked number of cycle occurrences.
+   * Otherwise, the tracker is completely reset to 1.
+   *
+   * Finally, the path of visited states is reset to a value of [ N ], in hopes
+   * that the exact same cycle is discovered enough times to be considered an
+   * issue.
+   */
+  recordStateTransition(destStateName: string): void {
+    if (this.currStateName() === destStateName) {
+      return;
+    }
+    if (this.pathOfVisitedStates.includes(destStateName)) {
+      const cycleOfVisitedStates = (
+        this.makeCycle(this.pathOfVisitedStates.indexOf(destStateName)));
+      if (angular.equals(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
+        this.numLoops += 1;
+      } else {
+        this.cycleOfVisitedStates = cycleOfVisitedStates;
+        this.numLoops = 1;
+      }
+      this.pathOfVisitedStates.length = 0;
+    }
+    this.pathOfVisitedStates.push(destStateName);
   }
 
   generateIssueCustomizationArgs(): ICyclicStateTransitionsCustomizationArgs {
-    const [stateRegression, _] = this.getMostCommonStateRegression();
-    return {state_names: {value: stateRegression}};
+    return {
+      state_names: {value: this.cycleOfVisitedStates}
+    };
   }
 
-  private getMostCommonStateRegression(): [string[], number] {
-    let mostCommonStateRegression = null;
-    let mostCommonStateRegressionOccurrences = 0;
-    const stateRegressionOccurrences = (
-      this.stateRegressionOccurrences.entries());
-    for (const [stateRegression, occurrences] of stateRegressionOccurrences) {
-      // When two state regressions have the same number of occurrences, we take
-      // the most recent one (which would appear later in the map).
-      if (occurrences >= mostCommonStateRegressionOccurrences) {
-        mostCommonStateRegression = stateRegression;
-        mostCommonStateRegressionOccurrences = occurrences;
-      }
-    }
-    return [mostCommonStateRegression, mostCommonStateRegressionOccurrences];
+  private makeCycle(collisionIndex: number): string[] {
+    const collision = this.pathOfVisitedStates[collisionIndex];
+    const cycleWithNoCollision = this.pathOfVisitedStates.slice(collisionIndex);
+    return [...cycleWithNoCollision, collision];
+  }
+
+  private currStateName(): string {
+    return this.pathOfVisitedStates[this.pathOfVisitedStates.length - 1];
   }
 }
 
@@ -175,9 +180,9 @@ export class PlaythroughService {
   private eqTracker: EarlyQuitTracker = null;
   private cstTracker: CyclicStateTransitionsTracker = null;
   private misTracker: MultipleIncorrectAnswersTracker = null;
-  private playthrough: Playthrough = null;
-  private stopwatch: Stopwatch = null;
-  private expDurationInSecs: number = null;
+  private recordedLearnerActions: LearnerAction[] = null;
+  private playthroughStopwatch: Stopwatch = null;
+  private playthroughDurationInSecs: number = null;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -185,47 +190,6 @@ export class PlaythroughService {
       private playthroughBackendApiService: PlaythroughBackendApiService,
       private playthroughObjectFactory: PlaythroughObjectFactory,
       private stopwatchObjectFactory: StopwatchObjectFactory) {}
-
-  /**
-   * The ordering of checks in this method prioritizes the following types of
-   * playthroughs:
-   *    1. MultipleIncorrectSubmissionsIssue
-   *    2. CyclicStateTransitionsIssue
-   *    3. EarlyQuitIssue
-   */
-  private classifyPlaythrough(): void {
-    if (this.misTracker && this.misTracker.foundAnIssue()) {
-      this.playthrough.issueType = (
-        AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
-      this.playthrough.issueCustomizationArgs = (
-        this.misTracker.generateIssueCustomizationArgs());
-    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-      this.playthrough.issueType = (
-        AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
-      this.playthrough.issueCustomizationArgs = (
-        this.cstTracker.generateIssueCustomizationArgs());
-    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-      this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
-      this.playthrough.issueCustomizationArgs = (
-        this.eqTracker.generateIssueCustomizationArgs());
-    }
-  }
-
-  private isPlaythroughRecordingEnabled(): boolean {
-    return (
-      this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
-      this.learnerIsInSamplePopulation === true);
-  }
-
-  private isLearnerJustBrowsing(): boolean {
-    return (
-      // Learners who never enter an answer are probably just browsing.
-      !this.playthrough.actions.some(
-        a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) ||
-      // Learners who leave the exploration quickly are probably just browsing.
-      this.expDurationInSecs <
-          ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
-  }
 
   initSession(
       explorationId: string, explorationVersion: number,
@@ -236,48 +200,66 @@ export class PlaythroughService {
       Math.random() < sampleSizePopulationProportion);
   }
 
-  getPlaythrough(): Playthrough {
-    return this.playthrough;
+  /**
+   * The ordering of checks in this method prioritizes the following types of
+   * playthroughs:
+   *    1. MultipleIncorrectSubmissionsIssue
+   *    2. CyclicStateTransitionsIssue
+   *    3. EarlyQuitIssue
+   *
+   * If none of the issue types have been discovered, returns null instead.
+   */
+  getPlaythrough(): Playthrough | null {
+    if (this.misTracker && this.misTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory.createNew(
+        this.explorationId, this.explorationVersion,
+        AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+        this.misTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions);
+    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory.createNew(
+        this.explorationId, this.explorationVersion,
+        AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
+        this.cstTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions);
+    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory.createNew(
+        this.explorationId, this.explorationVersion,
+        AppConstants.ISSUE_TYPE_EARLY_QUIT,
+        this.eqTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions);
+    }
+    return null;
   }
 
   recordExplorationStartAction(initStateName: string): void {
-    if (!this.isPlaythroughRecordingEnabled()) {
-      return;
-    }
-    if (this.playthrough !== null) {
+    if (this.hasRecordingBegun() || !this.isPlaythroughRecordingEnabled()) {
       return;
     }
 
-    const explorationStartAction = (
+    this.recordedLearnerActions = [
       this.learnerActionObjectFactory.createNewExplorationStartAction({
-        state_name: {value: initStateName}
-      }));
-    this.playthrough = this.playthroughObjectFactory.createNew(
-      this.explorationId, this.explorationVersion, null, null,
-      [explorationStartAction]);
+        state_name: {value: initStateName},
+      })
+    ];
 
     this.eqTracker = new EarlyQuitTracker();
     this.misTracker = new MultipleIncorrectAnswersTracker(initStateName);
     this.cstTracker = new CyclicStateTransitionsTracker(initStateName);
 
-    this.expDurationInSecs = 0;
-    this.stopwatch = this.stopwatchObjectFactory.create();
-    this.stopwatch.reset();
+    this.playthroughDurationInSecs = 0;
+    this.playthroughStopwatch = this.stopwatchObjectFactory.create();
+    this.playthroughStopwatch.reset();
   }
 
   recordAnswerSubmitAction(
       stateName: string, destStateName: string, interactionId: string,
       answer: string, feedback: string, timeSpentInStateSecs: number): void {
-    if (this.playthrough === null ||
-        this.playthrough.getLastAction().actionType ===
-            AppConstants.ACTION_TYPE_EXPLORATION_QUIT) {
+    if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
 
-    this.misTracker.recordStateTransition(destStateName);
-    this.cstTracker.recordStateTransition(destStateName);
-
-    const answerSubmitAction = (
+    this.recordedLearnerActions.push(
       this.learnerActionObjectFactory.createNewAnswerSubmitAction({
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
@@ -286,39 +268,65 @@ export class PlaythroughService {
         feedback: {value: feedback},
         time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
-    this.playthrough.actions.push(answerSubmitAction);
+
+    this.misTracker.recordStateTransition(destStateName);
+    this.cstTracker.recordStateTransition(destStateName);
   }
 
   recordExplorationQuitAction(
       stateName: string, timeSpentInStateSecs: number): void {
-    if (this.playthrough === null ||
-        this.playthrough.getLastAction().actionType ===
-            AppConstants.ACTION_TYPE_EXPLORATION_QUIT) {
+    if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
 
-    this.expDurationInSecs = this.stopwatch.getTimeInSecs();
-    this.eqTracker.recordExplorationQuit(stateName, this.expDurationInSecs);
-
-    const explorationQuitAction = (
+    this.recordedLearnerActions.push(
       this.learnerActionObjectFactory.createNewExplorationQuitAction({
         state_name: {value: stateName},
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
-    this.playthrough.actions.push(explorationQuitAction);
 
-    this.classifyPlaythrough();
+    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
+    this.eqTracker.recordExplorationQuit(
+      stateName, this.playthroughDurationInSecs);
   }
 
   storePlaythrough(): void {
-    if (!this.isPlaythroughRecordingEnabled()) {
-      return;
+    if (this.isRecordedPlaythroughHelpful()) {
+      const playthrough = this.getPlaythrough();
+      if (playthrough !== null) {
+        this.playthroughBackendApiService.storePlaythrough(playthrough, 1);
+      }
     }
-    if (this.playthrough === null || this.playthrough.issueType === null ||
-        this.isLearnerJustBrowsing()) {
-      return;
-    }
-    this.playthroughBackendApiService.storePlaythrough(this.playthrough, 1);
+  }
+
+  private hasRecordingBegun(): boolean {
+    return this.recordedLearnerActions !== null;
+  }
+
+  private hasRecordingFinished(): boolean {
+    return (
+      this.hasRecordingBegun() &&
+      this.recordedLearnerActions.length > 1 &&
+      this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
+        .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
+  }
+
+  private isRecordedPlaythroughHelpful(): boolean {
+    return (
+      // Playthroughs are only helpful in their entirety.
+      this.hasRecordingFinished() &&
+      // Playthroughs are only helpful if learners have attempted an answer.
+      this.recordedLearnerActions.some(
+        a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
+      // Playthroughs are only helpful if learners have invested enough time.
+      this.playthroughDurationInSecs >=
+          ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+  }
+
+  private isPlaythroughRecordingEnabled(): boolean {
+    return (
+      this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
+      this.learnerIsInSamplePopulation === true);
   }
 }
 

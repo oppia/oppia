@@ -20,48 +20,40 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { LearnerAction, LearnerActionObjectFactory, ILearnerActionBackendDict }
-  from 'domain/statistics/LearnerActionObjectFactory';
-
-export interface IMultipleIncorrectSubmissionsCustomizationArgs {
-  'state_name': {value: string};
-  'num_times_answered_incorrectly': {value: number};
-}
-
-export interface ICyclicStateTransitionsCustomizationArgs {
-  'state_names': {value: string[]};
-}
-
-export interface IEarlyQuitCustomizationArgs {
-  'state_name': {value: string};
-  'time_spent_in_exp_in_msecs': {value: number};
-}
-
-export type IIssueCustomizationArgs = (
-  IMultipleIncorrectSubmissionsCustomizationArgs |
-  ICyclicStateTransitionsCustomizationArgs |
-  IEarlyQuitCustomizationArgs);
+import {
+  IEarlyQuitCustomizationArgs,
+  ICyclicStateTransitionsCustomizationArgs,
+  IMultipleIncorrectSubmissionsCustomizationArgs
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
+import {
+  ILearnerActionBackendDict,
+  LearnerAction,
+  LearnerActionObjectFactory
+} from 'domain/statistics/LearnerActionObjectFactory';
 
 export interface IPlaythroughBackendDict {
   'exp_id': string;
   'exp_version': number;
   'issue_type': string;
-  'issue_customization_args': IIssueCustomizationArgs;
+  'issue_customization_args': (
+    IEarlyQuitCustomizationArgs |
+    ICyclicStateTransitionsCustomizationArgs |
+    IMultipleIncorrectSubmissionsCustomizationArgs);
   'actions': ILearnerActionBackendDict[];
 }
+
+type IssueCustomizationArgs = (
+  IEarlyQuitCustomizationArgs |
+  ICyclicStateTransitionsCustomizationArgs |
+  IMultipleIncorrectSubmissionsCustomizationArgs);
 
 export class Playthrough {
   constructor(
       public expId: string,
       public expVersion: number,
       public issueType: string,
-      public issueCustomizationArgs: IIssueCustomizationArgs,
+      public issueCustomizationArgs: IssueCustomizationArgs,
       public actions: LearnerAction[]) {}
-
-  getLastAction(): LearnerAction {
-    const actionsLength = this.actions.length;
-    return actionsLength > 0 ? this.actions[actionsLength - 1] : null;
-  }
 
   toBackendDict(): IPlaythroughBackendDict {
     return {
@@ -69,7 +61,7 @@ export class Playthrough {
       exp_version: this.expVersion,
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
-      actions: this.actions.map(a => a.toBackendDict())
+      actions: this.actions.map(a => a.toBackendDict()),
     };
   }
 }
@@ -81,20 +73,24 @@ export class PlaythroughObjectFactory {
   constructor(private learnerActionObjectFactory: LearnerActionObjectFactory) {}
 
   createNew(
-      expId: string, expVersion: number, issueType: string,
-      issueCustomizationArgs: IIssueCustomizationArgs,
-      actions: LearnerAction[]): Playthrough {
+      expId: string, expVersion: number,
+      issueType: string, issueCustomizationArgs: any,
+      learnerActions: LearnerAction[]): Playthrough {
     return new Playthrough(
-      expId, expVersion, issueType, issueCustomizationArgs,
-      actions);
+      expId, expVersion, issueType, issueCustomizationArgs, learnerActions);
   }
 
+  /**
+   * @typedef
+   * @param {PlaythroughBackendDict} playthroughBackendDict
+   * @returns {Playthrough}
+   */
   createFromBackendDict(backendDict: IPlaythroughBackendDict): Playthrough {
+    const learnerActions = backendDict.actions.map(
+      this.learnerActionObjectFactory.createFromBackendDict);
     return new Playthrough(
       backendDict.exp_id, backendDict.exp_version, backendDict.issue_type,
-      backendDict.issue_customization_args,
-      backendDict.actions.map(
-        d => this.learnerActionObjectFactory.createFromBackendDict(d)));
+      backendDict.issue_customization_args, learnerActions);
   }
 }
 
