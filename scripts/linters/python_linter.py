@@ -50,7 +50,7 @@ import pycodestyle # isort:skip
 
 
 class StringMessageStream(python_utils.OBJECT):
-    """Save and return output stream of pylint"""
+    """Save and return output stream of pylint."""
 
     def __init__(self):
         """Constructs a StringMessageStream object."""
@@ -68,7 +68,7 @@ class StringMessageStream(python_utils.OBJECT):
         """Returns the pylint messages as a list.
 
         Returns:
-        list(str). Returns the pylint messages list.
+            list(str). Returns the pylint messages list.
         """
         return self.messages
 
@@ -357,7 +357,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """
         error_messages = []
         # Remove newlines and coverage report from the end of message.
-        # we need to remove last five items from the list because starting fromjjj
+        # we need to remove last five items from the list because starting from
         # end we have three lines with empty string(''), fourth line
         # contains the coverage report i.e.
         # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
