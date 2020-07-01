@@ -12,7 +12,7 @@
         "http://127.0.0.1:8181/donate",
         "http://127.0.0.1:8181/get-started",
         "http://127.0.0.1:8181/community-library",
-        "http://127.0.0.1:8181/privacy",
+        "http://127.0.0.1:8181/privacy-policy",
         "http://127.0.0.1:8181/teach",
         "http://127.0.0.1:8181/terms",
         "http://127.0.0.1:8181/thanks"
@@ -23,6 +23,7 @@
         {
           "matchingUrlPattern": ".*",
           "assertions": {
+            "categories:accessibility": ["error", {"minScore": 1}],
             "first-contentful-paint": [ "warn", {"maxNumericValue": 1230000}],
             "first-meaningful-paint": ["warn", {"maxNumericValue": 1280000}],
             "first-cpu-idle": ["warn", {"maxNumericValue": 1460000}],
