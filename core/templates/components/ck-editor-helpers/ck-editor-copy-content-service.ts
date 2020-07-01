@@ -148,7 +148,7 @@ export class CkEditorCopyContentService {
   /**
    * Binds editor and editor scope to listen for copy events.
    * @param {IRootScopeService} editorScope The scope to bind listener on to
-   *  respond to copy event.
+   *  respond to copy event.
    * @param {CKEDITOR.editor} editor The editor to add copied content to.
    */
   bindPasteHandler(
