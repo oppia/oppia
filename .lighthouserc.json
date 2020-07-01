@@ -21,8 +21,7 @@
         "http://127.0.0.1:8181/community-dashboard",
         "http://127.0.0.1:8181/delete-account",
         "http://127.0.0.1:8181/creator-dashboard",
-        "http://127.0.0.1:8181/emaildashboard",
-        "http://127.0.0.1:8181/collection/0"
+        "http://127.0.0.1:8181/emaildashboard"
       ]
     },
     "assert": {
