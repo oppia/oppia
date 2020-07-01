@@ -49,8 +49,8 @@ describe('Exploration history', function() {
   });
 
   it('should correctly display the dates of the commits', async function() {
-    await users.createUser('user@historyTab.com', 'userHistoryTab');
-    await users.login('user@historyTab.com');
+    await users.createUser('userTestDate@historyTab.com', 'testDateUsername');
+    await users.login('userTestDate@historyTab.com');
 
     // Creating an exploration creates the first commit. Therefore, there
     // should be a date associated with it.
@@ -60,6 +60,8 @@ describe('Exploration history', function() {
     // is displayed.
     await explorationEditorPage.navigateToHistoryTab();
     await explorationEditorHistoryTab.expectCommitDatesToBeDisplayed();
+
+    await users.logout();
   });
 
   it('should display the history', async function() {
