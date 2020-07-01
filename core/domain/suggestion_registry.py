@@ -452,7 +452,10 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to be an ExplorationChange, received %s'
                 % type(self.change))
-
+        # The score sub_type needs to match the validation for exploration
+        # category, i.e the second part of the score_category should match
+        # the target exploration's category and we have a prod validation
+        # for the same.
         if self.get_score_type() != suggestion_models.SCORE_TYPE_TRANSLATION:
             raise utils.ValidationError(
                 'Expected the first part of score_category to be %s '

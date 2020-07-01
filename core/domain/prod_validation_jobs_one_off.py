@@ -3175,7 +3175,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_score_category(cls, item):
-        """Validate that the score_category subtype for suggestions match the
+        """Validate that the score_category subtype for suggestions matches the
         exploration category.
 
         Args:
