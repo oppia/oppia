@@ -1628,7 +1628,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1643,6 +1645,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -1663,7 +1666,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1678,6 +1683,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:

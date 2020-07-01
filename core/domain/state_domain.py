@@ -1844,7 +1844,7 @@ class State(python_utils.OBJECT):
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
             written_translations, solicit_answer_details,
-            classifier_model_id=None):
+            next_content_id_index, classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1881,6 +1881,7 @@ class State(python_utils.OBJECT):
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
         self.solicit_answer_details = solicit_answer_details
+        self.next_content_id_index = next_content_id_index
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -2452,7 +2453,8 @@ class State(python_utils.OBJECT):
             'classifier_model_id': self.classifier_model_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict(),
-            'solicit_answer_details': self.solicit_answer_details
+            'solicit_answer_details': self.solicit_answer_details,
+            'next_content_id_index': self.next_content_id_index
         }
 
     @classmethod
@@ -2473,6 +2475,7 @@ class State(python_utils.OBJECT):
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
+            state_dict['next_content_id_index'],
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -2500,7 +2503,7 @@ class State(python_utils.OBJECT):
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
-            False)
+            False, 0)
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):

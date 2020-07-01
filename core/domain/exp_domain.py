@@ -2452,7 +2452,7 @@ class Exploration(python_utils.OBJECT):
 
 
         def convert_to_subtitled(
-            customization_arg_value, customization_arg_spec, obj_type
+            customization_arg, customization_arg_spec, obj_type
         ):
             """
             """
@@ -2467,45 +2467,57 @@ class Exploration(python_utils.OBJECT):
                     obj_type
                 )
 
-            if isinstance(customization_arg_value, str):
-                customization_args.value.update({
+
+            if isinstance(customization_arg['value'], str):
+                customization_arg['value'] = {
                     'content_id': '',
-                    translation_value_key: customization_args.value
-                })
-            elif isinstance(customization_arg_value, list):
-                for i in range(len(customization_args.value)):
-                    customization_args.value[i] = {
+                    translation_value_key: customization_arg['value']
+                }
+            elif isinstance(customization_arg['value'], list):
+                for i in range(len(customization_arg['value'])):
+                    customization_arg['value'][i] = {
                         'content_id': '',
-                        translation_value_key: customization_args.value[i]
+                        translation_value_key: customization_arg['value'][i]
                     }
-            elif isinstance(customization_arg_value, dict):
-                customization_args.value[customization_arg_spec.name].update({
+            elif isinstance(customization_arg['value'], dict):
+                customization_arg['value'][customization_arg_spec['name']] = {
                     'content_id': '',
-                    translation_value_key: customization_args.value
-                })
+                    translation_value_key: customization_arg['value']
+                }
 
 
         def convert_all_to_subtitled(customization_arg, customization_arg_spec):
             """
-            """
-            if (customization_arg_spec.schema.type == "custom" and (
-                customization_arg_spec.schema.obj_type ==
-                "TranslatableUnicodeString" or 
-                customization_arg_spec.schema.obj_type == "TranslatableHtml"
-            )):
+            """            
+            if 'schema' not in customization_arg_spec:
+                schema_type = customization_arg_spec['type']
+            else:
+                schema_type = customization_arg_spec['schema']['type']
+
+            schema_obj_type = None
+            if schema_type == "custom":
+                if 'schema' not in customization_arg_spec:
+                    schema_obj_type = customization_arg_spec['obj_type']
+                else:
+                    schema_obj_type = customization_arg_spec[
+                        'schema']['obj_type']
+
+            if (schema_obj_type == "TranslatableUnicodeString" or 
+                schema_obj_type == "TranslatableHtml"):
                 convert_to_subtitled(
                     customization_arg,
                     customization_arg_spec,
-                    customization_arg_spec.schema.obj_type)
-            elif (customization_arg_spec.schema.type == "list"):
+                    schema_obj_type)
+            elif (schema_type == "list"):
                 convert_all_to_subtitled(
                     customization_arg,
-                    customization_arg_spec.items)
-            elif (customization_arg_spec.schema.type == "dict"):
-                for i in range(len(customization_arg_spec.properties)):
+                    customization_arg_spec['schema']['items'])
+            elif (schema_type == "dict"):
+                for i in range(len(customization_arg_spec['properties'])):
                     convert_all_to_subtitled(
                         customization_arg,
-                        customization_arg_spec.properties[i].schema)
+                        customization_arg_spec[
+                            'schema']['properties'][i]['schema'])
             return
 
         with python_utils.open_file(
@@ -2514,6 +2526,8 @@ class Exploration(python_utils.OBJECT):
             interaction_specs = json.load(interaction_specs_json)
 
             for state_dict in states_dict.values():
+                state_dict['next_content_id_index'] = 0
+
                 interaction_id = state_dict['interaction']['id']
                 if interaction_id is None:
                     continue
@@ -2524,10 +2538,11 @@ class Exploration(python_utils.OBJECT):
                     'interaction']['customization_args']
                 
                 for customization_arg_spec in customization_arg_specs:
-                    print(customization_arg_spec)
-                    convert_all_to_subtitled(
-                        customization_args[customization_arg_spec.name],
-                        customization_arg_spec)
+                    if customization_arg_spec['name'] in customization_args:
+                        convert_all_to_subtitled(
+                            customization_args[customization_arg_spec['name']],
+                            customization_arg_spec)
+
 
         return states_dict
 
@@ -3738,7 +3753,7 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v39_dict_to_v40_dict(
                 exploration_dict)
             exploration_schema_version = 40
-
+        
         return (exploration_dict, initial_schema_version)
 
     @classmethod

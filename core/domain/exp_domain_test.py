@@ -1992,7 +1992,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(hasattr(
             exp_domain.Exploration,
             '_convert_states_v%s_dict_to_v%s_dict' % (
-                current_staxtes_schema_version,
+                current_states_schema_version,
                 current_states_schema_version + 1)))
 
     def test_correct_exploration_schema_conversion_methods_exist(self):
@@ -5779,8 +5779,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          unicode_str: ''
-          content_id: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -5795,6 +5796,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -5822,6 +5824,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -5840,8 +5843,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          unicode_str: ''
-          content_id: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -5856,6 +5860,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6306,7 +6311,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6333,7 +6338,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6348,6 +6355,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6375,6 +6383,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6414,6 +6423,7 @@ states:
       hints: []
       id: CodeRepl
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6424,7 +6434,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6456,7 +6466,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6483,7 +6493,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6498,6 +6510,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6525,6 +6538,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6543,7 +6557,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6561,6 +6577,7 @@ states:
           html: <p>Correct!</p>
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6573,7 +6590,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 34
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6623,7 +6640,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6650,7 +6667,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6665,6 +6684,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6692,6 +6712,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6710,7 +6731,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6733,6 +6756,7 @@ states:
         explanation:
           content_id: solution
           html: ''
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6747,7 +6771,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 34
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6779,7 +6803,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6806,7 +6830,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6821,6 +6847,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6848,6 +6875,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6889,6 +6917,7 @@ states:
       hints: []
       id: FractionInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6899,7 +6928,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6961,7 +6990,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6988,7 +7017,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -7003,6 +7034,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7030,6 +7062,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7068,6 +7101,7 @@ states:
       hints: []
       id: ImageClickInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7078,7 +7112,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -7775,7 +7809,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V39_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V40_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7785,7 +7819,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 40
 states:
   Introduction:
     classifier_model_id: null
@@ -7810,6 +7844,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7830,7 +7865,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -7850,6 +7887,7 @@ states:
         explanation:
           content_id: solution
           html: <p>This is <em>solution</em> for state1</p>
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7906,8 +7944,10 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - <p>This is value2 for <br>MultipleChoice</p>
+          - content_id: ''
+            html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
+          - content_id: ''
+            html: <p>This is value2 for <br>MultipleChoice</p>
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -7930,6 +7970,7 @@ states:
             forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7984,9 +8025,12 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is value1 for ItemSelection</p>
-          - <p>This is value2 for ItemSelection</p>
-          - <p>This is value3 for ItemSelection</p>
+          - content_id: ''
+            html: <p>This is value1 for ItemSelection</p>
+          - content_id: ''
+            html: <p>This is value2 for ItemSelection</p>
+          - content_id: ''
+            html: <p>This is value3 for ItemSelection</p>
         maxAllowableSelectionCount:
           value: 1
         minAllowableSelectionCount:
@@ -8003,6 +8047,7 @@ states:
       hints: []
       id: ItemSelectionInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8015,7 +8060,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 34
+states_schema_version: 35
 tags: []
 title: title
 """)
@@ -8261,7 +8306,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V39_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V40_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8271,7 +8316,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -8302,7 +8347,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -8317,6 +8364,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8344,6 +8392,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8362,7 +8411,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -8377,6 +8428,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8387,7 +8439,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -8405,7 +8457,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V39_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V40_IMAGE_DIMENSIONS)
 
 
     def test_load_from_v27_without_image_caption(self):
@@ -8418,7 +8470,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V39_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V40_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -8435,6 +8487,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             """Gets the default state dict of the exploration."""
             return {
+                'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': 'content',
