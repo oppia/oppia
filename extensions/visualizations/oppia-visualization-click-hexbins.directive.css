@@ -25,7 +25,7 @@
 }
 .click-hexbin-mesh {
   fill: none;
+  stroke: #FFF;
   stroke-opacity: 0.12;
   stroke-width: .5;
-  stroke: #FFF;
 }
