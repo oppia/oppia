@@ -2601,202 +2601,81 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
             pylint_extensions.NewlineBelowClassDocstring)
         self.checker_test_object.setup_method()
 
-    def test_no_newline_below_class_docstring(self):
-        node_no_newline_below_class_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        a = 1 + 2
-                """)
-        node_no_newline_below_class_docstring.file = filename
-        node_no_newline_below_class_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_no_newline_below_class_docstring)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            line=4)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_excessive_newline_below_class_docstring(self):
-        node_excessive_newline_below_class_docstring = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-
-                        a = 1 + 2
-                """)
-        node_excessive_newline_below_class_docstring.file = filename
-        node_excessive_newline_below_class_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_excessive_newline_below_class_docstring)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            line=6)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_class_with_no_docstring(self):
-        node_class_with_no_docstring = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        def func():
-                            \"\"\"This is a docstring.\"\"\"
-                            a = b + c
-                """)
-        node_class_with_no_docstring.file = filename
-        node_class_with_no_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_class_with_no_docstring)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_inline_comment_after_class_docstring(self):
-        node_inline_comment_after_class_docstring = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        # This is a comment.
-                        def func():
-                            a = 1 + 2
-                """)
-        node_inline_comment_after_class_docstring.file = filename
-        node_inline_comment_after_class_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_inline_comment_after_class_docstring)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            line=4)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_none_and_excessive_newline_below_class_docstring(self):
-        node_none_and_excessive_newline_below_class_docstring = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-                        a = 1 + 2
-
-
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        a = 1 + 2
-
-
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-
-                        a = 1 + 2
-                """)
-        node_none_and_excessive_newline_below_class_docstring.file = filename
-        node_none_and_excessive_newline_below_class_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_none_and_excessive_newline_below_class_docstring)
-
-        message_with_no_newline = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            line=10)
-
-        message_with_excessive_newline = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            line=17)
-
-        with self.checker_test_object.assertAddsMessages(
-            message_with_no_newline, message_with_excessive_newline):
-            temp_file.close()
+    # def test_no_newline_below_class_docstring(self):
+    #     node_no_newline_below_class_docstring = astroid.extract_node(
+    #             u"""
+    #                 class ClassName(dummy_class):
+    #                     \"\"\"This is a docstring.\"\"\"
+    #                     a = 1 + 2
+    #             """)
+    #
+    #     message = testutils.Message(
+    #         msg_id='newline-below-class-docstring',
+    #         node=node_no_newline_below_class_docstring)
+    #
+    #     with self.checker_test_object.assertAddsMessages(message):
+    #         self.checker_test_object.checker.visit_classdef(
+    #             node_no_newline_below_class_docstring)
+    #
+    # def test_excessive_newline_below_class_docstring(self):
+    #     node_excessive_newline_below_class_docstring = astroid.extract_node(
+    #             u"""
+    #                 class ClassName(dummy_class):
+    #                     \"\"\"This is a docstring.\"\"\"
+    #
+    #
+    #                     a = 1 + 2
+    #             """)
+    #
+    #     message = testutils.Message(
+    #         msg_id='newline-below-class-docstring',
+    #         node=node_excessive_newline_below_class_docstring)
+    #
+    #     with self.checker_test_object.assertAddsMessages(message):
+    #         self.checker_test_object.checker.visit_classdef(
+    #             node_excessive_newline_below_class_docstring)
+    #
+    # def test_class_with_no_docstring(self):
+    #     node_class_with_no_docstring = astroid.extract_node(
+    #             u"""
+    #                 class ClassName(dummy_class):
+    #                     def func():
+    #                         \"\"\"This is a docstring.\"\"\"
+    #                         a = b + c
+    #             """)
+    #
+    #     with self.checker_test_object.assertNoMessages():
+    #         self.checker_test_object.checker.visit_classdef(
+    #             node_class_with_no_docstring)
+    #
+    # def test_inline_comment_after_class_docstring(self):
+    #     node_inline_comment_after_class_docstring = astroid.extract_node(
+    #             u"""
+    #                 class ClassName(dummy_class):
+    #                     \"\"\"This is a docstring.\"\"\"
+    #                     # This is a comment.
+    #                     def func():
+    #                         a = 1 + 2
+    #             """)
+    #
+    #     message = testutils.Message(
+    #         msg_id='newline-below-class-docstring',
+    #         node=node_inline_comment_after_class_docstring)
+    #
+    #     with self.checker_test_object.assertAddsMessages(message):
+    #         self.checker_test_object.checker.visit_classdef(
+    #             node_inline_comment_after_class_docstring)
 
     def test_single_newline_below_class_docstring(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        node_with_no_error_message = astroid.extract_node(
+            u"""
+                class ClassName(): #@
+                    \"\"\"This is a docstring.\"\"\"
 
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a multiline.
-                        docstring.
-                        \"\"\"
-
-                        a = 1 + 2
-
-
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-                        # This is a comment.
-                        def func():
-                            a = 1 + 2
-
-
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-                        @staticmethod
-                        def func():
-                            a = 1 + 2
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
+                    a = b + c
+            """
+        )
 
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_classdef(
+                node_with_no_error_message)

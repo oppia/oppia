@@ -21,6 +21,7 @@ presubmit checks.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import linecache
 import os
 import re
 import sys
@@ -1738,7 +1739,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
 class NewlineBelowClassDocstring(checkers.BaseChecker):
     """Checks if there is a single newline below the class docstring."""
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'newline-below-class-docstring'
     priority = -1
     msgs = {
@@ -1749,69 +1750,30 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
+    def visit_classdef(self, node):
         """Process a module to ensure that there is a single newline below
         class docstring.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-
-        in_class = False
-        in_docstring = False
-        class_has_docstring = False
-        file_content = read_from_node(node)
-        blank_line_counter = 0
-        prev_line = ''
-
-        for line_num, line in enumerate(file_content):
-            line = file_content[line_num].strip()
-
-            if line_num > 0:
-                prev_line = file_content[line_num - 1].strip()
-
-            # Checks if it is a docstring and not some multi-line string.
-            if prev_line.startswith(b'class ') or in_class:
-                in_class = True
-                # Check if a class has docstring or not.
-                if prev_line.endswith(b'):'):
-                    in_class = False
-                    if line.startswith(b'"""'):
-                        in_docstring = True
-                        class_has_docstring = True
-
-            # This line is checking if docstring ends.
-            if line.endswith(b'"""'):
-                in_docstring = False
-                in_class = False
-                continue
-
-            # Checks if we are in a docstring.
-            if in_docstring:
-                continue
-
-            if class_has_docstring:
-                # This line is counting the empty lines.
-                if file_content[line_num] == b'\n':
-                    blank_line_counter += 1
-
-                # Checks if we reached to a non-empty line. If that's true it
-                # sets the variable blank_line_counter to zero and sets the
-                # variable class_has_docstring to false so that we can skip
-                # further lines until we find a next class.
-                elif (
-                        blank_line_counter == 1 and
-                        file_content[line_num] != b'\n'):
-                    blank_line_counter = 0
-                    class_has_docstring = False
-
-                # This line checks if there is no newline or more than one
-                # newline below the class docstring.
-                elif blank_line_counter != 1:
-                    class_has_docstring = False
-                    blank_line_counter = 0
-                    self.add_message(
-                        'newline-below-class-docstring', line=line_num + 1)
+        if node.doc:
+            doc_length = len(node.doc.split('\n'))
+            lineno = node.fromlineno + doc_length + 1
+            line = linecache.getline(node.root().file, lineno).strip()
+            next_line = linecache.getline(node.root().file, lineno + 1).strip()
+            python_utils.PRINT('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
+            python_utils.PRINT(line)
+            python_utils.PRINT(next_line)
+            python_utils.PRINT('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
+            if line != '':
+                self.add_message(
+                    'newline-below-class-docstring',
+                    node=node)
+            elif next_line == '':
+                self.add_message(
+                    'newline-below-class-docstring',
+                    node=node)
 
 
 def register(linter):

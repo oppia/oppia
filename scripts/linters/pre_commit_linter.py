@@ -548,16 +548,16 @@ def main(args=None):
     for task in tasks_third_party:
         semaphore.acquire()
         _get_task_output(lint_messages, task, semaphore)
-
-    lint_messages += codeowner_linter.check_codeowner_file(
-        FILE_CACHE, verbose_mode_enabled)
-
-    lint_messages += (
-        third_party_typings_linter.check_third_party_libs_type_defs(
-            verbose_mode_enabled))
-
-    lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
-        FILE_CACHE, verbose_mode_enabled)
+    #
+    # lint_messages += codeowner_linter.check_codeowner_file(
+    #     FILE_CACHE, verbose_mode_enabled)
+    #
+    # lint_messages += (
+    #     third_party_typings_linter.check_third_party_libs_type_defs(
+    #         verbose_mode_enabled))
+    #
+    # lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
+    #     FILE_CACHE, verbose_mode_enabled)
 
     _print_complete_summary_of_lint_messages(lint_messages)
 
