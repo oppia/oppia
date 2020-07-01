@@ -32,11 +32,14 @@ import { IGraphBackendDict } from
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { IGraphInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('GraphInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
   let validatorService: GraphInputValidationService;
-  let currentState: string, customizationArguments: any;
+  let currentState: string;
+  let customizationArguments: IGraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
@@ -77,6 +80,21 @@ describe('GraphInputValidationService', () => {
       },
       canEditVertexLabel: {
         value: false
+      },
+      canMoveVertex: {
+        value: false
+      },
+      canDeleteVertex: {
+        value: false
+      },
+      canDeleteEdge: {
+        value: false
+      },
+      canAddVertex: {
+        value: false
+      },
+      canAddEdge: {
+        value: false
       }
     };
 
@@ -113,6 +131,9 @@ describe('GraphInputValidationService', () => {
   it('should expect graph and edit customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        // TS ignore is used because we are assigning no customization
+        // args here to test errors.
+        // @ts-ignore
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have properties: ' +

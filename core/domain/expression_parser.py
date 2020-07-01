@@ -32,26 +32,35 @@ It uses the following grammar in Backus-Naur form:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import re
 import string
 
+from constants import constants
 import python_utils
 
-_GREEK_LETTERS = [
-    'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta',
-    'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'pi', 'rho', 'sigma', 'tau',
-    'upsilon', 'phi', 'chi', 'psi', 'omega', 'Gamma', 'Delta', 'Theta',
-    'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Psi', 'Omega']
 _MATH_FUNCTION_NAMES = [
     'log', 'ln', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
     'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
-_VALID_OPERATORS = ['[', '{', '(', ')', '}', ']', '+', '-', '/', '*', '^']
-VALID_ALGEBRAIC_IDENTIFIERS = list(string.ascii_letters) + _GREEK_LETTERS
+_OPENING_PARENS = ['[', '{', '(']
+_CLOSING_PARENS = [')', '}', ']']
+_VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
+VALID_ALGEBRAIC_IDENTIFIERS = (
+    list(string.ascii_letters) + constants.GREEK_LETTERS)
 
 _TOKEN_CATEGORY_IDENTIFIER = 'identifier'
 _TOKEN_CATEGORY_FUNCTION = 'function'
 _TOKEN_CATEGORY_NUMBER = 'number'
 _TOKEN_CATEGORY_OPERATOR = 'operator'
+
+_OPENING_CATEGORIES = (
+    _TOKEN_CATEGORY_IDENTIFIER,
+    _TOKEN_CATEGORY_FUNCTION,
+    _TOKEN_CATEGORY_NUMBER)
+
+_CLOSING_CATEGORIES = (
+    _TOKEN_CATEGORY_IDENTIFIER,
+    _TOKEN_CATEGORY_NUMBER)
 
 
 def contains_balanced_brackets(expression):
@@ -61,8 +70,7 @@ def contains_balanced_brackets(expression):
         expression: str. A math expression (algebraic/numeric).
 
     Returns:
-        bool. Whether the given expression contains a balanced
-            bracket sequence.
+        bool. Whether the given expression contains a balanced bracket sequence.
     """
     openers, closers = '({[', ')}]'
     stack = []
@@ -86,8 +94,8 @@ def is_algebraic(expression):
         expression: str. A math expression.
 
     Returns:
-        bool. Whether the given expression contains at least one single
-            latin letter or greek symbol name.
+        bool. Whether the given expression contains at least one single latin
+        letter or greek symbol name.
 
     Raises:
         Exception: Invalid syntax.
@@ -110,17 +118,38 @@ def tokenize(expression):
 
     Returns:
         list(Token). A list containing token objects formed from the given math
-            expression.
+        expression.
 
     Raises:
-        Exception: Invalid syntax: Unexpected token present in the expression.
+        Exception: Invalid token.
     """
     expression = expression.replace(' ', '')
 
-    re_string = r'([a-zA-Z]+|[0-9]+\.[0-9]+|[0-9]+|[%s])' % '\\'.join(
-        _VALID_OPERATORS)
+    # Note: Greek letters and math functions are sorted in reverse by length so
+    # that longer ones get matched before shorter ones.
+    # For eg. 'x + epsilon' should be tokenized as ['x','+','epsilon'] and not
+    # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
+    re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
+        '|'.join(sorted(
+            constants.GREEK_LETTERS + _MATH_FUNCTION_NAMES,
+            reverse=True, key=len)),
+        '\\'.join(_VALID_OPERATORS))
 
     token_texts = re.findall(re_string, expression)
+
+    # There is a possibility that the regex string skips past an invalid
+    # character. In that case, we must raise an error and display the invalid
+    # character. The invalid character is the one who's frequency in the
+    # original expression does not match with the frequency in the tokenized
+    # expression. The counter is being used to verify that frequencies match.
+    original_exp_frequency = collections.Counter(expression)
+    tokenized_exp_frequency = collections.Counter(''.join(token_texts))
+
+    for character in original_exp_frequency:
+        if original_exp_frequency[
+                character] != tokenized_exp_frequency[character]:
+            raise Exception('Invalid token: %s.' % character)
+
     token_list = []
     for token_text in token_texts:
         # Replacing all parens with '(' or ')' for simplicity while parsing.
@@ -131,11 +160,26 @@ def tokenize(expression):
         else:
             token_list.append(Token(token_text))
 
-    if sum([len(token.text) for token in token_list]) != len(expression):
-        raise Exception(
-            'Invalid syntax: Unexpected token present in the expression.')
+    # Adding '*' sign after identifiers, numbers and closing brackets if they
+    # are not followed by a valid operator.
+    final_token_list = []
+    for i in python_utils.RANGE(len(token_list)):
+        final_token_list.append(token_list[i])
+        if i != len(token_list) - 1:
+            # If a closing term is directly followed by another closing term,
+            # instead of being followed by an operator, we assume that the
+            # operation to be performed is multiplication and insert a '*' sign
+            # to explicitly denote the operation. For eg. 'ab+x' would be
+            # transformed into 'a*b+x'.
+            if ((
+                    token_list[i].category in _CLOSING_CATEGORIES or
+                    token_list[i].text in _CLOSING_PARENS) and
+                    (
+                        token_list[i + 1].category in _OPENING_CATEGORIES or
+                        token_list[i + 1].text in _OPENING_PARENS)):
+                final_token_list.append(Token('*'))
 
-    return token_list
+    return final_token_list
 
 
 class Token(python_utils.OBJECT):
@@ -361,8 +405,7 @@ class Parser(python_utils.OBJECT):
 
     def parse(self, expression):
         """A wrapper around the _parse_expr method. This method creates a list
-        of tokens present in the expression and checks if all tokens have been
-        consumed by the _parse_expr method.
+        of tokens present in the expression and calls the _parse_expr method.
 
         Args:
             expression: str. String representing the math expression.
@@ -390,11 +433,7 @@ class Parser(python_utils.OBJECT):
         # reset to 0.
         self._next_token_index = 0
 
-        parsed_expr = self._parse_expr(token_list)
-        if self._next_token_index < len(token_list):
-            raise Exception('Invalid syntax: Unexpected end of expression.')
-
-        return parsed_expr
+        return self._parse_expr(token_list)
 
     def _parse_expr(self, token_list):
         """Function representing the following production rule of the grammar:
@@ -539,8 +578,8 @@ class Parser(python_utils.OBJECT):
 
         Returns:
             Token|None. Token at the next position. Returns None if there are no
-                more tokens left or the next token text is not in the
-                allowed_token_texts.
+            more tokens left or the next token text is not in the
+            allowed_token_texts.
         """
         if self._next_token_index < len(token_list):
             text = token_list[self._next_token_index].text
