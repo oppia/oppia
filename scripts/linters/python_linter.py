@@ -508,7 +508,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pylint_error_messages = (
                     self._get_trimmed_error_messages(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
-                python_utils.PRINT(summary_message)
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
                 any_errors = True
 
             current_batch_start_index = current_batch_end_index

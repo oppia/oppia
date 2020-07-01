@@ -60,33 +60,31 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         return self.files_to_lint
 
     @staticmethod
-    def _get_trimmed_error_messages(lint_messages):
+    def _get_trimmed_error_messages(css_lint_output):
         """Remove extra bits from stylelint error messages.
 
         Args:
-            lint_messages: str. Messages returned by the css linter.
+            css_lint_output: str. Output returned by the css linter.
 
         Returns:
             str. A string with the trimmed error messages.
         """
-        error_messages = ''
+        error_messages = []
         # We need to extract messages from the list and split them line by
         # line so we can loop through them.
-        messages = lint_messages.split('\n')
-        for message in messages:
-            # Stylelint messages start with line numbers and then a
-            # cross(x) and a message-id in the end. We are matching
-            # if the line contains line number becuase every message start with
-            # num:num and we are matching it with regex and if that is True then
-            # we are removing cross(x) which is at the index 1 and message-id
-            # from the end.
-            if re.search(r'^\d+:\d+', message.lstrip()):
-                message_list = message.split()
-                new_message = ' '.join(
-                    message_list[:1] + message_list[2:-1])
-            else:
-                new_message = message
-            error_messages += new_message + '\n'
+        css_output_lines = css_lint_output.split('\n')
+        for line in css_output_lines:
+            # Stylelint messages starts with line numbers and then a
+            # "x"(\u2716) and a message-id in the end. We are capturing these
+            # and then replacing them with empty string('').
+            if re.search(r'^\d+:\d+', line.lstrip()):
+                caputure_x = re.search(r'\u2716', line).group(0)
+                capture_message_id = re.search(r'(\w+-\w+-*)+', line).group(0)
+                python_utils.PRINT(caputure_x)
+                python_utils.PRINT(capture_message_id)
+            # else:
+            #     new_message = line
+            # error_messages += new_message + '\n'
         return error_messages
 
     def _lint_css_files(self):
