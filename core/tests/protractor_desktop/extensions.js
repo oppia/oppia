@@ -40,10 +40,10 @@ describe('rich-text components', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display correctly', async function() {
+  it('should display simple rte correctly', async function() {
     await users.createUser(
-      'user@richTextComponents.com', 'userRichTextComponents');
-    await users.login('user@richTextComponents.com');
+      'user@simpleRichTextComponents.com', 'userSimpleRichTextComponents');
+    await users.login('user@simpleRichTextComponents.com');
 
     await workflow.createExploration();
 
@@ -55,18 +55,6 @@ describe('rich-text components', function() {
       await richTextEditor.addRteComponent('Math', 'abc');
       await richTextEditor.addRteComponent(
         'Video', 'M7lc1UVf-VE', 10, 100, false);
-      // We put these last as otherwise Protractor sometimes fails to scroll to
-      // and click on them.
-      await richTextEditor.addRteComponent(
-        'Collapsible', 'title', await forms.toRichText('inner'));
-      await richTextEditor.addRteComponent('Tabs', [{
-        title: 'title 1',
-        content: await forms.toRichText('contents 1')
-      }, {
-        title: 'title 1',
-        content: await forms.toRichText('contents 2')
-      }]);
-      await richTextEditor.addRteComponent('Svgdiagram');
     });
 
     await explorationEditorPage.navigateToPreviewTab();
@@ -80,6 +68,36 @@ describe('rich-text components', function() {
         await richTextChecker.readRteComponent('Math', 'abc');
         await richTextChecker.readRteComponent(
           'Video', 'M7lc1UVf-VE', 10, 100, false);
+      });
+
+    await explorationEditorPage.discardChanges();
+    await users.logout();
+  });
+
+  it('should display rte correctly', async function() {
+    await users.createUser(
+      'user@richTextComponents.com', 'userRichTextComponents');
+    await users.login('user@richTextComponents.com');
+
+    await workflow.createExploration();
+
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.addRteComponent(
+        'Collapsible', 'title', await forms.toRichText('inner'));
+      await richTextEditor.addRteComponent('Tabs', [{
+        title: 'title 1',
+        content: await forms.toRichText('contents 1')
+      }, {
+        title: 'title 1',
+        content: await forms.toRichText('contents 2')
+      }]);
+      await richTextEditor.addRteComponent('Svgdiagram', 'rectangle');
+    });
+
+    await explorationEditorPage.navigateToPreviewTab();
+
+    await explorationPlayerPage.expectContentToMatch(
+      async function(richTextChecker) {
         await richTextChecker.readRteComponent(
           'Collapsible', 'title', await forms.toRichText('inner'));
         await richTextChecker.readRteComponent('Tabs', [{
@@ -89,12 +107,14 @@ describe('rich-text components', function() {
           title: 'title 1',
           content: await forms.toRichText('contents 2')
         }]);
-        await richTextChecker.readRteComponent('Svgdiagram');
+        await richTextChecker.readRteComponent('Svgdiagram', 'rectangle');
       });
 
     await explorationEditorPage.discardChanges();
     await users.logout();
   });
+
+
 
   // TODO(Jacob): Add in a test for the use of rich text inside collapsibles
   // and tabs. Previous attempts at such a test intermittently fail with the

@@ -19,8 +19,8 @@
                 tooltip-placement="left" uib-tooltip="Pencil" ng-disabled="!$ctrl.isPencilEnabled()">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                ng-click="$ctrl.createLine()"
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
+                ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createLine()"
                 tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-slash" style="font-size: 19px;"></i>
         </button>
@@ -29,13 +29,13 @@
                 tooltip-placement="left" uib-tooltip="Rectangle" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="far fa-square"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                ng-click="$ctrl.createCircle()"
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-circle"
+                ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createCircle()"
                 tooltip-placement="right" uib-tooltip="Circle" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="far fa-circle"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                ng-click="$ctrl.createText()"
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-text"
+                ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createText()"
                 tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-font"></i>
         </button>
