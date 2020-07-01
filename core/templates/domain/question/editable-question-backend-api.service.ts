@@ -41,13 +41,33 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
         skillIds, skillDifficulties,
-        questionDict, successCallback, errorCallback) {
+        questionDict, imagesData, successCallback, errorCallback) {
       var postData = {
         question_dict: questionDict,
         skill_ids: skillIds,
         skill_difficulties: skillDifficulties
       };
-      $http.post(QUESTION_CREATION_URL, postData).then(function(response) {
+      let body = new FormData();
+      body.append('payload', JSON.stringify(postData));
+      let filenames = imagesData.map(obj => obj.filename);
+      let imageBlobs = imagesData.map(obj => obj.imageBlob);
+      for (let idx in imageBlobs) {
+        body.append(filenames[idx], imageBlobs[idx]);
+      }
+      $http.post(QUESTION_CREATION_URL, (body), {
+        // The actual header to be added for form-data is 'multipart/form-data',
+        // But adding it manually won't work because we will miss the boundary
+        // parameter. When we keep 'Content-Type' as undefined the browser
+        // automatically fills the boundary parameter according to the form
+        // data. Refer https://stackoverflow.com/questions/37039852/. and
+        // https://stackoverflow.com/questions/34983071/.
+        // Note: This should be removed and a convetion similar to
+        // SkillCreationBackendApiService should be followed once this service
+        // is migrated to Angular 8.
+        headers: {
+          'Content-Type': undefined
+        }
+      }).then(function(response) {
         var questionId = response.data.question_id;
         if (successCallback) {
           successCallback(questionId);
@@ -156,10 +176,11 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
     };
 
     return {
-      createQuestion: function(skillIds, skillDifficulties, questionDict) {
+      createQuestion: function(
+          skillIds, skillDifficulties, questionDict, imagesData) {
         return $q(function(resolve, reject) {
           _createQuestion(skillIds, skillDifficulties,
-            questionDict, resolve, reject);
+            questionDict, imagesData, resolve, reject);
         });
       },
 

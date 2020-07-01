@@ -34,7 +34,7 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
-  // Viewing roles can be done by two methods: 1. By roles 2. By username
+  // Viewing roles can be done by two methods: 1. By roles 2. By username.
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
   var roleUsernameOption = element(by.css(
@@ -94,7 +94,7 @@ var AdminPage = function() {
         var title = await getExplorationTitleElement(explorationElement)
           .getText();
 
-        // We use match here in case there is whitespace around the name
+        // We use match here in case there is whitespace around the name.
         if (title.match(name)) {
           await getExplorationElementReloadButton(explorationElement).click();
           await general.acceptAlert();
@@ -140,10 +140,14 @@ var AdminPage = function() {
     await this.get();
     await configTab.click();
     await waitFor.elementToBeClickable(saveAllConfigs);
-    var results = await configProperties.map(async function(x) {
-      return await saveConfigProperty(
-        x, propertyName, objectType, editingInstructions);
-    });
+
+    const results = [];
+    for (let configProperty of (await configProperties)) {
+      results.push(
+        await saveConfigProperty(
+          configProperty, propertyName, objectType, editingInstructions)
+      );
+    }
     var success = null;
     for (var i = 0; i < results.length; i++) {
       success = success || results[i];

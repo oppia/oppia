@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import html_validation_service
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -210,7 +211,7 @@ class SubtopicPage(python_utils.OBJECT):
 
         Returns:
             SubtopicPage. A subtopic object with given id, topic_id and default
-                page contents field.
+            page contents field.
         """
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
@@ -218,6 +219,30 @@ class SubtopicPage(python_utils.OBJECT):
             SubtopicPageContents.create_default_subtopic_page_contents(),
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
+
+    @classmethod
+    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
+        """Converts v1 SubtopicPage Contents schema to the v2 schema.
+        v2 schema introduces the new schema for Math components.
+
+        Args:
+            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+                domain object.
+
+        Returns:
+            dict. The converted page_contents_dict.
+        """
+        page_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                page_contents_dict['written_translations'],
+                html_validation_service.
+                add_math_content_to_math_rte_components))
+        page_contents_dict['subtitled_html']['html'] = (
+            html_validation_service.
+            add_math_content_to_math_rte_components(
+                page_contents_dict['subtitled_html']['html']))
+        return page_contents_dict
 
     @classmethod
     def update_page_contents_from_model(
@@ -265,7 +290,7 @@ class SubtopicPage(python_utils.OBJECT):
 
         Args:
             new_page_contents_audio: RecordedVoiceovers. The new audio for
-            the subtopic page.
+                the subtopic page.
         """
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 

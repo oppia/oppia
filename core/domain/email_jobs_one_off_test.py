@@ -57,7 +57,7 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
 
             Returns:
                 str. Empty if recipient_id is 'recipient_id2', None if
-                    'recipient_id1' and 'Email Hash' otherwise.
+                'recipient_id1' and 'Email Hash' otherwise.
             """
 
             if recipient_id == 'recipient_id1':

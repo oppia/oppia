@@ -27,13 +27,13 @@ describe('AudioLanguage object factory', () => {
     audioLanguage = alof.createFromDict({
       id: 'a',
       description: 'a description',
-      relatedLanguages: 'English',
+      relatedLanguages: ['English'],
     });
   });
 
   it('should set attributes correctly', () => {
     expect(audioLanguage.id).toEqual('a');
     expect(audioLanguage.description).toEqual('a description');
-    expect(audioLanguage.relatedLanguages).toEqual('English');
+    expect(audioLanguage.relatedLanguages).toEqual(['English']);
   });
 });

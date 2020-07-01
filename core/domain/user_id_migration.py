@@ -405,7 +405,7 @@ class SnapshotsContentUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             rights_snapshot_model: TopicRightsSnapshotContentModel. The model
-            that contains the old user IDs.
+                that contains the old user IDs.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **rights_snapshot_model.content)
