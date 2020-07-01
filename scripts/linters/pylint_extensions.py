@@ -1762,10 +1762,6 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
             lineno = node.fromlineno + doc_length + 1
             line = linecache.getline(node.root().file, lineno).strip()
             next_line = linecache.getline(node.root().file, lineno + 1).strip()
-            python_utils.PRINT('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
-            python_utils.PRINT(line)
-            python_utils.PRINT(next_line)
-            python_utils.PRINT('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
             if line != '':
                 self.add_message(
                     'newline-below-class-docstring',

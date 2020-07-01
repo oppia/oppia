@@ -2601,80 +2601,78 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
             pylint_extensions.NewlineBelowClassDocstring)
         self.checker_test_object.setup_method()
 
-    # def test_no_newline_below_class_docstring(self):
-    #     node_no_newline_below_class_docstring = astroid.extract_node(
-    #             u"""
-    #                 class ClassName(dummy_class):
-    #                     \"\"\"This is a docstring.\"\"\"
-    #                     a = 1 + 2
-    #             """)
-    #
-    #     message = testutils.Message(
-    #         msg_id='newline-below-class-docstring',
-    #         node=node_no_newline_below_class_docstring)
-    #
-    #     with self.checker_test_object.assertAddsMessages(message):
-    #         self.checker_test_object.checker.visit_classdef(
-    #             node_no_newline_below_class_docstring)
-    #
-    # def test_excessive_newline_below_class_docstring(self):
-    #     node_excessive_newline_below_class_docstring = astroid.extract_node(
-    #             u"""
-    #                 class ClassName(dummy_class):
-    #                     \"\"\"This is a docstring.\"\"\"
-    #
-    #
-    #                     a = 1 + 2
-    #             """)
-    #
-    #     message = testutils.Message(
-    #         msg_id='newline-below-class-docstring',
-    #         node=node_excessive_newline_below_class_docstring)
-    #
-    #     with self.checker_test_object.assertAddsMessages(message):
-    #         self.checker_test_object.checker.visit_classdef(
-    #             node_excessive_newline_below_class_docstring)
-    #
-    # def test_class_with_no_docstring(self):
-    #     node_class_with_no_docstring = astroid.extract_node(
-    #             u"""
-    #                 class ClassName(dummy_class):
-    #                     def func():
-    #                         \"\"\"This is a docstring.\"\"\"
-    #                         a = b + c
-    #             """)
-    #
-    #     with self.checker_test_object.assertNoMessages():
-    #         self.checker_test_object.checker.visit_classdef(
-    #             node_class_with_no_docstring)
-    #
-    # def test_inline_comment_after_class_docstring(self):
-    #     node_inline_comment_after_class_docstring = astroid.extract_node(
-    #             u"""
-    #                 class ClassName(dummy_class):
-    #                     \"\"\"This is a docstring.\"\"\"
-    #                     # This is a comment.
-    #                     def func():
-    #                         a = 1 + 2
-    #             """)
-    #
-    #     message = testutils.Message(
-    #         msg_id='newline-below-class-docstring',
-    #         node=node_inline_comment_after_class_docstring)
-    #
-    #     with self.checker_test_object.assertAddsMessages(message):
-    #         self.checker_test_object.checker.visit_classdef(
-    #             node_inline_comment_after_class_docstring)
+    def test_no_newline_below_class_docstring(self):
+        node_no_newline_below_class_docstring = astroid.extract_node(
+                u"""
+                    class ClassName(dummy_class): #@
+                        \"\"\"This is a docstring.\"\"\"
+                        a = 1 + 2
+                """)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_no_newline_below_class_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_classdef(
+                node_no_newline_below_class_docstring)
+
+    def test_excessive_newline_below_class_docstring(self):
+        node_excessive_newline_below_class_docstring = astroid.extract_node(
+                u"""
+                    class ClassName(dummy_class): #@
+                        \"\"\"This is a docstring.\"\"\"
+
+
+                        a = 1 + 2
+                """)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_excessive_newline_below_class_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_classdef(
+                node_excessive_newline_below_class_docstring)
+
+    def test_class_with_no_docstring(self):
+        node_class_with_no_docstring = astroid.extract_node(
+                u"""
+                    class ClassName(dummy_class): #@
+                        def func():
+                            \"\"\"This is a docstring.\"\"\"
+                            a = b + c
+                """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_classdef(
+                node_class_with_no_docstring)
+
+    def test_inline_comment_after_class_docstring(self):
+        node_inline_comment_after_class_docstring = astroid.extract_node(
+                u"""
+                    class ClassName(dummy_class): #@
+                        \"\"\"This is a docstring.\"\"\"
+                        # This is a comment.
+                        def func():
+                            a = 1 + 2
+                """)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_inline_comment_after_class_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_classdef(
+                node_inline_comment_after_class_docstring)
 
     def test_single_newline_below_class_docstring(self):
-        node_with_no_error_message = astroid.extract_node(
-            u"""
-                class ClassName(): #@
-                    \"\"\"This is a docstring.\"\"\"
+        node_with_no_error_message = astroid.extract_node("""
+        class ClassName(base): #@
+            \"\"\"This is a docstring.\"\"\"
 
-                    a = b + c
-            """
-        )
+            a = b + c
+        """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_classdef(
