@@ -65,19 +65,13 @@ def run_lighthouse_checks():
 
 def enable_webpages():
     """Enables deactivated webpages for testing."""
-    python_utils.PRINT(feconf.COMMUNITY_DASHBOARD_ENABLED)
-    # with swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
     pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
     replace = 'COMMUNITY_DASHBOARD_ENABLED = True'
     common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
-    python_utils.PRINT(feconf.COMMUNITY_DASHBOARD_ENABLED)
-    # constants.ENABLE_ACCOUNT_DELETION = True
 
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": true,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
-    # python_utils.PRINT(constants.ENABLE_ACCOUNT_DELETION)
-    # python_utils.PRINT("Community dashboard and Account Deletion Pages Enabled")
 
 
 def main():
