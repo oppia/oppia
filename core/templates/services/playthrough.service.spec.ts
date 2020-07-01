@@ -37,6 +37,20 @@ describe('PlaythroughService', () => {
   let playthroughService: PlaythroughService = null;
   let stopwatchObjectFactory: StopwatchObjectFactory = null;
 
+  // NOTE TO DEVELOPERS: For the following 3 "record" functions, it is the test
+  // writer's responsibility to create a "sensible" set of transitions.
+  // Specifically, avoid adding holes and otherwise impossible transitions
+  // unless that is being explicitly tested. For example:
+  //
+  //      recordStateTransitions(['A', 'B']);
+  //      recordStateTransitions(['F', 'G']); // Wrong, next should be 'B'.
+  //
+  //      recordCycle(['A', 'B', 'C'], 3); // Final position is at 'A'.
+  //      recordStateTransitions(['C', 'D', 'E']); // Wrong, next should be 'A'.
+  //
+  //      recordIncorrectAnswers('A', 3); // Final position is at 'A'.
+  //      recordStateTransitions(['C', 'D', 'E']); // Wrong, next should be 'A'.
+
   const recordStateTransitions = (stateNames: string[]) => {
     for (let i = 0; i < stateNames.length - 1; ++i) {
       playthroughService.recordAnswerSubmitAction(
