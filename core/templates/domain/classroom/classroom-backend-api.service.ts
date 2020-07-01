@@ -92,13 +92,13 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomData(classroomName: string): Promise<Object> {
+  fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
     });
   }
 
-  fetchClassroomPageIsShownStatus(): Promise<Object> {
+  fetchClassroomPageIsShownStatus(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomPageIsShownStatus(resolve, reject);
     });

@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { CollectionCreationBackendService, ICollectionCreationResponse } from
+import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -58,7 +58,7 @@ export class CollectionCreationService {
     this.loaderService.showLoadingScreen('Creating collection');
 
     this.collectionCreationBackendService.createCollection()
-      .then((response: ICollectionCreationResponse) => {
+      .then(response => {
         this.siteAnalyticsService.registerCreateNewCollectionEvent(
           response.collectionId);
 
