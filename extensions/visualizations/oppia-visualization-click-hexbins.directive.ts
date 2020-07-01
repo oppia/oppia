@@ -37,6 +37,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
     function(
         $scope, AssetsBackendApiService, ContextService,
         ImagePreloaderService) {
+      console.log('brianrodri: yo.');
       $scope.tooltipVisibility = 'hidden';
       $scope.tooltipLeft = 0;
       $scope.tooltipTop = 0;
@@ -69,6 +70,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
       };
 
       this.$onInit = () => {
+        console.log('brianrodri: ' + JSON.stringify($scope.interactionArgs));
         const imagePath = (
           $scope.interactionArgs.imageAndRegions.value.imagePath);
         const { height, width } = (

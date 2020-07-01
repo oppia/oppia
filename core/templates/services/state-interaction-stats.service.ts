@@ -47,7 +47,7 @@ interface IVisualizationInfo {
   };
 }
 
-export interface IStateRulesStats {
+export interface IStateInteractionStats {
   explorationId: string;
   stateName: string;
   visualizationsInfo: IVisualizationInfo[];
@@ -56,7 +56,7 @@ export interface IStateRulesStats {
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  statsCache: Map<string, Promise<IStateRulesStats>> = new Map();
+  statsCache: Map<string, Promise<IStateInteractionStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
@@ -95,8 +95,8 @@ export class StateInteractionStatsService {
         state.interaction.id));
 
     const statsPromise = this.stateInteractionStatsBackendApiService.getStats(
-      explorationId, state.name).then(vizInfo => <IStateRulesStats> {
-        explorationId: explorationId,
+      expId, state.name).then(vizInfo => <IStateInteractionStats> {
+        explorationId: expId,
         stateName: state.name,
         visualizationsInfo: vizInfo.map(info => <IVisualizationInfo> ({
           addressedInfoIsSupported: info.addressedInfoIsSupported,
