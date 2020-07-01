@@ -50,7 +50,11 @@ angular.module('oppia').component('positionOfTermsEditor', {
       }];
 
       ctrl.localValue = ctrl.positionOfTerms[2];
-      ctrl.value = ctrl.localValue;
+      for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
+        if (ctrl.positionOfTerms[i].name === ctrl.value) {
+          ctrl.localValue = ctrl.positionOfTerms[i];
+        }
+      }
     };
   }]
 });

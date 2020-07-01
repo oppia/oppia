@@ -46,6 +46,7 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
       StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
+    ContextService.setQuestionPlayerIsOpen();
     var _explorationId = ContextService.getExplorationId();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var version = UrlService.getExplorationVersionFromUrl();
@@ -187,6 +188,9 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       },
       getExplorationVersion: function() {
         return version;
+      },
+      clearQuestions: function() {
+        questions = [];
       },
       getLanguageCode: function() {
         return questions[currentIndex].getLanguageCode();
