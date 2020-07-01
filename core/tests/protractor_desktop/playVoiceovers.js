@@ -54,15 +54,8 @@ describe('Voiceover player', function() {
     await workflow.createExploration();
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorMainTab.setStateName('First');
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
-      await richTextEditor.appendPlainText('This is the first card.');
-      await richTextEditor.addRteComponent('Math', 'abc');
-    });
-    await explorationEditorMainTab.expectContentToMatch(
-      async function(richTextChecker) {
-        await richTextChecker.readPlainText('This is the first card.');
-        await richTextChecker.readRteComponent('Math', 'abc');
-      });
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'This is the first card.'));
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();

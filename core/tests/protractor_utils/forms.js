@@ -248,8 +248,8 @@ var RichTextEditor = async function(elem) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      await ((await richTextComponents.getComponent(componentName))
-        .customizeComponent.apply(null, args));
+      await richTextComponents.getComponent(componentName)
+        .customizeComponent.apply(null, args);
       var doneButton = await modal.element(
         by.css(
           '.protractor-test-close-rich-text-component-editor'));
