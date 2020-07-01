@@ -417,7 +417,11 @@ def categorize_files(file_paths):
 
 
 def _print_summary_of_error_messages(lint_messages):
-    """Print summary of linter error messages."""
+    """Print summary of linter error messages.
+
+    Args:
+        lint_messages: list(str). List of linter error messages.
+    """
     if lint_messages != '':
         python_utils.PRINT('Please fix errors below:')
         python_utils.PRINT('----------------------------------------')
@@ -565,8 +569,6 @@ def main(args=None):
 
     lint_messages += webpack_config_linter.check_webpack_config_file(
         FILE_CACHE, verbose_mode_enabled)
-
-    _print_complete_summary_of_lint_messages(lint_messages)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:

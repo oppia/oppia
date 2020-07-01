@@ -1145,8 +1145,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         for line in eslint_output_lines:
             # ESlint messages start with line numbers and then a
-            # cross(x) and a message-id in the end. We are matching
-            # if the line contains line number becuase every message start with
+            # "x" and a message-id in the end. We are matching
+            # if the line contains line number because every message start with
             # num:num where num is of type int and we are matching it with regex
             # and if that is True then we are replacing "error" with empty
             # string('') which is at the index 1 and message-id from the end.
@@ -1209,7 +1209,10 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for error in result_list:
                 python_utils.PRINT(error)
-            eslint_messages = self._get_trimmed_error_messages(result_list[0])
+            # Extracting eslint output from index 0 because all error messages
+            # are present at the 0th index.
+            eslint_output = result_list[0]
+            eslint_messages = self._get_trimmed_error_messages(eslint_output)
             summary_messages.append(eslint_messages)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (

@@ -49,15 +49,15 @@ import pycodestyle # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class PylintReport(python_utils.OBJECT):
-    """Output stream for pylint."""
+class StringMessageStream(python_utils.OBJECT):
+    """Save and return output stream of pylint"""
 
     def __init__(self):
-        """Constructs a PylintReport object."""
+        """Constructs a StringMessageStream object."""
         self.messages = []
 
     def write(self, message):
-        """Write method for pylint.
+        """Writes the given message to messages list.
 
         Args:
             message: str. Message returned by the pylinter.
@@ -65,7 +65,11 @@ class PylintReport(python_utils.OBJECT):
         self.messages.append(message)
 
     def read(self):
-        """Read method for pylint."""
+        """Returns the pylint messages as a list.
+
+        Returns:
+        list(str). Returns the pylint messages list.
+        """
         return self.messages
 
 
@@ -351,24 +355,30 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         Returns:
             str. A string with the trimmed error messages.
         """
-        error_messages = ''
+        error_messages = []
         # Remove newlines and coverage report from the end of message.
-        # we need to remove last five items from the list becuase starting from
-        # end we have three lines with just newline characters, fourth line
+        # we need to remove last five items from the list because starting fromjjj
+        # end we have three lines with empty string(''), fourth line
         # contains the coverage report i.e.
         # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
         # and one line with dashes(---).
-        lint_messages = lint_messages[:-5]
+        python_utils.PRINT(lint_messages)
+        newlines_present = lint_messages[-1] == '\n' and (
+            lint_messages[-2] == '\n' and lint_messages[-4] == '\n')
+        coverage_present = re.search(
+            r'previous run: \d+.\d+/\d+,', lint_messages[-3])
+        dashes_present = re.search(r'-+', lint_messages[-5])
+        if newlines_present and coverage_present and dashes_present:
+            lint_messages = lint_messages[:-5]
         for message in lint_messages:
             # Every pylint message has a message id inside the brackets
-            # so we need to check if it is true and if case is true then
-            # remove the message-id from the end of original message.
+            # we are removing them here.
             if message.endswith(')'):
-                last_string_length = len(message.split()[-1])
-                error_messages += message[:-last_string_length]
+                message_id = re.search(r'\((\w+-*)+\)$', message).group(0)
+                error_messages.append(message.replace(message_id, ''))
             else:
-                error_messages += message
-        return error_messages
+                error_messages.append(message)
+        return '\n'.join(error_messages) + '\n'
 
     def _lint_py_files(self, config_pylint, config_pycodestyle):
         """Prints a list of lint errors in the given list of Python files.
@@ -408,7 +418,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             with linter_utils.redirect_stdout(stdout):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
-                pylint_report = PylintReport()
+                pylint_report = StringMessageStream()
                 pylinter = lint.Run(
                     current_files_to_lint + [config_pylint],
                     reporter=text.TextReporter(pylint_report),
@@ -497,7 +507,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
                 python_utils.PRINT('Messages for Python 3 support:')
-                pylint_report = PylintReport()
+                pylint_report = StringMessageStream()
                 pylinter_for_python3 = lint.Run(
                     current_files_to_lint + ['--py3k'],
                     reporter=text.TextReporter(pylint_report),
