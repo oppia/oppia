@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview About page component.
+ * @fileoverview Component for the about page.
  */
 
 import { Component, OnInit } from '@angular/core';
@@ -112,7 +112,7 @@ export class AboutPageComponent implements OnInit {
       .slice(0, this.listOfNamesToThank.length - 1).join(', ') +
       ' & ' + this.listOfNamesToThank[this.listOfNamesToThank.length - 1];
     this.aboutPageMascotImgUrl = this.urlInterpolationService
-      .getStaticImageUrl('/general/about_page_mascot.png');
+      .getStaticImageUrl('/general/about_page_mascot.webp');
 
     this.windowRef.nativeWindow.onhashchange = () => {
       const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);

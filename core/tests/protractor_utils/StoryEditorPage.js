@@ -128,14 +128,14 @@ var StoryEditorPage = function() {
     return await workflow.getImageSource(chapterThumbnailImageElement);
   };
 
-  this.submitStoryThumbnail = async function(imgPath) {
+  this.submitStoryThumbnail = async function(imgPath, resetExistingImage) {
     return await workflow.submitImage(
-      storyThumbnailButton, thumbnailContainer, imgPath);
+      storyThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
-  this.submitChapterThumbnail = async function(imgPath) {
+  this.submitChapterThumbnail = async function(imgPath, resetExistingImage) {
     return await workflow.submitImage(
-      chapterThumbnailButton, thumbnailContainer, imgPath);
+      chapterThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
   this.publishStory = async function() {
@@ -282,7 +282,7 @@ var StoryEditorPage = function() {
   };
 
   this.changeNodeDescription = async function(nodeDescription) {
-    // scrollToTop is added to prevent nodeDescriptionInputField from
+    // Function scrollToTop is added to prevent nodeDescriptionInputField from
     // being hidden by the navbar.
     await general.scrollToTop();
     await waitFor.visibilityOf(
@@ -315,7 +315,7 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterByIndex = async function(index) {
-    // scrollToTop is added to prevent chapterTitles from being hidden
+    // Function scrollToTop is added to prevent chapterTitles from being hidden
     // by the navbar.
     await general.scrollToTop();
     var chapterTitleButton = await chapterTitles.get(index);

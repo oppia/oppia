@@ -20,7 +20,7 @@
 var waitFor = require('./waitFor.js');
 
 var LearnerDashboardPage = function() {
-  var LEARNER_DASHBOARD_URL = '/learner_dashboard';
+  var LEARNER_DASHBOARD_URL = '/learner-dashboard';
   var completedSection =
     element(by.css('.protractor-test-completed-section'));
   var playLaterSection =
@@ -139,7 +139,7 @@ var LearnerDashboardPage = function() {
 
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
     // This explorationTitleArray is an Array but it will have only one element
-    // that is the exploration with the title passed as a parameter
+    // that is the exploration with the title passed as a parameter.
     var explorationTitle = element(
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
     expect(await explorationTitle.getText()).toMatch(title);

@@ -26,16 +26,16 @@ require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal', 'HtmlEscaperService',
-  'UrlInterpolationService', 'ENABLE_LITERALLY_CANVAS_EDITOR',
+  'UrlInterpolationService', 'ENABLE_SVG_EDITOR_RTE',
   'INLINE_RTE_COMPONENTS', 'RTE_COMPONENT_SPECS', function(
       $document, $log, $uibModal, HtmlEscaperService,
-      UrlInterpolationService, ENABLE_LITERALLY_CANVAS_EDITOR,
+      UrlInterpolationService, ENABLE_SVG_EDITOR_RTE,
       INLINE_RTE_COMPONENTS, RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
       if (componentId === 'Svgdiagram') {
-        if (!ENABLE_LITERALLY_CANVAS_EDITOR) {
+        if (!ENABLE_SVG_EDITOR_RTE) {
           return;
         }
       }

@@ -114,7 +114,7 @@ describe('TranslatePipe', () => {
 // Adding the following three lines for reference.
 // I18n_t_2: 'Hello <[val]>',
 // I18n_rogue_1: '<script>alert(\'Oppia\');</script>Hello',
-// I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'
+// I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'.
 @Component({
   /* eslint-disable max-len */
   // eslint-disable-next-line no-multi-str, angular/no-inline-template

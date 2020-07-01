@@ -129,7 +129,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             ).then(function() {
               var successToast = 'Topic published.';
               if (redirectToDashboard) {
-                $window.location = '/topics_and_skills_dashboard';
+                $window.location = '/topics-and-skills-dashboard';
               }
               AlertsService.addSuccessMessage(
                 successToast, 1000);
@@ -138,6 +138,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
+            $scope.discardChangesButtonIsShown = false;
             TopicEditorStateService.loadTopic($scope.topicId);
           };
 
@@ -164,6 +165,11 @@ angular.module('oppia').directive('topicEditorNavbar', [
             var prepublishValidationIssuesCount = (
               $scope.prepublishValidationIssues.length);
             return validationIssuesCount + prepublishValidationIssuesCount;
+          };
+
+          $scope.toggleDiscardChangeButton = function() {
+            $scope.discardChangesButtonIsShown = (
+              !$scope.discardChangesButtonIsShown);
           };
 
           $scope.saveChanges = function() {
@@ -201,6 +207,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $scope.topicId = UrlService.getTopicIdFromUrl();
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicSkillIds = $scope.topic.getSkillIds();
+            $scope.discardChangesButtonIsShown = false;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             $scope.topicRights = TopicEditorStateService.getTopicRights();

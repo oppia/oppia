@@ -16,17 +16,16 @@
  * @fileoverview Controller for the topics list viewer.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller');
 
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
-
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'delete-topic-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ajs.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -96,14 +95,22 @@ angular.module('oppia').directive('topicsList', [
 
           /**
            * @param {String} topicId - ID of the topic.
+           * @param {String} topicName - Name of the topic.
            */
-          ctrl.deleteTopic = function(topicId) {
+          ctrl.deleteTopic = function(topicId, topicName) {
+            ctrl.selectedIndex = null;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-topic-modal.template.html'),
               backdrop: true,
-              controller: 'ConfirmOrCancelModalController'
+              resolve: {
+                topicName: function() {
+                  return topicName;
+                }
+              },
+              windowClass: 'delete-topic-modal',
+              controller: 'DeleteTopicModalController'
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
@@ -120,6 +127,15 @@ angular.module('oppia').directive('topicsList', [
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
+          };
+
+          /**
+           * This function is required to toggle the edit option
+           * box in mobile view.
+           * @param {String} topicId - ID of the topic.
+           */
+          ctrl.toggleEditOptionsInMobileView = function(topicId) {
+            ctrl.selectedIndex = ctrl.selectedIndex ? null : topicId;
           };
 
           ctrl.$onInit = function() {

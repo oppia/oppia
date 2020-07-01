@@ -30,4 +30,3 @@ export class SuggestionsService {
 angular.module('oppia').factory(
   'SuggestionsService',
   downgradeInjectable(SuggestionsService));
-
