@@ -24,8 +24,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [CommonModule, BrowserAnimationsModule,
-    MatCardModule, MatButtonModule
+    MatButtonModule, MatCardModule
   ],
-  exports: [BrowserAnimationsModule, MatCardModule, MatButtonModule]
+  exports: [BrowserAnimationsModule, MatButtonModule, MatCardModule]
 })
 export class MaterialModule {}

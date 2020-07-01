@@ -31,7 +31,7 @@ import { TranslatePipe } from 'filters/translate.pipe';
   imports: [CommonModule, MaterialModule],
   declarations: [BackgroundBannerComponent, TranslatePipe],
   entryComponents: [BackgroundBannerComponent],
-  exports: [MaterialModule, BackgroundBannerComponent, TranslatePipe]
+  exports: [BackgroundBannerComponent, MaterialModule, TranslatePipe]
 })
 
 export class SharedComponentsModule { }
