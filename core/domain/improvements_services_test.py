@@ -453,20 +453,17 @@ class PutTasksTests(ImprovementsServicesTestBase):
 
         model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
         self.assertEqual(model.resolver_id, None)
+        self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
 
         task_entry = self._new_resolved_task()
 
-        print(model.last_updated)
-
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks(
                 [task_entry], update_last_updated_time=False)
 
-        print(task_entry.task_id)
         model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
-        print(model.last_updated)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)

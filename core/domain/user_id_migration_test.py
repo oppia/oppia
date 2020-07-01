@@ -1690,7 +1690,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -1736,7 +1735,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -1782,7 +1780,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -1855,7 +1852,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -1889,7 +1885,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         exp_models.ExplorationCommitLogEntryModel(
             id='rights-exp_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             exploration_id='exp_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -1935,7 +1930,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         topic_models.TopicCommitLogEntryModel(
             id='rights-top_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             topic_id='top_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -1979,7 +1973,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         topic_models.TopicCommitLogEntryModel(
             id='rights-top_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             topic_id='top_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2048,7 +2041,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2074,7 +2066,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_2_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2105,7 +2096,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2131,7 +2121,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_2_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2188,7 +2177,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2214,7 +2202,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_2_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2245,7 +2232,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2305,7 +2291,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_1_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
@@ -2331,7 +2316,6 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
         collection_models.CollectionCommitLogEntryModel(
             id='rights-col_2_id-1',
             user_id=self.USER_1_GAE_ID,
-            username='user',
             collection_id='col_1_id',
             commit_type='edit',
             commit_message='commit message 2',
