@@ -64,10 +64,10 @@ class CyclicStateTransitionsTracker {
    *
    *    [ ... , N , ... , N ]
    *
-   * then we update this tracker's latest cycle discovery.
-   *
-   * The cycle is defined as the current path of visited states with all states
-   * prior to the first occurrence of N discarded.
+   * then we update this tracker's latest cycle discovery. The cycle is defined
+   * as the current path of visited states with all states prior to the first
+   * occurrence of N discarded:
+   *    [ ... // N , ... , N ]  =>  [ N , ... , N ]
    *
    * If this *exact* cycle has been discovered before (NOTE: rotations of a
    * cycle are considered to be different from each other), then we increase the
