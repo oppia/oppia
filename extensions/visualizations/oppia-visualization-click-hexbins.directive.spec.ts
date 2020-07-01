@@ -72,8 +72,7 @@ describe('Oppia click hexbins visualization', function() {
     $rootScope.$digest();
   });
 
-  it('should render a single image from the interaction argument', () => {
-    expect(element.map((_, e) => e.innerHTML).toArray())
-      .toEqual([]);
+  it('should have been created', () => {
+    expect(element).toBeDefined();
   });
 });
