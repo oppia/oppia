@@ -15,6 +15,7 @@
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
+
 require('@angular/material/prebuilt-themes/deeppurple-amber.css');
 import 'hammerjs';
 require('app.constants.ajs.ts');
