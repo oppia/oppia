@@ -32,9 +32,3 @@ class TakeoutImage:
     def __init__(self, b64_image_data, image_export_path):
         self.b64_image_data = b64_image_data
         self.image_export_path = image_export_path
-
-    def __eq__(self, other):
-        return (
-            self.b64_image_data == other.b64_image_data and
-            self.image_export_path == other.image_export_path
-        )
