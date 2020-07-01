@@ -21,28 +21,59 @@
 
 module.exports = async(browser, context) => {
   const page = await browser.newPage();
+  const regex_admin = /admin/;
   await page.setDefaultNavigationTimeout(0);
   // eslint-disable-next-line dot-notation
-  await page.goto(context.url);
-  try {
+  console.log(context.url);
     // Sign into Oppia.
-    await page.click('#admin');
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click('#submit-login')
-    ]);
+  if(context.url.includes('admin')) {
+    try {
+      console.log("Logging in")
+      await page.goto(context.url);
+      await page.click('#admin');
+      await Promise.all([
+        page.waitForNavigation(),
+        page.click('#submit-login')
+      ]);
 
-    await page.type('#username', 'username1');
-    await page.click('#terms-checkbox');
-    await page.waitFor(5000);
+      await page.type('#username', 'username1');
+      await page.click('#terms-checkbox');
+      await page.waitFor(5000);
 
-    await Promise.all([
-      page.waitForNavigation(),
-      await page.click('#signup-submit')
-    ]);
-
-    await page.close();
-  } catch (e) {
-    // Logged in.
+      await Promise.all([
+        page.waitForNavigation(),
+        await page.click('#signup-submit')
+      ]);
+      console.log("Succesfully Logged into Oppia")
+    } catch (e) {
+      console.log("Already Logged into Oppia")
+    }
   }
+  else if(context.url.includes('emaildashboard')) {
+    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.waitFor(2000);
+    await page.type('#update-role-username-textbook', 'username1');
+    await page.select('#update-role-input', 'string:ADMIN')
+    await page.waitFor(5000);
+    await page.click('#update-button-id');
+    await page.waitFor(2000);
+    console.log("succesfully changed roles to Admin")
+  }
+  else if(context.url.includes('collection/0')) {
+    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.waitFor(2000);
+    await page.type('#update-role-username-textbook', 'username1');
+    await page.select('#update-role-input', 'string:COLLECTION_EDITOR')
+    await page.waitFor(5000);
+    await page.click('#update-button-id');
+    await page.waitFor(2000);
+    console.log("succesfully changed roles to CollectionEditor")
+    // Load in Collection
+    await page.goto('http://127.0.0.1:8181/admin');
+    await page.waitFor(2000);
+    await page.evaluate(`window.confirm = () => true`)
+    await page.click('#reload-collection-button-id');
+    console.log("Succesfully reloaded collection welcome_to_collections.yaml")
+  }
+  await page.close();
 };

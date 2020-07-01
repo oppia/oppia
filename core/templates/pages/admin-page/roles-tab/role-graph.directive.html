@@ -79,7 +79,7 @@
           <div class="d-xl-inline-flex form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.UPDATABLE_ROLES" ng-model="$ctrl.formData.updateRole.newRole" class="form-control protractor-update-form-role-select">
+              <select id="update-role-input" ng-options="roleName as roleString for (roleName, roleString) in $ctrl.UPDATABLE_ROLES" ng-model="$ctrl.formData.updateRole.newRole" class="form-control protractor-update-form-role-select">
               </select>
             </div>
           </div>
@@ -91,7 +91,7 @@
               </select>
             </div>
           </div>
-          <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!$ctrl.formData.updateRole.isValid()" value="update role">Update Role</button>
+          <button id="update-button-id"type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!$ctrl.formData.updateRole.isValid()" value="update role">Update Role</button>
         </form>
       </md-card>
 
