@@ -26,6 +26,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import takeout_service
+from core.domain import takeout_domain
 from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
@@ -607,8 +608,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         # Perform export and compare.
-        observed_data, observed_images = takeout_service.export_data_for_user(
+        user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)
+        observed_data = user_takeout_object.user_data
+        observed_images = user_takeout_object.user_images
         self.assertEqual(expected_data, observed_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
@@ -1001,13 +1004,15 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-        observed_data, observed_images = takeout_service.export_data_for_user(
+        user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)
+        observed_data = user_takeout_object.user_data
+        observed_images = user_takeout_object.user_images
         self.assertEqual(observed_data, expected_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
         self.assertEqual(json.loads(observed_json), json.loads(expected_json))
         expected_images = [
-            (self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
+            takeout_domain.TakeoutImage(self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
         ]
         self.assertEqual(expected_images, observed_images)

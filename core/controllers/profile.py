@@ -372,18 +372,26 @@ class ExportAccountHandler(base.BaseHandler):
         if not constants.ENABLE_ACCOUNT_EXPORT:
             raise self.PageNotFoundException
 
-        user_data, user_images = takeout_service.export_data_for_user(
+        # Retrieve user data.
+        user_takeout_object = takeout_service.export_data_for_user(
             self.user_id)
-        memfile = python_utils.string_io()
+        user_data = user_takeout_object.user_data
+        user_images = user_takeout_object.user_images
+
+        # Create zip file.
+        temp_file = python_utils.string_io()
         with zipfile.ZipFile(
-            memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
             zfile.writestr('oppia_data.json', json.dumps(user_data))
             for image in user_images:
-                image_decoded = base64.b64decode(
-                    python_utils.url_unquote_plus(image[0].split(',')[1]))
-                zfile.writestr('images/' + image[1], image_decoded)
+                b64_png_no_header = image.b64_image_data.split(',')[1]
+                decoded_png = base64.b64decode(
+                    python_utils.url_unquote_plus(b64_png_no_header))
+                zfile.writestr('images/' + image.image_export_path, decoded_png)
+        
+        # Render file for download.
         self.render_downloadable_file(
-            memfile.getvalue(), 'oppia_data.zip', 'text/plain')
+            temp_file.getvalue(), 'oppia_data.zip', 'text/plain')
 
 
 class PendingAccountDeletionPage(base.BaseHandler):

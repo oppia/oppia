@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
+from core.domain import takeout_domain
 from core.platform import models
 
 (
@@ -66,22 +67,27 @@ def export_data_for_user(user_id):
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
         exported_data[final_name] = model.export_data(user_id)
 
-    # Separate out images.
-    image_paths = {
+    # Separate out images. We store the images that need to be separated here
+    # as a dictionary mapping tuples to strings. The tuple value indicates the
+    # "path" to take to the image in the user's data dictionary, and the string
+    # indicates the filename that the exported image will be saved to.
+    image_positions = {
         ('user_settings_data', 'profile_picture_data_url'):
             'user_settings_profile_picture.png'
     }
     image_files = []
-    for image_path in image_paths:
-        # Iterate to the position indicated by the tuple.
-        data_pointer = exported_data
-        for key in image_path[:-1]:
-            data_pointer = data_pointer[key]
-        if data_pointer[image_path[-1]] != None:
-            # Append (original value, desired filename).
-            image_files.append(
-                (data_pointer[image_path[-1]], image_paths[image_path])
-            )
-            data_pointer[image_path[-1]] = image_paths[image_path]
+    for image_position in image_positions:
+        # Move pointer to the position indicated by the tuple.
+        pointer = exported_data
+        for key in image_position[:-1]:
+            pointer = pointer[key]
+        
+        # Swap out data with replacement filename.
+        image_key = image_position[-1]
+        image_data = pointer[image_key]
+        if pointer[image_key] != None:
+            replacement_filename = image_positions[image_position]
+            image_files.append(takeout_domain.TakeoutImage(image_data, replacement_filename))
+            pointer[image_key] = replacement_filename
 
-    return (exported_data, image_files)
+    return takeout_domain.TakeoutExport(exported_data, image_files)
