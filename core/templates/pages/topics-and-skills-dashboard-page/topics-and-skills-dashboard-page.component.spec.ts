@@ -125,7 +125,7 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.skillPageNumber).toEqual(0);
       expect(ctrl.selectedIndex).toEqual(null);
       expect(ctrl.itemsPerPageChoice).toEqual([10, 15, 20]);
-      expect(ctrl.classrooms).toEqual(['All', 'math']);
+      expect(ctrl.classrooms).toEqual(['All', 'Unassigned', 'math']);
       expect(ctrl.filterObject).toEqual(filterObject);
 
       expect(ctrl.sortOptions).toEqual([
