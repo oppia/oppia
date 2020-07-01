@@ -139,4 +139,13 @@ describe('Topics List Directive', function() {
     expect(alertSpy).toHaveBeenCalledWith(
       'There was an error when deleting the topic.');
   });
+
+  it('should toggle the visibility of topic edit box', function() {
+    ctrl.$onInit();
+    expect(ctrl.selectedIndex).toEqual(null);
+    ctrl.toggleEditOptionsInMobileView('1');
+    expect(ctrl.selectedIndex).toEqual('1');
+    ctrl.toggleEditOptionsInMobileView('1');
+    expect(ctrl.selectedIndex).toEqual(null);
+  });
 });

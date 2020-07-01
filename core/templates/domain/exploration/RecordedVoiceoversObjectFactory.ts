@@ -25,9 +25,11 @@ export interface IRecordedVoiceOverBackendDict {
 }
 
 export interface IVoiceoverMapping {
-  [propName: string]: {
-    [propName: string]: Voiceover
-  }
+  [propName: string]: IBindableVoiceovers;
+}
+
+export interface IBindableVoiceovers {
+  [propName: string]: Voiceover;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -49,7 +51,7 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string): {[propName: string]: Voiceover} {
+  getBindableVoiceovers(contentId: string): IBindableVoiceovers {
     return this.voiceoversMapping[contentId];
   }
 
