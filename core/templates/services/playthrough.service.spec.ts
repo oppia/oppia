@@ -26,7 +26,7 @@ import { LearnerActionObjectFactory } from
 import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PlaythroughBackendApiService } from
-  'services/playthrough-backend-api.service';
+  'domain/statistics/playthrough-backend-api.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 
@@ -73,7 +73,7 @@ describe('PlaythroughService', () => {
       }
     };
 
-    this.mockExplorationTimer = (durationInSecs: number) => {
+    this.mockTimedExplorationDurationInSecs = (durationInSecs: number) => {
       const mockStopwatch = jasmine.createSpyObj('Stopwatch', {
         getTimeInSecs: durationInSecs,
         reset: null,
@@ -107,7 +107,7 @@ describe('PlaythroughService', () => {
       });
 
       it('should stop recording actions after exploration quit', () => {
-        this.mockExplorationTimer(70);
+        this.mockTimedExplorationDurationInSecs(70);
         playthroughService.recordExplorationStartAction('A');
         playthroughService.recordAnswerSubmitAction(
           'A', 'B', 'TextInput', 'Hello', 'Wrong!', 30);
@@ -125,7 +125,7 @@ describe('PlaythroughService', () => {
 
         expect(playthroughService.getPlaythrough()).not.toBeNull();
         expect(playthroughService.getPlaythrough().actions).toEqual([
-          learnerActionObjectFactory.createExplorationStartAction({
+          learnerActionObjectFactory.createNewExplorationStartAction({
             state_name: {value: 'A'}
           }),
           learnerActionObjectFactory.createAnswerSubmitAction({
@@ -136,7 +136,7 @@ describe('PlaythroughService', () => {
             feedback: {value: 'Wrong!'},
             time_spent_state_in_msecs: {value: 30000},
           }),
-          learnerActionObjectFactory.createExplorationQuitAction({
+          learnerActionObjectFactory.createNewExplorationQuitAction({
             state_name: {value: 'B'},
             time_spent_in_state_in_msecs: {value: 40000},
           }),
@@ -147,7 +147,7 @@ describe('PlaythroughService', () => {
         const backendApiStorePlaythroughSpy = (
           spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
-        this.mockExplorationTimer(60);
+        this.mockTimedExplorationDurationInSecs(60);
         playthroughService.recordExplorationStartAction('A');
         playthroughService.storePlaythrough();
 
@@ -172,7 +172,7 @@ describe('PlaythroughService', () => {
 
     describe('Issue identification', () => {
       it('should return null issue if playthrough has no problems', () => {
-        this.mockExplorationTimer(400);
+        this.mockTimedExplorationDurationInSecs(400);
         playthroughService.recordExplorationStartAction('A');
         this.recordStateTransitions(['A', 'B', 'C']);
         playthroughService.recordExplorationQuitAction('C', 60);
@@ -184,7 +184,7 @@ describe('PlaythroughService', () => {
       });
 
       it('should identify multiple incorrect submissions', () => {
-        this.mockExplorationTimer(400);
+        this.mockTimedExplorationDurationInSecs(400);
         playthroughService.recordExplorationStartAction('A');
         this.recordIncorrectAnswers('A', 5);
         playthroughService.recordExplorationQuitAction('A', 60);
@@ -199,7 +199,7 @@ describe('PlaythroughService', () => {
 
       it('should return null if state with multiple incorrect submissions is ' +
         'eventually completed', () => {
-        this.mockExplorationTimer(400);
+        this.mockTimedExplorationDurationInSecs(400);
         playthroughService.recordExplorationStartAction('A');
         this.recordIncorrectAnswers('A', 5);
         this.recordStateTransitions(['A', 'B', 'C']);
@@ -211,7 +211,7 @@ describe('PlaythroughService', () => {
       });
 
       it('should identify cyclic state transitions', () => {
-        this.mockExplorationTimer(400);
+        this.mockTimedExplorationDurationInSecs(400);
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle(['A', 'B', 'C'], 3);
         playthroughService.recordExplorationQuitAction('A', 30);
@@ -224,7 +224,7 @@ describe('PlaythroughService', () => {
       });
 
       it('should identify early quits', () => {
-        this.mockExplorationTimer(60);
+        this.mockTimedExplorationDurationInSecs(60);
         playthroughService.recordExplorationStartAction('A');
         this.recordIncorrectAnswers('A', 1);
         playthroughService.recordExplorationQuitAction('A', 20);
@@ -240,7 +240,7 @@ describe('PlaythroughService', () => {
 
     describe('Types of cycles', () => {
       beforeEach(() => {
-        this.mockExplorationTimer(400);
+        this.mockTimedExplorationDurationInSecs(400);
       });
 
       it('should identify p-shaped cyclic state transitions with cyclic ' +
@@ -333,7 +333,7 @@ describe('PlaythroughService', () => {
       it('should be able to identify the outer-cycle of nested cycles', () => {
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle(['A', 'B'], 2);
-        this.recordCycle(['A', /* inner-cycle: CDC. */ 'C', 'D', 'C', 'B'], 1);
+        this.recordCycle(['A', /* Inner-cycle: CDC. */ 'C', 'D', 'C', 'B'], 1);
         playthroughService.recordExplorationQuitAction('A', 60);
 
         const playthrough = playthroughService.getPlaythrough();
@@ -395,7 +395,7 @@ describe('PlaythroughService', () => {
     describe('Issue prioritization', () => {
       it('should prioritize multiple incorrect submissions over cyclic state ' +
         'transitions and early quit', () => {
-        this.mockExplorationTimer(50);
+        this.mockTimedExplorationDurationInSecs(50);
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle(['A', 'B'], 3);
         this.recordIncorrectAnswers('A', 5);
@@ -407,7 +407,7 @@ describe('PlaythroughService', () => {
 
       it('should prioritize multiple incorrect submissions over early quit',
         () => {
-          this.mockExplorationTimer(50);
+          this.mockTimedExplorationDurationInSecs(50);
           playthroughService.recordExplorationStartAction('A');
           this.recordIncorrectAnswers('A', 5);
           playthroughService.recordExplorationQuitAction('A', 10);
@@ -417,7 +417,7 @@ describe('PlaythroughService', () => {
         });
 
       it('should prioritize cyclic state transitions over early quit', () => {
-        this.mockExplorationTimer(50);
+        this.mockTimedExplorationDurationInSecs(50);
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle(['A', 'B'], 3);
         playthroughService.recordExplorationQuitAction('A', 10);
@@ -432,7 +432,7 @@ describe('PlaythroughService', () => {
         const backendApiStorePlaythroughSpy = (
           spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
-        this.mockExplorationTimer(40);
+        this.mockTimedExplorationDurationInSecs(40);
         playthroughService.recordExplorationStartAction('A');
         this.recordIncorrectAnswers('A', 5);
         playthroughService.recordExplorationQuitAction('A', 10);
@@ -448,7 +448,7 @@ describe('PlaythroughService', () => {
           const backendApiStorePlaythroughSpy = (
             spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
-          this.mockExplorationTimer(60);
+          this.mockTimedExplorationDurationInSecs(60);
           playthroughService.recordExplorationStartAction('A');
           playthroughService.recordExplorationQuitAction('A', 60);
           playthroughService.storePlaythrough();
@@ -470,7 +470,7 @@ describe('PlaythroughService', () => {
 
       playthroughService.initSession('expId', 1, 1.0);
 
-      this.mockExplorationTimer(400);
+      this.mockTimedExplorationDurationInSecs(400);
       playthroughService.recordExplorationStartAction('A');
       this.recordIncorrectAnswers('A', 5);
       playthroughService.recordExplorationQuitAction('A', 10);
@@ -489,7 +489,7 @@ describe('PlaythroughService', () => {
       const sampleSizePopulationProportion = 0.6;
       spyOn(Math, 'random').and.returnValue(0.9); // Not in sample population.
 
-      this.mockExplorationTimer(400);
+      this.mockTimedExplorationDurationInSecs(400);
       playthroughService.initSession(
         'expId', 1, sampleSizePopulationProportion);
       playthroughService.recordExplorationStartAction('A');

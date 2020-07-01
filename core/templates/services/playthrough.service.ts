@@ -32,7 +32,7 @@ import {
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughBackendApiService } from
-  'services/playthrough-backend-api.service';
+  'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
@@ -69,14 +69,14 @@ class MultipleIncorrectAnswersTracker {
 
 class CyclicStateTransitionsTracker {
   private currStateName: string;
-  private visitedStates: Set<string>;
+  private visitedStates: string[];
   // Maps [fromState, destState] to their number of occurrences. Map is kept in
   // insertion-order (most recent appears at the end).
   private stateRegressionOccurrences: Map<string[], number>;
 
   constructor(initStateName: string) {
     this.currStateName = initStateName;
-    this.visitedStates = new Set([initStateName]);
+    this.visitedStates = [initStateName];
     this.stateRegressionOccurrences = new Map();
   }
 
@@ -84,8 +84,8 @@ class CyclicStateTransitionsTracker {
     if (this.currStateName === destStateName) {
       return;
     }
-    if (!this.visitedStates.has(destStateName)) {
-      this.visitedStates.add(destStateName);
+    if (!this.visitedStates.includes(destStateName)) {
+      this.visitedStates.push(destStateName);
     } else {
       const newStateRegression = [this.currStateName, destStateName];
       const stateRegressionOccurrences = (
@@ -249,7 +249,7 @@ export class PlaythroughService {
     }
 
     const explorationStartAction = (
-      this.learnerActionObjectFactory.createExplorationStartAction({
+      this.learnerActionObjectFactory.createNewExplorationStartAction({
         state_name: {value: initStateName}
       }));
     this.playthrough = this.playthroughObjectFactory.createNew(
@@ -301,7 +301,7 @@ export class PlaythroughService {
     this.eqTracker.recordExplorationQuit(stateName, this.expDurationInSecs);
 
     const explorationQuitAction = (
-      this.learnerActionObjectFactory.createExplorationQuitAction({
+      this.learnerActionObjectFactory.createNewExplorationQuitAction({
         state_name: {value: stateName},
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
@@ -318,7 +318,7 @@ export class PlaythroughService {
         this.isLearnerJustBrowsing()) {
       return;
     }
-    this.playthroughBackendApiService.storePlaythrough(this.playthrough);
+    this.playthroughBackendApiService.storePlaythrough(this.playthrough, 1);
   }
 }
 

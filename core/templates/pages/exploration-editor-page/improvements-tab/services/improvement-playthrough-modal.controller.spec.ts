@@ -59,10 +59,10 @@ describe('Improvement Playthough Modal Controller', function() {
     'per block', function() {
     beforeEach(() => {
       playthoughActions = [
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name1'}
         }),
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name2'}
         }),
       ];
@@ -136,22 +136,22 @@ describe('Improvement Playthough Modal Controller', function() {
   'per block', function() {
     beforeEach(function() {
       playthoughActions = [
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name1'}
         }),
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name2'}
         }),
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name3'}
         }),
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name4'}
         }),
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name5'}
         }),
-        learnerActionObjectFactory.createExplorationStartAction({
+        learnerActionObjectFactory.createNewExplorationStartAction({
           state_name: {value: 'state_name6'}
         }),
       ];

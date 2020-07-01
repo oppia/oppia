@@ -39,12 +39,6 @@ module.exports = function(config) {
       // unknown reason.
       'core/templates/combined-tests.spec.ts',
       {
-        pattern: 'third_party/static/literallycanvas-0.5.2/lib/img/*.png',
-        watched: false,
-        served: true,
-        included: false
-      },
-      {
         pattern: 'extensions/**/*.png',
         watched: false,
         served: true,
@@ -71,7 +65,6 @@ module.exports = function(config) {
       // We access files directly in our code, for example /folder/,
       // so we need to proxy the requests from /folder/ to /base/folder/.
       '/assets/': '/base/assets/',
-      '/third_party/': '/base/third_party',
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
@@ -139,7 +132,7 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
-      // ngHtml2JsPreprocessor adds the html inside $templateCache,
+      // Key ngHtml2JsPreprocessor adds the html inside $templateCache,
       // the key that we use for that cache needs to be exactly the same as
       // the templateUrl in directive JS. The stripPrefix and prependPrefix are
       // used for modifying the $templateCache keys.
@@ -176,7 +169,7 @@ module.exports = function(config) {
               {
                 loader: 'ts-loader',
                 options: {
-                  // this is needed for thread-loader to work correctly
+                  // This is needed for thread-loader to work correctly.
                   happyPackMode: true
                 }
               },

@@ -18,123 +18,257 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ILearnerActionBackendDict, LearnerActionObjectFactory } from
+import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants';
 
 describe('Learner Action Object Factory', () => {
-  // TODO(#9311): Assign to "this" once we can use TestBed.inject to keep type
-  // information.
-  let learnerActionObjectFactory: LearnerActionObjectFactory;
+  var learnerActionObjectFactory: LearnerActionObjectFactory;
 
   beforeEach(() => {
-    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
+    TestBed.configureTestingModule({
+      providers: [LearnerActionObjectFactory]
+    });
+
+    learnerActionObjectFactory =
+      TestBed.get(LearnerActionObjectFactory);
+    this.LEARNER_ACTION_SCHEMA_LATEST_VERSION =
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
   });
 
-  it('should throw for invalid schema versions', () => {
-    expect(
-      () => learnerActionObjectFactory.createFromBackendDict({
-        action_type: 'ExplorationStart',
-        action_customization_args: {
-          state_name: {value: 'Hola'},
+  it('should create a new learner action', () => {
+    var answerSubmitlearnerActionObject =
+      learnerActionObjectFactory.createNewAnswerSubmitAction({
+        state_name: {
+          value: 'state'
         },
-        schema_version: -1,
-      })).toThrowError('given invalid schema version');
+        dest_state_name: {
+          value: 'dest_state'
+        },
+        interaction_id: {
+          value: 'interaction_id'
+        },
+        submitted_answer: {
+          value: 'answer'
+        },
+        feedback: {
+          value: 'feedback'
+        },
+        time_spent_state_in_msecs: {
+          value: 2
+        }
+      });
+    var explorationStartlearnerActionObject =
+      learnerActionObjectFactory.createNewExplorationStartAction({
+        state_name: {
+          value: 'state'
+        }
+      });
+    var explorationQuitlearnerActionObject =
+      learnerActionObjectFactory.createNewExplorationQuitAction({
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_state_in_msecs: {
+          value: 2
+        }
+      });
+
+    expect(answerSubmitlearnerActionObject.actionType).toEqual('AnswerSubmit');
+    expect(answerSubmitlearnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state'
+      },
+      dest_state_name: {
+        value: 'dest_state'
+      },
+      interaction_id: {
+        value: 'interaction_id'
+      },
+      submitted_answer: {
+        value: 'answer'
+      },
+      feedback: {
+        value: 'feedback'
+      },
+      time_spent_state_in_msecs: {
+        value: 2
+      }
+    });
+    expect(answerSubmitlearnerActionObject.schemaVersion)
+      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(explorationStartlearnerActionObject.actionType).toEqual(
+      'ExplorationStart');
+    expect(
+      explorationStartlearnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state'
+      }
+    });
+    expect(explorationStartlearnerActionObject.schemaVersion)
+      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(explorationQuitlearnerActionObject.actionType).toEqual(
+      'ExplorationQuit');
+    expect(
+      explorationQuitlearnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state'
+      },
+      time_spent_in_state_in_msecs: {
+        value: 2
+      }
+    });
+    expect(explorationQuitlearnerActionObject.schemaVersion)
+      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   });
 
-  it('should return a backend dict equivalent to input', () => {
-    const explorationStartActionBackendDict: ILearnerActionBackendDict = {
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {value: 'Hola'},
+  it('should throw if the schema version is not a positive int', () => {
+    var LearnerActionObjectFactoryLocalReference =
+        learnerActionObjectFactory;
+
+    expect(() => {
+      return LearnerActionObjectFactoryLocalReference.
+        createNewAnswerSubmitAction({
+          state_name: {
+            value: 'state'
+          },
+          dest_state_name: {
+            value: 'dest_state'
+          },
+          interaction_id: {
+            value: 'interaction_id'
+          },
+          submitted_answer: {
+            value: 'answer'
+          },
+          feedback: {
+            value: 'feedback'
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
+        }, -1);
+    }).toThrowError('given invalid schema version');
+  });
+
+  it('should use a specific schema version if provided', () => {
+    var learnerActionObject =
+        learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {
+            value: 'state'
+          },
+          dest_state_name: {
+            value: 'dest_state'
+          },
+          interaction_id: {
+            value: 'interaction_id'
+          },
+          submitted_answer: {
+            value: 'answer'
+          },
+          feedback: {
+            value: 'feedback'
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
+        }, 99);
+
+    expect(learnerActionObject.schemaVersion).toEqual(99);
+  });
+
+  it('should create a new learner action from a backend dict', () => {
+    var learnerActionObject =
+        learnerActionObjectFactory.createFromBackendDict({
+          action_type: 'ExplorationQuit',
+          action_customization_args: {
+            state_name: {
+              value: 'state'
+            },
+            time_spent_in_state_in_msecs: {
+              value: 2
+            }
+          },
+          schema_version: 1
+        });
+
+    expect(learnerActionObject.actionType).toEqual('ExplorationQuit');
+    expect(learnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state'
       },
-      schema_version: 1,
-    };
-    const explorationQuitActionBackendDict: ILearnerActionBackendDict = {
-      action_type: 'ExplorationQuit',
-      action_customization_args: {
-        state_name: {value: 'End'},
-        time_spent_in_state_in_msecs: {value: 13000},
-      },
-      schema_version: 1,
-    };
-    const answerSubmitActionBackendDict: ILearnerActionBackendDict = {
+      time_spent_in_state_in_msecs: {
+        value: 2
+      }
+    });
+    expect(learnerActionObject.schemaVersion).toEqual(1);
+  });
+
+  it('should convert a learner action to a backend dict', () => {
+    var learnerActionObject =
+        learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {
+            value: 'state'
+          },
+          dest_state_name: {
+            value: 'dest_state'
+          },
+          interaction_id: {
+            value: 'interaction_id'
+          },
+          submitted_answer: {
+            value: 'answer'
+          },
+          feedback: {
+            value: 'feedback'
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
+        }, 1);
+
+    var learnerActionDict = learnerActionObject.toBackendDict();
+    expect(learnerActionDict).toEqual({
       action_type: 'AnswerSubmit',
       action_customization_args: {
-        state_name: {value: 'Hola'},
-        dest_state_name: {value: 'Adios'},
-        interaction_id: {value: 'TextInput'},
-        submitted_answer: {value: 'Hi'},
-        feedback: {value: 'Correct!'},
-        time_spent_state_in_msecs: {value: 3.5},
+        state_name: {
+          value: 'state'
+        },
+        dest_state_name: {
+          value: 'dest_state'
+        },
+        interaction_id: {
+          value: 'interaction_id'
+        },
+        submitted_answer: {
+          value: 'answer'
+        },
+        feedback: {
+          value: 'feedback'
+        },
+        time_spent_state_in_msecs: {
+          value: 2
+        }
       },
-      schema_version: 1,
+      schema_version: 1
+    });
+  });
+
+  it('should throw error on invalid backend dict', () => {
+    const playthroughDict = {
+      action_type: 'InvalidAction',
+      action_customization_args: {},
+      schema_version: 1
     };
 
-    expect(
-      learnerActionObjectFactory.createFromBackendDict(
-        explorationStartActionBackendDict).toBackendDict())
-      .toEqual(
-        explorationStartActionBackendDict);
-    expect(
-      learnerActionObjectFactory.createFromBackendDict(
-        explorationQuitActionBackendDict).toBackendDict())
-      .toEqual(
-        explorationQuitActionBackendDict);
-    expect(
-      learnerActionObjectFactory.createFromBackendDict(
-        answerSubmitActionBackendDict).toBackendDict())
-      .toEqual(
-        answerSubmitActionBackendDict);
-  });
-
-  it('should create a new exploration start action', () => {
-    const learnerAction = (
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'Hola'},
-      }));
-
-    expect(learnerAction.actionType).toEqual('ExplorationStart');
-    expect(learnerAction.actionCustomizationArgs).toEqual({
-      state_name: {value: 'Hola'},
-    });
-    expect(learnerAction.schemaVersion).toEqual(1);
-  });
-
-  it('should create a new answer submit action', () => {
-    const learnerAction = (
-      learnerActionObjectFactory.createAnswerSubmitAction({
-        state_name: {value: 'Hola'},
-        dest_state_name: {value: 'Adios'},
-        interaction_id: {value: 'TextInput'},
-        submitted_answer: {value: 'Hi'},
-        feedback: {value: 'Correct!'},
-        time_spent_state_in_msecs: {value: 3.5},
-      }));
-
-    expect(learnerAction.actionType).toEqual('AnswerSubmit');
-    expect(learnerAction.actionCustomizationArgs).toEqual({
-      state_name: {value: 'Hola'},
-      dest_state_name: {value: 'Adios'},
-      interaction_id: {value: 'TextInput'},
-      submitted_answer: {value: 'Hi'},
-      feedback: {value: 'Correct!'},
-      time_spent_state_in_msecs: {value: 3.5},
-    });
-    expect(learnerAction.schemaVersion).toEqual(1);
-  });
-
-  it('should create a new exploration quit action', () => {
-    const learnerAction = (
-      learnerActionObjectFactory.createExplorationQuitAction({
-        state_name: {value: 'Adios'},
-        time_spent_in_state_in_msecs: {value: 300},
-      }));
-
-    expect(learnerAction.actionType).toEqual('ExplorationQuit');
-    expect(learnerAction.actionCustomizationArgs).toEqual({
-      state_name: {value: 'Adios'},
-      time_spent_in_state_in_msecs: {value: 300},
-    });
-    expect(learnerAction.schemaVersion).toEqual(1);
+    expect(() => {
+      // TS ignore is used because playthrough dict is assigned a invalid type
+      // to test errors.
+      // @ts-ignore
+      learnerActionObjectFactory.createFromBackendDict(playthroughDict);
+    }).toThrowError(
+      'Backend dict does not match any known action type: ' +
+      JSON.stringify(playthroughDict));
   });
 });

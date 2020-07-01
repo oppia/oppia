@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AppConstants } from 'app.constants';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
 
@@ -42,69 +41,143 @@ export interface IExplorationQuitCustomizationArgs {
   'time_spent_in_state_in_msecs': {value: number};
 }
 
-export type ILearnerActionCustomizationArgs = (
-  IExplorationStartCustomizationArgs |
-  IAnswerSubmitCustomizationArgs |
-  IExplorationQuitCustomizationArgs);
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This type takes one of the values of the above customization args based
+// on the type of ActionType.
+type ActionCustomizationArgs<ActionType> = (
+  ActionType extends 'ExplorationStart' ?
+  IExplorationStartCustomizationArgs :
+  ActionType extends 'AnswerSubmit' ? IAnswerSubmitCustomizationArgs :
+  ActionType extends 'ExplorationQuit' ?
+  IExplorationQuitCustomizationArgs : never);
 
-export interface ILearnerActionBackendDict {
-  'action_type': string;
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This interface takes the type of backend dict according to the ActionType
+// parameter.
+interface ILearnerActionBackendDictBase<ActionType> {
+  'action_type': ActionType;
+  'action_customization_args': ActionCustomizationArgs<ActionType>;
   'schema_version': number;
-  'action_customization_args': ILearnerActionCustomizationArgs;
 }
 
-export class LearnerAction {
+export type IExplorationStartLearnerActionBackendDict = (
+  ILearnerActionBackendDictBase<'ExplorationStart'>);
+
+export type IAnswerSubmitLearnerActionBackendDict = (
+  ILearnerActionBackendDictBase<'AnswerSubmit'>);
+
+export type IExplorationQuitLearnerActionBackendDict = (
+  ILearnerActionBackendDictBase<'ExplorationQuit'>);
+
+export type ILearnerActionBackendDict = (
+  IExplorationStartLearnerActionBackendDict |
+  IAnswerSubmitLearnerActionBackendDict |
+  IExplorationQuitLearnerActionBackendDict);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This class takes the type according to the ActionType parameter.
+class LearnerActionBase<ActionType> {
   constructor(
-      public actionType: string,
-      public schemaVersion: number,
-      public actionCustomizationArgs: ILearnerActionCustomizationArgs) {
-    if (this.schemaVersion < 1) {
+      public readonly actionType: ActionType,
+      public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
+      public schemaVersion: number) {
+    if (schemaVersion < 1) {
       throw new Error('given invalid schema version');
     }
   }
 
-  toBackendDict(): ILearnerActionBackendDict {
+  toBackendDict(): ILearnerActionBackendDictBase<ActionType> {
     return {
       action_type: this.actionType,
-      schema_version: this.schemaVersion,
       action_customization_args: this.actionCustomizationArgs,
+      schema_version: this.schemaVersion,
     };
   }
 }
+
+export class ExplorationStartLearnerAction extends
+  LearnerActionBase<'ExplorationStart'> {}
+
+export class AnswerSubmitLearnerAction extends
+  LearnerActionBase<'AnswerSubmit'> {}
+
+export class ExplorationQuitLearnerAction extends
+  LearnerActionBase<'ExplorationQuit'> {}
+
+export type LearnerAction = (
+  ExplorationStartLearnerAction |
+  AnswerSubmitLearnerAction |
+  ExplorationQuitLearnerAction);
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerActionObjectFactory {
-  createFromBackendDict(backendDict: ILearnerActionBackendDict): LearnerAction {
-    return new LearnerAction(
-      backendDict.action_type,
-      backendDict.schema_version,
-      backendDict.action_customization_args);
+  createNewExplorationStartAction(
+      actionCustomizationArgs: IExplorationStartCustomizationArgs,
+      schemaVersion?: number): ExplorationStartLearnerAction {
+    schemaVersion = schemaVersion ||
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    return new ExplorationStartLearnerAction(
+      'ExplorationStart', actionCustomizationArgs, schemaVersion);
   }
 
-  createExplorationStartAction(
-      customizationArgs: IExplorationStartCustomizationArgs): LearnerAction {
-    return new LearnerAction(
-      AppConstants.ACTION_TYPE_EXPLORATION_START,
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION,
-      customizationArgs);
+  createNewAnswerSubmitAction(
+      actionCustomizationArgs: IAnswerSubmitCustomizationArgs,
+      schemaVersion?: number): AnswerSubmitLearnerAction {
+    schemaVersion = schemaVersion ||
+    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    return new AnswerSubmitLearnerAction(
+      'AnswerSubmit', actionCustomizationArgs, schemaVersion);
   }
 
-  createAnswerSubmitAction(
-      customizationArgs: IAnswerSubmitCustomizationArgs): LearnerAction {
-    return new LearnerAction(
-      AppConstants.ACTION_TYPE_ANSWER_SUBMIT,
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION,
-      customizationArgs);
+  createNewExplorationQuitAction(
+      actionCustomizationArgs: IExplorationQuitCustomizationArgs,
+      schemaVersion?: number): ExplorationQuitLearnerAction {
+    schemaVersion = schemaVersion ||
+    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    return new ExplorationQuitLearnerAction(
+      'ExplorationQuit', actionCustomizationArgs, schemaVersion);
   }
 
-  createExplorationQuitAction(
-      customizationArgs: IExplorationQuitCustomizationArgs): LearnerAction {
-    return new LearnerAction(
-      AppConstants.ACTION_TYPE_EXPLORATION_QUIT,
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION,
-      customizationArgs);
+  /**
+   * @typedef LearnerActionBackendDict
+   * @property {string} actionType - type of an action.
+   * @property {Object.<string, *>} actionCustomizationArgs - customization
+   *   dict for an action.
+   * @property {number} schemaVersion - schema version of the class instance.
+   *   Defaults to the latest schema version.
+   */
+
+  /**
+   * @param {LearnerActionBackendDict} learnerActionBackendDict
+   * @returns {LearnerAction}
+   */
+  createFromBackendDict(
+      learnerActionBackendDict: ILearnerActionBackendDict): LearnerAction {
+    switch (learnerActionBackendDict.action_type) {
+      case 'ExplorationStart':
+        return new ExplorationStartLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case 'AnswerSubmit':
+        return new AnswerSubmitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case 'ExplorationQuit':
+        return new ExplorationQuitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      default:
+        break;
+    }
+    const invalidBackendDict: never = learnerActionBackendDict;
+    throw new Error(
+      'Backend dict does not match any known action type: ' +
+      angular.toJson(invalidBackendDict));
   }
 }
 

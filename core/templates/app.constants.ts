@@ -122,9 +122,11 @@ export class AppConstants {
     EXPLANATION: 'worked_example_explanation'
   };
 
-  public static ACTION_TYPE_EXPLORATION_START = 'ExplorationStart';
-  public static ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit';
-  public static ACTION_TYPE_EXPLORATION_QUIT = 'ExplorationQuit';
+  public static ACTION_TYPE_EXPLORATION_START: 'ExplorationStart' =
+    'ExplorationStart';
+  public static ACTION_TYPE_ANSWER_SUBMIT: 'AnswerSubmit' = 'AnswerSubmit';
+  public static ACTION_TYPE_EXPLORATION_QUIT: 'ExplorationQuit'
+    = 'ExplorationQuit';
 
   public static ISSUE_TYPE_EARLY_QUIT = 'EarlyQuit';
   public static ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS =
@@ -140,7 +142,7 @@ export class AppConstants {
 
   public static SITE_NAME = 'Oppia.org';
 
-  public static DEFAULT_PROFILE_IMAGE_PATH = '/avatar/user_blue_72px.png';
+  public static DEFAULT_PROFILE_IMAGE_PATH = '/avatar/user_blue_72px.webp';
 
   public static LOGOUT_URL = '/logout';
 
@@ -165,7 +167,6 @@ export class AppConstants {
     TOPIC: 'topic',
     SKILL: 'skill',
     STORY: 'story',
-    SUBTOPIC: 'subtopic',
     QUESTION: 'question'
   };
 

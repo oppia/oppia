@@ -18,140 +18,155 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import {
-  ICyclicStateTransitionsCustomizationArgs,
-  IEarlyQuitCustomizationArgs,
-  IMultipleIncorrectSubmissionsCustomizationArgs,
-  PlaythroughObjectFactory
-} from 'domain/statistics/PlaythroughObjectFactory';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough Object Factory', () => {
-  let learnerActionObjectFactory: LearnerActionObjectFactory;
-  let playthroughObjectFactory: PlaythroughObjectFactory;
+  var laof: LearnerActionObjectFactory;
 
   beforeEach(() => {
-    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
-    playthroughObjectFactory = TestBed.get(PlaythroughObjectFactory);
+    TestBed.configureTestingModule({
+      providers: [PlaythroughObjectFactory]
+    });
+
+    this.pof = TestBed.get(PlaythroughObjectFactory);
+    laof = TestBed.get(LearnerActionObjectFactory);
   });
 
-  it('should create a new early quit playthrough', () => {
-    var actions = [
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state name'},
-      })
-    ];
-    var customizationArgs: IEarlyQuitCustomizationArgs = {
-      state_name: {value: 'state name'},
-      time_spent_in_exp_in_msecs: {value: 45000},
-    };
-    var playthroughObject = playthroughObjectFactory.createNew(
-      'expId1', 1, 'EarlyQuit', customizationArgs, actions);
+  it('should create a new playthrough', () => {
+    var actions = [laof.createNewExplorationStartAction({
+      state_name: {
+        value: 'state'
+      }
+    }, 1)];
+    var playthroughObject = this.pof.createNew(
+      'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
+    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual(customizationArgs);
-    expect(playthroughObject.actions).toEqual(actions);
-  });
-
-  it('should create a new cyclic state transitions playthrough', () => {
-    var actions = [
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state name'},
-      })
-    ];
-    var customizationArgs: ICyclicStateTransitionsCustomizationArgs = {
-      state_names: {value: ['state 1', 'state 2', 'state 3', 'state 1']},
-    };
-    var playthroughObject = playthroughObjectFactory.createNew(
-      'expId1', 1, 'CyclicStateTransitions', customizationArgs, actions);
-
-    expect(playthroughObject.expId).toEqual('expId1');
-    expect(playthroughObject.expVersion).toEqual(1);
-    expect(playthroughObject.issueType).toEqual('CyclicStateTransitions');
-    expect(playthroughObject.issueCustomizationArgs).toEqual(customizationArgs);
-    expect(playthroughObject.actions).toEqual(actions);
-  });
-
-  it('should create a new multiple incorrect answers playthrough', () => {
-    var actions = [
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state name'},
-      })
-    ];
-    var customizationArgs: IMultipleIncorrectSubmissionsCustomizationArgs = {
-      state_name: {value: 'state name'},
-      num_times_answered_incorrectly: {value: 5},
-    };
-    var playthroughObject = playthroughObjectFactory.createNew(
-      'expId1', 1, 'MultipleIncorrectAnswers', customizationArgs, actions);
-
-    expect(playthroughObject.expId).toEqual('expId1');
-    expect(playthroughObject.expVersion).toEqual(1);
-    expect(playthroughObject.issueType).toEqual('MultipleIncorrectAnswers');
-    expect(playthroughObject.issueCustomizationArgs).toEqual(customizationArgs);
+    expect(playthroughObject.issueCustomizationArgs).toEqual({});
     expect(playthroughObject.actions).toEqual(actions);
   });
 
   it('should create a new playthrough from a backend dict', () => {
-    var playthroughObject = playthroughObjectFactory.createFromBackendDict({
-      exp_id: 'expId1',
-      exp_version: 1,
-      issue_type: 'EarlyQuit',
-      issue_customization_args: <IEarlyQuitCustomizationArgs>{
-        state_name: {value: 'early quit'},
-      },
-      actions: [
-        {
-          action_type: 'ExplorationStart',
+    var playthroughObject = this.pof.createFromBackendDict(
+      {
+        playthrough_id: 'playthroughId1',
+        exp_id: 'expId1',
+        exp_version: 1,
+        issue_type: 'EarlyQuit',
+        issue_customization_args: {},
+        actions: [{
+          action_type: 'AnswerSubmit',
           action_customization_args: {
-            state_name: {value: 'state name'},
+            state_name: {
+              value: 'state'
+            },
+            dest_state_name: {
+              value: 'dest_state'
+            },
+            interaction_id: {
+              value: 'interaction_id'
+            },
+            submitted_answer: {
+              value: 'answer'
+            },
+            feedback: {
+              value: 'feedback'
+            },
+            time_spent_state_in_msecs: {
+              value: 2
+            }
           },
           schema_version: 1
-        }
-      ]
-    });
+        }]
+      }
+    );
 
+    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual({
-      state_name: {value: 'early quit'},
-    });
-    expect(playthroughObject.actions).toEqual([
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state name'},
-      })
-    ]);
+    expect(playthroughObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughObject.actions).toEqual(
+      [laof.createNewAnswerSubmitAction({
+        state_name: {
+          value: 'state'
+        },
+        dest_state_name: {
+          value: 'dest_state'
+        },
+        interaction_id: {
+          value: 'interaction_id'
+        },
+        submitted_answer: {
+          value: 'answer'
+        },
+        feedback: {
+          value: 'feedback'
+        },
+        time_spent_state_in_msecs: {
+          value: 2
+        }
+      }, 1)]);
   });
 
   it('should convert a playthrough to a backend dict', () => {
-    var actions = [
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state name'},
-      })
-    ];
-    var customizationArgs: IEarlyQuitCustomizationArgs = {
-      state_name: {value: 'early quit'},
-      time_spent_in_exp_in_msecs: {value: 45000},
-    };
-    var playthroughObject = playthroughObjectFactory.createNew(
-      'expId1', 1, 'EarlyQuit', customizationArgs, actions);
+    var actions = [laof.createNewAnswerSubmitAction({
+      state_name: {
+        value: 'state'
+      },
+      dest_state_name: {
+        value: 'dest_state'
+      },
+      interaction_id: {
+        value: 'interaction_id'
+      },
+      submitted_answer: {
+        value: 'answer'
+      },
+      feedback: {
+        value: 'feedback'
+      },
+      time_spent_state_in_msecs: {
+        value: 2
+      }
+    }, 1)];
+    var playthroughObject = this.pof.createNew(
+      'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
-    expect(playthroughObject.toBackendDict()).toEqual({
+    var playthroughDict = playthroughObject.toBackendDict();
+    expect(playthroughDict).toEqual({
+      id: 'playthroughId1',
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',
-      issue_customization_args: {
-        state_name: {value: 'early quit'},
-        time_spent_in_exp_in_msecs: {value: 45000},
-      },
+      issue_customization_args: {},
       actions: [{
-        action_type: 'ExplorationStart',
+        action_type: 'AnswerSubmit',
         action_customization_args: {
-          state_name: {value: 'state name'},
+          state_name: {
+            value: 'state'
+          },
+          dest_state_name: {
+            value: 'dest_state'
+          },
+          interaction_id: {
+            value: 'interaction_id'
+          },
+          submitted_answer: {
+            value: 'answer'
+          },
+          feedback: {
+            value: 'feedback'
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
         },
         schema_version: 1
       }]
