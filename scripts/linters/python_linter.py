@@ -362,7 +362,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         # contains the coverage report i.e.
         # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
         # and one line with dashes(---).
-        python_utils.PRINT(lint_messages)
         newlines_present = lint_messages[-1] == '\n' and (
             lint_messages[-2] == '\n' and lint_messages[-4] == '\n')
         coverage_present = re.search(
