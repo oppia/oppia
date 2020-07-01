@@ -36,6 +36,7 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
+from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -3870,6 +3871,24 @@ title: Old Title
                     'property_name': 'title',
                     'new_value': 'new title'
                 })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
+
+    def test_update_exploration_does_nothing_if_create_stats_model_fails(self):
+        swap_create_stats_model = (
+            self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
+        assert_raises = self.assertRaises(Exception)
+
+        self.save_new_valid_exploration('exp_id', 'user_id')
+        with swap_create_stats_model, assert_raises:
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'bn'
+            })], 'Changed language code.')
+
+        self.assertIsNone(
+            exp_fetchers.get_exploration_by_id(
+                'exp_id', strict=False, version=2))
 
     def test_update_language_code(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

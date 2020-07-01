@@ -59,6 +59,7 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -554,8 +555,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (exploration_model.version, exploration.version))
 
-    old_states = exp_fetchers.get_exploration_from_model(
-        exploration_model).states
+    old_states = (
+        exp_fetchers.get_exploration_from_model(exploration_model).states)
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -568,7 +569,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
-        for (state_name, state) in exploration.states.items()}
+        for state_name, state in exploration.states.items()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -576,44 +577,48 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration.correctness_feedback_enabled)
 
     change_list_dict = [change.to_dict() for change in change_list]
-    exploration_model.commit(committer_id, commit_message, change_list_dict)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
-
     exploration.version += 1
-
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
-    # Trigger statistics model update.
-    new_exp_stats = stats_services.get_stats_for_new_exp_version(
-        exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+    def commit_exploration_and_update_relationships_in_transaction():
+        """Commits all the newly created models in an atomic transaction. If any
+        operation fails, every other operation will fail as well.
+        """
+        if feconf.ENABLE_ML_CLASSIFIERS:
+            trainable_states_dict = exploration.get_trainable_states_dict(
+                old_states, exp_versions_diff)
+            state_names_with_changed_answer_groups = trainable_states_dict[
+                'state_names_with_changed_answer_groups']
+            state_names_with_unchanged_answer_groups = trainable_states_dict[
+                'state_names_with_unchanged_answer_groups']
+            state_names_to_train_classifier = (
+                state_names_with_changed_answer_groups)
+            if state_names_with_unchanged_answer_groups:
+                state_names_without_classifier = (
+                    classifier_services.handle_non_retrainable_states(
+                        exploration, state_names_with_unchanged_answer_groups,
+                        exp_versions_diff))
+                state_names_to_train_classifier.extend(
+                    state_names_without_classifier)
+            if state_names_to_train_classifier:
+                classifier_services.handle_trainable_states(
+                    exploration, state_names_to_train_classifier)
 
-    stats_services.create_stats_model(new_exp_stats)
+        stats_services.create_stats_model(
+            stats_services.get_stats_for_new_exp_version(
+                exploration.id, exploration.version, exploration.states,
+                exp_versions_diff=exp_versions_diff, revert_to_version=None))
 
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        state_names_with_changed_answer_groups = trainable_states_dict[
-            'state_names_with_changed_answer_groups']
-        state_names_with_unchanged_answer_groups = trainable_states_dict[
-            'state_names_with_unchanged_answer_groups']
-        state_names_to_train_classifier = state_names_with_changed_answer_groups
-        if state_names_with_unchanged_answer_groups:
-            state_names_without_classifier = (
-                classifier_services.handle_non_retrainable_states(
-                    exploration, state_names_with_unchanged_answer_groups,
-                    exp_versions_diff))
-            state_names_to_train_classifier.extend(
-                state_names_without_classifier)
-        if state_names_to_train_classifier:
-            classifier_services.handle_trainable_states(
-                exploration, state_names_to_train_classifier)
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration, exp_versions_diff=exp_versions_diff,
+            revert_to_version=None)
 
-    # Trigger exploration issues model updation.
-    stats_services.update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff=exp_versions_diff,
-        revert_to_version=None)
+        exploration_model.commit(committer_id, commit_message, change_list_dict)
+        memcache_services.delete(
+            exp_fetchers.get_exploration_memcache_key(exploration.id))
+
+    transaction_services.run_in_transaction(
+        commit_exploration_and_update_relationships_in_transaction)
 
 
 def _create_exploration(
