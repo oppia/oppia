@@ -19,7 +19,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
+import {
+  IStateBackendDict,
+  StateObjectFactory,
+  State
+} from 'domain/state/StateObjectFactory';
+import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -27,15 +32,20 @@ export interface IStateObjectsDict {
   [state: string]: State;
 }
 
-export class States {
-  _stateObject;
-  _states;
-  constructor(stateObject: StateObjectFactory, states: any) {
-    this._stateObject = stateObject;
-    this._states = states;
-  }
+export interface IStateObjectsBackendDict {
+  [state: string]: IStateBackendDict;
+}
 
-  getState(stateName: string): any {
+export interface IVoiceoverObjectsDict {
+  [state: string]: Voiceover[];
+}
+
+export class States {
+  constructor(
+    private _stateObject: StateObjectFactory,
+    private _states: IStateObjectsDict) { }
+
+  getState(stateName: string): State {
     return this._states[stateName];
   }
 
@@ -43,14 +53,14 @@ export class States {
   // with an object to represent data to be manipulated inside
   // ExplorationDiffService.
 
-  getStateObjects(): any {
+  getStateObjects(): IStateObjectsDict {
     return this._states;
   }
   addState(newStateName: string): void {
     this._states[newStateName] = this._stateObject.createDefaultState(
       newStateName);
   }
-  setState(stateName: string, stateData: any): void {
+  setState(stateName: string, stateData: State): void {
     // We use the copy method defined in the StateObjectFactory to make
     // sure that this._states[stateName] remains a State object as opposed to
     // Object.assign(..) which returns an object with the content of stateData.
@@ -96,10 +106,10 @@ export class States {
       }
     }
   }
-  getStateNames(): Array<string> {
+  getStateNames(): string[] {
     return Object.keys(this._states);
   }
-  getFinalStateNames(): Array<string> {
+  getFinalStateNames(): string[] {
     var finalStateNames = [];
     for (var stateName in this._states) {
       var interaction = this._states[stateName].interaction;
@@ -110,7 +120,7 @@ export class States {
     return finalStateNames;
   }
 
-  getAllVoiceoverLanguageCodes(): Array<string> {
+  getAllVoiceoverLanguageCodes(): string[] {
     var allAudioLanguageCodes = [];
     for (var stateName in this._states) {
       var state = this._states[stateName];
@@ -128,7 +138,7 @@ export class States {
     return allAudioLanguageCodes;
   }
 
-  getAllVoiceovers(languageCode: string): any {
+  getAllVoiceovers(languageCode: string): IVoiceoverObjectsDict {
     var allAudioTranslations = {};
     for (var stateName in this._states) {
       var state = this._states[stateName];
@@ -152,10 +162,7 @@ export class States {
 })
 export class StatesObjectFactory {
   constructor(private stateObject: StateObjectFactory) {}
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  createFromBackendDict(statesBackendDict: any): States {
-  /* eslint-enable dot-notation */
+  createFromBackendDict(statesBackendDict: IStateObjectsBackendDict): States {
     var stateObjectsDict = {};
     for (var stateName in statesBackendDict) {
       stateObjectsDict[stateName] = this.stateObject.createFromBackendDict(
