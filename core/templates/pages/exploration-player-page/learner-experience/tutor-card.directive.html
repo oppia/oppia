@@ -6,7 +6,8 @@
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
       <img class="conversation-skin-oppia-avatar"
-           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt=""
+           ng-if="isAvatarImageShown()">
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">

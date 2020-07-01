@@ -74,7 +74,7 @@ export class GraphInputRulesService {
   // TODO(#7165): Replace 'any' with the exact type.
   private isWeaklyConnected(graph: any): boolean {
     // Generates adjacency lists assuming graph is undirected, then uses depth
-    // first search on node 0 to try to reach every other vertex
+    // first search on node 0 to try to reach every other vertex.
     if (graph.vertices.length === 0) {
       return true;
     }
@@ -98,7 +98,7 @@ export class GraphInputRulesService {
   private isAcyclic(graph: any): boolean {
     // Uses depth first search to ensure that we never have an edge to an
     // ancestor in the search tree.
-    var isVisited = graph.vertices.map(() => {
+    var nodeStatus = graph.vertices.map(() => {
       return this.gus.DFS_STATUS.UNVISITED;
     });
     var adjacencyLists = this.gus.constructAdjacencyLists(
@@ -106,9 +106,9 @@ export class GraphInputRulesService {
     for (var startVertex = 0;
       startVertex < graph.vertices.length;
       startVertex++) {
-      if (isVisited[startVertex] === this.gus.DFS_STATUS.UNVISITED) {
+      if (nodeStatus[startVertex] === this.gus.DFS_STATUS.UNVISITED) {
         if (this.gus.findCycle(
-          startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
+          startVertex, -1, adjacencyLists, nodeStatus, graph.isDirected)) {
           return false;
         }
       }
@@ -122,7 +122,7 @@ export class GraphInputRulesService {
    */
   // TODO(#7165): Replace 'any' with the exact type.
   private isRegular(graph: any): boolean {
-    // Checks that every vertex has outdegree and indegree equal to the first
+    // Checks that every vertex has outdegree and indegree equal to the first.
     if (graph.vertices.length === 0) {
       return true;
     }
@@ -159,7 +159,7 @@ export class GraphInputRulesService {
     var adj2 = this.gus.constructAdjacencyMatrix(graph2);
 
     // Check that for every vertex from the first graph there is a vertex in
-    // the second graph with the same sum of weights of outgoing edges
+    // the second graph with the same sum of weights of outgoing edges.
     var degrees1 = adj1.map(function(value) {
       return value.reduce(function(prev, cur) {
         return prev + cur;

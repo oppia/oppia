@@ -94,7 +94,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
             playthroughIssueObjectFactory.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
 
-        // Try to fetch another issue
+        // Try to fetch another issue.
         playthroughIssuesBackendApiService.fetchIssues('8', 1).then(
           successHandler, failureHandler);
 
@@ -159,7 +159,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
       req.flush(backendIssues);
       flushMicrotasks();
 
-      // resolveIssue does not return a value.
+      // Function resolveIssue does not return a value.
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));

@@ -27,7 +27,7 @@ var logicProofShared = (function() {
   // typings of an expression considered.
   var MAX_NUM_TYPINGS_PERMITTED = 1000;
 
-  // ERROR-HANDLING
+  // ---- ERROR-HANDLING ----
 
   // UserErrors have codes that refer to entries in the errorDictionary (which
   // is either logicProofData.BASE_GENERAL_MESSAGES or
@@ -45,7 +45,7 @@ var logicProofShared = (function() {
     this.messages = messages;
     this.code = code;
   };
-  // TODO(Jacob): Make these errors prototype from Error()
+  // TODO(Jacob): Make these errors prototype from Error().
 
   /** Converts a message template into a string to show to the user.
    * @param messageTemplate: a GeneralMessageTemplate object that determines how
@@ -112,7 +112,7 @@ var logicProofShared = (function() {
     }
   };
 
-  // DISPLAY
+  // ---- DISPLAY ----
 
   /**
    * @param {Expression} expression - an Expression, which is to be displayed
@@ -208,7 +208,7 @@ var logicProofShared = (function() {
     return processedArray.join(', ');
   };
 
-  // PARSING
+  // ---- PARSING ----
 
   /**
    * This function checks whether the string contains any symbol that occurs
@@ -355,7 +355,7 @@ var logicProofShared = (function() {
       // We have parsed the first i-many entries in the given unparsedArray,
       // and will now attempt to parse the next one.
 
-      // This will only occur in pathological cases
+      // This will only occur in pathological cases.
       if (partiallyParsedArrays[i].length > MAX_NUM_PARSINGS_PERMITTED) {
         throw new UserError('too_many_parsings', {});
       }
@@ -387,7 +387,8 @@ var logicProofShared = (function() {
       // e.g. 'a' could reasonably be either a word or the name of an atom.
       if (unparsedArray[i].length === 1 ||
           vocabularyWords.indexOf(unparsedArray[i].toLowerCase()) === -1) {
-        // We attempt to parse this entry as an expression / expression template
+        // We attempt to parse this entry as an expression / expression
+        // template.
         try {
           var expression = logicProofParser.parse(
             unparsedArray[i], isTemplate ? 'expressionTemplate' : 'expression');
@@ -415,10 +416,10 @@ var logicProofShared = (function() {
     }
 
     if (partiallyParsedArrays[unparsedArray.length].length > 0) {
-      // We have succeeded in fully parsing
+      // We have succeeded in fully parsing.
       return partiallyParsedArrays[unparsedArray.length];
     } else {
-      // We identify the best attempts
+      // We identify the best attempts.
       for (var i = unparsedArray.length; i >= 0; i--) {
         if (partiallyParsedArrays[i].length > 0) {
           var numEntriesMatched = i;
@@ -481,7 +482,7 @@ var logicProofShared = (function() {
     }
   };
 
-  // TYPING ASSIGNMENT
+  // ---- TYPING ASSIGNMENT ----
 
   /**
    * This takes an array of TypingElements and converts it into an array of
@@ -673,7 +674,7 @@ var logicProofShared = (function() {
             amount_typed: []
           });
         } else if (untypedExpression.dummies[n].top_kind_name !== 'variable') {
-          // The parser does not currently permit this to happen
+          // The parser does not currently permit this to happen.
           throw new UserError('dummy_not_variable', {
             dummy: untypedExpression.dummies[n],
             expression: untypedExpression,
@@ -799,7 +800,7 @@ var logicProofShared = (function() {
       }
 
       for (var j = 0; j < partiallyTypedArrays[i].length; j++) {
-        // Dummies are always allowed to have previously unseen names
+        // Dummies are always allowed to have previously unseen names.
         var newKindsPermittedHere = (i < numDummies) ?
           newKindsPermitted.concat(['variable']) :
           newKindsPermitted;
@@ -847,9 +848,9 @@ var logicProofShared = (function() {
     }
   };
 
-  // UTILITIES
+  // ---- UTILITIES ----
 
-  // Expressions with different dummy variables are considered different
+  // Expressions with different dummy variables are considered different.
   var checkExpressionsAreEqual = function(expression1, expression2) {
     if (expression1.top_kind_name !== expression2.top_kind_name ||
         expression1.top_operator_name !== expression2.top_operator_name ||
@@ -898,7 +899,7 @@ var logicProofShared = (function() {
 
   // Returns a list of all the names of operators in an expression. kinds is an
   // array specifying which kinds of operators to return; if it is not supplied
-  // then all are returned
+  // then all are returned.
   var getOperatorsFromExpression = function(expression, kinds = null) {
     var output = getOperatorsFromExpressionArray(
       expression.arguments.concat(expression.dummies), kinds);
@@ -941,7 +942,7 @@ var logicProofShared = (function() {
     });
   };
 
-  // Returns whether LHS is larger than RHS in lexicographic ordering
+  // Returns whether LHS is larger than RHS in lexicographic ordering.
   var greaterThanInLex = function(LHS, RHS) {
     for (var i = 0; i < LHS.length; i++) {
       if (i >= RHS.length) {
@@ -955,12 +956,12 @@ var logicProofShared = (function() {
     return false;
   };
 
-  // Checks if the string contains the character
+  // Checks if the string contains the character.
   var containsCharacter = function(string, character) {
     return (string.indexOf(character) !== -1);
   };
 
-  // Checks if the string contains some character from the array
+  // Checks if the string contains some character from the array.
   var containsCharacterFromArray = function(string, array) {
     for (var i = 0; i < array.length; i++) {
       if (string.indexOf(array[i]) !== -1) {

@@ -1,8 +1,20 @@
 <md-card class="oppia-editor-card-with-avatar" style="margin-bottom: 5vh;">
   <div class="oppia-editor-card-body">
-    <div class="oppia-editor-card-section">
-      <strong style="font-size: 1.4em;">Rubrics</strong>
-      <div>
+    <div class="oppia-editor-card-section edit-rubrics-header">
+      <div class="oppia-skill-rubrics-header">
+        <strong>Rubrics</strong>
+        <i ng-click="toggleRubricsList()"
+           class="fa fa-angle-down"
+           ng-if="!rubricsListIsShown"
+           aria-hidden="true">
+        </i>
+        <i ng-click="toggleRubricsList()"
+           class="fa fa-angle-up"
+           ng-if="rubricsListIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div ng-if="rubricsListIsShown">
         <rubrics-editor rubrics="skill.getRubrics()"
                         on-save-rubric="onSaveRubric"
                         new-skill-being-created="false">
@@ -11,3 +23,22 @@
     </div>
   </div>
 </md-card>
+
+<style>
+  skill-rubrics-editor .edit-rubrics-header strong {
+    font-size: 16px;
+  }
+  skill-rubrics-editor .oppia-skill-rubrics-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  skill-rubrics-editor .oppia-skill-rubrics-header i {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-rubrics-editor .oppia-skill-rubrics-header i {
+      display: block;
+    }
+  }
+</style>
