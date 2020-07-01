@@ -87,6 +87,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
         TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
       var ctrl = this;
+      var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
 
       /**
            * Calls the TopicsAndSkillsDashboardBackendApiService and fetches
@@ -134,11 +135,15 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
               ctrl.initSkillDashboard();
             }
             ctrl.classrooms = response.all_classroom_names;
-            // Adding this since karma tests adds
-            // TOPIC_FILTER_CLASSROOM_ALL for every it block.
+            // Adding the if checks since karma tests adds
+            // the values in the array for every it block.
+            if (!ctrl.classrooms.includes(TOPIC_CLASSROOM_UNASSIGNED)) {
+              ctrl.classrooms.unshift(TOPIC_CLASSROOM_UNASSIGNED);
+            }
             if (!ctrl.classrooms.includes(TOPIC_FILTER_CLASSROOM_ALL)) {
               ctrl.classrooms.unshift(TOPIC_FILTER_CLASSROOM_ALL);
             }
+
             $rootScope.$apply();
           },
           function(errorResponse) {
