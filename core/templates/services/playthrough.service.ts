@@ -67,6 +67,7 @@ class CyclicStateTransitionsTracker {
    * then we update this tracker's latest cycle discovery. The cycle is defined
    * as the current path of visited states with all states prior to the first
    * occurrence of N discarded:
+   *
    *    [ ... // N , ... , N ]  =>  [ N , ... , N ]
    *
    * If this *exact* cycle has been discovered before (NOTE: rotations of a
