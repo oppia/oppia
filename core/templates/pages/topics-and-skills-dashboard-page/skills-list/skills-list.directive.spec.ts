@@ -130,7 +130,7 @@ describe('Skills List Directive', function() {
     const skillId1 = 'uXcdsad3f42';
     const skillId2 = 'aEdf44DGfre';
     expect(ctrl.showEditOptions(skillId1)).toEqual(false);
-    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
 
     ctrl.changeEditOptions(skillId1);
     expect(ctrl.showEditOptions(skillId1)).toEqual(true);

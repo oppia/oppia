@@ -69,7 +69,7 @@ describe('Topics List Directive', function() {
     const topicId1 = 'uXcdsad3f42';
     const topicId2 = 'aEdf44DGfre';
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
-    expect(ctrl.showEditOptions(topicId1)).toEqual(false);
+    expect(ctrl.showEditOptions(topicId2)).toEqual(false);
 
     ctrl.changeEditOptions(topicId1);
     expect(ctrl.showEditOptions(topicId1)).toEqual(true);
