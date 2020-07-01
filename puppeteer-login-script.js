@@ -42,7 +42,7 @@ module.exports = async(browser, context) => {
         await page.click('#signup-submit')
       ]);
     } catch (e) {
-      // Already logged into Oppia
+      // Already logged into Oppia.
     }
   } else if (context.url.includes('emaildashboard')) {
     // eslint-disable-next-line dot-notation
