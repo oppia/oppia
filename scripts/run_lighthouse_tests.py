@@ -21,8 +21,6 @@ import os
 import shutil
 import subprocess
 
-from constants import constants
-import feconf
 import python_utils
 from scripts import common
 
