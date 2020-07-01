@@ -232,14 +232,14 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('circle');
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('rect');
     svgFilenameCtrl.canvas.setActiveObject(
-      svgFilenameCtrl.canvas.getObjects()[0]); 
+      svgFilenameCtrl.canvas.getObjects()[0]);
     svgFilenameCtrl.bringObjectForward();
     expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('rect');
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('circle');
     svgFilenameCtrl.sendObjectBackward();
     expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('circle');
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('rect');
-  })
+  });
 
   it('should undo and redo the creation of shapes', function() {
     for (var i = 0; i < 6; i++) {

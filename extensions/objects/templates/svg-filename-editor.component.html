@@ -66,15 +66,15 @@
           </div>
           <div>
             <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isObjectSelected}"
-                style="background-image:url(/assets/svg_diagram_editor/bring_forward.svg);"
-                ng-click="$ctrl.bringObjectForward()" tooltip-placement="left" uib-tooltip="Bring Forward"
-                ng-disabled="!$ctrl.isObjectSelected">
-          </button>
-          <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isObjectSelected}"
-                  style="background-image:url(/assets/svg_diagram_editor/send_backward.svg);"
-                  ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
-                  ng-disabled="!$ctrl.isObjectSelected">
-          </button>
+                    style="background-image:url(/assets/svg_diagram_editor/bring_forward.svg);"
+                    ng-click="$ctrl.bringObjectForward()" tooltip-placement="left" uib-tooltip="Bring Forward"
+                    ng-disabled="!$ctrl.isObjectSelected">
+            </button>
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isObjectSelected}"
+                    style="background-image:url(/assets/svg_diagram_editor/send_backward.svg);"
+                    ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
+                    ng-disabled="!$ctrl.isObjectSelected">
+            </button>
             <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectUndoStack.length}"
                     ng-click="$ctrl.onUndo()"
                     ng-disabled="!$ctrl.objectUndoStack.length">

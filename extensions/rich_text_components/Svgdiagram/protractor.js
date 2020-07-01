@@ -54,7 +54,7 @@ var svgTags = {
   '.org/1999/xlink" version="1.1" width="496" height="338" viewBox="0 0 496 ' +
   '338"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y=' +
   '"0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matrix' +
-  '(1 0 0 1 32.01 32.47)" style="">		<text font-family="helvetica" font-siz' +
+  '(1 0 0 1 32.01 32.47)" style=""><text font-family="helvetica" font-siz' +
   'e="18" font-style="normal" font-weight="normal" style="stroke: none; stro' +
   'ke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoff' +
   'set: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); f' +
@@ -73,11 +73,12 @@ var customizeComponent = async function(modal, shape) {
 };
 
 var expectComponentDetailsToMatch = async function(elem, shapeName) {
-  await elem.element(by.css('.protractor-test-svg-diagram')).getAttribute('src').then(function(src) {
+  await elem.element(by.css(
+    '.protractor-test-svg-diagram')).getAttribute('src').then(function(src) {
     request(src, function(error, response, body) {
       expect(body.replace(/(\r\n|\n|\r)/gm, '')).toBe(svgTags[shapeName]);
-    })
-  })
+    });
+  });
 };
 
 exports.customizeComponent = customizeComponent;

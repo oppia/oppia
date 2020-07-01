@@ -169,12 +169,13 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 % hyphenated_component_id)
             main_html_file = os.path.join(
                 directives_dir, '%s.directive.html' % hyphenated_component_id)
-            if (hyphenated_component_id == 'svgdiagram'):
+            if hyphenated_component_id == 'svgdiagram':
                 main_ts_file = os.path.join(
                     directives_dir, 'oppia-noninteractive-%s.component.ts'
                     % hyphenated_component_id)
                 main_html_file = os.path.join(
-                directives_dir, '%s.component.html' % hyphenated_component_id)
+                    directives_dir, '%s.component.html'
+                    % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 

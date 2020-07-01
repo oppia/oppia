@@ -584,11 +584,11 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.bringObjectForward = function() {
         ctrl.canvas.bringForward(ctrl.canvas.getActiveObject());
-      }
+      };
 
       ctrl.sendObjectBackward = function() {
         ctrl.canvas.sendBackwards(ctrl.canvas.getActiveObject());
-      }
+      };
 
       var undoStackPush = function(object) {
         if (ctrl.objectUndoStack.length === ctrl.undoLimit) {
