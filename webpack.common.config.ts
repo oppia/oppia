@@ -217,6 +217,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['console_errors'],
       filename: 'console_errors.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Contact the Oppia team, submit feedback, and learn ' +
+          'how to get involved with the Oppia project.'
+      },
       template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -298,6 +303,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-iframed.mainpage.html',
+      meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -419,6 +425,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['maintenance'],
       filename: 'maintenance-page.mainpage.html',
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -462,6 +469,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['practice_session'],
       filename: 'practice-session-page.mainpage.html',
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.mainpage.html',
