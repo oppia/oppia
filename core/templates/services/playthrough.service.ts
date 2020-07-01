@@ -23,62 +23,31 @@ import { AppConstants } from 'app.constants';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import {
-  Playthrough,
-  PlaythroughObjectFactory
-} from 'domain/statistics/PlaythroughObjectFactory';
-import { LearnerActionObjectFactory, LearnerAction } from
+  ICyclicStateTransitionsCustomizationArgs,
+  IEarlyQuitCustomizationArgs,
+  IMultipleIncorrectSubmissionsCustomizationArgs
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
+import { LearnerAction, LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+import { Playthrough, PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
-import {
-  ICyclicStateTransitionsCustomizationArgs,
-  IMultipleIncorrectSubmissionsCustomizationArgs,
-  IEarlyQuitCustomizationArgs
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
-
-class MultipleIncorrectAnswersTracker {
-  currStateName: string;
-  numTries: number = 0;
-
-  constructor(initStateName: string) {
-    this.currStateName = initStateName;
-  }
-
-  foundAnIssue(): boolean {
-    return this.numTries >= ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD;
-  }
-
-  recordStateTransition(destStateName: string): void {
-    if (this.currStateName === destStateName) {
-      this.numTries += 1;
-    } else {
-      this.currStateName = destStateName;
-      this.numTries = 0;
-    }
-  }
-
-  generateIssueCustomizationArgs(
-  ): IMultipleIncorrectSubmissionsCustomizationArgs {
-    return {
-      state_name: {value: this.currStateName},
-      num_times_answered_incorrectly: {value: this.numTries},
-    };
-  }
-}
 
 class CyclicStateTransitionsTracker {
-  numLoops: number = 0;
-  // A path of visited states without any cycles/repeated states.
-  pathOfVisitedStates: string[];
-  // A cycle of visited states discovered by the tracker.
-  cycleOfVisitedStates: string[];
+  /** A path of visited states without any repeats. */
+  private pathOfVisitedStates: string[];
+  /** The most recently discovered cycle of visited states. */
+  private cycleOfVisitedStates: string[];
+  private numLoops: number;
 
   constructor(initStateName: string) {
     this.pathOfVisitedStates = [initStateName];
     this.cycleOfVisitedStates = null;
+    this.numLoops = 0;
   }
 
   foundAnIssue(): boolean {
@@ -145,9 +114,8 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  constructor(
-      public stateName: string = null,
-      public expDurationInSecs: number = null) {}
+  private stateName: string = null;
+  private expDurationInSecs: number = null;
 
   foundAnIssue(): boolean {
     return (
@@ -155,8 +123,7 @@ class EarlyQuitTracker {
       this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
-  recordExplorationQuit(
-      stateName: string, expDurationInSecs: number): void {
+  recordExplorationQuit(stateName: string, expDurationInSecs: number): void {
     this.stateName = stateName;
     this.expDurationInSecs = expDurationInSecs;
   }
@@ -165,6 +132,37 @@ class EarlyQuitTracker {
     return {
       state_name: {value: this.stateName},
       time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
+    };
+  }
+}
+
+class MultipleIncorrectAnswersTracker {
+  private currStateName: string;
+  private numTries: number;
+
+  constructor(initStateName: string) {
+    this.currStateName = initStateName;
+    this.numTries = 0;
+  }
+
+  foundAnIssue(): boolean {
+    return this.numTries >= ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD;
+  }
+
+  recordStateTransition(destStateName: string): void {
+    if (this.currStateName === destStateName) {
+      this.numTries += 1;
+    } else {
+      this.currStateName = destStateName;
+      this.numTries = 0;
+    }
+  }
+
+  generateIssueCustomizationArgs(
+  ): IMultipleIncorrectSubmissionsCustomizationArgs {
+    return {
+      state_name: {value: this.currStateName},
+      num_times_answered_incorrectly: {value: this.numTries},
     };
   }
 }
@@ -299,8 +297,16 @@ export class PlaythroughService {
     }
   }
 
+  private isPlaythroughRecordingEnabled(): boolean {
+    return (
+      this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
+      this.learnerIsInSamplePopulation === true);
+  }
+
   private hasRecordingBegun(): boolean {
-    return this.recordedLearnerActions !== null;
+    return (
+      this.isPlaythroughRecordingEnabled() &&
+      this.recordedLearnerActions !== null);
   }
 
   private hasRecordingFinished(): boolean {
@@ -321,12 +327,6 @@ export class PlaythroughService {
       // Playthroughs are only helpful if learners have invested enough time.
       this.playthroughDurationInSecs >=
           ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
-  }
-
-  private isPlaythroughRecordingEnabled(): boolean {
-    return (
-      this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
-      this.learnerIsInSamplePopulation === true);
   }
 }
 
