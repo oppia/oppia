@@ -120,7 +120,7 @@ def get_topic_from_model(topic_model):
 
     Returns:
         topic. A Topic domain object corresponding to the given
-            topic model.
+        topic model.
     """
     versioned_subtopics = {
         'schema_version': topic_model.subtopic_schema_version,
@@ -207,7 +207,7 @@ def get_topics_by_ids(topic_ids):
 
     Returns:
         list(Topic|None). The list of topics corresponding to given ids
-            (with None in place of topic ids corresponding to deleted topics).
+        (with None in place of topic ids corresponding to deleted topics).
     """
     all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
     topics = [

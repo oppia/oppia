@@ -59,6 +59,7 @@ CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_CANONICAL_STORY = 'add_canonical_story'
 CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story'
+CMD_REARRANGE_CANONICAL_STORY = 'rearrange_canonical_story'
 CMD_ADD_ADDITIONAL_STORY = 'add_additional_story'
 CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
 CMD_PUBLISH_STORY = 'publish_story'
@@ -134,6 +135,10 @@ class TopicChange(change_domain.BaseChange):
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_REARRANGE_CANONICAL_STORY,
+        'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': []
     }, {
         'name': CMD_ADD_ADDITIONAL_STORY,
@@ -272,7 +277,7 @@ class StoryReference(python_utils.OBJECT):
 
         Returns:
             StoryReference. A story reference object with given story_id and
-                'not published' status.
+            'not published' status.
         """
         return cls(story_id, False)
 
@@ -357,7 +362,7 @@ class Subtopic(python_utils.OBJECT):
 
         Returns:
             Subtopic. A subtopic object with given id, title and empty skill ids
-                list.
+            list.
         """
         return cls(subtopic_id, title, [], None, None)
 
@@ -378,7 +383,7 @@ class Subtopic(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -582,7 +587,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -707,6 +712,40 @@ class Topic(python_utils.OBJECT):
             raise Exception(
                 'The story_id %s is not present in the canonical '
                 'story references list of the topic.' % story_id)
+
+    def rearrange_canonical_story(self, from_index, to_index):
+        """Rearranges or moves a canonical story to another position.
+
+        Args:
+            from_index: int. The index of canonical story to move.
+            to_index: int. The index at which to insert the moved canonical
+                story.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception('Expected from_index value to be a number, '
+                            'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception('Expected to_index value to be a number, '
+                            'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception('Expected from_index and to_index values '
+                            'to be different.')
+
+        if (from_index >= len(self.canonical_story_references) or
+                to_index >= len(self.canonical_story_references) or
+                from_index < 0 or to_index < 0):
+            raise Exception('Expected index values to be with-in bounds.')
+
+        canonical_story_reference_to_move = copy.deepcopy(
+            self.canonical_story_references[from_index])
+        del self.canonical_story_references[from_index]
+        self.canonical_story_references.insert(
+            to_index, canonical_story_reference_to_move)
 
     def add_canonical_story(self, story_id):
         """Adds a story to the canonical_story_references list.
@@ -1003,7 +1042,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_abbreviated_name: str. The updated abbreviated_name
-            for the topic.
+                for the topic.
         """
         self.abbreviated_name = new_abbreviated_name
 
@@ -1012,7 +1051,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
-            for the topic.
+                for the topic.
         """
         self.thumbnail_filename = new_thumbnail_filename
 
@@ -1021,7 +1060,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_bg_color: str|None. The updated thumbnail background
-            color for the topic.
+                color for the topic.
         """
         self.thumbnail_bg_color = new_thumbnail_bg_color
 
@@ -1086,7 +1125,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             list(dict). The list of all subtopics present
-                in topic.
+            in topic.
         """
         subtopics = []
         for _, subtopic in enumerate(self.subtopics):
@@ -1103,7 +1142,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             int or None. Returns the index of the subtopic if it exists or else
-                None.
+            None.
         """
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
@@ -1459,7 +1498,7 @@ class TopicRights(python_utils.OBJECT):
 
         Returns:
             dict. A dict version of TopicRights suitable for use by the
-                frontend.
+            frontend.
         """
         return {
             'topic_id': self.id,

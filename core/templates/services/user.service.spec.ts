@@ -79,7 +79,7 @@ describe('User Service', function() {
   });
 
   it('should return userInfo data', function() {
-    // creating a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -139,7 +139,7 @@ describe('User Service', function() {
 
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo).toEqual(sampleUserInfo);
-      // Fetch userInfo again
+      // Fetch userInfo again.
       UserService.getUserInfoAsync().then(function(sameUserInfo) {
         expect(sameUserInfo).toEqual(userInfo);
       });

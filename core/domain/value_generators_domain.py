@@ -122,7 +122,7 @@ class Registry(python_utils.OBJECT):
 
         Returns:
             class(BaseValueGenerator). A generator class mapping to the
-                generator id given.
+            generator id given.
 
         Raises:
             KeyError: The given generator_id is invalid.
