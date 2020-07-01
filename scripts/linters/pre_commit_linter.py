@@ -61,6 +61,7 @@ import threading
 import python_utils
 
 # Install third party dependencies before proceeding.
+from . import app_dev_linter
 from . import codeowner_linter
 from . import css_linter
 from . import general_purpose_linter
@@ -555,6 +556,9 @@ def main(args=None):
     lint_messages += (
         third_party_typings_linter.check_third_party_libs_type_defs(
             verbose_mode_enabled))
+
+    lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
+        FILE_CACHE, verbose_mode_enabled)
 
     lint_messages += webpack_config_linter.check_webpack_config_file(
         FILE_CACHE, verbose_mode_enabled)
