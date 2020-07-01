@@ -288,8 +288,11 @@ class BaseModel(ndb.Model):
             entities: list(ndb.Model).
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
+
+        Returns:
+            list(future). A list of futures.
         """
-        ndb.put_multi_async(
+        return ndb.put_multi_async(
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
