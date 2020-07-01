@@ -22,8 +22,8 @@
 module.exports = async(browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
-    // Sign into Oppia.
-  if(context.url.includes('admin')) {
+  // Sign into Oppia.
+  if (context.url.includes('admin')) {
     try {
       // eslint-disable-next-line dot-notation
       await page.goto(context.url);
@@ -44,8 +44,7 @@ module.exports = async(browser, context) => {
     } catch (e) {
       // Already logged into Oppia
     }
-  }
-  else if(context.url.includes('emaildashboard')) {
+  } else if (context.url.includes('emaildashboard')) {
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
@@ -54,8 +53,7 @@ module.exports = async(browser, context) => {
     await page.waitFor(5000);
     await page.click('#update-button-id');
     await page.waitFor(2000);
-  }
-  else if(context.url.includes('collection/0')) {
+  } else if (context.url.includes('collection/0')) {
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
