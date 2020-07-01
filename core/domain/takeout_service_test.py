@@ -31,6 +31,7 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (
@@ -1013,10 +1014,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_json = json.dumps(expected_data)
         self.assertEqual(json.loads(observed_json), json.loads(expected_json))
         expected_images = [
-            takeout_domain.TakeoutImage(self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
+            takeout_domain.TakeoutImage(
+                self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
         ]
         self.assertEqual(len(expected_images), len(observed_images))
-        for i in range(len(expected_images)):
+        for i, _ in enumerate(expected_images)):
             self.assertEqual(
                 expected_images[i].b64_image_data,
                 observed_images[i].b64_image_data

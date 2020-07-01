@@ -81,13 +81,14 @@ def export_data_for_user(user_id):
         pointer = exported_data
         for key in image_position[:-1]:
             pointer = pointer[key]
-        
+
         # Swap out data with replacement filename.
         image_key = image_position[-1]
         image_data = pointer[image_key]
         if pointer[image_key] != None:
             replacement_filename = image_positions[image_position]
-            image_files.append(takeout_domain.TakeoutImage(image_data, replacement_filename))
+            image_files.append(
+                takeout_domain.TakeoutImage(image_data, replacement_filename))
             pointer[image_key] = replacement_filename
 
     return takeout_domain.TakeoutExport(exported_data, image_files)

@@ -388,7 +388,7 @@ class ExportAccountHandler(base.BaseHandler):
                 decoded_png = base64.b64decode(
                     python_utils.url_unquote_plus(b64_png_no_header))
                 zfile.writestr('images/' + image.image_export_path, decoded_png)
-        
+
         # Render file for download.
         self.render_downloadable_file(
             temp_file.getvalue(), 'oppia_data.zip', 'text/plain')

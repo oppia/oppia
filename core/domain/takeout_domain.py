@@ -19,14 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-class TakeoutExport:
+import python_utils
+
+class TakeoutExport(python_utils.OBJECT):
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(self, user_data, user_images):
         self.user_data = user_data
         self.user_images = user_images
-        
-class TakeoutImage:
+
+class TakeoutImage(python_utils.OBJECT):
     """Domain object for storing image data exported as part of Takeout."""
 
     def __init__(self, b64_image_data, image_export_path):
