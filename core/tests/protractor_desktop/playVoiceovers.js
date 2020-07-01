@@ -20,6 +20,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
@@ -52,12 +53,14 @@ describe('Voiceover player', function() {
       'testVoiceovers');
     await users.login('testVoiceovers@voiceovers.com');
     await workflow.createExploration();
+    await waitFor.pageToFullyLoad();
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'This is the first card.'));
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
+    await waitFor.pageToFullyLoad();
     await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
       'Hindi', '../data/cafe.mp3');
@@ -65,6 +68,7 @@ describe('Voiceover player', function() {
       'Arabic', '../data/ambient-noise.mp3');
     await explorationEditorPage.saveChanges('Added voiceovers');
     await explorationEditorPage.navigateToSettingsTab();
+    await waitFor.pageToFullyLoad();
     await explorationEditorSettingsTab.setTitle('voiceoverPlayerTest');
     await explorationEditorSettingsTab.setCategory('Languages');
     await explorationEditorSettingsTab.setLanguage('English');
@@ -81,8 +85,11 @@ describe('Voiceover player', function() {
 
   it('should play and pause voiceovers', async function() {
     await libraryPage.get();
+    await waitFor.pageToFullyLoad();
     await libraryPage.playExploration('voiceoverPlayerTest');
+    await waitFor.pageToFullyLoad();
     await explorationPlayerPage.expandAudioBar();
+    await explorationPlayerPage.changeVoiceoverLanguage('Hindi');
     await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
     await explorationPlayerPage.pressPauseButton();
@@ -91,7 +98,9 @@ describe('Voiceover player', function() {
 
   it('should play voiceovers for multiple languages', async function() {
     await libraryPage.get();
+    await waitFor.pageToFullyLoad();
     await libraryPage.playExploration('voiceoverPlayerTest');
+    await waitFor.pageToFullyLoad();
     await explorationPlayerPage.expandAudioBar();
     await explorationPlayerPage.changeVoiceoverLanguage('Hindi');
     await explorationPlayerPage.pressPlayButton();

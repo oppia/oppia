@@ -26,7 +26,7 @@
         <div ng-if="audioLoadingIndicatorIsShown">
           <md-progress-linear md-mode="indeterminate"></md-progress-linear>
         </div>
-        <div ng-if="!audioLoadingIndicatorIsShown">
+        <div ng-if="!audioLoadingIndicatorIsShown" class="protractor-test-audio-progress-slider">
           <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
           </md-slider>
         </div>

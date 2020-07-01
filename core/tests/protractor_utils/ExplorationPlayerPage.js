@@ -85,11 +85,15 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-audio-lang-select'));
   var playButton = element(by.css('.protractor-test-play-circle'));
   var pauseButton = element(by.css('.protractor-test-pause-circle'));
+  var audioProgressSlider = element(
+    by.css('.protractor-test-audio-progress-slider'));
 
   this.expandAudioBar = async function() {
     await waitFor.elementToBeClickable(audioBarExpandButton,
       'Audio bar taking too long to be clickable');
     await audioBarExpandButton.click();
+    await waitFor.visibilityOf(voiceoverLanguageSelector,
+      'Audio bar not expanding');
   };
 
   this.pressPlayButton = async function() {
@@ -99,7 +103,12 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectAudioToBePlaying = async function() {
+    await waitFor.visibilityOf(pauseButton,
+      'Pause button not showing up');
+    await waitFor.visibilityOf(audioProgressSlider,
+      'Audio Progress Slider not showing up');
     expect(await pauseButton.isPresent()).toBeTruthy();
+    expect(await audioProgressSlider.isPresent()).toBeTruthy();
   };
 
   this.pressPauseButton = async function() {
@@ -109,6 +118,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectAudioToBePaused = async function() {
+    await waitFor.visibilityOf(playButton,
+      'Play button not showing up');
     expect(await playButton.isPresent()).toBeTruthy();
   };
 
