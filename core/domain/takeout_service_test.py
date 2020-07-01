@@ -1018,7 +1018,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
         ]
         self.assertEqual(len(expected_images), len(observed_images))
-        for i, _ in enumerate(expected_images)):
+        for i, _ in enumerate(expected_images):
             self.assertEqual(expected_images[i].b64_image_data,
                 observed_images[i].b64_image_data)
             self.assertEqual(
