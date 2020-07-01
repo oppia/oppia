@@ -21,12 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import python_utils
 
+
 class TakeoutExport(python_utils.OBJECT):
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(self, user_data, user_images):
         self.user_data = user_data
         self.user_images = user_images
+
 
 class TakeoutImage(python_utils.OBJECT):
     """Domain object for storing image data exported as part of Takeout."""
