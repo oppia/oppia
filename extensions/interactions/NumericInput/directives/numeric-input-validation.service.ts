@@ -188,7 +188,7 @@ export class NumericInputValidationService {
   parseValue(viewValue: string): number {
     if (viewValue) {
       // Remove commas and leading/trailing spaces before parsing.
-      return parseFloat(viewValue.replace(/\,|^\s+|\s+$/g, ''));
+      return parseFloat(viewValue.trim().replace(/\,/g, ''));
     }
   }
 }
