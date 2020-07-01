@@ -34,3 +34,19 @@ angular.module('oppia').directive('socialButtons', [
       }]
     };
   }]);
+
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service.ts';
+
+@Component({
+  selector: 'social-buttons'
+  templateUrl: './social-buttons.directive.html',
+  styleUrls: []
+})
+export class SocialButtonsComponent {
+  let urlInterpolation: UrlInterpolationService = null;
+
+  constructor() {}
+  getStaticImageUrl(imagePath) {
+    return this.UrlInterpolation.getStaticImageUrl(imagePath);
+  }
+}
