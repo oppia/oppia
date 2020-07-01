@@ -54,12 +54,10 @@
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
       </div>
       <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
-        <span class="oppia-dashboard-language-container-label">Translate text to:</span>
-        <select class="oppia-opportunity-language-selector protractor-test-language-selector"
-                ng-change="$ctrl.onChangeLanguage()"
-                ng-model="$ctrl.languageCode"
-                ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
-        </select>
+        <span class="oppia-dashboard-language-container-label">Translate to</span>
+        <translation-language-selector [active-language-code]="$ctrl.languageCode"
+                                       (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+        </translation-language-selector>
       </div>
     </div>
   </div>
@@ -80,13 +78,13 @@
   .oppia-dashboard-language-container-label {
     color: #4a4a4a;
     font-size: 18px;
+    margin-top: 10px;
   }
   .oppia-dashboard-language-container {
     display: flex;
     flex-direction: column;
-    height: 80px;
     margin-left: 10%;
-    width: 15%;
+    width: 250px;
   }
   .oppia-opportunity-language-selector {
     background: white;
@@ -94,9 +92,8 @@
     height: 35px;
   }
   .oppia-opportunities-tabs-explanation {
-    padding-top: 25px;
+    padding-top: 50px;
     position: relative;
-    width: 40%;
   }
   .oppia-opportunities-tabs-explanation::before {
     bottom: 65%;

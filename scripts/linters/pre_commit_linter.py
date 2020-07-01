@@ -61,6 +61,7 @@ import threading
 import python_utils
 
 # Install third party dependencies before proceeding.
+from . import app_dev_linter
 from . import codeowner_linter
 from . import css_linter
 from . import general_purpose_linter
@@ -69,6 +70,7 @@ from . import js_ts_linter
 from . import linter_utils
 from . import python_linter
 from . import third_party_typings_linter
+from . import webpack_config_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -551,12 +553,20 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(lint_messages, task, semaphore)
 
-    # lint_messages += codeowner_linter.check_codeowner_file(
-    #     FILE_CACHE, verbose_mode_enabled)
-    #
-    # lint_messages += (
-    #     third_party_typings_linter.check_third_party_libs_type_defs(
-    #         verbose_mode_enabled))
+    lint_messages += codeowner_linter.check_codeowner_file(
+        FILE_CACHE, verbose_mode_enabled)
+
+    lint_messages += (
+        third_party_typings_linter.check_third_party_libs_type_defs(
+            verbose_mode_enabled))
+
+    lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
+        FILE_CACHE, verbose_mode_enabled)
+
+    lint_messages += webpack_config_linter.check_webpack_config_file(
+        FILE_CACHE, verbose_mode_enabled)
+
+    _print_complete_summary_of_lint_messages(lint_messages)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
