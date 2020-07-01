@@ -29,7 +29,7 @@ from . import pre_commit_linter
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
-FILE_CACHE = NAME_SPACE.files  # pylint: disable=redefined-builtin
+FILE_CACHE = NAME_SPACE.files
 
 
 class AppDevLinterTests(test_utils.GenericTestBase):
