@@ -124,7 +124,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         bold: false,
         italic: false
       };
-      ctrl.isObjectSelected = false;
+      ctrl.objectIsSelected = false;
       ctrl.resizeSubscription = null;
 
       ctrl.onWidthInputBlur = function() {
@@ -768,6 +768,8 @@ angular.module('oppia').component('svgFilenameEditor', {
             var points = [x, y, x, y];
             var size = ctrl.fabricjsOptions.size;
             var stroke = ctrl.fabricjsOptions.stroke;
+            // This is to ensure that the polygon lines are visible when
+            // creating the polygon.
             stroke = stroke.slice(0, -2) + '1)';
             var line = new fabric.Line(points, {
               strokeWidth: parseInt(size.substring(0, size.length - 2)),
@@ -828,7 +830,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.strokePicker.setOptions({
             color: ctrl.canvas.getActiveObject().get('stroke')
           });
-          ctrl.isObjectSelected = true;
+          ctrl.objectIsSelected = true;
           if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
             ctrl.displayFontStyles = true;
           }
@@ -849,7 +851,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('selection:cleared', function() {
-          ctrl.isObjectSelected = false;
+          ctrl.objectIsSelected = false;
           ctrl.displayFontStyles = false;
         });
         $scope.$applyAsync();

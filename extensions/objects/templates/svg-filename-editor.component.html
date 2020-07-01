@@ -65,15 +65,15 @@
             </div>
           </div>
           <div>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isObjectSelected}"
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     style="background-image:url(/assets/svg_diagram_editor/bring_forward.svg);"
                     ng-click="$ctrl.bringObjectForward()" tooltip-placement="left" uib-tooltip="Bring Forward"
-                    ng-disabled="!$ctrl.isObjectSelected">
+                    ng-disabled="!$ctrl.objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isObjectSelected}"
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     style="background-image:url(/assets/svg_diagram_editor/send_backward.svg);"
                     ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
-                    ng-disabled="!$ctrl.isObjectSelected">
+                    ng-disabled="!$ctrl.objectIsSelected">
             </button>
             <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectUndoStack.length}"
                     ng-click="$ctrl.onUndo()"
@@ -87,7 +87,7 @@
             </button>
           </div>
           <button class="toolbar-button fat-button" ng-click="$ctrl.removeShape()"
-                  ng-disabled="!$ctrl.isObjectSelected">
+                  ng-disabled="!$ctrl.objectIsSelected">
             Remove
           </button>
           <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()">
