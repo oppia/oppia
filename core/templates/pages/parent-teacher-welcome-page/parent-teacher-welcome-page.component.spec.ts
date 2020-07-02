@@ -44,9 +44,9 @@ describe('Parents and Teachers Welcome Page', function() {
   });
 
   it('should contain the right classes and i18n information for ' +
-	'the bullet points', function(done) {
+	'the bullet points', function() {
   	ctrl.$onInit();
-    expect(ctrl.arr).toBe([
+    expect(ctrl.arr).toEqual([
 	  {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
 	    spanClass: 'oppia-parent-teacher-welcome-guide-blue',
 	    I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_1'},
@@ -65,39 +65,39 @@ describe('Parents and Teachers Welcome Page', function() {
 	]);
   });
 
-  it('should return the Fraction Exploration PNG URL', function(done) {
+  it('should return the Fraction Exploration PNG URL', function() {
   	ctrl.$onInit();
-    expect(ctrl.fractionExplorationPngImageUrl).toBe(
-      '/parent_teacher_welcome_page/fractions_exploration.png');
+    expect(ctrl.fractionExplorationPngImageUrl).toEqual(
+      '/assets/images/parent_teacher_welcome_page/fractions_exploration.png');
   });
 
-  it('should return the Fraction Exploration Webp Image URL', function(done) {
+  it('should return the Fraction Exploration Webp Image URL', function() {
   	ctrl.$onInit();
-    expect(ctrl.fractionExplorationPngImageUrl).toBe(
-      '/parent_teacher_welcome_page/fractions_exploration.webp');
+    expect(ctrl.fractionExplorationWebpImageUrl).toEqual(
+      '/assets/images/parent_teacher_welcome_page/fractions_exploration.webp');
   });
 
-  it('should return the Oppia Users PNG URL', function(done) {
+  it('should return the Oppia Users PNG URL', function() {
   	ctrl.$onInit();
-    expect(ctrl.fractionExplorationPngImageUrl).toBe(
-      '/parent_teacher_welcome_page/oppia_users.png');
+    expect(ctrl.oppiaUsersPngImageUrl).toEqual(
+      '/assets/images/parent_teacher_welcome_page/oppia_users.png');
   });
 
-  it('should return the Oppia Users Webp Image URL', function(done) {
+  it('should return the Oppia Users Webp Image URL', function() {
   	ctrl.$onInit();
-    expect(ctrl.fractionExplorationPngImageUrl).toBe(
-      '/parent_teacher_welcome_page/oppia_users.webp');
+    expect(ctrl.oppiaUsersWebpImageUrl).toEqual(
+      '/assets/images/parent_teacher_welcome_page/oppia_users.webp');
   });
 
-  it('should return the Library PNG URL', function(done) {
+  it('should return the Library PNG URL', function() {
   	ctrl.$onInit();
-    expect(ctrl.fractionExplorationPngImageUrl).toBe(
-      '/parent_teacher_welcome_page/exploration_library.png');
+    expect(ctrl.explorationLibraryPngImageUrl).toEqual(
+      '/assets/images/parent_teacher_welcome_page/exploration_library.png');
   });
 
-  it('should return the Library Webp Image URL', function(done) {
+  it('should return the Library Webp Image URL', function() {
   	ctrl.$onInit();
-    expect(ctrl.fractionExplorationPngImageUrl).toBe(
-      '/parent_teacher_welcome_page/exploration_library.webp');
+    expect(ctrl.explorationLibraryWebpImageUrl).toEqual(
+      '/assets/images/parent_teacher_welcome_page/exploration_library.webp');
   });
 });
