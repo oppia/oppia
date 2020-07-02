@@ -252,6 +252,9 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.select2DropdownIsShown).toBe(true);
     });
 
+    it('should return the upper count value for pagination', function() {
+      expect(ctrl.getUpperCountForPagination()).toEqual(1);
+    });
 
     it('should return number from 1 to the range specified', function() {
       var array = ctrl.generateNumbersTillRange(5);
@@ -373,12 +376,20 @@ describe('Topics and Skills Dashboard Page', function() {
         expect(ctrl.activeTab).toEqual('skills');
       });
 
+    it('should return the total count value for skills', function() {
+      expect(ctrl.getTotalCountValueForSkills()).toEqual(4);
+      ctrl.itemsPerPage = 2;
+      expect(ctrl.getTotalCountValueForSkills()).toEqual('many');
+    });
+
     it('should fetch skills when filters are applied', function() {
       expect(ctrl.activeTab).toEqual('skills');
       var fetchSkillSpy = spyOn(ctrl, 'fetchSkills').and.callThrough();
       ctrl.applyFilters();
       expect(fetchSkillSpy).toHaveBeenCalled();
     });
+
+
 
     it('should paginate if skills are present in memory instead of fetching',
       function() {
