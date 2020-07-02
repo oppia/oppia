@@ -20,8 +20,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 require ('pages/parent-teacher-welcome-page/' + 'parent-teacher-welcome-page.component.ts');
 
-// TODO(diana): Change to be for the right page
-
 describe('Parents and Teachers Welcome Page', function() {
   var ctrl = null;
   var windowRef = new WindowRef();
