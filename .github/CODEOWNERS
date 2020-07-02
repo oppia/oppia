@@ -440,21 +440,6 @@
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
 
-# QA team.
-/core/tests/ @nithusha21
-/core/tests/protractor_utils/ @U8NWXD
-/core/tests/protractor_desktop/ @U8NWXD
-/core/tests/protractor/ @U8NWXD
-/core/tests/protractor.conf.js @U8NWXD
-/extensions/interactions/*/protractor.js @U8NWXD
-/extensions/interactions/protractor.js @U8NWXD
-/extensions/rich_text_components/*/protractor.js @U8NWXD
-/extensions/rich_text_components/protractor.js @U8NWXD
-/extensions/objects/protractor.js @U8NWXD
-/assets/ @nithusha21
-/data/ @nithusha21
-
-
 # Release team.
 /scripts/release_scripts/ @ankita240796
 
@@ -563,6 +548,22 @@
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
+
+
+# QA team.
+/core/tests/ @nithusha21
+/assets/ @nithusha21
+/data/ @nithusha21
+/core/tests/protractor_utils/ @U8NWXD
+/core/tests/protractor_desktop/ @U8NWXD
+/core/tests/protractor/ @U8NWXD
+/core/tests/protractor.conf.js @U8NWXD
+/extensions/interactions/*/protractor.js @U8NWXD
+/extensions/interactions/protractor.js @U8NWXD
+/extensions/rich_text_components/*/protractor.js @U8NWXD
+/extensions/rich_text_components/protractor.js @U8NWXD
+/extensions/objects/protractor.js @U8NWXD
+
 
 # Critical files.
 #
