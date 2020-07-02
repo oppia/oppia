@@ -142,8 +142,7 @@ def _generate_activity_to_user_ids_mapping(activity_ids):
         user IDs.
     """
     return {
-        activity_id: user_models.PseudonymizedUserModel.get_new_id(
-            entity_name='')
+        activity_id: user_models.PseudonymizedUserModel.get_new_id()
         for activity_id in activity_ids
     }
 

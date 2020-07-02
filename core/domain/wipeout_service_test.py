@@ -366,7 +366,10 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.save_new_topic(self.TOPIC_1_ID, self.user_1_id)
+        self.save_new_topic(
+            self.TOPIC_1_ID,
+            self.user_1_id,
+            canonical_story_ids=[self.STORY_1_ID])
         self.save_new_story(self.STORY_1_ID, self.user_1_id, self.TOPIC_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
@@ -556,6 +559,7 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
     TOPIC_1_ID = 'topic_1_id'
+    TOPIC_2_ID = 'topic_2_id'
     STORY_1_ID = 'story_1_id'
     STORY_2_ID = 'story_2_id'
     USER_1_EMAIL = 'some@email.com'

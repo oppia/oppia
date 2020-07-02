@@ -320,7 +320,7 @@ class BaseModel(ndb.Model):
 
         Args:
             entity_name: The name of the entity. Coerced to a utf-8 encoded
-                string. Defaults to ''.
+                string.
 
         Returns:
             str. New unique id for this entity class.
