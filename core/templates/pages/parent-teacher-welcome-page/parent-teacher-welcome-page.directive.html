@@ -1,0 +1,64 @@
+<div class = "oppia-parent-teacher-welcome-guide-top-section row content">
+  <div  class="col-lg-7">
+    <div class="oppia-parent-teacher-welcome-guide-header">
+      <h1 class="oppia-parent-teacher-welcome-guide-h1" translate="I18N_PARENT_TEACHER_WELCOME_GUIDE_TITLE"> </h1>
+      <p class = "oppia-parent-teacher-welcome-guide-p" translate="I18N_PARENT_TEACHER_WELCOME_GUIDE_PARAGRAH_1">
+      	</p>
+    </div>
+  </div>
+  <div class="oppia-parent-teacher-welcome-guide-img col-lg-5">
+    <picture>
+      <source type="image/webp" ng-srcset="<[$ctrl.oppiaUsersWebpImageUrl]>">
+      <source type="image/jpeg" ng-srcset="<[$ctrl.oppiaUsersPngImageUrl]>">
+      <img ng-src="<[$ctrl.oppiaUsersPngImageUrl]>" alt="I18N_PARENT_TEACHER_WELCOME_GUIDE_HEADER_IMAGE">
+    </picture>
+  </div>
+</div>
+
+<div class="oppia-parent-teacher-welcome-guide-exploration-and-collection row content">
+  <div class="col-lg-6">
+    <div class="oppia-parent-teacher-welcome-guide-second-section">
+      <div class = "oppia-parent-teacher-welcome-guide-second-section-description">
+        <h1 class="oppia-parent-teacher-welcome-guide-h1" translate="I18N_PARENT_TEACHER_WELCOME_PAGE_COLLECTIONS_TITLE"></h1>
+        <div  class="oppia-parent-teacher-welcome-guide-p" translate="I18N_PARENT_TEACHER_WELCOME_PAGE_COLLECTIONS_PARAGRAPH">
+        </div>
+      </div>
+      <div class = "oppia-parent-teacher-welcome-guide-second-section-description">
+        <h1 class="oppia-parent-teacher-welcome-guide-h1" translate="I18N_PARENT_TEACHER_WELCOME_PAGE_EXPLORATION_TITLE"></h1>
+        <div class="oppia-parent-teacher-welcome-guide-p" translate="I18N_PARENT_TEACHER_WELCOME_PAGE_EXPLORATION_PARAGRAPH">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 oppia-parent-teacher-welcome-guide-fractions-image">
+    <picture>
+      <source type="image/webp" ng-srcset="<[$ctrl.fractionExplorationWebpImageUrl]>">
+      <source type="image/png" ng-srcset="<[$ctrl.fractionExplorationPngImageUrl]>">
+      <img class="oppia-parent-teacher-welcome-guide-fractions-img" ng-src="<[$ctrl.fractionExplorationPngImageUrl]>" alt="I18N_PARENT_TEACHER_WELCOME_GUIDE_FRACTIONS_IMAGE">
+    </picture>
+  </div>
+</div>
+
+<div class="oppia-parent-teacher-welcome-guide-find-explorations row content">
+  <div class="col-lg-12">
+    <div class="oppia-parent-teacher-welcome-guide-third-section">
+      <h1 class="oppia-parent-teacher-welcome-guide-h1" translate="I18N_PARENT_TEACHER_WELCOME_GUIDE_HOW_TO_TITLE"></h1>
+      <p class = "oppia-parent-teacher-welcome-guide-p" translate="I18N_PARENT_TEACHER_WELCOME_GUIDE_PARAGRAH_2"></p>
+      <p class = "oppia-parent-teacher-welcome-guide-p" translate="I18N_PARENT_TEACHER_WELCOME_GUIDE_PARAGRAH_3"></p>
+      <p class = "oppia-parent-teacher-welcome-guide-p" translate="I18N_PARENT_TEACHER_WELCOME_GUIDE_PARAGRAH_4"></p>
+    </div>
+  </div>
+  <div class="oppia-parent-teacher-welcome-guide-exploration-image col-lg-6">
+    <picture>
+      <source type="image/webp" ng-srcset="<[$ctrl.explorationLibraryWebpImageUrl]>">
+      <source type="image/jpeg" ng-srcset="<[$ctrl.explorationLibraryPngImageUrl]>">
+      <img style="width: 625px;" ng-src="<[$ctrl.explorationLibraryPngImageUrl]>" alt="I18N_PARENT_TEACHER_WELCOME_GUIDE_EXPLORATION_BROSWER_IMAGE">
+    </picture>
+  </div>
+  <div class="oppia-parent-teacher-welcome-guide-browser-image col-lg-6">
+    <div ng-repeat="element in $ctrl.arr track by $index"><span class = "<[element.spanClass]>"><[$index+1]></span>
+      <p class="<[element.pClass]>" translate = "<[element.I8n]>"></p>
+    </div>
+  </div>
+</div>

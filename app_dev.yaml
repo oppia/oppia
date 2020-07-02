@@ -155,7 +155,7 @@ handlers:
   secure: always
   expiration: "0"
 - url: /about/parents-teachers-guide
-  static_files: webpack_bundles/teacher-parents-welcome-page.mainpage.html
+  static_files: webpack_bundles/parent-teacher-welcome-page.mainpage.html
   upload: webpack_bundles/about-page.mainpage.html
   http_headers:
     Pragma: no-cache
