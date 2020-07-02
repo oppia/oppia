@@ -166,6 +166,40 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.logout()
 
 
+class UnassignSkillDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
+
+    def test_get(self):
+        self.login(self.ADMIN_EMAIL)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='Skill description')
+
+        json_response = self.get_json(
+            '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
+        self.assertEqual(len(json_response['assigned_topics']), 0)
+
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, name='Topic1',
+            description='Description1', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.admin_id, name='Topic2',
+            description='Description2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id],
+            subtopics=[], next_subtopic_id=1)
+
+        json_response = self.get_json(
+            '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
+        self.assertEqual(len(json_response['assigned_topics']), 2)
+        self.assertTrue('Topic1' in json_response['assigned_topics'])
+        self.assertTrue('Topic2' in json_response['assigned_topics'])
+
+
 class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_post(self):

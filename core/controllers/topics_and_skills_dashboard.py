@@ -166,6 +166,29 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class UnassignSkillDataHandler(base.BaseHandler):
+    """Provides data for Unassign skill modal."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self, skill_id):
+        """Handles GET requests."""
+        skill_ids_assigned_to_some_topic = (
+            topic_services.get_all_skill_ids_assigned_to_some_topic())
+
+        assigned_topics = []
+        topics = topic_fetchers.get_all_topics()
+        if skill_id in skill_ids_assigned_to_some_topic:
+            for topic in topics:
+                if skill_id in topic.get_all_skill_ids():
+                    assigned_topics.append(topic.name)
+
+        self.render_json({
+            'assigned_topics': assigned_topics
+        })
+
+
 class SkillsDashboardPageDataHandler(base.BaseHandler):
     """Provides data for the user's skills dashboard page."""
 

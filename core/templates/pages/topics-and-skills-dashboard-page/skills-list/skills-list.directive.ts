@@ -23,6 +23,9 @@ require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'assign-skill-to-topic-modal.controller.ts');
 require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'delete-skill-modal.controller.ts');
+require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 require(
@@ -90,8 +93,11 @@ angular.module('oppia').directive('skillsList', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
+              resolve: {
+                skillId: () => skillId
+              },
               windowClass: 'delete-skill-modal',
-              controller: 'ConfirmOrCancelModalController'
+              controller: 'DeleteSkillModalController'
             }).result.then(function() {
               SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {

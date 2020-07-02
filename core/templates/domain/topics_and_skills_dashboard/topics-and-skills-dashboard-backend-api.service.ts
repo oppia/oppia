@@ -27,6 +27,8 @@ import {
   TopicsAndSkillsDashboardFilter
 // eslint-disable-next-line max-len
 } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 export interface ITopicSummaryBackendDict {
   'id': string;
@@ -72,16 +74,30 @@ interface ISkillsDashboardDataBackendDict {
   'total_skill_count': number
 }
 
+interface IAssignedSkillDataBackendDict {
+  'assigned_topics': Array<string>
+}
+
 @Injectable({
   providedIn: 'root'
 })
 
 export class TopicsAndSkillsDashboardBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+              private urlInterpolationService: UrlInterpolationService) {}
 
   fetchDashboardData(): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
     return this.http.get<ITopicsAndSkillsDashboardDataBackendDict>(
       '/topics_and_skills_dashboard/data').toPromise();
+  }
+
+  fetchAssignedSkillData(skillId): Promise<IAssignedSkillDataBackendDict> {
+    var assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+      '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
+        skill_id: skillId
+      });
+    return this.http.get<IAssignedSkillDataBackendDict>(
+      assignSkillDataUrl).toPromise();
   }
 
   fetchSkillsDashboardData(

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -327,14 +328,23 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_delete_when_associated_topics_exist(self):
         self.login(self.ADMIN_EMAIL)
-        # Check DELETE returns 400 when the skill still has associated
-        # topics.
-        skill_has_topics_swap = self.swap(
-            topic_services,
-            'get_all_skill_ids_assigned_to_some_topic',
-            lambda: [self.skill_id])
-        with skill_has_topics_swap:
-            self.delete_json(self.url, expected_status_int=400)
+        # Check DELETE removes skill from the topic and returns 200 when the
+        # skill still has associated topics.
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Topic1',
+            description='Description1', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
+
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        self.assertTrue(self.skill_id in topic.get_all_skill_ids())
+
+        self.delete_json(self.url, expected_status_int=200)
+
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        self.assertFalse(self.skill_id in topic.get_all_skill_ids())
         self.logout()
 
 

@@ -951,9 +951,6 @@ export class UpgradedServices {
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
-    upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
-        new TopicsAndSkillsDashboardBackendApiService(
-          upgradedServices['HttpClient']);
     upgradedServices['TopicCreationBackendApiService'] =
         new TopicCreationBackendApiService(
           upgradedServices['HttpClient']);
@@ -1286,7 +1283,8 @@ export class UpgradedServices {
       new TopicCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
       new TopicsAndSkillsDashboardBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['TopicViewerBackendApiService'] =
       new TopicViewerBackendApiService(
         upgradedServices['HttpClient'],
