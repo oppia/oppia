@@ -169,6 +169,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 % hyphenated_component_id)
             main_html_file = os.path.join(
                 directives_dir, '%s.directive.html' % hyphenated_component_id)
+            # TODO(#9762): Remove this if condition once all the files in the
+            # rich_text_components directory is migrated from directives
+            # to component files.
             if hyphenated_component_id == 'svgdiagram':
                 main_ts_file = os.path.join(
                     directives_dir, 'oppia-noninteractive-%s.component.ts'
