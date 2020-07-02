@@ -118,6 +118,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
         class Form(python_utils.with_metaclass(FormType1, BaseForm)): # pylint: disable=inherit-non-class
             """Test class."""
+
             pass
 
         self.assertTrue(isinstance(Form, FormType1))

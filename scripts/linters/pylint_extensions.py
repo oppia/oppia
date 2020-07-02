@@ -1757,16 +1757,44 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
+        # if node.doc:
+        #     doc_length = len(node.doc.split('\n'))
+        #     lineno = node.fromlineno + doc_length + 1
+        #     line = linecache.getline(node.root().file, lineno).strip()
+        #     next_line = linecache.getline(node.root().file, lineno + 1).strip()
+        #     if line != '':
+        #         self.add_message(
+        #             'newline-below-class-docstring',
+        #             node=node)
+        #     elif next_line == '':
+        #         self.add_message(
+        #             'newline-below-class-docstring',
+        #             node=node)
+
+        # python_utils.PRINT('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
+        lineno = node.fromlineno
+        line_num = lineno
+        line = ''
+        while True:
+            line = linecache.getline(node.root().file, line_num).strip()
+            if line.find(b'):') != -1:
+                break
+            else:
+                line_num += 1
+                continue
+
         if node.doc:
-            doc_length = len(node.doc.split('\n'))
-            lineno = node.fromlineno + doc_length + 1
-            line = linecache.getline(node.root().file, lineno).strip()
-            next_line = linecache.getline(node.root().file, lineno + 1).strip()
-            if line != '':
+            doc_length = len(node.doc.split(b'\n'))
+            line_num += doc_length + 1
+            line = linecache.getline(node.root().file, line_num).strip()
+            next_line = linecache.getline(node.root().file, line_num + 1).strip()
+            # python_utils.PRINT(line)
+            # python_utils.PRINT(next_line)
+            if line != b'':
                 self.add_message(
                     'newline-below-class-docstring',
                     node=node)
-            elif next_line == '':
+            elif next_line == b'':
                 self.add_message(
                     'newline-below-class-docstring',
                     node=node)

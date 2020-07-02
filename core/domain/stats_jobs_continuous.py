@@ -272,10 +272,10 @@ class InteractionAnswerSummariesMRJobManager(
 
 class InteractionAnswerSummariesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    # TODO(bhenning): Implement a real-time model for
-    # InteractionAnswerSummariesAggregator.
     """Realtime model class for InteractionAnswerSummariesAggregator."""
 
+    # TODO(bhenning): Implement a real-time model for
+    # InteractionAnswerSummariesAggregator.
     pass
 
 

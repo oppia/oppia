@@ -139,6 +139,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(TypeError, 'not a Python function'):
             class BadCallCounter(python_utils.OBJECT):  # pylint: disable=unused-variable
                 """Counts calls made to the class."""
+
                 count = 0
 
                 @linter_utils.memoize
