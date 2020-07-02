@@ -198,38 +198,6 @@ export class PlaythroughService {
       Math.random() < sampleSizePopulationProportion);
   }
 
-  /**
-   * The ordering of checks in this method prioritizes the following types of
-   * playthroughs:
-   *    1. MultipleIncorrectSubmissionsIssue
-   *    2. CyclicStateTransitionsIssue
-   *    3. EarlyQuitIssue
-   *
-   * If none of the issue types have been discovered, returns null instead.
-   */
-  getPlaythrough(): Playthrough | null {
-    if (this.misTracker && this.misTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory.createNew(
-        this.explorationId, this.explorationVersion,
-        AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-        this.misTracker.generateIssueCustomizationArgs(),
-        this.recordedLearnerActions);
-    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory.createNew(
-        this.explorationId, this.explorationVersion,
-        AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
-        this.cstTracker.generateIssueCustomizationArgs(),
-        this.recordedLearnerActions);
-    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory.createNew(
-        this.explorationId, this.explorationVersion,
-        AppConstants.ISSUE_TYPE_EARLY_QUIT,
-        this.eqTracker.generateIssueCustomizationArgs(),
-        this.recordedLearnerActions);
-    }
-    return null;
-  }
-
   recordExplorationStartAction(initStateName: string): void {
     if (this.hasRecordingBegun() || !this.isPlaythroughRecordingEnabled()) {
       return;
@@ -290,11 +258,43 @@ export class PlaythroughService {
 
   storePlaythrough(): void {
     if (this.isRecordedPlaythroughHelpful()) {
-      const playthrough = this.getPlaythrough();
+      const playthrough = this.createNewPlaythrough();
       if (playthrough !== null) {
         this.playthroughBackendApiService.storePlaythrough(playthrough, 1);
       }
     }
+  }
+
+  /**
+   * The ordering of checks in this method prioritizes the following types of
+   * playthroughs:
+   *    1. MultipleIncorrectSubmissionsIssue
+   *    2. CyclicStateTransitionsIssue
+   *    3. EarlyQuitIssue
+   *
+   * If none of the issue types have been discovered, returns null instead.
+   */
+  private createNewPlaythrough(): Playthrough | null {
+    if (this.misTracker && this.misTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory.createNew(
+        this.explorationId, this.explorationVersion,
+        AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+        this.misTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions);
+    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory.createNew(
+        this.explorationId, this.explorationVersion,
+        AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
+        this.cstTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions);
+    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory.createNew(
+        this.explorationId, this.explorationVersion,
+        AppConstants.ISSUE_TYPE_EARLY_QUIT,
+        this.eqTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions);
+    }
+    return null;
   }
 
   private isPlaythroughRecordingEnabled(): boolean {
