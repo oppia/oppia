@@ -1041,17 +1041,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             camel_case_class_name = class_name[0].lower() + class_name[1:]
             return class_name, camel_case_class_name
 
-        #pylint: disable=invalid-name
-        OPPIA_ANGULAR_ROOT_PATH = (
+        oppia_angular_root_path = (
             './core/templates/components/oppia-angular-root.component.ts')
-        #pylint: disable=invalid-name
-        OPPIA_ROOT_DIRECTIVE_PATH = (
+        oppia_root_directive_path = (
             './core/templates/base-components/oppia-root.directive.ts')
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Oppia Angular Root file check')
             python_utils.PRINT('----------------------------------------')
-        oppia_angular_root = FILE_CACHE.read(OPPIA_ANGULAR_ROOT_PATH)
-        oppia_root_directive = FILE_CACHE.read(OPPIA_ROOT_DIRECTIVE_PATH)
+        oppia_angular_root = FILE_CACHE.read(oppia_angular_root_path)
+        oppia_root_directive = FILE_CACHE.read(oppia_root_directive_path)
         summary_messages = []
         total_error_count = 0
         total_files_checked = 0
@@ -1061,22 +1059,24 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 total_files_checked += 1
                 class_name, camel_case_class_name = (
                     get_injectable_class_name(file_content))
-                if not 'import { ' + class_name in oppia_angular_root:
+                import_statement = 'import { ' + class_name
+                if not import_statement in oppia_angular_root:
                     summary_message = (
-                        'Please import %s to Oppia Angular Root'
-                        % (class_name))
+                        'Please import %s to Oppia Angular Root Component in %s'
+                        % (class_name, oppia_angular_root_path))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
                     total_error_count += 1
 
-                if not (
-                        'static ' + camel_case_class_name + ': ' + class_name
-                        in oppia_angular_root):
+                static_declaration = (
+                    'static ' + camel_case_class_name + ': ' + class_name)
+                if not static_declaration in oppia_angular_root:
                     total_error_count += 1
                     summary_message = (
                         'Please add a static class member %s '
-                        'to Oppia Angular Root:' % (camel_case_class_name))
+                        'to Oppia Angular Root Component in %s:' % (
+                            camel_case_class_name, oppia_angular_root_path))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     summary_message = (
@@ -1086,13 +1086,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
 
-                if not (
-                        'private ' + camel_case_class_name + ': ' + class_name
-                        in oppia_angular_root):
+                dependency_injection_statement = (
+                    'private ' + camel_case_class_name + ': ' + class_name)
+                if not dependency_injection_statement in oppia_angular_root:
                     total_error_count += 1
                     summary_message = (
                         'Please add the class %s to Oppia Angular'
-                        ' Root constructor:' % (class_name)
+                        ' Root Component constructor in %s:' % (
+                            class_name, oppia_angular_root_path)
                     )
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
@@ -1102,13 +1103,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
 
-                if not (
-                        'OppiaAngularRootComponent.' + camel_case_class_name +
-                        ' = ' + 'this.' + camel_case_class_name + ';' in
-                        oppia_angular_root):
+                static_variable_assignment = (
+                    'OppiaAngularRootComponent.' + camel_case_class_name +
+                    ' = ' + 'this.' + camel_case_class_name + ';'
+                )
+                if not static_variable_assignment in oppia_angular_root:
                     total_error_count += 1
                     summary_message = (
-                        'The static variable hasn\'t been assigned value:')
+                        'The static variable hasn\'t been assigned value'
+                        'in Oppia Angular Root Component in %s:') % (
+                            oppia_angular_root_path)
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     summary_message = (
@@ -1134,9 +1138,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             if total_error_count:
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
-                summary_message = linter_utils.FAILED_MESSAGE_PREFIX
-                summary_message += 'OppiaAngularRootComponent linting failed,'
-                summary_message += ' fix the errors listed above'
+                summary_message = (
+                    '%sOppiaAngularRootComponent linting failed, fix the'
+                    'errors listed above' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
