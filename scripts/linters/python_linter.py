@@ -60,7 +60,7 @@ class StringMessageStream(python_utils.OBJECT):
         """Writes the given message to messages list.
 
         Args:
-            message: str. Message returned by the method.
+            message: str. The message to be written.
         """
         self.messages.append(message)
 
@@ -68,7 +68,7 @@ class StringMessageStream(python_utils.OBJECT):
         """Returns the output messages as a list.
 
         Returns:
-            list(str). Returns the output messages list.
+            list(str). The list of output messages.
         """
         return self.messages
 
