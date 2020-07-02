@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the social buttons displayed in footer.
+ * @fileoverview Component for the social buttons displayed in the footer.
  */
 
 import { Component } from '@angular/core';
@@ -23,7 +23,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'social-buttons',
-  templateUrl: './social-buttons.directive.html',
+  templateUrl: './social-buttons.component.html',
   styleUrls: []
 })
 export class SocialButtonsComponent {
