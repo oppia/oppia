@@ -116,7 +116,11 @@ describe('Learner dashboard page', function() {
         objective: '',
         category: '',
         version: '0',
-        nodes: []
+        nodes: [],
+        playthrough_dict: {
+          next_exploration_id: 'expId',
+          completed_exploration_ids: ['expId2']
+        }
       };
       learnerDashboardData = {
         completed_explorations_list: [],

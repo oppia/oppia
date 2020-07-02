@@ -1244,7 +1244,7 @@ angular.module('oppia').directive('conversationSkin', [
               ReadOnlyCollectionBackendApiService
                 .loadCollection($scope.collectionId)
                 .then(function(collection) {
-                  $scope.collectionTitle = collection.title;
+                  $scope.collectionTitle = collection.getTitle();
                 });
             } else {
               $scope.collectionTitle = null;

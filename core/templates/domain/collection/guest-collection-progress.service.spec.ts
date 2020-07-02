@@ -74,7 +74,14 @@ describe('Guest collection progress service', () => {
       objective: 'an objective',
       category: 'a category',
       version: 1,
-      nodes: []
+      nodes: [],
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      },
+      tags: null,
+      language_code: null,
+      schema_version: null
     };
     return collectionObjectFactory.create(collectionBackendObject);
   };

@@ -801,7 +801,8 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['CollectionObjectFactory'] =
       new CollectionObjectFactory(
-        upgradedServices['CollectionNodeObjectFactory']);
+        upgradedServices['CollectionNodeObjectFactory'],
+        upgradedServices['CollectionPlaythroughObjectFactory']);
     upgradedServices['ContinueValidationService'] =
       new ContinueValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1207,6 +1208,7 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
       new ReadOnlyCollectionBackendApiService(
         upgradedServices['HttpClient'],
+        upgradedServices['CollectionObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
@@ -1309,6 +1311,7 @@ export class UpgradedServices {
       new EditableCollectionBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['ReadOnlyCollectionBackendApiService'],
+        upgradedServices['CollectionObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardDataService'] =
         new EmailDashboardDataService(

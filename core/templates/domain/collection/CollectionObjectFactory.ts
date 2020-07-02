@@ -27,16 +27,27 @@ import {
   CollectionNode,
   CollectionNodeObjectFactory
 } from 'domain/collection/collection-node-object.factory';
+import {
+  CollectionPlaythrough,
+  CollectionPlaythroughBackendDict,
+  CollectionPlaythroughObjectFactory
+} from 'domain/collection/CollectionPlaythroughObjectFactory';
 
-export interface ICollectionBackendDict {
-  'id'?: string;
-  'title'?: string;
-  'objective'?: string;
-  'language_code'?: string;
-  'tags'?: string[];
-  'category'?: string;
-  'version'?: number;
-  'nodes'?: ICollectionNodeBackendDict[];
+interface ExplorationIdToNodeIndexMap {
+  [explorationId: string]: number;
+}
+
+export interface CollectionBackendDict {
+  'id': string;
+  'title': string;
+  'objective': string;
+  'language_code': string;
+  'tags': string[];
+  'schema_version': number;
+  'playthrough_dict': CollectionPlaythroughBackendDict;
+  'category': string;
+  'version': number;
+  'nodes': ICollectionNodeBackendDict[];
 }
 
 export class Collection {
@@ -45,29 +56,33 @@ export class Collection {
   _objective: string;
   _languageCode: string;
   _tags: string[];
+  _playthrough: CollectionPlaythrough;
   _category: string;
   _version: number;
+  _schemaVersion: number;
   _nodes: CollectionNode[];
-  _explorationIdToNodeIndexMap: {};
+  _explorationIdToNodeIndexMap: ExplorationIdToNodeIndexMap = {};
 
   constructor(
-      collectionBackendObject: ICollectionBackendDict,
-      collectionNodeObjectFactory: CollectionNodeObjectFactory) {
-    this._id = collectionBackendObject.id;
-    this._title = collectionBackendObject.title;
-    this._objective = collectionBackendObject.objective;
-    this._languageCode = collectionBackendObject.language_code;
-    this._tags = collectionBackendObject.tags;
-    this._category = collectionBackendObject.category;
-    this._version = collectionBackendObject.version;
+      id: string, title: string, objective: string, languageCode: string,
+      tags: string[], playthrough: CollectionPlaythrough, category: string,
+      version: number, schemaVersion: number, nodes: CollectionNode[]) {
+    this._id = id;
+    this._title = title;
+    this._objective = objective;
+    this._languageCode = languageCode;
+    this._tags = tags;
+    this._category = category;
+    this._version = version;
+    this._schemaVersion = schemaVersion;
+    this._playthrough = playthrough;
     this._nodes = [];
 
     // This map acts as a fast way of looking up a collection node for a given
     // exploration ID.
     this._explorationIdToNodeIndexMap = {};
-    for (var i = 0; i < collectionBackendObject.nodes.length; i++) {
-      this._nodes[i] = collectionNodeObjectFactory.create(
-        collectionBackendObject.nodes[i]);
+    for (var i = 0; i < nodes.length; i++) {
+      this._nodes[i] = nodes[i];
       var explorationId = this._nodes[i].getExplorationId();
       this._explorationIdToNodeIndexMap[explorationId] = i;
     }
@@ -87,6 +102,14 @@ export class Collection {
 
   getCategory(): string {
     return this._category;
+  }
+
+  getSchemaVersion(): number {
+    return this._schemaVersion;
+  }
+
+  getPlaythrough(): CollectionPlaythrough {
+    return this._playthrough;
   }
 
   setCategory(category: string) {
@@ -254,6 +277,8 @@ export class Collection {
     this.setLanguageCode(otherCollection.getLanguageCode());
     this.setTags(otherCollection.getTags());
     this._version = otherCollection.getVersion();
+    this._playthrough = otherCollection.getPlaythrough();
+    this._schemaVersion = otherCollection.getSchemaVersion();
     this.clearCollectionNodes();
 
     var nodes = otherCollection.getCollectionNodes();
@@ -268,19 +293,38 @@ export class Collection {
 })
 export class CollectionObjectFactory {
   constructor(
-      private collectionNodeObjectFactory: CollectionNodeObjectFactory) {}
+      private collectionNodeObjectFactory: CollectionNodeObjectFactory,
+      private collectionPlaythroughObjectFactory:
+      CollectionPlaythroughObjectFactory) { }
 
-  create(collectionBackendObject: ICollectionBackendDict): Collection {
+  create(collectionBackendObject: CollectionBackendDict): Collection {
+    let collectionNodes = collectionBackendObject.nodes.map(
+      node => this.collectionNodeObjectFactory.create(node));
+    let collectionPlaythrough = (
+      this.collectionPlaythroughObjectFactory.createFromBackendObject(
+        collectionBackendObject.playthrough_dict));
+
     return new Collection(
-      collectionBackendObject, this.collectionNodeObjectFactory);
+      collectionBackendObject.id,
+      collectionBackendObject.title,
+      collectionBackendObject.objective,
+      collectionBackendObject.language_code,
+      collectionBackendObject.tags,
+      collectionPlaythrough,
+      collectionBackendObject.category,
+      collectionBackendObject.version,
+      collectionBackendObject.schema_version,
+      collectionNodes);
   }
 
   // Create a new, empty collection. This is not guaranteed to pass validation
   // tests.
   createEmptyCollection(): Collection {
-    return new Collection({
-      nodes: [],
-    }, this.collectionNodeObjectFactory);
+    let emptyCollectionPlaythrough = this.collectionPlaythroughObjectFactory
+      .create(null, []);
+    return new Collection(
+      null, null, null, null, null, emptyCollectionPlaythrough,
+      null, null, null, []);
   }
 }
 

@@ -61,7 +61,7 @@ export class CollectionRightsBackendApiService {
       },
       (error) => {
         if (errorCallback) {
-          errorCallback(error);
+          errorCallback(error.statusText);
         }
       });
   }

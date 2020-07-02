@@ -308,9 +308,8 @@ angular.module('oppia').directive('collectionPlayerPage', [
             // Load the collection the learner wants to view.
             ReadOnlyCollectionBackendApiService.loadCollection(
               ctrl.collectionId).then(
-              function(collectionBackendObject) {
-                ctrl.collection = CollectionObjectFactory.create(
-                  collectionBackendObject);
+              function(collection) {
+                ctrl.collection = collection;
                 $rootScope.$broadcast('collectionLoaded');
 
                 PageTitleService.setPageTitle(
@@ -339,10 +338,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       CollectionPlaythroughObjectFactory.create(
                         nextExplorationId, completedExplorationIds));
                   } else {
-                    ctrl.collectionPlaythrough = (
-                      CollectionPlaythroughObjectFactory
-                        .createFromBackendObject(
-                          collectionBackendObject.playthrough_dict));
+                    ctrl.collectionPlaythrough = collection.getPlaythrough();
                   }
                   ctrl.nextExplorationId =
                     ctrl.collectionPlaythrough.getNextExplorationId();
