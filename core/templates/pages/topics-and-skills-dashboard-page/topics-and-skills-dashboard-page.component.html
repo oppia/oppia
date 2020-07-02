@@ -51,10 +51,10 @@
         <div class="dashboard-list">
           <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 || $ctrl.skillSummaries.length>0">
             <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperCountForPagination()]> of <[$ctrl.currentCount]></span>
+              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.currentCount]></span>
             </div>
             <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperCountForPagination()]> of <[$ctrl.getTotalCountValueForSkills()]></span>
+              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.getTotalCountValueForSkills()]></span>
             </div>
             <div class="dashboard-list-pagination">
               <div>

@@ -253,7 +253,19 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should return the upper count value for pagination', function() {
-      expect(ctrl.getUpperCountForPagination()).toEqual(1);
+      // This basically signifies that there is no second page,
+      // since there's just 1 topic, so the pagination header should say
+      // 1-1 of 1.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(1);
+      ctrl.currentCount = 15;
+      // This basically signifies that there's a second page since current
+      // count is 15 so the pagination header should show 1-10 of 15.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(10);
+      ctrl.currentCount = 15;
+      ctrl.pageNumber = 1;
+      // This basically signifies that there's a second page since current
+      // count is 15 so the pagination header should show 10-15 of 15.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(15);
     });
 
     it('should return number from 1 to the range specified', function() {
@@ -388,8 +400,6 @@ describe('Topics and Skills Dashboard Page', function() {
       ctrl.applyFilters();
       expect(fetchSkillSpy).toHaveBeenCalled();
     });
-
-
 
     it('should paginate if skills are present in memory instead of fetching',
       function() {

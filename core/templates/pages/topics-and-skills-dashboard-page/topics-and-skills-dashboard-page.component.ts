@@ -318,7 +318,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       };
 
       ctrl.resetFilters = function() {
-        ctrl.getUpperCountForPagination();
+        ctrl.getUpperLimitValueForPagination();
         ctrl.topicSummaries = ctrl.totalTopicSummaries;
         ctrl.currentCount = ctrl.totalEntityCountToDisplay;
         ctrl.filterObject.reset();
@@ -329,8 +329,9 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.filterBoxIsShown = !ctrl.filterBoxIsShown;
       };
 
-      ctrl.getUpperCountForPagination = function() {
-        return (Math.min(((ctrl.pageNumber * ctrl.itemsPerPage) +
+      ctrl.getUpperLimitValueForPagination = function() {
+        return (
+          Math.min(((ctrl.pageNumber * ctrl.itemsPerPage) +
             ctrl.itemsPerPage), ctrl.currentCount));
       };
 
