@@ -25,8 +25,6 @@ import { IProfileResponse, ProfileLinkImageBackendApiService } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-
-
 @Component({
   selector: 'profile-link-image',
   templateUrl: './profile-link-image.component.html',
