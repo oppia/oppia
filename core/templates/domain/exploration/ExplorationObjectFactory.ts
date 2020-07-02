@@ -58,14 +58,14 @@ export class Exploration {
     this.urlInterpolationService = urlInterpolationService;
   }
 
-  // Instance methods
+  // ---- Instance methods ----
   isStateTerminal(stateName: string): boolean {
     return (
       stateName && this.getInteractionId(stateName) &&
         INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
   }
 
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getAuthorRecommendedExpIds(stateName: string): any {
     if (!this.isStateTerminal(stateName)) {
       throw new Error(
@@ -78,7 +78,7 @@ export class Exploration {
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getInteraction(stateName: string): any {
     let state = this.states.getState(stateName);
     if (!state) {
@@ -96,7 +96,7 @@ export class Exploration {
     return interaction.id;
   }
 
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getInteractionCustomizationArgs(stateName: string): any {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
@@ -118,7 +118,7 @@ export class Exploration {
             '');
   }
 
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getInteractionThumbnailSrc(stateName: string): any {
     // TODO(sll): Unify this with the 'choose interaction' modal in
     // state_editor_interaction.html.
@@ -139,15 +139,15 @@ export class Exploration {
         INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getStates(): any {
     return cloneDeep(this.states);
   }
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getState(stateName: string): any {
     return this.states.getState(stateName);
   }
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getInitialState(): any {
     return this.getState(this.initStateName);
   }
@@ -159,7 +159,7 @@ export class Exploration {
   getUninterpolatedContentHtml(stateName: string): string {
     return this.getState(stateName).content.getHtml();
   }
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getVoiceovers(stateName: string): any {
     let state = this.getState(stateName);
     if (!state) {
@@ -171,7 +171,7 @@ export class Exploration {
     return recordedVoiceovers.getBindableVoiceovers(
       contentId);
   }
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getVoiceover(
       stateName: string, languageCode: string): any {
     let state = this.getState(stateName);
@@ -184,7 +184,7 @@ export class Exploration {
     const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
     return voiceovers || null;
   }
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   getAllVoiceovers(languageCode: string): any {
     return this.states.getAllVoiceovers(languageCode);
   }
@@ -208,7 +208,7 @@ export class ExplorationObjectFactory {
               private statesObjectFactory: StatesObjectFactory,
               private urlInterpolationService: UrlInterpolationService) {}
 
-  // TODO(#7165): Replace any with exact type
+  // TODO(#7165): Replace any with exact type.
   createFromBackendDict(explorationBackendDict: any): Exploration {
     /* eslint-enable dot-notation */
     return new Exploration(

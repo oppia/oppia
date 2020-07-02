@@ -1,38 +1,45 @@
-<div class="modal-header">
-  <h3>Create New Skill</h3>
+<div class="modal-header create-new-skill-modal-header">
+  <h3>New Skill</h3>
+  <i class="fa fa-times modal-close-button" ng-click="cancel()"></i>
 </div>
 
 <form ng-submit="createNewSkill()">
-  <div class="modal-body">
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
-      <strong>New Skill Description</strong>
+  <div class="modal-body create-new-skill-modal">
+    <div class="skill-description-box">
+      <div class="skill-description-header">
+        <strong>Skill Description</strong>
+      </div>
+      <input type="text" class="form-control protractor-test-new-skill-description-field"
+             placeholder="eg: Adding Fractions" ng-change="updateSkillDescription()" ng-model="newSkillDescription"
+             autofocus maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
+        </i>
+      </span>
+      <span ng-if="errorMsg" class="skill-description-error-message">
+        <i>
+          <[errorMsg]>
+        </i>
+      </span>
     </div>
-    <input type="text" class="form-control protractor-test-new-skill-description-field"
-           placeholder="eg: Adding Fractions" ng-change="resetErrorMsg()" ng-model="newSkillDescription"
-           autofocus maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
-    <span class="oppia-input-box-subtitle">
-      <i>
-        Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
-      </i>
-    </span>
-    <span ng-if="errorMsg" class="skill-description-error-message">
-      <i>
-        <[errorMsg]>
-      </i>
-    </span>
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
-      <strong>Review Material</strong>
+    <div class="skill-review-material-box">
+      <div class="oppia-rule-details-header protractor-test-open-concept-card" ng-click="openConceptCardExplanationEditor()">
+        <strong>Review Material</strong>
+        <div class="oppia-input-box-subtitle">
+          <i>
+            This gives the learner a brief overview of how to perform the skill.
+          </i>
+          <i class="fa fa-pen"></i>
+        </div>
+      </div>
+
+      <div ng-if="conceptCardExplanationEditorIsShown">
+        <schema-based-editor schema="HTML_SCHEMA" class="protractor-test-concept-card-text"
+                             local-value="bindableDict.displayedConceptCardExplanation">
+        </schema-based-editor>
+      </div>
     </div>
-    <review-material-editor bindable-dict="bindableDict"
-                            on-save-explanation="onSaveExplanation">
-    </review-material-editor>
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
-      <strong>Add Skill Rubrics</strong>
-    </div>
-    <rubrics-editor rubrics="rubrics"
-                    on-save-rubric="onSaveRubric"
-                    new-skill-being-created="true">
-    </rubrics-editor>
   </div>
 
   <div class="modal-footer">
@@ -45,9 +52,64 @@
   </div>
 </form>
 <style>
-  .skill-description-error-message {
+  .create-new-skill-modal-header i {
+    display: none;
+  }
+  .create-new-skill-modal .skill-description-header {
+    margin-bottom: 6px;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .create-new-skill-modal .oppia-rule-details-header {
+    margin-bottom: 0.5em;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .create-new-skill-modal .skill-description-error-message {
     color: red;
     display: block;
     font-size: 0.8em;
+  }
+
+  @media screen and (max-width: 768px) {
+    .create-new-skill-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-skill-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+    }
+    .create-new-skill-modal .modal-body {
+      height: 80vh;
+    }
+    .create-new-skill-modal .modal-header {
+      align-items: center;
+      background-color: #00609C;
+      display: flex;
+    }
+    .create-new-skill-modal .modal-header h3 {
+      color: #FFFFFF;
+    }
+    .create-new-skill-modal .modal-close-button {
+      color: #FFFFFF;
+      display: block;
+      font-size: 20px;
+    }
+    .create-new-skill-modal .skill-description-box {
+      margin: 40px 0;
+    }
+    .create-new-skill-modal .skill-review-material-box {
+      margin: 40px 0;
+    }
+    .create-new-skill-modal .oppia-input-box-subtitle {
+      margin-bottom: 15px;
+    }
   }
 </style>

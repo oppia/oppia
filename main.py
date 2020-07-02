@@ -266,6 +266,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/usercommunityrightsdatahandler',
         community_dashboard.UserCommunityRightsDataHandler),
     get_redirect_route(
+        r'/retrivefeaturedtranslationlanguages',
+        community_dashboard.FeaturedTranslationLanguagesHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -345,6 +348,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.SKILL_DASHBOARD_DATA_URL,
+        topics_and_skills_dashboard.SkillsDashboardPageDataHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' %

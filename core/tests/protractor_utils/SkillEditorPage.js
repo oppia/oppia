@@ -103,8 +103,14 @@ var SkillEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.selectDifficultyForRubric = async function(difficulty) {
+    await element(by.css('.protractor-test-select-rubric-difficulty'))
+      .element(by.cssContainingText('option', difficulty)).click();
+  };
+
   this.addRubricExplanationForDifficulty = async function(
       difficulty, explanation) {
+    await this.selectDifficultyForRubric(difficulty);
     var addRubricExplanationButton = element(
       by.css('.protractor-test-add-explanation-button-' + difficulty));
     await waitFor.elementToBeClickable(
@@ -130,6 +136,7 @@ var SkillEditorPage = function() {
     // The edit explanation buttons for all explanations of a difficulty have
     // the same class name and each explanation in it are identified by its
     // index.
+    await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     var button = await editRubricExplanationButtons.get(explIndex);
@@ -148,6 +155,7 @@ var SkillEditorPage = function() {
     // The edit explanation buttons for all explanations of a difficulty have
     // the same class name and each explanation in it are identified by its
     // index.
+    await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     await waitFor.elementToBeClickable(
@@ -167,6 +175,7 @@ var SkillEditorPage = function() {
 
   this.expectRubricExplanationsToMatch = async function(
       difficulty, explanations) {
+    await this.selectDifficultyForRubric(difficulty);
     var rubricExplanationsForDifficulty = element.all(
       by.css('.protractor-test-rubric-explanation-' + difficulty));
     var explanationCount = await rubricExplanationsForDifficulty.count();

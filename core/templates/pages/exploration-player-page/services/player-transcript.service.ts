@@ -27,6 +27,7 @@ import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { LoggerService } from 'services/contextual/logger.service';
+import { StateCard } from 'domain/state_card/StateCardObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -40,10 +41,9 @@ export class PlayerTranscriptService {
   // there is a card 'in reserve', but the learner has not yet navigated to it
   // -- this happens if the current card offers feedback to the learner before
   // they carry on.
-  transcript = [];
+  transcript: StateCard[] = [];
   numAnswersSubmitted = 0;
-  // TODO(#7165): Replace 'any' with the exact type.
-  restore(oldTranscript: any): void {
+  restore(oldTranscript: StateCard[]): void {
     this.transcript = cloneDeep(oldTranscript);
   }
 
@@ -53,13 +53,11 @@ export class PlayerTranscriptService {
   }
 
   hasEncounteredStateBefore(stateName: string): boolean {
-    // TODO(#7165): Replace 'any' with the exact type.
-    return this.transcript.some((transcriptItem: any) => {
+    return this.transcript.some(transcriptItem => {
       return transcriptItem.getStateName() === stateName;
     });
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  addNewCard(newCard: any): void {
+  addNewCard(newCard: StateCard): void {
     this.transcript.push(newCard);
     this.numAnswersSubmitted = 0;
   }
@@ -105,8 +103,8 @@ export class PlayerTranscriptService {
   getNumCards(): number {
     return this.transcript.length;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  getCard(index: number): any {
+
+  getCard(index: number): StateCard {
     if (index < 0 || index >= this.transcript.length) {
       this.log.error(
         'Requested card with index ' + index +
@@ -133,7 +131,7 @@ export class PlayerTranscriptService {
     return index === this.transcript.length - 1;
   }
 
-  getLastCard(): any {
+  getLastCard(): StateCard {
     return this.getCard(this.transcript.length - 1);
   }
 

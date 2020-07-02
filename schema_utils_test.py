@@ -57,7 +57,7 @@ ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 ALLOWED_CUSTOM_OBJ_TYPES = [
-    'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
+    'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
     'ListOfTabs', 'SkillSelector', 'SvgFilename']
 
@@ -169,7 +169,8 @@ VALIDATOR_SPECS = {
                 'type': SCHEMA_TYPE_BOOL
             }
         },
-        'is_valid_math_equation': {}
+        'is_valid_math_equation': {},
+        'is_supported_audio_language_code': {}
     },
 }
 
@@ -211,7 +212,7 @@ def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
     keys, are in the given dict.
 
     Raises:
-      AssertionError: if the validation fails.
+        AssertionError: The validation fails.
     """
     assert set(required_keys) <= set(dict_to_check.keys()), (
         'Missing keys: %s' % dict_to_check)
@@ -237,7 +238,7 @@ def validate_schema(schema):
     of normalizers.
 
     Raises:
-      AssertionError: if the schema is not valid.
+        AssertionError: The schema is not valid.
     """
     assert isinstance(schema, dict)
     assert SCHEMA_KEY_TYPE in schema
@@ -514,6 +515,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_valid_math_equation('(a/b)+c=(4^3)*a'))
         self.assertTrue(is_valid_math_equation('2^alpha-(-3) = 3'))
         self.assertTrue(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2*a*b'))
+        self.assertTrue(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2ab'))
         self.assertTrue(is_valid_math_equation('x/a + y/b = 1'))
         self.assertTrue(is_valid_math_equation('3 = -5 + pi^pi'))
         self.assertTrue(is_valid_math_equation('pi = 3.1415'))
@@ -524,7 +526,6 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_math_equation('3 -= 2/a'))
         self.assertFalse(is_valid_math_equation('3 == 2/a'))
         self.assertFalse(is_valid_math_equation('x + y = '))
-        self.assertFalse(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2ab'))
         self.assertFalse(is_valid_math_equation('(a+b = 0)'))
         self.assertFalse(is_valid_math_equation('a+b=0=a-b'))
         self.assertFalse(is_valid_math_equation('alpha - beta/c'))
@@ -538,6 +539,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_math_equation('(a+(b)=0'))
         self.assertFalse(is_valid_math_equation('a+b=c:)'))
 
+    def test_is_supported_audio_language_code(self):
+        is_supported_audio_language_code = schema_utils.get_validator(
+            'is_supported_audio_language_code')
+
+        self.assertTrue(is_supported_audio_language_code('en'))
+        self.assertTrue(is_supported_audio_language_code('fr'))
+        self.assertTrue(is_supported_audio_language_code('de'))
+
+        self.assertFalse(is_supported_audio_language_code(''))
+        self.assertFalse(is_supported_audio_language_code('zz'))
+        self.assertFalse(is_supported_audio_language_code('test'))
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
@@ -546,11 +559,15 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         """Validates the schema and tests that values are normalized correctly.
 
         Args:
-          schema: the schema to normalize the value against.
-          mappings: a list of 2-element tuples. The first element of
-            each item is expected to be normalized to the second.
-          invalid_items: a list of values. Each of these is expected to raise
-            an AssertionError when normalized.
+            schema: dict. The schema to normalize the value
+                against. Each schema is a dict with at least a key called
+                'type'. The 'type' can take one of the SCHEMA_TYPE_* values
+                declared above.
+            mappings: list(tuple). A list of 2-element tuples.
+                The first element of each item is expected to be normalized to
+                the second.
+            invalid_items: list(tuple(double, double)). Each of these is
+                expected to raise an AssertionError when normalized.
         """
         validate_schema(schema)
 
@@ -594,6 +611,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [
             ('<script></script>', ''),
+            (b'<script></script>', ''),
             ('<a class="webLink" href="https'
              '://www.oppia.com/"><img src="images/oppia.png"></a>',
              '<a href="https://www.oppia.com/"></a>')]
