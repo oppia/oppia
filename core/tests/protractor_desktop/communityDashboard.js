@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CommunityDashboardPage = require(
   '../protractor_utils/CommunityDashboardPage.js');
 
@@ -30,14 +33,48 @@ describe('Community dashboard page', function() {
       new CommunityDashboardPage.CommunityDashboardPage());
     communityDashboardTranslateTextTab = (
       communityDashboardPage.getTranslateTextTab());
+  });
+
+  beforeEach(async function() {
     await browser.get('/community-dashboard');
+    await waitFor.pageToFullyLoad();
+    await communityDashboardPage.navigateToTranslateTextTab();
   });
 
   it('should allow user to switch to translate text tab', async function() {
-    await communityDashboardPage.navigateToTranslateTextTab();
     await communityDashboardTranslateTextTab.changeLanguage('Hindi');
     await communityDashboardTranslateTextTab.expectSelectedLanguageToBe(
       'Hindi');
+  });
+
+  describe('featured languages', () => {
+    beforeAll(async function() {
+      await users.createAndLoginAdminUser(
+        'config@communityDashboard.com', 'communityDashboard');
+      const adminPage = new AdminPage.AdminPage();
+      await adminPage.editConfigProperty(
+        'Featured Translation Languages',
+        'List',
+        async function(elem) {
+          const featured = await elem.addItem('Dictionary');
+          await (await featured.editEntry(0, 'Unicode')).setValue('fr');
+          await (await featured.editEntry(1, 'Unicode'))
+            .setValue('Partnership with ABC');
+        });
+      await users.logout();
+    });
+
+    it('should show correct featured languages', async function() {
+      await communityDashboardTranslateTextTab
+        .expectFeaturedLanguagesToBe(['French']);
+    });
+
+    it('should show correct explanation', async function() {
+      await communityDashboardTranslateTextTab
+        .mouseoverFeaturedLanguageTooltip(0);
+      await communityDashboardTranslateTextTab
+        .expectFeaturedLanguageExplanationToBe('Partnership with ABC');
+    });
   });
 
   afterEach(async function() {
