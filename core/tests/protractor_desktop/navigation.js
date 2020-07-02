@@ -152,7 +152,8 @@ describe('Static Pages Tour', function() {
     await browser.get('/about/parents-teachers-guide');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-parent-teacher-welcome-page')).isPresent()).toBe(true);
+      by.css('.protractor-test-parent-teacher-welcome-page')).isPresent())
+        .toBe(true);
   });
 
   it('visits the Privacy page', async function() {

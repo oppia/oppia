@@ -18,8 +18,10 @@
 
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.
-require('pages/parent-teacher-welcome-page/parent-teacher-welcome-page.module.ts');
+require('pages/parent-teacher-welcome-page/' +
+	'parent-teacher-welcome-page.module.ts');
 require('App.ts');
 
 require('base-components/base-content.directive.ts');
-require('pages/parent-teacher-welcome-page/parent-teacher-welcome-page.controller.ts');
+require('pages/parent-teacher-welcome-page/' +
+	'parent-teacher-welcome-page.controller.ts

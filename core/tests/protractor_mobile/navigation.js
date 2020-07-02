@@ -140,14 +140,16 @@ describe('Navigation features on mobile', function() {
         'http://localhost:9001/library');
     });
 
-  it('should navigate to Parents and Teachers Welcome page using the sidebar menu',
+  it('should navigate to Parents and Teachers Welcome page using the sidebar ' +
+      'menu',
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
       await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
-      var libraryLink = element(by.css('.protractor-mobile-test-parent-teacher-welcome-link'));
+      var libraryLink = element(by.css(
+        '.protractor-mobile-test-parent-teacher-welcome-link'));
       await waitFor.elementToBeClickable(
         libraryLink, 'Could not click Parent Teacher Welcome page link');
       await libraryLink.click();

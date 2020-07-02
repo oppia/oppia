@@ -16,21 +16,12 @@
  * @fileoverview Controllers for the Parents and Teachers Welcome Guide page.
  */
 
- //TODO(diana): Change to be component
-
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('welcomeGuidePage', [
-'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/parent-teacher-welcome-page/parent-teacher-welcome-page.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['UrlInterpolationService', function(
-          UrlInterpolationService) {
+angular.module('oppia').component('parentTeacherWelcomePage', {
+	template: require('./parent-teacher-welcome-page.mainpage.html'),
+	controller: ['UrlInterpolationService', 
+	function(UrlInterpolationService) {
         var ctrl = this;
         ctrl.$onInit = function() {
           ctrl.arr = [
@@ -70,6 +61,5 @@ angular.module('oppia').directive('welcomeGuidePage', [
             UrlInterpolationService.getStaticImageUrl(
               '/parent_teacher_welcome_page/exploration_library.webp'));
         };
-      }]
-    };
-  }]);
+    }]
+}; 
