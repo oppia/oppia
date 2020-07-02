@@ -1190,10 +1190,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['PlaythroughBackendApiService'] =
-      new PlaythroughBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
