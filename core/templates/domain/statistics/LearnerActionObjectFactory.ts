@@ -115,27 +115,27 @@ export type LearnerAction = (
 export class LearnerActionObjectFactory {
   createNewExplorationStartAction(
       actionCustomizationArgs: IExplorationStartCustomizationArgs,
-      schemaVersion?: number): ExplorationStartLearnerAction {
-    schemaVersion = schemaVersion ||
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+      schemaVersion: number = (
+        StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION)
+  ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
       'ExplorationStart', actionCustomizationArgs, schemaVersion);
   }
 
   createNewAnswerSubmitAction(
       actionCustomizationArgs: IAnswerSubmitCustomizationArgs,
-      schemaVersion?: number): AnswerSubmitLearnerAction {
-    schemaVersion = schemaVersion ||
-    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+      schemaVersion: number = (
+        StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION)
+  ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
       'AnswerSubmit', actionCustomizationArgs, schemaVersion);
   }
 
   createNewExplorationQuitAction(
       actionCustomizationArgs: IExplorationQuitCustomizationArgs,
-      schemaVersion?: number): ExplorationQuitLearnerAction {
-    schemaVersion = schemaVersion ||
-    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+      schemaVersion: number = (
+        StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION)
+  ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
       'ExplorationQuit', actionCustomizationArgs, schemaVersion);
   }
