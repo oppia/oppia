@@ -1,13 +1,13 @@
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an 'AS-IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -24,20 +24,21 @@ module.exports = async(browser, context) => {
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
   if (context.url.includes('admin')) {
-    await login(context, page)
+    await login(context, page);
   } else if (context.url.includes('emaildashboard')) {
-    await set_role_admin(context, page)
+    await set_role_admin(context, page);
   } else if (context.url.includes('collection/0')) {
-    await create_collections(context, page)
+    await create_collections(context, page);
   }
   await page.close();
 };
 
 
-async function login(context, page) {
+const login = async function(context, page) {
   try {
-    console.log("Logging into Oppia...")
-    //eslint-disable-next-line dot-notation
+    // eslint-disable-next-line no-console
+    console.log('Logging into Oppia...')
+    // eslint-disable-next-line dot-notation
     await page.goto(context.url);
     await page.click('#admin');
     await Promise.all([
@@ -53,19 +54,20 @@ async function login(context, page) {
       page.waitForNavigation(),
       await page.click('#signup-submit')
     ]);
-    console.log("Successfully Logged in")
+    // eslint-disable-next-line no-console
+    console.log('Successfully Logged in');
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log("Already Logged In")
+    console.log('Login Failed')
     // eslint-disable-next-line no-console
     console.log(e)
   }
 };
 
 
-async function set_role_admin(context, page) {
+const set_role_admin=  async function(context, page) {
   try {
-    console.log("Changing role to admin...")
+    console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
@@ -75,20 +77,20 @@ async function set_role_admin(context, page) {
     await page.click('#update-button-id');
     await page.waitFor(2000);
     // eslint-disable-next-line no-console
-    console.log("Role changed to admin")
+    console.log('Role changed to admin');
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log("Changing role to admin failed");
+    console.log('Changing role to admin failed');
     // eslint-disable-next-line no-console
-    console.log(e)
+    console.log(e);
   }
 };
 
 
-async function create_collections(context, page) {
+const create_collections = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
-    console.log("Creating Collections...");
+    console.log('Creating Collections...');
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
@@ -104,10 +106,11 @@ async function create_collections(context, page) {
     await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
     // eslint-disable-next-line no-console
-    console.log("Collections Created");
+    console.log('Collections Created');
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log("Creating Collections Failed");
+    console.log('Creating Collections Failed');
+    // eslint-disable-next-line no-console
     console.log(e);
   }
 }
