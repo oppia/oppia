@@ -22,6 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from core.domain import exp_domain
+from core.domain import html_validation_service
+from core.domain import state_domain
 from core.platform import models
 import python_utils
 import utils
@@ -48,7 +50,7 @@ def try_upgrading_draft_to_exp_version(
 
     Returns:
         list(ExplorationChange) or None. A list of ExplorationChange domain
-            objects after upgrade or None if upgrade fails.
+        objects after upgrade or None if upgrade fails.
 
     Raises:
         InvalidInputException. current_draft_version is greater than
@@ -87,6 +89,95 @@ def try_upgrading_draft_to_exp_version(
 
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
+
+    @classmethod
+    def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):
+        """Converts draft change list from state version 33 to 34. State
+        version 34 adds the new schema for Math components.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        conversion_fn = (
+            html_validation_service.add_math_content_to_math_rte_components)
+        for i, change in enumerate(draft_change_list):
+            new_value = None
+            if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                continue
+            # The change object has the key 'new_value' only if the
+            # cmd is 'CMD_EDIT_STATE_PROPERTY' or
+            # 'CMD_EDIT_EXPLORATION_PROPERTY'.
+            new_value = change.new_value
+            if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                new_value['html'] = conversion_fn(new_value['html'])
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                # Only customization args with the key 'choices' have HTML
+                # content in them.
+                if 'choices' in new_value.keys():
+                    for value_index, value in enumerate(
+                            new_value['choices']['value']):
+                        new_value['choices']['value'][value_index] = (
+                            conversion_fn(value))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                new_value = (
+                    state_domain.WrittenTranslations.
+                    convert_html_in_written_translations(
+                        new_value, conversion_fn))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                new_value = (
+                    state_domain.Outcome.convert_html_in_outcome(
+                        new_value, conversion_fn))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                new_value = [
+                    (state_domain.Hint.convert_html_in_hint(
+                        hint_dict, conversion_fn))
+                    for hint_dict in new_value]
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                new_value['explanation']['html'] = (
+                    conversion_fn(new_value['explanation']['html']))
+                # TODO(#9413): Find a way to include a reference to the
+                # interaction type in the Draft change lists.
+                # See issue: https://github.com/oppia/oppia/issues/9413.
+                # currently, only DragAndDropSortInput interaction allows
+                # solution correct answers having HTML in them.
+                # This code below should be updated if any new interaction
+                # is allowed to have HTML in the solution correct answer
+                # The typecheckings below can be avoided once #9413 is fixed.
+                if new_value['correct_answer']:
+                    if isinstance(new_value['correct_answer'], list):
+                        for list_index, html_list in enumerate(
+                                new_value['correct_answer']):
+                            if isinstance(html_list, list):
+                                for answer_html_index, answer_html in enumerate(
+                                        html_list):
+                                    if isinstance(
+                                            answer_html, python_utils.UNICODE):
+                                        new_value['correct_answer'][list_index][
+                                            answer_html_index] = (
+                                                conversion_fn(answer_html))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                new_value = [
+                    (state_domain.AnswerGroup.convert_html_in_answer_group(
+                        answer_group, conversion_fn))
+                    for answer_group in new_value]
+            if new_value is not None:
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': change.cmd,
+                    'property_name': change.property_name,
+                    'state_name': change.state_name,
+                    'new_value': new_value
+                })
+        return draft_change_list
 
     @classmethod
     def _convert_states_v32_dict_to_v33_dict(cls, draft_change_list):

@@ -162,7 +162,7 @@ export class ExtractImageFilenamesFromStateService {
       let filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
-      // .imagePath
+      // .imagePath.
       if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         let filename = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);

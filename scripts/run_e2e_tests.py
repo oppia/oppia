@@ -31,8 +31,6 @@ from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-from scripts import setup
-from scripts import setup_gae
 
 CHROME_DRIVER_VERSION = '2.41'
 
@@ -72,7 +70,6 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
-HASHES_FILE_PATH = os.path.join('assets', 'hashes.json')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -174,7 +171,7 @@ def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
-    Return:
+    Returns:
         bool: Whether there is a running Oppia instance.
     """
     running = False
@@ -260,8 +257,6 @@ def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
-    setup.main(args=[])
-    setup_gae.main(args=[])
     if os.getenv('TRAVIS'):
         install_chrome_on_travis.main(args=[])
 
@@ -271,9 +266,9 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
-        in dev mode.
+            in dev mode.
         deparallelize_terser: bool. Represents whether to use webpack
-        compilation config that disables parallelism on terser plugin.
+            compilation config that disables parallelism on terser plugin.
     """
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
@@ -282,10 +277,6 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
         else:
             build.main(args=['--prod_env'])
     else:
-        # The 'hashes.json' file is used by the `url-interpolation` service.
-        if not os.path.isfile(HASHES_FILE_PATH):
-            with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
-                hash_file.write('{}')
         build.main(args=[])
         run_webpack_compilation()
 
