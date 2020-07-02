@@ -39,8 +39,7 @@ type IssueCustomizationArgs<IssueType> = (
   IssueType extends 'CyclicStateTransitions' ?
   ICyclicStateTransitionsCustomizationArgs :
   IssueType extends 'MultipleIncorrectSubmissions' ?
-  IMultipleIncorrectSubmissionsCustomizationArgs :
-  IssueType extends 'none' ? null : never);
+  IMultipleIncorrectSubmissionsCustomizationArgs : never);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This interface takes the type of backend dict according to the IssueType
@@ -48,7 +47,6 @@ type IssueCustomizationArgs<IssueType> = (
 interface IPlaythroughBackendDictBase<IssueType> {
   'issue_type': IssueType;
   'issue_customization_args': IssueCustomizationArgs<IssueType>;
-  'playthrough_id': string;
   'exp_id': string;
   'exp_version': number;
   'actions': ILearnerActionBackendDict[];
@@ -74,23 +72,17 @@ class PlaythroughBase<IssueType> {
   constructor(
     public readonly issueType: IssueType,
     public issueCustomizationArgs: IssueCustomizationArgs<IssueType>,
-    public playthroughId: string,
     public expId: string,
     public expVersion: number,
     public actions: LearnerAction[]) { }
 
   toBackendDict(): IPlaythroughBackendDictBase<IssueType> {
-    var actionDicts = this.actions.map(function(action) {
-      return action.toBackendDict();
-    });
-
     return {
-      playthrough_id: this.playthroughId,
       exp_id: this.expId,
       exp_version: this.expVersion,
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
-      actions: actionDicts
+      actions: this.actions.map(a => a.toBackendDict()),
     };
   }
 }
@@ -104,14 +96,10 @@ export class MultipleIncorrectSubmissionsPlaythrough extends
 export class CyclicStateTransitionsPlaythrough extends
   PlaythroughBase<'CyclicStateTransitions'> { }
 
-export class EmptyPlaythrough extends
-  PlaythroughBase<'none'> { }
-
 export type Playthrough = (
   EarlyQuitPlaythrough |
   MultipleIncorrectSubmissionsPlaythrough |
-  CyclicStateTransitionsPlaythrough |
-  EmptyPlaythrough);
+  CyclicStateTransitionsPlaythrough);
 
 @Injectable({
   providedIn: 'root'
@@ -120,35 +108,30 @@ export class PlaythroughObjectFactory {
   constructor(private learnerActionObjectFactory: LearnerActionObjectFactory) {}
 
   createNewEarlyQuitPlaythrough(
-      playthroughId: string, expId: string, expVersion: number,
+      expId: string, expVersion: number,
       issueCustomizationArgs: IEarlyQuitCustomizationArgs,
       actions: LearnerAction[]): EarlyQuitPlaythrough {
     return new EarlyQuitPlaythrough(
-      'EarlyQuit', issueCustomizationArgs, playthroughId, expId,
+      'EarlyQuit', issueCustomizationArgs, expId,
       expVersion, actions);
   }
 
   createNewMultipleIncorrectSubmissionsPlaythrough(
-      playthroughId: string, expId: string, expVersion: number,
+      expId: string, expVersion: number,
       issueCustomizationArgs: IMultipleIncorrectSubmissionsCustomizationArgs,
       actions: LearnerAction[]): MultipleIncorrectSubmissionsPlaythrough {
     return new MultipleIncorrectSubmissionsPlaythrough(
-      'MultipleIncorrectSubmissions', issueCustomizationArgs, playthroughId,
+      'MultipleIncorrectSubmissions', issueCustomizationArgs,
       expId, expVersion, actions);
   }
 
   createNewCyclicStateTransitionsPlaythrough(
-      playthroughId: string, expId: string, expVersion: number,
+      expId: string, expVersion: number,
       issueCustomizationArgs: ICyclicStateTransitionsCustomizationArgs,
       actions: LearnerAction[]): CyclicStateTransitionsPlaythrough {
     return new CyclicStateTransitionsPlaythrough(
-      'CyclicStateTransitions', issueCustomizationArgs, playthroughId,
+      'CyclicStateTransitions', issueCustomizationArgs,
       expId, expVersion, actions);
-  }
-
-  createNewEmptyPlaythrough(
-      expId: string, expVersion: number): EmptyPlaythrough {
-    return new EmptyPlaythrough(null, null, null, expId, expVersion, []);
   }
 
   createFromBackendDict(
@@ -161,21 +144,18 @@ export class PlaythroughObjectFactory {
         return new EarlyQuitPlaythrough(
           playthroughBackendDict.issue_type,
           playthroughBackendDict.issue_customization_args,
-          playthroughBackendDict.playthrough_id,
           playthroughBackendDict.exp_id,
           playthroughBackendDict.exp_version, actions);
       case 'CyclicStateTransitions':
         return new CyclicStateTransitionsPlaythrough(
           playthroughBackendDict.issue_type,
           playthroughBackendDict.issue_customization_args,
-          playthroughBackendDict.playthrough_id,
           playthroughBackendDict.exp_id,
           playthroughBackendDict.exp_version, actions);
       case 'MultipleIncorrectSubmissions':
         return new MultipleIncorrectSubmissionsPlaythrough(
           playthroughBackendDict.issue_type,
           playthroughBackendDict.issue_customization_args,
-          playthroughBackendDict.playthrough_id,
           playthroughBackendDict.exp_id,
           playthroughBackendDict.exp_version, actions);
       default:

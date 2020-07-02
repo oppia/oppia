@@ -20,16 +20,16 @@
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select ng-model="$ctrl.formData.viewUserRoles.filterCriterion" class="form-control protractor-test-role-method">
+              <select id="$ctrl.formData.viewUserRoles.filterCriterion" ng-model="$ctrl.formData.viewUserRoles.filterCriterion" class="form-control protractor-test-role-method">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
             </div>
           </div>
           <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewUserRoles.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
+            <label for="viewable-role-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.formData.viewUserRoles.role" class="form-control protractor-test-role-value">
+              <select id="viewable-role-input" ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.formData.viewUserRoles.role" class="form-control protractor-test-role-value">
               </select>
             </div>
           </div>
@@ -70,16 +70,16 @@
         <form class="form-horizontal" ng-submit="$ctrl.submitUpdateRoleForm($ctrl.formData.updateRole)">
           <legend class="text-center">Update Role</legend>
           <div class="d-xl-inline-flex form-group">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <label for="update-role-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" placeholder="Enter username" ng-model="$ctrl.formData.updateRole.username" class="form-control protractor-update-form-name">
+              <input type="text" id="update-role-username-input" placeholder="Enter username" ng-model="$ctrl.formData.updateRole.username" class="form-control protractor-update-form-name">
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
+            <label for="update-role-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.UPDATABLE_ROLES" ng-model="$ctrl.formData.updateRole.newRole" class="form-control protractor-update-form-role-select">
+              <select id="update-role-input" ng-options="roleName as roleString for (roleName, roleString) in $ctrl.UPDATABLE_ROLES" ng-model="$ctrl.formData.updateRole.newRole" class="form-control protractor-update-form-role-select">
               </select>
             </div>
           </div>
@@ -103,7 +103,7 @@
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select ng-model="$ctrl.formData.viewCommunityReviewers.filterCriterion" class="form-control">
+              <select id="$ctrl.formData.viewCommunityReviewers.filterCriterion" ng-model="$ctrl.formData.viewCommunityReviewers.filterCriterion" class="form-control">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
@@ -111,9 +111,9 @@
           </div>
           <div class="d-xl-inline-flex form-group"
                ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
+            <label for="review-categories-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.viewCommunityReviewers.category" class="form-control">
+              <select id="review-categories-input" sng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.viewCommunityReviewers.category" class="form-control">
               </select>
             </div>
           </div>
@@ -173,16 +173,16 @@
         <form class="form-horizontal" ng-submit="$ctrl.submitAddCommunityReviewerForm($ctrl.formData.addCommunityReviewer)">
           <legend class="text-center">Add Reviewer For Community</legend>
           <div class="d-xl-inline-flex form-group">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <label for="add-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control">
+              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control">
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
+            <label for="add-community-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.addCommunityReviewer.category" class="form-control">
+              <select id="add-community-reviewer" ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.addCommunityReviewer.category" class="form-control">
               </select>
             </div>
           </div>
@@ -209,12 +209,13 @@
         <form class="form-horizontal" ng-submit="$ctrl.submitRemoveCommunityReviewerForm($ctrl.formData.removeCommunityReviewer)">
           <legend class="text-center">Remove Reviewer From Community</legend>
           <div class="d-xl-inline-flex form-group">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <label for="remove-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-4 col-lg-4 col-sm-4 ml-auto">
-              <input type="text" placeholder="Enter username" ng-model="$ctrl.formData.removeCommunityReviewer.username" class="form-control">
+              <input type="text" id="remove-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.removeCommunityReviewer.username" class="form-control">
             </div>
+            <label for="remove-reviewer-form-control" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
             <div class="col-md-4 ml-auto">
-              <select ng-model="$ctrl.formData.removeCommunityReviewer.method" class="form-control">
+              <select id="remove-reviewer-form-control" ng-model="$ctrl.formData.removeCommunityReviewer.method" class="form-control">
                 <option value="<[$ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS]>">Remove all review rights</option>
                 <option value="<[$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS]>">Remove specific review rights</option>
               </select>
