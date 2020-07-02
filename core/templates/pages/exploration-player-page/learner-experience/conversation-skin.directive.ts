@@ -427,7 +427,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           $scope.canAskLearnerForAnswerInfo = function() {
-            return LearnerAnswerInfoService.canAskLearnerForAnswerInfo();
+            return LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
           };
 
           var initLearnerAnswerInfoService = function(
@@ -865,7 +865,7 @@ angular.module('oppia').directive('conversationSkin', [
 
             PlayerTranscriptService.addNewInput(answer, false);
 
-            if ($scope.canAskLearnerForAnswerInfo()) {
+            if ($scope.getCanAskLearnerForAnswerInfo()) {
               $timeout(function() {
                 PlayerTranscriptService.addNewResponse(
                   LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
