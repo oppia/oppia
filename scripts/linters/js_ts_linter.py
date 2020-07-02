@@ -1081,13 +1081,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Oppia Angular Root file check')
             python_utils.PRINT('----------------------------------------')
-        oppia_angular_root = FILE_CACHE.read(oppia_angular_root_path)
-        oppia_root_directive = FILE_CACHE.read(oppia_root_directive_path)
+        oppia_angular_root = self.file_cache.read(oppia_angular_root_path)
+        oppia_root_directive = self.file_cache.read(oppia_root_directive_path)
         summary_messages = []
         total_error_count = 0
         total_files_checked = 0
         for file_path in self.ts_files:
-            file_content = FILE_CACHE.read(file_path)
+            file_content = self.file_cache.read(file_path)
             if '@Injectable({' in file_content:
                 total_files_checked += 1
                 class_name, camel_case_class_name = (
@@ -1131,7 +1131,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     summary_message = (
-                        'private %s: %s' % (camel_case_class_name, class_name))
+                        '  private %s: %s' % (
+                            camel_case_class_name, class_name))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
@@ -1144,7 +1145,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     total_error_count += 1
                     summary_message = (
                         'The static variable hasn\'t been assigned value'
-                        'in Oppia Angular Root Component in %s:') % (
+                        ' in Oppia Angular Root Component in %s:') % (
                             oppia_angular_root_path)
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
@@ -1154,13 +1155,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
-
-                if not '\'' + class_name + '\'' in oppia_root_directive:
+                class_name_in_quotes = '\'' + class_name + '\''
+                if not class_name_in_quotes in oppia_root_directive:
                     total_error_count += 1
                     summary_message = (
                         'The class %s hasn\'t been added to ANGULAR_SERVICES'
-                        ' in  oppia-root.directive.ts.' % (
-                            class_name))
+                        ' in  oppia-root.directive.ts. in %s' % (
+                            class_name, oppia_root_directive_path))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
