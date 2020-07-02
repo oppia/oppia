@@ -51,7 +51,10 @@ describe('Playthrough Object Factory', () => {
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughObject.issueCustomizationArgs).toEqual({
+      state_name: {value: 'state'},
+      time_spent_in_exp_in_msecs: {value: 1.2}
+    });
     expect(playthroughObject.actions).toEqual(actions);
   });
 
@@ -162,7 +165,10 @@ describe('Playthrough Object Factory', () => {
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 1.2}
+      },
       actions: [{
         action_type: 'AnswerSubmit',
         action_customization_args: {
