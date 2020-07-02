@@ -865,7 +865,7 @@ angular.module('oppia').directive('conversationSkin', [
 
             PlayerTranscriptService.addNewInput(answer, false);
 
-            if ($scope.getCanAskLearnerForAnswerInfo()) {
+            if ($scope.canAskLearnerForAnswerInfo()) {
               $timeout(function() {
                 PlayerTranscriptService.addNewResponse(
                   LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());

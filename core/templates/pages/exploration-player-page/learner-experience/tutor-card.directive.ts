@@ -213,7 +213,7 @@ angular.module('oppia').directive('tutorCard', [
               );
             };
             $scope.canAskLearnerForAnswerInfo = (
-              LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
+              LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
 
             $scope.OPPIA_AVATAR_IMAGE_URL = (
               UrlInterpolationService.getStaticImageUrl(
