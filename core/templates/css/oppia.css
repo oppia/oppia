@@ -1815,6 +1815,15 @@ pre.oppia-pre-wrapped-text {
   line-height: 1.846;
 }
 
+.oppia-parent-teacher-welcome-guide-browser-image p {
+  text-align: left;
+}
+
+.oppia-parent-teacher-welcome-guide-third-section p {
+  line-height: 200%;
+}
+
+
 .oppia-rte-content > div > p {
   line-height: 1.846;
 }
@@ -4525,4 +4534,227 @@ div.oppia-issues-learner-action {
 
 .oppia-rule-preview {
   word-wrap: break-word;
+}
+
+.oppia-parent-teacher-welcome-guide-second-section-description {
+  padding-bottom: 40px;
+}
+
+.oppia-parent-teacher-welcome-guide-top-section {
+  height: auto;
+  background-color: #FFFFFF;
+}
+
+.oppia-parent-teacher-welcome-guide-exploration-and-collection {
+  background-color: #E5E5E5;
+}
+
+.oppia-parent-teacher-welcome-guide-find-explorations {
+  background-color: #FFFFFF;
+}
+
+.oppia-parent-teacher-welcome-guide-second-section {
+  padding: 40px 0 40px 70px;
+}
+
+.oppia-parent-teacher-welcome-guide-third-section {
+  padding: 40px 70px 0 70px;
+}
+
+.oppia-parent-teacher-welcome-guide-fractions-image {
+  margin: auto;
+  padding-bottom: 40px;
+  text-align: center;
+  width: auto;
+}
+
+.oppia-parent-teacher-welcome-guide-header {
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .oppia-parent-teacher-welcome-guide-body {
+    padding: 20px 0 0 20px;
+  }
+}
+
+@media (min-width: 992px) {
+  .oppia-parent-teacher-welcome-guide-img {
+    height: 460px;
+      text-align: right;
+  }
+
+  .oppia-parent-teacher-welcome-guide-header {
+    padding: 80px 20px 0 70px;
+    }
+
+  .oppia-parent-teacher-welcome-guide-img img {
+    height: 460px;
+     width: auto;
+  }
+
+  .oppia-parent-teacher-welcome-guide-fractions-image img {
+    padding-top: 20px;
+    width: 80%;
+  }
+
+  .oppia-parent-teacher-welcome-guide-browser-image {
+    margin: auto;
+    padding: 55px 70px 30px 15px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .oppia-parent-teacher-welcome-guide-exploration-image {
+    padding: 30px 0 30px 70px;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 992px) {
+  .oppia-parent-teacher-welcome-guide-img {
+    height: auto;
+    padding: 20px 0 30px 0;
+    text-align: center;
+  }
+
+  .oppia-parent-teacher-welcome-guide-header {
+    padding: 70px 70px 0 70px;
+  }
+
+  .oppia-parent-teacher-welcome-guide-img img {
+    height: auto;
+    padding-top: 0;
+    width: 80%;
+  }
+
+  .oppia-parent-teacher-welcome-guide-fractions-image img {
+    width: 90%;
+  }
+
+  .oppia-parent-teacher-welcome-guide-exploration-image {
+    padding: 30px 15% 40px 15%;
+    text-align: center;
+    width: 100%;
+  }
+
+  .oppia-parent-teacher-welcome-guide-browser-image {
+    padding: 0 15% 30px 15%;
+  }
+}
+
+@media (max-width: 700px) {
+  .oppia-parent-teacher-welcome-guide-img {
+    height: auto;
+    padding-bottom: 30px;
+    text-align: center;
+  }
+
+  .oppia-parent-teacher-welcome-guide-header {
+    padding: 40px 70px 0 70px;
+  }
+
+  .oppia-parent-teacher-welcome-guide-img img {
+    height: auto;
+    padding: 15px 50px 0 50px;
+    width: auto;
+  }
+
+  .oppia-parent-teacher-welcome-guide-second-section {
+    padding: 15px 70px 0 70px;
+  }
+}
+
+
+.oppia-parent-teacher-welcome-guide-numbers {
+  display: inline;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.17em;
+  padding-bottom: 0;
+  padding-top: 0;
+  text-align: left;
+}
+
+.oppia-parent-teacher-welcome-guide-h1 {
+  color: #005c5e;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  padding-bottom: 15px;
+}
+
+.oppia-parent-teacher-welcome-guide-p {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.17em;
+  line-height: 200%;
+  text-align: left;
+}
+
+span.oppia-parent-teacher-welcome-guide-blue {
+  background: rgb(13,61,245);
+  border-radius: 1em;
+  color: #ffffff;
+  display: inline-block;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 2em;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 2em;
+}
+
+span.oppia-parent-teacher-welcome-guide-purple {
+  background: rgb(116,39,245);
+  border-radius: 1em;
+  color: #ffffff;
+  display: inline-block;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 2em;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 2em;
+}
+
+span.oppia-parent-teacher-welcome-guide-red {
+  background: rgb(231,67,57);
+  border-radius: 1em;
+  color: #ffffff;
+  display: inline-block;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 2em;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 2em;
+}
+
+span.oppia-parent-teacher-welcome-guide-orange {
+  background: rgb(236,147,69);
+  border-radius: 1em;
+  color: #ffffff;
+  display: inline-block;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 2em;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 2em;
+}
+
+span.oppia-parent-teacher-welcome-guide-green {
+  background: rgb(69,148,136);
+  border-radius: 1em;
+  color: #ffffff;
+  display: inline-block;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 2em;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 2em;
 }
