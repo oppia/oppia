@@ -43,7 +43,10 @@ describe('Playthrough Object Factory', () => {
       }
     }, 1)];
     var playthroughObject = pof.createNew(
-      'expId1', 1, 'EarlyQuit', {}, actions);
+      'expId1', 1, 'EarlyQuit', {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 30000},
+      }, actions);
 
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
@@ -149,7 +152,10 @@ describe('Playthrough Object Factory', () => {
       }
     }, 1)];
     var playthroughObject = pof.createNew(
-      'expId1', 1, 'EarlyQuit', {}, actions);
+      'expId1', 1, 'EarlyQuit', {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 1.2}
+      }, actions);
 
     var playthroughDict = playthroughObject.toBackendDict();
     expect(playthroughDict).toEqual({
