@@ -41,8 +41,9 @@ describe('rich-text components', function() {
 
   it('should display math expressions correctly', async function() {
     await users.createUser(
-      'user@richTextComponents.com', 'userRichTextComponents');
-    await users.login('user@richTextComponents.com');
+      'richTextuser@fileUploadExtensions.com',
+      'fileUploadRichTextuser');
+    await users.login('richTextuser@fileUploadExtensions.com');
 
     await workflow.createExploration();
 
