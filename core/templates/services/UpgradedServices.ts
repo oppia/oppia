@@ -53,7 +53,7 @@ import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { AssetsBackendApiService } from
-  'services/assets-backend-api.service'
+  'services/assets-backend-api.service';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
