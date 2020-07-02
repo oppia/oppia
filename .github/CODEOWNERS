@@ -109,7 +109,7 @@
 
 
 # Dev workflow team.
-/.circleci/ @kevinlee12
+/.circleci/ @kevinlee12 @U8NWXD
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -119,7 +119,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @kevinlee12
+/.travis.yml @kevinlee12 @U8NWXD
 /.yarnrc @kevinlee12
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
