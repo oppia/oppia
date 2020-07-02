@@ -148,6 +148,13 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
   });
 
+  it('visits the Parents and Teachers Welcome page', async function() {
+    await browser.get('/about/parents-teachers-guide');
+    await waitFor.pageToFullyLoad();
+    expect(await element(
+      by.css('.protractor-test-parent-teacher-welcome-page')).isPresent()).toBe(true);
+  });
+
   it('visits the Privacy page', async function() {
     await browser.get('/privacy');
     await waitFor.pageToFullyLoad();

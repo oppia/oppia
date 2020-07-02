@@ -4581,16 +4581,16 @@ div.oppia-issues-learner-action {
 @media (min-width: 992px) {
   .oppia-parent-teacher-welcome-guide-img {
     height: 460px;
-      text-align: right;
+    text-align: right;
   }
 
   .oppia-parent-teacher-welcome-guide-header {
     padding: 80px 20px 0 70px;
-    }
+  }
 
   .oppia-parent-teacher-welcome-guide-img img {
     height: 460px;
-     width: auto;
+    width: auto;
   }
 
   .oppia-parent-teacher-welcome-guide-fractions-image img {

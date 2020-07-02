@@ -103,6 +103,9 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.scripts.ts',
+    parent_teacher_welcome_page:
+      commonPrefix + '/pages/parent-teacher-welcome-page/parent-teacher-' +
+        'welcome-guide-page.scripts.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.scripts.ts',
@@ -446,6 +449,20 @@ module.exports = {
         '/pages/notifications-dashboard-page/' +
         'notifications-dashboard-page.mainpage.html'
       ),
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['parent_teacher_welcome_page'],
+      filename: 'parent-teacher-welcome-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Learn about how you can use Oppia with your children ' +
+          'or students.'
+      },
+      template:
+        commonPrefix + '/pages/parent-teacher-welcome-page/' +
+        'parent-teacher-welcome-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

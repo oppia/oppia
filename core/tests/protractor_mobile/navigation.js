@@ -140,6 +140,22 @@ describe('Navigation features on mobile', function() {
         'http://localhost:9001/library');
     });
 
+  it('should navigate to Parents and Teachers Welcome page using the sidebar menu',
+    async function() {
+      var navbarButton = element(
+        by.css('.protractor-mobile-test-navbar-button'));
+      await waitFor.elementToBeClickable(
+        navbarButton, 'Could not click navbar button');
+      await navbarButton.click();
+      var libraryLink = element(by.css('.protractor-mobile-test-parent-teacher-welcome-link'));
+      await waitFor.elementToBeClickable(
+        libraryLink, 'Could not click Parent Teacher Welcome page link');
+      await libraryLink.click();
+      await waitFor.pageToFullyLoad();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/about/parents-teachers-guide');
+    });
+
   it('should navigate to Home page by clicking on the Oppia logo',
     async function() {
       var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
