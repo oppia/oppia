@@ -100,16 +100,6 @@ describe('Community dashboard page', function() {
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     });
 
-    it('should get all language codes and its descriptions', function() {
-      const allLanguageCodesAndDescriptionsFromConstants = (
-        CONSTANTS.SUPPORTED_AUDIO_LANGUAGES.map(language => ({
-          id: language.id,
-          description: language.description
-        })));
-      expect(ctrl.languageCodesAndDescriptions).toEqual(
-        allLanguageCodesAndDescriptionsFromConstants);
-    });
-
     it('should change active tab name', function() {
       var changedTab = 'translateTextTab';
       expect(ctrl.activeTabName).toBe('myContributionTab');
@@ -121,7 +111,7 @@ describe('Community dashboard page', function() {
       spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
         .and.callThrough();
 
-      ctrl.onChangeLanguage();
+      ctrl.onChangeLanguage('hi');
 
       expect(TranslationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalledWith('hi');
