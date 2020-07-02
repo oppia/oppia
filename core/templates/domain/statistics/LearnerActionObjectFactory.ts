@@ -114,30 +114,27 @@ export type LearnerAction = (
 })
 export class LearnerActionObjectFactory {
   createNewExplorationStartAction(
-      actionCustomizationArgs: IExplorationStartCustomizationArgs,
-      schemaVersion: number = (
-        StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION)
+      actionCustomizationArgs: IExplorationStartCustomizationArgs
   ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
-      'ExplorationStart', actionCustomizationArgs, schemaVersion);
+      'ExplorationStart', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
   createNewAnswerSubmitAction(
-      actionCustomizationArgs: IAnswerSubmitCustomizationArgs,
-      schemaVersion: number = (
-        StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION)
+      actionCustomizationArgs: IAnswerSubmitCustomizationArgs
   ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
-      'AnswerSubmit', actionCustomizationArgs, schemaVersion);
+      'AnswerSubmit', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
   createNewExplorationQuitAction(
-      actionCustomizationArgs: IExplorationQuitCustomizationArgs,
-      schemaVersion: number = (
-        StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION)
+      actionCustomizationArgs: IExplorationQuitCustomizationArgs
   ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
-      'ExplorationQuit', actionCustomizationArgs, schemaVersion);
+      'ExplorationQuit', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
   /**

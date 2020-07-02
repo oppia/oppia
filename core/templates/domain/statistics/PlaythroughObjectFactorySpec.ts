@@ -41,7 +41,7 @@ describe('Playthrough Object Factory', () => {
       state_name: {
         value: 'state'
       }
-    }, 1)];
+    })];
     let playthroughObject = pof.createNew(
       'expId1', 1, 'EarlyQuit', {
         state_name: {value: 'state'},
@@ -130,7 +130,7 @@ describe('Playthrough Object Factory', () => {
         time_spent_state_in_msecs: {
           value: 2
         }
-      }, 1)]);
+      })]);
   });
 
   it('should convert a playthrough to a backend dict', () => {
@@ -153,7 +153,7 @@ describe('Playthrough Object Factory', () => {
       time_spent_state_in_msecs: {
         value: 2
       }
-    }, 1)];
+    })];
     let playthroughObject = pof.createNew(
       'expId1', 1, 'EarlyQuit', {
         state_name: {value: 'state'},
