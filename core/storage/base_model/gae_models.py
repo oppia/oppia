@@ -277,6 +277,8 @@ class BaseModel(ndb.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
         """
+        # Internally put_multi calls put so we don't need to call
+        # update_timestamps here.
         ndb.put_multi(
             entities, update_last_updated_time=update_last_updated_time)
 
@@ -292,6 +294,8 @@ class BaseModel(ndb.Model):
         Returns:
             list(future). A list of futures.
         """
+        # Internally put_multi_async calls put_async so we don't need to call
+        # update_timestamps here.
         return ndb.put_multi_async(
             entities, update_last_updated_time=update_last_updated_time)
 
@@ -403,10 +407,6 @@ class BaseCommitLogEntryModel(BaseModel):
     """Base Model for the models that store the log of commits to a
     construct.
     """
-
-    # Update superclass model to make these properties indexed.
-    # created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    # last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
 
     # The id of the user.
     user_id = ndb.StringProperty(indexed=True, required=True)
