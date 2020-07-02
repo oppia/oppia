@@ -80,11 +80,7 @@ class LearnerActionBase<ActionType> {
   constructor(
       public readonly actionType: ActionType,
       public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
-      public schemaVersion: number) {
-    if (schemaVersion < 1) {
-      throw new Error('given invalid schema version');
-    }
-  }
+      public schemaVersion: number) {}
 
   toBackendDict(): ILearnerActionBackendDictBase<ActionType> {
     return {
