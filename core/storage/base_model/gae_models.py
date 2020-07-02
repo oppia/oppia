@@ -404,10 +404,6 @@ class BaseCommitLogEntryModel(BaseModel):
     construct.
     """
 
-    # Update superclass model to make these properties indexed.
-    # created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    # last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
     # The id of the user.
     user_id = ndb.StringProperty(indexed=True, required=True)
     # The type of the commit: 'create', 'revert', 'edit', 'delete'.
