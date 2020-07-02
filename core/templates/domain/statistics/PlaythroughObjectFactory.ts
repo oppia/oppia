@@ -74,7 +74,7 @@ export class PlaythroughObjectFactory {
 
   createNew(
       expId: string, expVersion: number,
-      issueType: string, issueCustomizationArgs: any,
+      issueType: string, issueCustomizationArgs: IssueCustomizationArgs,
       learnerActions: LearnerAction[]): Playthrough {
     return new Playthrough(
       expId, expVersion, issueType, issueCustomizationArgs, learnerActions);

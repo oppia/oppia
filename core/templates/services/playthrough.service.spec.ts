@@ -84,7 +84,7 @@ describe('PlaythroughService', () => {
     spyOn(stopwatchObjectFactory, 'create').and.returnValue(mockStopwatch);
   };
 
-  const spyOnStorePlaythrough = (callback?: (p: Playthrough) => void) => {
+  const spyOnStorePlaythrough = (callback: (p: Playthrough) => void = null) => {
     if (callback) {
       return spyOn(playthroughBackendApiService, 'storePlaythrough')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
