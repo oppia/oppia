@@ -31,14 +31,16 @@ describe('AutosaveInfoModalsService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        LocalStorageService,
-        UrlInterpolationService
-      ]
+      providers: []
     });
   });
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('LocalStorageService', TestBed.get(LocalStorageService));
+    $provide.value('UrlInterpolationService',
+      TestBed.get(UrlInterpolationService));
+  }));
   beforeEach(angular.mock.inject(($injector) => {
     AutosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     $uibModal = $injector.get('$uibModal');
