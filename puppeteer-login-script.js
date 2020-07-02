@@ -26,9 +26,9 @@ module.exports = async(browser, context) => {
   if (context.url.includes('admin')) {
     await login(context, page);
   } else if (context.url.includes('emaildashboard')) {
-    await set_role_admin(context, page);
+    await setRoleAdmin(context, page);
   } else if (context.url.includes('collection/0')) {
-    await create_collections(context, page);
+    await createCollections(context, page);
   }
   await page.close();
 };
@@ -37,7 +37,7 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
-    console.log('Logging into Oppia...')
+    console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
     await page.goto(context.url);
     await page.click('#admin');
@@ -58,15 +58,16 @@ const login = async function(context, page) {
     console.log('Successfully Logged in');
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Login Failed')
+    console.log('Login Failed');
     // eslint-disable-next-line no-console
-    console.log(e)
+    console.log(e);
   }
 };
 
 
-const set_role_admin=  async function(context, page) {
+const setRoleAdmin = async function(context, page) {
   try {
+    // eslint-disable-next-line no-console
     console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
@@ -87,7 +88,7 @@ const set_role_admin=  async function(context, page) {
 };
 
 
-const create_collections = async function(context, page) {
+const createCollections = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
@@ -113,4 +114,4 @@ const create_collections = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log(e);
   }
-}
+};
