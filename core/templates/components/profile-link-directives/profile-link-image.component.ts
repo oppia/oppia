@@ -51,12 +51,12 @@ export class ProfileLinkImageComponent implements OnInit {
       this.username);
     this.profileBackendApiService.fetchProfilePicture(
       this.profileImageUrl).then((response: IProfileResponse) => {
-        this.profilePicture = (
-          response.profile_picture_data_url_for_username ||
-          this.DEFAULT_PROFILE_IMAGE_PATH);
-      }, (error) => {
-        return error;
-      });
+      this.profilePicture = (
+        response.profile_picture_data_url_for_username ||
+        this.DEFAULT_PROFILE_IMAGE_PATH);
+    }, (error) => {
+      return error;
+    });
   }
 
   isUsernameLinkable(): boolean {
