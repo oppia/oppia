@@ -59,19 +59,17 @@ describe('Playthrough Object Factory', () => {
   });
 
   it('should create same objects from backend dict and direct values.', () => {
-    var playthroughDictObject = pof.createFromBackendDict(
-      {
-        exp_id: 'expId1',
-        exp_version: 1,
-        issue_type: 'CyclicStateTransitions',
-        issue_customization_args: {
-          state_names: {
-            value: ['state1', 'state2']
-          }
-        },
-        actions: []
-      }
-    );
+    var playthroughDictObject = pof.createFromBackendDict({
+      exp_id: 'expId1',
+      exp_version: 1,
+      issue_type: 'CyclicStateTransitions',
+      issue_customization_args: {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      },
+      actions: []
+    });
 
     var playthroughObject = pof.createNewCyclicStateTransitionsPlaythrough(
       'expId1', 1, {
@@ -235,12 +233,10 @@ describe('Playthrough Object Factory', () => {
       actions: []
     };
 
-    expect(() => {
-      // TS ignore is used because playthrough dict is assigned a invalid type
-      // to test errors.
-      // @ts-ignore
-      pof.createFromBackendDict(playthroughDict);
-    }).toThrowError(
+    // TS ignore is used because playthrough dict is assigned a invalid type
+    // to test errors.
+    // @ts-ignore
+    expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError(
       'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
   });
