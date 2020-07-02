@@ -270,12 +270,12 @@ class InteractionAnswerSummariesMRJobManager(
             calc_output.save()
 
 
+# TODO(bhenning): Implement a real-time model for
+# InteractionAnswerSummariesAggregator.
 class InteractionAnswerSummariesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     """Realtime model class for InteractionAnswerSummariesAggregator."""
 
-    # TODO(bhenning): Implement a real-time model for
-    # InteractionAnswerSummariesAggregator.
     pass
 
 
