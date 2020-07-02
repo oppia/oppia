@@ -105,7 +105,7 @@ export class ContextService {
         } else if (pathnameArray[i] === 'collection_editor') {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
-        } else if (pathnameArray[i] === 'topics_and_skills_dashboard') {
+        } else if (pathnameArray[i] === 'topics-and-skills-dashboard') {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
