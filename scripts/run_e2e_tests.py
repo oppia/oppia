@@ -153,7 +153,9 @@ def ensure_screenshots_dir_is_removed():
 
 
 def cleanup():
-    """Kill the running subprocesses and server fired in this program."""
+    """Kill the running subprocesses and server fired in this program, set
+    constants back to default values.
+    """
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
@@ -168,6 +170,7 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+    build.set_constants_to_default()
 
 
 def is_oppia_server_already_running():

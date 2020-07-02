@@ -75,12 +75,15 @@ PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
 def cleanup():
-    """Function for waiting for the servers to go down."""
+    """Wait for the servers to go down and set constants back to default
+    values.
+    """
     common.print_each_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
     while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
+    build.set_constants_to_default()
 
 
 def main(args=None):

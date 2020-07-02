@@ -819,6 +819,41 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file.close()
         feconf_temp_file.close()
 
+    def test_set_constants_to_default(self):
+        mock_constants_path = 'mock_app_dev.yaml'
+        mock_feconf_path = 'mock_app.yaml'
+        constants_path_swap = self.swap(
+            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
+        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+
+        constants_temp_file = tempfile.NamedTemporaryFile()
+        constants_temp_file.name = mock_constants_path
+        with python_utils.open_file(mock_constants_path, 'w') as tmp:
+            tmp.write(u'export = {\n')
+            tmp.write(u'  "DEV_MODE": false\n')
+            tmp.write(u'};')
+
+        feconf_temp_file = tempfile.NamedTemporaryFile()
+        feconf_temp_file.name = mock_feconf_path
+        with python_utils.open_file(mock_feconf_path, 'w') as tmp:
+            tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
+
+        with constants_path_swap, feconf_path_swap:
+            build.set_constants_to_default()
+            with python_utils.open_file(
+                mock_constants_path, 'r') as constants_file:
+                self.assertEqual(
+                    constants_file.read(),
+                    'export = {\n'
+                    '  "DEV_MODE": true\n'
+                    '};')
+            with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                self.assertEqual(
+                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+
+        constants_temp_file.close()
+        feconf_temp_file.close()
+
     def test_safe_delete_file(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = 'some_file.txt'

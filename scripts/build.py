@@ -219,6 +219,11 @@ def modify_constants(prod_env, maintenance_mode):
         enable_maintenance_mode_variable)
 
 
+def set_constants_to_default():
+    """Set variables in constants.ts and feconf.py to default values."""
+    modify_constants(prod_env=False, maintenance_mode=False)
+
+
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path.
 
