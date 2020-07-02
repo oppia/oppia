@@ -21,7 +21,7 @@ var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 var request = require('request');
 
-var svgTags = {
+const SVGTAGS = {
   rectangle: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="496" height="338" viewBox="0 0 496 338' +
@@ -65,19 +65,26 @@ var svgTags = {
 
 var customizeComponent = async function(modal, shape) {
   var shapeClass = '.protractor-test-create-' + shape;
-  await modal.element(by.css(shapeClass)).click();
-  await modal.element(by.css('.protractor-test-save-diagram')).click();
+  var shapeTool = modal.element(by.css(shapeClass));
+  await waitFor.elementToBeClickable(
+    shapeTool,
+    'Could not click on the required tool');
+  await shapeTool.click();
+  var saveDiagram = modal.element(by.css('.protractor-test-save-diagram'));
+  await waitFor.elementToBeClickable(
+    saveDiagram,
+    'Could not save the diagram');
+  await saveDiagram.click();
   await waitFor.visibilityOf(
     modal.element(by.css('.protractor-test-saved-diagram-container')),
     'Diagram container not visible');
 };
 
 var expectComponentDetailsToMatch = async function(elem, shapeName) {
-  await elem.element(by.css(
-    '.protractor-test-svg-diagram')).getAttribute('src').then(function(src) {
-    request(src, function(error, response, body) {
-      expect(body.replace(/(\r\n|\n|\r)/gm, '')).toBe(svgTags[shapeName]);
-    });
+  var src = await elem.element(by.css(
+    '.protractor-test-svg-diagram')).getAttribute('src');
+  await request(src, function(error, response, body) {
+    expect(body.replace(/(\r\n|\n|\r)/gm, '')).toBe(SVGTAGS[shapeName]);
   });
 };
 

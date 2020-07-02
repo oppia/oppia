@@ -114,8 +114,6 @@ describe('rich-text components', function() {
     await users.logout();
   });
 
-
-
   // TODO(Jacob): Add in a test for the use of rich text inside collapsibles
   // and tabs. Previous attempts at such a test intermittently fail with the
   // rich-text checker unable to read the formatted text.
