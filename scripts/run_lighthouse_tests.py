@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import atexit
 import shutil
 import subprocess
 
@@ -36,7 +37,7 @@ def setup_and_install_dependencies():
     install_third_party_libs.main()
 
 
-def clean_up():
+def cleanup():
     """Deactivates webpages and deletes html lighthouse reports."""
     shutil.rmtree('.lighthouseci')
 
@@ -76,8 +77,8 @@ def main():
     """Runs lighthouse checks and deletes reports."""
     # setup_and_install_dependencies()
     enable_webpages()
+    atexit.register(cleanup)
     run_lighthouse_checks()
-    clean_up()
 
 
 if __name__ == '__main__':
