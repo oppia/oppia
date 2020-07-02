@@ -52,8 +52,8 @@ describe('Playthrough Object Factory', () => {
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({
-      });state_name: {value: 'state'},
-      time_spent_in_exp_in_msecs: {value: 1.2}
+      state_name: {value: 'state'},
+      time_spent_in_exp_in_msecs: {value: 30000}
     });
     expect(playthroughObject.actions).toEqual(actions);
   });
@@ -69,7 +69,7 @@ describe('Playthrough Object Factory', () => {
             value: 'state'
           },
           time_spent_in_exp_in_msecs: {
-            value: 1200
+            value: 1.2
           }
         },
         actions: [{
@@ -157,7 +157,7 @@ describe('Playthrough Object Factory', () => {
     var playthroughObject = pof.createNew(
       'expId1', 1, 'EarlyQuit', {
         state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 1.2}
+        time_spent_in_exp_in_msecs: {value: 30000}
       }, actions);
 
     var playthroughDict = playthroughObject.toBackendDict();
@@ -167,7 +167,7 @@ describe('Playthrough Object Factory', () => {
       issue_type: 'EarlyQuit',
       issue_customization_args: {
         state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 1.2}
+        time_spent_in_exp_in_msecs: {value: 30000}
       },
       actions: [{
         action_type: 'AnswerSubmit',
