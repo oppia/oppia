@@ -34,7 +34,7 @@ import feconf
 class ExplorationImprovementsHandler(base.BaseHandler):
     """Handles operations related to managing exploration improvement tasks.
 
-    NOTE: Only exploration creators can interface with tasks.
+    NOTE: Only exploration creators and editors can interface with tasks.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -90,7 +90,7 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 class ExplorationImprovementsHistoryHandler(base.BaseHandler):
     """Handles fetching the history of resolved exploration tasks.
 
-    NOTE: Only exploration creators can interface with tasks.
+    NOTE: Only exploration creators and editors can interface with tasks.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
