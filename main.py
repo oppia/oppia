@@ -35,6 +35,7 @@ from core.controllers import editor
 from core.controllers import email_dashboard
 from core.controllers import features
 from core.controllers import feedback
+from core.controllers import improvements
 from core.controllers import learner_dashboard
 from core.controllers import learner_playlist
 from core.controllers import library
@@ -748,6 +749,17 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/updateusernamehandler', admin.UpdateUsernameHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsHandler),
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsHistoryHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

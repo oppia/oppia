@@ -262,6 +262,7 @@
 
 # Lesson Analytics team.
 /core/controllers/features*.py @brianrodri
+/core/controllers/improvements*.py @brianrodri
 /core/domain/action_registry*.py @brianrodri
 /core/domain/calculation_registry*.py @brianrodri
 /core/domain/event_services*.py @brianrodri
@@ -280,6 +281,7 @@
 /core/templates/services/exploration-stats.service*.ts @brianrodri
 /core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
+/core/templates/services/improvements-backend-api*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
 /core/templates/services/state-interaction-stats.service*.ts @brianrodri
