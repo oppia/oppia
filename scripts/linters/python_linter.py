@@ -50,7 +50,7 @@ import pycodestyle # isort:skip
 
 
 class StringMessageStream(python_utils.OBJECT):
-    """Save and return output stream of pylint."""
+    """Save and return output stream."""
 
     def __init__(self):
         """Constructs a StringMessageStream object."""
@@ -60,15 +60,15 @@ class StringMessageStream(python_utils.OBJECT):
         """Writes the given message to messages list.
 
         Args:
-            message: str. Message returned by the pylinter.
+            message: str. Message returned by the method.
         """
         self.messages.append(message)
 
     def read(self):
-        """Returns the pylint messages as a list.
+        """Returns the output messages as a list.
 
         Returns:
-            list(str). Returns the pylint messages list.
+            list(str). Returns the output messages list.
         """
         return self.messages
 
@@ -346,7 +346,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return self.files_to_lint
 
     @staticmethod
-    def _get_trimmed_error_messages(lint_messages):
+    def _get_trimmed_error_output(lint_messages):
         """Remove extra bits from pylint error messages.
 
         Args:
@@ -355,7 +355,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         Returns:
             str. A string with the trimmed error messages.
         """
-        error_messages = []
+        trimmed_error_messages = []
         # Remove newlines and coverage report from the end of message.
         # we need to remove last five items from the list because starting from
         # end we have three lines with empty string(''), fourth line
@@ -374,10 +374,11 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             # we are removing them here.
             if message.endswith(')'):
                 message_id = re.search(r'\((\w+-*)+\)$', message).group(0)
-                error_messages.append(message.replace(message_id, ''))
+                trimmed_error_messages.append(
+                    message.replace(message_id, '', 1))
             else:
-                error_messages.append(message)
-        return '\n'.join(error_messages) + '\n'
+                trimmed_error_messages.append(message)
+        return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_py_files(self, config_pylint, config_pycodestyle):
         """Prints a list of lint errors in the given list of Python files.
@@ -434,7 +435,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 for message in pylint_report.read():
                     python_utils.PRINT(message)
                 pylint_error_messages = (
-                    self._get_trimmed_error_messages(pylint_report.read()))
+                    self._get_trimmed_error_output(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
                 python_utils.PRINT(summary_message)
                 are_there_errors = True
@@ -515,7 +516,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             if pylinter_for_python3.msg_status != 0:
                 summary_message = stdout.getvalue()
                 pylint_error_messages = (
-                    self._get_trimmed_error_messages(pylint_report.read()))
+                    self._get_trimmed_error_output(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
                 for message in pylint_report.read():
                     python_utils.PRINT(message)

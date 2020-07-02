@@ -60,7 +60,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         return self.files_to_lint
 
     @staticmethod
-    def _get_trimmed_error_messages(css_lint_output):
+    def _get_trimmed_error_output(css_lint_output):
         """Remove extra bits from stylelint error messages.
 
         Args:
@@ -69,7 +69,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         Returns:
             str. A string with the trimmed error messages.
         """
-        error_messages = []
+        trimmed_error_messages = []
         # We need to extract messages from the list and split them line by
         # line so we can loop through them.
         css_output_lines = css_lint_output.split('\n')
@@ -81,11 +81,11 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 unicode_x = re.search(r'\u2716', line).group(0)
                 message_id = re.search(r'(\w+-*)+$', line).group(0)
                 error_message = (
-                    line.replace(unicode_x, '').replace(message_id, ''))
+                    line.replace(unicode_x, '', 1).replace(message_id, '', 1))
             else:
                 error_message = line
-            error_messages.append(error_message)
-        return '\n'.join(error_messages) + '\n'
+            trimmed_error_messages.append(error_message)
+        return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
@@ -135,10 +135,10 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 result_list.append(linter_stdout)
 
         if num_files_with_errors:
-            for error in result_list:
-                python_utils.PRINT(error)
-            summary_messages.append(
-                self._get_trimmed_error_messages(result_list[0]))
+            for result in result_list:
+                python_utils.PRINT(result)
+                summary_messages.append(
+                    self._get_trimmed_error_output(result))
             summary_message = ('%s %s CSS file' % (
                 linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:

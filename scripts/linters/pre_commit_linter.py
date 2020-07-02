@@ -423,7 +423,7 @@ def _print_summary_of_error_messages(lint_messages):
         lint_messages: list(str). List of linter error messages.
     """
     if lint_messages != '':
-        python_utils.PRINT('Please fix errors below:')
+        python_utils.PRINT('Please fix the errors below:')
         python_utils.PRINT('----------------------------------------')
         for message in lint_messages:
             if message.startswith(('SUCCESS', 'FAILED')):
