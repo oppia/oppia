@@ -24,36 +24,71 @@ module.exports = async(browser, context) => {
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
   if (context.url.includes('admin')) {
-    try {
-      // eslint-disable-next-line dot-notation
-      await page.goto(context.url);
-      await page.click('#admin');
-      await Promise.all([
-        page.waitForNavigation(),
-        page.click('#submit-login'),
-      ]);
-
-      await page.type('#username', 'username1');
-      await page.click('#terms-checkbox');
-      await page.waitFor(5000);
-
-      await Promise.all([
-        page.waitForNavigation(),
-        await page.click('#signup-submit')
-      ]);
-    } catch (e) {
-      // Already logged into Oppia.
-    }
+    await login(context, page)
   } else if (context.url.includes('emaildashboard')) {
+    await set_role_admin(context, page)
+  } else if (context.url.includes('collection/0')) {
+    await create_collections(context, page)
+  }
+  await page.close();
+};
+
+
+async function login(context, page) {
+  try {
+    console.log("Logging into Oppia...")
+    //eslint-disable-next-line dot-notation
+    await page.goto(context.url);
+    await page.click('#admin');
+    await Promise.all([
+      page.waitForNavigation(),
+      page.click('#submit-login'),
+    ]);
+
+    await page.type('#username', 'username1');
+    await page.click('#terms-checkbox');
+    await page.waitFor(5000);
+
+    await Promise.all([
+      page.waitForNavigation(),
+      await page.click('#signup-submit')
+    ]);
+    console.log("Successfully Logged in")
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log("Already Logged In")
+    // eslint-disable-next-line no-console
+    console.log(e)
+  }
+};
+
+
+async function set_role_admin(context, page) {
+  try {
+    console.log("Changing role to admin...")
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
-    await page.type('#update-role-username-textbook', 'username1');
+    await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', 'string:ADMIN');
     await page.waitFor(5000);
     await page.click('#update-button-id');
     await page.waitFor(2000);
-  } else if (context.url.includes('collection/0')) {
+    // eslint-disable-next-line no-console
+    console.log("Role changed to admin")
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log("Changing role to admin failed");
+    // eslint-disable-next-line no-console
+    console.log(e)
+  }
+};
+
+
+async function create_collections(context, page) {
+  try {
+    // eslint-disable-next-line no-console
+    console.log("Creating Collections...");
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitFor(2000);
@@ -68,6 +103,11 @@ module.exports = async(browser, context) => {
     await page.waitFor(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
+    // eslint-disable-next-line no-console
+    console.log("Collections Created");
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log("Creating Collections Failed");
+    console.log(e);
   }
-  await page.close();
-};
+}
