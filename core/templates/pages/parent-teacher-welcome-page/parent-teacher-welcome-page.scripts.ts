@@ -24,4 +24,4 @@ require('App.ts');
 
 require('base-components/base-content.directive.ts');
 require('pages/parent-teacher-welcome-page/' +
-	'parent-teacher-welcome-page.controller.ts
+	'parent-teacher-welcome-page.component.ts
