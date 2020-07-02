@@ -34,8 +34,6 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
-from scripts import setup
-from scripts import setup_gae
 
 
 class MockProcessClass(python_utils.OBJECT):
@@ -340,54 +338,28 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.run_webdriver_manager(['start', '--detach'])
 
     def test_setup_and_install_dependencies_without_skip(self):
-        # pylint: disable=unused-argument
-        def mock_setup_main(args):
-            return
 
         def mock_install_third_party_libs_main():
             return
 
-        def mock_setup_gae_main(args):
-            return
-        # pylint: enable=unused-argument
-
-        setup_swap = self.swap_with_checks(
-            setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
-        setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main,
-            expected_kwargs=[{'args': []}]
-        )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main)
 
-        with setup_swap, setup_gae_swap, install_swap:
+        with install_swap:
             run_e2e_tests.setup_and_install_dependencies(False)
 
     def test_setup_and_install_dependencies_on_travis(self):
-        # pylint: disable=unused-argument
-        def mock_setup_main(args):
-            return
 
         def mock_install_third_party_libs_main():
             return
 
-        def mock_setup_gae_main(args):
+        def mock_install_chrome_main(args):  # pylint: disable=unused-argument
             return
-
-        def mock_install_chrome_main(args):
-            return
-        # pylint: enable=unused-argument
 
         def mock_getenv(unused_variable_name):
             return True
 
-        setup_swap = self.swap_with_checks(
-            setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
-        setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main,
-            expected_kwargs=[{'args': []}]
-            )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main)
@@ -397,49 +369,29 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('TRAVIS',)])
 
-        with setup_swap, setup_gae_swap, install_swap, install_chrome_swap:
+        with install_swap, install_chrome_swap:
             with getenv_swap:
                 run_e2e_tests.setup_and_install_dependencies(False)
 
     def test_setup_and_install_dependencies_with_skip(self):
-        # pylint: disable=unused-argument
-        def mock_setup_main(args):
+
+        def mock_install_third_party_libs_main(unused_args):
             return
 
-        def mock_install_third_party_libs_main(args):
-            return
-
-        def mock_setup_gae_main(args):
-            return
-        # pylint: enable=unused-argument
-
-        setup_swap = self.swap_with_checks(
-            setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
-        setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main,
-            expected_kwargs=[{'args': []}]
-            )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main, called=False)
 
-        with setup_swap, setup_gae_swap, install_swap:
+        with install_swap:
             run_e2e_tests.setup_and_install_dependencies(True)
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self):
         def mock_isdir(unused_path):
             return True
 
-        def mock_is_file(unused_path):
-            return True
-
         expected_commands = [
             self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
             'webpack.dev.config.ts']
-
-        is_file_swap = self.swap_with_checks(
-            os.path, 'isfile', mock_is_file,
-            expected_args=[(run_e2e_tests.HASHES_FILE_PATH,)])
 
         isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
         check_call_swap = self.swap_with_checks(
@@ -450,42 +402,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap, check_call_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with is_file_swap, build_main_swap, isdir_swap:
+                with build_main_swap, isdir_swap:
                     run_e2e_tests.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_hash_file_not_exist(self):
-
-        def mock_isdir(unused_path):
-            return True
-
-        expected_commands = [
-            self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
-            'webpack.dev.config.ts']
-        mock_hash_file_path = 'NOT_A_FILE.json'
-
-        hash_file_path_swap = self.swap(
-            run_e2e_tests, 'HASHES_FILE_PATH', mock_hash_file_path)
-        isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
-        check_call_swap = self.swap_with_checks(
-            subprocess, 'check_call', self.mock_check_call,
-            expected_args=[(expected_commands,)])
-        build_main_swap = self.swap_with_checks(
-            build, 'main', self.mock_build_main, expected_kwargs=[{'args': []}])
-        print_swap = self.print_swap(called=False)
-        with print_swap, self.constant_file_path_swap, check_call_swap:
-            with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with hash_file_path_swap, build_main_swap, isdir_swap:
-                    run_e2e_tests.build_js_files(True)
-
-        with python_utils.open_file(mock_hash_file_path, 'r') as f:
-            content = f.readlines()
-        os.remove(mock_hash_file_path)
-        self.assertEqual(content, ['{}'])
 
     def test_build_js_files_in_dev_mode_with_exception_raised(self):
-
-        def mock_is_file(unused_path):
-            return True
 
         def mock_check_call(commands):
             raise subprocess.CalledProcessError(
@@ -498,10 +418,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
             'webpack.dev.config.ts']
 
-        is_file_swap = self.swap_with_checks(
-            os.path, 'isfile', mock_is_file,
-            expected_args=[(run_e2e_tests.HASHES_FILE_PATH,)])
-
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', mock_check_call,
             expected_args=[(expected_commands,)])
@@ -512,7 +428,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         print_swap = self.print_swap(expected_args=[('ERROR',)])
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with check_call_swap, is_file_swap, exit_swap, build_main_swap:
+                with check_call_swap, exit_swap, build_main_swap:
                     run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_prod_mode(self):
