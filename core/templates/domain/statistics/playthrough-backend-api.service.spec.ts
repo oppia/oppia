@@ -20,9 +20,9 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { StorePlaythroughResponse, PlaythroughBackendApiService } from
+import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughObjectFactory } from
+import { PlaythroughObjectFactory, IPlaythroughBackendDict } from
   'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough backend api service', () => {
@@ -47,28 +47,30 @@ describe('Playthrough backend api service', () => {
   it('should correctly store playthroughs', fakeAsync(() => {
     let backendResposne = {
       playthrough_stored: true,
-      playthrough_id: 'pId'
     };
 
-    let expectedObject = new StorePlaythroughResponse(true, 'pId');
-
-    let playthroughDict = {
-      playthrough_id: 'playthroughId1',
+    let playthroughDict: IPlaythroughBackendDict = {
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {value: 'Introduction'},
+        time_spent_in_exp_in_msecs: {value: 30000}
+      },
       actions: [{
-        action_type: 'AnswerSubmit',
-        action_customization_args: {},
+        action_type: 'ExplorationQuit',
+        action_customization_args: {
+          state_name: {value: 'state'},
+          time_spent_in_state_in_msecs: {value: 2}
+        },
         schema_version: 1
       }]
     };
     let playthorughObject = pof.createFromBackendDict(playthroughDict);
 
-    pbas.storePlaythrough(playthorughObject, 1, 'pId').then((response) => {
-      expect(response).toEqual(expectedObject);
-    });
+    let onSuccess = jasmine.createSpy('onSuccess');
+    let onFailure = jasmine.createSpy('onFailure');
+    pbas.storePlaythrough(playthorughObject, 1).then(onSuccess, onFailure);
 
     let req = httpTestingController.expectOne(
       '/explorehandler/store_playthrough/expId1');

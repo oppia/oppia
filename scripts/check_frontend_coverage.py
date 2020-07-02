@@ -307,7 +307,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'player-transcript.service.ts',
     'playthrough-improvement-task.directive.ts',
     'playthrough-issues.directive.ts',
-    'playthrough.service.ts',
     'Polyfills.ts',
     'post-publish-modal.controller.ts',
     'practice-tab.directive.ts',
