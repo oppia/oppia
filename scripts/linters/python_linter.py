@@ -373,9 +373,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             # Every pylint message has a message id inside the brackets
             # we are removing them here.
             if message.endswith(')'):
-                message_id = re.search(r'\((\w+-*)+\)$', message).group(0)
+                # Replace message-id with empty string('').
                 trimmed_error_messages.append(
-                    message.replace(message_id, '', 1))
+                    re.sub(r'\((\w+-*)+\)$', '', message))
             else:
                 trimmed_error_messages.append(message)
         return '\n'.join(trimmed_error_messages) + '\n'
