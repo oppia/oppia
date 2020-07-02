@@ -75,7 +75,7 @@ def enable_webpages():
 
 def main():
     """Runs lighthouse checks and deletes reports."""
-    # setup_and_install_dependencies()
+    setup_and_install_dependencies()
     enable_webpages()
     atexit.register(cleanup)
     run_lighthouse_checks()
