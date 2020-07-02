@@ -29,4 +29,4 @@ jobs:
         run: python -m scripts.third_party_size_check
       - name: Run Lint Checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.linters.pre_commit_linter --path=. --verbose
+        run: PYTHONIOENCODING=utf-8 python -m scripts.linters.pre_commit_linter --path=. --verbose
