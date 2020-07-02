@@ -13,21 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the skill mastery viewer.
+ * @fileoverview Component for the skill mastery viewer.
  */
-
-import { SkillMasteryListConstants } from
-  'components/skills-mastery-list/skills-mastery-list.constants';
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { SkillMasteryListConstants } from
+  'components/skills-mastery-list/skills-mastery-list.constants';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 
 @Component({
   selector: 'skill-mastery-viewer',
-  templateUrl: './skill-mastery.directive.html',
+  templateUrl: './skill-mastery.component.html',
   styleUrls: []
 })
 export class SkillMasteryViewerComponent implements OnInit {
@@ -44,9 +43,8 @@ export class SkillMasteryViewerComponent implements OnInit {
     this.skillMasteryDegree = 0.0;
 
     this.skillMasteryBackendApiService.fetchSkillMasteryDegrees(
-      [this.skillId]).then(function(degreesOfMastery) {
-      this.skillMasteryDegree = degreesOfMastery[this.skillId];
-    });
+      [this.skillId]).then(degreesOfMastery => this.skillMasteryDegree = (
+      degreesOfMastery[this.skillId]));
   }
 
   getSkillMasteryPercentage() {
@@ -65,16 +63,16 @@ export class SkillMasteryViewerComponent implements OnInit {
     if (this.masteryChange > 0) {
       if (this.skillMasteryDegree >=
           SkillMasteryListConstants.MASTERY_CUTOFF.GOOD_CUTOFF) {
-        return 'You have mastered this skill very well! ' +
-          'You can work on other skills or learn new skills.';
+        return ('You have mastered this skill very well! ' +
+          'You can work on other skills or learn new skills.');
       } else {
-        return 'You have made progress! You can increase your ' +
-          'mastery level by doing more practice sessions.';
+        return ('You have made progress! You can increase your ' +
+          'mastery level by doing more practice sessions.');
       }
     } else {
-      return 'Looks like your mastery of this skill has dropped. ' +
+      return ('Looks like your mastery of this skill has dropped. ' +
           'To improve it, try reviewing the concept card below and ' +
-          'then practicing more questions for the skill.';
+          'then practicing more questions for the skill.');
     }
   }
 }
