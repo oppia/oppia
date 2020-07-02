@@ -299,7 +299,7 @@ def _handle_exp_issues_after_state_rename(
 
     old_state_name = state_name
     new_state_name = old_to_new_state_names[old_state_name]
-    if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+    if stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
             exp_issue.issue_type] == 'state_names':
         state_names = exp_issue.issue_customization_args['state_names'][
             'value']
@@ -350,7 +350,8 @@ def update_exp_issues_for_new_exp_version(
     playthrough_ids_by_state_name = collections.defaultdict(list)
 
     for i_idx, exp_issue in enumerate(exp_issues.unresolved_issues):
-        keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
+        keyname = stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+            exp_issue.issue_type]
         if keyname == 'state_names':
             state_names = exp_issue.issue_customization_args[keyname]['value']
             for state_name in state_names:
@@ -394,7 +395,7 @@ def update_exp_issues_for_new_exp_version(
 
         playthroughs = get_playthroughs_multi(playthrough_ids)
         for p_idx, playthrough in enumerate(playthroughs):
-            if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+            if stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
                     playthrough.issue_type] == 'state_names':
                 state_names = playthrough.issue_customization_args[
                     'state_names']['value']

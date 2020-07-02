@@ -25,22 +25,11 @@ import { Playthrough } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface IStorePlaythroughBackendResponse {
-  'playthrough_stored': boolean;
-  'playthrough_id': string;
-}
-
-export class StorePlaythroughResponse {
-  constructor(
-    public playthroughStored: boolean,
-    public playthroughId: string) {}
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class PlaythroughBackendApiService {
-  STORE_PLAYTHROUGH_URL: string = (
+  private readonly STORE_PLAYTHROUGH_URL: string = (
     '/explorehandler/store_playthrough/<exploration_id>');
 
   constructor(
@@ -48,21 +37,16 @@ export class PlaythroughBackendApiService {
       private urlInterpolationService: UrlInterpolationService) {}
 
   storePlaythrough(
-      playthrough: Playthrough, issueSchemaVersion: number,
-      playthroughId: string): Promise<StorePlaythroughResponse> {
+      playthrough: Playthrough, issueSchemaVersion: number): Promise<void> {
     let playthroughUrl = this.urlInterpolationService.interpolateUrl(
       this.STORE_PLAYTHROUGH_URL, {
         exploration_id: playthrough.expId
       });
 
-    return this.http.post<IStorePlaythroughBackendResponse>(playthroughUrl, {
+    return this.http.post<void>(playthroughUrl, {
       playthrough_data: playthrough.toBackendDict(),
       issue_schema_version: issueSchemaVersion,
-      playthrough_id: playthroughId
-    }).toPromise().then(response => {
-      return new StorePlaythroughResponse(
-        response.playthrough_stored, response.playthrough_id);
-    });
+    }).toPromise();
   }
 }
 

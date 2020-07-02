@@ -80,11 +80,7 @@ class LearnerActionBase<ActionType> {
   constructor(
       public readonly actionType: ActionType,
       public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
-      public schemaVersion: number) {
-    if (schemaVersion < 1) {
-      throw new Error('given invalid schema version');
-    }
-  }
+      public schemaVersion: number) {}
 
   toBackendDict(): ILearnerActionBackendDictBase<ActionType> {
     return {
@@ -114,30 +110,27 @@ export type LearnerAction = (
 })
 export class LearnerActionObjectFactory {
   createNewExplorationStartAction(
-      actionCustomizationArgs: IExplorationStartCustomizationArgs,
-      schemaVersion?: number): ExplorationStartLearnerAction {
-    schemaVersion = schemaVersion ||
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+      actionCustomizationArgs: IExplorationStartCustomizationArgs
+  ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
-      'ExplorationStart', actionCustomizationArgs, schemaVersion);
+      'ExplorationStart', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
   createNewAnswerSubmitAction(
-      actionCustomizationArgs: IAnswerSubmitCustomizationArgs,
-      schemaVersion?: number): AnswerSubmitLearnerAction {
-    schemaVersion = schemaVersion ||
-    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+      actionCustomizationArgs: IAnswerSubmitCustomizationArgs
+  ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
-      'AnswerSubmit', actionCustomizationArgs, schemaVersion);
+      'AnswerSubmit', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
   createNewExplorationQuitAction(
-      actionCustomizationArgs: IExplorationQuitCustomizationArgs,
-      schemaVersion?: number): ExplorationQuitLearnerAction {
-    schemaVersion = schemaVersion ||
-    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+      actionCustomizationArgs: IExplorationQuitCustomizationArgs
+  ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
-      'ExplorationQuit', actionCustomizationArgs, schemaVersion);
+      'ExplorationQuit', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
   /**
