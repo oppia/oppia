@@ -17,6 +17,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
@@ -25,7 +26,7 @@ import { UrlService } from 'services/contextual/url.service';
 @Component({
   selector: 'attribution-guide',
   templateUrl: './attribution-guide.component.html',
-  styleUrl: []
+  styleUrls: []
 })
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;
@@ -37,7 +38,7 @@ export class AttributionGuideComponent implements OnInit {
 
   ngOnInit() {
     this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
-    this.iframe = this.urlService.isIframed();
+    this.iframed = this.urlService.isIframed();
   }
 }
 
