@@ -1751,40 +1751,34 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
     }
 
     def visit_classdef(self, node):
-        """Process a module to ensure that there is a single newline below
-        class docstring.
+        """Visit each class definition in a module.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.scoped_nodes.ClassDef. Node for a class definition
+                in the AST.
         """
+        # Check if the given node has docstring.
+        if node.doc is None:
+            return
         line_number = node.fromlineno
-        # Iterate till the end of class definition because some classes has
-        # definition of more than one line. Example:
-        # class ClassName(
-        #       BaseClass):
+        # Iterate till the start of docstring.
         while True:
             line = linecache.getline(node.root().file, line_number).strip()
-            if line.find(b'):') != -1:
+            if line.startswith('"""'):
                 break
             else:
                 line_number += 1
-                continue
 
-        # Check if the given node has docstring.
-        if node.doc:
-            doc_length = len(node.doc.split(b'\n'))
-            line_number += doc_length + 1
-            line = linecache.getline(node.root().file, line_number).strip()
-            next_line = linecache.getline(
-                node.root().file, line_number + 1).strip()
-            if line != b'':
-                self.add_message(
-                    'newline-below-class-docstring',
-                    node=node)
-            elif next_line == b'':
-                self.add_message(
-                    'newline-below-class-docstring',
-                    node=node)
+        doc_length = len(node.doc.split(b'\n'))
+        line_number += doc_length
+        first_line_after_doc = linecache.getline(
+            node.root().file, line_number).strip()
+        second_line_after_doc = linecache.getline(
+            node.root().file, line_number + 1).strip()
+        if first_line_after_doc != b'':
+            self.add_message('newline-below-class-docstring', node=node)
+        elif second_line_after_doc == b'':
+            self.add_message('newline-below-class-docstring', node=node)
 
 
 def register(linter):

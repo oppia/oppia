@@ -2688,8 +2688,38 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_class_argument_in_other_lines(self):
-        node_class_argument_in_other_lines = (
+    def test_multiline_class_argument_with_incorrect_style(self):
+        node_multiline_class_argument_with_incorrect_style = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(
+                            dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+                        a = 1 + 2
+                """)
+        node_multiline_class_argument_with_incorrect_style.file = filename
+        node_multiline_class_argument_with_incorrect_style.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_multiline_class_argument_with_incorrect_style)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_multiline_class_argument_with_incorrect_style)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+
+    def test_multiline_class_argument_with_correct_style(self):
+        node_multiline_class_argument_with_correct_style = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
@@ -2705,11 +2735,11 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
 
                         a = 1 + 2
                 """)
-        node_class_argument_in_other_lines.file = filename
-        node_class_argument_in_other_lines.path = filename
+        node_multiline_class_argument_with_correct_style.file = filename
+        node_multiline_class_argument_with_correct_style.path = filename
 
         self.checker_test_object.checker.visit_classdef(
-            node_class_argument_in_other_lines)
+            node_multiline_class_argument_with_correct_style)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2736,4 +2766,81 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
             node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_class_with_no_docstring(self):
+        node_class_with_no_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc=None)
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        a = 1 + 2
+                """)
+        node_class_with_no_docstring.file = filename
+        node_class_with_no_docstring.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_class_with_no_docstring)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_newline_before_docstring_with_correct_style(self):
+        node_newline_before_docstring_with_correct_style = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+
+                        \"\"\"This is a multiline docstring.\"\"\"
+
+                        a = 1 + 2
+                """)
+        node_newline_before_docstring_with_correct_style.file = filename
+        node_newline_before_docstring_with_correct_style.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_newline_before_docstring_with_correct_style)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_newline_before_docstring_with_incorrect_style(self):
+        node_newline_before_docstring_with_incorrect_style = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+
+                        \"\"\"This is a multiline docstring.\"\"\"
+                        a = 1 + 2
+                """)
+        node_newline_before_docstring_with_incorrect_style.file = filename
+        node_newline_before_docstring_with_incorrect_style.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_newline_before_docstring_with_incorrect_style)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_newline_before_docstring_with_incorrect_style)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
