@@ -24,7 +24,7 @@ import { Component } from '@angular/core';
   styleUrls: []
 })
 export class LazyLoadingComponent {
-  constructor() {} 
+  constructor() {}
 }
 angular.module('oppia').directive(
   'lazyLoading', downgradeComponent(

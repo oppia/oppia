@@ -29,7 +29,7 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;
-  iframed: boolean = false; 
+  iframed: boolean = false;
   constructor(
     private browserCheckerService: BrowserCheckerService,
     private urlService: UrlService
