@@ -23,16 +23,16 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 
 describe('Oppia click hexbins visualization', function() {
+  let $compile, $rootScope, AssetsBackendApiService, ContextService,
+    ImagePreloaderService;
+  let el: JQLite;
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-
-  // Dependencies of the visualization.
-  let $compile, $rootScope, AssetsBackendApiService, ContextService,
-    ImagePreloaderService;
 
   beforeEach(angular.mock.inject(function(
       _$compile_, _$rootScope_, _AssetsBackendApiService_, _ContextService_,
@@ -42,9 +42,7 @@ describe('Oppia click hexbins visualization', function() {
     AssetsBackendApiService = _AssetsBackendApiService_;
     ContextService = _ContextService_;
     ImagePreloaderService = _ImagePreloaderService_;
-  }));
 
-  beforeEach(() => {
     spyOn(ContextService, 'getEntityId').and.returnValue('eid');
     spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
     spyOn(AssetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
@@ -52,9 +50,6 @@ describe('Oppia click hexbins visualization', function() {
     spyOn(ImagePreloaderService, 'getDimensionsOfImage').and.returnValue(
       {width: 300, height: 250});
   });
-
-  /** Holds a reference to the visualization directive. */
-  let el: JQLite;
 
   beforeEach(() => {
     const elementTemplate = angular.element(
