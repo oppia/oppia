@@ -190,9 +190,9 @@
 
 
 # Global components and filters.
-/core/templates/components/button-directives/exploration-embed-button.service.ts @ankita240796
-/core/templates/components/button-directives/exploration-embed-button.directive.html @ankita240796
-/core/templates/components/button-directives/exploration-embed-button-modal.controller*.ts @ankita240796
+/core/templates/components/button-directives/exploration-embed-button-modal.component.html @ankita240796
+/core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts @nithusha21
+/core/templates/components/button-directives/exploration-embed-button-modal.component.ts @ankita240796
 /core/templates/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
@@ -207,8 +207,8 @@
 /core/templates/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @ankita240796
 /core/templates/components/profile-link-directives/ @ankita240796
 /core/templates/components/summary-tile/ @ankita240796
 /core/templates/directives/angular-html-bind.directive*.ts @ankita240796

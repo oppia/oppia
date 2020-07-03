@@ -19,7 +19,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'sharing-links.directive.ts');
+  'sharing-links.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
