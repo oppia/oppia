@@ -1,0 +1,26 @@
+oppia-visualization-enumerated-frequency-table a.answer-rank {
+  font-weight: bold;
+}
+oppia-visualization-enumerated-frequency-table table {
+  margin-top: 12px;
+}
+oppia-visualization-enumerated-frequency-table table th {
+  text-align: center;
+}
+oppia-visualization-enumerated-frequency-table table th:first-child {
+  text-align: left;
+  width: 100%;
+}
+oppia-visualization-enumerated-frequency-table table td {
+  text-align: center;
+}
+oppia-visualization-enumerated-frequency-table table td:first-child {
+  text-align: left;
+  word-wrap: break-word;
+}
+oppia-visualization-enumerated-frequency-table table.item {
+  margin-top: 8px;
+}
+oppia-visualization-enumerated-frequency-table table.item tr:nth-child(odd) {
+  background-color: rgba(242, 242, 242, 1);
+}

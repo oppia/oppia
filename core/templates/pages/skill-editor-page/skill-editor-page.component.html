@@ -1,0 +1,95 @@
+<div>
+  <div class="skill-editor-main">
+    <div class="navbar-helper">
+      <div class="navbar-tabs">
+        <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'active': $ctrl.getActiveTabName() === 'main'}"
+            ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>"
+            ng-click="$ctrl.selectMainTab()" class="navbar-tab">
+          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class=" protractor-test-main-tab">
+            <i class="material-icons">&#xE254;</i><span>Skill</span>
+          </a>
+          <div ng-show="$ctrl.getWarningsCount()"
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
+            <span class="oppia-editor-warnings-count">
+              <[$ctrl.getWarningsCount()]>
+            </span>
+          </div>
+          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+            <span class="oppia-editor-warnings-header">Warnings</span>
+            <li class="oppia-editor-warnings-text"
+                ng-repeat="issue in $ctrl.skill.getValidationIssues() track by $index">
+              <hr class="oppia-editor-warnings-separator">
+              <[issue]>
+            </li>
+          </ul>
+        </li>
+        <li class="navbar-tab icon protractor-test-questions-tab"
+            ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}"
+            ng-click="$ctrl.selectQuestionsTab()">
+          <a uib-tooltip="Questions" tooltip-placement="bottom">
+            <i class="fa fa-book"></i><span>Questions</span>
+          </a>
+        </li>
+        <li class="navbar-tab icon">
+          <a ng-click="$ctrl.selectPreviewTab()" class="nav-link" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
+            <i class="material-icons">&#xE037;</i><span>Preview</span>
+          </a>
+        </li>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'main'">
+    <skill-editor-main-tab></skill-editor-main-tab>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'questions'">
+    <questions-tab></questions-tab>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'preview'">
+    <skill-preview-tab></skill-preview-tab>
+  </div>
+</div>
+
+
+<style>
+  .skill-editor-main .navbar-helper {
+    background-color: #00008B;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    height: 70px;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .skill-editor-main .oppia-editor-warnings-box-block {
+    display: block;
+  }
+
+  .skill-editor-main .navbar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .skill-editor-main .navbar-tab {
+    align-items: center;
+    display: flex;
+    margin: 0 30px;
+  }
+
+  .skill-editor-main .navbar-tab i {
+    color: #FFFFFF;
+    display: block;
+    font-size: 30px;
+    width: 100%;
+  }
+
+  .skill-editor-main .navbar-tab span {
+    color: #FFFFFF;
+    font-size: 12px;
+  }
+</style>

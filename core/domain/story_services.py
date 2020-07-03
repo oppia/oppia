@@ -107,8 +107,8 @@ def apply_change_list(story_id, change_list):
 
     Returns:
         Story, list(str), list(str). The resulting story domain object, the
-            exploration IDs removed from story and the exploration IDs added to
-            the story.
+        exploration IDs removed from story and the exploration IDs added to
+        the story.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -223,7 +223,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
 
     Returns:
         list(str). The various validation error messages (if raise_error is
-            False).
+        False).
 
     Raises:
         ValidationError. Expected story to only reference valid explorations.
@@ -544,11 +544,12 @@ def compute_summary_of_story(story):
     Returns:
         StorySummary. The computed summary for the given story.
     """
-    story_model_node_count = len(story.story_contents.nodes)
+    story_model_node_titles = [
+        node.title for node in story.story_contents.nodes]
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
-        story.version, story_model_node_count,
-        story.created_on, story.last_updated
+        story.version, story_model_node_titles, story.thumbnail_bg_color,
+        story.thumbnail_filename, story.created_on, story.last_updated
     )
 
     return story_summary
@@ -578,7 +579,9 @@ def save_story_summary(story_summary):
         'description': story_summary.description,
         'language_code': story_summary.language_code,
         'version': story_summary.version,
-        'node_count': story_summary.node_count,
+        'node_titles': story_summary.node_titles,
+        'thumbnail_bg_color': story_summary.thumbnail_bg_color,
+        'thumbnail_filename': story_summary.thumbnail_filename,
         'story_model_last_updated': (
             story_summary.story_model_last_updated),
         'story_model_created_on': (

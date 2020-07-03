@@ -74,13 +74,13 @@ class TopicPageDataHandler(base.BaseHandler):
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
             story_summary_dict = story_summary.to_human_readable_dict()
-            story_summary_dict['published'] = True
+            story_summary_dict['story_is_published'] = True
             canonical_story_dicts.append(story_summary_dict)
 
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
             story_summary_dict = story_summary.to_human_readable_dict()
-            story_summary_dict['published'] = True
+            story_summary_dict['story_is_published'] = True
             additional_story_dicts.append(story_summary_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
@@ -121,6 +121,7 @@ class TopicPageDataHandler(base.BaseHandler):
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
+            'topic_description': topic.description,
             'canonical_story_dicts': canonical_story_dicts,
             'additional_story_dicts': additional_story_dicts,
             'uncategorized_skill_ids': uncategorized_skill_ids,

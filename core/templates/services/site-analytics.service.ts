@@ -36,7 +36,7 @@ export class SiteAnalyticsService {
   constructor(private windowRef: WindowRef) {}
 
   // For definitions of the various arguments, please see:
-  // developers.google.com/analytics/devguides/collection/analyticsjs/events
+  // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
     if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
@@ -47,10 +47,9 @@ export class SiteAnalyticsService {
 
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/
-  // social-interactions
-  // TODO(#7176): Replace 'any' with the exact type.
+  // social-interactions.
   __sendSocialEventToGoogleAnalytics(
-      network: any, action: any, targetUrl: any): void {
+      network: string, action: string, targetUrl: string): void {
     if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.ga('send', 'social',
         network, action, targetUrl);
@@ -58,8 +57,7 @@ export class SiteAnalyticsService {
   }
 
   // The srcElement refers to the element on the page that is clicked.
-  // TODO(#7176): Replace 'any' with the exact type.
-  registerStartLoginEvent(srcElement: any): void {
+  registerStartLoginEvent(srcElement: string): void {
     this._sendEventToGoogleAnalytics(
       'LoginButton', 'click',
       this.windowRef.nativeWindow.location.pathname + ' ' + srcElement);
@@ -113,7 +111,7 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'CommitToPublicExploration', 'click', explorationId);
   }
-  // Metrics for tutorial on first creating exploration
+  // Metrics for tutorial on first creating exploration.
   registerTutorialModalOpenEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'TutorialModalOpen', 'open', explorationId);
@@ -126,7 +124,7 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'AcceptTutorialModal', 'click', explorationId);
   }
-  // Metrics for visiting the help center
+  // Metrics for visiting the help center.
   registerClickHelpButtonEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'ClickHelpButton', 'click', explorationId);
@@ -139,7 +137,7 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'OpenTutorialFromHelpCenter', 'click', explorationId);
   }
-  // Metrics for exiting the tutorial
+  // Metrics for exiting the tutorial.
   registerSkipTutorialEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'SkipTutorial', 'click', explorationId);
@@ -148,7 +146,7 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'FinishTutorial', 'click', explorationId);
   }
-  // Metrics for first time editor use
+  // Metrics for first time editor use.
   registerEditorFirstEntryEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'FirstEnterEditor', 'open', explorationId);
@@ -181,7 +179,7 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'FirstCreateSecondState', 'create', explorationId);
   }
-  // Metrics for publishing explorations
+  // Metrics for publishing explorations.
   registerSavePlayableExplorationEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'SavePlayableExploration', 'save', explorationId);

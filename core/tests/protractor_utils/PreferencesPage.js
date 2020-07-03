@@ -60,13 +60,14 @@ var PreferencesPage = function() {
     expect(await profilePhotoUploadError.isDisplayed()).toBe(true);
   };
 
-  this.uploadProfilePhoto = async function(imgPath) {
-    return await workflow.uploadImage(profilePhotoClickable, imgPath);
+  this.uploadProfilePhoto = async function(imgPath, resetExistingImage) {
+    return await workflow.uploadImage(
+      profilePhotoClickable, imgPath, resetExistingImage);
   };
 
-  this.submitProfilePhoto = async function(imgPath) {
+  this.submitProfilePhoto = async function(imgPath, resetExistingImage) {
     return await workflow.submitImage(
-      profilePhotoClickable, profilePhotoCropper, imgPath);
+      profilePhotoClickable, profilePhotoCropper, imgPath, resetExistingImage);
   };
 
   this.getProfilePhotoSource = async function() {

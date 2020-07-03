@@ -15,6 +15,20 @@
 /**
  * @fileoverview Constants for the topics and skills dashboard.
  */
+const constants = require('constants.ts');
+
+export enum ETopicSortOptions {
+  IncreasingCreatedOn = 'Newly Created',
+  DecreasingCreatedOn = 'Oldest Created',
+  IncreasingUpdatedOn = 'Most Recently Updated',
+  DecreasingUpdatedOn = 'Least Recently Updated',
+}
+
+export enum ETopicPublishedOptions {
+  All = 'All',
+  Published = 'Published',
+  NotPublished = 'Not Published'
+}
 
 export class TopicsAndSkillsDashboardPageConstants {
   public static EVENT_TYPE_TOPIC_CREATION_ENABLED = 'topicCreationEnabled';
@@ -29,4 +43,9 @@ export class TopicsAndSkillsDashboardPageConstants {
     STATUS_CHANGED: 'changed',
     STATUS_DISABLED: 'disabled'
   };
+  public static TOPIC_SORT_OPTIONS = (
+    constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS);
+  public static TOPIC_PUBLISHED_OPTIONS = ETopicPublishedOptions;
+  public static TOPIC_FILTER_CLASSROOM_ALL = 'All';
+  public static SKILL_STATUS_OPTIONS = constants.SKILL_STATUS_OPTIONS;
 }
