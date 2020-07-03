@@ -29,6 +29,7 @@ from scripts.release_scripts import initial_release_prep
 
 class InitialReleasePrepTests(test_utils.GenericTestBase):
     """Test the methods for intial release preparation."""
+
     def test_exception_is_raised_if_release_journal_is_not_created(self):
         def mock_open_tab(unused_url):
             pass

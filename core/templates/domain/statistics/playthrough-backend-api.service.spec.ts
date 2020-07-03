@@ -52,17 +52,18 @@ describe('Playthrough backend api service', () => {
     let playthroughDict: IPlaythroughBackendDict = {
       exp_id: 'expId1',
       exp_version: 1,
-      issue_type: 'EarlyQuit',
+      issue_type: 'MultipleIncorrectSubmissions',
       issue_customization_args: {
-        state_name: {value: 'Introduction'},
-        time_spent_in_exp_in_msecs: {value: 30000}
+        state_name: {
+          value: 'stateName'
+        },
+        num_times_answered_incorrectly: {
+          value: 14
+        }
       },
       actions: [{
-        action_type: 'ExplorationQuit',
-        action_customization_args: {
-          state_name: {value: 'state'},
-          time_spent_in_state_in_msecs: {value: 2}
-        },
+        action_type: 'AnswerSubmit',
+        action_customization_args: null,
         schema_version: 1
       }]
     };
