@@ -40,6 +40,7 @@ import feconf
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic services."""
+
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'

@@ -36,6 +36,7 @@ class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that computes the number of commits done by contributors for
     each collection and exploration.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionModel, exp_models.ExplorationModel]
