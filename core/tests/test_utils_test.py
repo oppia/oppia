@@ -60,6 +60,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                     AssertionError: The argument doesn't match with the mock
                         name.
                 """
+
                 order.append('before')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
