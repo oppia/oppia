@@ -61,6 +61,7 @@ import threading
 import python_utils
 
 # Install third party dependencies before proceeding.
+from . import app_dev_linter
 from . import codeowner_linter
 from . import css_linter
 from . import general_purpose_linter
@@ -69,11 +70,10 @@ from . import js_ts_linter
 from . import linter_utils
 from . import python_linter
 from . import third_party_typings_linter
+from . import webpack_config_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
-
-install_third_party_libs.main()
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
@@ -97,11 +97,6 @@ _PARSER.add_argument(
     help='specific file extensions to be linted. Space separated list. '
     'If either of js or ts used then both js and ts files will be linted.',
     action='store')
-
-if not os.getcwd().endswith('oppia'):
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'ERROR    Please run this script from the oppia root directory.')
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -229,20 +224,21 @@ def _get_linters_for_file_extension(
         general_files_to_lint = _FILES['.%s' % file_extension_to_lint]
 
     custom_linter, third_party_linter = general_purpose_linter.get_linters(
-        general_files_to_lint,
+        general_files_to_lint, FILE_CACHE,
         verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
-            _FILES['.js'], _FILES['.ts'],
+            _FILES['.js'], _FILES['.ts'], FILE_CACHE,
             verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'html':
         custom_linter, third_party_linter = html_linter.get_linters(
-            _FILES['.html'], verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.html'], FILE_CACHE,
+            verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -263,7 +259,8 @@ def _get_linters_for_file_extension(
 
     elif file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
-            _FILES['.py'], verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.py'], FILE_CACHE,
+            verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -419,13 +416,20 @@ def categorize_files(file_paths):
     _FILES.update(all_filepaths_dict)
 
 
-def _print_complete_summary_of_lint_messages(lint_messages):
-    """Print complete summary of lint messages."""
+def _print_summary_of_error_messages(lint_messages):
+    """Print summary of linter error messages.
+
+    Args:
+        lint_messages: list(str). List of linter error messages.
+    """
     if lint_messages != '':
-        python_utils.PRINT('Summary of Errors:')
+        python_utils.PRINT('Please fix the errors below:')
         python_utils.PRINT('----------------------------------------')
         for message in lint_messages:
-            python_utils.PRINT(message)
+            if message.startswith(('SUCCESS', 'FAILED')):
+                continue
+            else:
+                python_utils.PRINT(message)
 
 
 def _get_task_output(lint_messages, task, semaphore):
@@ -476,6 +480,8 @@ def main(args=None):
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+
+    install_third_party_libs.main()
 
     python_utils.PRINT('Starting Linter....')
 
@@ -552,13 +558,17 @@ def main(args=None):
         _get_task_output(lint_messages, task, semaphore)
 
     lint_messages += codeowner_linter.check_codeowner_file(
-        verbose_mode_enabled)
+        FILE_CACHE, verbose_mode_enabled)
 
     lint_messages += (
         third_party_typings_linter.check_third_party_libs_type_defs(
             verbose_mode_enabled))
 
-    _print_complete_summary_of_lint_messages(lint_messages)
+    lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
+        FILE_CACHE, verbose_mode_enabled)
+
+    lint_messages += webpack_config_linter.check_webpack_config_file(
+        FILE_CACHE, verbose_mode_enabled)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
@@ -566,6 +576,7 @@ def main(args=None):
 
     if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
             message in lint_messages]) or errors_stacktrace:
+        _print_summary_of_error_messages(lint_messages)
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')
@@ -579,8 +590,11 @@ def main(args=None):
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = FileCache()
-__builtins__.FILE_CACHE = NAME_SPACE.files
+FILE_CACHE = NAME_SPACE.files
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when pre_commit_linter.py is used as a
+# script.
+if __name__ == '__main__': # pragma: no cover
     main()

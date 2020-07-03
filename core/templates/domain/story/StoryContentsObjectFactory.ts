@@ -25,7 +25,7 @@ import { StoryEditorPageConstants } from
 import { IStoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 
-interface IStoryContentsBackendDict {
+export interface IStoryContentsBackendDict {
   'initial_node_id': string;
   'next_node_id': string;
   'nodes': IStoryNodeBackendDict[];

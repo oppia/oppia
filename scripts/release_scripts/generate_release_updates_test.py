@@ -112,6 +112,7 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         class MockFile(python_utils.OBJECT):
             def read(self):
                 """Read content of the file object."""
+
                 return mock_read()
         def mock_read():
             check_function_calls['read_gets_called'] += 1

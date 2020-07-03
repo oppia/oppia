@@ -76,8 +76,8 @@ angular.module('oppia').directive('topicsList', [
           /**
            * @param {String} topicId - ID of the topic.
            */
-          ctrl.enableEditOptions = function(topicId) {
-            ctrl.selectedIndex = topicId;
+          ctrl.changeEditOptions = function(topicId) {
+            ctrl.selectedIndex = ctrl.selectedIndex ? null : topicId;
           };
 
           /**
@@ -98,6 +98,7 @@ angular.module('oppia').directive('topicsList', [
            * @param {String} topicName - Name of the topic.
            */
           ctrl.deleteTopic = function(topicId, topicName) {
+            ctrl.selectedIndex = null;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -108,6 +109,7 @@ angular.module('oppia').directive('topicsList', [
                   return topicName;
                 }
               },
+              windowClass: 'delete-topic-modal',
               controller: 'DeleteTopicModalController'
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
