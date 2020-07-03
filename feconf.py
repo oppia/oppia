@@ -1026,5 +1026,5 @@ AVAILABLE_LANDING_PAGES = {
 }
 
 # Classroom page names for generating URLs. These need to be kept in sync with
-# TOPIC_IDS_FOR_CLASSROOM_PAGES property in config_domain.
+# CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']

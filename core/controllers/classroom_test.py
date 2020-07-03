@@ -90,7 +90,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.name: (
+                config_domain.CLASSROOM_PAGES_DATA.name: (
                     new_config_value),
             }
         }

@@ -53,7 +53,7 @@ class ClassroomDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         classroom_name_is_valid = False
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
+        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
             if classroom_dict['name'] == classroom_name:
                 classroom_name_is_valid = True
                 classroom_data = classroom_dict

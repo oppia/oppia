@@ -27,6 +27,8 @@ export interface ITopicSummaryBackendDict {
   'subtopic_count': number;
   'total_skill_count': number;
   'uncategorized_skill_count': number;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
 }
 
 export class TopicSummary {
@@ -36,15 +38,19 @@ export class TopicSummary {
   _subtopicCount: number;
   _totalSkillCount: number;
   _uncategorizedSkillCount: number;
+  _thumbnailFilename: string;
+  _thumbnailBgColor: string;
 
   constructor(id, name, canonicalStoryCount, subtopicCount, totalSkillCount,
-      uncategorizedSkillCount) {
+      uncategorizedSkillCount, thumbnailFilename, thumbnailBgColor) {
     this._id = id;
     this._name = name;
     this._canonicalStoryCount = canonicalStoryCount;
     this._totalSkillCount = totalSkillCount;
     this._uncategorizedSkillCount = uncategorizedSkillCount;
     this._subtopicCount = subtopicCount;
+    this._thumbnailFilename = thumbnailFilename;
+    this._thumbnailBgColor = thumbnailBgColor;
   }
   // ---- Instance methods ----
 
@@ -71,6 +77,14 @@ export class TopicSummary {
   getUncategorizedSkillCount(): number {
     return this._uncategorizedSkillCount;
   }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
 }
 
 @Injectable({
@@ -85,7 +99,9 @@ export class TopicSummaryObjectFactory {
       topicSummaryBackendDict.canonical_story_count,
       topicSummaryBackendDict.subtopic_count,
       topicSummaryBackendDict.total_skill_count,
-      topicSummaryBackendDict.uncategorized_skill_count
+      topicSummaryBackendDict.uncategorized_skill_count,
+      topicSummaryBackendDict.thumbnail_filename,
+      topicSummaryBackendDict.thumbnail_bg_color
     );
   }
 }

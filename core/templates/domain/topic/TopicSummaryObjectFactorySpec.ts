@@ -32,7 +32,9 @@ describe('Topic summary object factory', () => {
       subtopic_count: 5,
       canonical_story_count: 4,
       total_skill_count: 10,
-      uncategorized_skill_count: 3
+      uncategorized_skill_count: 3,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA'
     };
     _sampleTopicSummary = topicSummaryObjectFactory.createFromBackendDict(
       sampleTopicSummaryBackendDict);
@@ -45,5 +47,7 @@ describe('Topic summary object factory', () => {
     expect(_sampleTopicSummary.getCanonicalStoryCount()).toEqual(4);
     expect(_sampleTopicSummary.getTotalSkillCount()).toEqual(10);
     expect(_sampleTopicSummary.getUncategorizedSkillCount()).toEqual(3);
+    expect(_sampleTopicSummary.getThumbnailFilename()).toEqual('image.svg');
+    expect(_sampleTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
   });
 });

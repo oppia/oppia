@@ -73,12 +73,18 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
         }, {
             'name': 'course_details',
             'schema': {
-                'type': 'unicode'
+                'type': 'unicode',
+                'ui_config': {
+                    'rows': 8,
+                }
             }
         }, {
             'name': 'topics_covered',
             'schema': {
-                'type': 'unicode'
+                'type': 'unicode',
+                'ui_config': {
+                    'rows': 5,
+                }
             }
         }, {
             'name': 'topic_ids',
@@ -351,8 +357,8 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
 
-TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
-    'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
+CLASSROOM_PAGES_DATA = ConfigProperty(
+    'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The details for each classroom page.', [{
         'name': 'math',
         'topic_ids': [],

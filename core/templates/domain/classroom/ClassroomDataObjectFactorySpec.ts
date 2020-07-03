@@ -41,7 +41,9 @@ describe('Classroom data object factory', () => {
         canonical_story_count: 4,
         subtopic_count: 5,
         total_skill_count: 20,
-        uncategorized_skill_count: 5
+        uncategorized_skill_count: 5,
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA'
       }, {
         id: 'topic2',
         name: 'Topic name 2',
@@ -49,7 +51,9 @@ describe('Classroom data object factory', () => {
         canonical_story_count: 3,
         subtopic_count: 2,
         total_skill_count: 10,
-        uncategorized_skill_count: 3
+        uncategorized_skill_count: 3,
+        thumbnail_filename: 'image2.svg',
+        thumbnail_bg_color: '#C6DCDA'
       }],
       course_details: 'Course Details',
       topics_covered: 'Topics Covered'
