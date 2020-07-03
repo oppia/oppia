@@ -48,7 +48,7 @@
 }
 .oppia-visualization-sorted-tile-tooltip > p {
   color: rgba(255, 255, 255, 0.7);
-  font-family: Roboto;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 12px;
   font-style: normal;
   font-weight: 500;
