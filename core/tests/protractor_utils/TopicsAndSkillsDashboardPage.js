@@ -59,6 +59,8 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-delete-topic-button'));
   var editTopicButton = element(
     by.css('.protractor-test-edit-topic-button'));
+  var unassignSkillButon = element(
+    by.css('.protractor-test-unassign-skill-button'));
   var skillNameField = element(
     by.css('.protractor-test-new-skill-description-field')
   );
@@ -383,6 +385,23 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.unassignSkillWithIndex = async function(index) {
+    await waitFor.visibilityOf(skillsTable,
+      'Skill table taking too long to appear.');
+    var skillEditOptionBox = skillEditOptions.get(index);
+    await skillEditOptionBox.click();
+    await waitFor.elementToBeClickable(
+      unassignSkillButon,
+      'Unassign Skill button takes too long to be clickable');
+    await unassignSkillButon.click();
+    var confirmUnassignSkillDeletionButton =
+      element(by.css('.protractor-test-confirm-unassign-skill-button'));
+    await waitFor.elementToBeClickable(
+      confirmUnassignSkillDeletionButton,
+      'Confirm Delete Topic button takes too long to be clickable');
+    await confirmUnassignSkillDeletionButton.click();
+  };
+
   this.navigateToSkillsTab = async function() {
     await waitFor.elementToBeClickable(
       skillsTabButton,
@@ -416,6 +435,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.expectNumberOfSkillsToBe = async function(number) {
+    console.log(await skillsListItems.count());
     expect(await skillsListItems.count()).toEqual(number);
   };
 

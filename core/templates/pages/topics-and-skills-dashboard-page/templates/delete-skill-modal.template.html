@@ -3,9 +3,9 @@
     Are you sure you want to delete this skill?
   </h3>
 </div>
-<div class="modal-body" ng-if="assignedTopics.length">
+<div class="modal-body" ng-if="showAssignedTopics()">
   <span>This skill is assigned to these following topics, If you delete the skill, it will be automatically removed from these topics.</span>
-  <div ng-repeat="topic in assignedTopics">
+  <div ng-repeat="(topic, id) in assignedTopics">
     <span class="topic-name"><[topic]></span>
   </div>
 </div>

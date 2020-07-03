@@ -13,15 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the delete skill modal.
+ * @fileoverview Controller for unassign skill from topics modal.
  */
+
+require(
+  'components/common-layout-directives/common-elements/' +
+    'confirm-or-cancel-modal.controller.ts');
 
 require(
   'domain/topics_and_skills_dashboard/' +
     'topics-and-skills-dashboard-backend-api.service.ts');
-angular.module('oppia').controller('DeleteSkillModalController', [
+
+angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  'TopicsAndSkillsDashboardBackendApiService', 'skillId',
+  'TopicsAndSkillsDashboardBackendApiService',
+  'skillId',
   function($controller, $scope, $uibModalInstance,
       TopicsAndSkillsDashboardBackendApiService, skillId) {
     $controller('ConfirmOrCancelModalController', {
@@ -31,18 +37,32 @@ angular.module('oppia').controller('DeleteSkillModalController', [
     $scope.fetchAssignedSkillData = function() {
       TopicsAndSkillsDashboardBackendApiService.fetchAssignedSkillData(
         skillId).then((response) => {
+        console.log(response);
         $scope.assignedTopics = response.assigned_topics;
         $scope.assignedTopicsAreFetched = true;
       });
     };
     $scope.init = function() {
+      $scope.selectedIndexes = [];
       $scope.assignedTopicsAreFetched = false;
       $scope.fetchAssignedSkillData();
     };
-    $scope.showAssignedTopics = function() {
-      return (
-        $scope.assignedTopicsAreFetched &&
-          Object.keys($scope.assignedTopics).length);
+    $scope.addTopicId = function(topicId) {
+      console.log(topicId);
+      var index = $scope.selectedIndexes.indexOf(topicId);
+      if (index !== -1) {
+        $scope.selectedIndexes.splice(index, 1);
+      } else {
+        $scope.selectedIndexes.push(topicId);
+      }
+    };
+    $scope.close = function() {
+      var selectedTopics = [];
+      for (let index in $scope.selectedIndexes) {
+        selectedTopics.push(
+          $scope.assignedTopics[$scope.selectedIndexes[index]]);
+      }
+      $uibModalInstance.close(selectedTopics);
     };
     $scope.init();
   }

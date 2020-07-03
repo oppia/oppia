@@ -177,12 +177,15 @@ class UnassignSkillDataHandler(base.BaseHandler):
         skill_ids_assigned_to_some_topic = (
             topic_services.get_all_skill_ids_assigned_to_some_topic())
 
-        assigned_topics = []
+        assigned_topics = {}
         topics = topic_fetchers.get_all_topics()
         if skill_id in skill_ids_assigned_to_some_topic:
             for topic in topics:
                 if skill_id in topic.get_all_skill_ids():
-                    assigned_topics.append(topic.name)
+                    assigned_topics[topic.name] = {'id': topic.id, 'version': topic.version}
+                    for subtopic in topic.subtopics:
+                        if skill_id in subtopic.skill_ids:
+                            assigned_topics[topic.name].update({'subtopic_id': subtopic.id})
 
         self.render_json({
             'assigned_topics': assigned_topics

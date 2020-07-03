@@ -34,6 +34,7 @@ describe('Topics and skills dashboard functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var SKILL_STATUS_UNASSIGNED = 'Unassigned';
+  var SKILL_STATUS_ASSIGNED = 'Assigned';
 
   beforeAll(async function() {
     topicsAndSkillsDashboardPage = (
@@ -61,6 +62,51 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+  });
+
+  fit('should assign, unassign and delete a skill', async function() {
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic1 TASD', 'Topic 1 description', true);
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        'Skill 2', 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      SKILL_STATUS_UNASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    // Await topicsAndSkillsDashboardPage.get();
+    // await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    // await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+    //   SKILL_STATUS_UNASSIGNED);
+    // await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+    // Await topicsAndSkillsDashboardPage.resetTopicFilters();
+    // await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+    //   SKILL_STATUS_ASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.unassignSkillWithIndex(0);
+    // Await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      SKILL_STATUS_ASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+    // Await topicsAndSkillsDashboardPage.resetTopicFilters();
+    // await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+    //   SKILL_STATUS_UNASSIGNED);
+    // await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    //
+    // await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
+    //
+    // await topicsAndSkillsDashboardPage.get();
+    // await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    // await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
   });
 
   it('should filter the topics', async function() {

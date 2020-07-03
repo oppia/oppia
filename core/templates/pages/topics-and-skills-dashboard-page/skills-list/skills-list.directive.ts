@@ -38,6 +38,9 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'skills-list/assign-skill-to-topic-modal.controller.ts');
 require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'skills-list/unassign-skill-from-topics-modal.controller.ts');
+require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 require('services/alerts.service.ts');
@@ -114,6 +117,52 @@ angular.module('oppia').directive('skillsList', [
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             }).then(function() {
+            });
+          };
+
+          ctrl.unassignSkill = function(skillId) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics-and-skills-dashboard-page/templates/' +
+                  'unassign-skill-from-topics-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                skillId: () => skillId
+              },
+              controller: 'UnassignSkillFromTopicModalController'
+            }).result.then(function(assignedTopics) {
+              console.log('Inside skills list');
+              console.log(assignedTopics);
+              for (let topic in assignedTopics) {
+                var changeList = [];
+                console.log(assignedTopics[topic]);
+                if (assignedTopics[topic].subtopic_id) {
+                  changeList.push({
+                    cmd: 'remove_skill_id_from_subtopic',
+                    subtopic_id: assignedTopics[topic].subtopic_id,
+                    skill_id: skillId
+                  });
+                }
+                changeList.push({
+                  cmd: 'remove_uncategorized_skill_id',
+                  uncategorized_skill_id: skillId
+                });
+                EditableTopicBackendApiService.updateTopic(
+                  assignedTopics[topic].id, assignedTopics[topic].version,
+                  'Unassigned skill with id ' + skillId + ' from the topic.',
+                  changeList
+                ).then(function() {
+                  $timeout(function() {
+                    $rootScope.$broadcast(
+                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+                      true);
+                  }, 100);
+                }).then(function() {
+                  var successToast = (
+                    'The skill has been unassigned to the topic.');
+                  AlertsService.addSuccessMessage(successToast, 1000);
+                });
+              }
             });
           };
 
