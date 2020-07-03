@@ -47,11 +47,11 @@ export class SkillMasteryViewerComponent implements OnInit {
       degreesOfMastery[this.skillId]));
   }
 
-  getSkillMasteryPercentage() {
+  getSkillMasteryPercentage(): number {
     return Math.round(this.skillMasteryDegree * 100);
   }
 
-  getMasteryChangePercentage() {
+  getMasteryChangePercentage(): string | number {
     if (this.masteryChange >= 0) {
       return '+' + Math.round(this.masteryChange * 100);
     } else {
@@ -59,21 +59,19 @@ export class SkillMasteryViewerComponent implements OnInit {
     }
   }
 
-  getLearningTips() {
-    if (this.masteryChange > 0) {
-      if (this.skillMasteryDegree >=
-          SkillMasteryListConstants.MASTERY_CUTOFF.GOOD_CUTOFF) {
-        return ('You have mastered this skill very well! ' +
-          'You can work on other skills or learn new skills.');
-      } else {
-        return ('You have made progress! You can increase your ' +
-          'mastery level by doing more practice sessions.');
-      }
-    } else {
+  getLearningTips(): string {
+    if (this.masteryChange <= 0) {
       return ('Looks like your mastery of this skill has dropped. ' +
-          'To improve it, try reviewing the concept card below and ' +
-          'then practicing more questions for the skill.');
+      'To improve it, try reviewing the concept card below and ' +
+      'then practicing more questions for the skill.');
     }
+    if (this.skillMasteryDegree >=
+      SkillMasteryListConstants.MASTERY_CUTOFF.GOOD_CUTOFF) {
+      return ('You have mastered this skill very well! ' +
+      'You can work on other skills or learn new skills.');
+    }
+    return ('You have made progress! You can increase your ' +
+            'mastery level by doing more practice sessions.');
   }
 }
 

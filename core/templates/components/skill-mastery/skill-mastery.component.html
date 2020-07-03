@@ -2,7 +2,7 @@
   <div class="skill-mastery-degree">
     <b> Mastery Degree: </b>
     <div style="margin-bottom: 10px">
-      {{ getSkillMasteryPercentage() }} %
+      {{ getSkillMasteryPercentage() }}%
       <span style="color: green" *ngIf="masteryChange >= 0"> ({{ getMasteryChangePercentage() }}%) </span>
       <span style="color: red" *ngIf="masteryChange < 0"> ({{ getMasteryChangePercentage() }}%) </span>
     </div>
