@@ -122,6 +122,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
 class ClassroomPageStatusHandlerTests(BaseClassroomControllerTests):
     """Unit test for ClassroomPageStatusHandler."""
+
     def test_get_request_returns_correct_status(self):
         self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, False)
 
