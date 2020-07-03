@@ -20,12 +20,21 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import cloneDeep from 'lodash/cloneDeep';
+
 import { LibraryPageConstants } from
   'pages/library-page/library-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ExplorationMetadataObjectFactory } from
-  'domain/exploration/ExplorationMetadataObjectFactory';
+import {
+  ExplorationMetaDataBackendDict,
+  ExplorationMetadata,
+  ExplorationMetadataObjectFactory
+} from 'domain/exploration/ExplorationMetadataObjectFactory';
+
+interface SearchExplorationBackendResponse {
+  'collection_node_metadata_list': ExplorationMetaDataBackendDict[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -38,19 +47,21 @@ export class SearchExplorationsBackendApiService {
 
   private _fetchExplorations(
       searchQuery: string, successCallback: (
-      value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
-    var explorationMetadataObject = null;
+      value?: ExplorationMetadata[]) => void,
+      errorCallback: (reason?: Object) => void): void {
     var queryUrl = this.urlInterpolationService.interpolateUrl(
       LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
         query: btoa(searchQuery)
       }
     );
-    this.http.get(queryUrl).toPromise().then((response) => {
-      explorationMetadataObject = (
-        ExplorationMetadataObjectFactory.createFromBackendDict(
-          angular.copy(response)));
-      successCallback(explorationMetadataObject);
+    this.http.get<SearchExplorationBackendResponse>(
+      queryUrl).toPromise().then(response => {
+      var explorationMetadataBackendList = cloneDeep(
+        response.collection_node_metadata_list);
+      var explorationMetadataList = explorationMetadataBackendList.map(
+        explorationMetaData => ExplorationMetadataObjectFactory.
+          createFromBackendDict(explorationMetaData));
+      successCallback(explorationMetadataList);
     }, (errorResponse) => {
       errorCallback(errorResponse);
     });
@@ -61,7 +72,7 @@ export class SearchExplorationsBackendApiService {
    * queries are tokens that will be matched against exploration's title
    * and objective.
    */
-  fetchExplorations(searchQuery: string): Promise<Object> {
+  fetchExplorations(searchQuery: string): Promise<ExplorationMetadata[]> {
     return new Promise((resolve, reject) => {
       this._fetchExplorations(searchQuery, resolve, reject);
     });

@@ -174,8 +174,6 @@ import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissionsObjectFactory } from
   'domain/exploration/exploration-permissions-object.factory';
-import { ExplorationSummaryObjectFactory } from
-  'domain/summary/exploration-summary-object.factory';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ExplorationStatsBackendApiService } from
@@ -270,6 +268,8 @@ import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import { LearnerExplorationSummaryObjectFactory } from
+  'domain/summary/learner-exploration-summary-object.factory';
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -642,8 +642,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExplorationPermissionsObjectFactory'] =
       new ExplorationPermissionsObjectFactory();
-    upgradedServices['ExplorationSummaryObjectFactory'] =
-      new ExplorationSummaryObjectFactory();
     upgradedServices['ExplorationMetadataObjectFactory'] =
       new ExplorationMetadataObjectFactory();
     upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
@@ -688,6 +686,8 @@ export class UpgradedServices {
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
+    upgradedServices['LearnerExplorationSummaryObjectFactory'] =
+      new LearnerExplorationSummaryObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
@@ -1100,7 +1100,7 @@ export class UpgradedServices {
     upgradedServices['ExplorationRecommendationsBackendApiService'] =
       new ExplorationRecommendationsBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['ExplorationSummaryObjectFactory']);
+        upgradedServices['LearnerExplorationSummaryObjectFactory']);
     upgradedServices['InteractionRulesRegistryService'] =
       new InteractionRulesRegistryService(
         upgradedServices['AlgebraicExpressionInputRulesService'],

@@ -222,8 +222,6 @@ import { ExplorationStatsBackendApiService } from
 import { ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { ExplorationSummaryObjectFactory } from
-  'domain/summary/exploration-summary-object.factory';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
 import { ExpressionSyntaxTreeService } from
@@ -314,6 +312,8 @@ import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import { LearnerExplorationSummaryObjectFactory } from
+  'domain/summary/learner-exploration-summary-object.factory';
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -705,7 +705,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationStatsBackendApiService: ExplorationStatsBackendApiService;
   static explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   static explorationStatsService: ExplorationStatsService;
-  static explorationSummaryObjectFactory: ExplorationSummaryObjectFactory;
+  static learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory;
   static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
@@ -990,7 +990,7 @@ private explorationRecommendationsService: ExplorationRecommendationsService,
 private explorationStatsBackendApiService: ExplorationStatsBackendApiService,
 private explorationStatsObjectFactory: ExplorationStatsObjectFactory,
 private explorationStatsService: ExplorationStatsService,
-private explorationSummaryObjectFactory: ExplorationSummaryObjectFactory,
+private learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory,
 private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
@@ -1276,7 +1276,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationStatsBackendApiService = this.explorationStatsBackendApiService;
     OppiaAngularRootComponent.explorationStatsObjectFactory = this.explorationStatsObjectFactory;
     OppiaAngularRootComponent.explorationStatsService = this.explorationStatsService;
-    OppiaAngularRootComponent.explorationSummaryObjectFactory = this.explorationSummaryObjectFactory;
+    OppiaAngularRootComponent.learnerExplorationSummaryObjectFactory = this.learnerExplorationSummaryObjectFactory;
     OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;

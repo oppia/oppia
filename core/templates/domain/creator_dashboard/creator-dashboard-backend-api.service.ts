@@ -21,19 +21,140 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import {
+  CreatorDashboardStatsBackendDict,
+  CreatorDashboardStats,
+  CreatorDashboardStatsObjectFactory
+} from 'domain/creator_dashboard/creator-dashboard-stats-object.factory';
+import {
+  FeedbackThread,
+  FeedbackThreadObjectFactory,
+  FeedbackThreadBackendDict
+} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {
+  SuggestionBackendDict,
+  Suggestion,
+  SuggestionObjectFactory
+} from 'domain/suggestion/SuggestionObjectFactory';
+import {
+  SubscriberSummary,
+  SubscriberSummaryBackendDict,
+  SubscriberSummaryObjectFactory
+} from 'domain/creator_dashboard/subscriber-summary-object.factory';
+import {
+  SuggestionThread,
+  SuggestionThreadObjectFactory
+} from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { LoggerService } from 'services/contextual/logger.service';
+import { SuggestionsService } from
+  'services/suggestions.service';
+
+interface CreatorDashboardDataBackendDict {
+  'dashboard_stats': CreatorDashboardStatsBackendDict;
+  'last_week_stats': CreatorDashboardStatsBackendDict;
+  'display_preference': 'card' | 'list';
+  'subscribers_list': SubscriberSummaryBackendDict[];
+  'threads_for_created_suggestions_list': FeedbackThreadBackendDict[]; //Start from here
+  'threads_for_suggestions_to_review_list': FeedbackThreadBackendDict[];
+  'created_suggestions_list': SuggestionBackendDict[];
+  'suggestions_to_review_list': SuggestionBackendDict[];
+}
+
+interface CreatorDashboardData {
+  dashboardStats: CreatorDashboardStats;
+  lastWeekStats: CreatorDashboardStats;
+  displayPreference: 'card' | 'list';
+  subscribersList: SubscriberSummary[];
+  threadsForCreatedSuggestionsList: FeedbackThread[];
+  threadsForSuggestionsToReviewList: FeedbackThread[];
+  createdSuggestionsList: Suggestion[];
+  suggestionsToReviewList: Suggestion[];
+  createdSuggestionThreadsList: SuggestionThread[];
+  suggestionThreadsToReviewList: SuggestionThread[]
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CreatorDashboardBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private creatorDashboardStatsObjectFactory:
+    CreatorDashboardStatsObjectFactory,
+    private subscriberSummaryObjectFactory: SubscriberSummaryObjectFactory,
+    private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
+    private suggestionObjectFactory: SuggestionObjectFactory,
+    private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
+    private suggestionsService: SuggestionsService,
+    private loggerService: LoggerService) {}
 
-  _fetchDashboardData(): Promise<Object> {
-    // HttpClient returns an Observable, the toPromise converts it into a
-    // Promise.
-    return this.http.get('/creatordashboardhandler/data').toPromise();
+  _getSuggestionThreads(
+      feedbackDicts: FeedbackThreadBackendDict[],
+      suggestionDicts: SuggestionBackendDict[]): SuggestionThread[] {
+    var numberOfSuggestions = feedbackDicts.length;
+    var suggestionThreads: SuggestionThread[] = [];
+
+    for (var i = 0; i < numberOfSuggestions; i++) {
+      if (suggestionDicts.length !== numberOfSuggestions) {
+        this.loggerService.error(
+          'Number of suggestions does not match number of suggestion threads');
+      }
+
+      for (var j = 0; j < numberOfSuggestions; j++) {
+        var suggestionThreadId = this.suggestionsService
+          .getThreadIdFromSuggestionBackendDict(suggestionDicts[j]);
+        var threadDict = feedbackDicts[i];
+        if (threadDict.thread_id === suggestionThreadId) {
+          var suggestionThread = (
+            this.suggestionThreadObjectFactory.createFromBackendDicts(
+              threadDict, suggestionDicts[j]));
+          suggestionThreads.push(suggestionThread);
+        }
+      }
+    }
+
+    return suggestionThreads;
   }
 
-  fetchDashboardData(): Promise<Object> {
+  _fetchDashboardData(): Promise<CreatorDashboardData> {
+    return this.http.get<CreatorDashboardDataBackendDict>(
+      '/creatordashboardhandler/data').toPromise().then(dashboardData => {
+      return {
+        dashboardStats: this.creatorDashboardStatsObjectFactory
+          .createFromBackendDict(dashboardData.dashboard_stats),
+        lastWeekStats: this.creatorDashboardStatsObjectFactory
+          .createFromBackendDict(dashboardData.last_week_stats),
+        displayPreference: dashboardData.display_preference,
+        subscribersList: dashboardData.subscribers_list.map(
+          subscriber => this.subscriberSummaryObjectFactory
+            .createFromBackendDict(subscriber)),
+        threadsForCreatedSuggestionsList: (
+          dashboardData.threads_for_created_suggestions_list.map(
+            feedbackThread => this.feedbackThreadObjectFactory
+              .createFromBackendDict(feedbackThread))),
+        threadsForSuggestionsToReviewList: (
+          dashboardData.threads_for_suggestions_to_review_list.map(
+            feedbackThread => this.feedbackThreadObjectFactory
+              .createFromBackendDict(feedbackThread))),
+        createdSuggestionsList: (
+          dashboardData.created_suggestions_list.map(
+            suggestionDict => this.suggestionObjectFactory
+              .createFromBackendDict(suggestionDict))),
+        suggestionsToReviewList: (
+          dashboardData.suggestions_to_review_list.map(
+            suggestionDict => this.suggestionObjectFactory
+              .createFromBackendDict(suggestionDict))),
+        createdSuggestionThreadsList: this._getSuggestionThreads(
+          dashboardData.threads_for_created_suggestions_list,
+          dashboardData.created_suggestions_list),
+        suggestionThreadsToReviewList: this._getSuggestionThreads(
+          dashboardData.threads_for_suggestions_to_review_list,
+          dashboardData.suggestions_to_review_list)
+      };
+    });
+  }
+
+  fetchDashboardData(): Promise<CreatorDashboardData> {
     return this._fetchDashboardData();
   }
 }
