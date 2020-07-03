@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Visualization which groups image clicks into hexagonal bins.
+ */
+
 import { hexbin, HexbinBin } from 'd3-hexbin';
 import { max, sum } from 'd3-array';
 import { RGBColor, rgb } from 'd3-color';
 import { scaleLinear } from 'd3-scale';
-
 
 interface ClickOnImageAnswer {
   answer: {
@@ -27,10 +30,6 @@ interface ClickOnImageAnswer {
 }
 
 type Hexbin = HexbinBin<ClickOnImageAnswer>;
-
-/**
- * @fileoverview Visualization which groups image clicks into hexagonal bins.
- */
 
 angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
   restrict: 'E',
