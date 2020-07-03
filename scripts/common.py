@@ -80,7 +80,7 @@ RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('.', 'feconf.py')
@@ -581,21 +581,25 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         raise
 
 
-def wait_for_port_to_be_open(port_number):
+def wait_for_port_to_be_open(
+        port_number, wait_time=MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
     """Wait until the port is open.
 
     Args:
         port_number: int. The port number to wait.
+        wait_time: int. The maximum time to wait for port to be open.
     """
     waited_seconds = 0
-    while (not is_port_open(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+    while (
+            not is_port_open(port_number)
+            and waited_seconds < wait_time):
         time.sleep(1)
         waited_seconds += 1
-    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+    if (
+            waited_seconds == wait_time
             and not is_port_open(port_number)):
-        python_utils.PRINT('Failed to start server on port %s, exiting ...' %
-                           port_number)
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' % port_number)
         sys.exit(1)
 
 

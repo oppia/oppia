@@ -23,6 +23,7 @@ import fileinput
 import os
 import re
 import subprocess
+import sys
 
 import python_utils
 from scripts import build
@@ -39,6 +40,9 @@ RUNNING_PROCESSES = []
 
 APP_ENGINE_PORT = 8181
 NGINX_PORT = 9999
+NGINX_DOWNLOAD_PATH = os.path.join(common.OPPIA_TOOLS_DIR, 'nginx-1.13.1')
+NGINX_INSTALL_PATH = os.path.join(common.OPPIA_TOOLS_DIR, 'nginx')
+NGINX_BINARY = os.path.join(NGINX_INSTALL_PATH, 'sbin', 'nginx')
 
 
 def run_lighthouse_checks():
@@ -52,48 +56,73 @@ def run_lighthouse_checks():
     for line in iter(process.stdout.readline, ''):
         python_utils.PRINT(line[:-1])
 
+    if process.returncode != 0:
+        python_utils.PRINT('Checks failed view details above')
+        sys.exit(1)
 
-def start_google_app_engine_server():
+
+def start_google_app_engine_server(port=APP_ENGINE_PORT):
     """Start the Google App Engine server."""
     app_yaml_filepath = 'app.yaml'
 
     python_utils.PRINT('Starting oppia server...')
 
-    p = subprocess.Popen(
+    server_process = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-            APP_ENGINE_PORT, app_yaml_filepath), shell=True)
-    RUNNING_PROCESSES.append(p)
+            port, app_yaml_filepath), shell=True)
+    RUNNING_PROCESSES.append(server_process)
 
 
 def download_and_install_nginx():
     """Download and install nginx."""
     python_utils.PRINT('Installing nginx...')
-    update_command = ['sudo', 'apt', 'update']
-    install_command = ['sudo', 'apt', 'install', 'nginx']
+    nginx_download_url = 'https://nginx.org/download/nginx-1.13.1.tar.gz'
+    nginx_outfile_name = 'nginx-download'
 
-    subprocess.check_call(update_command)
-    subprocess.check_call(install_command)
+    python_utils.url_retrieve(nginx_download_url, nginx_outfile_name)
+    subprocess.check_call([
+        'tar', '-xvzf', nginx_outfile_name, '-C', common.OPPIA_TOOLS_DIR
+    ])
+    os.remove(nginx_outfile_name)
+
+    #  Nginx depends on zlib for gzip functionality.
+    zlib_download_url = 'http://www.zlib.net/zlib-1.2.11.tar.gz'
+    zlib_outfile_name = 'zlib-download'
+    python_utils.url_retrieve(zlib_download_url, zlib_outfile_name)
+    subprocess.check_call([
+        'tar', '-xvzf', zlib_outfile_name, '-C', common.OPPIA_TOOLS_DIR
+    ])
+    zlib_path = os.path.join(common.OPPIA_TOOLS_DIR, 'zlib-1.2.11')
+    os.remove(zlib_outfile_name)
+
+    config_filepath = os.path.join(common.CURR_DIR, 'nginx.conf')
+    configure_command = [
+        './configure', '--prefix=' + NGINX_INSTALL_PATH, '--build=Ubuntu',
+        '--without-http_rewrite_module', '--with-zlib=' + zlib_path,
+        '--with-http_gzip_static_module', '--conf-path=' + config_filepath
+    ]
+    with common.CD(NGINX_DOWNLOAD_PATH):
+        subprocess.check_call(configure_command)
+        subprocess.check_call(['make'])
+        subprocess.check_call(['make', 'install'])
+        python_utils.PRINT('Installation successful')
 
 
 def start_proxy_server():
     """Start the nginx proxy server."""
-    filepath = os.path.join(common.CURR_DIR, 'nginx.conf')
-
     python_utils.PRINT('Starting proxy server...')
-    start_server_command = ['sudo', 'nginx', '-c', filepath]
-    subprocess.Popen(start_server_command)
+    start_server_command = [NGINX_BINARY]
+    proxy_process = subprocess.Popen(start_server_command)
+    RUNNING_PROCESSES.append(proxy_process)
 
 
 def run_lighthouse_checks_with_compression():
     """Run lighthouse checks with compression enabled."""
-    try:
-        python_utils.PRINT('Checking if nginx is installed...')
-        check_nginx_command = ['which', 'nginx']
-        subprocess.check_call(check_nginx_command)
-    except subprocess.CalledProcessError:
+    python_utils.PRINT('Checking if nginx is installed...')
+    if not os.path.exists(NGINX_INSTALL_PATH):
         download_and_install_nginx()
 
     constants_env_variable = '"DEV_MODE": false'
@@ -116,7 +145,8 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program."""
     dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
     processes_to_kill = [
-        '.*%s.*' % re.escape(dev_appserver_path)
+        '.*%s.*' % re.escape(dev_appserver_path),
+        '.*%s.*' % re.escape(NGINX_INSTALL_PATH)
     ]
 
     for p in RUNNING_PROCESSES:
@@ -124,9 +154,6 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
-
-    stop_server_command = ['sudo', 'service', 'nginx', 'stop']
-    subprocess.Popen(stop_server_command)
 
 
 def main(args=None):
@@ -136,7 +163,8 @@ def main(args=None):
     build.main(args=['--prod_env'])
 
     if parsed_args.disable_compression:
-        start_google_app_engine_server()
+        # Setting this so that it will be compatible with the config file.
+        start_google_app_engine_server(port=NGINX_PORT)
         common.wait_for_port_to_be_open(APP_ENGINE_PORT)
         run_lighthouse_checks()
     else:

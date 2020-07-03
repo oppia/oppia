@@ -424,8 +424,8 @@ def main(args=None):
 
     start_google_app_engine_server(dev_mode)
 
-    common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
-    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+    common.wait_for_port_to_be_open(WEB_DRIVER_PORT, wait_time=1000)
+    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT, wait_time=1000)
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
