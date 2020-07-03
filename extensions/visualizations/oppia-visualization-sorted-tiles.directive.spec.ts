@@ -88,37 +88,26 @@ describe('Oppia sorted tiles visualization', function() {
         .toEqual(['foo', '75%', 'bar', '25%']);
     });
 
-    it('should not show frequency tooltip by default', () => {
-      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-        .toEqual(0);
-    });
+    describe('Tooltip behavior', () => {
+      it('should not show frequency tooltip by default', () => {
+        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+          .toEqual(0);
+      });
 
-    it('should show the frequency tooltip after clicking a tile', () => {
-      element.find('li').get(0).click();
-      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-        .toEqual(1);
-      expect(
-        element.find('.oppia-visualization-sorted-tile-tooltip')
-          .get(0).innerText.trim())
-        .toEqual('3 times');
+      it('should show and hide tooltip when hovering the percentage', () => {
+        element.find('li:first').trigger('mouseover');
 
-      element.find('li').get(1).click();
-      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-        .toEqual(1);
-      expect(
-        element.find('.oppia-visualization-sorted-tile-tooltip')
-          .get(0).innerText.trim())
-        .toEqual('1 time');
-    });
+        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+          .toEqual(1);
+        expect(
+          element.find('.oppia-visualization-sorted-tile-tooltip')
+            .get(0).innerText.trim())
+          .toEqual('3 times');
 
-    it('should hide frequency tooltip after clicking on a tile again', () => {
-      element.find('li').get(0).click();
-      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-        .toEqual(1);
-
-      element.find('li').get(0).click();
-      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-        .toEqual(0);
+        element.find('li:first').trigger('mouseout');
+        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+          .toEqual(0);
+      });
     });
   });
 });

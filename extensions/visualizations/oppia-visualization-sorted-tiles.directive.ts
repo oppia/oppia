@@ -28,17 +28,19 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
   controller: ['$scope', function($scope) {
     this.$onInit = () => {
       const data = <AnswerStats[]> $scope.data;
+
+      $scope.isSelected = Array<boolean>(data.length).fill(false);
+      $scope.select = (index: number) => {
+        $scope.isSelected[index] = true;
+      };
+      $scope.unselect = (index: number) => {
+        $scope.isSelected[index] = false;
+      };
+
       if ($scope.options.use_percentages) {
-        const totalAnswerFrequency = sum(data, a => a.frequency);
-        $scope.selectedIndex = null;
-        $scope.toggle = (index: number) => {
-          $scope.selectedIndex = $scope.selectedIndex === index ? null : index;
-        };
-        $scope.data = $scope.data.map(({answer, frequency}) => ({
-          answer,
-          frequency,
-          percent: Math.round(100.0 * frequency / totalAnswerFrequency)
-        }));
+        const totalFrequency = sum(data, a => a.frequency);
+        $scope.percentages = (
+          data.map(d => Math.round(100.0 * d.frequency / totalFrequency)));
       }
     };
   }],

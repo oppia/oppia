@@ -31,6 +31,7 @@
   letter-spacing: 0.22px;
   line-height: 16px;
   overflow: hidden;
+  pointer-events: none;
 }
 .oppia-visualization-sorted-tile-frequency {
   color: rgba(0, 0, 0, 0.54);
@@ -39,10 +40,12 @@
   letter-spacing: 0.24px;
   line-height: 16px;
   margin-top: 5px;
+  pointer-events: none;
 }
 .oppia-visualization-sorted-tile-tooltip {
   bottom: -12px;
   left: 0;
+  pointer-events: none;
   position: absolute;
   text-align: center;
 }
@@ -51,6 +54,7 @@
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   height: 0;
+  pointer-events: none;
   width: 0;
 }
 .oppia-visualization-sorted-tile-tooltip > p.frequency {
@@ -64,4 +68,5 @@
   letter-spacing: 0.2px;
   line-height: 14px;
   padding: 6px 13px 5px 11px;
+  pointer-events: none;
 }
