@@ -3184,15 +3184,15 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
         """
-        score_category_sub_type = (
-            item.score_category.split(
-                suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
+        if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
+            return
         score_category_type = (
             item.score_category.split(
                 suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
+        score_category_sub_type = (
+            item.score_category.split(
+                suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
         if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-            if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
-                return
             target_model_class_model_id_model_tuples = (
                 cls.external_instance_details['%s_ids' % item.target_type])
 
