@@ -83,11 +83,11 @@ ID_LENGTH = 12
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
 
-    # When this entity was first created. This value should only modified with
-    # the update_timestamps method.
+    # When this entity was first created. This value should only be modified
+    # with the _update_timestamps method.
     created_on = ndb.DateTimeProperty(indexed=True, required=True)
-    # When this entity was last updated. This value should only modified with
-    # the update_timestamps method.
+    # When this entity was last updated. This value should only be modified
+    # with the _update_timestamps method.
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
     # Whether the current version of the model instance is deleted.
     deleted = ndb.BooleanProperty(indexed=True, default=False)
@@ -229,7 +229,7 @@ class BaseModel(ndb.Model):
                     entities[i] = None
         return entities
 
-    def update_timestamps(self, update_last_updated_time):
+    def _update_timestamps(self, update_last_updated_time):
         """Update the created_on and last_updated fields.
 
         Args:
@@ -252,7 +252,7 @@ class BaseModel(ndb.Model):
         Returns:
             Model. The entity that was stored.
         """
-        self.update_timestamps(update_last_updated_time)
+        self._update_timestamps(update_last_updated_time)
         return super(BaseModel, self).put()
 
     def put_async(self, update_last_updated_time=True):
@@ -265,7 +265,7 @@ class BaseModel(ndb.Model):
         Returns:
             Model. The entity that was stored.
         """
-        self.update_timestamps(update_last_updated_time)
+        self._update_timestamps(update_last_updated_time)
         return super(BaseModel, self).put_async()
 
     @classmethod
@@ -278,7 +278,7 @@ class BaseModel(ndb.Model):
                 last_updated field of the entities.
         """
         # Internally put_multi calls put so we don't need to call
-        # update_timestamps here.
+        # _update_timestamps here.
         ndb.put_multi(
             entities, update_last_updated_time=update_last_updated_time)
 
@@ -295,7 +295,7 @@ class BaseModel(ndb.Model):
             list(future). A list of futures.
         """
         # Internally put_multi_async calls put_async so we don't need to call
-        # update_timestamps here.
+        # _update_timestamps here.
         return ndb.put_multi_async(
             entities, update_last_updated_time=update_last_updated_time)
 
