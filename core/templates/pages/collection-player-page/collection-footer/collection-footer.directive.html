@@ -15,10 +15,12 @@
           </li>
           <li>
             <sharing-links ng-click="$event.stopPropagation()"
-                           collection-id="$ctrl.collectionId"
+                           [collection-id]="$ctrl.collectionId"
                            layout-type="row"
+                           layout-align-type="center center"
                            share-type="collection"
-                           class="oppia-collection-footer-sharing-links">
+                           class="oppia-collection-footer-sharing-links"
+                           aria-label="Social media links">
             </sharing-links>
           </li>
         </ul>
