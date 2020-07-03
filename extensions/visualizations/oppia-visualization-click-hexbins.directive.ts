@@ -19,11 +19,12 @@ interface ClickOnImageAnswer {
   answer: {
     clickPosition: [number, number];
     clickedRegions: string[];
-  }
+  };
+  frequency: number;
 }
 
 /**
- * @fileoverview Visualization for image clicks as a hexagonal heat-map.
+ * @fileoverview Visualization to group image-clicks into hexagonal bins.
  */
 
 angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
@@ -52,14 +53,17 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
           .y(d => d.answer.clickPosition[1] * wrapperHeight)
           .size([wrapperWidth, wrapperHeight])
           .radius(16);
-        const binData = $scope.data.map(d => Array(d.frequency).fill(d)).flat();
-        const bins = hexbinGenerator(binData);
+        const bins = hexbinGenerator($scope.data);
+        const getClicks = (bin: HexbinBin<ClickOnImageAnswer>) => {
+          return d3.sum(bin.map(a => a.frequency));
+        };
 
         $scope.bins = bins;
         $scope.hexagon = hexbinGenerator.hexagon();
         $scope.hexagonMesh = hexbinGenerator.mesh();
+        $scope.getClicks = getClicks;
         $scope.fillColor = d3.scaleLinear()
-          .domain([0, d3.max(bins, b => b.length)])
+          .domain([0, d3.max(bins, getClicks)])
           // @ts-ignore the type of .range is wrong, rgba strings are accepted.
           .range(['rgba(255, 255, 255, 0.25)', 'rgba(255, 255, 255, 0.75)']);
         $scope.imagePath = AssetsBackendApiService.getImageUrlForPreview(

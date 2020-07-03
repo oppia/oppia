@@ -1,7 +1,7 @@
 <div class="click-hexbin-wrapper">
   <div class="click-hexbin-chart-tooltip" ng-if="binTooltipTarget !== null"
        style="top: <[binTooltipTarget.y]>px; left: <[binTooltipTarget.x]>px">
-    <ng-pluralize count="binTooltipTarget.length"
+    <ng-pluralize count="getClicks(binTooltipTarget)"
                   when="{'one': '1 click', 'other': '{} clicks'}">
     </ng-pluralize>
   </div>
