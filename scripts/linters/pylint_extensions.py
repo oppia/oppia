@@ -1757,25 +1757,26 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        lineno = node.fromlineno
+        line_number = node.fromlineno
         # Iterate till the end of class definition because some classes has
         # definition of more than one line. Example:
         # class ClassName(
         #       BaseClass):
         while True:
-            line = linecache.getline(node.root().file, lineno).strip()
+            line = linecache.getline(node.root().file, line_number).strip()
             if line.find(b'):') != -1:
                 break
             else:
-                lineno += 1
+                line_number += 1
                 continue
 
         # Check if the given node has docstring.
         if node.doc:
             doc_length = len(node.doc.split(b'\n'))
-            lineno += doc_length + 1
-            line = linecache.getline(node.root().file, lineno).strip()
-            next_line = linecache.getline(node.root().file, lineno + 1).strip()
+            line_number += doc_length + 1
+            line = linecache.getline(node.root().file, line_number).strip()
+            next_line = linecache.getline(
+                node.root().file, line_number + 1).strip()
             if line != b'':
                 self.add_message(
                     'newline-below-class-docstring',
