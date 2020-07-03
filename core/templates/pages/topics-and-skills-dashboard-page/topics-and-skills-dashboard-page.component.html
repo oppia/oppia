@@ -105,8 +105,8 @@
                          user-can-delete-skill="$ctrl.userCanDeleteSkill"
                          skills-categorized-by-topics="$ctrl.skillsCategorizedByTopics">
             </skills-list>
-            <p class="intro-card-message" ng-if="$ctrl.isSkillsTabHelpTextVisible()">
-              There are no pending unused skills.
+            <p class="intro-card-message" ng-if="!$ctrl.displayedSummaries.length">
+              No skills to display.
             </p>
           </div>
           <div class="pagination-mobile">
