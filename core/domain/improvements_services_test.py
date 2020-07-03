@@ -453,7 +453,6 @@ class PutTasksTests(ImprovementsServicesTestBase):
 
         model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
         self.assertEqual(model.resolver_id, None)
-        self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
 
