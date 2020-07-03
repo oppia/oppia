@@ -100,6 +100,7 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
+
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
@@ -454,6 +455,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
 class ExplorationRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
+
     EXPLORATION_ID_1 = '1'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
