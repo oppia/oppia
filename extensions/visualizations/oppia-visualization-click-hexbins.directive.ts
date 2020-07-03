@@ -14,6 +14,17 @@
 
 /**
  * @fileoverview Visualization which groups image clicks into hexagonal bins.
+ *
+ * > Why hexagons? There are many reasons for using hexagons, at least over
+ *   squares. Hexagons have symmetry of nearest neighbors which is lacking in
+ *   square bins. Hexagons are the maximum number of sides a polygon can have
+ *   for a regular tesselation of the plane, so in terms of packing a hexagon
+ *   is 13% more efficient for covering the plane than squares. This property
+ *   translates into better sampling efficiency at least for elliptical shapes.
+ *   Lastly hexagons are visually less biased for displaying densities than
+ *   other regular tesselations. For instance with squares our eyes are drawn
+ *   to the horizontal and vertical lines of the grid.
+ * https://cran.r-project.org/web/packages/hexbin/vignettes/hexagon_binning.pdf
  */
 
 import { hexbin, HexbinBin } from 'd3-hexbin';
