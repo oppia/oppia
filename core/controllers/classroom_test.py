@@ -82,7 +82,9 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
             'name': 'math',
-            'topic_ids': [topic_id_1, topic_id_2]
+            'topic_ids': [topic_id_1, topic_id_2],
+            'course_details': 'Course details for classroom.',
+            'topics_covered': 'Topics covered for classroom'
         }]
 
         payload = {
@@ -102,7 +104,12 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
                 topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
 
             expected_dict = {
-                'topic_summary_dicts': [topic_summary_dict]
+                'classroom_data': {
+                    'name': 'math',
+                    'topic_summary_dicts': [topic_summary_dict],
+                    'course_details': 'Course details for classroom.',
+                    'topics_covered': 'Topics covered for classroom'
+                }
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
