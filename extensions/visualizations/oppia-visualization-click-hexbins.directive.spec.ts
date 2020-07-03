@@ -80,7 +80,6 @@ describe('Oppia click hexbins visualization', function() {
     });
 
     it('should appear after hovering a hexagon', () => {
-      // Same order as $scope.data array.
       el.find('.protractor-test-hexagon-0').trigger('mouseover');
       expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
       expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
