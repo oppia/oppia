@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import * as d3 from 'd3';
+import { scaleLinear } from 'd3-scale';
 import { hexbin, HexbinBin } from 'd3-hexbin';
 
 interface ClickOnImageAnswer {
@@ -74,9 +75,8 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
           .size([wrapperWidth, wrapperHeight])
           .radius(16);
         const bins = hexbinGenerator($scope.data);
-        const colorScale = d3.scaleLinear()
+        const colorScale = d3.scaleLinear<string>()
           .domain([0, d3.max(bins, getNumClicks)])
-          // @ts-ignore the type of .range is wrong, rgba strings are accepted.
           .range(['rgba(255, 255, 255, 0.25)', 'rgba(255, 255, 255, 0.75)']);
 
         $scope.imageUrl = imageUrl;

@@ -105,6 +105,7 @@
     "@angular/router": "^8.0.0",
     "@angular/upgrade": "^8.0.0",
     "@types/d3-hexbin": "^0.2.3",
+    "@types/d3-scale": "^2.2.0",
     "angular": "^1.7.9",
     "angular-cookies": "^1.7.9",
     "angular-route": "^1.7.9",
