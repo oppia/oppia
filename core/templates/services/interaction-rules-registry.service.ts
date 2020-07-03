@@ -128,7 +128,6 @@ export class InteractionRulesRegistryService {
     if (!this.rulesServiceRegistry.has(rulesServiceName)) {
       throw new Error('Unknown interaction ID: ' + interactionId);
     }
-    console.log('brianrodri: ' + rulesServiceName);
     return this.rulesServiceRegistry.get(rulesServiceName);
   }
 }
