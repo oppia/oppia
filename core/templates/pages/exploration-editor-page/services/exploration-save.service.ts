@@ -24,7 +24,7 @@ require(
   'loading-dots.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'sharing-links.component.ts');
+  'sharing-links.directive.ts');
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'editor-reloading-modal.controller.ts');
