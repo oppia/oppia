@@ -134,6 +134,7 @@ describe('Interactions', function() {
     var defaultOutcomeSet = false;
 
     for (var interactionId in interactions.INTERACTIONS) {
+      console.error(`interactionId is : ${interactionId}`);
       var interaction = interactions.INTERACTIONS[interactionId];
 
       for (var i = 0; i < interaction.testSuite.length; i++) {
