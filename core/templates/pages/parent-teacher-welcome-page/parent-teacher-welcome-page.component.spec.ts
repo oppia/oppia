@@ -18,7 +18,8 @@
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-require ('pages/parent-teacher-welcome-page/' + 'parent-teacher-welcome-page.component.ts');
+require (
+  'pages/parent-teacher-welcome-page/parent-teacher-welcome-page.component.ts');
 
 describe('Parents and Teachers Welcome Page', function() {
   var ctrl = null;
@@ -29,7 +30,7 @@ describe('Parents and Teachers Welcome Page', function() {
     $provide.value('WindowRef', windowRef);
   }));
   beforeEach(angular.mock.inject(function($componentController) {
-  	ctrl = $componentController('parentTeacherWelcomePage')
+    ctrl = $componentController('parentTeacherWelcomePage')
   }));
 
   afterEach(function() {
@@ -44,59 +45,59 @@ describe('Parents and Teachers Welcome Page', function() {
   });
 
   it('should contain the right classes and i18n information for ' +
-	'the bullet points', function() {
-  	ctrl.$onInit();
+    'the bullet points', function() {
+    ctrl.$onInit();
     expect(ctrl.arr).toEqual([
-	  {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-	    spanClass: 'oppia-parent-teacher-welcome-guide-blue',
-	    I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_1'},
-	  {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-	    spanClass: 'oppia-parent-teacher-welcome-guide-purple',
-	    I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_2'},
-	  {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-	    spanClass: 'oppia-parent-teacher-welcome-guide-red',
-	    I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_3'},
-	  {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-	    spanClass: 'oppia-parent-teacher-welcome-guide-orange',
-	    I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_4'},
-	  {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-	    spanClass: 'oppia-parent-teacher-welcome-guide-green',
-	    I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_5'}
-	]);
+      {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+        spanClass: 'oppia-parent-teacher-welcome-guide-blue',
+        I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_1'},
+      {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+        spanClass: 'oppia-parent-teacher-welcome-guide-purple',
+        I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_2'},
+      {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+        spanClass: 'oppia-parent-teacher-welcome-guide-red',
+        I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_3'},
+      {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+        spanClass: 'oppia-parent-teacher-welcome-guide-orange',
+        I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_4'},
+      {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+        spanClass: 'oppia-parent-teacher-welcome-guide-green',
+        I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_5'}
+    ]);
   });
 
   it('should return the Fraction Exploration PNG URL', function() {
-  	ctrl.$onInit();
+    ctrl.$onInit();
     expect(ctrl.fractionExplorationPngImageUrl).toEqual(
       '/assets/images/parent_teacher_welcome_page/fractions_exploration.png');
   });
 
   it('should return the Fraction Exploration Webp Image URL', function() {
-  	ctrl.$onInit();
+    ctrl.$onInit();
     expect(ctrl.fractionExplorationWebpImageUrl).toEqual(
       '/assets/images/parent_teacher_welcome_page/fractions_exploration.webp');
   });
 
   it('should return the Oppia Users PNG URL', function() {
-  	ctrl.$onInit();
+    ctrl.$onInit();
     expect(ctrl.oppiaUsersPngImageUrl).toEqual(
       '/assets/images/parent_teacher_welcome_page/oppia_users.png');
   });
 
   it('should return the Oppia Users Webp Image URL', function() {
-  	ctrl.$onInit();
+    ctrl.$onInit();
     expect(ctrl.oppiaUsersWebpImageUrl).toEqual(
       '/assets/images/parent_teacher_welcome_page/oppia_users.webp');
   });
 
   it('should return the Library PNG URL', function() {
-  	ctrl.$onInit();
+    ctrl.$onInit();
     expect(ctrl.explorationLibraryPngImageUrl).toEqual(
       '/assets/images/parent_teacher_welcome_page/exploration_library.png');
   });
 
   it('should return the Library Webp Image URL', function() {
-  	ctrl.$onInit();
+    ctrl.$onInit();
     expect(ctrl.explorationLibraryWebpImageUrl).toEqual(
       '/assets/images/parent_teacher_welcome_page/exploration_library.webp');
   });

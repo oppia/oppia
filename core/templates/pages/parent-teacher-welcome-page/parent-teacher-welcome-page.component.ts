@@ -62,4 +62,4 @@ angular.module('oppia').component('parentTeacherWelcomePage', {
               '/parent_teacher_welcome_page/exploration_library.webp'));
         };
     }]
-}; 
+}); 
