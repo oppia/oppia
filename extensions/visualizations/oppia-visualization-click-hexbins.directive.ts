@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as d3 from 'd3';
-import { scaleLinear } from 'd3-scale';
 import { hexbin, HexbinBin } from 'd3-hexbin';
+import { max, sum } from 'd3-array';
+import { RGBColor, rgb } from 'd3-color';
+import { scaleLinear } from 'd3-scale';
+
 
 interface ClickOnImageAnswer {
   answer: {
@@ -24,13 +26,18 @@ interface ClickOnImageAnswer {
   frequency: number;
 }
 
+type Hexbin = HexbinBin<ClickOnImageAnswer>;
+
 /**
- * @fileoverview Visualization to group image-clicks into hexagonal bins.
+ * @fileoverview Visualization which groups image clicks into hexagonal bins.
  */
 
 angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
   restrict: 'E',
-  scope: { data: '<', interactionArgs: '<' },
+  scope: {
+    data: '<',
+    interactionArgs: '<',
+  },
   template: require('./oppia-visualization-click-hexbins.directive.html'),
   style: require('./oppia-visualization-click-hexbins.directive.css'),
   controller: [
@@ -40,21 +47,20 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
         $scope, AssetsBackendApiService, ContextService,
         ImagePreloaderService) {
       const imagePath = $scope.interactionArgs.imageAndRegions.value.imagePath;
-      const imageDimensions = (
-        ImagePreloaderService.getDimensionsOfImage(imagePath));
+      const imageSize = ImagePreloaderService.getDimensionsOfImage(imagePath);
       const imageUrl = AssetsBackendApiService.getImageUrlForPreview(
         ContextService.getEntityType(), ContextService.getEntityId(),
         imagePath);
 
-      let tooltipTarget: HexbinBin<ClickOnImageAnswer> = null;
+      let tooltipTarget: Hexbin = null;
 
-      const showTooltip = function(bin: HexbinBin<ClickOnImageAnswer>) {
+      const showTooltip = function(bin: Hexbin) {
         if (tooltipTarget === null && bin.length > 0) {
           tooltipTarget = bin;
         }
       };
 
-      const hideTooltip = function(bin: HexbinBin<ClickOnImageAnswer>) {
+      const hideTooltip = function(bin: Hexbin) {
         if (tooltipTarget === bin) {
           tooltipTarget = null;
         }
@@ -62,39 +68,35 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
 
       this.$onInit = () => {
         const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
-        const wrapperHeight = Math.round(
-          wrapperWidth * imageDimensions.height / imageDimensions.width);
+        const wrapperHeight = imageSize.width === 0 ?
+          imageSize.height :
+          Math.round(wrapperWidth * imageSize.height / imageSize.width);
 
-        const getNumClicks = function(bin: HexbinBin<ClickOnImageAnswer>) {
-          return d3.sum(bin, a => a.frequency);
-        };
+        const getNumClicks = (bin: Hexbin) => sum(bin, a => a.frequency);
 
         const hexbinGenerator = hexbin<ClickOnImageAnswer>()
-          .x(d => d.answer.clickPosition[0] * wrapperWidth)
-          .y(d => d.answer.clickPosition[1] * wrapperHeight)
+          .x(a => a.answer.clickPosition[0] * wrapperWidth)
+          .y(a => a.answer.clickPosition[1] * wrapperHeight)
           .size([wrapperWidth, wrapperHeight])
           .radius(16);
-        const bins = hexbinGenerator($scope.data);
-        const colorScale = d3.scaleLinear<string>()
-          .domain([0, d3.max(bins, getNumClicks)])
-          .range(['rgba(255, 255, 255, 0.25)', 'rgba(255, 255, 255, 0.75)']);
+        const hexbins = hexbinGenerator($scope.data);
+        const colorScale = scaleLinear<RGBColor>()
+          .domain([0, max(hexbins, getNumClicks)])
+          .range([rgb(255, 255, 255, 0.25), rgb(255, 255, 255, 0.75)]);
 
         $scope.imageUrl = imageUrl;
         $scope.wrapperWidth = wrapperWidth;
         $scope.wrapperHeight = wrapperHeight;
 
-        $scope.bins = bins;
+        $scope.hexbins = hexbins;
         $scope.hexagon = hexbinGenerator.hexagon();
         $scope.hexagonMesh = hexbinGenerator.mesh();
-        $scope.getFillColor = (
-          (b: HexbinBin<ClickOnImageAnswer>) => colorScale(getNumClicks(b)));
+        $scope.getFillColor = (b: Hexbin) => colorScale(getNumClicks(b));
 
         $scope.isTooltipVisible = () => tooltipTarget !== null;
         $scope.getTooltipNumClicks = () => getNumClicks(tooltipTarget);
-        $scope.getTooltipStyle = () => ({
-          top: `${tooltipTarget.y}px`,
-          left: `${tooltipTarget.x}px`,
-        });
+        $scope.getTooltipStyle = () => (
+          { left: tooltipTarget.x + 'px', top: tooltipTarget.y + 'px' });
         $scope.showTooltip = showTooltip;
         $scope.hideTooltip = hideTooltip;
       };
