@@ -234,7 +234,13 @@ exports.config = {
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
     browserName: 'chrome',
-    chromeOptions: {
+    'goog:chromeOptions': {
+      // Chromedriver versions 75+ sets w3c mode to true by default.
+      // see https://chromedriver.storage.googleapis.com/75.0.3770.8/notes.txt
+      // This causes certain legacy APIs to fail eg. sendKeysToActiveElement.
+      // The workaround is to set this property to false per discussion on
+      // this thread: https://github.com/angular/protractor/issues/5274
+      w3c: false,
       args: [
         '--lang=en-EN',
         '--window-size=1285x1000',

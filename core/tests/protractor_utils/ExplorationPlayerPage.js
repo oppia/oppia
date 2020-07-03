@@ -29,6 +29,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-suggestion-description-input'));
   var closeSuggestionModalButton = element(
     by.css('.protractor-test-exploration-close-suggestion-modal-btn'));
+  var conversationSkinCardsContainer = element(
+    by.css('.protractor-test-conversation-skin-cards-container'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
   var conversationFeedback = element.all(
@@ -263,6 +265,9 @@ var ExplorationPlayerPage = function() {
   // Additional arguments may be sent to this function, and they will be
   // passed on to the relevant interaction's detail checker.
   this.expectInteractionToMatch = async function(interactionId) {
+    await waitFor.visibilityOf(
+      conversationSkinCardsContainer,
+      'Conversation skill cards take too long to appear.');
     // Convert additional arguments to an array to send on.
     var args = [conversationInput];
     for (var i = 1; i < arguments.length; i++) {
