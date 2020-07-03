@@ -203,8 +203,8 @@
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
