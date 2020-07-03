@@ -61,7 +61,7 @@ ALLOWED_ACTION_TYPES = [
 # mapping is useful to uniquely identify issues by the combination of their
 # issue type and other type-specific information (such as the list of states
 # involved).
-ISSUE_TYPE_KEYNAME_MAPPING = {
+CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
     'EarlyQuit': 'state_name',
     'MultipleIncorrectSubmissions': 'state_name',
     'CyclicStateTransitions': 'state_names'
@@ -78,6 +78,7 @@ class StateCounterModel(base_models.BaseModel):
     The ID/key of instances of this class has the form
         [EXPLORATION_ID].[STATE_NAME].
     """
+
     # Number of times the state was entered for the first time in a reader
     # session.
     first_entry_count = ndb.IntegerProperty(default=0, indexed=False)
@@ -128,6 +129,7 @@ class StateCounterModel(base_models.BaseModel):
 
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student submitting an answer."""
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -198,6 +200,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     'actually' entering an exploration means the student has completed the
     initial state of the exploration and traversed to the second state.
     """
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -257,6 +260,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student triggering the solution."""
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -334,6 +338,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         params: Current parameter values, in the form of a map of parameter
             name to value.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -464,6 +469,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: Time spent in this state before the event
             was triggered.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -588,6 +594,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     have the wrong 'last updated' timestamp. However, the 'created_on'
     timestamp is the same as that of the original model.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -698,6 +705,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         exploration_id: ID of exploration which is being rated.
         rating: Value of rating assigned to exploration.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration which has been rated.
@@ -789,6 +797,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     amount of time between this event (i.e., the learner entering the
     state) and the other event.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -884,6 +893,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing a state."""
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -948,6 +958,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student leaving for a refresher exploration."""
+
     # ID of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # ID of the refresher exploration.
@@ -1019,6 +1030,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     The ID of instances of this class has the form [exp_id].[exp_version].
     """
+
     # ID of exploration.
     exp_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
@@ -1210,6 +1222,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
     """
+
     # ID of exploration.
     exp_id = ndb.StringProperty(indexed=True, required=True)
     # Version of exploration.
@@ -1295,6 +1308,7 @@ class PlaythroughModel(base_models.BaseModel):
     The ID of instances of this class are of the form
     '[exp_id].[random hash of 16 chars]'.
     """
+
     # ID of the exploration.
     exp_id = ndb.StringProperty(indexed=True, required=True)
     # Version of the exploration.
@@ -1564,6 +1578,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     This model is keyed using a custom ID of the format
     {[EXPLORATION_ID]:[EXPLORATION_VERSION]}.
     """
+
     # ID of exploration.
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
@@ -1663,6 +1678,7 @@ class StateAnswersModel(base_models.BaseModel):
     This model is keyed using a custom ID of the format
         {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID]}.
     """
+
     # This provides about 124k of padding for the other properties and entity
     # storage overhead (since the max entity size is 1MB). The meta data can
     # get close to 50k or exceed it, so plenty of padding is left to avoid

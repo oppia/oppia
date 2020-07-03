@@ -109,7 +109,7 @@
 
 
 # Dev workflow team.
-/.circleci/ @kevinlee12
+/.circleci/ @kevinlee12 @U8NWXD
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -119,7 +119,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @kevinlee12
+/.travis.yml @kevinlee12 @U8NWXD
 /.yarnrc @kevinlee12
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -262,6 +262,7 @@
 
 # Lesson Analytics team.
 /core/controllers/features*.py @brianrodri
+/core/controllers/improvements*.py @brianrodri
 /core/domain/action_registry*.py @brianrodri
 /core/domain/calculation_registry*.py @brianrodri
 /core/domain/event_services*.py @brianrodri
@@ -280,6 +281,7 @@
 /core/templates/services/exploration-stats.service*.ts @brianrodri
 /core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
+/core/templates/services/improvements-backend-api*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
 /core/templates/services/state-interaction-stats.service*.ts @brianrodri
@@ -440,21 +442,6 @@
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
 
-# QA team.
-/core/tests/ @nithusha21
-/core/tests/protractor_utils/ @U8NWXD
-/core/tests/protractor_desktop/ @U8NWXD
-/core/tests/protractor/ @U8NWXD
-/core/tests/protractor.conf.js @U8NWXD
-/extensions/interactions/*/protractor.js @U8NWXD
-/extensions/interactions/protractor.js @U8NWXD
-/extensions/rich_text_components/*/protractor.js @U8NWXD
-/extensions/rich_text_components/protractor.js @U8NWXD
-/extensions/objects/protractor.js @U8NWXD
-/assets/ @nithusha21
-/data/ @nithusha21
-
-
 # Release team.
 /scripts/release_scripts/ @ankita240796
 
@@ -563,6 +550,22 @@
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
+
+
+# QA team.
+/core/tests/ @nithusha21
+/assets/ @nithusha21
+/data/ @nithusha21
+/core/tests/protractor_utils/ @U8NWXD
+/core/tests/protractor_desktop/ @U8NWXD
+/core/tests/protractor/ @U8NWXD
+/core/tests/protractor.conf.js @U8NWXD
+/extensions/interactions/*/protractor.js @U8NWXD
+/extensions/interactions/protractor.js @U8NWXD
+/extensions/rich_text_components/*/protractor.js @U8NWXD
+/extensions/rich_text_components/protractor.js @U8NWXD
+/extensions/objects/protractor.js @U8NWXD
+
 
 # Critical files.
 #

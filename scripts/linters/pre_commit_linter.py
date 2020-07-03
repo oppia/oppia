@@ -70,6 +70,7 @@ from . import js_ts_linter
 from . import linter_utils
 from . import python_linter
 from . import third_party_typings_linter
+from . import webpack_config_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -415,13 +416,20 @@ def categorize_files(file_paths):
     _FILES.update(all_filepaths_dict)
 
 
-def _print_complete_summary_of_lint_messages(lint_messages):
-    """Print complete summary of lint messages."""
+def _print_summary_of_error_messages(lint_messages):
+    """Print summary of linter error messages.
+
+    Args:
+        lint_messages: list(str). List of linter error messages.
+    """
     if lint_messages != '':
-        python_utils.PRINT('Summary of Errors:')
+        python_utils.PRINT('Please fix the errors below:')
         python_utils.PRINT('----------------------------------------')
         for message in lint_messages:
-            python_utils.PRINT(message)
+            if message.startswith(('SUCCESS', 'FAILED')):
+                continue
+            else:
+                python_utils.PRINT(message)
 
 
 def _get_task_output(lint_messages, task, semaphore):
@@ -559,7 +567,8 @@ def main(args=None):
     lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
         FILE_CACHE, verbose_mode_enabled)
 
-    _print_complete_summary_of_lint_messages(lint_messages)
+    lint_messages += webpack_config_linter.check_webpack_config_file(
+        FILE_CACHE, verbose_mode_enabled)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
@@ -567,6 +576,7 @@ def main(args=None):
 
     if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
             message in lint_messages]) or errors_stacktrace:
+        _print_summary_of_error_messages(lint_messages)
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')

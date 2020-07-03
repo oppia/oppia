@@ -35,6 +35,7 @@ import html.parser # isort:skip
 
 class TagMismatchException(Exception):
     """Error class for mismatch between start and end tags."""
+
     pass
 
 
@@ -240,6 +241,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, file_cache, verbose_mode_enabled, debug=False):
         """Constructs a HTMLLintChecksManager object.
@@ -336,6 +338,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyHTMLLintChecksManager object.
@@ -357,6 +360,34 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.html_filepaths
+
+    @staticmethod
+    def _get_trimmed_error_output(html_lint_output):
+        """Remove extra bits from htmllint error messages.
+
+        Args:
+            html_lint_output: str. Output returned by the html linter.
+
+        Returns:
+            str. A string with the trimmed error messages.
+        """
+        trimmed_error_messages = []
+        # Extracting messages by removing number of files linted and number of
+        # error messages from the end of message. Becuase we have second last
+        # line containing error and file count.
+        # Example: [htmllint] found 1 errors out of 1 files
+        # and last line is an empty string. Hence removing last two lines from
+        # the message.
+        html_output_lines = html_lint_output.split('\n')
+        empty_string_present = html_output_lines[-1] == ''
+        htmllint_present = html_output_lines[-2].startswith('[htmllint]')
+
+        if empty_string_present and htmllint_present:
+            html_output_lines = html_output_lines[:-2]
+
+        for line in html_output_lines:
+            trimmed_error_messages.append(line)
+        return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
@@ -394,6 +425,8 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 if error_count:
                     error_summary.append(error_count)
                     python_utils.PRINT(linter_stdout)
+                    summary_messages.append(
+                        self._get_trimmed_error_output(linter_stdout))
 
         with linter_utils.redirect_stdout(stdout):
             if self.verbose_mode_enabled:
