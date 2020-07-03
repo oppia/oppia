@@ -24,6 +24,7 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
+var waitFor = require('./waitFor.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -185,6 +186,9 @@ var RichTextEditor = async function(elem) {
     await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
+    await waitFor.elementToBeClickable(
+      elem.element(by.css('.' + buttonName)),
+      'Toolbar button takes too long to be clickable.');
     await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {
