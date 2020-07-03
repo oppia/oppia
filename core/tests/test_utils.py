@@ -1873,6 +1873,7 @@ tags: []
 
         class PatchedDatetimeType(type):
             """Validates the datetime instances."""
+
             def __instancecheck__(cls, other):
                 """Validates whether the given instance is datetime
                 instance.
@@ -1885,6 +1886,7 @@ tags: []
             @classmethod
             def utcnow(cls):
                 """Returns the mocked datetime."""
+
                 return mocked_datetime
 
         setattr(datetime, 'datetime', MockDatetime)
@@ -2257,6 +2259,24 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
+
+    def assert_same_list_elements(self, phrases, stdout):
+        """Checks to see if all of the phrases appear in at least one of the
+        stdout outputs.
+
+        Args:
+            phrases: list(str). A list of phrases we are trying to find in
+                one of the stdout outputs. For example, python linting
+                outputs a success string that includes data we don't have easy
+                access to, like how long the test took, so we may want to search
+                for a substring of that success string in stdout.
+
+            stdout: list(str). A list of the output results from the
+                method's execution.
+        """
+        self.assertTrue(
+            any(all(phrase in output for phrase in phrases) for
+                output in stdout))
 
 
 GenericTestBase = AppEngineTestBase
