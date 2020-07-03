@@ -95,7 +95,8 @@ describe('Oppia sorted tiles visualization', function() {
       });
 
       it('should show and hide tooltip when hovering the percentage', () => {
-        element.find('li:first').trigger('mouseover');
+        element.find('.oppia-visualization-sorted-tile-content:first')
+          .trigger('mouseover');
 
         expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
           .toEqual(1);
@@ -104,7 +105,8 @@ describe('Oppia sorted tiles visualization', function() {
             .get(0).innerText.trim())
           .toEqual('3 times');
 
-        element.find('li:first').trigger('mouseout');
+        element.find('.oppia-visualization-sorted-tile-content:first')
+          .trigger('mouseout');
         expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
           .toEqual(0);
       });
