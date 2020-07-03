@@ -19,47 +19,47 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').component('parentTeacherWelcomePage', {
-	template: require('./parent-teacher-welcome-page.mainpage.html'),
-	controller: ['UrlInterpolationService', 
-	function(UrlInterpolationService) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.arr = [
-            {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-              spanClass: 'oppia-parent-teacher-welcome-guide-blue',
-              I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_1'},
-            {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-              spanClass: 'oppia-parent-teacher-welcome-guide-purple',
-              I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_2'},
-            {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-              spanClass: 'oppia-parent-teacher-welcome-guide-red',
-              I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_3'},
-            {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-              spanClass: 'oppia-parent-teacher-welcome-guide-orange',
-              I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_4'},
-            {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
-              spanClass: 'oppia-parent-teacher-welcome-guide-green',
-              I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_5'}
-          ];
+  template: require('./parent-teacher-welcome-page.mainpage.html'),
+  controller: ['UrlInterpolationService',
+    function(UrlInterpolationService) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        ctrl.arr = [
+          {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+            spanClass: 'oppia-parent-teacher-welcome-guide-blue',
+            I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_1'},
+          {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+            spanClass: 'oppia-parent-teacher-welcome-guide-purple',
+            I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_2'},
+          {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+            spanClass: 'oppia-parent-teacher-welcome-guide-red',
+            I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_3'},
+          {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+            spanClass: 'oppia-parent-teacher-welcome-guide-orange',
+            I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_4'},
+          {pClass: 'oppia-parent-teacher-welcome-guide-numbers',
+            spanClass: 'oppia-parent-teacher-welcome-guide-green',
+            I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_5'}
+        ];
 
-          ctrl.fractionExplorationPngImageUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/parent_teacher_welcome_page/fractions_exploration.png'));
-          ctrl.fractionExplorationWebpImageUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/parent_teacher_welcome_page/fractions_exploration.webp'));
-          ctrl.oppiaUsersPngImageUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/parent_teacher_welcome_page/oppia_users.png'));
-          ctrl.oppiaUsersWebpImageUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/parent_teacher_welcome_page/oppia_users.webp'));
-          ctrl.explorationLibraryPngImageUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/parent_teacher_welcome_page/exploration_library.png'));
-          ctrl.explorationLibraryWebpImageUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/parent_teacher_welcome_page/exploration_library.webp'));
-        };
+        ctrl.fractionExplorationPngImageUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/parent_teacher_welcome_page/fractions_exploration.png'));
+        ctrl.fractionExplorationWebpImageUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/parent_teacher_welcome_page/fractions_exploration.webp'));
+        ctrl.oppiaUsersPngImageUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/parent_teacher_welcome_page/oppia_users.png'));
+        ctrl.oppiaUsersWebpImageUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/parent_teacher_welcome_page/oppia_users.webp'));
+        ctrl.explorationLibraryPngImageUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/parent_teacher_welcome_page/exploration_library.png'));
+        ctrl.explorationLibraryWebpImageUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/parent_teacher_welcome_page/exploration_library.webp'));
+      };
     }]
-}); 
+});

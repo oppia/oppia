@@ -30,11 +30,11 @@ describe('Parents and Teachers Welcome Page', function() {
     $provide.value('WindowRef', windowRef);
   }));
   beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('parentTeacherWelcomePage')
+    ctrl = $componentController('parentTeacherWelcomePage');
   }));
 
   afterEach(function() {
-    // onhashchange and location.hash are reassigned because it shares
+    // Onhashchange and location.hash are reassigned because it shares
     // same memory reference to all test blocks and the controller itself
     // because $provide.value of WindowRef refers to windowRef as well.
     // Once location.hash or onhashchange is set in the controller,
