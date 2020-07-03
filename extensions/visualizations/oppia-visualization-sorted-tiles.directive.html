@@ -11,10 +11,10 @@
         <span ng-if="options.use_percentages"><[datum.percent]>%</span>
         <span ng-if="!options.use_percentages"><[datum.frequency]> times</span>
       </div>
-    </div>
-    <div class="oppia-visualization-sorted-tile-tooltip" ng-if="selectedIndex === $index">
-      <p ng-pluralize count="datum.frequency" when="{'one': '1 time', 'other': '{} times'}">
-      </p>
+      <div class="oppia-visualization-sorted-tile-tooltip" ng-if="selectedIndex === $index">
+        <p ng-pluralize count="datum.frequency" when="{'one': '1 time', 'other': '{} times'}">
+        </p>
+      </div>
     </div>
   </li>
 </ol>
