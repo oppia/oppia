@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
   'teach-oppia-modal.controller.ts');

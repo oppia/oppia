@@ -22,7 +22,7 @@ require(
   'version-diff-visualization.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
