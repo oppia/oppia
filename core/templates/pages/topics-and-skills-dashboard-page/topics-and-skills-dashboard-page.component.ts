@@ -101,7 +101,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
             ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
             ctrl.currentCount = ctrl.totalEntityCountToDisplay;
-            ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
             ctrl.applyFilters();
             ctrl.editableTopicSummaries = (ctrl.topicSummaries.filter(
               function(summary) {
@@ -338,6 +337,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.skillPageNumber = 0;
         ctrl.lastSkillPage = 0;
         ctrl.selectedIndex = null;
+        ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
         ctrl.itemsPerPageChoice = [10, 15, 20];
         ctrl.filterBoxIsShown = !WindowDimensionsService.isWindowNarrow();
         ctrl.filterObject = (
