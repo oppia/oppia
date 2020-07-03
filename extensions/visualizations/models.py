@@ -151,5 +151,5 @@ class SortedTiles(BaseVisualization):
     }, {
         'name': 'use_percentages',
         'description': 'Summarize frequency through percentages',
-        'schema': {'type': 'boolean'},
+        'schema': {'type': 'bool'},
     }]
