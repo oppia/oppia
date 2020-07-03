@@ -23,6 +23,8 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { AttributionGuideComponent } from
+  './common-layout-directives/common-elements/attribution-guide.component';  
 import { LazyLoadingComponent } from
   './common-layout-directives/common-elements/lazy-loading.component';
 import { LoadingDotsComponent } from
@@ -32,8 +34,8 @@ import { TranslatePipe } from 'filters/translate.pipe';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe, LazyLoadingComponent, LoadingDotsComponent],
-  entryComponents: [BackgroundBannerComponent, LazyLoadingComponent, LoadingDotsComponent],
+  declarations: [BackgroundBannerComponent, TranslatePipe, LazyLoadingComponent, LoadingDotsComponent, AttributionGuideComponent],
+  entryComponents: [BackgroundBannerComponent, LazyLoadingComponent, LoadingDotsComponent, AttributionGuideComponent],
   exports: [BackgroundBannerComponent, TranslatePipe]
 })
 

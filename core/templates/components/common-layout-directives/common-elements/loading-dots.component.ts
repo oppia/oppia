@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying animated loading dots.
+ * @fileoverview Component for displaying animated loading dots.
  */
 
 require('domain/utilities/url-interpolation.service.ts');

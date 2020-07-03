@@ -196,8 +196,8 @@
 /core/templates/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
