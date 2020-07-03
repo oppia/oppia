@@ -1,28 +1,59 @@
-ol.oppia-visualization-sorted-tiles {
+.oppia-visualization-sorted-tiles {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-li.oppia-visualization-sorted-tiles-tile {
-  background-color: rgba(245,245,245,1);
+.oppia-visualization-sorted-tile {
   border-radius: 27px;
   display: inline-block;
-  margin-right: 22px;
   min-width: 100px;
-  padding: 25px;
+  padding: 5px 6px 7px 4px;
 }
-li.oppia-visualization-sorted-tiles-tile .oppia-visualization-sorted-tiles-tile-answer {
+.oppia-visualization-sorted-tile .oppia-visualization-sorted-tile-content {
+  background: #F5F5F5;
+  border-radius: 27px;
+  margin: 0;
+  max-height: 250px;
+  max-width: 175px;
+  padding: 25px;
+  position: relative;
+}
+.oppia-visualization-sorted-tile.selected {
+  background: rgba(65, 152, 137, 0.07);
+}
+.oppia-visualization-sorted-tile.selected .oppia-visualization-sorted-tile-content {
+  background: #E4F1EF;
+}
+.oppia-visualization-sorted-tile-answer {
   color: rgba(0,0,0,0.87);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   letter-spacing: 0.22px;
   line-height: 16px;
+  overflow: hidden;
 }
-li.oppia-visualization-sorted-tiles-tile .oppia-visualization-sorted-tiles-tile-frequency {
+.oppia-visualization-sorted-tile-frequency {
   color: rgba(0,0,0,0.54);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   letter-spacing: 0.24px;
   line-height: 16px;
   margin-top: 7px;
+}
+.oppia-visualization-sorted-tile-tooltip {
+  background: #323232;
+  box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.24), 0px 0px 6px rgba(0, 0, 0, 0.12);
+  position: absolute;
+  top: 100%;
+}
+.oppia-visualization-sorted-tile-tooltip > p {
+  color: rgba(255, 255, 255, 0.7);
+  font-family: Roboto;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  height: 14px;
+  letter-spacing: 0.2px;
+  line-height: 14px;
+  margin: 12px;
 }

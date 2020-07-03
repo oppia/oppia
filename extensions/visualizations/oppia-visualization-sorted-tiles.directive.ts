@@ -16,9 +16,30 @@
  * @fileoverview Directive for the SortedTiles visualization.
  */
 
+import { sum } from 'd3-array';
+
+import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+
 angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
   restrict: 'E',
   scope: { data: '<', options: '<' },
   template: require('./oppia-visualization-sorted-tiles.directive.html'),
   style: require('./oppia-visualization-sorted-tiles.directive.css'),
+  controller: ['$scope', function($scope) {
+    this.$onInit = () => {
+      const data = <AnswerStats[]> $scope.data;
+      if ($scope.options.use_percentages) {
+        const totalAnswerFrequency = sum(data, a => a.frequency);
+        $scope.selectedIndex = null;
+        $scope.toggle = (index: number) => {
+          $scope.selectedIndex = $scope.selectedIndex === index ? null : index;
+        };
+        $scope.data = $scope.data.map(({answer, frequency}) => ({
+          answer,
+          frequency,
+          percent: Math.round(100.0 * frequency / totalAnswerFrequency)
+        }));
+      }
+    };
+  }],
 }));

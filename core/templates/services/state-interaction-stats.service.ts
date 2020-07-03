@@ -25,6 +25,8 @@ import { AnswerClassificationService } from
 import { ContextService } from 'services/context.service';
 import { IFractionDict, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
+import { IMultipleChoiceInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -80,6 +82,13 @@ export class StateInteractionStatsService {
     if (state.interaction.id === 'FractionInput') {
       return (
         this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString());
+    } else if (state.interaction.id === 'MultipleChoiceInput') {
+      const customizationArgs = (
+        <IMultipleChoiceInputCustomizationArgs>
+        state.interaction.customizationArgs);
+      const answerHtml = customizationArgs.choices.value[Number(answer)];
+      return new DOMParser().parseFromString(answerHtml, 'text/html')
+        .documentElement.textContent.trim();
     }
     return answer;
   }

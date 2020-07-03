@@ -19,37 +19,106 @@
 
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
-describe('Oppia sorted tiles visualization', function() {
-  let $compile, $rootScope, element: JQuery;
+import { UpgradedServices } from 'services/UpgradedServices';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
+import { IAnswerStatsBackendDict, AnswerStatsObjectFactory } from
+  'domain/exploration/AnswerStatsObjectFactory';
+
+describe('Oppia sorted tiles visualization', function() {
+  let $compile, $rootScope;
+  let answerStatsObjectFactory: AnswerStatsObjectFactory;
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.inject(function(
+      _$compile_, _$rootScope_, _AnswerStatsObjectFactory_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
+    answerStatsObjectFactory = _AnswerStatsObjectFactory_;
   }));
 
-  beforeEach(() => {
+  const newDirective = (data: IAnswerStatsBackendDict[], options): JQLite => {
     const elementHtml = (
       '<oppia-visualization-sorted-tiles data="data" options="options">' +
       '</oppia-visualization-sorted-tiles>');
-    const $scope = $rootScope.$new();
-    $scope.data = [
-      {answer: 'foo', frequency: 3},
-      {answer: 'bar', frequency: 1},
-    ];
-    $scope.options = {
-      header: 'Pretty Tiles!'
-    };
-    element = $compile(elementHtml)($scope);
+    const scope = $rootScope.$new();
+    scope.data = (
+      data.map(d => answerStatsObjectFactory.createFromBackendDict(d)));
+    scope.options = options;
+    const element = $compile(elementHtml)(scope);
     $rootScope.$digest();
+    return element;
+  };
+
+  describe('Without percentages', () => {
+    let element: JQLite;
+
+    beforeEach(() => {
+      element = newDirective(
+        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
+        {header: 'Pretty Tiles!', use_percentages: false});
+    });
+
+    it('should render the provided data and their frequencies', () => {
+      expect(element.find('strong').text()).toEqual('Pretty Tiles!');
+      expect(
+        element.find('div.oppia-visualization-sorted-tile-content > div')
+          .map((_, el) => el.textContent.trim()).toArray())
+        .toEqual(['foo', '3 times', 'bar', '1 times']);
+    });
   });
 
-  it('should render the provided scope bindings', () => {
-    expect(element.find('strong').text()).toEqual('Pretty Tiles!');
-    expect(element.find('li > div').map((_, el) => el.textContent).toArray())
-      .toEqual([
-        'foo', '3 times',
-        'bar', '1 times',
-      ]);
+  describe('With percentages', () => {
+    let element: JQLite;
+
+    beforeEach(() => {
+      element = newDirective(
+        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
+        {header: 'Pretty Tiles!', use_percentages: true});
+    });
+
+    it('should render the provided data with percentages', () => {
+      expect(
+        element.find('div.oppia-visualization-sorted-tile-content > div')
+          .map((_, el) => el.textContent.trim()).toArray())
+        .toEqual(['foo', '75%', 'bar', '25%']);
+    });
+
+    it('should not show frequency tooltip by default', () => {
+      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+        .toEqual(0);
+    });
+
+    it('should show the frequency tooltip after clicking a tile', () => {
+      element.find('li').get(0).click();
+      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+        .toEqual(1);
+      expect(
+        element.find('.oppia-visualization-sorted-tile-tooltip')
+          .get(0).innerText.trim())
+        .toEqual('3 times');
+
+      element.find('li').get(1).click();
+      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+        .toEqual(1);
+      expect(
+        element.find('.oppia-visualization-sorted-tile-tooltip')
+          .get(0).innerText.trim())
+        .toEqual('1 time');
+    });
+
+    it('should hide frequency tooltip after clicking on a tile again', () => {
+      element.find('li').get(0).click();
+      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+        .toEqual(1);
+
+      element.find('li').get(0).click();
+      expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+        .toEqual(0);
+    });
   });
 });
