@@ -80,7 +80,7 @@ RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('.', 'feconf.py')

@@ -27,24 +27,18 @@ import subprocess
 import python_utils
 from scripts import build
 from scripts import common
-from scripts import install_third_party_libs
 
 _PARSER = argparse.ArgumentParser()
 
 _PARSER.add_argument(
-    '--enable_compression',
-    help='optional; if specified, uses nginx to serve compressed assets',
+    '--disable_compression',
+    help='optional; if specified does not serve compressed assets',
     action='store_true')
 
 RUNNING_PROCESSES = []
 
 APP_ENGINE_PORT = 8181
 NGINX_PORT = 9999
-
-
-def setup_and_install_dependencies():
-    """Runs the setup and installation scripts."""
-    install_third_party_libs.main()
 
 
 def run_lighthouse_checks():
@@ -59,12 +53,9 @@ def run_lighthouse_checks():
         python_utils.PRINT(line[:-1])
 
 
-def start_google_app_engine_server(prod_env):
+def start_google_app_engine_server():
     """Start the Google App Engine server."""
-    if prod_env:
-        app_yaml_filepath = 'app.yaml'
-    else:
-        app_yaml_filepath = 'app_dev.yaml'
+    app_yaml_filepath = 'app.yaml'
 
     python_utils.PRINT('Starting oppia server...')
 
@@ -80,8 +71,8 @@ def start_google_app_engine_server(prod_env):
 def download_and_install_nginx():
     """Download and install nginx."""
     python_utils.PRINT('Installing nginx...')
-    update_command = ['sudo', 'apt-get', 'update']
-    install_command = ['sudo', 'apt-get', 'install', 'nginx']
+    update_command = ['sudo', 'apt', 'update']
+    install_command = ['sudo', 'apt', 'install', 'nginx']
 
     subprocess.check_call(update_command)
     subprocess.check_call(install_command)
@@ -93,9 +84,7 @@ def start_proxy_server():
 
     python_utils.PRINT('Starting proxy server...')
     start_server_command = ['sudo', 'nginx', '-c', filepath]
-    p = subprocess.Popen(start_server_command)
-
-    RUNNING_PROCESSES.append(p)
+    subprocess.Popen(start_server_command)
 
 
 def run_lighthouse_checks_with_compression():
@@ -115,8 +104,8 @@ def run_lighthouse_checks_with_compression():
         python_utils.PRINT(
             re.sub(
                 r'"DEV_MODE": .*', constants_env_variable, line), end='')
-    build.main(args=['--prod_env'])
-    start_google_app_engine_server(True)
+
+    start_google_app_engine_server()
     common.wait_for_port_to_be_open(APP_ENGINE_PORT)
     start_proxy_server()
     common.wait_for_port_to_be_open(NGINX_PORT)
@@ -127,8 +116,7 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program."""
     dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
     processes_to_kill = [
-        '.*%s.*' % re.escape(dev_appserver_path),
-        '.*%s.*' % re.escape('nginx')
+        '.*%s.*' % re.escape(dev_appserver_path)
     ]
 
     for p in RUNNING_PROCESSES:
@@ -137,18 +125,22 @@ def cleanup():
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
 
+    stop_server_command = ['sudo', 'service', 'nginx', 'stop']
+    subprocess.Popen(stop_server_command)
+
 
 def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
     atexit.register(cleanup)
-    setup_and_install_dependencies()
-    if parsed_args.enable_compression:
-        run_lighthouse_checks_with_compression()
-    else:
-        start_google_app_engine_server(False)
+    build.main(args=['--prod_env'])
+
+    if parsed_args.disable_compression:
+        start_google_app_engine_server()
         common.wait_for_port_to_be_open(APP_ENGINE_PORT)
         run_lighthouse_checks()
+    else:
+        run_lighthouse_checks_with_compression()
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 name: Lighthouse CI tests
-on: [push]
+on: [pull_request, push]
 
 jobs:
   lighthouse:
@@ -16,4 +16,4 @@ jobs:
       - name: Install Third Party Dependencies
         run: python -m scripts.install_third_party_libs
       - name: Run lighthouse checks
-        run: python -m scripts.run_lighthouse_tests --enable_compression
+        run: python -m scripts.run_lighthouse_tests
