@@ -52,7 +52,6 @@ describe('rich-text components', function() {
       await richTextEditor.appendPlainText(' ');
       // TODO(Jacob): Add test for image RTE component.
       await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
-      await richTextEditor.addRteComponent('Math', 'abc');
       await richTextEditor.addRteComponent(
         'Video', 'M7lc1UVf-VE', 10, 100, false);
     });
@@ -253,10 +252,7 @@ describe('Interactions', function() {
     await explorationEditorMainTab.moveToState('MathExp');
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendPlainText(
-        'Please simplify the following expression: ');
-      // Some Latex styling is expected here.
-      await richTextEditor.addRteComponent(
-        'Math', '16x^{12}/4x^2');
+        'Please simplify the following expression: 16x^{12}/4x^2');
     });
 
     await explorationEditorMainTab.setInteraction('AlgebraicExpressionInput');
