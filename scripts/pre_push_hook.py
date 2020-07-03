@@ -74,6 +74,7 @@ class ChangedBranch(python_utils.OBJECT):
     that need to be linted. It does not change branch when modified files are
     not committed.
     """
+
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
         self.old_branch = subprocess.check_output(get_branch_cmd).strip()

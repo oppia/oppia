@@ -1128,6 +1128,7 @@ class MockInteractionAnswerSummariesAggregator(
     """A modified InteractionAnswerSummariesAggregator that does not start
     a new batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockInteractionAnswerSummariesMRJobManager
@@ -1755,6 +1756,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
     """
+
     ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
     INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
     TEXT_INPUT_EXP_ID = 'exp_id0'
@@ -2102,6 +2104,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving statistics for answers of a
     particular state.
     """
+
     STATE_NAMES = ['STATE A', 'STATE B', 'STATE C']
     EXP_ID = 'exp_id'
 

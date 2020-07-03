@@ -664,6 +664,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
 class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
     """Test Collection Summaries Handler."""
+
     def test_access_collection(self):
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,

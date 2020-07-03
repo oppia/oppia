@@ -85,6 +85,7 @@ def all_checks_passed(linter_stdout):
 
 class LintTests(test_utils.GenericTestBase):
     """General class for all linter function tests."""
+
     def setUp(self):
         super(LintTests, self).setUp()
         self.linter_stdout = []

@@ -34,6 +34,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
     Instances of this class are keyed by a custom Id.
     [user_id].[timestamp_in_sec].[intent].[random_number]
     """
+
     # The user_id of the user making query.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The intent of making query (viewing (by role or username)

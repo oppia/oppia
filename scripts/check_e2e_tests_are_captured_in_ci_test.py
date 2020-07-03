@@ -35,6 +35,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
     """Test the methods which performs .travis.yml and
     protractor.conf.js sync checks.
     """
+
     def test_read_travis_ci_file(self):
         travis_ci_file = os.path.join(
             DUMMY_CONF_FILES, '.dummy_travis.yml')

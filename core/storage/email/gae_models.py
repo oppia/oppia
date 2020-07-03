@@ -38,6 +38,7 @@ class SentEmailModel(base_models.BaseModel):
     This model is read-only; entries cannot be modified once created. The
     id/key of instances of this class has the form '[intent].[random hash]'.
     """
+
     # TODO(sll): Implement functionality to get all emails sent to a particular
     # user with a given intent within a given time period.
 

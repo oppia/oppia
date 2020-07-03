@@ -49,6 +49,7 @@ VALID_CONSTANTS = os.path.join(RELEASE_TEST_DIR, 'valid_constants.txt')
 
 class MockCD(python_utils.OBJECT):
     """Mock for context manager for changing the current working directory."""
+
     def __init__(self, unused_new_path):
         pass
 

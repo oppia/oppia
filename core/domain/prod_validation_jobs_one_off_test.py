@@ -96,6 +96,7 @@ OriginalDatetimeType = datetime.datetime
 
 class PatchedDatetimeType(type):
     """Validates the datetime instances."""
+
     def __instancecheck__(cls, other):
         """Validates whether the given instance is a datatime instance.
 

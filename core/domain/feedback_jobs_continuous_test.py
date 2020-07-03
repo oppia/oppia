@@ -36,6 +36,7 @@ class MockFeedbackAnalyticsAggregator(
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockFeedbackAnalyticsMRJobManager
@@ -59,6 +60,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     test environment the realtime datastore is not automatically cleared after
     a batch job completes.
     """
+
     ALL_CC_MANAGERS_FOR_TESTS = [MockFeedbackAnalyticsAggregator]
 
     def _get_swap_context(self):

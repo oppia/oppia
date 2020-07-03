@@ -68,6 +68,7 @@ class StewardsLandingPageTest(test_utils.GenericTestBase):
     """Test for showing the landing page for stewards (parents, teachers,
     volunteers, or NGOs).
     """
+
     def test_nonprofits_landing_page(self):
         response = self.get_html_response(
             feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)

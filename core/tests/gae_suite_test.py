@@ -48,6 +48,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
 
         def _mock_create_test_suites(**unused_test_target):
             """Mocks create_test_suites()."""
+
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('core.tests.data.failing_tests')]
 

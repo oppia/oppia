@@ -51,6 +51,7 @@ import github # isort:skip
 
 class MockPsutilProcess(python_utils.OBJECT):
     """A mock class for Process class in Psutil."""
+
     cmdlines = [
         ['dev_appserver.py', '--host', '0.0.0.0', '--port', '9001'],
         ['downloads']

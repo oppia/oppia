@@ -48,6 +48,7 @@ def _require_valid_version(version_from_payload, collection_version):
 
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
+
     pass
 
 

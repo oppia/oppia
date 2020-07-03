@@ -32,11 +32,13 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
+
     pass
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
+
     pass
 
 
@@ -46,6 +48,7 @@ class CollectionModel(base_models.VersionedModel):
     This class should only be imported by the collection services file
     and the collection model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = CollectionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionSnapshotContentModel
     ALLOW_REVERT = True
@@ -193,12 +196,14 @@ class CollectionModel(base_models.VersionedModel):
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
+
     pass
 
 
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
+
     pass
 
 
@@ -207,6 +212,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     The id of each instance is the id of the corresponding collection.
     """
+
     SNAPSHOT_METADATA_CLASS = CollectionRightsSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionRightsSnapshotContentModel
     ALLOW_REVERT = False
@@ -453,6 +459,7 @@ class CollectionRightsAllUsersModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding collection.
     """
+
     # The user_ids of users who are (or were in history) members of owner_ids,
     # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
     all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -523,6 +530,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'collection-[collection_id]-[version]'.
     """
+
     # The id of the collection being edited.
     collection_id = ndb.StringProperty(indexed=True, required=True)
 

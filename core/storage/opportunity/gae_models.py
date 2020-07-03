@@ -32,6 +32,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding exploration.
     """
+
     topic_id = ndb.StringProperty(required=True, indexed=True)
     topic_name = ndb.StringProperty(required=True, indexed=True)
     story_id = ndb.StringProperty(required=True, indexed=True)
@@ -182,6 +183,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     When a SkillModel's skill description changes, the corresponding instance
     of this model is also updated.
     """
+
     # The description of the opportunity's skill.
     skill_description = ndb.StringProperty(required=True, indexed=True)
     # The number of questions associated with this opportunity's skill.

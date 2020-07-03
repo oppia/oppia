@@ -60,6 +60,7 @@ def get_gae_id_from_email(email):
     """
     class _FakeUser(ndb.Model):
         """A fake user class."""
+
         _use_memcache = False
         _use_cache = False
         user = ndb.UserProperty(required=True)

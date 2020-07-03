@@ -1507,6 +1507,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
     """Tests CategorizedAnswerFrequencyLists for basic domain object
     operations.
     """
+
     ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
     ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
     ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)

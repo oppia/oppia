@@ -389,6 +389,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     The ID of the voiceover application will be a random hashed value.
     """
+
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
     target_type = ndb.StringProperty(required=True, indexed=True)

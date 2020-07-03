@@ -33,6 +33,7 @@ import feconf
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicModel class."""
+
     TOPIC_NAME = 'tOpic_NaMe'
     TOPIC_CANONICAL_NAME = 'topic_name'
     TOPIC_ID = 'topic_id'
@@ -175,6 +176,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
+
     SUBTOPIC_PAGE_ID = 'subtopic_page_id'
 
     def test_get_deletion_policy(self):
@@ -435,6 +437,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
 class TopicRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
     """Test the TopicRightsModel class."""
+
     TOPIC_ID_1 = '1'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'

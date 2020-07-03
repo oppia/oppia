@@ -40,6 +40,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job that computes a list of recommended explorations to play
     after completing an exploration.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExpSummaryModel]

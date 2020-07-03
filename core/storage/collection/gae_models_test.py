@@ -71,6 +71,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionRightsModel class."""
+
     COLLECTION_ID_1 = '1'
     COLLECTION_ID_2 = '2'
     COLLECTION_ID_3 = '3'
@@ -413,6 +414,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionRightsModel class."""
+
     COLLECTION_ID_1 = '1'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'

@@ -41,6 +41,7 @@ MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v' + common.YARN_VERSION)
 
 class MockCD(python_utils.OBJECT):
     """Mock for context manager for changing the current working directory."""
+
     def __init__(self, unused_new_path):
         pass
 

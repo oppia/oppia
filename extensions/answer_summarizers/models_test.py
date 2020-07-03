@@ -259,6 +259,7 @@ class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
 class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
     """This calculation only works on answers which are all lists."""
+
     CALCULATION_ID = 'FrequencyCommonlySubmittedElements'
 
     def test_shared_answers(self):

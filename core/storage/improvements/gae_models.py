@@ -65,6 +65,7 @@ class TaskEntryModel(base_models.BaseModel):
     The ID of a task has the form: "[entity_type].[entity_id].[entity_version].
                                     [task_type].[target_type].[target_id]".
     """
+
     # Utility field which results in a 20% speedup compared to querying by each
     # of the invididual fields used to compose it.
     # Value has the form: "[entity_type].[entity_id].[entity_version]".

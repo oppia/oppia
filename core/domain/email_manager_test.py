@@ -1863,6 +1863,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
 class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
     """Test that correct email is sent while onboarding reviewers."""
+
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
@@ -1940,6 +1941,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
 
 class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
     """Test that correct email is sent while notifying reviewers."""
+
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
@@ -2010,6 +2012,7 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
     """Test that email is send to submitter when query has completed
     or failed.
     """
+
     SUBMITTER_USERNAME = 'submit'
     SUBMITTER_EMAIL = 'submit@example.com'
     SENDER_USERNAME = 'sender'
@@ -2210,6 +2213,7 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
 
 class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
     """Unit test related to voiceover application emails."""
+
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
@@ -2326,6 +2330,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
 
 class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
     """Unit test related to account deletion application emails."""
+
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
@@ -2641,6 +2646,7 @@ class ModeratorActionEmailsTests(test_utils.GenericTestBase):
 
 class CommunityReviewerEmailTest(test_utils.GenericTestBase):
     """Test for assignment and removal of reviewer in community."""
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'

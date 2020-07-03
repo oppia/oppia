@@ -126,11 +126,13 @@ def are_commit_cmds_role_change(commit_cmds):
 
 class MissingUserException(Exception):
     """Exception for cases when the user doesn't exist."""
+
     pass
 
 
 class AlreadyMigratedUserException(Exception):
     """Exception for cases when the user is already migrated."""
+
     pass
 
 

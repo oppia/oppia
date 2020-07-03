@@ -21,6 +21,7 @@ presubmit checks.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import linecache
 import os
 import re
 import sys
@@ -69,6 +70,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for explicit keyword arguments
     in any function call.
     """
+
     __implements__ = interfaces.IAstroidChecker
 
     name = 'explicit-keyword-args'
@@ -168,6 +170,7 @@ class HangingIndentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for break after parenthesis in case
     of hanging indentation.
     """
+
     __implements__ = interfaces.IRawChecker
 
     name = 'hanging-indent'
@@ -246,6 +249,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     Args:
         linter: Pylinter. The linter object.
     """
+
     __implements__ = interfaces.IAstroidChecker
 
     name = 'parameter_documentation'
@@ -866,6 +870,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that backslash is not used
     for continuation.
     """
+
     __implements__ = interfaces.IRawChecker
 
     name = 'backslash-continuation'
@@ -1036,6 +1041,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
     """Checks if only one space is used after a yield statement
     when applicable ('yield' is acceptable).
     """
+
     __implements__ = interfaces.IRawChecker
 
     name = 'single-space-after-yield'
@@ -1092,6 +1098,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
 
 class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
     """Checks if there are excessive newlines between method definitions."""
+
     __implements__ = interfaces.IRawChecker
 
     name = 'excessive-new-lines'
@@ -1729,6 +1736,51 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                     line=closing_line_index_of_fileoverview + 1)
 
 
+class NewlineBelowClassDocstring(checkers.BaseChecker):
+    """Checks if there is a single newline below the class docstring."""
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'newline-below-class-docstring'
+    priority = -1
+    msgs = {
+        'C0026': (
+            'Missing single newline below class docstring.',
+            'newline-below-class-docstring',
+            'Please add a single newline below class docstring.'
+        )
+    }
+
+    def visit_classdef(self, node):
+        """Visit each class definition in a module.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+        """
+        # Check if the given node has docstring.
+        if node.doc is None:
+            return
+        line_number = node.fromlineno
+        # Iterate till the start of docstring.
+        while True:
+            line = linecache.getline(node.root().file, line_number).strip()
+            if line.startswith((b'"""', b'\'\'\'', b'\'', b'"')):
+                break
+            else:
+                line_number += 1
+
+        doc_length = len(node.doc.split(b'\n'))
+        line_number += doc_length
+        first_line_after_doc = linecache.getline(
+            node.root().file, line_number).strip()
+        second_line_after_doc = linecache.getline(
+            node.root().file, line_number + 1).strip()
+        if first_line_after_doc != b'':
+            self.add_message('newline-below-class-docstring', node=node)
+        elif second_line_after_doc == b'':
+            self.add_message('newline-below-class-docstring', node=node)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1750,3 +1802,4 @@ def register(linter):
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
+    linter.register_checker(NewlineBelowClassDocstring(linter))

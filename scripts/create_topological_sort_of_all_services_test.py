@@ -31,6 +31,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
     """Test the methods which performs topological sort of services based
     on dependencies.
     """
+
     def test_dfs_with_connected_graph(self):
         topo_sort_stack = []
         visit_stack = []

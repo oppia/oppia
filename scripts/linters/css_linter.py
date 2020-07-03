@@ -39,6 +39,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, config_path, files_to_lint,
             verbose_mode_enabled):

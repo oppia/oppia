@@ -1032,6 +1032,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
 class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the UserSubmittedSuggestionsHandler."""
+
     AUTHOR_EMAIL = 'author@example.com'
 
     def setUp(self):

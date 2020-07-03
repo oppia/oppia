@@ -42,6 +42,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_subtopic_viewer_page

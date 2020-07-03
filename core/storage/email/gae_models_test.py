@@ -559,6 +559,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
 
 class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToId model."""
+
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
     THREAD_ID_1 = 'thread_id_1'

@@ -148,6 +148,7 @@ class NextJobHandler(base.BaseHandler):
     """This handler fetches next job to be processed according to the time
     and sends back job_id, algorithm_id and training data to the VM.
     """
+
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.open_access
