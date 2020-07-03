@@ -49,7 +49,7 @@ describe('Oppia click hexbins visualization', function() {
       'solar-system.png');
     spyOn(ImagePreloaderService, 'getDimensionsOfImage').and.returnValue(
       {width: 300, height: 250});
-  });
+  }));
 
   beforeEach(() => {
     const elementTemplate = angular.element(
