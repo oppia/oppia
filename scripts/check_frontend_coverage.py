@@ -370,7 +370,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'settings-tab.directive.ts',
     'shared.ts',
     'sharing-links.directive.ts',
-    'side-navigation-bar.directive.ts',
+    'side-navigation-bar.component.ts',
     'skill-concept-card-editor.directive.ts',
     'skill-creation.service.ts',
     'skill-description-editor.directive.ts',
