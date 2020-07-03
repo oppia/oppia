@@ -18,14 +18,16 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { QuestionSummaryForOneSkill, QuestionSummaryForOneSkillObjectFactory }
-  from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
+import {
+  IQuestionSummaryForOneSkillBackendDict,
+  QuestionSummaryForOneSkillObjectFactory
+} from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 
 describe('Question summary for one skill object factory', () => {
   describe('QuestionSummaryForOneSkillObjectFactory', () => {
     let questionSummaryForOneSkillObjectFactory:
       QuestionSummaryForOneSkillObjectFactory = null;
-    let backendDict: any;
+    let backendDict: IQuestionSummaryForOneSkillBackendDict;
 
     beforeEach(() => {
       TestBed.configureTestingModule({

@@ -19,7 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { IFractionDict, Fraction, FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
@@ -129,10 +130,10 @@ export class FractionInputValidationService {
         switch (rule.type) {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
-              var fraction: any = rule.inputs.f;
+              var fractionDict: IFractionDict = rule.inputs.f;
               var fractionInSimplestForm = this.fof.fromDict(
-                fraction).convertToSimplestForm();
-              if (!angular.equals(fraction, fractionInSimplestForm)) {
+                fractionDict).convertToSimplestForm();
+              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
@@ -144,7 +145,7 @@ export class FractionInputValidationService {
               }
             }
             if (!allowImproperFraction) {
-              var fraction: any = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = this.fof.fromDict(rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -157,7 +158,7 @@ export class FractionInputValidationService {
               }
             }
             if (!allowNonzeroIntegerPart) {
-              var fraction: any = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = this.fof.fromDict(rule.inputs.f);
               if (fraction.hasNonzeroIntegerPart()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -240,7 +241,7 @@ export class FractionInputValidationService {
               });
             }
             if (!allowImproperFraction) {
-              var fraction: any = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = this.fof.fromDict(rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,

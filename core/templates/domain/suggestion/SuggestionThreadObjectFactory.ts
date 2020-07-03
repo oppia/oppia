@@ -20,12 +20,24 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Suggestion, SuggestionObjectFactory } from
+import { ISuggestionBackendDict, Suggestion, SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+
+interface ISuggestionThreadBackendDict {
+  'status': string;
+  'subject': string;
+  'summary': string;
+  'original_author_username': string;
+  'last_updated_msecs': number;
+  'message_count': number;
+  'thread_id': string;
+  'last_nonempty_message_author': string;
+  'last_nonempty_message_text': string;
+}
 
 export class SuggestionThread {
   status: string;
@@ -111,7 +123,7 @@ export class SuggestionThreadObjectFactory {
       ThreadMessageSummaryObjectFactory) {}
 
   private createEditExplorationStateContentSuggestionFromBackendDict(
-      suggestionBackendDict: any): Suggestion {
+      suggestionBackendDict: ISuggestionBackendDict): Suggestion {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
       return null;
@@ -120,10 +132,9 @@ export class SuggestionThreadObjectFactory {
       suggestionBackendDict);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type.
   createFromBackendDicts(
-      suggestionThreadBackendDict: any,
-      suggestionBackendDict: any): SuggestionThread {
+      suggestionThreadBackendDict: ISuggestionThreadBackendDict,
+      suggestionBackendDict: ISuggestionBackendDict): SuggestionThread {
     return new SuggestionThread(
       suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
       suggestionThreadBackendDict.summary,

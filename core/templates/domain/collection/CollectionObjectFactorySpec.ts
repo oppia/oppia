@@ -43,6 +43,8 @@ describe('Collection object factory', () => {
       category: 'a category',
       version: 1,
       nodes: [],
+      language_code: null,
+      tags: null
     };
     _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -63,13 +65,13 @@ describe('Collection object factory', () => {
 
   it('should be able to create an empty collection object', () => {
     var collection = collectionObjectFactory.createEmptyCollection();
-    expect(collection.getId()).toBeUndefined();
-    expect(collection.getTitle()).toBeUndefined();
-    expect(collection.getCategory()).toBeUndefined();
-    expect(collection.getObjective()).toBeUndefined();
-    expect(collection.getLanguageCode()).toBeUndefined();
-    expect(collection.getTags()).toBeUndefined();
-    expect(collection.getVersion()).toBeUndefined();
+    expect(collection.getId()).toBeNull();
+    expect(collection.getTitle()).toBeNull();
+    expect(collection.getCategory()).toBeNull();
+    expect(collection.getObjective()).toBeNull();
+    expect(collection.getLanguageCode()).toBeNull();
+    expect(collection.getTags()).toBeNull();
+    expect(collection.getVersion()).toBeNull();
     expect(collection.getCollectionNodes()).toEqual([]);
   });
 
@@ -81,7 +83,13 @@ describe('Collection object factory', () => {
       };
       var collection = collectionObjectFactory.create({
         id: 'collection_id',
-        nodes: [collectionNodeBackendObject]
+        nodes: [collectionNodeBackendObject],
+        title: null,
+        objective: null,
+        language_code: null,
+        tags: null,
+        category: null,
+        version: null
       });
       expect(collection.containsCollectionNode('exp_id0')).toBe(true);
       expect(collection.getCollectionNodes()).toEqual([
@@ -263,6 +271,7 @@ describe('Collection object factory', () => {
       language_code: 'en',
       version: 15,
       nodes: [],
+      tags: null
     });
     secondCollection.addCollectionNode(collectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',

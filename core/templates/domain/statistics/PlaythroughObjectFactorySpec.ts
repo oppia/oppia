@@ -42,8 +42,8 @@ describe('Playthrough Object Factory', () => {
         value: 'state'
       }
     })];
-    let playthroughObject = pof.createNew(
-      'expId1', 1, 'EarlyQuit', {
+    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+      'expId1', 1, {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000},
       }, actions);
@@ -56,6 +56,29 @@ describe('Playthrough Object Factory', () => {
       time_spent_in_exp_in_msecs: {value: 30000}
     });
     expect(playthroughObject.actions).toEqual(actions);
+  });
+
+  it('should create same objects from backend dict and direct values.', () => {
+    var playthroughDictObject = pof.createFromBackendDict({
+      exp_id: 'expId1',
+      exp_version: 1,
+      issue_type: 'CyclicStateTransitions',
+      issue_customization_args: {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      },
+      actions: []
+    });
+
+    var playthroughObject = pof.createNewCyclicStateTransitionsPlaythrough(
+      'expId1', 1, {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      }, []);
+
+    expect(playthroughDictObject).toEqual(playthroughObject);
   });
 
   it('should create a new playthrough from a backend dict', () => {
@@ -154,8 +177,8 @@ describe('Playthrough Object Factory', () => {
         value: 2
       }
     })];
-    let playthroughObject = pof.createNew(
-      'expId1', 1, 'EarlyQuit', {
+    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+      'expId1', 1, {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000}
       }, actions);
@@ -194,5 +217,27 @@ describe('Playthrough Object Factory', () => {
         schema_version: 1
       }]
     });
+  });
+
+  it('should throw error on invalid backend dict', () => {
+    const playthroughDict = {
+      playthrough_id: 'playthroughId1',
+      exp_id: 'expId1',
+      exp_version: 1,
+      issue_type: 'InvalidType',
+      issue_customization_args: {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      },
+      actions: []
+    };
+
+    // TS ignore is used because playthrough dict is assigned a invalid type
+    // to test errors.
+    // @ts-ignore
+    expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError(
+      'Backend dict does not match any known issue type: ' +
+      JSON.stringify(playthroughDict));
   });
 });
