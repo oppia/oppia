@@ -1754,7 +1754,7 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
         """Visit each class definition in a module.
 
         Args:
-            node: astroid.scoped_nodes.ClassDef. Node for a class definition
+            node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
         """
         # Check if the given node has docstring.
@@ -1764,7 +1764,7 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
         # Iterate till the start of docstring.
         while True:
             line = linecache.getline(node.root().file, line_number).strip()
-            if line.startswith('"""'):
+            if line.startswith((b'"""', b'\'\'\'', b'\'', b'"')):
                 break
             else:
                 line_number += 1
