@@ -31,3 +31,17 @@ angular.module('oppia').directive('loadingDots', [
       controller: [function() {}]
     };
   }]);
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'loading-dots',
+  templateUrl: './loading-dots.component.html',
+  styleUrls: []
+})
+export class LoadingDotsComponent {
+  constructor() {} 
+}
+angular.module('oppia').directive(
+  'loadingDots', downgradeComponent(
+    {component: LoadingDotsComponent}));
