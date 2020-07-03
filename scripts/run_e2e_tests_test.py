@@ -302,6 +302,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_arg):
             class Ret(python_utils.OBJECT):
                 """Return object with required attributes."""
+
                 def read(self):
                     """Return required method."""
                     return '77.0.3865'
@@ -311,6 +312,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_url_open(unused_arg):
             class Ret(python_utils.OBJECT):
                 """Return object with required attributes."""
+
                 def read(self):
                     """Return required method."""
                     return run_e2e_tests.CHROME_DRIVER_VERSION
@@ -351,6 +353,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_command):
             class Ret(python_utils.OBJECT):
                 """Return object with required attributes."""
+
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
