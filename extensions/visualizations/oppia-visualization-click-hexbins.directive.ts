@@ -38,15 +38,35 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
     function(
         $scope, AssetsBackendApiService, ContextService,
         ImagePreloaderService) {
-      this.$onInit = () => {
-        const imagePath = (
-          $scope.interactionArgs.imageAndRegions.value.imagePath);
-        const imageDimensions = (
-          ImagePreloaderService.getDimensionsOfImage(imagePath));
+      const imagePath = $scope.interactionArgs.imageAndRegions.value.imagePath;
+      const imageDimensions = (
+        ImagePreloaderService.getDimensionsOfImage(imagePath));
+      const imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+        ContextService.getEntityType(), ContextService.getEntityId(),
+        imagePath);
 
+      let tooltipTarget: HexbinBin<ClickOnImageAnswer> = null;
+
+      const showTooltip = function(bin: HexbinBin<ClickOnImageAnswer>) {
+        if (tooltipTarget === null && bin.length > 0) {
+          tooltipTarget = bin;
+        }
+      };
+
+      const hideTooltip = function(bin: HexbinBin<ClickOnImageAnswer>) {
+        if (tooltipTarget === bin) {
+          tooltipTarget = null;
+        }
+      };
+
+      this.$onInit = () => {
         const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
         const wrapperHeight = Math.round(
           wrapperWidth * imageDimensions.height / imageDimensions.width);
+
+        const getNumClicks = function(bin: HexbinBin<ClickOnImageAnswer>) {
+          return d3.sum(bin, a => a.frequency);
+        };
 
         const hexbinGenerator = hexbin<ClickOnImageAnswer>()
           .x(d => d.answer.clickPosition[0] * wrapperWidth)
@@ -54,35 +74,29 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
           .size([wrapperWidth, wrapperHeight])
           .radius(16);
         const bins = hexbinGenerator($scope.data);
-        const getClicks = (bin: HexbinBin<ClickOnImageAnswer>) => {
-          return d3.sum(bin.map(a => a.frequency));
-        };
+        const colorScale = d3.scaleLinear()
+          .domain([0, d3.max(bins, getNumClicks)])
+          // @ts-ignore the type of .range is wrong, rgba strings are accepted.
+          .range(['rgba(255, 255, 255, 0.25)', 'rgba(255, 255, 255, 0.75)']);
+
+        $scope.imageUrl = imageUrl;
+        $scope.wrapperWidth = wrapperWidth;
+        $scope.wrapperHeight = wrapperHeight;
 
         $scope.bins = bins;
         $scope.hexagon = hexbinGenerator.hexagon();
         $scope.hexagonMesh = hexbinGenerator.mesh();
-        $scope.getClicks = getClicks;
-        $scope.fillColor = d3.scaleLinear()
-          .domain([0, d3.max(bins, getClicks)])
-          // @ts-ignore the type of .range is wrong, rgba strings are accepted.
-          .range(['rgba(255, 255, 255, 0.25)', 'rgba(255, 255, 255, 0.75)']);
-        $scope.imagePath = AssetsBackendApiService.getImageUrlForPreview(
-          ContextService.getEntityType(), ContextService.getEntityId(),
-          imagePath);
-        $scope.wrapperWidth = wrapperWidth;
-        $scope.wrapperHeight = wrapperHeight;
+        $scope.getFillColor = (
+          (b: HexbinBin<ClickOnImageAnswer>) => colorScale(getNumClicks(b)));
 
-        $scope.binTooltipTarget = null;
-        $scope.showBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
-          if ($scope.binTooltipTarget === null && bin.length > 0) {
-            $scope.binTooltipTarget = bin;
-          }
-        };
-        $scope.hideBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
-          if ($scope.binTooltipTarget === bin) {
-            $scope.binTooltipTarget = null;
-          }
-        };
+        $scope.isTooltipVisible = () => tooltipTarget !== null;
+        $scope.getTooltipNumClicks = () => getNumClicks(tooltipTarget);
+        $scope.getTooltipStyle = () => ({
+          top: `${tooltipTarget.y}px`,
+          left: `${tooltipTarget.x}px`,
+        });
+        $scope.showTooltip = showTooltip;
+        $scope.hideTooltip = hideTooltip;
       };
     }
   ]
