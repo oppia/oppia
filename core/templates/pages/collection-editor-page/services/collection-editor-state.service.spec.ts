@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-editor-state.service.ts is upgraded to Angular 8.
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { ChangeObjectFactory } from
@@ -86,7 +86,10 @@ describe('Collection editor state service', function() {
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(self.backendCollectionRightsObject);
+          resolve(
+            collectionRightsObjectFactory.create(
+              self.backendCollectionRightsObject
+            ));
         } else {
           reject();
         }

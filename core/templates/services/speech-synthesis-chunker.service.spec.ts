@@ -122,8 +122,9 @@ describe('Speech Synthesis Chunker Service', () => {
     it('should properly convert the raw_latex-with-value attribute to' +
       ' speakable text', () => {
       const html = (
-        '<oppia-noninteractive-math raw_latex-with-value="5 - 1">' +
-        '</oppia-noninteractive-math>' +
+        '<oppia-noninteractive-math math_content-with-value="{&amp;quot;' +
+        'raw_latex&amp;quot;:&amp;quot;5-1&amp;quot;,&amp;quot;svg_filename&' +
+        'amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math>' +
         '<li>Speech</li>' +
         '<li>Text</li>'
       );
@@ -204,7 +205,7 @@ describe('Speech Synthesis Chunker Service', () => {
       speechSynthesisChunkerService.speak(
         speechSynthesisUtterance, callbackSpy);
 
-      // wait for 2 setTimeout calls to finished because there are
+      // Wait for 2 setTimeout calls to finished because there are
       // two chuncks in speechSynthesisUtterance.
       flush(2);
 
@@ -226,7 +227,7 @@ describe('Speech Synthesis Chunker Service', () => {
           speechSynthesisUtterance, callbackSpy);
         speechSynthesisChunkerService.cancel();
 
-        // wait for 1 setTimeout call to finished.
+        // Wait for 1 setTimeout call to finished.
         flush(1);
 
         expect(callbackSpy).not.toHaveBeenCalled();

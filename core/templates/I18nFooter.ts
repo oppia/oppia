@@ -29,17 +29,19 @@ angular.module('oppia').directive('i18nFooter', [
       template: require('./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$timeout', '$translate', 'UserService',
-        'SUPPORTED_SITE_LANGUAGES',
+        '$http', '$timeout', '$translate', 'I18nLanguageCodeService',
+        'UserService', 'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $timeout, $translate, UserService,
-            SUPPORTED_SITE_LANGUAGES) {
+            $http, $timeout, $translate, I18nLanguageCodeService,
+            UserService, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           // Changes the language of the translations.
           var preferencesDataUrl = '/preferenceshandler/data';
           var siteLanguageUrl = '/save_site_language';
           ctrl.changeLanguage = function() {
             $translate.use(ctrl.currentLanguageCode);
+            I18nLanguageCodeService.setI18nLanguageCode(
+              ctrl.currentLanguageCode);
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.isLoggedIn()) {
                 $http.put(siteLanguageUrl, {
@@ -50,18 +52,10 @@ angular.module('oppia').directive('i18nFooter', [
           };
           ctrl.$onInit = function() {
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
-
-            // The $timeout seems to be necessary for the dropdown
-            // to show anything at the outset, if the default language
-            // is not English.
-            $timeout(function() {
-              // $translate.use() returns undefined until the language
-              // file is fully loaded, which causes a blank field
-              // in the dropdown, hence we use $translate.proposedLanguage()
-              // as suggested in http://stackoverflow.com/a/28903658
-              ctrl.currentLanguageCode = $translate.use() ||
-                $translate.proposedLanguage();
-            }, 50);
+            ctrl.currentLanguageCode = (
+              $translate.proposedLanguage() || $translate.use());
+            I18nLanguageCodeService.setI18nLanguageCode(
+              ctrl.currentLanguageCode);
           };
         }
       ]
@@ -88,7 +82,7 @@ angular.module('oppia').config([
         suffix: '.json'
       })
       // The use of default translation improves the loading time when English
-      // is selected
+      // is selected.
       .translations('en', DEFAULT_TRANSLATIONS)
       .fallbackLanguage('en')
       .determinePreferredLanguage()
@@ -99,7 +93,8 @@ angular.module('oppia').config([
       .addInterpolation('$translateMessageFormatInterpolation')
       // The strategy 'sanitize' does not support utf-8 encoding.
       // https://github.com/angular-translate/angular-translate/issues/1131
-      // The strategy 'escape' will brake strings with raw html, like hyperlinks
+      // The strategy 'escape' will brake strings with raw html, like
+      // hyperlinks.
       .useSanitizeValueStrategy('sanitizeParameters')
       .forceAsyncReload(true);
   }

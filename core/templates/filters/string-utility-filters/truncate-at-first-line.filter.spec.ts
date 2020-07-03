@@ -56,41 +56,41 @@ describe('Testing filters', function() {
       expect(filter('\n')).toEqual('');
       expect(filter('\n\n\n')).toEqual('');
 
-      // Windows
+      // ---- Windows ----
       expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
       expect(filter('Single line\u000D\u000AEOL')).toEqual('Single line...');
       expect(filter('Single line\x0D\x0AEOL')).toEqual('Single line...');
       expect(filter('Single line\u000D\x0AEOL')).toEqual('Single line...');
       expect(filter('Single line\x0D\u000AEOL')).toEqual('Single line...');
 
-      // Mac
+      // ---- Mac ----
       expect(filter('Single line\rEOL')).toEqual('Single line...');
       expect(filter('Single line\u000DEOL')).toEqual('Single line...');
       expect(filter('Single line\x0DEOL')).toEqual('Single line...');
 
-      // Linux
+      // ---- Linux ----
       expect(filter('Single line\nEOL')).toEqual('Single line...');
       expect(filter('Single line\u000AEOL')).toEqual('Single line...');
       expect(filter('Single line\x0AEOL')).toEqual('Single line...');
 
-      // Vertical Tab
+      // ---- Vertical Tab ----
       expect(filter('Vertical Tab\vEOL')).toEqual('Vertical Tab...');
       expect(filter('Vertical Tab\u000BEOL')).toEqual('Vertical Tab...');
       expect(filter('Vertical Tab\x0BEOL')).toEqual('Vertical Tab...');
 
-      // Form Feed
+      // ---- Form Feed ----
       expect(filter('Form Feed\fEOL')).toEqual('Form Feed...');
       expect(filter('Form Feed\u000CEOL')).toEqual('Form Feed...');
       expect(filter('Form Feed\x0CEOL')).toEqual('Form Feed...');
 
-      // Next Line
+      // ---- Next Line ----
       expect(filter('Next Line\u0085EOL')).toEqual('Next Line...');
       expect(filter('Next Line\x85EOL')).toEqual('Next Line...');
 
-      // Line Separator
+      // ---- Line Separator ----
       expect(filter('Line Separator\u2028EOL')).toEqual('Line Separator...');
 
-      // Paragraph Separator
+      // ---- Paragraph Separator ----
       expect(filter('Paragraph Separator\u2029EOL')).toEqual(
         'Paragraph Separator...');
     }));

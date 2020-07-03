@@ -26,7 +26,8 @@ import utils
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.user])
 
 # Allowed feedback thread statuses.
 STATUS_CHOICES_OPEN = 'open'
@@ -51,7 +52,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     """Threads for each entity.
 
     The id of instances of this class has the form
-        [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING]
+        [entity_type].[entity_id].[generated_string]
     """
     # The type of entity the thread is linked to.
     entity_type = ndb.StringProperty(required=True, indexed=True)
@@ -105,18 +106,54 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.original_author_id == user_id).get(
-            keys_only=True) is not None
+        return cls.query(ndb.OR(
+            cls.original_author_id == user_id,
+            cls.last_nonempty_message_author_id == user_id
+        )).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
         """GeneralFeedbackThreadModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.original_author_id
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the original_author_id and
+        last_nonempty_message_author_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+
+        Returns:
+            (str, (str, str)). Status message when the model doesn't exist
+            for the user ID otherwise None.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.original_author_id == old_user_id,
+                cls.last_nonempty_message_author_id == old_user_id)).fetch():
+            if model.original_author_id == old_user_id:
+                model.original_author_id = new_user_id
+            if model.last_nonempty_message_author_id == old_user_id:
+                model.last_nonempty_message_author_id = new_user_id
+            migrated_models.append(model)
+        cls.put_multi(migrated_models, update_last_updated_time=False)
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the IDs in
+        original_author_id and last_nonempty_message_author_id.
+        """
+        user_ids = []
+        if self.original_author_id is not None:
+            user_ids.append(self.original_author_id)
+        if self.last_nonempty_message_author_id is not None:
+            user_ids.append(self.last_nonempty_message_author_id)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
     @classmethod
     def export_data(cls, user_id):
@@ -159,11 +196,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
         Returns:
             str. A thread ID that is different from the IDs of all
-                the existing threads within the given entity.
+            the existing threads within the given entity.
 
         Raises:
-           Exception: There were too many collisions with existing thread IDs
-               when attempting to generate a new thread ID.
+            Exception: There were too many collisions with existing thread IDs
+                when attempting to generate a new thread ID.
         """
         for _ in python_utils.RANGE(_MAX_RETRIES):
             thread_id = (
@@ -184,7 +221,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
         Returns:
             GeneralFeedbackThreadModel. The newly created FeedbackThreadModel
-                instance.
+            instance.
 
         Raises:
             Exception: A thread with the given thread ID exists already.
@@ -209,7 +246,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
         Returns:
             list(GeneralFeedbackThreadModel). List of threads associated with
-                the entity. Doesn't include deleted entries.
+            the entity. Doesn't include deleted entries.
         """
         return cls.get_all().filter(cls.entity_type == entity_type).filter(
             cls.entity_id == entity_id).order(-cls.last_updated).fetch(limit)
@@ -218,7 +255,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 class GeneralFeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 
-    The id of instances of this class has the form [THREAD_ID].[MESSAGE_ID]
+    The id of instances of this class has the form [thread_id].[message_id]
     """
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = ndb.StringProperty(required=True, indexed=True)
@@ -250,7 +287,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
-
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -344,7 +380,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         Returns:
             GeneralFeedbackMessageModel. Instance of the new
-                GeneralFeedbackMessageModel entry.
+            GeneralFeedbackMessageModel entry.
 
         Raises:
             Exception: A message with the same ID already exists
@@ -369,15 +405,15 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         Returns:
             GeneralFeedbackMessageModel or None. If strict == False and no
-                undeleted message with the given message_id exists in the
-                datastore, then returns None. Otherwise, returns the
-                GeneralFeedbackMessageModel instance that corresponds to the
-                given ID.
+            undeleted message with the given message_id exists in the
+            datastore, then returns None. Otherwise, returns the
+            GeneralFeedbackMessageModel instance that corresponds to the
+            given ID.
 
         Raises:
             EntityNotFoundError: strict == True and either
-                    (i) message ID is not valid
-                    (ii) message is marked as deleted.
+                (i) message ID is not valid
+                (ii) message is marked as deleted.
                 No error will be raised if strict == False.
         """
         instance_id = cls._generate_id(thread_id, message_id)
@@ -449,7 +485,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 of the full list of messages.
 
         Returns:
-            3-tuple of (results, cursor, more) where:
+            3-tuple of (results, cursor, more). Where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -469,8 +505,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     Instances of this class have keys of the form [user_id].[thread_id]
     """
 
-    user_id = ndb.StringProperty(required=False, indexed=True)
-    thread_id = ndb.StringProperty(required=False, indexed=True)
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    thread_id = ndb.StringProperty(required=True, indexed=True)
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 
     @staticmethod
@@ -510,7 +546,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """Generates the full message id of the format:
             <user_id.thread_id>.
 
-         Args:
+        Args:
             user_id: str. The user id.
             thread_id: str. The thread id.
 
@@ -530,7 +566,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
         Returns:
             FeedbackThreadUserModel. The FeedbackThreadUserModel instance which
-                matches with the given user_id, and thread id.
+            matches with the given user_id, and thread id.
         """
         instance_id = cls.generate_full_id(user_id, thread_id)
         return super(GeneralFeedbackThreadUserModel, cls).get(
@@ -546,7 +582,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
         Returns:
             FeedbackThreadUserModel. The newly created FeedbackThreadUserModel
-                instance.
+            instance.
         """
         instance_id = cls.generate_full_id(user_id, thread_id)
         new_instance = cls(id=instance_id, user_id=user_id, thread_id=thread_id)
@@ -564,7 +600,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
         Returns:
             list(FeedbackThreadUserModel). The FeedbackThreadUserModels
-                corresponding to the given user ans thread ids.
+            corresponding to the given user ans thread ids.
         """
         instance_ids = [
             cls.generate_full_id(user_id, thread_id)
@@ -621,7 +657,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.

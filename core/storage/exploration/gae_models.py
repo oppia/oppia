@@ -163,7 +163,7 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # TODO(msl): test if put_async() leads to any problems (make
+        # TODO(msl): Test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
         # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
@@ -223,8 +223,7 @@ class ExplorationModel(base_models.VersionedModel):
 class ExplorationContextModel(base_models.BaseModel):
     """Model for storing Exploration context.
 
-    The ID of instances of this class has the form
-    {{random_hash_of_12_chars}}, which is the ID of the exploration itself.
+    The ID of instances of this class is the ID of the exploration itself.
     """
 
     # The ID of the story that the exploration is a part of.
@@ -248,7 +247,7 @@ class ExplorationContextModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -328,7 +327,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @staticmethod
-    def transform_dict_to_valid(model_dict):
+    def convert_to_valid_dict(model_dict):
         """Replace invalid fields and values in the ExplorationRightsModel dict.
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
@@ -476,7 +475,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             committer_username = (
                 committer_user_settings_model.username
                 if committer_user_settings_model else '')
-            # TODO(msl): test if put_async() leads to any problems (make
+            # TODO(msl): Test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when explorations
             # are changed).
             ExplorationCommitLogEntryModel(
@@ -528,6 +527,77 @@ class ExplorationRightsModel(base_models.VersionedModel):
         }
 
 
+class ExplorationRightsAllUsersModel(base_models.BaseModel):
+    """Temporary storage model for all user ids ever mentioned in the
+    exploration rights.
+
+    TODO (#8529): This model should be deleted after the user ID migration is
+    completed.
+
+    The id of each instance is the id of the corresponding exploration.
+    """
+    # The user_ids of users who are (or were in history) members of owner_ids,
+    # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
+    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationRightsAllUsersModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationRightsAllUsersModel references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.all_user_ids == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only used for migration purposes. All the data
+        contained in this model are already exported through
+        ExplorationRightsModel.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRightsAllUsersModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
+        """This model is used to verify that the user ID migration of
+        ExplorationRightsSnapshotContentModel was successful. The content is
+        filled by the AddAllUserIdsVerificationJob and
+        AddAllUserIdsSnapshotsVerificationJob before the
+        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
+        this method.
+
+        Args:
+            unused_old_user_id: str. The old user ID.
+            unused_new_user_id: str. The new user ID.
+        """
+        pass
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
+        user_ids = [user_id for user_id in self.all_user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
+
+
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to explorations.
 
@@ -535,7 +605,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     ExplorationModel or ExplorationRightsModel occurs.
 
     The id for this model is of the form
-    'exploration-{{EXP_ID}}-{{EXP_VERSION}}'.
+    'exploration-[exploration_id]-[version]'.
     """
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
@@ -584,7 +654,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
         Returns:
             str. A string containing exploration ID and
-                exploration version.
+            exploration version.
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
 
@@ -604,8 +674,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 commits are needed.
 
         Returns:
-            3-tuple of (results, cursor, more) which were created which were
-            created no earlier than max_age before the current time where:
+            3-tuple of (results, cursor, more). Created no earlier than the
+            max_age before the current time where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this will
@@ -704,6 +774,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
+
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -765,8 +836,12 @@ class ExpSummaryModel(base_models.BaseModel):
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
             model.contributor_ids = [
-                new_user_id if contributor_id == old_user_id else contributor_id
-                for contributor_id in model.contributor_ids]
+                new_user_id if contributor_id == old_user_id else
+                contributor_id for contributor_id in model.contributor_ids]
+            if old_user_id in model.contributors_summary:
+                model.contributors_summary[new_user_id] = (
+                    model.contributors_summary[old_user_id])
+                del model.contributors_summary[old_user_id]
             migrated_models.append(model)
         cls.put_multi(migrated_models, update_last_updated_time=False)
 
@@ -793,7 +868,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with the top rated exp summaries that are
-                public in descending order of scaled_average_rating.
+            public in descending order of scaled_average_rating.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
@@ -813,7 +888,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with private exp summaries that are at least
-                viewable by the given user.
+            viewable by the given user.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
@@ -835,7 +910,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with exp summaries that are at least
-                editable by the given user.
+            editable by the given user.
         """
         return ExpSummaryModel.query().filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
@@ -852,9 +927,9 @@ class ExpSummaryModel(base_models.BaseModel):
             limit: int. The maximum number of results to return.
 
         Returns:
-            An iterable with exp summaries that are recently published. The
-                returned list is sorted by the time of publication with latest
-                being first in the list.
+            iterable. An iterable with exp summaries that are
+            recently published. The returned list is sorted by the time of
+            publication with latest being first in the list.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC

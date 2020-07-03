@@ -102,7 +102,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Title 1'])
+        self.assertEqual(story_summary.thumbnail_bg_color, None)
+        self.assertEqual(story_summary.thumbnail_filename, None)
 
     def test_get_new_story_id(self):
         new_story_id = story_services.get_new_story_id()
@@ -160,7 +162,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Title 1'])
+        self.assertEqual(
+            story_summary.thumbnail_bg_color,
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
+        self.assertEqual(story_summary.thumbnail_filename, 'image.svg')
 
     def test_update_story_node_properties(self):
         changelist = [
@@ -237,7 +243,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.version, 3)
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
-        self.assertEqual(story_summary.node_count, 2)
+        self.assertEqual(story_summary.node_titles, ['Title 1', 'Title 2'])
 
         changelist = [
             story_domain.StoryChange({
@@ -272,7 +278,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'Removed a story node.')
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Modified title 2'])
         self.assertEqual(
             story.story_contents.nodes[0].title, 'Modified title 2')
         self.assertEqual(
@@ -355,7 +361,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summaries[0].title, 'Title')
         self.assertEqual(story_summaries[0].description, 'Description')
         self.assertEqual(story_summaries[0].language_code, 'en')
-        self.assertEqual(story_summaries[0].node_count, 1)
+        self.assertEqual(story_summaries[0].node_titles, ['Title 1'])
+        self.assertEqual(story_summaries[0].thumbnail_filename, None)
+        self.assertEqual(story_summaries[0].thumbnail_bg_color, None)
         self.assertEqual(story_summaries[0].version, 2)
 
     def test_cannot_update_story_with_non_story_change_changelist(self):
@@ -1789,11 +1797,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         )
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
-        self.assertEqual(story.story_contents_schema_version, 3)
+        self.assertEqual(story.story_contents_schema_version, 4)
         self.assertEqual(
-            story.story_contents.to_dict(), self.VERSION_3_STORY_CONTENTS_DICT)
+            story.story_contents.to_dict(), self.VERSION_4_STORY_CONTENTS_DICT)

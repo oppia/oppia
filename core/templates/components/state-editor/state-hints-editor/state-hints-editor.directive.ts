@@ -23,6 +23,9 @@ require(
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
 require(
   'components/state-directives/response-header/response-header.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'add-hint-modal.controller.ts');
 
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -57,17 +60,15 @@ angular.module('oppia').directive('stateHintsEditor', [
         '/components/state-editor/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter',
-        'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
-        'StateHintsService', 'COMPONENT_NAME_HINT', 'StateEditorService',
-        'EditabilityService', 'StateInteractionIdService',
-        'UrlInterpolationService', 'HintObjectFactory', 'StateSolutionService',
+        '$scope', '$rootScope', '$uibModal', '$filter', 'AlertsService',
+        'EditabilityService', 'StateEditorService', 'StateHintsService',
+        'StateInteractionIdService', 'StateSolutionService',
+        'UrlInterpolationService', 'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, $filter,
-            GenerateContentIdService, AlertsService, INTERACTION_SPECS,
-            StateHintsService, COMPONENT_NAME_HINT, StateEditorService,
-            EditabilityService, StateInteractionIdService,
-            UrlInterpolationService, HintObjectFactory, StateSolutionService) {
+            $scope, $rootScope, $uibModal, $filter, AlertsService,
+            EditabilityService, StateEditorService, StateHintsService,
+            StateInteractionIdService, StateSolutionService,
+            UrlInterpolationService, INTERACTION_SPECS) {
           var ctrl = this;
           var _getExistingHintsContentIds = function() {
             var existingContentIds = [];
@@ -137,41 +138,10 @@ angular.module('oppia').directive('stateHintsEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', 'ContextService',
-                function(
-                    $controller, $scope, $uibModalInstance, ContextService) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.HINT_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      hide_complex_extensions: (
-                        ContextService.getEntityType() === 'question')
-                    }
-                  };
-
-                  $scope.tmpHint = '';
-
-                  $scope.addHintForm = {};
-
-                  $scope.hintIndex = StateHintsService.displayed.length + 1;
-
-                  $scope.saveHint = function() {
-                    var contentId = GenerateContentIdService.getNextId(
-                      existingHintsContentIds, COMPONENT_NAME_HINT);
-                    // Close the modal and save it afterwards.
-                    $uibModalInstance.close({
-                      hint: angular.copy(
-                        HintObjectFactory.createNew(contentId, $scope.tmpHint)),
-                      contentId: contentId
-                    });
-                  };
-                }
-              ]
+              resolve: {
+                existingHintsContentIds: () => existingHintsContentIds
+              },
+              controller: 'AddHintModalController'
             }).result.then(function(result) {
               StateHintsService.displayed.push(result.hint);
               StateHintsService.saveDisplayedValue();
@@ -243,14 +213,15 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
             $scope.StateHintsService = StateHintsService;
             StateHintsService.setActiveHintIndex(null);
             $scope.canEdit = EditabilityService.isEditable();
-
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
             // the helper. This is a bug in jQueryUI that has not been fixed

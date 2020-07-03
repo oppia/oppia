@@ -23,6 +23,8 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { INumericInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -36,21 +38,15 @@ export class NumericInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): any[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: INumericInputCustomizationArgs): IWarning[] {
     return [];
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: INumericInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -107,7 +103,7 @@ export class NumericInputValidationService {
         };
         switch (rule.type) {
           case 'Equals':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
             break;
           case 'IsInclusivelyBetween':
@@ -119,24 +115,24 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, a, b, true, true);
             break;
           case 'IsGreaterThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, false, false);
             break;
           case 'IsGreaterThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, true, false);
             break;
           case 'IsLessThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
             break;
           case 'IsLessThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
             break;
           case 'IsWithinTolerance':
-            var x = rule.inputs.x;
-            var tol = rule.inputs.tol;
+            var x = (<number>rule.inputs.x);
+            var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             break;
           default:

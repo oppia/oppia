@@ -92,6 +92,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
 
+    def test_get_all_html_content_strings(self):
+        html_strings = self.skill.get_all_html_content_strings()
+        self.assertEqual(len(html_strings), 8)
+
     def test_valid_misconception_name(self):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
@@ -219,7 +223,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconceptions schema version to be an integer')
 
-        self.skill.misconceptions_schema_version = 2
+        self.skill.misconceptions_schema_version = 3
         self.skill.rubric_schema_version = 100
         self._assert_validation_error(
             'Expected rubric schema version to be %s' %
@@ -769,3 +773,32 @@ class SkillSummaryTests(test_utils.GenericTestBase):
                 'Expected worked_examples_count to be non-negative, '
                 'received \'-1\'')):
             self.skill_summary.validate()
+
+
+class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AugmentedSkillSummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
+
+        self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
+            'skill_id', 'description', 'en', 1, 1, 1,
+            'topic1', 'math', current_time, current_time)
+
+    def test_augmented_skill_summary_gets_created(self):
+        augmented_skill_summary_dict = {
+            'id': 'skill_id',
+            'description': 'description',
+            'language_code': 'en',
+            'version': 1,
+            'misconception_count': 1,
+            'worked_examples_count': 1,
+            'topic_name': 'topic1',
+            'classroom_name': 'math',
+            'skill_model_created_on': self.time_in_millisecs,
+            'skill_model_last_updated': self.time_in_millisecs
+        }
+        self.assertEqual(
+            self.augmented_skill_summary.to_dict(),
+            augmented_skill_summary_dict)

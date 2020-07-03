@@ -20,7 +20,7 @@
 var waitFor = require('./waitFor.js');
 
 var CreatorDashboardPage = function() {
-  var CREATOR_DASHBOARD_URL = '/creator_dashboard';
+  var CREATOR_DASHBOARD_URL = '/creator-dashboard';
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
   var allExplorationCards = element.all(
@@ -53,7 +53,7 @@ var CreatorDashboardPage = function() {
     await waitFor.visibilityOf(explorationDashboardCard);
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
-      // Tile text contains title, possibly followed by newline and text
+      // Tile text contains title, possibly followed by newline and text.
       return (
         text.startsWith(explorationTitle + '\n') ||
         text === explorationTitle
