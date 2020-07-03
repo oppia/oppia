@@ -17,10 +17,9 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'pages/creator-dashboard-page/modal-templates/' +
+  'create-activity-modal.controller.ts');
 
-require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/utilities/browser-checker.service.ts');
 require('services/contextual/url.service.ts');
@@ -37,14 +36,12 @@ angular.module('oppia').directive('createActivityButton', [
       controllerAs: '$ctrl',
       controller: [
         '$timeout', '$window', '$uibModal',
-        'ExplorationCreationService', 'CollectionCreationService',
-        'SiteAnalyticsService', 'UrlService', 'UserService',
-        'ALLOW_YAML_FILE_UPLOAD',
+        'ExplorationCreationService', 'SiteAnalyticsService',
+        'UrlService', 'UserService', 'ALLOW_YAML_FILE_UPLOAD',
         function(
             $timeout, $window, $uibModal,
-            ExplorationCreationService, CollectionCreationService,
-            SiteAnalyticsService, UrlService, UserService,
-            ALLOW_YAML_FILE_UPLOAD) {
+            ExplorationCreationService, SiteAnalyticsService,
+            UrlService, UserService, ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(
@@ -66,40 +63,15 @@ angular.module('oppia').directive('createActivityButton', [
 
             if (!ctrl.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
-            } else if (UrlService.getPathname() !== '/creator_dashboard') {
-              $window.location.replace('/creator_dashboard?mode=create');
+            } else if (UrlService.getPathname() !== '/creator-dashboard') {
+              $window.location.replace('/creator-dashboard?mode=create');
             } else {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/creator-dashboard-page/modal-templates/' +
                   'create-activity-modal.directive.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    UserService.getUserInfoAsync().then(function(userInfo) {
-                      $scope.canCreateCollections = (
-                        userInfo.canCreateCollections());
-                    });
-
-                    $scope.chooseExploration = function() {
-                      ExplorationCreationService.createNewExploration();
-                      $uibModalInstance.close();
-                    };
-
-                    $scope.chooseCollection = function() {
-                      CollectionCreationService.createNewCollection();
-                      $uibModalInstance.close();
-                    };
-
-                    $scope.explorationImgUrl = (
-                      UrlInterpolationService.getStaticImageUrl(
-                        '/activity/exploration.svg'));
-
-                    $scope.collectionImgUrl = (
-                      UrlInterpolationService.getStaticImageUrl(
-                        '/activity/collection.svg'));
-                  }],
+                controller: 'CreateActivityModalController',
                 windowClass: 'oppia-creation-modal'
               }).result.then(function() {}, function() {
                 ctrl.creationInProgress = false;

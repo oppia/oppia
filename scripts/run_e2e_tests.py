@@ -30,8 +30,6 @@ from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-from scripts import setup
-from scripts import setup_gae
 
 CHROME_DRIVER_VERSION = '2.41'
 
@@ -70,7 +68,6 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
-HASHES_FILE_PATH = os.path.join('assets', 'hashes.json')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -129,6 +126,10 @@ _PARSER.add_argument(
     help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
     action='store_true')
 
+_PARSER.add_argument(
+    '--community_dashboard_enabled', action='store_true',
+    help='Run the test after enabling the community dashboard page.')
+
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
@@ -168,7 +169,7 @@ def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
-    Return:
+    Returns:
         bool: Whether there is a running Oppia instance.
     """
     running = False
@@ -204,21 +205,6 @@ def run_webpack_compilation():
         sys.exit(1)
 
 
-def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
-    """Change constant file based on the running mode. Only the `DEV_MODE` line
-    should be changed.
-
-    Args:
-        constant_file: str. File path to the constant file.
-        dev_mode_setting: bool. Represents whether the program is running on dev
-            mode.
-    """
-    pattern = '"DEV_MODE": .*'
-    replace = '"DEV_MODE": %s' % (
-        'true' if dev_mode_setting else 'false')
-    common.inplace_replace_file(constant_file, pattern, replace)
-
-
 def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
 
@@ -231,12 +217,25 @@ def run_webdriver_manager(parameters):
     python_utils.PRINT(common.run_cmd(web_driver_command))
 
 
+def update_community_dashboard_status_in_feconf_file(
+        feconf_file_path, enable_community_dashboard):
+    """Change feconf.py file based on whether the community dashboard is
+    enabled.
+
+    Args:
+        feconf_file_path: str. Path to the feconf.py file.
+        enable_community_dashboard: bool. Represents whether community
+            dashboard is enabled.
+    """
+    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
+    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_community_dashboard
+    common.inplace_replace_file(feconf_file_path, pattern, replace)
+
+
 def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
-    setup.main(args=[])
-    setup_gae.main(args=[])
     if os.getenv('TRAVIS'):
         install_chrome_on_travis.main(args=[])
 
@@ -246,11 +245,10 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
-        in dev mode.
+            in dev mode.
         deparallelize_terser: bool. Represents whether to use webpack
-        compilation config that disables parallelism on terser plugin.
+            compilation config that disables parallelism on terser plugin.
     """
-    update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
         if deparallelize_terser:
@@ -258,10 +256,6 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
         else:
             build.main(args=['--prod_env'])
     else:
-        # The 'hashes.json' file is used by the `url-interpolation` service.
-        if not os.path.isfile(HASHES_FILE_PATH):
-            with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
-                hash_file.write('{}')
         build.main(args=[])
         run_webpack_compilation()
 
@@ -372,6 +366,7 @@ def get_e2e_test_parameters(
         suite_name: str. Performs test for different suites.
         dev_mode_setting: bool. Represents whether run the related commands in
             dev mode.
+
     Returns:
         list(str): Parameters for running the tests.
     """
@@ -415,10 +410,13 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
 
-
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
+
+    update_community_dashboard_status_in_feconf_file(
+        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
+
     if not parsed_args.skip_build:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)

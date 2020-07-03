@@ -61,7 +61,7 @@ ALLOWED_ACTION_TYPES = [
 # mapping is useful to uniquely identify issues by the combination of their
 # issue type and other type-specific information (such as the list of states
 # involved).
-ISSUE_TYPE_KEYNAME_MAPPING = {
+CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
     'EarlyQuit': 'state_name',
     'MultipleIncorrectSubmissions': 'state_name',
     'CyclicStateTransitions': 'state_names'
@@ -160,7 +160,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -226,7 +226,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -285,7 +285,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -914,7 +914,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -980,7 +980,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -1017,7 +1017,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration. This model contains
     statistics data aggregated from version 1 to the version given in the key.
 
-    The ID of instances of this class has the form {{exp_id}}.{{exp_version}}.
+    The ID of instances of this class has the form [exp_id].[exp_version].
     """
     # ID of exploration.
     exp_id = ndb.StringProperty(indexed=True)
@@ -1066,7 +1066,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
         """Generates an ID for the instance of the form
-        {{exp_id}}.{{exp_version}}.
+        '[exp_id].[exp_version]'.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1087,7 +1087,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
         Returns:
             ExplorationStatsModel. Exploration analytics model instance in
-                datastore.
+            datastore.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exploration_stats_model = cls.get(instance_id, strict=False)
@@ -1142,7 +1142,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
         Returns:
             list(ExplorationStatsModel|None). Model instances representing the
-                given versions.
+            given versions.
         """
         entity_ids = [cls.get_entity_id(
             exp_id, version) for version in version_numbers]
@@ -1160,7 +1160,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
         Returns:
             list(ExplorationStatsModel|None). Model instances representing the
-                given versions or None if it does not exist.
+            given versions or None if it does not exist.
         """
         entity_ids = [
             cls.get_entity_id(
@@ -1234,7 +1234,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
         """Generates an ID for the instance of the form
-        {{exp_id}}.{{exp_version}}.
+        [exp_id].[exp_version].
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1255,7 +1255,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
         Returns:
             ExplorationIssuesModel. Exploration issues model instance in
-                datastore.
+            datastore.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exp_issues_model = cls.get(instance_id, strict=False)
@@ -1293,7 +1293,7 @@ class PlaythroughModel(base_models.BaseModel):
     """Model for storing recorded useful playthrough data in the datastore.
 
     The ID of instances of this class are of the form
-    {{exp_id}}.{{random_hash_of_16_chars}}
+    '[exp_id].[random hash of 16 chars]'.
     """
     # ID of the exploration.
     exp_id = ndb.StringProperty(indexed=True, required=True)
@@ -1324,7 +1324,7 @@ class PlaythroughModel(base_models.BaseModel):
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the playthrough of the form
-        {{exp_id}}.{{random_hash_of_16_chars}}
+        '[exp_id].[random hash of 16 chars]'.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1504,8 +1504,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 the form 'question_id'.
             interaction_id: str.  The ID of the interaction for which the
                 answer details are received.
-            learner_answer_info_list: list. The list of LearnerAnswerInfo
-                objects in dict format, which is defined in the stats_domain.
+            learner_answer_info_list: list(LearnerAnswerInfo). The list of
+                LearnerAnswerInfo objects in dict format, which is defined in
+                the stats_domain.
             learner_answer_info_schema_version: int. The version of
                 LearnerAnswerInfo dict, which is currently supported by
                 the Oppia.
@@ -1541,9 +1542,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
         Returns:
             LearnerAnswerDetailsModel or None. The answer details model
-                associated with the given entity type and state reference or
-                None if the instance is not found. Doesn't include deleted
-                entries.
+            associated with the given entity type and state reference or
+            None if the instance is not found. Doesn't include deleted
+            entries.
         """
         instance_id = cls.get_instance_id(entity_type, state_reference)
         model_instance = cls.get(instance_id, strict=False)
@@ -1638,7 +1639,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             list(int). List of versions corresponding to annotation models
-                with given exp_id.
+            with given exp_id.
         """
         return [
             annotations.version for annotations in cls.get_all().filter(
@@ -1732,8 +1733,8 @@ class StateAnswersModel(base_models.BaseModel):
 
         Returns:
             StateAnswersModel. The model associated with the specified
-                exploration state and shard ID, or None if no answers
-                have been submitted corresponding to this state.
+            exploration state and shard ID, or None if no answers
+            have been submitted corresponding to this state.
         """
         entity_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, shard_id)
@@ -1753,8 +1754,8 @@ class StateAnswersModel(base_models.BaseModel):
 
         Returns:
             StateAnswersModel|None. The master model associated with the
-                specified exploration state, or None if no answers have been
-                submitted to this state.
+            specified exploration state, or None if no answers have been
+            submitted to this state.
         """
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
@@ -1773,7 +1774,7 @@ class StateAnswersModel(base_models.BaseModel):
 
         Returns:
             list(StateAnswersModel)|None. Returns None if no answers have yet
-                been submitted to the specified exploration state.
+            been submitted to the specified exploration state.
         """
         # It's okay if this isn't run in a transaction. When adding new shards,
         # it's guaranteed the master shard will be updated at the same time the
@@ -2101,7 +2102,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             StateAnswersCalcOutputModel. Entity instance associated with the
-                given exploration state.
+            given exploration state.
         """
         entity_id = cls._get_entity_id(
             exploration_id, python_utils.UNICODE(exploration_version),

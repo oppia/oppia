@@ -16,13 +16,13 @@
  * @fileoverview Directive for the exploration history tab.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
+require(
+  'pages/exploration-editor-page/history-tab/modal-templates/' +
+  'revert-exploration-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -56,12 +56,12 @@ angular.module('oppia').directive('historyTab', [
             DateTimeFormatService, EditabilityService, ExplorationDataService,
             UrlInterpolationService, VersionTreeService) {
           var ctrl = this;
-          // explorationSnapshots is a list of all snapshots for the
+          // Variable explorationSnapshots is a list of all snapshots for the
           // exploration in ascending order.
           var explorationSnapshots = null;
           var versionTreeParents = null;
-          // nodesData is an object whose keys are nodeIds (assigned in version
-          // comparison), and whose values are an object containing
+          // Variable nodesData is an object whose keys are nodeIds (assigned in
+          // version comparison), and whose values are an object containing
           // 'newestStateName', 'originalStateName' and 'stateProperty'.
           var nodesData = null;
           var currentPage = 0;
@@ -109,12 +109,10 @@ angular.module('oppia').directive('historyTab', [
             ExplorationDataService.getData().then(function(data) {
               var currentVersion = data.version;
               ctrl.currentVersion = currentVersion;
-              /**
-               * ctrl.compareVersionMetadata is an object with keys
-               * 'earlierVersion' and 'laterVersion' whose values are the
-               * metadata of the compared versions, containing 'committerId',
-               * 'createdOnMsecs', 'commitMessage', and 'versionNumber'.
-               */
+              // The ctrl.compareVersionMetadata is an object with keys
+              // 'earlierVersion' and 'laterVersion' whose values are the
+              // metadata of the compared versions, containing 'committerId',
+              // 'createdOnMsecs', 'commitMessage', and 'versionNumber'.
               ctrl.compareVersions = {};
               ctrl.compareVersionMetadata = {};
 
@@ -176,7 +174,7 @@ angular.module('oppia').directive('historyTab', [
           };
 
           // Function to set compared version metadata, download YAML and
-          // generate diff graph and legend when selection is changed
+          // generate diff graph and legend when selection is changed.
           ctrl.changeCompareVersion = function() {
             ctrl.diffData = null;
 
@@ -205,7 +203,7 @@ angular.module('oppia').directive('historyTab', [
             );
           };
 
-          // Check if valid versions were selected
+          // Check if valid versions were selected.
           ctrl.areCompareVersionsSelected = function() {
             return (
               ctrl.compareVersions && ctrl.selectedVersionsArray.length === 2);
@@ -240,25 +238,7 @@ angular.module('oppia').directive('historyTab', [
                   return version;
                 }
               },
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', 'version',
-                'ExplorationDataService',
-                function(
-                    $controller, $scope, $uibModalInstance, version,
-                    ExplorationDataService) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.version = version;
-                  $scope.getExplorationUrl = function(version) {
-                    return (
-                      '/explore/' + ExplorationDataService.explorationId +
-                      '?v=' + version);
-                  };
-                }
-              ]
+              controller: 'RevertExplorationModalController'
             }).result.then(function(version) {
               $http.post(ctrl.revertExplorationUrl, {
                 current_version: ExplorationDataService.data.version,
@@ -286,7 +266,7 @@ angular.module('oppia').directive('historyTab', [
           };
           ctrl.$onInit = function() {
             $scope.$on('refreshVersionHistory', function(evt, data) {
-              // Uncheck all checkboxes when page is refreshed
+              // Uncheck all checkboxes when page is refreshed.
               angular.forEach(ctrl.versionCheckboxArray, function(
                   versionCheckbox) {
                 versionCheckbox.selected = false;

@@ -725,7 +725,7 @@ var logicProofData = (function() {
       },
       // eslint-disable-next-line quote-props
       'if': {
-        // NOTE: this prefix function is unusual in having a boolean input
+        // NOTE: this prefix function is unusual in having a boolean input.
         kind: 'prefix_function',
         typing: [{
           arguments: [SINGLE_BOOLEAN, SINGLE_INTEGER, SINGLE_INTEGER],

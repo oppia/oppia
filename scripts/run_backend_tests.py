@@ -53,6 +53,7 @@ import subprocess
 import sys
 import threading
 import time
+import unittest
 
 import python_utils
 
@@ -84,6 +85,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.43.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.3'),
+    os.path.join(common.THIRD_PARTY_DIR, 'pylatexenc-2.5'),
     os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.17.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
@@ -201,10 +203,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         python_module = importlib.import_module(test_target_path)
         for name, clazz in inspect.getmembers(
                 python_module, predicate=inspect.isclass):
-            all_base_classes = [base_class.__name__ for base_class in
-                                (inspect.getmro(clazz))]
-            # Check that it is a subclass of 'AppEngineTestBase'.
-            if 'AppEngineTestBase' in all_base_classes:
+            if unittest.TestCase in inspect.getmro(clazz):
                 class_names.append(name)
 
         return [

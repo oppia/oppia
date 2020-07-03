@@ -81,23 +81,24 @@
     </style>
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <collection-navbar></collection-navbar>
-        </navbar-breadcrumb>
-        <nav-options>
-          <collection-local-nav></collection-local-nav>
-        </nav-options>
-        <content>
-          <collection-player-page></collection-player-page>
-        </content>
-        <page-footer>
-          <collection-footer></collection-footer>
-        </page-footer>
-      </base-content>
-    </div>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <collection-navbar></collection-navbar>
+          </navbar-breadcrumb>
+          <nav-options>
+            <collection-local-nav></collection-local-nav>
+          </nav-options>
+          <content>
+            <collection-player-page></collection-player-page>
+          </content>
+          <page-footer>
+            <collection-footer></collection-footer>
+          </page-footer>
+        </base-content>
+      </div>
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

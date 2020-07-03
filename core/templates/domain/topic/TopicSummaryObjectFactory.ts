@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface ITopicSummaryBackendDict {
+export interface ITopicSummaryBackendDict {
   'id': string;
   'name': string;
   'canonical_story_count': number;
@@ -29,7 +29,7 @@ interface ITopicSummaryBackendDict {
   'uncategorized_skill_count': number;
 }
 
-class TopicSummary {
+export class TopicSummary {
   _id: string;
   _name: string;
   _canonicalStoryCount: number;
@@ -46,7 +46,7 @@ class TopicSummary {
     this._uncategorizedSkillCount = uncategorizedSkillCount;
     this._subtopicCount = subtopicCount;
   }
-  // Instance methods
+  // ---- Instance methods ----
 
   getId(): string {
     return this._id;
