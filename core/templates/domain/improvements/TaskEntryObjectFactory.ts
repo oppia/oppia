@@ -37,11 +37,8 @@ export interface ITaskEntryBackendDict {
 }
 
 export interface ITaskEntryPayloadDict {
-  'entity_type': string;
-  'entity_id': string;
   'entity_version': number;
   'task_type': string;
-  'target_type': string;
   'target_id': string;
   'issue_description': string;
   'status': string;
@@ -77,11 +74,8 @@ export class TaskEntry {
 
   public toPayloadDict(): ITaskEntryPayloadDict {
     return {
-      entity_type: this.entityType,
-      entity_id: this.entityId,
       entity_version: this.entityVersion,
       task_type: this.taskType,
-      target_type: this.targetType,
       target_id: this.targetId,
       issue_description: this.issueDescription,
       status: this.taskStatus,
