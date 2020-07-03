@@ -190,7 +190,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'int-editor.directive.ts',
     'item-selection-input-validation.service.ts',
     'language-util.service.ts',
-    'lazy-loading.directive.ts',
+    'lazy-loading.component.ts',
     'learner-answer-info-card.directive.ts',
     'learner-answer-info.service.ts',
     'learner-dashboard-icons.directive.ts',

@@ -23,13 +23,15 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { LazyLoadingComponent } from
+  './common-layout-directives/common-elements/lazy-loading.component';  
 import { TranslatePipe } from 'filters/translate.pipe';
 
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe],
-  entryComponents: [BackgroundBannerComponent],
+  declarations: [BackgroundBannerComponent, TranslatePipe, LazyLoadingComponent],
+  entryComponents: [BackgroundBannerComponent, LazyLoadingComponent],
   exports: [BackgroundBannerComponent, TranslatePipe]
 })
 

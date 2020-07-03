@@ -13,22 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying animated lazy loading container.
+ * @fileoverview Component for displaying animated lazy loading container.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Component } from '@angular/core';
 
-angular.module('oppia').directive('lazyLoading', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'lazy-loading.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }
-]);
+@Component({
+  selector: 'lazy-loading',
+  templateUrl: './lazy-loading.component.html',
+  styleUrls: []
+})
+export class LazyLoadingComponent {
+  constructor() {} 
+}
+angular.module('oppia').directive(
+  'lazyLoading', downgradeComponent(
+    {component: LazyLoadingComponent}));
