@@ -22,8 +22,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { ClassroomDataObjectFactory } from
+import { IClassroomDataBackendDict, ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
+import { ITopicSummaryBackendDict } from
+  'domain/topic/TopicSummaryObjectFactory';
 
 describe('Classroom backend API service', function() {
   let classroomBackendApiService:
@@ -31,32 +33,37 @@ describe('Classroom backend API service', function() {
   let httpTestingController: HttpTestingController;
   let classroomDataObjectFactory:
     ClassroomDataObjectFactory = null;
+  let firstTopicSummaryDict: ITopicSummaryBackendDict = {
+    id: 'topic1',
+    name: 'Topic name',
+    canonical_story_count: 4,
+    subtopic_count: 5,
+    total_skill_count: 20,
+    uncategorized_skill_count: 5,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA'
+  };
+  let secondTopicSummaryDict: ITopicSummaryBackendDict = {
+    id: 'topic2',
+    name: 'Topic name 2',
+    canonical_story_count: 3,
+    subtopic_count: 2,
+    total_skill_count: 10,
+    uncategorized_skill_count: 3,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA'
+  };
+  let classroomDataDict: IClassroomDataBackendDict = {
+    name: 'Math',
+    topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
+    course_details: 'Course Details',
+    topics_covered: 'Topics Covered'
+  };
   let responseDictionaries = {
-    classroom_data: {
-      name: 'Math',
-      topic_summary_dicts: [{
-        id: 'topic1',
-        name: 'Topic name',
-        description: 'Topic description',
-        canonical_story_count: 4,
-        subtopic_count: 5,
-        total_skill_count: 20,
-        uncategorized_skill_count: 5
-      }, {
-        id: 'topic2',
-        name: 'Topic name 2',
-        description: 'Topic description 2',
-        canonical_story_count: 3,
-        subtopic_count: 2,
-        total_skill_count: 10,
-        uncategorized_skill_count: 3
-      }],
-      course_details: 'Course Details',
-      topics_covered: 'Topics Covered'
-    }
+    classroom_data: classroomDataDict
   };
 
-  let sampleDataResultsObjects = null;
+  let sampleClassroomDataObject = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

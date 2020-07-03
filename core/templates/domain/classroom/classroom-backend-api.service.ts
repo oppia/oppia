@@ -34,11 +34,15 @@ interface IClassroomStatusBackendDict {
   'classroom_page_is_shown': boolean;
 }
 
+interface IClassroomDataReturnedBackendDict {
+  'classroom_data': IClassroomDataBackendDict
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ClassroomBackendApiService {
-  topicSummaryObjects: TopicSummary[] = null;
+  classroomData: ClassroomData = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
@@ -53,7 +57,7 @@ export class ClassroomBackendApiService {
         classroom_name: classroomName
       });
 
-    this.http.get<IClassroomDataBackendDict>(
+    this.http.get<IClassroomDataReturnedBackendDict>(
       classroomDataUrl).toPromise().then(data => {
       this.classroomData = (
         this.classroomDataObjectFactory.createFromBackendDict(
