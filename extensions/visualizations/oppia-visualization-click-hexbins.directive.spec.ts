@@ -16,17 +16,13 @@
  * @fileoverview Directive unit tests for the "click hexbins" visualization.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 
 describe('Oppia click hexbins visualization', function() {
-  let $compile, $rootScope, $scope,
-    AssetsBackendApiService, ContextService, ImagePreloaderService,
-    element: JQLite, elementTemplate: JQLite;
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -34,9 +30,13 @@ describe('Oppia click hexbins visualization', function() {
     }
   }));
 
+  // Dependencies of the visualization.
+  let $compile, $rootScope, AssetsBackendApiService, ContextService,
+    ImagePreloaderService;
+
   beforeEach(angular.mock.inject(function(
-      _$compile_, _$rootScope_,
-      _AssetsBackendApiService_, _ContextService_, _ImagePreloaderService_) {
+      _$compile_, _$rootScope_, _AssetsBackendApiService_, _ContextService_,
+      _ImagePreloaderService_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
     AssetsBackendApiService = _AssetsBackendApiService_;
@@ -50,29 +50,83 @@ describe('Oppia click hexbins visualization', function() {
     spyOn(AssetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
       'solar-system.png');
     spyOn(ImagePreloaderService, 'getDimensionsOfImage').and.returnValue(
-      [300, 250]);
+      {width: 300, height: 250});
   });
 
+  /** Holds a reference to the visualization directive. */
+  let el: JQLite;
+
   beforeEach(() => {
-    elementTemplate = angular.element(
+    const elementTemplate = angular.element(
       '<oppia-visualization-click-hexbins ' + (
-        'data="data" interactionArgs="interactionArgs">') +
+        'data="data" interaction-args="interactionArgs">') +
       '</oppia-visualization-click-hexbins>');
-    $scope = $rootScope.$new();
-    $scope.data = [
+    const scope = $rootScope.$new();
+    scope.data = [
       {answer: {clickPosition: [0.03, 0.03], clickedRegions: []}, frequency: 2},
       {answer: {clickPosition: [0.50, 0.50], clickedRegions: []}, frequency: 1},
     ];
-    $scope.interactionArgs = {
+    scope.interactionArgs = {
       imageAndRegions: {
         value: { imagePath: 'solar-system.png' },
       },
     };
-    element = $compile(elementTemplate)($scope);
+    el = $compile(elementTemplate)(scope);
     $rootScope.$digest();
   });
 
-  it('should have been created', () => {
-    expect(element).toBeDefined();
+  it('should group the two answers as two distinct hexagons', () => {
+    expect(el.find('.click-hexbin-hexagon').length).toEqual(2);
+  });
+
+  describe('Tooltip behavior', () => {
+    it('should be hidden by default', () => {
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
+    });
+
+    it('should appear after hovering a hexagon', () => {
+      // Same order as $scope.data array.
+      el.find('.protractor-test-hexagon-0').trigger('mouseover');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
+      expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
+        .toEqual('2 clicks');
+    });
+
+    it('should switch focus when moving mouse between hexagons', () => {
+      el.find('.protractor-test-hexagon-0').trigger('mouseover');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
+      expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
+        .toEqual('2 clicks');
+
+      el.find('.protractor-test-hexagon-0').trigger('mouseout');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
+
+      el.find('.protractor-test-hexagon-1').trigger('mouseover');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
+      expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
+        .toEqual('1 click');
+    });
+
+    it('should stick to first hexagon hovered', () => {
+      el.find('.protractor-test-hexagon-0').trigger('mouseover');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
+      expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
+        .toEqual('2 clicks');
+
+      el.find('.protractor-test-hexagon-1').trigger('mouseover');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(1);
+      expect(el.find('.click-hexbin-chart-tooltip').get(0).innerText.trim())
+        .toEqual('2 clicks');
+    });
+
+    it('should handle mouseout of unfocused hexagons gracefully', () => {
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
+
+      el.find('.protractor-test-hexagon-0').trigger('mouseout');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
+
+      el.find('.protractor-test-hexagon-1').trigger('mouseout');
+      expect(el.find('.click-hexbin-chart-tooltip').length).toEqual(0);
+    });
   });
 });

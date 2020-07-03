@@ -1,24 +1,33 @@
 <div class="click-hexbin-wrapper">
-  <div class="click-hexbin-chart-tooltip"
-       style="top: <[tooltipTop]>px; left: <[tooltipLeft]>px; visibility: <[tooltipVisibility]>">
-    <[tooltipText]>
+  <div class="click-hexbin-chart-tooltip" ng-if="binTooltipTarget !== null"
+       style="top: <[binTooltipTarget.y]>px; left: <[binTooltipTarget.x]>px">
+    <ng-pluralize count="binTooltipTarget.length"
+                  when="{'one': '1 click', 'other': '{} clicks'}">
+    </ng-pluralize>
   </div>
-  <svg class="click-hexbin-chart" ng-attr-view_box="0 0 <[containerWidth]> <[containerHeight]>">
-    <image ng-attr-href="<[imageUrl]>"
-           ng-attr-width="<[containerWidth]>px" ng-attr-height="<[containerHeight]>px">
+  <svg class="click-hexbin-chart" ng-attr-view_box="0 0 <[wrapperWidth]> <[wrapperHeight]>">
+    <image ng-attr-href="<[imagePath]>"
+           ng-attr-width="<[wrapperWidth]>px" ng-attr-height="<[wrapperHeight]>px">
     </image>
     <rect class="click-hexbin-image-overlay"
-          x="0" y="0" ng-attr-width="<[containerWidth]>" ng-attr-height="<[containerHeight]>">
+          x="0" y="0" ng-attr-width="<[wrapperWidth]>" ng-attr-height="<[wrapperHeight]>">
     </rect>
     <clipPath class="click-hexbin-clip-path">
-      <rect class="mesh" ng-attr-width="<[containerWidth]>" ng-attr-height="<[containerHeight]>">
+      <rect class="mesh" ng-attr-width="<[wrapperWidth]>" ng-attr-height="<[wrapperHeight]>">
       </rect>
     </clipPath>
     <svg class="click-hexbin-mesh" clip-path="url(.click-hexbin-clip-path)">
-      <path ng-attr-d="<[hexbinMesh]>">
+      <path ng-attr-d="<[hexagonMesh]>">
       </path>
     </svg>
     <g clip-path="url(.click-hexbin-clip-path)">
+      <path ng-repeat="bin in bins"
+            ng-class="['click-hexbin-hexagon', 'protractor-test-hexagon-' + $index]"
+            ng-attr-fill="<[fillColor(bin.length)]>"
+            ng-attr-d="M<[bin.x]>,<[bin.y]><[hexagon]>"
+            ng-mouseover="showBinTooltip(bin)"
+            ng-mouseout="hideBinTooltip(bin)">
+      </path>
     </g>
   </svg>
 </div>

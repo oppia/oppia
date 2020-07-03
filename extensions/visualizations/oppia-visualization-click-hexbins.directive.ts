@@ -37,71 +37,48 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
     function(
         $scope, AssetsBackendApiService, ContextService,
         ImagePreloaderService) {
-      $scope.tooltipVisibility = 'hidden';
-      $scope.tooltipLeft = 0;
-      $scope.tooltipTop = 0;
-      $scope.tooltipText = '';
-
-      let binTarget = null;
-
-      const showBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
-        if (binTarget !== null || bin.length === 0) {
-          return;
-        }
-        binTarget = bin;
-        $scope.$apply(() => {
-          $scope.tooltipLeft = bin.x;
-          $scope.tooltipTop = bin.y;
-          $scope.tooltipText = (
-            `${bin.length} click${bin.length > 1 ? 's' : ''}`);
-          $scope.tooltipVisibility = 'visible';
-        });
-      };
-
-      const hideBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
-        if (binTarget !== bin) {
-          return;
-        }
-        binTarget = null;
-        $scope.$apply(() => {
-          $scope.tooltipVisibility = 'hidden';
-        });
-      };
-
       this.$onInit = () => {
         const imagePath = (
           $scope.interactionArgs.imageAndRegions.value.imagePath);
-        const { height, width } = (
+        const imageDimensions = (
           ImagePreloaderService.getDimensionsOfImage(imagePath));
-        const containerWidth = $('.click-hexbin-wrapper').width();
-        const containerHeight = Math.round(containerWidth * height / width);
+
+        const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
+        const wrapperHeight = Math.round(
+          wrapperWidth * imageDimensions.height / imageDimensions.width);
 
         const hexbinGenerator = hexbin<ClickOnImageAnswer>()
-          .x(d => (d.answer.clickPosition[0] * containerWidth))
-          .y(d => (d.answer.clickPosition[1] * containerHeight))
-          .radius(16)
-          .size([containerWidth, containerHeight]);
-        const bins = hexbinGenerator($scope.data);
+          .x(d => d.answer.clickPosition[0] * wrapperWidth)
+          .y(d => d.answer.clickPosition[1] * wrapperHeight)
+          .size([wrapperWidth, wrapperHeight])
+          .radius(16);
+        const binData = $scope.data.map(d => Array(d.frequency).fill(d)).flat();
+        const bins = hexbinGenerator(binData);
 
-        const fillColor = d3.scaleLinear()
+        $scope.bins = bins;
+        $scope.hexagon = hexbinGenerator.hexagon();
+        $scope.hexagonMesh = hexbinGenerator.mesh();
+        $scope.fillColor = d3.scaleLinear()
           .domain([0, d3.max(bins, b => b.length)])
-          // @ts-ignore: range's type is wrong, rgba strings are supported.
+          // @ts-ignore the type of .range is wrong, rgba strings are accepted.
           .range(['rgba(255, 255, 255, 0.25)', 'rgba(255, 255, 255, 0.75)']);
-
-        d3.select('g').selectAll('path').data(bins).enter()
-          .append('path')
-          .attr('transform', b => `translate(${b.x}, ${b.y})`)
-          .attr('fill', b => fillColor(b.length))
-          .attr('d', hexbinGenerator.hexagon())
-          .on('mouseout', hideBinTooltip)
-          .on('mouseover', showBinTooltip);
-
-        $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+        $scope.imagePath = AssetsBackendApiService.getImageUrlForPreview(
           ContextService.getEntityType(), ContextService.getEntityId(),
           imagePath);
-        $scope.containerWidth = containerWidth;
-        $scope.containerHeight = containerHeight;
-        $scope.hexbinMesh = hexbinGenerator.mesh();
+        $scope.wrapperWidth = wrapperWidth;
+        $scope.wrapperHeight = wrapperHeight;
+
+        $scope.binTooltipTarget = null;
+        $scope.showBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
+          if ($scope.binTooltipTarget === null && bin.length > 0) {
+            $scope.binTooltipTarget = bin;
+          }
+        };
+        $scope.hideBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
+          if ($scope.binTooltipTarget === bin) {
+            $scope.binTooltipTarget = null;
+          }
+        };
       };
     }
   ]

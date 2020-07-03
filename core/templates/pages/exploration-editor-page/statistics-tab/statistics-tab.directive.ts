@@ -112,7 +112,7 @@ angular.module('oppia').directive('statisticsTab', [
                   interactionArgs: () => state.interaction.customizationArgs,
                   stateName: () => stateName,
                   stateStats: () => this.expStats.getStateStats(stateName),
-                  visualizationsInfo: () => stats.visualizations_info,
+                  visualizationsInfo: () => stats.visualizationsInfo,
                 },
               }).result);
           };

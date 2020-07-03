@@ -1,6 +1,7 @@
 .click-hexbin-wrapper {
   position: relative;
   width: 100%;
+  min-width: 300px;
   z-index: 0;
 }
 .click-hexbin-chart-tooltip {
