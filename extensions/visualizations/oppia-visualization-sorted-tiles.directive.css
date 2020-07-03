@@ -25,7 +25,7 @@
   background: #E4F1EF;
 }
 .oppia-visualization-sorted-tile-answer {
-  color: rgba(0,0,0,0.87);
+  color: rgba(0, 0, 0, 0.87);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   letter-spacing: 0.22px;
@@ -33,7 +33,7 @@
   overflow: hidden;
 }
 .oppia-visualization-sorted-tile-frequency {
-  color: rgba(0,0,0,0.54);
+  color: rgba(0, 0, 0, 0.54);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   letter-spacing: 0.24px;
