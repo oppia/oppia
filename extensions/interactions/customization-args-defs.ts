@@ -26,9 +26,7 @@ import { IReadableNote } from
   'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive';
 
 
-export interface IAlgebraicExpressionInputCustomizationArgs {
-
-}
+export interface IAlgebraicExpressionInputCustomizationArgs { }
 
 export interface ICodeReplCustomizationArgs {
   language?: {
@@ -147,9 +145,7 @@ export interface ILogicCustomizationArgs {
   };
 }
 
-export interface IMathEquationInputCustomizationArgs {
-
-}
+export interface IMathEquationInputCustomizationArgs { }
 
 export interface IMultipleChoiceInputCustomizationArgs {
   showChoicesInShuffledOrder?: {
@@ -190,17 +186,11 @@ export interface ITextInputCustomizationArgs {
   };
 }
 
-export interface IMathExpressionCustomizationArgs {
+export interface IMathExpressionCustomizationArgs { }
 
-}
+export interface INumericInputCustomizationArgs { }
 
-export interface INumericInputCustomizationArgs {
-
-}
-
-export interface INumberWithUnitsCustomizationArgs {
-
-}
+export interface INumberWithUnitsCustomizationArgs { }
 
 export type IInteractionCustomizationArgs = (
   IAlgebraicExpressionInputCustomizationArgs |
@@ -215,11 +205,11 @@ export type IInteractionCustomizationArgs = (
   IItemSelectionInputCustomizationArgs |
   ILogicCustomizationArgs |
   IMathEquationInputCustomizationArgs |
+  IMathExpressionCustomizationArgs |
   IMultipleChoiceInputCustomizationArgs |
   IMusicNotesInputCustomizationArgs |
+  INumberWithUnitsCustomizationArgs |
+  INumericInputCustomizationArgs |
   IPencilCodeCustomizationArgs |
   ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs |
-  IMathExpressionCustomizationArgs |
-  INumericInputCustomizationArgs |
-  INumberWithUnitsCustomizationArgs);
+  ITextInputCustomizationArgs);

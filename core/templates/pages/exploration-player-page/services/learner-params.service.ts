@@ -22,19 +22,23 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+interface ExplorationParams {
+  [paramName: string]: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerParamsService {
-  private _paramDict = {};
+  private _paramDict: ExplorationParams = {};
   // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
-  init(initParamSpecs: Object): void {
+  init(initParamSpecs: ExplorationParams): void {
     // The initParamSpecs arg is a dict mapping the parameter names used in
     // the exploration to their default values.
     this._paramDict = cloneDeep(initParamSpecs);
   }
 
-  getValue(paramName: string): Object {
+  getValue(paramName: string): string {
     if (!this._paramDict.hasOwnProperty(paramName)) {
       throw new Error('Invalid parameter name: ' + paramName);
     } else {
@@ -52,7 +56,7 @@ export class LearnerParamsService {
     }
   }
 
-  getAllParams(): {} {
+  getAllParams(): ExplorationParams {
     return cloneDeep(this._paramDict);
   }
 }
