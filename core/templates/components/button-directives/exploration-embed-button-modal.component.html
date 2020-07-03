@@ -22,7 +22,7 @@
       To embed this exploration in another webpage, copy the following HTML into the source code of the webpage:
     </p>
 
-    <div class="oppia-embed-modal-code" ng-click="selectText($event)">&lt;iframe src="<[serverName]>/embed/exploration/<[explorationId]>" width="700" height="1000"&gt;</div>
+    <div class="oppia-embed-modal-code" (click)="selectText($event)">&lt;iframe src="{{serverName}}/embed/exploration/{{explorationId}}" width="700" height="1000"&gt;</div>
 
     <p>
       For more details, as well as instructions on how to embed a particular version of an exploration, please see the <a href="https://oppia.github.io/#/EmbeddingAnExploration" target="_blank" rel="noopener">documentation</a>.
@@ -30,6 +30,6 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()">Close</button>
+    <button class="btn btn-secondary" (click)="cancel()">Close</button>
   </div>
 </div>
