@@ -149,7 +149,7 @@ describe('Navigation features on mobile', function() {
       navbarButton, 'Could not click navbar button');
     await navbarButton.click();
     var libraryLink = element(by.css(
-       '.protractor-mobile-test-parent-teacher-welcome-link'));
+      '.protractor-mobile-test-parent-teacher-welcome-link'));
     await waitFor.elementToBeClickable(
       libraryLink, 'Could not click Parent Teacher Welcome page link');
     await libraryLink.click();
