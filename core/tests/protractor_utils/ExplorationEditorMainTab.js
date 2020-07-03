@@ -280,6 +280,8 @@ var ExplorationEditorMainTab = function() {
     // Open the feedback entry form if it is not already open.
     var isVisible = await feedbackEditor.isPresent();
     if (isVisible) {
+      await waitFor.elementToBeClickable(
+        feedbackEditor, 'Feedback editor takes too long to be clickable.');
       await feedbackEditor.click();
     }
 
