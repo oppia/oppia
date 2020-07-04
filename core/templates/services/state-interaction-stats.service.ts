@@ -21,7 +21,6 @@ import { Injectable } from '@angular/core';
 
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { ContextService } from 'services/context.service';
 import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { IInteractionAnswer, IFractionAnswer } from
@@ -49,7 +48,7 @@ interface IVisualizationInfo {
   };
 }
 
-export interface IStateRulesStats {
+export interface IStateInteractionStats {
   explorationId: string;
   stateName: string;
   visualizationsInfo: IVisualizationInfo[];
@@ -58,11 +57,10 @@ export interface IStateRulesStats {
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  statsCache: Map<string, Promise<IStateRulesStats>> = new Map();
+  statsCache: Map<string, Promise<IStateInteractionStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
-      private contextService: ContextService,
       private fractionObjectFactory: FractionObjectFactory,
       private interactionRulesRegistryService: InteractionRulesRegistryService,
       private stateInteractionStatsBackendApiService:
@@ -91,18 +89,17 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(state: State): Promise<IStateRulesStats> {
+  computeStats(expId: string, state: State): Promise<IStateInteractionStats> {
     if (this.statsCache.has(state.name)) {
       return this.statsCache.get(state.name);
     }
-    const explorationId = this.contextService.getExplorationId();
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
 
     const statsPromise = this.stateInteractionStatsBackendApiService.getStats(
-      explorationId, state.name).then(vizInfo => <IStateRulesStats> {
-        explorationId: explorationId,
+      expId, state.name).then(vizInfo => <IStateInteractionStats> {
+        explorationId: expId,
         stateName: state.name,
         visualizationsInfo: vizInfo.map(info => <IVisualizationInfo> ({
           addressedInfoIsSupported: info.addressedInfoIsSupported,

@@ -61,8 +61,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = skill_models.SkillCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False
         )
         commit.skill_id = 'b'
