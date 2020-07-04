@@ -1395,7 +1395,7 @@ def get_next_page_of_all_non_private_commits(
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.created_on, entry.last_updated, entry.user_id,
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private

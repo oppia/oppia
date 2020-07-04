@@ -35,15 +35,20 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.committer_1_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.committer_2_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_1', 0, 'committer_0', 'Janet',
-            'create', 'created first commit', [], 'public', True)
+            'entity_1', 0, self.committer_1_id, 'create',
+            'created first commit', [], 'public', True)
         commit2 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_1', 1, 'committer_1', 'Joe',
-            'edit', 'edited commit', [], 'public', True)
+            'entity_1', 1, self.committer_2_id, 'edit', 'edited commit', [],
+            'public', True)
         commit3 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_2', 0, 'committer_0', 'Janet',
-            'create', 'created second commit', [], 'private', False)
+            'entity_2', 0, self.committer_1_id, 'create',
+            'created second commit', [], 'private', False)
         commit1.exploration_id = 'exp_1'
         commit2.exploration_id = 'exp_1'
         commit3.exploration_id = 'exp_2'
@@ -59,13 +64,13 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             params={'query_type': 'all_non_private_commits'})
         self.assertEqual(len(response_dict['results']), 2)
         self.assertDictContainsSubset(
-            {'username': 'Janet', 'exploration_id': 'exp_1',
+            {'username': self.VIEWER_USERNAME, 'exploration_id': 'exp_1',
              'post_commit_status': 'public', 'version': 0,
              'commit_message': 'created first commit',
              'commit_type': 'create'},
             response_dict['results'][1])
         self.assertDictContainsSubset(
-            {'username': 'Joe', 'exploration_id': 'exp_1',
+            {'username': self.NEW_USER_USERNAME, 'exploration_id': 'exp_1',
              'post_commit_status': 'public', 'version': 1,
              'commit_message': 'edited commit',
              'commit_type': 'edit'},
@@ -97,8 +102,8 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             exp_id = 'exp_%s' % i
 
             commit_i = exp_models.ExplorationCommitLogEntryModel.create(
-                entity_id, 0, 'committer_0', 'Joe',
-                'create', 'created commit', [], 'public', True)
+                entity_id, 0, self.committer_2_id, 'create', 'created commit',
+                [], 'public', True)
             commit_i.exploration_id = exp_id
             commit_i.put()
         response_dict = self.get_json(

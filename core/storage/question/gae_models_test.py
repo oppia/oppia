@@ -650,8 +650,7 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = question_models.QuestionCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.question_id = 'b'
         commit.put()
