@@ -37,11 +37,13 @@ from google.appengine.ext import ndb
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""
+
     pass
 
 
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
+
     pass
 
 
@@ -50,6 +52,7 @@ class QuestionModel(base_models.VersionedModel):
 
     The ID of instances of this class are in form of random hash of 12 chars.
     """
+
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
     ALLOW_REVERT = True
@@ -611,6 +614,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'question-[question_id]-[version]'.
     """
+
     # The id of the question being edited.
     question_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -656,6 +660,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     The key of each instance is the question id.
     """
+
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).

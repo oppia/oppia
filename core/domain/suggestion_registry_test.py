@@ -1161,6 +1161,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     """Tests for the SuggestionAddQuestion class."""
+
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_EMAIL = 'reviewer@example.com'
     ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'

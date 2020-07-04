@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import re
 import subprocess
 import sys
 import time
@@ -38,6 +39,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, config_path, files_to_lint,
             verbose_mode_enabled):
@@ -57,6 +59,34 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.files_to_lint
+
+    @staticmethod
+    def _get_trimmed_error_output(css_lint_output):
+        """Remove extra bits from stylelint error messages.
+
+        Args:
+            css_lint_output: str. Output returned by the css linter.
+
+        Returns:
+            str. A string with the trimmed error messages.
+        """
+        trimmed_error_messages = []
+        # We need to extract messages from the list and split them line by
+        # line so we can loop through them.
+        css_output_lines = css_lint_output.split('\n')
+        for line in css_output_lines:
+            # Stylelint messages starts with line numbers and then a
+            # "x"(\u2716) and a message-id in the end. We are capturing these
+            # and then replacing them with empty string('').
+            if re.search(r'^\d+:\d+', line.lstrip()):
+                # Replacing message-id with an empty string('').
+                line = re.sub(r'(\w+-*)+$', '', line)
+                unicode_x = re.search(r'\u2716', line).group(0)
+                error_message = line.replace(unicode_x, '', 1)
+            else:
+                error_message = line
+            trimmed_error_messages.append(error_message)
+        return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
@@ -106,9 +136,10 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 result_list.append(linter_stdout)
 
         if num_files_with_errors:
-            for error in result_list:
-                python_utils.PRINT(error)
-                summary_messages.append(error)
+            for result in result_list:
+                python_utils.PRINT(result)
+                summary_messages.append(
+                    self._get_trimmed_error_output(result))
             summary_message = ('%s %s CSS file' % (
                 linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:

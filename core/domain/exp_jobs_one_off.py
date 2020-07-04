@@ -438,6 +438,7 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks the html content of an exploration and validates all the
     Math tags in the HTML.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -625,6 +626,7 @@ class InteractionCustomizationArgsValidationJob(
     """One-off job for validating all the customizations arguments of
     Rich Text Components.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]

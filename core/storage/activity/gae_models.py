@@ -31,6 +31,7 @@ class ActivityReferencesModel(base_models.BaseModel):
     The id of each model instance is the name of the list. This should be one
     of the constants in feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES.
     """
+
     # The types and ids of activities to show in the library page. Each item
     # in this list is a dict with two keys: 'type' and 'id'.
     activity_references = ndb.JsonProperty(repeated=True)
