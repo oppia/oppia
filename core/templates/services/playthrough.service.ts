@@ -277,23 +277,23 @@ export class PlaythroughService {
    */
   private createNewPlaythrough(): Playthrough | null {
     if (this.misTracker && this.misTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory.createNew(
-        this.explorationId, this.explorationVersion,
-        AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-        this.misTracker.generateIssueCustomizationArgs(),
-        this.recordedLearnerActions);
+      return this.playthroughObjectFactory
+        .createNewMultipleIncorrectSubmissionsPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.misTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
     } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory.createNew(
-        this.explorationId, this.explorationVersion,
-        AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
-        this.cstTracker.generateIssueCustomizationArgs(),
-        this.recordedLearnerActions);
+      return this.playthroughObjectFactory
+        .createNewCyclicStateTransitionsPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.cstTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory.createNew(
-        this.explorationId, this.explorationVersion,
-        AppConstants.ISSUE_TYPE_EARLY_QUIT,
-        this.eqTracker.generateIssueCustomizationArgs(),
-        this.recordedLearnerActions);
+      return this.playthroughObjectFactory
+        .createNewEarlyQuitPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.eqTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
     }
     return null;
   }

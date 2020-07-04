@@ -107,22 +107,39 @@ class UserFacingExceptions(python_utils.OBJECT):
     class NotLoggedInException(Exception):
         """Error class for users that are not logged in (error code 401)."""
 
+        pass
+
+
     class InvalidInputException(Exception):
         """Error class for invalid input on the user side (error code 400)."""
+
+        pass
+
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""
 
+        pass
+
+
     class PageNotFoundException(Exception):
         """Error class for a page not found error (error code 404)."""
 
+        pass
+
+
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+        pass
+
 
     class TemporaryMaintenanceException(Exception):
         """Error class for when the server is currently down for temporary
         maintenance (error code 503).
         """
+
+        pass
 
 
 class BaseHandler(webapp2.RequestHandler):

@@ -42,6 +42,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -148,6 +149,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -266,6 +268,7 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -347,6 +350,7 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that adds fields to record last exploration created and last
     edited times.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
