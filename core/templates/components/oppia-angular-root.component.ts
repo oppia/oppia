@@ -341,9 +341,6 @@ import { LostChangeObjectFactory } from
 import { MathEquationInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
-import { MathEquationInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathEquationInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-validation.service';
@@ -997,7 +994,7 @@ private computationDataObjectFactory: ComputationDataObjectFactory,
 private computeGraphService: ComputeGraphService,
 private conceptCardObjectFactory: ConceptCardObjectFactory,
 private contextService: ContextService,
-private continueRulesService: ContinueRulesService;
+private continueRulesService: ContinueRulesService,
 private continueValidationService: ContinueValidationService,
 private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService,
 private constructTranslationIdsService: ConstructTranslationIdsService,
