@@ -36,10 +36,11 @@ import { TranslatePipe } from 'filters/translate.pipe';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe, LazyLoadingComponent,
-    LoadingDotsComponent, AttributionGuideComponent, SideNavigationBarComponent],
-  entryComponents: [BackgroundBannerComponent, LazyLoadingComponent,
-    LoadingDotsComponent, AttributionGuideComponent, SideNavigationBarComponent],
+  declarations: [BackgroundBannerComponent, TranslatePipe,
+    AttributionGuideComponent, LazyLoadingComponent, LoadingDotsComponent,
+    SideNavigationBarComponent],
+  entryComponents: [BackgroundBannerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SideNavigationBarComponent],
   exports: [BackgroundBannerComponent, TranslatePipe]
 })
 
