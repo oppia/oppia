@@ -152,10 +152,7 @@ export class States {
 })
 export class StatesObjectFactory {
   constructor(private stateObject: StateObjectFactory) {}
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
   createFromBackendDict(statesBackendDict: any): States {
-  /* eslint-enable dot-notation */
     var stateObjectsDict = {};
     for (var stateName in statesBackendDict) {
       stateObjectsDict[stateName] = this.stateObject.createFromBackendDict(

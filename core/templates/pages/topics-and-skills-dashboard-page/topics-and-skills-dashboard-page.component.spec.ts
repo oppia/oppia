@@ -252,6 +252,21 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.select2DropdownIsShown).toBe(true);
     });
 
+    it('should return the upper count value for pagination', function() {
+      // This basically signifies that there is no second page,
+      // since there's just 1 topic, so the pagination header should say
+      // 1-1 of 1.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(1);
+      ctrl.currentCount = 15;
+      // This basically signifies that there's a second page since current
+      // count is 15 so the pagination header should show 1-10 of 15.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(10);
+      ctrl.currentCount = 15;
+      ctrl.pageNumber = 1;
+      // This basically signifies that there's a second page since current
+      // count is 15 so the pagination header should show 10-15 of 15.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(15);
+    });
 
     it('should return number from 1 to the range specified', function() {
       var array = ctrl.generateNumbersTillRange(5);
@@ -372,6 +387,12 @@ describe('Topics and Skills Dashboard Page', function() {
       function() {
         expect(ctrl.activeTab).toEqual('skills');
       });
+
+    it('should return the total count value for skills', function() {
+      expect(ctrl.getTotalCountValueForSkills()).toEqual(4);
+      ctrl.itemsPerPage = 2;
+      expect(ctrl.getTotalCountValueForSkills()).toEqual('many');
+    });
 
     it('should fetch skills when filters are applied', function() {
       expect(ctrl.activeTab).toEqual('skills');

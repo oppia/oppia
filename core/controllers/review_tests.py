@@ -43,6 +43,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
     be called only if the user has completed at least one exploration in
     the story.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page

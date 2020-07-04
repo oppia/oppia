@@ -58,6 +58,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-time job that can be used to migrate the Math components in the
     suggestions to the new Math Schema.
     """
+
     _ERROR_KEY_BEFORE_MIGRATION = 'validation_error'
     _ERROR_KEY_AFTER_MIGRATION = 'validation_error_after_migration'
 
