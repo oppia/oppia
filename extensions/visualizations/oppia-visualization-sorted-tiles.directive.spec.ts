@@ -28,6 +28,7 @@ describe('Oppia sorted tiles visualization', function() {
   let $compile, $rootScope;
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
 
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
