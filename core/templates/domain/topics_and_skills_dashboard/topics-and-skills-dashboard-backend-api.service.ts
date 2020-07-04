@@ -18,8 +18,9 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
@@ -75,7 +76,9 @@ interface ISkillsDashboardDataBackendDict {
 }
 
 interface IAssignedSkillDataBackendDict {
-  'assigned_topics': Array<string>
+  'assigned_topics': {
+    [key: string]: {'id': string, 'subtopic_id'?: number}
+  }
 }
 
 @Injectable({
@@ -92,7 +95,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
   }
 
   fetchAssignedSkillData(skillId): Promise<IAssignedSkillDataBackendDict> {
-    var assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+    const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
       '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
         skill_id: skillId
       });

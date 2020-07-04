@@ -186,18 +186,31 @@ class UnassignSkillDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
             subtopics=[], next_subtopic_id=1)
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [skill_id],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None
+        })
         self.save_new_topic(
             topic_id_2, self.admin_id, name='Topic2',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
-            uncategorized_skill_ids=[skill_id],
-            subtopics=[], next_subtopic_id=1)
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
 
         json_response = self.get_json(
             '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
         self.assertEqual(len(json_response['assigned_topics']), 2)
         self.assertTrue('Topic1' in json_response['assigned_topics'])
+        self.assertEqual(json_response['assigned_topics']['Topic1']['id'], topic_id_1)
+        self.assertTrue('subtopic_id' not in json_response['assigned_topics']['Topic1'])
+
         self.assertTrue('Topic2' in json_response['assigned_topics'])
+        self.assertEqual(json_response['assigned_topics']['Topic2']['id'], topic_id_2)
+        self.assertEqual(
+            json_response['assigned_topics']['Topic2']['subtopic_id'], 1)
 
 
 class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):

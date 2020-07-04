@@ -101,6 +101,13 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-thumbnail-container'));
   var skillStatusFilterDropdown = element(
     by.css('.protractor-test-select-skill-status-dropdown'));
+  var confirmUnassignSkillButton =
+    element(by.css('.protractor-test-confirm-unassign-skill-button'));
+  var noSkillsPresentMessage = element(
+    by.css('.protractor-test-no-skills-present-message'));
+  var assignedTopicNamesInput = element.all(
+    by.css('.protractor-test-unassign-topic'));
+
 
   // Returns a promise of all topics with the given name.
   var _getTopicElements = async function(topicName) {
@@ -385,7 +392,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.unassignSkillWithIndex = async function(index) {
+  this.unassignSkillWithIndex = async function(index, topicIndex) {
     await waitFor.visibilityOf(skillsTable,
       'Skill table taking too long to appear.');
     var skillEditOptionBox = skillEditOptions.get(index);
@@ -394,12 +401,16 @@ var TopicsAndSkillsDashboardPage = function() {
       unassignSkillButon,
       'Unassign Skill button takes too long to be clickable');
     await unassignSkillButon.click();
-    var confirmUnassignSkillDeletionButton =
-      element(by.css('.protractor-test-confirm-unassign-skill-button'));
+    var assignedTopicInput = assignedTopicNamesInput.get(topicIndex);
     await waitFor.elementToBeClickable(
-      confirmUnassignSkillDeletionButton,
+      assignedTopicInput,
+      'Assigned topic checkbox takes too long to be clickable');
+    await assignedTopicInput.click();
+
+    await waitFor.elementToBeClickable(
+      confirmUnassignSkillButton,
       'Confirm Delete Topic button takes too long to be clickable');
-    await confirmUnassignSkillDeletionButton.click();
+    await confirmUnassignSkillButton.click();
   };
 
   this.navigateToSkillsTab = async function() {
@@ -435,7 +446,10 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.expectNumberOfSkillsToBe = async function(number) {
-    console.log(await skillsListItems.count());
+    if (!number) {
+      expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
+      return ;
+    }
     expect(await skillsListItems.count()).toEqual(number);
   };
 

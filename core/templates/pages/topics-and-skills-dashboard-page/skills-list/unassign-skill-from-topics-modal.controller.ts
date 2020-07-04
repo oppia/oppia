@@ -26,8 +26,7 @@ require(
 
 angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  'TopicsAndSkillsDashboardBackendApiService',
-  'skillId',
+  'TopicsAndSkillsDashboardBackendApiService', 'skillId',
   function($controller, $scope, $uibModalInstance,
       TopicsAndSkillsDashboardBackendApiService, skillId) {
     $controller('ConfirmOrCancelModalController', {
@@ -37,32 +36,30 @@ angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
     $scope.fetchAssignedSkillData = function() {
       TopicsAndSkillsDashboardBackendApiService.fetchAssignedSkillData(
         skillId).then((response) => {
-        console.log(response);
         $scope.assignedTopics = response.assigned_topics;
         $scope.assignedTopicsAreFetched = true;
       });
     };
     $scope.init = function() {
-      $scope.selectedIndexes = [];
+      $scope.selectedTopicNames = [];
       $scope.assignedTopicsAreFetched = false;
       $scope.fetchAssignedSkillData();
     };
-    $scope.addTopicId = function(topicId) {
-      console.log(topicId);
-      var index = $scope.selectedIndexes.indexOf(topicId);
+    $scope.selectedTopicToUnassign = function(topicId) {
+      var index = $scope.selectedTopicNames.indexOf(topicId);
       if (index !== -1) {
-        $scope.selectedIndexes.splice(index, 1);
+        $scope.selectedTopicNames.splice(index, 1);
       } else {
-        $scope.selectedIndexes.push(topicId);
+        $scope.selectedTopicNames.push(topicId);
       }
     };
     $scope.close = function() {
-      var selectedTopics = [];
-      for (let index in $scope.selectedIndexes) {
-        selectedTopics.push(
-          $scope.assignedTopics[$scope.selectedIndexes[index]]);
+      $scope.selectedTopics = [];
+      for (let index in $scope.selectedTopicNames) {
+        $scope.selectedTopics.push(
+          $scope.assignedTopics[$scope.selectedTopicNames[index]]);
       }
-      $uibModalInstance.close(selectedTopics);
+      $uibModalInstance.close($scope.selectedTopics);
     };
     $scope.init();
   }

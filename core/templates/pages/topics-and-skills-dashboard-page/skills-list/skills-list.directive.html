@@ -72,13 +72,13 @@
                 <span>Merge Skill</span>
               </div>
             </div>
-            <div class="unassign-skill-box" ng-if="skill.topic_name">
-              <div class="protractor-test-unassign-skill-button" ng-click="$ctrl.unassignSkill(skill.id)">
+            <div class="unassign-skill-box protractor-test-unassign-skill-button" ng-if="skill.topic_name" ng-click="$ctrl.unassignSkill(skill.id)">
+              <div>
                 <i class="fa fa-minus"></i>
                 <span>Unassign Skill</span>
               </div>
             </div>
-            <div class="delete-icon-box" ng-click="$ctrl.deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+            <div class="delete-icon-box protractor-test-delete-skill-button" ng-click="$ctrl.deleteSkill(skill.id)">
               <a ng-if="canDeleteSkill()">
                 <span class="fa fa-trash-alt"></span>
                 <span>Delete</span>
@@ -109,15 +109,14 @@
                     <span> Assign to Topic </span>
                   </span>
                 </div>
-                <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0">
-                  <div class="protractor-test-merge-skills-button"
-                       ng-click="$ctrl.mergeSkill(skill)">
+                <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0" ng-click="$ctrl.mergeSkill(skill)">
+                  <div class="protractor-test-merge-skills-button">
                     <i class="fa fa-plus"></i>
                     <span>Merge Skill</span>
                   </div>
                 </div>
-                <div class="delete-icon-box">
-                  <span ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)">
+                <div class="delete-icon-box" ng-click="$ctrl.deleteSkill(skill.id)">
+                  <span ng-if="canDeleteSkill()" >
                     <i class="fa fa-trash-alt"></i>
                     <span>Delete</span>
                   </span>
