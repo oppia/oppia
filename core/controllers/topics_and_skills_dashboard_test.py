@@ -204,11 +204,14 @@ class UnassignSkillDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
         self.assertEqual(len(json_response['assigned_topics']), 2)
         self.assertTrue('Topic1' in json_response['assigned_topics'])
-        self.assertEqual(json_response['assigned_topics']['Topic1']['id'], topic_id_1)
-        self.assertTrue('subtopic_id' not in json_response['assigned_topics']['Topic1'])
+        self.assertEqual(
+            json_response['assigned_topics']['Topic1']['id'], topic_id_1)
+        self.assertTrue('subtopic_id' not in
+                        json_response['assigned_topics']['Topic1'])
 
         self.assertTrue('Topic2' in json_response['assigned_topics'])
-        self.assertEqual(json_response['assigned_topics']['Topic2']['id'], topic_id_2)
+        self.assertEqual(
+            json_response['assigned_topics']['Topic2']['id'], topic_id_2)
         self.assertEqual(
             json_response['assigned_topics']['Topic2']['subtopic_id'], 1)
 

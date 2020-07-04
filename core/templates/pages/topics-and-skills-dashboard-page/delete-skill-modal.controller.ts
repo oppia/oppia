@@ -40,7 +40,7 @@ angular.module('oppia').controller('DeleteSkillModalController', [
       $scope.fetchAssignedSkillData();
     };
     $scope.showAssignedTopics = function() {
-      return (
+      return Boolean(
         $scope.assignedTopicsAreFetched &&
           Object.keys($scope.assignedTopics).length);
     };

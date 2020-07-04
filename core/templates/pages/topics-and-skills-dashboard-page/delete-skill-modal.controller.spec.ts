@@ -36,37 +36,79 @@ describe('Delete Skill Modal Controller', function() {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    $rootScope = $injector.get('$rootScope');
-    $q = $injector.get('$q');
-    TopicsAndSkillsDashboardBackendApiService = (
-      $injector.get('TopicsAndSkillsDashboardBackendApiService'));
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-    var MockTopicsAndSkillsDashboardBackendApiService = {
-      fetchAssignedSkillData: () => {
-        var deferred = $q.defer();
-        deferred.resolve({
-          assigned_topics: []
-        });
-        return deferred.promise;
-      }
-    };
-    $scope = $rootScope.$new();
-    $controller('DeleteSkillModalController', {
-      $scope: $scope,
-      TopicsAndSkillsDashboardBackendApiService:
-      MockTopicsAndSkillsDashboardBackendApiService,
-      $uibModalInstance: $uibModalInstance,
-      skillId
+  describe('when skill has no assigned topics', function() {
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $rootScope = $injector.get('$rootScope');
+      $q = $injector.get('$q');
+      TopicsAndSkillsDashboardBackendApiService = (
+        $injector.get('TopicsAndSkillsDashboardBackendApiService'));
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+      var MockTopicsAndSkillsDashboardBackendApiService = {
+        fetchAssignedSkillData: () => {
+          var deferred = $q.defer();
+          deferred.resolve({
+            assigned_topics: {}
+          });
+          return deferred.promise;
+        }
+      };
+      $scope = $rootScope.$new();
+      $controller('DeleteSkillModalController', {
+        $scope: $scope,
+        TopicsAndSkillsDashboardBackendApiService:
+        MockTopicsAndSkillsDashboardBackendApiService,
+        $uibModalInstance: $uibModalInstance,
+        skillId
+      });
+    }));
+
+    it('should initialize the correct value', function() {
+      $scope.init();
+      $rootScope.$apply();
+      expect($scope.assignedTopics).toEqual({});
+      expect($scope.assignedTopicsAreFetched).toEqual(true);
+      expect($scope.showAssignedTopics()).toEqual(false);
     });
-  }));
+  });
 
-  it('should initialize the correct value', function() {
-    $scope.init();
-    $rootScope.$apply();
-    expect($scope.assignedTopics).toEqual([]);
-    expect($scope.assignedTopicsAreFetched).toEqual(true);
+  describe('when skill has assigned topics', function() {
+    var topicIdDict = {topic1: {id: 'topicId1'}};
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $rootScope = $injector.get('$rootScope');
+      $q = $injector.get('$q');
+      TopicsAndSkillsDashboardBackendApiService = (
+        $injector.get('TopicsAndSkillsDashboardBackendApiService'));
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+      var MockTopicsAndSkillsDashboardBackendApiService = {
+        fetchAssignedSkillData: () => {
+          var deferred = $q.defer();
+          deferred.resolve({
+            assigned_topics: topicIdDict
+          });
+          return deferred.promise;
+        }
+      };
+      $scope = $rootScope.$new();
+      $controller('DeleteSkillModalController', {
+        $scope: $scope,
+        TopicsAndSkillsDashboardBackendApiService:
+        MockTopicsAndSkillsDashboardBackendApiService,
+        $uibModalInstance: $uibModalInstance,
+        skillId
+      });
+    }));
+
+    it('should initialize the correct value', function() {
+      $scope.init();
+      $rootScope.$apply();
+      expect($scope.assignedTopics).toEqual(topicIdDict);
+      expect($scope.assignedTopicsAreFetched).toEqual(true);
+      expect($scope.showAssignedTopics()).toEqual(true);
+    });
   });
 });

@@ -182,10 +182,14 @@ class UnassignSkillDataHandler(base.BaseHandler):
         if skill_id in skill_ids_assigned_to_some_topic:
             for topic in topics:
                 if skill_id in topic.get_all_skill_ids():
-                    assigned_topics[topic.name] = {'id': topic.id, 'version': topic.version}
+                    assigned_topics[topic.name] = {
+                        'id': topic.id,
+                        'version': topic.version
+                    }
                     for subtopic in topic.subtopics:
                         if skill_id in subtopic.skill_ids:
-                            assigned_topics[topic.name].update({'subtopic_id': subtopic.id})
+                            assigned_topics[topic.name].update(
+                                {'subtopic_id': subtopic.id})
 
         self.render_json({
             'assigned_topics': assigned_topics
