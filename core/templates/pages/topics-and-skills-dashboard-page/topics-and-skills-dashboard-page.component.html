@@ -51,10 +51,10 @@
         <div class="dashboard-list">
           <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 || $ctrl.skillSummaries.length>0">
             <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[($ctrl.pageNumber*$ctrl.itemsPerPage)+$ctrl.itemsPerPage]> of <[$ctrl.currentCount]></span>
+              <span>Displaying <[$ctrl.pageNumber * $ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.currentCount]></span>
             </div>
             <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[($ctrl.pageNumber*$ctrl.itemsPerPage)+$ctrl.itemsPerPage]> of Many</span>
+              <span>Displaying <[$ctrl.pageNumber * $ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.getTotalCountValueForSkills()]></span>
             </div>
             <div class="dashboard-list-pagination">
               <div>
@@ -105,8 +105,8 @@
                          user-can-delete-skill="$ctrl.userCanDeleteSkill"
                          skills-categorized-by-topics="$ctrl.skillsCategorizedByTopics">
             </skills-list>
-            <p class="intro-card-message" ng-if="$ctrl.isSkillsTabHelpTextVisible()">
-              There are no pending unused skills.
+            <p class="intro-card-message" ng-if="!$ctrl.displayedSkillSummaries.length">
+              No skills to display.
             </p>
           </div>
           <div class="pagination-mobile">
@@ -196,10 +196,19 @@
                 <span>Classroom</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div ng-if="$ctrl.select2DropdownIsShown">
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
                   <select2-dropdown item="$ctrl.filterObject.classroom"
                                     class="classroom-dropdown protractor-test-select-classroom-dropdown"
                                     choices="$ctrl.classrooms"
+                                    placeholder="Classrooms"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+                  <select2-dropdown item="$ctrl.filterObject.classroom"
+                                    class="classroom-dropdown protractor-test-select-classroom-dropdown"
+                                    choices="$ctrl.skillClassrooms"
                                     placeholder="Classrooms"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
@@ -273,7 +282,6 @@
     padding-top: 10px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-content {
-    display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     margin: 0 auto;
@@ -291,7 +299,9 @@
   }
   .oppia-topics-and-skills-dashboard .dashboard-content-secondary {
     display: inline-block;
-    width: 26%;
+    margin-left: 1%;
+    position: fixed;
+    width: 25%;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list {
     margin: 30px auto;
@@ -562,6 +572,8 @@
       width: 100%;
     }
     .oppia-topics-and-skills-dashboard .dashboard-content-secondary {
+      margin-left: 0;
+      position: static;
       width: 100%;
     }
     .oppia-topics-and-skills-dashboard .dashboard-tabs li {

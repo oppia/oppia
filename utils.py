@@ -43,11 +43,13 @@ import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
+
     pass
 
 
 class ValidationError(Exception):
     """Error class for when a domain object fails validation."""
+
     pass
 
 
@@ -55,6 +57,7 @@ class ExplorationConversionError(Exception):
     """Error class for when an exploration fails to convert from a certain
     version to a certain version.
     """
+
     pass
 
 
@@ -746,4 +749,5 @@ def get_hashable_value(value):
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
+
     pass
