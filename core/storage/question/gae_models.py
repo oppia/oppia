@@ -22,7 +22,6 @@ import random
 
 from constants import constants
 from core.platform import models
-import core.storage.user.gae_models as user_models
 import feconf
 import python_utils
 import utils
@@ -141,16 +140,9 @@ class QuestionModel(base_models.VersionedModel):
         super(QuestionModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         question_commit_log = QuestionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
         question_commit_log.put()

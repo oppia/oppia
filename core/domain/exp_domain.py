@@ -211,7 +211,7 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
     """Value object representing a commit to an exploration."""
 
     def __init__(
-            self, created_on, last_updated, user_id, username, exploration_id,
+            self, created_on, last_updated, user_id, exploration_id,
             commit_type, commit_message, commit_cmds, version,
             post_commit_status, post_commit_community_owned,
             post_commit_is_private):
@@ -223,7 +223,6 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
             last_updated: datetime.datetime. Date and time when the exploration
                 commit was last updated.
             user_id: str. User id of the user who has made the commit.
-            username: str. Username of the user who has made the commit.
             exploration_id: str. Id of the exploration.
             commit_type: str. The type of commit.
             commit_message: str. A description of changes made to the
@@ -245,7 +244,6 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
         self.created_on = created_on
         self.last_updated = last_updated
         self.user_id = user_id
-        self.username = username
         self.exploration_id = exploration_id
         self.commit_type = commit_type
         self.commit_message = commit_message
@@ -257,15 +255,16 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
 
     def to_dict(self):
         """Returns a dict representing this ExplorationCommitLogEntry domain
-        object. This omits created_on, user_id and commit_cmds.
+        object. This omits created_on, user_id and commit_cmds and adds username
+        (derived from user_id).
 
         Returns:
             dict. A dict, mapping all fields of ExplorationCommitLogEntry
-            instance, except created_on, user_id and commit_cmds fields.
+            instance, except created_on, user_id and commit_cmds fields and
+            adding username (derived from user_id).
         """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'username': self.username,
             'exploration_id': self.exploration_id,
             'commit_type': self.commit_type,
             'commit_message': self.commit_message,
