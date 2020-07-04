@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
-import { ComponentFixture, fakeAsync, TestBed, async} from
+import { ComponentFixture, fakeAsync, TestBed, async, tick} from
   '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -24,6 +24,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationEmbedButtonModalComponent } from
   './exploration-embed-button-modal.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { selection } from 'd3';
 
 class MockActiveModal {
   dismiss(): void {
@@ -86,12 +87,18 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   }));
 
   it('should select the embed url', fakeAsync(() => {
+    const removeAllRanges = jasmine.createSpy('removeAllRanges');
+    const addRange = jasmine.createSpy('addRange');
+    spyOn(window, 'getSelection').and.returnValue(<any>{
+      removeAllRanges: removeAllRanges,
+      addRange: addRange
+    });
+
     let embedUrlDiv = fixture.debugElement.query(
       By.css('.oppia-embed-modal-code'));
     embedUrlDiv.nativeElement.click();
     fixture.detectChanges();
-    expect(window.getSelection().getRangeAt(0).toString()).toBe(
-      '<iframe src="https://oppia.org/embed/exploration/3f6cD869" width="700" height="1000">'
-    );
+    expect(addRange).toHaveBeenCalled();
+    expect(removeAllRanges).toHaveBeenCalled();
   }));
 });
