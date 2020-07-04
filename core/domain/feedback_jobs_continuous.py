@@ -39,6 +39,7 @@ class FeedbackAnalyticsRealtimeModel(
     and the total number of threads to the default integer value of zero
     in the realtime layer.
     """
+
     num_open_threads = ndb.IntegerProperty(default=0)
     num_total_threads = ndb.IntegerProperty(default=0)
 

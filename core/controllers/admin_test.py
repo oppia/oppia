@@ -1126,6 +1126,7 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     """Tests for updating usernames."""
+
     OLD_USERNAME = 'oldUsername'
     NEW_USERNAME = 'newUsername'
 
@@ -1286,6 +1287,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     """Tests related to add reviewers for contributor's
     suggestion/application.
     """
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
@@ -1500,6 +1502,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
 class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     """Tests related to remove reviewers from community dashboard page."""
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
@@ -1755,6 +1758,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
 class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
     """Tests CommunityReviewersListHandler."""
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
@@ -1845,6 +1849,7 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
 
 class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
     """Tests CommunityReviewerRightsDataHandler."""
+
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
