@@ -15,16 +15,15 @@
 /**
  * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
+
 import { ComponentFixture, fakeAsync, TestBed, async, tick} from
   '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ExplorationEmbedButtonModalComponent } from
   './exploration-embed-button-modal.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { selection } from 'd3';
 
 class MockActiveModal {
   dismiss(): void {
