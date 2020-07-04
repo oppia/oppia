@@ -400,7 +400,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-editor.service.ts',
     'state-graph-visualization.directive.ts',
     'state-hints-editor.directive.ts',
-    'state-improvement-suggestion.service.ts',
     'state-interaction-editor.directive.ts',
     'state-name-editor.directive.ts',
     'state-param-changes-editor.directive.ts',

@@ -91,6 +91,13 @@ describe('Exploration stats', function() {
       });
     });
 
+    it('should return whether corresponding state stats exists', () => {
+      expect(explorationStats.hasStateStates('Introduction')).toBeTrue();
+      expect(explorationStats.hasStateStates('Middle')).toBeTrue();
+      expect(explorationStats.hasStateStates('End')).toBeTrue();
+      expect(explorationStats.hasStateStates('Prelude')).toBeFalse();
+    });
+
     it('should return corresponding state stats', () => {
       const introductionStats = explorationStats.getStateStats('Introduction');
       expect(introductionStats).toBeInstanceOf(StateStats);

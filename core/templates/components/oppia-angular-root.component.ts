@@ -482,9 +482,6 @@ import { StateGraphLayoutService } from
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
-import { StateImprovementSuggestionService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -835,7 +832,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateEditorService: StateEditorService;
   static stateGraphLayoutService: StateGraphLayoutService;
   static stateHintsService: StateHintsService;
-  static stateImprovementSuggestionService: StateImprovementSuggestionService;
   static stateInteractionIdService: StateInteractionIdService;
   static stateInteractionStatsBackendApiService: StateInteractionStatsBackendApiService;
   static stateInteractionStatsService: StateInteractionStatsService;
@@ -1119,7 +1115,6 @@ private stateCustomizationArgsService: StateCustomizationArgsService,
 private stateEditorService: StateEditorService,
 private stateGraphLayoutService: StateGraphLayoutService,
 private stateHintsService: StateHintsService,
-private stateImprovementSuggestionService: StateImprovementSuggestionService,
 private stateInteractionIdService: StateInteractionIdService,
 private stateInteractionStatsBackendApiService: StateInteractionStatsBackendApiService,
 private stateInteractionStatsService: StateInteractionStatsService,
@@ -1404,7 +1399,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;
     OppiaAngularRootComponent.stateHintsService = this.stateHintsService;
-    OppiaAngularRootComponent.stateImprovementSuggestionService = this.stateImprovementSuggestionService;
     OppiaAngularRootComponent.stateInteractionIdService = this.stateInteractionIdService;
     OppiaAngularRootComponent.stateInteractionStatsBackendApiService = this.stateInteractionStatsBackendApiService;
     OppiaAngularRootComponent.stateInteractionStatsService = this.stateInteractionStatsService;

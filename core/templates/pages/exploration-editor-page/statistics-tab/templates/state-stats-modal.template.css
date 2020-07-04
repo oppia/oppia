@@ -1,0 +1,9 @@
+.oppia-state-stats-modal-body .section {
+  margin-top: 18px;
+}
+.oppia-state-stats-warning {
+  background: #f9edbe;
+  border-radius: 2px;
+  padding: 12px;
+  width: 100%;
+}
