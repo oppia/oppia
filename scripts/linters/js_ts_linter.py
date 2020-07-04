@@ -128,6 +128,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(self, js_files, ts_files, file_cache, verbose_mode_enabled):
         """Constructs a JsTsLintChecksManager object.
 
@@ -1100,6 +1101,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
     Attributes:
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyJsTsLintChecksManager object.
@@ -1116,6 +1118,49 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.files_to_lint
+
+    @staticmethod
+    def _get_trimmed_error_output(eslint_output):
+        """Remove extra bits from eslint messages.
+
+        Args:
+            eslint_output: str. output returned by the eslint linter.
+
+        Returns:
+            str. A string with the trimmed messages.
+        """
+        trimmed_error_messages = []
+        # Extract the message from list and split the message by newline
+        # so that we can use them and remove last four lines from the end.
+        # Becuase last two lines are empty strings and third one have a message
+        # with number of errors.
+        # Example: \u2716 2 problems (2 errors, 0 warnings)
+        # 1 error and 0 warnings potentially fixable with the `--fix` option.
+        eslint_output_lines = eslint_output.split('\n')
+        newlines_present = eslint_output_lines[-1] == '' and (
+            eslint_output_lines[-2] == '')
+        fix_option_present = eslint_output_lines[-3].endswith('`--fix` option.')
+        unicode_x_present = eslint_output_lines[-4].startswith('\u2716')
+
+        if (newlines_present and fix_option_present and unicode_x_present):
+            eslint_output_lines = eslint_output_lines[:-4]
+
+        for line in eslint_output_lines:
+            # ESlint messages start with line numbers and then a
+            # "x" and a message-id in the end. We are matching
+            # if the line contains line number because every message start with
+            # num:num where num is of type int and we are matching it with regex
+            # and if that is True then we are replacing "error" with empty
+            # string('') which is at the index 1 and message-id from the end.
+            if re.search(r'^\d+:\d+', line.lstrip()):
+                # Replacing message-id with an empty string('').
+                line = re.sub(r'(\w+-*)+$', '', line)
+                error_string = re.search(r'error', line).group(0)
+                error_message = line.replace(error_string, '', 1)
+            else:
+                error_message = line
+            trimmed_error_messages.append(error_message)
+        return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_js_and_ts_files(self):
         """Prints a list of lint errors in the given list of JavaScript files.
@@ -1164,9 +1209,10 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
                 result_list.append(linter_stdout)
 
         if num_files_with_errors:
-            for error in result_list:
-                python_utils.PRINT(error)
-                summary_messages.append(error)
+            for result in result_list:
+                python_utils.PRINT(result)
+                summary_messages.append(
+                    self._get_trimmed_error_output(result))
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (
                     linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))

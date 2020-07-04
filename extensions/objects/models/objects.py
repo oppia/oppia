@@ -972,6 +972,7 @@ class Fraction(BaseObject):
 
 class Units(BaseObject):
     """Units class."""
+
     # Validation of the units is performed only in the frontend using math.js.
     # math.js is not available in the backend.
 

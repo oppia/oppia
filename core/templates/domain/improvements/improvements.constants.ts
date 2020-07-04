@@ -41,4 +41,9 @@ export namespace ImprovementsConstants {
   export const HIGH_BOUNCE_RATE_THRESHOLD_HIGH: number = 0.25;
   export const HIGH_BOUNCE_RATE_THRESHOLD_LOW: number = 0.20;
   export const HIGH_BOUNCE_RATE_MIN_EXP_STARTS: number = 100;
+
+  export const EXPLORATION_IMPROVEMENTS_URL: string = (
+    `/improvements/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
+  export const EXPLORATION_IMPROVEMENTS_HISTORY_URL: string = (
+    `/improvements/history/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
 }

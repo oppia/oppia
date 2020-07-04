@@ -29,11 +29,13 @@ from google.appengine.ext import ndb
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill snapshot."""
+
     pass
 
 
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
+
     pass
 
 
@@ -43,6 +45,7 @@ class SkillModel(base_models.VersionedModel):
     This class should only be imported by the skill services file
     and the skill model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = SkillSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SkillSnapshotContentModel
     ALLOW_REVERT = False
@@ -162,6 +165,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'skill-[skill_id]-[version]'.
     """
+
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)
 

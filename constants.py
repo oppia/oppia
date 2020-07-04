@@ -47,6 +47,7 @@ def remove_comments(text):
 
 class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
+
     __getattr__ = dict.__getitem__
 
 

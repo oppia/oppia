@@ -31,11 +31,13 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
+
     pass
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
+
     pass
 
 
@@ -45,6 +47,7 @@ class TopicModel(base_models.VersionedModel):
     This class should only be imported by the topic services file
     and the topic model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
     ALLOW_REVERT = False
@@ -177,6 +180,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'topic-[topic_id]-[version]'.
     """
+
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -283,11 +287,13 @@ class TopicSummaryModel(base_models.BaseModel):
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
+
     pass
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
+
     pass
 
 
@@ -296,6 +302,7 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     This stores the HTML data for a subtopic page.
     """
+
     SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
     ALLOW_REVERT = False
@@ -382,6 +389,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     The id for this model is of the form
     'subtopicpage-[subtopic_page_id]-[version]'.
     """
+
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -417,11 +425,13 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
+
     pass
 
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
+
     pass
 
 
@@ -589,6 +599,7 @@ class TopicRightsAllUsersModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding topic.
     """
+
     # The user_ids of users who are (or were in history) members of manager_ids
     # in corresponding rights model.
     all_user_ids = ndb.StringProperty(indexed=True, repeated=True)

@@ -233,6 +233,8 @@ import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
+import { ImprovementsBackendApiService } from
+  'services/improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -1169,6 +1171,11 @@ export class UpgradedServices {
         upgradedServices['ExplorationStatsObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['ImprovementsBackendApiService'] =
+      new ImprovementsBackendApiService(
+        upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],
@@ -1188,7 +1195,7 @@ export class UpgradedServices {
     upgradedServices['PlaythroughIssuesBackendApiService'] =
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['PlaythroughIssuesBackendApiService'],
+        upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
