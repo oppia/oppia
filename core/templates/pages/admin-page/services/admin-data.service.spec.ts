@@ -28,7 +28,7 @@ import { ComputationDataObjectFactory } from
   'domain/admin/computation-data-object.factory';
 import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
-import { JobStausSummaryObjectFactory } from
+import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
@@ -38,7 +38,7 @@ describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;
   let cdof: ComputationDataObjectFactory;
   let jdof: JobDataObjectFactory;
-  let jsof: JobStausSummaryObjectFactory;
+  let jsof: JobStatusSummaryObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   var sampleAdminData = {
@@ -120,7 +120,7 @@ describe('Admin Data Service', () => {
     adminDataService = TestBed.get(AdminDataService);
     cdof = TestBed.get(ComputationDataObjectFactory);
     jdof = TestBed.get(JobDataObjectFactory);
-    jsof = TestBed.get(JobStausSummaryObjectFactory);
+    jsof = TestBed.get(JobStatusSummaryObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataResponse = {

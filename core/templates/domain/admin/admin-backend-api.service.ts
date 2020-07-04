@@ -40,7 +40,7 @@ import {
 import {
   IJobStatusSummaryBackendDict,
   JobStatusSummary,
-  JobStausSummaryObjectFactory
+  JobStatusSummaryObjectFactory
 } from 'domain/admin/job-status-summary-object.factory';
 
 
@@ -104,7 +104,7 @@ export class AdminBackendApiService {
     private http: HttpClient,
     private computationDataObjectFactory: ComputationDataObjectFactory,
     private jobDataObjectFactory: JobDataObjectFactory,
-    private jobStatusSummaryObjectFactory: JobStausSummaryObjectFactory,
+    private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   getData(): Promise<AdminPageData> {

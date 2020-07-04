@@ -77,18 +77,6 @@ describe('Improvement Modal Service', function() {
     expect(openModalSpy).toHaveBeenCalled();
   });
 
-  it('should open feedback modal', function() {
-    ImprovementModalService.openFeedbackThread(thread);
-    $rootScope.$apply();
-    expect(openModalSpy).toHaveBeenCalled();
-  });
-
-  it('should open suggestion modal', function() {
-    ImprovementModalService.openSuggestionThread(thread);
-    $rootScope.$apply();
-    expect(openModalSpy).toHaveBeenCalled();
-  });
-
   it('should open confirmation modal', function() {
     ImprovementModalService.openConfirmationModal(
       'Message', 'ButtonText', 'btn');

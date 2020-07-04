@@ -37,7 +37,7 @@ export class JobStatusSummary {
 @Injectable({
   providedIn: 'root'
 })
-export class JobStausSummaryObjectFactory {
+export class JobStatusSummaryObjectFactory {
   createFromBackendDict(
       backendDict: IJobStatusSummaryBackendDict): JobStatusSummary {
     return new JobStatusSummary(
@@ -46,5 +46,5 @@ export class JobStausSummaryObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'JobStausSummaryObjectFactory',
-  downgradeInjectable(JobStausSummaryObjectFactory));
+  'JobStatusSummaryObjectFactory',
+  downgradeInjectable(JobStatusSummaryObjectFactory));
