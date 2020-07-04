@@ -476,7 +476,9 @@ describe('Logic demo test', function() {
 
   it('should submit mistakes', function() {
     const MISTAKE_STRINGS_LENGTH = 40;
-    spyOn(logicProofTeacher2, 'buildMistakeSection').and.returnValue(<any>[{
+    // @ts-ignore logicProofTeacher2 buildMistakeSection method should return
+    // ore properties than entries according with lint settings.
+    spyOn(logicProofTeacher2, 'buildMistakeSection').and.returnValue([{
       entries: []
     }]);
     var sectionNumber = 0;
@@ -500,8 +502,9 @@ describe('Logic demo test', function() {
   });
 
   it('should submit control functions', function() {
-    spyOn(logicProofTeacher2, 'buildControlFunctionTable').and.returnValue(
-      <any>{});
+    // @ts-ignore logicProofTeacher2 buildControlFunctionTable method should
+    // return more properties than {} according with lint settings.
+    spyOn(logicProofTeacher2, 'buildControlFunctionTable').and.returnValue({});
     $scope.submitControlFunctions();
 
     expect($scope.controlFunctionSuccess).toBe(true);
@@ -536,11 +539,14 @@ describe('Logic demo test', function() {
   });
 
   it('should request javascript', function() {
-    spyOn(logicProofTeacher2, 'buildMistakeSection').and.returnValue(<any>[{
+    // @ts-ignore logicProofTeacher2 buildMistakeSection method should return
+    // ore properties than entries according with lint settings.
+    spyOn(logicProofTeacher2, 'buildMistakeSection').and.returnValue([{
       entries: []
     }]);
-    spyOn(logicProofTeacher2, 'buildControlFunctionTable').and.returnValue(
-      <any>{});
+    // @ts-ignore logicProofTeacher2 buildControlFunctionTable method should
+    // return more properties than {} according with lint settings.
+    spyOn(logicProofTeacher2, 'buildControlFunctionTable').and.returnValue({});
 
     $scope.submitMistakes(0);
     $scope.submitMistakes(1);

@@ -72,21 +72,29 @@ describe('Exploration player page', function() {
 
     var elementNameItemProp = $('<div>');
     angularElementSpy.withArgs(
-      'meta[itemprop="name"]').and.returnValue(<any>elementNameItemProp);
+      // @ts-ignore Angular element method doesn't expect to receive 1 argument
+      // in the lints.
+      'meta[itemprop="name"]').and.returnValue(elementNameItemProp);
 
     var elementDescriptionItemProp = $('<div>');
     angularElementSpy.withArgs(
+      // @ts-ignore Angular element method doesn't expect to receive 1 argument
+      // in the lints.
       'meta[itemprop="description"]').and.returnValue(
-        <any>elementDescriptionItemProp);
+      elementDescriptionItemProp);
 
     var elementTitleProperty = $('<div>');
     angularElementSpy.withArgs(
-      'meta[property="og:title"]').and.returnValue(<any>elementTitleProperty);
+      // @ts-ignore Angular element method doesn't expect to receive 1 argument
+      // in the lints.
+      'meta[property="og:title"]').and.returnValue(elementTitleProperty);
 
     var elementDescriptionProperty = $('<div>');
     angularElementSpy.withArgs(
+      // @ts-ignore Angular element method doesn't expect to receive 1 argument
+      // in the lints.
       'meta[property="og:description"]').and.returnValue(
-        <any>elementDescriptionProperty);
+      elementDescriptionProperty);
 
     ctrl.$onInit();
     $scope.$apply();

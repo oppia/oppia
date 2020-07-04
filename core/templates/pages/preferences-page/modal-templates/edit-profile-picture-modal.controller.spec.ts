@@ -88,7 +88,9 @@ describe('EditProfilePictureModalController', function() {
         'data:application/octet-stream;base64,' + dataBase64Mock);
 
       var mockUrl = 'mock-url';
-      spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue(<any>{
+      // @ts-ignore Cropper getCroppedCanvas method should return more
+      // properties than toDataURL according with lint settings.
+      spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({
         toDataURL: () => mockUrl
       });
       $scope.confirm();
