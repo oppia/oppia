@@ -29,15 +29,17 @@ import { LazyLoadingComponent } from
   './common-layout-directives/common-elements/lazy-loading.component';
 import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
+import { SideNavigationBarComponent } from
+  './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { TranslatePipe } from 'filters/translate.pipe';
 
 
 @NgModule({
   imports: [CommonModule],
   declarations: [BackgroundBannerComponent, TranslatePipe, LazyLoadingComponent,
-    LoadingDotsComponent, AttributionGuideComponent],
+    LoadingDotsComponent, AttributionGuideComponent, SideNavigationBarComponent],
   entryComponents: [BackgroundBannerComponent, LazyLoadingComponent,
-    LoadingDotsComponent, AttributionGuideComponent],
+    LoadingDotsComponent, AttributionGuideComponent, SideNavigationBarComponent],
   exports: [BackgroundBannerComponent, TranslatePipe]
 })
 
