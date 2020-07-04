@@ -137,7 +137,9 @@
         </select>
         <span class="sort-order fas"
               ng-click="$ctrl.setExplorationsSortingOptions($ctrl.currentSortType)"
-              ng-class="$ctrl.isCurrentSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
+              ng-class="$ctrl.isCurrentSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'"
+              role="button"
+              aria-label="Change Sort Order">
         </span>
       </span>
     </div>

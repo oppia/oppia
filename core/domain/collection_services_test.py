@@ -598,6 +598,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     """Tests collection query methods which operate on CollectionSummary
     objects.
     """
+
     COL_ID_0 = '0_arch_bridges_in_england'
     COL_ID_1 = '1_welcome_introduce_oppia'
     COL_ID_2 = '2_welcome_introduce_oppia_interactions'
