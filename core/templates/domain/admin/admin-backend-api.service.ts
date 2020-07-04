@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
-  ITopicSummaryBackendDict,
+  TopicSummaryBackendDict,
   TopicSummary,
   TopicSummaryObjectFactory
 } from 'domain/topic/TopicSummaryObjectFactory';
@@ -76,7 +76,7 @@ export interface IAdminPageDataBackendDict {
   'unfinished_job_data': IJobDataBackendDict[];
   'recent_job_data': IJobDataBackendDict[];
   'continuous_computations_data': IComputationDataBackendDict[];
-  'topic_summaries': ITopicSummaryBackendDict[];
+  'topic_summaries': TopicSummaryBackendDict[];
 }
 
 export interface AdminPageData {

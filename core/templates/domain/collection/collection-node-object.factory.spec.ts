@@ -26,21 +26,30 @@ describe('Collection node object factory', () => {
     collectionNodeObjectFactory = new CollectionNodeObjectFactory();
   });
 
-  var _createEmptyCollectionNode = function(explorationId) {
-    return collectionNodeObjectFactory.create({
-      exploration_id: explorationId,
-      exploration_summary: {
-        title: 'Title',
-        status: 'private'
-      }
-    });
-  };
-
   it('should provide an immutable exploration summary', () => {
     var explorationSummaryBackendObject = {
-      title: 'exp title',
-      category: 'exp category',
-      objective: 'exp objective'
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cd672b',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'exp title'
     };
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',

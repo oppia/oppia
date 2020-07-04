@@ -22,10 +22,20 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
+  CollectionSummary,
+  CollectionSummaryBackendDict,
+  CollectionSummaryObjectFactory
+} from 'domain/collection/collection-summary-object.factory';
+import {
   CreatorDashboardStatsBackendDict,
   CreatorDashboardStats,
   CreatorDashboardStatsObjectFactory
 } from 'domain/creator_dashboard/creator-dashboard-stats-object.factory';
+import {
+  CreatorExplorationSummary,
+  CreatorExplorationSummaryBackendDict,
+  CreatorExplorationSummaryObjectFactory
+} from 'domain/summary/creator-exploration-summary-object.factory';
 import {
   FeedbackThread,
   FeedbackThreadObjectFactory,
@@ -45,6 +55,11 @@ import {
   SuggestionThread,
   SuggestionThreadObjectFactory
 } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import {
+  TopicSummary,
+  TopicSummaryBackendDict,
+  TopicSummaryObjectFactory
+} from 'domain/topic/TopicSummaryObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionsService } from
   'services/suggestions.service';
@@ -54,10 +69,15 @@ interface CreatorDashboardDataBackendDict {
   'last_week_stats': CreatorDashboardStatsBackendDict;
   'display_preference': 'card' | 'list';
   'subscribers_list': SubscriberSummaryBackendDict[];
-  'threads_for_created_suggestions_list': FeedbackThreadBackendDict[]; //Start from here
+  'threads_for_created_suggestions_list': FeedbackThreadBackendDict[];
   'threads_for_suggestions_to_review_list': FeedbackThreadBackendDict[];
   'created_suggestions_list': SuggestionBackendDict[];
   'suggestions_to_review_list': SuggestionBackendDict[];
+  'explorations_list': CreatorExplorationSummaryBackendDict[];
+  'collections_list': CollectionSummaryBackendDict[];
+  // Here topic summary dicts are optional because they are present in response
+  // only if new structrures are enabled.
+  'topic_summary_dicts'?: TopicSummaryBackendDict[];
 }
 
 interface CreatorDashboardData {
@@ -70,7 +90,10 @@ interface CreatorDashboardData {
   createdSuggestionsList: Suggestion[];
   suggestionsToReviewList: Suggestion[];
   createdSuggestionThreadsList: SuggestionThread[];
-  suggestionThreadsToReviewList: SuggestionThread[]
+  suggestionThreadsToReviewList: SuggestionThread[];
+  explorationsList: CreatorExplorationSummary[];
+  collectionsList: CollectionSummary[];
+  topicSummaries?: TopicSummary[];
 }
 
 @Injectable({
@@ -79,13 +102,18 @@ interface CreatorDashboardData {
 export class CreatorDashboardBackendApiService {
   constructor(
     private http: HttpClient,
+    private collectionSummaryObjectFactory:
+    CollectionSummaryObjectFactory,
     private creatorDashboardStatsObjectFactory:
     CreatorDashboardStatsObjectFactory,
+    private creatorExplorationSummaryObjectFactory:
+    CreatorExplorationSummaryObjectFactory,
     private subscriberSummaryObjectFactory: SubscriberSummaryObjectFactory,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private suggestionObjectFactory: SuggestionObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
+    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
     private loggerService: LoggerService) {}
 
   _getSuggestionThreads(
@@ -122,8 +150,10 @@ export class CreatorDashboardBackendApiService {
       return {
         dashboardStats: this.creatorDashboardStatsObjectFactory
           .createFromBackendDict(dashboardData.dashboard_stats),
-        lastWeekStats: this.creatorDashboardStatsObjectFactory
-          .createFromBackendDict(dashboardData.last_week_stats),
+        // Because lastWeekStats may be null
+        lastWeekStats: dashboardData.last_week_stats ? (
+          this.creatorDashboardStatsObjectFactory
+            .createFromBackendDict(dashboardData.last_week_stats)) : null,
         displayPreference: dashboardData.display_preference,
         subscribersList: dashboardData.subscribers_list.map(
           subscriber => this.subscriberSummaryObjectFactory
@@ -149,7 +179,18 @@ export class CreatorDashboardBackendApiService {
           dashboardData.created_suggestions_list),
         suggestionThreadsToReviewList: this._getSuggestionThreads(
           dashboardData.threads_for_suggestions_to_review_list,
-          dashboardData.suggestions_to_review_list)
+          dashboardData.suggestions_to_review_list),
+        explorationsList: dashboardData.explorations_list.map(
+          expSummary => this.creatorExplorationSummaryObjectFactory
+            .createFromBackendDict(expSummary)),
+        collectionsList: dashboardData.collections_list.map(
+          collectionSummary => this.collectionSummaryObjectFactory
+            .createFromBackendDict(collectionSummary)),
+        topicSummaries: (
+          dashboardData.topic_summary_dicts ? (
+            dashboardData.topic_summary_dicts.map(
+              topicSummaryDict => this.topicSummaryObjectFactory
+                .createFromBackendDict(topicSummaryDict))) : null)
       };
     });
   }

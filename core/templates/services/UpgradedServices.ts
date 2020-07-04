@@ -105,6 +105,8 @@ import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
+import { CollectionSummaryObjectFactory } from
+  'domain/collection/collection-summary-object.factory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
@@ -123,6 +125,10 @@ import { ConstructTranslationIdsService } from
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import { CreatorDashboardStatsObjectFactory } from
+  'domain/creator_dashboard/creator-dashboard-stats-object.factory';
+import { CreatorExplorationSummaryObjectFactory } from
+  'domain/summary/creator-exploration-summary-object.factory';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
@@ -492,6 +498,8 @@ import { StorySummaryObjectFactory } from
   'domain/story/StorySummaryObjectFactory';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
+import { SubscriberSummaryObjectFactory } from
+  'domain/creator_dashboard/subscriber-summary-object.factory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -617,6 +625,8 @@ export class UpgradedServices {
       new CollectionPlaythroughObjectFactory();
     upgradedServices['CollectionRightsObjectFactory'] =
       new CollectionRightsObjectFactory();
+    upgradedServices['CollectionSummaryObjectFactory'] =
+      new CollectionSummaryObjectFactory();
     upgradedServices['CollectionValidationService'] =
       new CollectionValidationService();
     upgradedServices['ComputationDataObjectFactory'] =
@@ -625,6 +635,10 @@ export class UpgradedServices {
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
+    upgradedServices['CreatorExplorationSummaryObjectFactory'] =
+      new CreatorExplorationSummaryObjectFactory();
+    upgradedServices['CreatorDashboardStatsObjectFactory'] =
+      new CreatorDashboardStatsObjectFactory();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
@@ -752,6 +766,8 @@ export class UpgradedServices {
       new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
       new StorySummaryObjectFactory();
+    upgradedServices['SubscriberSummaryObjectFactory'] =
+      new SubscriberSummaryObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuccessiveIncorrectAnswersTaskObjectFactory'] =
@@ -1150,7 +1166,18 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['FeaturedTranslationLanguageObjectFactory']);
     upgradedServices['CreatorDashboardBackendApiService'] =
-      new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+      new CreatorDashboardBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['CollectionSummaryObjectFactory'],
+        upgradedServices['CreatorDashboardStatsObjectFactory'],
+        upgradedServices['CreatorExplorationSummaryObjectFactory'],
+        upgradedServices['SubscriberSummaryObjectFactory'],
+        upgradedServices['FeedbackThreadObjectFactory'],
+        upgradedServices['SuggestionObjectFactory'],
+        upgradedServices['SuggestionThreadObjectFactory'],
+        upgradedServices['SuggestionsService'],
+        upgradedServices['TopicSummaryObjectFactory'],
+        upgradedServices['LoggerService']);
     upgradedServices['CurrentInteractionService'] =
       new CurrentInteractionService(
         upgradedServices['ContextService'],

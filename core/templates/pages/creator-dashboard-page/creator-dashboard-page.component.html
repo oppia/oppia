@@ -192,18 +192,18 @@
             </td>
             <td ng-if="exploration.status !== 'private'">
               <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-num-views">
-                <[exploration.num_views]>
+                <[exploration.numViews]>
               </a>
             </td>
             <td ng-if="exploration.status !== 'private'">
               <a ng-href="/create/<[exploration.id]>#/feedback"
                  class="oppia-dashboard-list-summary protractor-test-exp-summary-row-open-feedback">
-                <[exploration.num_open_threads]>
+                <[exploration.numOpenThreads]>
               </a>
             </td>
             <td>
               <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-last-updated">
-                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)]>
               </a>
             </td>
           </tr>
@@ -218,9 +218,9 @@
                is-private="exploration.status === 'private'">
         <a ng-href="/create/<[exploration.id]>">
           <div class="title-section"
-               style="background-color: <[exploration.thumbnail_bg_color]>;">
+               style="background-color: <[exploration.thumbnailBgColor]>;">
             <img class="thumbnail-image"
-                 ng-src="<[$ctrl.getCompleteThumbnailIconUrl(exploration.thumbnail_icon_url)]>">
+                 ng-src="<[$ctrl.getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)]>">
             <h2 class="activity-title protractor-test-exp-summary-tile-title">
               <span><[(exploration.title || $ctrl.DEFAULT_EMPTY_TITLE) | truncate:40]></span>
             </h2>
@@ -258,13 +258,13 @@
                     uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                     tooltip-placement="top">
               </span>
-              <a ng-if="exploration.num_open_threads != 0" ng-href="/create/<[exploration.id]>#/feedback"
+              <a ng-if="exploration.numOpenThreads != 0" ng-href="/create/<[exploration.id]>#/feedback"
                  class="oppia-dashboard-card-statistic-value">
-                <[exploration.num_open_threads]>
+                <[exploration.numOpenThreads]>
               </a>
-              <span ng-if="exploration.num_open_threads === 0"
+              <span ng-if="exploration.numOpenThreads === 0"
                     class="oppia-dashboard-card-statistic-value">
-                <[exploration.num_open_threads]>
+                <[exploration.numOpenThreads]>
               </span>
             </li>
 
@@ -274,7 +274,7 @@
                     tooltip-placement="top">
               </span>
               <span class="oppia-dashboard-card-statistic-value">
-                <[exploration.num_views]>
+                <[exploration.numViews]>
               </span>
             </li>
 
@@ -284,7 +284,7 @@
                     tooltip-placement="top">
               </span>
               <span class="oppia-dashboard-card-statistic-value">
-                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)]>
               </span>
             </li>
             <li>
@@ -367,11 +367,11 @@
         <collection-summary-tile class="protractor-test-collection-card"
                                  collection-id="collection.id"
                                  collection-title="collection.title"
-                                 last-updated-msec="collection.last_updated"
-                                 node-count="collection.node_count"
+                                 last-updated-msec="collection.lastUpdated"
+                                 node-count="collection.nodeCount"
                                  objective="collection.objective"
-                                 thumbnail-icon-url="collection.thumbnail_icon_url"
-                                 thumbnail-bg-color="collection.thumbnail_bg_color"
+                                 thumbnail-icon-url="collection.thumbnailIconUrl"
+                                 thumbnail-bg-color="collection.thumbnailBgColor"
                                  is-linked-to-editor-page="true">
         </collection-summary-tile>
       </span>

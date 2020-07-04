@@ -280,8 +280,8 @@ angular.module('oppia').component('creatorDashboardPage', {
               SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
             ctrl.isCurrentSortDescending = true;
             ctrl.isCurrentSubscriptionSortDescending = true;
-            ctrl.explorationsList = responseData.explorations_list;
-            ctrl.collectionsList = responseData.collections_list;
+            ctrl.explorationsList = responseData.explorationsList;
+            ctrl.collectionsList = responseData.collectionsList;
             ctrl.subscribersList = responseData.subscribersList;
             ctrl.dashboardStats = responseData.dashboardStats;
             ctrl.lastWeekStats = responseData.lastWeekStats;

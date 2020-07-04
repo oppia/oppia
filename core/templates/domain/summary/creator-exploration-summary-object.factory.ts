@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for learner exploration summary.
+ * @fileoverview Frontend domain object factory for creator exploration summary.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -33,7 +33,7 @@ interface HumanReadableContributorsSummary {
   }
 }
 
-export interface LearnerExplorationSummaryBackendDict {
+export interface CreatorExplorationSummaryBackendDict {
   'category': string;
   'community_owned': boolean;
   'activity_type': string;
@@ -50,9 +50,11 @@ export interface LearnerExplorationSummaryBackendDict {
   'thumbnail_bg_color': string;
   'thumbnail_icon_url': string;
   'title': string;
+  'num_total_threads': number;
+  'num_open_threads': number;
 }
 
-export class LearnerExplorationSummary {
+export class CreatorExplorationSummary {
   constructor(
       public category: string,
       public communityOwned: boolean,
@@ -70,16 +72,18 @@ export class LearnerExplorationSummary {
       public createdOnMsec: number,
       public ratings: ExpRatings,
       public humanReadableContributorsSummary:
-      HumanReadableContributorsSummary) {}
+      HumanReadableContributorsSummary,
+      public numTotalThreads: number,
+      public numOpenThreads: number) {}
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class LearnerExplorationSummaryObjectFactory {
+export class CreatorExplorationSummaryObjectFactory {
   createFromBackendDict(
-      expSummaryBacknedDict: LearnerExplorationSummaryBackendDict) {
-    return new LearnerExplorationSummary(
+      expSummaryBacknedDict: CreatorExplorationSummaryBackendDict) {
+    return new CreatorExplorationSummary(
       expSummaryBacknedDict.category, expSummaryBacknedDict.community_owned,
       expSummaryBacknedDict.id, expSummaryBacknedDict.language_code,
       expSummaryBacknedDict.num_views, expSummaryBacknedDict.objective,
@@ -89,10 +93,12 @@ export class LearnerExplorationSummaryObjectFactory {
       expSummaryBacknedDict.activity_type,
       expSummaryBacknedDict.last_updated_msec,
       expSummaryBacknedDict.created_on_msec, expSummaryBacknedDict.ratings,
-      expSummaryBacknedDict.human_readable_contributors_summary);
+      expSummaryBacknedDict.human_readable_contributors_summary,
+      expSummaryBacknedDict.num_total_threads,
+      expSummaryBacknedDict.num_open_threads);
   }
 }
 
 angular.module('oppia').factory(
-  'LearnerExplorationSummaryObjectFactory',
-  downgradeInjectable(LearnerExplorationSummaryObjectFactory));
+  'CreatorExplorationSummaryObjectFactory',
+  downgradeInjectable(CreatorExplorationSummaryObjectFactory));
