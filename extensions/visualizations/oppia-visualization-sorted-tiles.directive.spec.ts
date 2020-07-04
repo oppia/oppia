@@ -19,7 +19,7 @@
 
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { TestBed } from '@angular/core/testing';
 
 import { IAnswerStatsBackendDict, AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
@@ -28,17 +28,10 @@ describe('Oppia sorted tiles visualization', function() {
   let $compile, $rootScope;
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function(
-      _$compile_, _$rootScope_, _AnswerStatsObjectFactory_) {
+  beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
-    answerStatsObjectFactory = _AnswerStatsObjectFactory_;
+    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
   }));
 
   const newDirective = (data: IAnswerStatsBackendDict[], options): JQLite => {
