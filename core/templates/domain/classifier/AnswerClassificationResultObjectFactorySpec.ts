@@ -18,62 +18,20 @@
 
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
-
-require('domain/exploration/OutcomeObjectFactory.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-
-class MockSubtitledHtml {
-  _html: string;
-  _contentId: string;
-  constructor(html: string, contentId: string) {
-    this._html = html;
-    this._contentId = contentId;
-  }
-}
-
-class MockOutcome {
-  dest: string;
-  feedback: MockSubtitledHtml;
-  labelledAsCorrect: boolean;
-  paramChanges: any;
-  refresherExplorationId: any;
-  missingPrerequisiteSkillId: any;
-  constructor(
-      dest: string, feedback: MockSubtitledHtml, labelledAsCorrect: boolean,
-      paramChanges: any, refresherExplorationId: any,
-      missingPrerequisiteSkillId: any) {
-    this.dest = dest;
-    this.feedback = feedback;
-    this.labelledAsCorrect = labelledAsCorrect;
-    this.paramChanges = paramChanges;
-    this.refresherExplorationId = refresherExplorationId;
-    this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
-  }
-}
-
-class MockOutcomeObjectFactory {
-  createNew(
-      dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: any) {
-    return new MockOutcome(
-      dest,
-      new MockSubtitledHtml(feedbackText, feedbackTextId),
-      false,
-      paramChanges,
-      null,
-      null);
-  }
-}
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
 
 describe('Answer classification result object factory', () => {
   let acrof: AnswerClassificationResultObjectFactory;
-  let oof: MockOutcomeObjectFactory;
+  let oof: OutcomeObjectFactory;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
   beforeEach(() => {
     acrof = new AnswerClassificationResultObjectFactory();
-    oof = new MockOutcomeObjectFactory();
+    oof = new OutcomeObjectFactory(
+      new SubtitledHtmlObjectFactory());
     DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
   });
 

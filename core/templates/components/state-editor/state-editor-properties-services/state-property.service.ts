@@ -24,35 +24,36 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
+/**
+ * NOTE TO DEVELOPERS: This class should not be used to create objects directly.
+ * This class should be first inherited to a other class. And a type argument
+ * with the type of state property should be passed.
+ *
+ * Example usage:
+ * class ExampleClass extends StatePropertyService<string> {
+ *   ...
+ * }
+ *
+ * This will initialize the class with the type of properties like displayed,
+ * savedMomento etc. to be string.
+ */
 @Injectable({
   providedIn: 'root'
 })
-export class StatePropertyService {
+export class StatePropertyService<StatePropertyType> {
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
   setterMethodKey: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept
-  // as any since type of displayed depends on the property for which the
-  // value is provided. We need to create different domain objects for
-  // various properties and decide type of displayed according to that.
-  displayed: any;
+  displayed: StatePropertyType;
   stateName: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept
-  // as any since type of savedMemento depends on the property for which the
-  // value is provided. We need to create different domain objects for
-  // various properties and decide type of savedMemento according to that.
-  savedMemento: any;
+  savedMemento: StatePropertyType;
 
   constructor(private alertsService: AlertsService,
     private utilsService: UtilsService) {
     this.setterMethodKey = null;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept
-  // as any since type of value depends on the property for which the
-  // value is provided. We need to create different domain objects for
-  // various properties and decide type of value according to that.
-  init(stateName: string, value: any): void {
+  init(stateName: string, value: StatePropertyType): void {
     if (this.setterMethodKey === null) {
       throw new Error('State property setter method key cannot be null.');
     }
@@ -74,22 +75,14 @@ export class StatePropertyService {
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept
-  // as any since type of value depends on the property for which the
-  // value is provided. We need to create different domain objects for
-  // various properties and decide type of value according to that.
-  _normalize(value: any): any {
+  _normalize(value: StatePropertyType): StatePropertyType {
     return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept
-  // as any since type of value depends on the property for which the
-  // value is provided. We need to create different domain objects for
-  // various properties and decide type of value according to that.
-  _isValid(value: any): boolean {
+  _isValid(value: StatePropertyType): boolean {
     return true;
   }
 

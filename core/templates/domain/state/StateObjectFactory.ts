@@ -43,7 +43,7 @@ import {
 
 const constants = require('constants.ts');
 
-interface IStateBackendDict {
+export interface IStateBackendDict {
   'classifier_model_id': string;
   'content': ISubtitledHtmlBackendDict;
   'interaction': IInteractionBackendDict;

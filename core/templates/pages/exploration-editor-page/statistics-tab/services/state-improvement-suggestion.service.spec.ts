@@ -36,6 +36,7 @@ describe('StateImprovementSuggestionService', () => {
     // A self-looping state.
     var statesDict1 = {
       state: {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
           html: 'content'
@@ -49,6 +50,8 @@ describe('StateImprovementSuggestionService', () => {
         },
         interaction: {
           id: 'RuleTest',
+          confirmed_unclassified_answers: null,
+          customization_args: {},
           answer_groups: [{
             outcome: {
               dest: 'unused',
@@ -58,7 +61,8 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -66,6 +70,8 @@ describe('StateImprovementSuggestionService', () => {
               },
               rule_type: 'Equals'
             }],
+            training_data: ['training_data'],
+            tagged_skill_misconception_id: 'skill_id-1'
           }],
           default_outcome: {
             dest: 'state',
@@ -73,9 +79,20 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          hints: []
+          hints: [],
+          solution: {
+            answer_is_exclusive: false,
+            correct_answer: 'This is a correct answer!',
+            explanation: {
+              content_id: 'solution',
+              html: 'This is the explanation to the answer'
+            }
+          }
         },
         param_changes: [],
         solicit_answer_details: false,
@@ -92,6 +109,7 @@ describe('StateImprovementSuggestionService', () => {
     // A non-looping state.
     var statesDict2 = {
       initial: {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
           html: 'content'
@@ -105,6 +123,8 @@ describe('StateImprovementSuggestionService', () => {
         },
         interaction: {
           id: 'RuleTest',
+          confirmed_unclassified_answers: null,
+          customization_args: {},
           answer_groups: [{
             outcome: {
               dest: 'unused',
@@ -114,14 +134,17 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }]
+            }],
+            training_data: ['training_data'],
+            tagged_skill_misconception_id: 'skill_id-1'
           }],
           default_outcome: {
             dest: 'end',
@@ -129,9 +152,20 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          hints: []
+          hints: [],
+          solution: {
+            answer_is_exclusive: false,
+            correct_answer: 'This is a correct answer!',
+            explanation: {
+              content_id: 'solution',
+              html: 'This is the explanation to the answer'
+            }
+          }
         },
         param_changes: [],
         solicit_answer_details: false,
@@ -144,6 +178,7 @@ describe('StateImprovementSuggestionService', () => {
         },
       },
       end: {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
           html: 'content'
@@ -157,6 +192,8 @@ describe('StateImprovementSuggestionService', () => {
         },
         interaction: {
           id: 'RuleTest',
+          confirmed_unclassified_answers: null,
+          customization_args: {},
           answer_groups: [{
             outcome: {
               dest: 'unused',
@@ -166,14 +203,17 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }]
+            }],
+            training_data: ['training_data'],
+            tagged_skill_misconception_id: 'skill_id-1'
           }],
           default_outcome: {
             dest: null,
@@ -181,9 +221,20 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          hints: []
+          hints: [],
+          solution: {
+            answer_is_exclusive: false,
+            correct_answer: 'This is a correct answer!',
+            explanation: {
+              content_id: 'solution',
+              html: 'This is the explanation to the answer'
+            }
+          }
         },
         param_changes: [],
         solicit_answer_details: false,
