@@ -21,9 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os
+import re
 
 from core.tests import test_utils
 from extensions.rich_text_components import components
+import python_utils
 
 
 class ComponentValidationUnitTests(test_utils.GenericTestBase):
@@ -33,12 +35,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         """Test that values are validated correctly.
 
         Args:
-          rte_component_class: the class whose validate() method
-            is to be tested.
-          valid_items: a list of values. Each of these items is expected to
-            be validated without any Exception.
-          invalid_items: a list of values. Each of these is expected to raise
-            a TypeError when validated.
+            rte_component_class: child of BaseRTEComponent. The class whose
+                validate() method is to be tested.
+            valid_items: a list of values. Each of these items is expected to
+                be validated without any Exception.
+            invalid_items: a list of values. Each of these is expected to raise
+                a TypeError when validated.
         """
         for item in valid_items:
             rte_component_class.validate(item)
@@ -115,17 +117,35 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Link, valid_items, invalid_items)
 
+    # TODO(#9379): Add validations for svg_filename field and add proper
+    # values in the tests.
     def test_math_validation(self):
         """Tests collapsible component validation."""
         valid_items = [{
-            'raw_latex-with-value': '123456789'
+            'math_content-with-value': {
+                u'raw_latex': u'123456',
+                u'svg_filename': u''
+            }
         }, {
-            'raw_latex-with-value': '\\frac{x}{y}'
+            'math_content-with-value': {
+                u'raw_latex': u'\\frac{x}{y}',
+                u'svg_filename': u''
+            }
         }]
         invalid_items = [{
-            'raw_latex-with-value': False
+            'math_content-with-value': False
         }, {
             'url-with-value': 'http://link.com'
+        }, {
+            'math_content-with-value': {
+                u'raw_latex': True,
+                u'svg_filename': False
+            }
+        }, {
+            'math_content-with-value': {
+                u'raw_latex': 123,
+                u'svg_filename': 11
+            }
         }]
 
         self.check_validation(
@@ -134,13 +154,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_skillreview_validation(self):
         """Tests skillreview component validation."""
         valid_items = [{
-            'skill_summary-with-value':
-                '{\'id\': \'skill_id\', \'description\': '
-                '\'skill_description\'}',
+            'skill_id-with-value': 'skill_id',
+            'text-with-value': 'Skill Link Text'
         }]
         invalid_items = [{
-            'skill_summary-with-value': 'javascript:alert(5);',
-            'text-with-value': 'Hello'
+            'skill_id-with-value': 20,
+            'url-with-value': 'Hello'
         }]
 
         self.check_validation(
@@ -216,18 +235,82 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Video, valid_items, invalid_items)
 
+    def test_svg_diagram_validation(self):
+        """Tests svg diagram component validation."""
+        valid_items = [{
+            'svg_filename-with-value': 'random.svg',
+            'alt-with-value': '1234'
+        }, {
+            'svg_filename-with-value': 'xyz.svg',
+            'alt-with-value': 'hello'
+        }]
+        invalid_items = [{
+            'svg_filename-with-value': 'random.png',
+            'alt-with-value': 'abc'
+        }, {
+            'svg_filename-with-value': 'xyz.svg.svg',
+            'alt-with-value': 'hello'
+        }, {
+            'svg_filename-with-value': 'xyz.png.svg',
+            'alt-with-value': 'hello'
+        }]
+
+        self.check_validation(
+            components.Svgdiagram, valid_items, invalid_items)
+
 
 class ComponentDefinitionTests(test_utils.GenericTestBase):
     """Tests definition of rich text components."""
 
     def test_component_definition(self):
         """Test that all components are defined."""
+        rich_text_components_dir = (
+            os.path.join(os.curdir, 'extensions', 'rich_text_components'))
         actual_components = [name for name in os.listdir(
-            './extensions/rich_text_components') if os.path.isdir(os.path.join(
-                './extensions/rich_text_components', name))]
+            rich_text_components_dir) if os.path.isdir(os.path.join(
+                rich_text_components_dir, name))]
         defined_components = []
         for name, obj in inspect.getmembers(components):
             if inspect.isclass(obj):
                 defined_components.append(name)
         defined_components.remove('BaseRteComponent')
         self.assertEqual(set(defined_components), set(actual_components))
+
+
+class ComponentE2eTests(test_utils.GenericTestBase):
+    """Tests that all components have their e2e test files defined."""
+
+    def test_component_e2e_tests(self):
+        """Tests that an e2e test is defined for all rich text components."""
+        test_file = os.path.join(
+            'extensions', 'rich_text_components', 'protractor.js')
+        rich_text_components_dir = (
+            os.path.join(os.curdir, 'extensions', 'rich_text_components'))
+        actual_components = [name for name in os.listdir(
+            rich_text_components_dir) if os.path.isdir(os.path.join(
+                rich_text_components_dir, name))]
+        with python_utils.open_file(test_file, 'r') as f:
+            text = f.read()
+            # Replace all spaces and new lines with empty space.
+            text = re.sub(r' ', r'', text)
+            text = re.sub(r'\n', r'', text)
+
+            # Isolate the text inside the RICH_TEXT_COMPONENTS constant.
+            beginning_sequence = 'varRICH_TEXT_COMPONENTS={'
+            first_bracket_index = text.find(beginning_sequence)
+            last_bracket_index = text.find('};')
+            text_inside_constant = text[
+                first_bracket_index + len(beginning_sequence):
+                last_bracket_index] + ','
+
+            rte_components_with_test = []
+            while text_inside_constant.find(',') != -1:
+                rte_components_with_test.append(
+                    text_inside_constant[0:text_inside_constant.find(':')])
+                text_inside_constant = text_inside_constant[
+                    text_inside_constant.find(',') + 1:]
+
+        # TODO(#9356): Add svgdiagram to validations once the e2e tests for it
+        # are created in the 2nd milestone.
+        actual_components.remove('Svgdiagram')
+        self.assertEqual(set(actual_components), set(rte_components_with_test))

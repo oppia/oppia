@@ -42,7 +42,7 @@
            class="filepath-editor-image-shade-overlay">
       </div>
       <div class="filepath-editor-crop-area"
-           ng-if="$ctrl.imageResizeRatio === 1"
+           ng-if="$ctrl.imageResizeRatio === 1 && $ctrl.isCropAllowed()"
            ng-attr-style="<[$ctrl.getCropAreaDynamicStyles()]>"
            ng-mousedown="$ctrl.onMouseDownOnCropArea($event)"
            ng-mouseup="$ctrl.onMouseUpOnCropArea($event)">
@@ -69,7 +69,7 @@
            title="Delete this image">
           &#xE872;
         </i>
-        <img ng-src="<[$ctrl.data.metadata.savedImageUrl]>">
+        <img ng-src="<[$ctrl.data.metadata.savedImageUrl]>" ng-style="$ctrl.imageContainerStyle">
       </div>
     </div>
   </div>
@@ -87,6 +87,12 @@
       Discard
     </button>
   </div>
+  <div class="oppia-form-error" ng-if="$ctrl.invalidTagsAndAttributes.tags.length" style="margin-top: 15px;">
+    Unsupported SVG tags found: <[$ctrl.invalidTagsAndAttributes.tags]>
+  </div>
+  <div class="oppia-form-error" ng-if="$ctrl.invalidTagsAndAttributes.attrs.length" style="margin-top: 15px;">
+    Unsupported SVG attributes found: <[$ctrl.invalidTagsAndAttributes.attrs]>
+  </div>
 </div>
 
 <style>
@@ -95,20 +101,24 @@
   }
 
   .filepath-editor-saved-image-container {
-    position: relative;
-    margin: 0 auto;
-    display: inline-block;
     background-color: red;
+    display: inline-block;
+    margin: 0 auto;
+    position: relative;
   }
 
   .filepath-editor-main-container {
     margin: 0 auto;
-    user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select: none;
+  }
+
+  .filepath-editor-main-container .oppia-form-error {
+    word-break: break-word;
   }
 
   .filepath-editor-crop-button {
@@ -152,13 +162,13 @@
     height: 24px;
     padding: 4px 2px;
     text-align: right;
-    width: 40px;
-    user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select: none;
+    width: 40px;
   }
 
   .filepath-editor-button {
@@ -175,12 +185,12 @@
     height: 24px;
     padding: 4px 8px;
     text-align: center;
-    user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select: none;
   }
 
   .filepath-editor-button:hover {

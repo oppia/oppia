@@ -31,10 +31,8 @@ from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-from scripts import setup
-from scripts import setup_gae
 
-CHROME_DRIVER_VERSION = '2.41'
+CHROME_DRIVER_VERSION = '77.0.3865.40'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -72,7 +70,6 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
-HASHES_FILE_PATH = os.path.join('assets', 'hashes.json')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -96,6 +93,10 @@ _PARSER.add_argument(
     help='If true, skips installing dependencies. The default value is false.',
     action='store_true')
 _PARSER.add_argument(
+    '--skip-build',
+    help='If true, skips building files. The default value is false.',
+    action='store_true')
+_PARSER.add_argument(
     '--sharding-instances', type=int, default=3,
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
@@ -106,9 +107,6 @@ _PARSER.add_argument(
     help='Run the tests in prod mode. Static resources are served from'
          ' build directory and use cache slugs.',
     action='store_true')
-_PARSER.add_argument(
-    '--community_dashboard_enabled', action='store_true',
-    help='Run the test after enabling the community dashboard page.')
 
 _PARSER.add_argument(
     '--suite', default='full',
@@ -117,6 +115,28 @@ _PARSER.add_argument(
          'core/test/protractor/ dirs. e.g. for the file'
          'core/tests/protractor/accessibility.js use --suite=accessibility.'
          'For performing a full test, no argument is required.')
+
+_PARSER.add_argument(
+    '--auto_select_chromedriver',
+    help='Automatically sets the chromedriver version depending on the version '
+         'of Chrome installed in the environment.',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--debug_mode',
+    help='Runs the protractor test in debugging mode. Follow the instruction '
+         'provided in following URL to run e2e tests in debugging mode: '
+         'https://www.protractortest.org/#/debugging#disabled-control-flow',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--deparallelize_terser',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--community_dashboard_enabled', action='store_true',
+    help='Run the test after enabling the community dashboard page.')
 
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
@@ -137,13 +157,13 @@ def ensure_screenshots_dir_is_removed():
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
-    dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
-        '.*%s.*' % re.escape(dev_appserver_path),
+        '.*%s.*' % re.escape(google_app_engine_path),
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
     for p in SUBPROCESSES:
@@ -157,7 +177,7 @@ def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
-    Return:
+    Returns:
         bool: Whether there is a running Oppia instance.
     """
     running = False
@@ -191,19 +211,38 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
-def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
-    """Change constant file based on the running mode. Only the `DEV_MODE` line
-    should be changed.
+def run_webpack_compilation():
+    """Runs webpack compilation."""
+    max_tries = 5
+    webpack_bundles_dir_name = 'webpack_bundles'
+    for _ in python_utils.RANGE(max_tries):
+        try:
+            subprocess.check_call([
+                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                'webpack.dev.config.ts'])
+        except subprocess.CalledProcessError as error:
+            python_utils.PRINT(error.output)
+            sys.exit(error.returncode)
+            return
+        if os.path.isdir(webpack_bundles_dir_name):
+            break
+    if not os.path.isdir(webpack_bundles_dir_name):
+        python_utils.PRINT(
+            'Failed to complete webpack compilation, exiting ...')
+        sys.exit(1)
+
+
+def run_webdriver_manager(parameters):
+    """Run commands of webdriver manager.
 
     Args:
-        constant_file: str. File path to the constant file.
-        dev_mode_setting: bool. Represents whether the program is running on dev
-            mode.
+        parameters: list(str). A list of parameters to pass to webdriver
+            manager.
     """
-    pattern = '"DEV_MODE": .*'
-    replace = '"DEV_MODE": %s' % (
-        'true' if dev_mode_setting else 'false')
-    common.inplace_replace_file(constant_file, pattern, replace)
+    web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
+    web_driver_command.extend(parameters)
+    p = subprocess.Popen(web_driver_command)
+    p.communicate()
 
 
 def update_community_dashboard_status_in_feconf_file(
@@ -221,51 +260,32 @@ def update_community_dashboard_status_in_feconf_file(
     common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 
-def run_webdriver_manager(parameters):
-    """Run commands of webdriver manager.
-
-    Args:
-        parameters: list(str). A list of parameters to pass to webdriver
-            manager.
-    """
-    web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
-    web_driver_command.extend(parameters)
-    python_utils.PRINT(common.run_cmd(web_driver_command))
-
-
 def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
-    setup.main(args=[])
-    setup_gae.main(args=[])
     if os.getenv('TRAVIS'):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode_setting):
+def build_js_files(dev_mode_setting, deparallelize_terser=False):
     """Build the javascript files.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
-        in dev mode.
+            in dev mode.
+        deparallelize_terser: bool. Represents whether to use webpack
+            compilation config that disables parallelism on terser plugin.
     """
-    update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
+        if deparallelize_terser:
+            build.main(args=['--prod_env', '--deparallelize_terser'])
+        else:
+            build.main(args=['--prod_env'])
     else:
-        # The 'hashes.json' file is used by the `url-interpolation` service.
-        if not os.path.isfile(HASHES_FILE_PATH):
-            with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
-                hash_file.write('{}')
-        try:
-            common.run_cmd(
-                [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                 'webpack.dev.config.ts'])
-        except subprocess.CalledProcessError as error:
-            python_utils.PRINT(error.output)
-            sys.exit(error.returncode)
-    build.main(args=(['--prod_env'] if not dev_mode_setting else []))
+        build.main(args=[])
+        run_webpack_compilation()
 
 
 @contextlib.contextmanager
@@ -310,13 +330,17 @@ def undo_webdriver_tweak():
         os.rename(GECKO_PROVIDER_BAK_FILE_PATH, GECKO_PROVIDER_FILE_PATH)
 
 
-def start_webdriver_manager():
-    """Update and start webdriver manager."""
+def start_webdriver_manager(version):
+    """Update and start webdriver manager.
+
+    Args:
+        version: str. The chromedriver version.
+    """
     with tweak_webdriver_manager():
         run_webdriver_manager(
-            ['update', '--versions.chrome', CHROME_DRIVER_VERSION])
+            ['update', '--versions.chrome', version])
         run_webdriver_manager(
-            ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
+            ['start', '--versions.chrome', version,
              '--detach', '--quiet'])
 
 
@@ -374,6 +398,7 @@ def get_e2e_test_parameters(
         suite_name: str. Performs test for different suites.
         dev_mode_setting: bool. Represents whether run the related commands in
             dev mode.
+
     Returns:
         list(str): Parameters for running the tests.
     """
@@ -407,6 +432,21 @@ def start_google_app_engine_server(dev_mode_setting):
     SUBPROCESSES.append(p)
 
 
+def get_chrome_driver_version():
+    """Fetches the latest supported version of chromedriver depending on the
+    Chrome version.
+    This method follows the steps mentioned here:
+    https://chromedriver.chromium.org/downloads/version-selection
+    """
+    output = os.popen('google-chrome --version').read()
+    chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
+    chrome_version = '.'.join(chrome_version.split('.')[:-1])
+    response = python_utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
+        % chrome_version)
+    return response.read()
+
+
 def main(args=None):
     """Run the scripts to start end-to-end tests."""
 
@@ -417,21 +457,32 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
 
-
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
+
     update_community_dashboard_status_in_feconf_file(
         FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
-    build_js_files(dev_mode)
-    start_webdriver_manager()
+
+    if not parsed_args.skip_build:
+        build_js_files(
+            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
+    version = (
+        get_chrome_driver_version() if parsed_args.auto_select_chromedriver
+        else CHROME_DRIVER_VERSION)
+    start_webdriver_manager(version)
 
     start_google_app_engine_server(dev_mode)
 
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     ensure_screenshots_dir_is_removed()
-    commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
+    commands = [common.NODE_BIN_PATH]
+    if parsed_args.debug_mode:
+        commands.append('--inspect-brk')
+    # This flag ensures tests fail if waitFor calls time out.
+    commands.append('--unhandled-rejections=strict')
+    commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 

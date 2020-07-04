@@ -28,6 +28,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+import utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -51,6 +52,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
@@ -74,6 +76,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             gae_id=self.USER_3_GAE_ID,
+            gae_user_id=self.USER_3_GAE_ID,
             email=self.USER_3_EMAIL,
             role=self.USER_3_ROLE,
             username=self.GENERIC_USERNAME,
@@ -126,7 +129,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_verify_model_user_ids_exist(self):
+        self.assertTrue(
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
+            .verify_model_user_ids_exist())
 
     def test_get_by_role(self):
         user = user_models.UserSettingsModel.get_by_role(
@@ -171,11 +179,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': self.GENERIC_DATE,
-            'last_started_state_translation_tutorial': self.GENERIC_DATE,
-            'last_logged_in': self.GENERIC_DATE,
-            'last_edited_an_exploration': self.GENERIC_DATE,
+            'last_agreed_to_terms': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
+            'last_logged_in': self.GENERIC_EPOCH,
+            'last_edited_an_exploration': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -512,6 +520,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
 class LearnerPlaylistModelTests(test_utils.GenericTestBase):
     """Tests for the LearnerPlaylistModel."""
+
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
@@ -752,22 +761,46 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'user_id_2'
     USER_ID_3 = 'user_id_3'
     USER_ID_4 = 'user_id_4'
-    CREATOR_IDS = ['4', '8', '16']
+    USER_ID_5 = 'user_id_5'
+    USER_ID_6 = 'user_id_6'
+    CREATOR_IDS = [USER_ID_5, USER_ID_6]
+    CREATOR_USERNAMES = ['usernameuser_id_5', 'usernameuser_id_6']
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
+    GENERIC_DATETIME = datetime.datetime(2020, 6, 2)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserSubscriptionsModelTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
+
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
+
+        for creator_id in self.CREATOR_IDS:
+            user_models.UserSettingsModel(
+                id=creator_id,
+                gae_id='gae_' + creator_id,
+                username='username' + creator_id,
+                email=creator_id + '@example.com'
+            ).put()
 
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_2,
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
-            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            last_checked=self.GENERIC_DATETIME
         ).put()
 
         user_models.UserSubscriptionsModel(
@@ -796,7 +829,23 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         )
         self.assertTrue(
             user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_3)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
             .has_reference_to_user_id(self.USER_ID_4)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_5)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_6)
         )
         self.assertFalse(
             user_models.UserSubscriptionsModel
@@ -806,14 +855,74 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             user_models.UserSubscriptionsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        user_id_1_old = 'user_id_1_old'
+        user_id_2_old = 'user_id_2_old'
+        user_id_3_old = 'user_id_3_old'
+        user_id_1_new = 'user_id_1_new'
+        user_id_2_new = 'user_id_2_new'
+        user_id_3_new = 'user_id_3_new'
+
+        user_models.UserSubscriptionsModel(id=user_id_1_old).put()
+        user_models.UserSubscriptionsModel(
+            id=user_id_2_old, creator_ids=[user_id_1_old, user_id_3_old]).put()
+        user_models.UserSubscriptionsModel(
+            id=user_id_3_old, creator_ids=[user_id_2_old]).put()
+
+        user_models.UserSubscriptionsModel.migrate_model(
+            user_id_1_old, user_id_1_new)
+        user_models.UserSubscriptionsModel.migrate_model(
+            user_id_2_old, user_id_2_new)
+        user_models.UserSubscriptionsModel.migrate_model(
+            user_id_3_old, user_id_3_new)
+
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get_by_id(user_id_1_old))
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get_by_id(user_id_2_old))
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get_by_id(user_id_3_old))
+
+        migrated_model_1 = user_models.UserSubscriptionsModel.get_by_id(
+            user_id_1_new)
+        self.assertEqual(migrated_model_1.creator_ids, [])
+
+        migrated_model_2 = user_models.UserSubscriptionsModel.get_by_id(
+            user_id_2_new)
+        self.assertEqual(
+            migrated_model_2.creator_ids, [user_id_1_new, user_id_3_new])
+
+        migrated_model_3 = user_models.UserSubscriptionsModel.get_by_id(
+            user_id_3_new)
+        self.assertEqual(migrated_model_3.creator_ids, [user_id_2_new])
+
+    def test_verify_model_user_ids_exist(self):
+        model = user_models.UserSubscriptionsModel(
+            id=self.USER_ID_1, creator_ids=[self.USER_ID_2])
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.creator_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.creator_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.creator_ids = [feconf.SUGGESTION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.creator_ids = [self.USER_ID_2, 'user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model = user_models.UserSubscriptionsModel(
+            id='user_non_id', creator_ids=[self.USER_ID_2])
+        self.assertFalse(model.verify_model_user_ids_exist())
 
     def test_export_data_trivial(self):
         """Test if empty user data is properly exported."""
         user_data = (
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_1))
         test_data = {
-            'creator_ids': [],
+            'creator_usernames': [],
             'collection_ids': [],
             'activity_ids': [],
             'general_feedback_thread_ids': [],
@@ -826,21 +935,19 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
         test_data = {
-            'creator_ids': self.CREATOR_IDS,
+            'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': None
+            'last_checked': utils.get_time_in_millisecs(self.GENERIC_DATETIME)
         }
         self.assertEqual(user_data, test_data)
 
     def test_export_data_on_nonexistent_user(self):
         """Test if exception is raised on nonexistent UserSubscriptionsModel."""
-        export_data_exception = (
-            self.assertRaisesRegexp(
-                Exception, 'UserSubscriptionsModel does not exist.'))
-        with export_data_exception:
-            user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
+        user_data = user_models.UserSubscriptionsModel.export_data(
+            self.USER_ID_3)
+        self.assertEqual({}, user_data)
 
 
 class UserSubscribersModelTests(test_utils.GenericTestBase):
@@ -849,12 +956,25 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserSubscribersModelTests, self).setUp()
 
-        user_models.UserSubscribersModel(id=self.USER_ID_1).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
+
+        user_models.UserSubscribersModel(
+            id=self.USER_ID_1, subscriber_ids=[self.USER_ID_3]).put()
         user_models.UserSubscribersModel(id=self.USER_ID_2, deleted=True).put()
 
     def test_get_deletion_policy(self):
@@ -880,6 +1000,10 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
             user_models.UserSubscribersModel
             .has_reference_to_user_id(self.USER_ID_2)
         )
+        self.assertTrue(
+            user_models.UserSubscribersModel
+            .has_reference_to_user_id(self.USER_ID_3)
+        )
         self.assertFalse(
             user_models.UserSubscribersModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
@@ -888,7 +1012,68 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             user_models.UserSubscribersModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        user_id_1_old = 'user_id_1_old'
+        user_id_2_old = 'user_id_2_old'
+        user_id_3_old = 'user_id_3_old'
+        user_id_1_new = 'user_id_1_new'
+        user_id_2_new = 'user_id_2_new'
+        user_id_3_new = 'user_id_3_new'
+
+        user_models.UserSubscribersModel(id=user_id_1_old).put()
+        user_models.UserSubscribersModel(
+            id=user_id_2_old, subscriber_ids=[user_id_1_old, user_id_3_old]
+        ).put()
+        user_models.UserSubscribersModel(
+            id=user_id_3_old, subscriber_ids=[user_id_2_old]).put()
+
+        user_models.UserSubscribersModel.migrate_model(
+            user_id_1_old, user_id_1_new)
+        user_models.UserSubscribersModel.migrate_model(
+            user_id_2_old, user_id_2_new)
+        user_models.UserSubscribersModel.migrate_model(
+            user_id_3_old, user_id_3_new)
+
+        self.assertIsNone(
+            user_models.UserSubscribersModel.get_by_id(user_id_1_old))
+        self.assertIsNone(
+            user_models.UserSubscribersModel.get_by_id(user_id_2_old))
+        self.assertIsNone(
+            user_models.UserSubscribersModel.get_by_id(user_id_3_old))
+
+        migrated_model_1 = user_models.UserSubscribersModel.get_by_id(
+            user_id_1_new)
+        self.assertEqual(migrated_model_1.subscriber_ids, [])
+
+        migrated_model_2 = user_models.UserSubscribersModel.get_by_id(
+            user_id_2_new)
+        self.assertEqual(
+            migrated_model_2.subscriber_ids, [user_id_1_new, user_id_3_new])
+
+        migrated_model_3 = user_models.UserSubscribersModel.get_by_id(
+            user_id_3_new)
+        self.assertEqual(migrated_model_3.subscriber_ids, [user_id_2_new])
+
+    def test_verify_model_user_ids_exist(self):
+        model = user_models.UserSubscribersModel(
+            id=self.USER_ID_1, subscriber_ids=[self.USER_ID_2])
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.subscriber_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.subscriber_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.subscriber_ids = [feconf.SUGGESTION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.subscriber_ids = [self.USER_ID_2, 'user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model = user_models.UserSubscribersModel(
+            id='user_non_id', subscriber_ids=[self.USER_ID_2])
+        self.assertFalse(model.verify_model_user_ids_exist())
 
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
@@ -1100,6 +1285,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     DATETIME_OBJECT = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    DATETIME_EPOCH = utils.get_time_in_millisecs(DATETIME_OBJECT)
     USER_1_ID = 'id_1'
     USER_2_ID = 'id_2'
     EXP_ID_ONE = 'exp_id_one'
@@ -1186,9 +1372,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
         self.assertEqual(retrieved_object.rating, 2)
-        self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
         self.assertEqual(
             retrieved_object.draft_change_list, {'new_content': {}})
+        self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
         self.assertEqual(
             retrieved_object.draft_change_list_last_updated,
             self.DATETIME_OBJECT)
@@ -1213,9 +1399,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1245,9 +1431,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1269,9 +1455,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {'content': 3}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 2,
                 'draft_change_list_id': 2,
                 'mute_suggestion_notifications': (
@@ -1903,6 +2089,27 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_export_data_trivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            'USER_WITHOUT_DATA')
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            self.USER_1_ID)
+        expected_data = {
+            self.SCORE_CATEGORY_1: {
+                'has_email_been_sent': False,
+                'score': 1.5
+            },
+            self.SCORE_CATEGORY_2: {
+                'has_email_been_sent': False,
+                'score': 2
+            }
+        }
+        self.assertEqual(user_data, expected_data)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserContributionScoringModel.get_deletion_policy(),
@@ -2040,6 +2247,155 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+
+class UserCommunityRightsModelTests(test_utils.GenericTestBase):
+    """Tests for UserCommunityRightsModel."""
+
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    NONEXISTENT_USER_ID = 'id_3'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserCommunityRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        self.assertTrue(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertTrue(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.UserCommunityRightsModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY)
+
+    def test_export_data_trivial(self):
+        user_data = user_models.UserCommunityRightsModel.export_data(
+            self.USER_ID_1)
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        user_data = user_models.UserCommunityRightsModel.export_data(
+            self.USER_ID_1)
+        expected_data = {
+            'can_review_translation_for_language_codes': ['hi', 'en'],
+            'can_review_voiceover_for_language_codes': ['hi'],
+            'can_review_questions': True
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_get_translation_reviewer_user_ids(self):
+        translation_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_translation_reviewer_user_ids('hi'))
+        self.assertEqual(len(translation_reviewer_ids), 0)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        translation_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_translation_reviewer_user_ids('hi'))
+        self.assertEqual(len(translation_reviewer_ids), 2)
+        self.assertTrue(self.USER_ID_1 in translation_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in translation_reviewer_ids)
+
+    def test_get_voiceover_reviewer_user_ids(self):
+        voiceover_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_voiceover_reviewer_user_ids('hi'))
+        self.assertEqual(len(voiceover_reviewer_ids), 0)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        voiceover_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_voiceover_reviewer_user_ids('hi'))
+        self.assertEqual(len(voiceover_reviewer_ids), 1)
+        self.assertFalse(self.USER_ID_1 in voiceover_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in voiceover_reviewer_ids)
+
+    def test_get_question_reviewer_user_ids(self):
+        question_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_question_reviewer_user_ids())
+        self.assertEqual(len(question_reviewer_ids), 0)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        question_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_question_reviewer_user_ids())
+        self.assertEqual(len(question_reviewer_ids), 1)
+        self.assertFalse(self.USER_ID_1 in question_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in question_reviewer_ids)
 
 
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):

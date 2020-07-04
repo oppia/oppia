@@ -42,6 +42,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -102,6 +103,23 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(username_counter))
 
 
+class UsernameLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates username lengths."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if len(model_instance.username) > 20:
+            yield (len(model_instance.username), model_instance.username)
+
+    @staticmethod
+    def reduce(key, values):
+        yield ('Length: %s' % key, 'Usernames: %s' % sorted(values))
+
+
 class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the length of user_bios."""
 
@@ -131,6 +149,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -249,6 +268,7 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -330,6 +350,7 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that adds fields to record last exploration created and last
     edited times.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""

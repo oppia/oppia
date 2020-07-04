@@ -16,7 +16,14 @@
  * @fileoverview Directive for the concept card rich-text component.
  */
 
+require(
+  'rich_text_components/Skillreview/directives/' +
+  'oppia-noninteractive-skillreview-concept-card-modal.controller.ts');
+
 require('components/concept-card/concept-card.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
@@ -33,37 +40,32 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
         '$attrs', '$uibModal', 'ContextService', 'ENTITY_TYPE',
         function($attrs, $uibModal, ContextService, ENTITY_TYPE) {
           var ctrl = this;
-          var skillSummary = HtmlEscaperService.escapedJsonToObj(
-            $attrs.skillSummaryWithValue);
+          var skillId = HtmlEscaperService.escapedJsonToObj(
+            $attrs.skillIdWithValue);
+          ctrl.linkText = HtmlEscaperService.escapedJsonToObj(
+            $attrs.textWithValue);
           ctrl.openConceptCard = function() {
-            var skillId = skillSummary.id;
-            var skillDescription = ctrl.skillDescription;
-            var removeCustomEntityContext =
-              ContextService.removeCustomEntityContext;
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
+            // The catch at the end was needed according to this thread:
+            // https://github.com/angular-ui/bootstrap/issues/6501, where in
+            // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
+            // The catch prevents that when clicking outside as well as for
+            // cancel.
             $uibModal.open({
               template: require(
                 'components/concept-card/concept-card-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.skillIds = [skillId];
-                  $scope.index = 0;
-                  $scope.currentSkill = skillDescription;
-                  $scope.isInTestMode = false;
-
-                  $scope.closeModal = function() {
-                    removeCustomEntityContext();
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                skillId: () => skillId
+              },
+              controller: (
+                'OppiaNoninteractiveSkillreviewConceptCardModalController')
+            }).result.then(function() {}, function(res) {
+              ContextService.removeCustomEntityContext();
+              if (!(res === 'cancel' || res === 'escape key press')) {
+                throw new Error(res);
+              }
             });
-          };
-          ctrl.$onInit = function() {
-            ctrl.skillDescription = skillSummary.description;
           };
         }
       ]

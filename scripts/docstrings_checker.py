@@ -25,9 +25,11 @@ import re
 import sys
 
 import python_utils
+from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+_PYLINT_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'pylint-%s' % common.PYLINT_VERSION)
 sys.path.insert(0, _PYLINT_PATH)
 
 # pylint: disable=wrong-import-order
@@ -59,7 +61,7 @@ def get_setters_property_name(node):
 
     Returns:
         str|None. The name of the property that the node is a setter for,
-            or None if one could not be found.
+        or None if one could not be found.
     """
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
@@ -78,7 +80,7 @@ def get_setters_property(node):
 
     Returns:
         astroid.FunctionDef|None. The node relating to the property of
-            the given setter node, or None if one could not be found.
+        the given setter node, or None if one could not be found.
     """
     property_ = None
 
@@ -101,8 +103,8 @@ def returns_something(return_node):
         return_node: astroid.Return. The return node to check.
 
     Returns:
-        bool. True if the return node returns a value
-            other than None, False otherwise.
+        bool. True if the return node returns a value other than None, False
+        otherwise.
     """
     returns = return_node.value
 
@@ -171,7 +173,7 @@ def docstringify(docstring):
 
     Returns:
         Docstring. Pylint Docstring class instance representing
-            a node's docstring.
+        a node's docstring.
     """
     for docstring_type in [GoogleDocstring]:
         instance = docstring_type(docstring)
@@ -185,6 +187,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """Class for checking whether docstrings follow the Google Python Style
     Guide.
     """
+
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
     re_param_line = re.compile(r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
@@ -265,7 +268,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
 
         Returns:
             list(str). Each str contains an error message. If no linting
-                errors were found, the list will be empty.
+            errors were found, the list will be empty.
         """
         results = []
 

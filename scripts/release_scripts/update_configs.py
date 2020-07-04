@@ -18,7 +18,7 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Usage: Run this script from your oppia root folder:
 
-    python -m scripts.update_configs
+    python -m scripts.release_scripts.update_configs
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -51,7 +51,7 @@ FECONF_REGEX = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
 TERMS_PAGE_URL = (
     'https://github.com/oppia/oppia/commits/develop/core/'
-    'templates/dev/head/pages/terms-page/terms-page.mainpage.html')
+    'templates/pages/terms-page/terms-page.mainpage.html')
 
 
 def apply_changes_based_on_config(
@@ -199,4 +199,8 @@ def main(personal_access_token):
         raise Exception(e)
 
     common.ask_user_to_confirm(
-        'Done! Please check manually to ensure all the changes are correct.')
+        'Done! Please check feconf.py and assets/constants.ts to ensure that '
+        'the changes made are correct. Specifically verify that the '
+        'MAILGUN_API_KEY is updated correctly and other config changes '
+        'are corresponding to %s and %s.\n' % (
+            FECONF_CONFIG_PATH, CONSTANTS_CONFIG_PATH))

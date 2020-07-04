@@ -46,10 +46,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
-EXPORT_POLICY = utils.create_enum( # pylint: disable=invalid-name
+EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'CONTAINS_USER_DATA',
     'NOT_APPLICABLE',
-    'TO_BE_IMPLEMENTED'
 )
 
 # Types of user id migration policies. The pragma comment is needed because
@@ -106,6 +105,7 @@ class BaseModel(ndb.Model):
 
     class EntityNotFoundError(Exception):
         """Raised when no entity for a given id exists in the datastore."""
+
         pass
 
     @staticmethod
@@ -147,8 +147,8 @@ class BaseModel(ndb.Model):
 
         Raises:
             NotImplementedError: This method is needed when the migration
-            policy is ONE_FIELD, it is only overwritten in classes that have
-            that policy.
+                policy is ONE_FIELD, it is only overwritten in classes that have
+                that policy.
         """
         raise NotImplementedError
 
@@ -354,7 +354,7 @@ class BaseModel(ndb.Model):
                 list of entities.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: List of query results.
@@ -381,6 +381,7 @@ class BaseCommitLogEntryModel(BaseModel):
     """Base Model for the models that store the log of commits to a
     construct.
     """
+
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
     last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
@@ -460,7 +461,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
         Returns:
             CommitLogEntryModel. Returns the respective CommitLogEntryModel
-                instance of the construct from which this is called.
+            instance of the construct from which this is called.
         """
         return cls(
             id=cls._get_instance_id(entity_id, version),
@@ -505,7 +506,7 @@ class BaseCommitLogEntryModel(BaseModel):
                 of the full list of entities.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: List of query results.
@@ -533,7 +534,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
         Returns:
             BaseCommitLogEntryModel. The commit with the target entity id and
-                version number.
+            version number.
         """
         commit_id = cls._get_instance_id(target_entity_id, version)
         return cls.get_by_id(commit_id)
@@ -552,6 +553,7 @@ class VersionedModel(BaseModel):
     Note that commit() should be used for VersionedModels, as opposed to put()
     for direct subclasses of BaseModel.
     """
+
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.
     SNAPSHOT_METADATA_CLASS = None
@@ -609,7 +611,7 @@ class VersionedModel(BaseModel):
 
         Returns:
             VersionedModel. The instance of the VersionedModel class populated
-                with the the snapshot.
+            with the the snapshot.
         """
         self.populate(**snapshot_dict)
         return self
@@ -909,7 +911,7 @@ class VersionedModel(BaseModel):
         # pylint: enable=protected-access
 
     @classmethod
-    def get_version(cls, entity_id, version_number):
+    def get_version(cls, entity_id, version_number, strict=True):
         """Gets model instance representing the given version.
 
         The snapshot content is used to populate this model instance. The
@@ -918,6 +920,8 @@ class VersionedModel(BaseModel):
         Args:
             entity_id: str.
             version_number: int.
+            strict: bool. Whether to fail noisily if no entity with the given id
+                exists in the datastore. Default is True.
 
         Returns:
             VersionedModel. Model instance representing given version.
@@ -926,13 +930,24 @@ class VersionedModel(BaseModel):
             Exception: This model instance has been deleted.
         """
         # pylint: disable=protected-access
-        cls.get(entity_id)._require_not_marked_deleted()
+        current_version_model = cls.get(entity_id, strict=strict)
+
+        if current_version_model is None:
+            return None
+
+        current_version_model._require_not_marked_deleted()
 
         snapshot_id = cls.get_snapshot_id(entity_id, version_number)
 
-        return cls(
-            id=entity_id,
-            version=version_number)._reconstitute_from_snapshot_id(snapshot_id)
+        try:
+            return cls(
+                id=entity_id,
+                version=version_number
+            )._reconstitute_from_snapshot_id(snapshot_id)
+        except cls.EntityNotFoundError as e:
+            if not strict:
+                return None
+            raise e
         # pylint: enable=protected-access
 
     @classmethod
@@ -945,7 +960,7 @@ class VersionedModel(BaseModel):
 
         Returns:
             list(VersionedModel). Model instances representing the given
-                versions.
+            versions.
 
         Raises:
             ValueError. The given entity_id is invalid.
@@ -1003,7 +1018,7 @@ class VersionedModel(BaseModel):
         if version is None:
             return super(VersionedModel, cls).get(entity_id, strict=strict)
         else:
-            return cls.get_version(entity_id, version)
+            return cls.get_version(entity_id, version, strict=strict)
 
     @classmethod
     def get_snapshots_metadata(
@@ -1092,6 +1107,11 @@ class BaseSnapshotMetadataModel(BaseModel):
     commit_cmds = ndb.JsonProperty(indexed=False)
 
     @staticmethod
+    def get_export_policy():
+        """Snapshot Metadata is relevant to the user for Takeout."""
+        return EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @staticmethod
     def get_user_id_migration_policy():
         """BaseSnapshotMetadataModel has one field that contains user ID."""
         return USER_ID_MIGRATION_POLICY.ONE_FIELD
@@ -1160,6 +1180,20 @@ class BaseSnapshotMetadataModel(BaseModel):
         """
         return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
 
+    @classmethod
+    def export_data(cls, user_id):
+        metadata_models = (
+            cls.query(cls.committer_id == user_id).fetch())
+
+        user_data = {}
+        for metadata_model in metadata_models:
+            user_data[metadata_model.id] = {
+                'commit_type': metadata_model.commit_type,
+                'commit_message': metadata_model.commit_message,
+                'commit_cmds': metadata_model.commit_cmds
+            }
+        return user_data
+
 
 class BaseSnapshotContentModel(BaseModel):
     """Base class for snapshot content classes.
@@ -1169,6 +1203,13 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_export_policy():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
+        """
+        return EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1216,5 +1257,6 @@ class BaseMapReduceBatchResultsModel(BaseModel):
     shown after each MapReduce job run. Classes which are used by a MR job to
     store its batch results should subclass this class.
     """
+
     _use_cache = False
     _use_memcache = False

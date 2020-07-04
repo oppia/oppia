@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import role_services
 from core.domain import skill_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -51,12 +52,14 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Description')
         self.topic_id = topic_services.get_new_topic_id()
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic1')
+        subtopic.skill_ids = [self.skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[self.skill_id],
-            subtopics=[], next_subtopic_id=1)
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
 
     def delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill
@@ -162,16 +165,98 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_get_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
+        self.assertEqual(
+            json_response['assigned_skill_topic_data_dict']['Name'],
+            'Subtopic1')
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
+        self.logout()
+
+    def test_skill_which_is_assigned_to_topic_but_not_subtopic(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='DescriptionSkill')
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='TopicName1',
+            description='DescriptionTopic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[skill_id],
+            subtopics=[], next_subtopic_id=1)
+
+        url = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+
+        json_response = self.get_json(url)
+        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertIsNone(
+            json_response['assigned_skill_topic_data_dict']['TopicName1'])
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
+        self.logout()
+
+    def test_skill_which_is_not_assigned_to_any_topic(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='DescriptionSkill')
+
+        url = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+
+        json_response = self.get_json(url)
+        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(json_response['assigned_skill_topic_data_dict'], {})
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
+        self.logout()
+
+    def test_skill_which_is_assigned_to_multiple_topics(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='DescriptionSkill')
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Addition')
+        subtopic.skill_ids = [skill_id]
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Maths',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Chemistry')
+        subtopic.skill_ids = [skill_id]
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Science',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        url = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+
+        json_response = self.get_json(url)
+        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(
+            2, len(json_response['assigned_skill_topic_data_dict']))
+        self.assertEqual(
+            json_response['assigned_skill_topic_data_dict']['Maths'],
+            'Addition')
+        self.assertEqual(
+            json_response['assigned_skill_topic_data_dict']['Science'],
+            'Chemistry')
         self.assertEqual(
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
@@ -217,17 +302,39 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_editable_skill_handler_delete_succeeds(self):
         self.login(self.ADMIN_EMAIL)
         # Check that admins can delete a skill.
-        self.delete_json(self.url)
+        skill_has_topics_swap = self.swap(
+            topic_services,
+            'get_all_skill_ids_assigned_to_some_topic',
+            lambda: [])
+        with skill_has_topics_swap:
+            self.delete_json(self.url)
         self.logout()
 
-    def test_editable_skill_handler_delete_fails(self):
+    def test_editable_skill_handler_delete_when_associated_questions_exist(
+            self):
         self.login(self.ADMIN_EMAIL)
-        # Check DELETE returns 500 when the skill still has associated
+        # Check DELETE returns 400 when the skill still has associated
         # questions.
         skill_has_questions_swap = self.swap(
             skill_services, 'skill_has_associated_questions', lambda x: True)
-        with skill_has_questions_swap:
-            self.delete_json(self.url, expected_status_int=500)
+        skill_has_topics_swap = self.swap(
+            topic_services,
+            'get_all_skill_ids_assigned_to_some_topic',
+            lambda: [])
+        with skill_has_questions_swap, skill_has_topics_swap:
+            self.delete_json(self.url, expected_status_int=400)
+        self.logout()
+
+    def test_editable_skill_handler_delete_when_associated_topics_exist(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check DELETE returns 400 when the skill still has associated
+        # topics.
+        skill_has_topics_swap = self.swap(
+            topic_services,
+            'get_all_skill_ids_assigned_to_some_topic',
+            lambda: [self.skill_id])
+        with skill_has_topics_swap:
+            self.delete_json(self.url, expected_status_int=400)
         self.logout()
 
 

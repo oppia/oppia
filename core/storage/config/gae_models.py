@@ -28,25 +28,13 @@ class ConfigPropertySnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a config property snapshot."""
 
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
 
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class ConfigPropertyModel(base_models.VersionedModel):
@@ -54,6 +42,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     The id is the name of the property.
     """
+
     SNAPSHOT_METADATA_CLASS = ConfigPropertySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
 

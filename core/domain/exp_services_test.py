@@ -50,7 +50,7 @@ gae_image_services = models.Registry.import_gae_image_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
-# TODO(msl): test ExpSummaryModel changes if explorations are updated,
+# TODO(msl): Test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
 
 
@@ -62,7 +62,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
     Returns:
         int. The number of exploration summaries that are at least editable
-            by the given user.
+        by the given user.
     """
     return len(exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(
@@ -71,6 +71,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
+
     EXP_0_ID = 'An_exploration_0_id'
     EXP_1_ID = 'An_exploration_1_id'
 
@@ -239,6 +240,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests exploration query methods which operate on ExplorationSummary
     objects.
     """
+
     EXP_ID_0 = '0_en_arch_bridges_in_england'
     EXP_ID_1 = '1_fi_arch_sillat_suomi'
     EXP_ID_2 = '2_en_welcome_introduce_oppia'
@@ -1047,6 +1049,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     """Tests for loading explorations using imported YAML."""
+
     EXP_ID = 'exp_id0'
     DEMO_EXP_ID = '0'
     TEST_ASSET_PATH = 'test_asset.file'
@@ -1477,36 +1480,31 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_customization_args(customization_args_dict2)
         state3.update_interaction_customization_args(customization_args_dict3)
 
-        default_outcome_dict1 = {
-            'dest': 'state2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Default outcome for state1</p>'
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        state1.update_interaction_default_outcome(default_outcome_dict1)
+        default_outcome1 = state_domain.Outcome(
+            'state2', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], None, None
+        )
+        state1.update_interaction_default_outcome(default_outcome1)
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': (
-                    '<p>Hello, this is html1 for state2</p>'
-                    '<oppia-noninteractive-image filepath-with-value="'
-                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1',
+                    (
+                        '<p>Hello, this is html1 for state2</p>'
+                        '<oppia-noninteractive-image filepath-with-value="'
+                        '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                        '"&amp;quot;&amp;quot;" alt-with-value='
+                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     )
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            ),
+        ]
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
@@ -1830,6 +1828,17 @@ title: A title
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
+    def test_export_to_zip_file_with_unpublished_exploration(self):
+        """Test the export_to_zip_file() method."""
+        self.save_new_default_exploration(
+            self.EXP_0_ID, self.owner_id, title='')
+
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
+        zf = zipfile.ZipFile(python_utils.string_io(
+            buffer_value=zip_file_output))
+
+        self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
+
     def test_export_to_zip_file_with_assets(self):
         """Test exporting an exploration with assets to a zip file."""
         exploration = self.save_new_valid_exploration(
@@ -1944,6 +1953,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents.
     """
+
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
   content_id: content
@@ -2632,6 +2642,49 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name, 'written_translations',
                     [1, 2]), 'Added fake text translations.')
 
+    def test_migrate_exp_to_latest_version_migrates_to_version(self):
+        """Test migrate exploration state schema to the latest version."""
+        latest_schema_version = python_utils.UNICODE(
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': latest_schema_version
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, migration_change_list,
+            'Ran Exploration Migration job.')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(exploration.version, 2)
+        self.assertEqual(
+            python_utils.UNICODE(
+                exploration.states_schema_version),
+            latest_schema_version)
+
+    def test_migrate_exp_to_earlier_version_raises_exception(self):
+        """Test migrate state schema to earlier version raises exception."""
+        latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        not_latest_schema_version = python_utils.UNICODE(
+            latest_schema_version - 1)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': not_latest_schema_version
+            })
+        ]
+        exception_string = (
+            'Expected to migrate to the latest state schema '
+            'version %s, received %s' % (
+                latest_schema_version, not_latest_schema_version)
+        )
+        with self.assertRaisesRegexp(Exception, exception_string):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID, migration_change_list,
+                'Ran Exploration Migration job.')
+
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
@@ -2694,6 +2747,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
+
     SECOND_USERNAME = 'abc123'
     SECOND_EMAIL = 'abc123@gmail.com'
 
@@ -2993,6 +3047,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to the exploration commit log."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3166,11 +3221,12 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
-        # TODO(frederikcreemers@gmail.com): test max_age here.
+        # TODO(frederikcreemers@gmail.com): Test max_age here.
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
+
     USER_ID_1 = 'user_1'
     USER_ID_2 = 'user_2'
 
@@ -3352,6 +3408,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3485,6 +3542,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3623,23 +3681,12 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         }
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(list(actual_summaries.keys()),
-                         list(expected_summaries.keys()))
-        simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings', 'status',
-                        'community_owned', 'owner_ids',
-                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
-                        'contributor_ids', 'version',
-                        'exploration_model_created_on',
-                        'exploration_model_last_updated']
-        for exp_id in actual_summaries:
-            for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
+        self.assertItemsEqual(actual_summaries, expected_summaries)
 
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
@@ -4015,6 +4062,38 @@ title: Old Title
             exploration.init_state.interaction.hints[0].hint_content.content_id,
             'hint_1')
 
+    def test_update_interaction_hints_invalid_parameter_type(self):
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.hints, [])
+
+        # The passed hints should be a list.
+        hint_dict = {
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>')
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception,
+                                     'Expected hints_list to be a list.*'):
+            hints_update = exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_dict
+            })
+            exp_services.update_exploration(
+                self.albert_id, self.NEW_EXP_ID, [hints_update],
+                'Changed hints.'
+            )
+
     def test_update_interaction_solutions(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertIsNone(exploration.init_state.interaction.solution)
@@ -4061,6 +4140,18 @@ title: Old Title
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution)
+        solution = None
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'state_name': exploration.init_state_name,
+                'new_value': solution
+            })], 'Changed interaction_solutions.')
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.solution,
+            None)
 
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -4091,6 +4182,7 @@ title: Old Title
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
+
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     EXP_ID3 = 'exp_id3'
@@ -4281,6 +4373,68 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
+
+    def test_get_exp_with_draft_applied_when_draft_has_invalid_math_tags(self):
+        """Test the method get_exp_with_draft_applied when the draft_changes
+        have invalid math-tags in them.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_customization_args_dict = {
+            'choices': {
+                'value': [
+                    '<p>state customization arg html 1</p>',
+                    '<p>state customization arg html 2</p>',
+                    '<p>state customization arg html 3</p>',
+                    '<p>state customization arg html 4</p>'
+                ]
+            },
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            }
+        }
+        state.update_interaction_id('ItemSelectionInput')
+        state.update_interaction_customization_args(
+            state_customization_args_dict)
+        exp_services.save_new_exploration(self.USER_ID, exploration)
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'State1',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'choices': {
+                    'value': [
+                        '<p>1</p>',
+                        '<p>2</p>',
+                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
+                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                         'uot;"></oppia-noninteractive-math>'),
+                        '<p>4</p>'
+                    ]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 1
+                },
+                'minAllowableSelectionCount': {
+                    'value': 1
+                }
+            }
+        }).to_dict()]
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, 'exp_id'), user_id=self.USER_ID,
+            exploration_id='exp_id',
+            draft_change_list=change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=2).put()
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            'exp_id', self.USER_ID)
+        self.assertIsNone(updated_exploration)
 
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):

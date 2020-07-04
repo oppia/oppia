@@ -38,6 +38,7 @@ import webtest
 
 class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for play exploration decorator."""
+
     user_email = 'user@example.com'
     username = 'user'
     published_exp_id = 'exp_id_1'
@@ -114,6 +115,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
 
 class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for play collection decorator."""
+
     user_email = 'user@example.com'
     username = 'user'
     published_exp_id = 'exp_id_1'
@@ -201,6 +203,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
 class EditCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_edit_collection decorator."""
+
     user_email = 'user@example.com'
     username = 'user'
     published_exp_id = 'exp_id_1'
@@ -309,6 +312,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
 class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_create_exploration decorator."""
+
     username = 'banneduser'
     user_email = 'user@example.com'
 
@@ -356,6 +360,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
 
 class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_create_collection decorator."""
+
     username = 'collectioneditor'
     user_email = 'user@example.com'
 
@@ -412,6 +417,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
 
 class AccessCreatorDashboardTests(test_utils.GenericTestBase):
     """Tests for can_access_creator_dashboard decorator."""
+
     username = 'banneduser'
     user_email = 'user@example.com'
 
@@ -447,6 +453,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
 
 class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_comment_on_feedback_thread decorator."""
+
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
     viewer_username = 'viewer'
@@ -560,6 +567,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
 
 class CreateFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_create_feedback_thread decorator."""
+
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
     viewer_username = 'viewer'
@@ -641,6 +649,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
 
 class ViewFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_view_feedback_thread decorator."""
+
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
     viewer_username = 'viewer'
@@ -726,6 +735,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
 class ManageEmailDashboardTests(test_utils.GenericTestBase):
     """Tests for can_manage_email_dashboard decorator."""
+
     query_id = 'query_id'
 
     class MockHandler(base.BaseHandler):
@@ -774,6 +784,7 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
 
 class RateExplorationTests(test_utils.GenericTestBase):
     """Tests for can_rate_exploration decorator."""
+
     username = 'user'
     user_email = 'user@example.com'
     exp_id = 'exp_id'
@@ -843,6 +854,7 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
 
 class FlagExplorationTests(test_utils.GenericTestBase):
     """Tests for can_flag_exploration decorator."""
+
     username = 'user'
     user_email = 'user@example.com'
     exp_id = 'exp_id'
@@ -877,6 +889,7 @@ class FlagExplorationTests(test_utils.GenericTestBase):
 
 class SubscriptionToUsersTests(test_utils.GenericTestBase):
     """Tests for can_subscribe_to_users decorator."""
+
     username = 'user'
     user_email = 'user@example.com'
 
@@ -945,6 +958,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
 class VoiceoverExplorationTests(test_utils.GenericTestBase):
     """Tests for can_voiceover_exploration decorator."""
+
     role = rights_manager.ROLE_VOICE_ARTIST
     username = 'user'
     user_email = 'user@example.com'
@@ -1078,6 +1092,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
 class EditExplorationTests(test_utils.GenericTestBase):
     """Tests for can_edit_exploration decorator."""
+
     username = 'banneduser'
     user_email = 'user@example.com'
     published_exp_id = 'exp_0'
@@ -1247,6 +1262,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
 
 class DeleteExplorationTests(test_utils.GenericTestBase):
     """Tests for can_delete_exploration decorator."""
+
     private_exp_id = 'exp_0'
     published_exp_id = 'exp_1'
 
@@ -1328,6 +1344,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
 class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
     """Tests for can_suggest_changes_to_exploration decorator."""
+
     username = 'user'
     user_email = 'user@example.com'
     banned_username = 'banneduser'
@@ -1368,6 +1385,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
 
 class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
     """Tests for can_suggest_changes decorator."""
+
     username = 'user'
     user_email = 'user@example.com'
     banned_username = 'banneduser'
@@ -1406,6 +1424,7 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
 
 class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
     """Tests for can_resubmit_suggestion decorator."""
+
     owner_username = 'owner'
     owner_email = 'owner@example.com'
     author_username = 'author'
@@ -1469,6 +1488,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
 
 class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     """Tests for get_decorator_for_accepting_suggestion decorator."""
+
     AUTHOR_USERNAME = 'author'
     AUTHOR_EMAIL = 'author@example.com'
     VIEWER_USERNAME = 'user'
@@ -1553,6 +1573,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
 class PublishExplorationTests(test_utils.GenericTestBase):
     """Tests for can_publish_exploration decorator."""
+
     private_exp_id = 'exp_0'
     public_exp_id = 'exp_1'
 
@@ -1626,6 +1647,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
 class ModifyExplorationRolesTests(test_utils.GenericTestBase):
     """Tests for can_modify_exploration_roles decorator."""
+
     private_exp_id = 'exp_0'
 
     class MockHandler(base.BaseHandler):
@@ -1828,6 +1850,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
 class EditTopicDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_topic."""
+
     manager_username = 'topicmanager'
     manager_email = 'topicmanager@example.com'
     viewer_username = 'viewer'
@@ -1859,9 +1882,9 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -1900,6 +1923,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
 class EditStoryDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_story."""
+
     manager_username = 'topicmanager'
     manager_email = 'topicmanager@example.com'
     viewer_username = 'viewer'
@@ -1931,7 +1955,6 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -1989,6 +2012,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
 class AddStoryToTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_add_new_story_to_topic."""
+
     manager_username = 'topicmanager'
     manager_email = 'topicmanager@example.com'
     viewer_username = 'viewer'
@@ -2021,9 +2045,9 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
                 '/mock_add_story_to_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2045,6 +2069,15 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id)
         self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_topic_manager_cannot_add_story_to_topic_with_invalid_topic_id(
+            self):
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_add_story_to_topic/incorrect_id',
+                expected_status_int=404)
         self.logout()
 
     def test_topic_manager_can_add_story_to_topic(self):
@@ -2078,6 +2111,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
 class StoryViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_story_viewer_page."""
+
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
@@ -2110,7 +2144,6 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2141,6 +2174,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
 class CreateSkillTests(test_utils.GenericTestBase):
     """Tests for decorator can_create_skill."""
+
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
@@ -2194,6 +2228,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
 
 class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_question_skill_status."""
+
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
     skill_id = '1'
@@ -2258,6 +2293,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
 class CreateTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_create_topic."""
+
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
@@ -2310,6 +2346,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
 
 class ManageRightsForTopicTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_rights_for_topic."""
+
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
     topic_id = 'topic_1'
@@ -2367,6 +2404,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 
 class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_change_topic_publication_status."""
+
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
@@ -2374,8 +2412,10 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         @acl_decorators.can_change_topic_publication_status
-        def get(self):
-            self.render_json({})
+        def get(self, topic_id):
+            self.render_json({
+                topic_id: topic_id
+            })
 
     def setUp(self):
         super(ChangeTopicPublicationStatusTests, self).setUp()
@@ -2387,23 +2427,41 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
 
+        self.topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name1',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
-                '/mock_change_publication_status', self.MockHandler)],
+                '/mock_change_publication_status/<topic_id>',
+                self.MockHandler)],
             debug=feconf.DEBUG,
         ))
 
     def test_admin_can_change_topic_publication_status(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_change_publication_status')
+            self.get_json('/mock_change_publication_status/%s' % self.topic_id)
+        self.logout()
+
+    def test_can_not_change_topic_publication_status_with_invalid_topic_id(
+            self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_change_publication_status/invalid_topic_id',
+                expected_status_int=404)
         self.logout()
 
     def test_banned_user_cannot_change_topic_publication_status(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_change_publication_status', expected_status_int=401)
+                '/mock_change_publication_status/%s' % self.topic_id,
+                expected_status_int=401)
             self.assertIn(
                 'does not have enough rights to publish or unpublish the '
                 'topic.', response['error'])
@@ -2412,7 +2470,8 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     def test_guest_cannot_change_topic_publication_status(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_change_publication_status', expected_status_int=401)
+                '/mock_change_publication_status/%s' % self.topic_id,
+                expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
@@ -2464,6 +2523,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 
 class EditSkillDecoratorTests(test_utils.GenericTestBase):
     """Tests permissions for accessing the skill editor."""
+
     second_admin_username = 'adm2'
     second_admin_email = 'adm2@example.com'
     manager_username = 'topicmanager'
@@ -2537,6 +2597,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
 class EditQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_question."""
+
     question_id = 'question_id'
 
     class MockHandler(base.BaseHandler):
@@ -2619,6 +2680,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
 class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_play_question."""
+
     question_id = 'question_id'
 
     class MockHandler(base.BaseHandler):
@@ -2650,6 +2712,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 
 class PlayEntityDecoratorTests(test_utils.GenericTestBase):
     """Test the decorator can_play_entity."""
+
     user_email = 'user@example.com'
     username = 'user'
     published_exp_id = 'exp_id_1'
@@ -2821,7 +2884,6 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2830,6 +2892,16 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_TOPIC, topic_id))
             self.assertEqual(response['entity_id'], topic_id)
             self.assertEqual(response['entity_type'], 'topic')
+        self.logout()
+
+    def test_cannot_edit_topic_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        topic_id = 'incorrect_id'
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_TOPIC, topic_id),
+                expected_status_int=404)
         self.logout()
 
     def test_can_edit_skill(self):
@@ -2852,7 +2924,6 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             topic_id)
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2871,6 +2942,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
 class SaveExplorationTests(test_utils.GenericTestBase):
     """Tests for can_save_exploration decorator."""
+
     role = rights_manager.ROLE_VOICE_ARTIST
     username = 'user'
     user_email = 'user@example.com'

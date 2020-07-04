@@ -52,6 +52,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
@@ -63,7 +64,7 @@ import utils
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, job_models,
+    feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -72,7 +73,7 @@ import utils
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -89,6 +90,7 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
+USER_ID_REGEX = 'uid_[a-z]{32}'
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'FeedbackAnalyticsAggregator',
     'InteractionAnswerSummariesAggregator',
@@ -320,10 +322,10 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
         Returns:
             tuple(str, list(tuple), dict). A tuple with first element as
-                external model name, second element as a tuple of
-                cls.external_instance_details and the third element
-                as a properties dict with key as property name in summary
-                model and value as property name in external model.
+            external model name, second element as a tuple of
+            cls.external_instance_details and the third element
+            as a properties dict with key as property name in summary
+            model and value as property name in external model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -485,7 +487,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
 
         Returns:
             change_domain.BaseChange. A domain object class for the
-                changes made by commit commands of the model.
+            changes made by commit commands of the model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -608,7 +610,7 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^\\d+$'
+        return r'^%s$' % USER_ID_REGEX
 
     @classmethod
     def _get_exp_ids(cls, unused_item):
@@ -685,10 +687,10 @@ class BaseUserModelValidator(BaseModelValidator):
 
         Returns:
             list(tuple(str, str, list, str, list).
-                A list of tuple which consists of External model name,
-                property name in model, list of property value in model,
-                property name in external model, list of property value
-                in external model.
+            A list of tuple which consists of External model name,
+            property name in model, list of property value in model,
+            property name in external model, list of property value
+            in external model.
         """
         return []
 
@@ -784,6 +786,22 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
+
+
+class UsernameChangeAuditModelValidator(BaseModelValidator):
+    """Class for validating UsernameChangeAuditModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [committer_id].[timestamp_in_sec]
+        # committer_id refers to the user that is making the change.
+        regex_string = '^%s\\.\\d+$' % item.committer_id
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {'committer_ids': (
+            user_models.UserSettingsModel, [item.committer_id])}
 
 
 class ClassifierTrainingJobModelValidator(BaseModelValidator):
@@ -975,6 +993,8 @@ class CollectionModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 collection_models.CollectionSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                collection_models.CollectionRightsAllUsersModel, [item.id])
         }
 
 
@@ -1095,6 +1115,19 @@ class CollectionRightsSnapshotContentModelValidator(
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class CollectionRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating CollectionRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_rights_ids': (
+                collection_models.CollectionRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -1689,8 +1722,9 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return (
-            '^\\d+\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
+            '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
+                USER_ID_REGEX,
                 ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
 
@@ -1757,6 +1791,8 @@ class ExplorationModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 exp_models.ExplorationSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                exp_models.ExplorationRightsAllUsersModel, [item.id])
         }
 
 
@@ -1881,6 +1917,19 @@ class ExplorationRightsSnapshotContentModelValidator(
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class ExplorationRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating ExplorationRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_rights_ids': (
+                exp_models.ExplorationRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -2181,7 +2230,7 @@ class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
         thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
             ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
-        regex_string = '^\\d*\\.%s$' % thread_id_string
+        regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
         return regex_string
 
     @classmethod
@@ -2216,7 +2265,7 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^\\d*$'
+        return '^%s$' % USER_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2266,7 +2315,7 @@ class JobModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [job_type].[current time].[random int]
+        # Valid id: [job_type]-[current time]-[random int]
         regex_string = '^%s-\\d*-\\d*$' % item.job_type
         return regex_string
 
@@ -2425,6 +2474,19 @@ class QuestionModelValidator(BaseModelValidator):
                 snapshot_model_ids),
             'linked_skill_ids': (
                 skill_models.SkillModel, item.linked_skill_ids)
+        }
+
+
+class ExplorationContextModelValidator(BaseModelValidator):
+    """Class for validating ExplorationContextModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_ids': (
+                story_models.StoryModel, [item.story_id]),
+            'exp_ids': (
+                exp_models.ExplorationModel, [item.id])
         }
 
 
@@ -2975,8 +3037,8 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_node_count(cls, item):
-        """Validate that node_count of model is equal to number of nodes
+    def _validate_node_titles(cls, item):
+        """Validate that node_titles of model is equal to list of node titles
         in StoryModel.story_contents.
 
         Args:
@@ -2993,11 +3055,12 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
             if story_model is None or story_model.deleted:
                 continue
             nodes = story_model.story_contents['nodes']
-            if item.node_count != len(nodes):
-                cls.errors['node count check'].append((
-                    'Entity id %s: Node count: %s does not match the '
-                    'number of nodes in story_contents dict: %s') % (
-                        item.id, item.node_count, nodes))
+            node_titles = [node.title for node in nodes]
+            if item.node_titles != node_titles:
+                cls.errors['node titles check'].append((
+                    'Entity id %s: Node titles: %s does not match the '
+                    'nodes in story_contents dict: %s') % (
+                        item.id, item.node_titles, nodes))
 
     @classmethod
     def _get_external_model_properties(cls):
@@ -3020,7 +3083,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_node_count]
+        return [cls._validate_node_titles]
 
 
 class GeneralSuggestionModelValidator(BaseModelValidator):
@@ -3203,7 +3266,9 @@ class TopicModelValidator(BaseModelValidator):
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
                 ['%s-%s' % (
-                    item.id, subtopic['id']) for subtopic in item.subtopics])
+                    item.id, subtopic['id']) for subtopic in item.subtopics]),
+            'all_users_model_ids': (
+                topic_models.TopicRightsAllUsersModel, [item.id])
         }
 
     @classmethod
@@ -3257,25 +3322,11 @@ class TopicModelValidator(BaseModelValidator):
                             item.id, skill_id, subtopic['id']))
 
     @classmethod
-    def _validate_abbreviated_name_is_nonempty(cls, item):
-        """Validate that abbreviated name is nonempty.
-
-        Args:
-            item: ndb.Model. TopicModel to validate.
-        """
-        if not item.abbreviated_name:
-            cls.errors['abbreviated name check'].append(
-                'Entity id %s : Topic name %s: Expected nonempty '
-                'abbreviated name, but received %s.' % (
-                    item.id, item.name, item.abbreviated_name))
-
-    @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_canonical_name_is_unique,
             cls._validate_canonical_name_matches_name_in_lowercase,
-            cls._validate_uncategorized_skill_ids_not_in_subtopic_skill_ids,
-            cls._validate_abbreviated_name_is_nonempty]
+            cls._validate_uncategorized_skill_ids_not_in_subtopic_skill_ids]
 
 
 class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
@@ -3365,6 +3416,19 @@ class TopicRightsSnapshotContentModelValidator(
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class TopicRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating TopicRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'topic_rights_ids': (
+                topic_models.TopicRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -4786,6 +4850,24 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
             cls._validate_score]
 
 
+class UserCommunityRightsModelValidator(BaseUserModelValidator):
+    """Class for validating UserCommunityRightsModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return user_domain.UserCommunityRights(
+            item.id, item.can_review_translation_for_language_codes,
+            item.can_review_voiceover_for_language_codes,
+            item.can_review_questions)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id])
+        }
+
+
 class PendingDeletionRequestModelValidator(BaseUserModelValidator):
     """Class for validating PendingDeletionRequestModels."""
 
@@ -4860,9 +4942,106 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
             cls._validate_collections_are_marked_deleted]
 
 
+class TaskEntryModelValidator(BaseModelValidator):
+    """One off job for auditing task entries."""
+
+    # The name of the model which is to be used in the error messages.
+    MODEL_NAME = 'task entry'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return re.escape(improvements_models.TaskEntryModel.generate_task_id(
+            item.entity_type, item.entity_id, item.entity_version,
+            item.task_type, item.target_type, item.target_id))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'resolver_ids': (
+                user_models.UserSettingsModel,
+                [item.resolver_id] if item.resolver_id is not None else []),
+            'entity_ids': (exp_models.ExplorationModel, [item.entity_id])
+        }
+
+    @classmethod
+    def _validate_composite_entity_id(cls, item):
+        """Validates the composite_entity_id field of the given item.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
+        expected_composite_entity_id = (
+            improvements_models.TaskEntryModel.generate_composite_entity_id(
+                item.entity_type, item.entity_id, item.entity_version))
+        if item.composite_entity_id != expected_composite_entity_id:
+            cls.errors['composite_entity_id field check'].append(
+                'Entity id %s: composite_entity_id "%s" should be "%s"' % (
+                    item.id,
+                    item.composite_entity_id,
+                    expected_composite_entity_id))
+
+    @classmethod
+    def _validate_status(cls, item):
+        """Validates the fields of the item relating to the status field.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
+        if item.status == improvements_models.TASK_STATUS_OPEN:
+            if item.resolver_id:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is open but resolver_id is "%s", '
+                    'should be empty.' % (item.id, item.resolver_id))
+            if item.resolved_on:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is open but resolved_on is "%s", '
+                    'should be empty.' % (item.id, item.resolved_on))
+        elif item.status == improvements_models.TASK_STATUS_RESOLVED:
+            if item.resolver_id is None:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is resolved but resolver_id is not '
+                    'set' % (item.id,))
+            if item.resolved_on is None:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is resolved but resolved_on is not '
+                    'set' % (item.id,))
+
+    @classmethod
+    def _validate_target_id(cls, item):
+        """Validate that the given item contains an existing exploration state
+        name.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
+        try:
+            exp_model = exp_models.ExplorationModel.get(
+                item.entity_id, strict=True, version=item.entity_version)
+        except Exception:
+            cls.errors['target_id field check'].append(
+                'Entity id %s: exploration with id "%s" does not exist at '
+                'version %d' % (item.id, item.entity_id, item.entity_version))
+            return
+        if item.target_id not in exp_model.states.keys():
+            cls.errors['target_id field check'].append(
+                'Entity id %s: exploration with id "%s" does not have a state '
+                'named "%s" at version %d' % (
+                    item.id, item.entity_id, item.target_id,
+                    item.entity_version))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_composite_entity_id,
+            cls._validate_status,
+            cls._validate_target_id,
+        ]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
+    audit_models.UsernameChangeAuditModel: UsernameChangeAuditModelValidator,
     classifier_models.ClassifierTrainingJobModel: (
         ClassifierTrainingJobModelValidator),
     classifier_models.TrainingJobExplorationMappingModel: (
@@ -4879,6 +5058,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         CollectionRightsSnapshotContentModelValidator),
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
+    collection_models.CollectionRightsAllUsersModel: (
+        CollectionRightsAllUsersModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
     config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
     config_models.ConfigPropertySnapshotMetadataModel: (
@@ -4889,6 +5070,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
         GeneralFeedbackEmailReplyToIdModelValidator),
+    exp_models.ExplorationContextModel: (
+        ExplorationContextModelValidator),
     exp_models.ExplorationModel: ExplorationModelValidator,
     exp_models.ExplorationSnapshotMetadataModel: (
         ExplorationSnapshotMetadataModelValidator),
@@ -4899,6 +5082,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ExplorationRightsSnapshotMetadataModelValidator),
     exp_models.ExplorationRightsSnapshotContentModel: (
         ExplorationRightsSnapshotContentModelValidator),
+    exp_models.ExplorationRightsAllUsersModel: (
+        ExplorationRightsAllUsersModelValidator),
     exp_models.ExplorationCommitLogEntryModel: (
         ExplorationCommitLogEntryModelValidator),
     exp_models.ExpSummaryModel: ExpSummaryModelValidator,
@@ -4910,6 +5095,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
         GeneralFeedbackThreadUserModelValidator),
     feedback_models.FeedbackAnalyticsModel: FeedbackAnalyticsModelValidator,
     feedback_models.UnsentFeedbackEmailModel: UnsentFeedbackEmailModelValidator,
+    improvements_models.TaskEntryModel: TaskEntryModelValidator,
     job_models.JobModel: JobModelValidator,
     job_models.ContinuousComputationModel: ContinuousComputationModelValidator,
     opportunity_models.ExplorationOpportunitySummaryModel: (
@@ -4958,6 +5144,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
         TopicRightsSnapshotMetadataModelValidator),
     topic_models.TopicRightsSnapshotContentModel: (
         TopicRightsSnapshotContentModelValidator),
+    topic_models.TopicRightsAllUsersModel: TopicRightsAllUsersModelValidator,
     topic_models.TopicCommitLogEntryModel: (
         TopicCommitLogEntryModelValidator),
     topic_models.TopicSummaryModel: TopicSummaryModelValidator,
@@ -4989,20 +5176,51 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
         UserContributionScoringModelValidator),
+    user_models.UserCommunityRightsModel: UserCommunityRightsModelValidator,
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator)
 }
 
 
-class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class ProdValidationAuditOneOffJobMetaClass(type):
+    """Type class for audit one off jobs. Registers classes inheriting from
+    ProdValidationAuditOneOffJob in a list. With this strategy, job writers can
+    define them in separate modules while allowing us to assert that each model
+    has an audit job.
+    """
+
+    _MODEL_AUDIT_ONE_OFF_JOB_NAMES = set()
+
+    def __new__(mcs, name, bases, dct):
+        mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES.add(name)
+        return super(ProdValidationAuditOneOffJobMetaClass, mcs).__new__(
+            mcs, name, bases, dct)
+
+    @classmethod
+    def get_model_audit_job_names(mcs):
+        """Returns list of job names that have inherited from
+        ProdValidationAuditOneOffJob.
+
+        Returns:
+            tuple(str). The names of the one off audit jobs of this class type.
+        """
+        return sorted(mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES)
+
+
+class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
+        python_utils.with_metaclass(
+            ProdValidationAuditOneOffJobMetaClass,
+            jobs.BaseMapReduceOneOffJobManager)):
     """Job that audits and validates production models."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         raise NotImplementedError
 
     @staticmethod
     def map(model_instance):
+        """Implements a map function which defers to a pre-defined validator."""
         if not model_instance.deleted:
             model_name = model_instance.__class__.__name__
             validator_cls = MODEL_TO_VALIDATOR_MAPPING[type(model_instance)]
@@ -5020,6 +5238,7 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
+        """Yields number of fully validated models or the failure messages."""
         if 'fully-validated' in key:
             yield (key, len(values))
         else:
@@ -5040,6 +5259,14 @@ class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [audit_models.RoleQueryAuditModel]
+
+
+class UsernameChangeAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UsernameChangeAuditModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [audit_models.UsernameChangeAuditModel]
 
 
 class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -5109,6 +5336,14 @@ class CollectionRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionRightsSnapshotContentModel]
+
+
+class CollectionRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionRightsAllUsersModel]
 
 
 class CollectionCommitLogEntryModelAuditOneOffJob(
@@ -5248,6 +5483,15 @@ class ExplorationRightsSnapshotContentModelAuditOneOffJob(
         return [exp_models.ExplorationRightsSnapshotContentModel]
 
 
+class ExplorationRightsAllUsersModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsAllUsersModel]
+
+
 class ExplorationCommitLogEntryModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
     """Job that audits and validates ExplorationCommitLogEntryModel."""
@@ -5336,6 +5580,14 @@ class QuestionSkillLinkModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [question_models.QuestionSkillLinkModel]
+
+
+class ExplorationContextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationContextModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationContextModel]
 
 
 class QuestionSnapshotMetadataModelAuditOneOffJob(
@@ -5543,6 +5795,14 @@ class TopicRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [topic_models.TopicRightsSnapshotContentModel]
+
+
+class TopicRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates TopicRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicRightsAllUsersModel]
 
 
 class TopicCommitLogEntryModelAuditOneOffJob(
@@ -5763,9 +6023,25 @@ class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserContributionScoringModel]
 
 
+class UserCommunityRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserCommunityRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserCommunityRightsModel]
+
+
 class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates PendingDeletionRequestModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PendingDeletionRequestModel]
+
+
+class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates TaskEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [improvements_models.TaskEntryModel]

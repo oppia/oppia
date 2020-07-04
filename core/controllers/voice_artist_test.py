@@ -54,7 +54,8 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -161,7 +162,8 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -264,6 +266,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
 class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     """This controller tests the first time tutorial for translations."""
+
     EXP_ID = 'exp1'
 
     def setUp(self):

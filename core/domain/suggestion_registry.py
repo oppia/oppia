@@ -227,6 +227,20 @@ class BaseSuggestion(python_utils.OBJECT):
             'Subclasses of BaseSuggestion should implement '
             'pre_update_validate.')
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion."""
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'get_all_html_content_strings.')
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in a suggestion change and converts it
+        according to the conversion function.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'convert_html_in_suggestion_change.')
+
     @property
     def is_handled(self):
         """Returns if the suggestion has either been accepted or rejected.
@@ -316,7 +330,7 @@ class SuggestionEditStateContent(BaseSuggestion):
 
         Returns:
             list(ExplorationChange). The change_list corresponding to the
-                suggestion.
+            suggestion.
         """
         change = self.change
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
@@ -377,6 +391,32 @@ class SuggestionEditStateContent(BaseSuggestion):
         elif self.change.new_value['html'] == change.new_value['html']:
             raise utils.ValidationError(
                 'The new html must not match the old html')
+
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = [self.change.new_value['html']]
+        if self.change.old_value is not None:
+            html_string_list.append(self.change.old_value['html'])
+        return html_string_list
+
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in a suggestion change and converts it
+        according to the conversion function.
+
+        Args:
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        """
+        if self.change.old_value is not None:
+            self.change.old_value['html'] = (
+                conversion_fn(self.change.old_value['html']))
+        self.change.new_value['html'] = (
+            conversion_fn(self.change.new_value['html']))
 
 
 class SuggestionTranslateContent(BaseSuggestion):
@@ -466,6 +506,27 @@ class SuggestionTranslateContent(BaseSuggestion):
             self.final_reviewer_id, self.target_id, [self.change],
             commit_message, is_suggestion=True)
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        return [self.change.translation_html, self.change.content_html]
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in a suggestion change and converts it
+        according to the conversion function.
+
+        Args:
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        """
+        self.change.content_html = (
+            conversion_fn(self.change.content_html))
+        self.change.translation_html = (
+            conversion_fn(self.change.translation_html))
+
 
 class SuggestionAddQuestion(BaseSuggestion):
     """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION.
@@ -503,7 +564,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.status = status
         self.author_id = author_id
         self.final_reviewer_id = final_reviewer_id
-        self.change = question_domain.QuestionChange(change)
+        self.change = question_domain.QuestionSuggestionChange(change)
         # Update question_state_data_schema_version here instead of surfacing
         # the version in the frontend.
         self.change.question_dict['question_state_data_schema_version'] = (
@@ -526,9 +587,10 @@ class SuggestionAddQuestion(BaseSuggestion):
                 ', received "%s"' % (
                     suggestion_models.SCORE_TYPE_QUESTION,
                     self.get_score_type()))
-        if not isinstance(self.change, question_domain.QuestionChange):
+        if not isinstance(
+                self.change, question_domain.QuestionSuggestionChange):
             raise utils.ValidationError(
-                'Expected change to be an instance of QuestionChange')
+                'Expected change to be an instance of QuestionSuggestionChange')
 
         if not self.change.cmd:
             raise utils.ValidationError('Expected change to contain cmd')
@@ -543,6 +605,17 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not self.change.question_dict:
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
+
+        if not self.change.skill_difficulty:
+            raise utils.ValidationError(
+                'Expected change to contain skill_difficulty')
+
+        skill_difficulties = list(
+            constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
+        if self._get_skill_difficulty() not in skill_difficulties:
+            raise utils.ValidationError(
+                'Expected change skill_difficulty to be one of %s, found %s '
+                % (skill_difficulties, self._get_skill_difficulty()))
 
         question = question_domain.Question(
             None, state_domain.State.from_dict(
@@ -608,7 +681,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
             self.author_id, question_dict['id'], self.change.skill_id,
-            constants.DEFAULT_SKILL_DIFFICULTY)
+            self._get_skill_difficulty())
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
@@ -637,6 +710,35 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change question_dict must not be equal to the old '
                 'question_dict')
+
+    def _get_skill_difficulty(self):
+        """Returns the suggestion's skill difficulty."""
+        return self.change.skill_difficulty
+
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        state_object = (
+            state_domain.State.from_dict(
+                self.change.question_dict['question_state_data']))
+        html_string_list = state_object.get_all_html_content_strings()
+        return html_string_list
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in the suggestion change  and converts it
+        according to the conversion function.
+
+        Args:
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        """
+        self.change.question_dict['question_state_data'] = (
+            state_domain.State.convert_html_fields_in_state(
+                self.change.question_dict['question_state_data'],
+                conversion_fn))
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):

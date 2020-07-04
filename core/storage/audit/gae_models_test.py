@@ -67,15 +67,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             audit_models.RoleQueryAuditModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                audit_models.RoleQueryAuditModel.get_user_id_migration_field()),
-            python_utils.UNICODE(audit_models.RoleQueryAuditModel.user_id))
+            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_get_model(self):
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
@@ -85,3 +77,63 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(audit_model.user_id, self.USER_ID)
         self.assertEqual(audit_model.role, self.ROLE)
         self.assertEqual(audit_model.username, self.USERNAME)
+
+
+class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
+    """Unit tests for the UsernameChangeAuditModel class."""
+
+    NONEXISTENT_COMMITTER_ID = 'id_x'
+    COMMITTER_ID = 'committer_id'
+    ID = 'committer_id.111.222'
+    OLD_USERNAME = 'old_username'
+    NEW_USERNAME = 'new_username'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UsernameChangeAuditModelUnitTests, self).setUp()
+
+        audit_models.UsernameChangeAuditModel(
+            id=self.ID,
+            committer_id=self.COMMITTER_ID,
+            old_username=self.OLD_USERNAME,
+            new_username=self.NEW_USERNAME
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            audit_models.UsernameChangeAuditModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            audit_models.UsernameChangeAuditModel
+            .has_reference_to_user_id(self.COMMITTER_ID)
+        )
+        self.assertFalse(
+            audit_models.UsernameChangeAuditModel
+            .has_reference_to_user_id(self.NONEXISTENT_COMMITTER_ID)
+        )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            audit_models.UsernameChangeAuditModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                audit_models.UsernameChangeAuditModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                audit_models.UsernameChangeAuditModel.committer_id))
+
+    def test_get_model(self):
+        audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
+
+        self.assertEqual(audit_model.id, self.ID)
+        self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)
+        self.assertEqual(audit_model.old_username, self.OLD_USERNAME)
+        self.assertEqual(audit_model.new_username, self.NEW_USERNAME)

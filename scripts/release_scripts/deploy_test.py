@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/deploy.py."""
+"""Unit tests for scripts/release_scripts/deploy.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -33,12 +33,8 @@ from scripts.release_scripts import deploy
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
 # pylint: disable=wrong-import-position
-import github # isort:skip
+import github  # isort:skip
 # pylint: enable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
@@ -53,6 +49,7 @@ VALID_CONSTANTS = os.path.join(RELEASE_TEST_DIR, 'valid_constants.txt')
 
 class MockCD(python_utils.OBJECT):
     """Mock for context manager for changing the current working directory."""
+
     def __init__(self, unused_new_path):
         pass
 
@@ -170,7 +167,18 @@ class DeployTests(test_utils.GenericTestBase):
         with get_branch_swap, args_swap, self.install_swap:
             with self.assertRaisesRegexp(
                 Exception,
-                'Test branch cannot be deployed to prod.'):
+                'Test branch can only be deployed to backup server.'):
+                deploy.execute_deployment()
+
+    def test_exception_is_raised_for_deploying_test_branch_to_test_server(self):
+        def mock_get_branch():
+            return 'test-deploy'
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with get_branch_swap, self.args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                Exception,
+                'Test branch can only be deployed to backup server.'):
                 deploy.execute_deployment()
 
     def test_invalid_branch(self):
@@ -193,17 +201,33 @@ class DeployTests(test_utils.GenericTestBase):
                 'Current release version has \'.\' character.'):
                 deploy.execute_deployment()
 
+    def test_invalid_release_version_length(self):
+        args_swap = self.swap(
+            sys, 'argv', [
+                'deploy.py', '--app_name=oppiatestserver',
+                '--version=release-1.2.3-invalid-too-long'])
+        with self.get_branch_swap, args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                AssertionError,
+                'The length of the "version" arg should be less than or '
+                'equal to 25 characters.'):
+                deploy.execute_deployment()
+
     def test_invalid_last_commit_msg(self):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         def mock_check_output(unused_cmd_tokens):
             return 'Invalid'
+        def mock_get_personal_access_token():
+            return 'test'
         out_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
+        get_token_swap = self.swap(
+            common, 'get_personal_access_token', mock_get_personal_access_token)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.run_swap, self.create_swap, args_swap, out_swap:
-                    with self.assertRaisesRegexp(
+                    with get_token_swap, self.assertRaisesRegexp(
                         Exception, 'Invalid last commit message: Invalid.'):
                         deploy.execute_deployment()
 
@@ -211,7 +235,7 @@ class DeployTests(test_utils.GenericTestBase):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         feconf_swap = self.swap(
-            deploy, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
+            common, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
         def mock_main(unused_personal_access_token):
             pass
         def mock_get_personal_access_token():
@@ -314,7 +338,7 @@ class DeployTests(test_utils.GenericTestBase):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
-        def mock_build_scripts():
+        def mock_build_scripts(unused_maintenance_mode):
             check_function_calls['build_scripts_gets_called'] = True
         def mock_deploy_application_and_write_log_entry(
                 unused_app_name, version_to_deploy_to,
@@ -385,7 +409,7 @@ class DeployTests(test_utils.GenericTestBase):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
-        def mock_build_scripts():
+        def mock_build_scripts(unused_maintenance_mode):
             check_function_calls['build_scripts_gets_called'] = True
         def mock_deploy_application_and_write_log_entry(
                 unused_app_name, version_to_deploy_to,
@@ -482,7 +506,8 @@ class DeployTests(test_utils.GenericTestBase):
 
     def test_invalid_dev_mode(self):
         constants_swap = self.swap(
-            deploy, 'CONSTANTS_FILE_PATH',
+            common,
+            'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_DEV_MODE)
         with self.exists_swap, self.copyfile_swap, constants_swap:
             with self.listdir_swap, self.assertRaises(AssertionError):
@@ -490,7 +515,8 @@ class DeployTests(test_utils.GenericTestBase):
 
     def test_invalid_bucket_name(self):
         constants_swap = self.swap(
-            deploy, 'CONSTANTS_FILE_PATH',
+            common,
+            'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
         with self.exists_swap, self.copyfile_swap, constants_swap:
             with self.listdir_swap, self.assertRaises(AssertionError):
@@ -498,16 +524,17 @@ class DeployTests(test_utils.GenericTestBase):
 
     def test_constants_are_updated_correctly(self):
         constants_swap = self.swap(
-            deploy, 'CONSTANTS_FILE_PATH', VALID_CONSTANTS)
+            common, 'CONSTANTS_FILE_PATH', VALID_CONSTANTS)
+        files_swap = self.swap(deploy, 'FILES_AT_ROOT', [])
+        images_dir_swap = self.swap(deploy, 'IMAGE_DIRS', [])
         with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
             original_content = f.read()
         expected_content = original_content.replace(
-            '"DEV_MODE": true', '"DEV_MODE": false').replace(
-                '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
-                '"GCS_RESOURCE_BUCKET_NAME": "oppiaserver%s",' % (
-                    deploy.BUCKET_NAME_SUFFIX))
+            '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
+            '"GCS_RESOURCE_BUCKET_NAME": "oppiaserver%s",' % (
+                deploy.BUCKET_NAME_SUFFIX))
         try:
-            with self.exists_swap, self.copyfile_swap, constants_swap:
+            with self.exists_swap, constants_swap, files_swap, images_dir_swap:
                 with self.listdir_swap:
                     deploy.preprocess_release('oppiaserver', 'deploy_dir')
             with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
@@ -554,10 +581,28 @@ class DeployTests(test_utils.GenericTestBase):
             return process
         # pylint: enable=unused-argument
         with self.swap(subprocess, 'Popen', mock_popen):
-            deploy.build_scripts()
+            deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
             ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
+
+    def test_build_with_maintenance_mode(self):
+        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
+        cmd_tokens = []
+        # pylint: disable=unused-argument
+        def mock_popen(tokens, stdout):
+            cmd_tokens.extend(tokens)
+            return process
+        # pylint: enable=unused-argument
+        with self.swap(subprocess, 'Popen', mock_popen):
+            deploy.build_scripts(True)
+        self.assertEqual(
+            cmd_tokens,
+            [
+                'python', '-m', 'scripts.build',
+                '--prod_env', '--deploy_mode', '--maintenance_mode'
+            ]
+        )
 
     def test_build_failure(self):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
@@ -570,7 +615,7 @@ class DeployTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegexp(Exception, 'Build failed.'):
-            deploy.build_scripts()
+            deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
             ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
@@ -602,41 +647,26 @@ class DeployTests(test_utils.GenericTestBase):
                     deploy.CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                 ))
 
-    def test_successful_flush_memcache(self):
-        def mock_flush_memcache(unused_app_name):
-            return True
+    def test_flush_memcache(self):
         check_function_calls = {
-            'open_tab_gets_called': False
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
         }
         expected_check_function_calls = {
-            'open_tab_gets_called': False
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
         }
         def mock_open_tab(unused_url):
-            check_function_calls['open_tab_gets_called'] = True
-        flush_memcache_swap = self.swap(
-            gcloud_adapter, 'flush_memcache', mock_flush_memcache)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with flush_memcache_swap, open_tab_swap:
-            deploy.flush_memcache('oppiaserver')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
 
-    def test_unsuccessful_flush_memcache(self):
-        def mock_flush_memcache(unused_app_name):
-            return False
-        check_function_calls = {
-            'open_tab_gets_called': False
-        }
-        expected_check_function_calls = {
-            'open_tab_gets_called': True
-        }
-        def mock_open_tab(unused_url):
-            check_function_calls['open_tab_gets_called'] = True
-        flush_memcache_swap = self.swap(
-            gcloud_adapter, 'flush_memcache', mock_flush_memcache)
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with flush_memcache_swap, open_tab_swap:
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
             deploy.flush_memcache('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -764,7 +794,7 @@ class DeployTests(test_utils.GenericTestBase):
                 deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
             self.urls_to_open, [
-                'https://travis-ci.org/oppia/oppia/branches',
+                'https://travis-ci.com/oppia/oppia/branches',
                 'https://circleci.com/gh/username/workflows/oppia'])
 
     def test_check_travis_and_circleci_tests_with_local_circleci_not_setup(

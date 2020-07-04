@@ -52,7 +52,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             DebouncerService, DeviceInfoService, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          var guppyDivElt, guppyDivId, guppyInstance;
+          var guppyDivElt, guppyDivId, guppyInstance: Guppy;
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
             '/overrides/guppy/oppia_symbols.json');
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
@@ -171,7 +171,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
           ctrl.$onInit = function() {
             guppyDivElt = $element[0].querySelector('.guppy-div');
 
-            // Dynamically assigns a unique id to the guppy-div
+            // Dynamically assigns a unique id to the guppy-div.
             guppyDivElt.setAttribute(
               'id', 'guppy_' + Math.floor(Math.random() * 100000000));
             guppyDivId = guppyDivElt.id;
@@ -182,14 +182,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 buttons: []
               },
               events: {
-                done: function(e) {
-                  ctrl.submitAnswer();
-                },
-                change: function(e) {
-                  // Need to manually trigger the digest cycle
-                  // to make any 'watchers' aware of changes in answer.
-                  $scope.$apply();
-                },
                 ready: function() {
                   if (DeviceInfoService.isMobileUserAgent() &&
                     DeviceInfoService.hasTouchEvents()) {
@@ -206,9 +198,20 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 }
               }
             });
-            Guppy.init({
-              symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
-                oppiaSymbolsUrl]});
+            guppyInstance.event('change', (e) => {
+              // Need to manually trigger the digest cycle
+              // to make any 'watchers' aware of changes in answer.
+              $scope.$apply();
+            });
+            guppyInstance.event('done', (e) => {
+              ctrl.submitAnswer();
+            });
+
+            if (angular.equals(Guppy.Symbols.symbols, {})) {
+              Guppy.init({
+                symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
+                  oppiaSymbolsUrl]});
+            }
             guppyInstance.render();
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, ctrl.isCurrentAnswerValid);

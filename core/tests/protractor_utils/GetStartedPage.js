@@ -19,14 +19,14 @@
 var waitFor = require('./waitFor.js');
 
 var GetStartedPage = function() {
-  var GET_STARTED_PAGE_URL = '/get_started';
+  var GET_STARTED_PAGE_URL = '/get-started';
 
-  this.get = function() {
-    browser.get(GET_STARTED_PAGE_URL);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(GET_STARTED_PAGE_URL);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.getMetaTagContent = function(name, type) {
+  this.getMetaTagContent = async function(name, type) {
     if (type === 'itemprop') {
       var tag = element(by.css('meta[itemprop="' + name + '"]'));
     } else if (type === 'og') {
@@ -34,10 +34,10 @@ var GetStartedPage = function() {
     } else if (type === 'name') {
       var tag = element(by.css('meta[name="' + name + '"]'));
     } else {
-      throw Error('Unsupported tag type specified: ' + type);
+      throw new Error('Unsupported tag type specified: ' + type);
     }
 
-    return tag.getAttribute('content');
+    return await tag.getAttribute('content');
   };
 };
 

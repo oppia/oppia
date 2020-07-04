@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import user_services
 from core.platform import models
@@ -44,17 +45,21 @@ ROLE_NONE = 'none'
 TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
 TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
+TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
+SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
+SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_CANONICAL_STORY = 'add_canonical_story'
 CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story'
+CMD_REARRANGE_CANONICAL_STORY = 'rearrange_canonical_story'
 CMD_ADD_ADDITIONAL_STORY = 'add_additional_story'
 CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
 CMD_PUBLISH_STORY = 'publish_story'
@@ -101,11 +106,15 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE,
-        TOPIC_PROPERTY_THUMBNAIL_FILENAME)
+        TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+        TOPIC_PROPERTY_THUMBNAIL_BG_COLOR)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
-    SUBTOPIC_PROPERTIES = (SUBTOPIC_PROPERTY_TITLE,)
+    SUBTOPIC_PROPERTIES = (
+        SUBTOPIC_PROPERTY_TITLE,
+        SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
+        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -126,6 +135,10 @@ class TopicChange(change_domain.BaseChange):
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_REARRANGE_CANONICAL_STORY,
+        'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': []
     }, {
         'name': CMD_ADD_ADDITIONAL_STORY,
@@ -264,7 +277,7 @@ class StoryReference(python_utils.OBJECT):
 
         Returns:
             StoryReference. A story reference object with given story_id and
-                'not published' status.
+            'not published' status.
         """
         return cls(story_id, False)
 
@@ -288,7 +301,9 @@ class StoryReference(python_utils.OBJECT):
 class Subtopic(python_utils.OBJECT):
     """Domain object for a Subtopic."""
 
-    def __init__(self, subtopic_id, title, skill_ids):
+    def __init__(
+            self, subtopic_id, title, skill_ids, thumbnail_filename,
+            thumbnail_bg_color):
         """Constructs a Subtopic domain object.
 
         Args:
@@ -296,10 +311,16 @@ class Subtopic(python_utils.OBJECT):
             title: str. The title of the subtopic.
             skill_ids: list(str). The list of skill ids that are part of this
                 subtopic.
+            thumbnail_filename: str|None. The thumbnail filename for the
+                subtopic.
+            thumbnail_bg_color: str|None. The thumbnail background color for
+                the subtopic.
         """
         self.id = subtopic_id
         self.title = title
         self.skill_ids = skill_ids
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
 
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
@@ -310,7 +331,9 @@ class Subtopic(python_utils.OBJECT):
         return {
             'id': self.id,
             'title': self.title,
-            'skill_ids': self.skill_ids
+            'skill_ids': self.skill_ids,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color
         }
 
     @classmethod
@@ -325,7 +348,8 @@ class Subtopic(python_utils.OBJECT):
         """
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
-            subtopic_dict['skill_ids'])
+            subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'],
+            subtopic_dict['thumbnail_bg_color'])
         return subtopic
 
     @classmethod
@@ -338,9 +362,34 @@ class Subtopic(python_utils.OBJECT):
 
         Returns:
             Subtopic. A subtopic object with given id, title and empty skill ids
-                list.
+            list.
         """
-        return cls(subtopic_id, title, [])
+        return cls(subtopic_id, title, [], None, None)
+
+    @classmethod
+    def require_valid_thumbnail_filename(cls, thumbnail_filename):
+        """Checks whether the thumbnail filename of the subtopic is a valid
+            one.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+        utils.require_valid_thumbnail_filename(thumbnail_filename)
+
+    @classmethod
+    def require_valid_thumbnail_bg_color(cls, thumbnail_bg_color):
+        """Checks whether the thumbnail background color of the subtopic is a
+            valid one.
+
+        Args:
+            thumbnail_bg_color: str. The thumbnail background color to
+                validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
+        """
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'subtopic']
 
     def validate(self):
         """Validates various properties of the Subtopic object.
@@ -349,13 +398,33 @@ class Subtopic(python_utils.OBJECT):
             ValidationError: One or more attributes of the subtopic are
                 invalid.
         """
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if self.thumbnail_bg_color is not None and not (
+                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            raise utils.ValidationError(
+                'Subtopic thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Subtopic thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Subtopic thumbnail background color is not specified.')
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
+
         if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
                 self.title)
+
+        title_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_TITLE
+        if len(self.title) > title_limit:
+            raise utils.ValidationError(
+                'Expected subtopic title to be less than %d characters, '
+                'received %s' % (title_limit, self.title))
+
         if not isinstance(self.skill_ids, list):
             raise utils.ValidationError(
                 'Expected skill ids to be a list, received %s' %
@@ -377,7 +446,7 @@ class Topic(python_utils.OBJECT):
 
     def __init__(
             self, topic_id, name, abbreviated_name, thumbnail_filename,
-            description, canonical_story_references,
+            thumbnail_bg_color, description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids,
             subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
@@ -390,6 +459,8 @@ class Topic(python_utils.OBJECT):
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated topic name.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
+            thumbnail_bg_color: str|None. The thumbnail background color of the
+                topic.
             description: str. The description of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
@@ -418,6 +489,7 @@ class Topic(python_utils.OBJECT):
         self.name = name
         self.abbreviated_name = abbreviated_name
         self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
         self.canonical_name = name.lower()
         self.description = description
         self.canonical_story_references = canonical_story_references
@@ -443,6 +515,7 @@ class Topic(python_utils.OBJECT):
             'name': self.name,
             'abbreviated_name': self.abbreviated_name,
             'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
             'description': self.description,
             'canonical_story_references': [
                 reference.to_dict()
@@ -491,23 +564,36 @@ class Topic(python_utils.OBJECT):
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
+        name_limit = android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
+        if len(name) > name_limit:
+            raise utils.ValidationError(
+                'Topic name should be at most %d characters, received %s.'
+                % (name_limit, name))
+
     @classmethod
-    def require_valid_abbreviated_name(cls, name):
-        """Checks whether the abbreviated name of the topic is a valid one.
+    def require_valid_thumbnail_filename(cls, thumbnail_filename):
+        """Checks whether the thumbnail filename of the topic is a valid
+            one.
 
         Args:
-            name: str. The abbreviated name to validate.
+            thumbnail_filename: str. The thumbnail filename to validate.
         """
-        if not isinstance(name, python_utils.BASESTRING):
-            raise utils.ValidationError('Abbreviated name should be a string.')
+        utils.require_valid_thumbnail_filename(thumbnail_filename)
 
-        if name == '':
-            raise utils.ValidationError(
-                'Abbreviated name field should not be empty.')
+    @classmethod
+    def require_valid_thumbnail_bg_color(cls, thumbnail_bg_color):
+        """Checks whether the thumbnail background color of the topic is a
+            valid one.
 
-        if len(name) > 12:
-            raise utils.ValidationError(
-                'Abbreviated name field should not exceed 12 characters.')
+        Args:
+            thumbnail_bg_color: str. The thumbnail background color to
+                validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
+        """
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic']
 
     def get_all_skill_ids(self):
         """Returns all the ids of all the skills present in the topic.
@@ -627,6 +713,40 @@ class Topic(python_utils.OBJECT):
                 'The story_id %s is not present in the canonical '
                 'story references list of the topic.' % story_id)
 
+    def rearrange_canonical_story(self, from_index, to_index):
+        """Rearranges or moves a canonical story to another position.
+
+        Args:
+            from_index: int. The index of canonical story to move.
+            to_index: int. The index at which to insert the moved canonical
+                story.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception('Expected from_index value to be a number, '
+                            'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception('Expected to_index value to be a number, '
+                            'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception('Expected from_index and to_index values '
+                            'to be different.')
+
+        if (from_index >= len(self.canonical_story_references) or
+                to_index >= len(self.canonical_story_references) or
+                from_index < 0 or to_index < 0):
+            raise Exception('Expected index values to be with-in bounds.')
+
+        canonical_story_reference_to_move = copy.deepcopy(
+            self.canonical_story_references[from_index])
+        del self.canonical_story_references[from_index]
+        self.canonical_story_references.insert(
+            to_index, canonical_story_reference_to_move)
+
     def add_canonical_story(self, story_id):
         """Adds a story to the canonical_story_references list.
 
@@ -678,24 +798,46 @@ class Topic(python_utils.OBJECT):
                 'The story_id %s is not present in the additional '
                 'story references list of the topic.' % story_id)
 
-    def validate(self):
+    def validate(self, strict=False):
         """Validates all properties of this topic and its constituents.
+
+        Args:
+            strict: bool. Enable strict checks on the topic when the topic is
+                published or is going to be published.
 
         Raises:
             ValidationError: One or more attributes of the Topic are not
                 valid.
         """
         self.require_valid_name(self.name)
-        self.require_valid_abbreviated_name(self.abbreviated_name)
-        if self.thumbnail_filename is not None and not (
-                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if self.thumbnail_bg_color is not None and not (
+                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
-                'Expected thumbnail filename to be a string, received %s'
-                % self.thumbnail_filename)
+                'Topic thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Topic thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Topic thumbnail background color is not specified.')
+        if strict:
+            if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received %s.'
+                    % self.thumbnail_filename)
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        description_limit = (
+            android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION)
+        if len(self.description) > description_limit:
+            raise utils.ValidationError(
+                'Topic description should be at most %d characters, '
+                'received %s.' % (description_limit, self.description))
 
         if not isinstance(self.subtopics, list):
             raise utils.ValidationError(
@@ -736,6 +878,11 @@ class Topic(python_utils.OBJECT):
                     'The id for subtopic %s is greater than or equal to '
                     'next_subtopic_id %s'
                     % (subtopic.id, self.next_subtopic_id))
+            if strict:
+                if not subtopic.skill_ids:
+                    raise utils.ValidationError(
+                        'Subtopic with title %s does not have any skills '
+                        'linked.' % subtopic.title)
 
         if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -781,7 +928,8 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id, name, abbreviated_name):
+    def create_default_topic(
+            cls, topic_id, name, abbreviated_name, description):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -790,16 +938,33 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
             abbreviated_name: str. The abbreviated name for the topic.
+            description: str. The description for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, abbreviated_name, None,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            topic_id, name, abbreviated_name, None, None,
+            description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+
+    @classmethod
+    def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic_dict):
+        """Converts old Subtopic schema to the modern v2 schema. v2 schema
+        introduces the thumbnail_filename and thumbnail_bg_color field.
+
+        Args:
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        subtopic_dict['thumbnail_filename'] = None
+        subtopic_dict['thumbnail_bg_color'] = None
+        return subtopic_dict
 
     @classmethod
     def update_subtopics_from_model(cls, versioned_subtopics, current_version):
@@ -807,6 +972,7 @@ class Topic(python_utils.OBJECT):
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
         passed in is modified in-place.
+
         Args:
             versioned_subtopics: dict. A dict with two keys:
                 - schema_version: str. The schema version for the
@@ -876,7 +1042,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_abbreviated_name: str. The updated abbreviated_name
-            for the topic.
+                for the topic.
         """
         self.abbreviated_name = new_abbreviated_name
 
@@ -885,9 +1051,18 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
-            for the topic.
+                for the topic.
         """
         self.thumbnail_filename = new_thumbnail_filename
+
+    def update_thumbnail_bg_color(self, new_thumbnail_bg_color):
+        """Updates the thumbnail background color of a topic object.
+
+        Args:
+            new_thumbnail_bg_color: str|None. The updated thumbnail background
+                color for the topic.
+        """
+        self.thumbnail_bg_color = new_thumbnail_bg_color
 
     def update_description(self, new_description):
         """Updates the description of a topic object.
@@ -950,7 +1125,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             list(dict). The list of all subtopics present
-                in topic.
+            in topic.
         """
         subtopics = []
         for _, subtopic in enumerate(self.subtopics):
@@ -967,7 +1142,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             int or None. Returns the index of the subtopic if it exists or else
-                None.
+            None.
         """
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
@@ -984,6 +1159,7 @@ class Topic(python_utils.OBJECT):
         Raises:
             Exception. The new_subtopic_id and the expected next subtopic id
                 differs.
+
         Returns:
             int. The id of the newly created subtopic.
         """
@@ -1029,6 +1205,44 @@ class Topic(python_utils.OBJECT):
             raise Exception(
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].title = new_title
+
+    def update_subtopic_thumbnail_filename(
+            self, subtopic_id, new_thumbnail_filename):
+        """Updates the thumbnail filename property of the new subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_thumbnail_filename: str. The new thumbnail filename for the
+                subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        self.subtopics[subtopic_index].thumbnail_filename = (
+            new_thumbnail_filename)
+
+    def update_subtopic_thumbnail_bg_color(
+            self, subtopic_id, new_thumbnail_bg_color):
+        """Updates the thumbnail background color property of the new subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_thumbnail_bg_color: str. The new thumbnail background color for
+                the subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        self.subtopics[subtopic_index].thumbnail_bg_color = (
+            new_thumbnail_bg_color)
 
     def move_skill_id_to_subtopic(
             self, old_subtopic_id, new_subtopic_id, skill_id):
@@ -1110,8 +1324,8 @@ class TopicSummary(python_utils.OBJECT):
     """Domain object for Topic Summary."""
 
     def __init__(
-            self, topic_id, name, canonical_name, language_code, version,
-            canonical_story_count, additional_story_count,
+            self, topic_id, name, canonical_name, language_code, description,
+            version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
             topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
@@ -1121,6 +1335,7 @@ class TopicSummary(python_utils.OBJECT):
             name: str. The name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             language_code: str. The language code of the topic.
+            description: str. The description of the topic.
             version: int. The version of the topic.
             canonical_story_count: int. The number of canonical stories present
                 in the topic.
@@ -1138,6 +1353,7 @@ class TopicSummary(python_utils.OBJECT):
         """
         self.id = topic_id
         self.name = name
+        self.description = description
         self.canonical_name = canonical_name
         self.language_code = language_code
         self.version = version
@@ -1160,6 +1376,11 @@ class TopicSummary(python_utils.OBJECT):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
+
+        if not isinstance(self.description, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
 
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
@@ -1241,6 +1462,7 @@ class TopicSummary(python_utils.OBJECT):
             'id': self.id,
             'name': self.name,
             'language_code': self.language_code,
+            'description': self.description,
             'version': self.version,
             'canonical_story_count': self.canonical_story_count,
             'additional_story_count': self.additional_story_count,
@@ -1276,7 +1498,7 @@ class TopicRights(python_utils.OBJECT):
 
         Returns:
             dict. A dict version of TopicRights suitable for use by the
-                frontend.
+            frontend.
         """
         return {
             'topic_id': self.id,

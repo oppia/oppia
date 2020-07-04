@@ -163,6 +163,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
 class EmailDashboardResultTests(test_utils.GenericTestBase):
     """Tests for email dashboard result handler."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'b@example.com'

@@ -19,7 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -38,6 +40,7 @@ import feconf
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic services."""
+
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -56,7 +59,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -67,6 +69,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID)
         self.save_new_story(
             self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
+            self.TOPIC_ID)
+        self.save_new_story(
+            self.story_id_2, self.user_id, 'Title 2', 'Description 2', 'Notes',
             self.TOPIC_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
@@ -90,6 +95,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.description, 'Description')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -113,6 +119,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_summaries), 2)
         self.assertEqual(topic_summaries[0].name, 'Name')
+        self.assertEqual(topic_summaries[0].description, 'Description')
         self.assertEqual(topic_summaries[0].canonical_story_count, 0)
         self.assertEqual(topic_summaries[0].additional_story_count, 0)
         self.assertEqual(topic_summaries[0].total_skill_count, 2)
@@ -156,6 +163,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            description='description1',
             canonical_name='canonical_name',
             next_subtopic_id=1,
             language_code='en',
@@ -178,6 +186,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id_2',
             name='name 2',
             abbreviated_name='abbrev',
+            description='description',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -192,7 +201,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
-            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
 
     def test_get_topic_summary_from_model(self):
@@ -202,6 +211,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.description, 'Description')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -213,6 +223,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.description, 'Description')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -230,16 +241,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Moved skill to subtopic.')
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, name='Name 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            description='Description',
-            canonical_story_ids=[],
-            additional_story_ids=[],
+            topic_id, self.user_id, name='Name 2', description='Description',
+            canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
             subtopics=[], next_subtopic_id=1)
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
-            set([self.skill_id_1, self.skill_id_2, 'skill_3']))
+            {self.skill_id_1, self.skill_id_2, 'skill_3'})
 
     def test_cannot_create_topic_change_class_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
@@ -250,6 +258,74 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': 'Description',
                 'new_value': 'New Description'
             })
+
+    def test_cannot_rearrange_story_with_missing_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'from_index, to_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+            })
+
+    def test_cannot_rearrange_story_with_missing_from_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'from_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+                'to_index': 1
+            })
+
+    def test_cannot_rearrange_story_with_missing_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'to_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+                'from_index': 1
+            })
+
+    def test_rearrange_canonical_stories_in_topic(self):
+        story_id_new = 'story_id_new'
+        topic_services.add_canonical_story(
+            self.user_id_admin, self.TOPIC_ID, 'story_id_new')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, self.story_id_1)
+        self.assertEqual(
+            topic.canonical_story_references[1].story_id, self.story_id_2)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, story_id_new)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+            'from_index': 2,
+            'to_index': 0
+        })]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Rearranged canonical story on index 2 to index 0.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, story_id_new)
+        self.assertEqual(
+            topic.canonical_story_references[1].story_id, self.story_id_1)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, self.story_id_2)
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 4)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Rearranged canonical story on index 2 to index 0.')
 
     def test_cannot_update_topic_property_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
@@ -287,6 +363,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1,
             'old_value': 'Title',
             'new_value': 'New Title'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'thumbnail_filename',
+            'subtopic_id': 1,
+            'old_value': None,
+            'new_value': 'image.svg'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'thumbnail_bg_color',
+            'subtopic_id': 1,
+            'old_value': None,
+            'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -295,6 +383,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'New Title')
+        self.assertEqual(topic.subtopics[0].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            topic.subtopics[0].thumbnail_bg_color,
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
 
     def test_cannot_create_topic_change_class_with_invalid_cmd(self):
         with self.assertRaisesRegexp(
@@ -411,6 +503,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Throw error if exploration isn't published.
         self.save_new_default_exploration(
             'exp_id', self.user_id_admin, title='title')
+        self.publish_exploration(self.user_id_admin, 'exp_id')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -424,8 +517,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
+        rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegexp(
-            Exception, 'Exploration with id exp_id isn\'t published.'):
+            Exception, 'Exploration with ID exp_id is not public. Please '
+            'publish explorations before adding them to a story.'):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
@@ -433,7 +528,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.user_id_admin, 'exp_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Exploration id exp_id doesn\'t exist.'):
+            Exception, 'Expected story to only reference valid explorations, '
+            'but found a reference to an invalid exploration with ID: exp_id'):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
@@ -457,7 +553,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
             'old_value': '',
-            'new_value': 'thumbnail.png'
+            'new_value': 'thumbnail.svg'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+            'old_value': '',
+            'new_value': '#C6DCDA'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -466,7 +567,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short name')
-        self.assertEqual(topic.thumbnail_filename, 'thumbnail.png')
+        self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic_summary.version, 3)
 
@@ -590,7 +692,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.3
                             }
                         }
                     }
@@ -631,7 +734,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.3
                         }
                     }
                 }
@@ -690,7 +794,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 2, strict=False)
         self.assertIsNotNone(subtopic_page)
-
 
     def test_add_uncategorized_skill(self):
         topic_services.add_uncategorized_skill(
@@ -957,6 +1060,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         published_topic_ids = topic_services.filter_published_topic_ids([
             self.TOPIC_ID, 'invalid_id'])
         self.assertEqual(len(published_topic_ids), 0)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
         published_topic_ids = topic_services.filter_published_topic_ids([
             self.TOPIC_ID, 'invalid_id'])
@@ -966,6 +1078,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_publish_and_unpublish_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
 
         with self.assertRaisesRegexp(
@@ -1051,10 +1172,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Topic with name \'Name\' already exists'):
             self.save_new_topic(
                 'topic_2', self.user_id, name='Name',
-                abbreviated_name='abbrev', thumbnail_filename=None,
-                description='Description 2', canonical_story_ids=[],
-                additional_story_ids=[], uncategorized_skill_ids=[],
-                subtopics=[], next_subtopic_id=1)
+                description='Description 2',
+                canonical_story_ids=[], additional_story_ids=[],
+                uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
@@ -1126,7 +1246,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_publish_a_published_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
-
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_rights.topic_is_published)
@@ -1160,16 +1288,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
             'topic_2', self.user_id, name='Name 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            description='Description 2', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            description='Description 2',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             'topic_3', self.user_id, name='Name 3',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            description='Description 3', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            description='Description 3',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
         topic_services.assign_role(
             self.user_admin, self.user_a,
@@ -1239,11 +1365,6 @@ class MockTopicObject(topic_domain.Topic):
     """Mocks Topic domain object."""
 
     @classmethod
-    def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic):
-        """Converts v1 subtopic dict to v2."""
-        return subtopic
-
-    @classmethod
     def _convert_story_reference_v1_dict_to_v2_dict(cls, story_reference):
         """Converts v1 story reference dict to v2."""
         return story_reference
@@ -1257,8 +1378,15 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_CREATE_NEW,
             'name': 'name'
         })
-        subtopic_dict = {
+        subtopic_v1_dict = {
             'id': 1,
+            'title': 'subtopic_title',
+            'skill_ids': []
+        }
+        subtopic_v2_dict = {
+            'id': 1,
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
             'title': 'subtopic_title',
             'skill_ids': []
         }
@@ -1267,9 +1395,10 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
             next_subtopic_id=1,
             language_code='en',
-            subtopics=[subtopic_dict],
+            subtopics=[subtopic_v1_dict],
             subtopic_schema_version=1,
             story_reference_schema_version=1
         )
@@ -1290,7 +1419,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(topic.next_subtopic_id, 1)
         self.assertEqual(topic.language_code, 'en')
         self.assertEqual(len(topic.subtopics), 1)
-        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_dict)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v2_dict)
 
 
 class StoryReferenceMigrationTests(test_utils.GenericTestBase):
@@ -1310,6 +1439,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[],

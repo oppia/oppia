@@ -20,9 +20,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import topic_fetchers
+from core.domain import user_services
 import feconf
 import utils
 
@@ -205,3 +207,44 @@ class TranslatableTextHandler(base.BaseHandler):
         }
 
         self.render_json(self.values)
+
+
+class UserCommunityRightsDataHandler(base.BaseHandler):
+    """Provides review rights of the logged in user in translation, voiceover
+    and question category on the community dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        community_rights = None
+        if self.username:
+            community_rights = user_services.get_user_community_rights(
+                self.user_id)
+        self.render_json({
+            'can_review_translation_for_language_codes': (
+                community_rights.can_review_translation_for_language_codes
+                if community_rights else []),
+            'can_review_voiceover_for_language_codes': (
+                community_rights.can_review_voiceover_for_language_codes
+                if community_rights else []),
+            'can_review_questions': (
+                community_rights.can_review_questions
+                if community_rights else False)
+        })
+
+
+class FeaturedTranslationLanguagesHandler(base.BaseHandler):
+    """Provides featured translation languages set in admin config."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'featured_translation_languages':
+                config_domain.FEATURED_TRANSLATION_LANGUAGES.value
+        })

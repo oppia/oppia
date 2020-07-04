@@ -16,20 +16,20 @@
  * @fileoverview General config file for Webpack.
  */
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
 
 var htmlMinifyConfig = {
-  ignoreCustomFragments: [
-    /\{\{[\s\S]*?\}\}/,
-    /<\{%[\s\S]*?%\}/,
-    /<\[[\s\S]*?\]>/]
+  ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
+  removeAttributeQuotes: false,
+  caseSensitive: true,
+  customAttrSurround: [[/#/, /(?:)/], [/\*/, /(?:)/], [/\[?\(?/, /(?:)/]],
+  customAttrAssign: [/\)?\]?=/]
 };
-var commonPrefix = './core/templates/dev/head';
+var commonPrefix = './core/templates';
 var defaultMeta = {
   name: 'Personalized Online Learning from Oppia',
   description: 'Oppia is a free, open-source learning platform. Join ' +
@@ -40,7 +40,7 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'assets'),
-      path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'core/templates'),
       path.resolve(__dirname, 'extensions'),
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'third_party')
@@ -148,9 +148,11 @@ module.exports = {
       filename: 'about-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Oppia is an open source learning platform that ' +
-        'connects a community of teachers and learners. You can use this ' +
-        'site to create 1-1 learning scenarios for others.'
+        description: 'With Oppia, you can access free lessons on ' +
+          'math, physics, statistics, chemistry, music, history and ' +
+          'more from anywhere in the world. Oppia is a nonprofit ' +
+          'with the mission of providing high-quality ' +
+          'education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -161,9 +163,10 @@ module.exports = {
       filename: 'admin-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Oppia is a free site for sharing knowledge via ' +
-          'interactive lessons called \'explorations\'. Learn from ' +
-          'user-created explorations, or teach and create your own.'
+        description: 'With Oppia, you can access free lessons on math, ' +
+          'physics, statistics, chemistry, music, history and more from ' +
+          'anywhere in the world. Learn from our pre-existing ' +
+          'explorations, or teach and create your own.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -172,7 +175,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['classroom'],
       filename: 'classroom-page.mainpage.html',
-      meta: defaultMeta,
+      meta: {
+        name: defaultMeta.name,
+        description: 'Learn and practice all major math topics, functions, ' +
+        'equations, and formulas through problems, stories, and examples.'
+      },
       template:
         commonPrefix + '/pages/classroom-page/' +
         'classroom-page.mainpage.html',
@@ -210,6 +217,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['console_errors'],
       filename: 'console_errors.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Contact the Oppia team, submit feedback, and learn ' +
+          'how to get involved with the Oppia project.'
+      },
       template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -261,7 +273,8 @@ module.exports = {
       filename: 'donate-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Donate to The Oppia Foundation.'
+        description: 'Donate to The Oppia Foundation to enable more ' +
+        'students to receive the quality education they deserve.'
       },
       template: commonPrefix + '/pages/donate-page/donate-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -290,6 +303,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-iframed.mainpage.html',
+      meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -399,9 +413,10 @@ module.exports = {
       filename: 'library-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Looking to learn something new? Find explorations ' +
-          'created by professors, teachers and Oppia users in a subject ' +
-          'you\'re interested in, and start exploring!'
+        description: 'Looking to learn something new? Learn any subject ' +
+          'of your choice created by professors, teachers and Oppia ' +
+          'users! Free lessons are always available for any topic and ' +
+          'level you want.'
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -410,6 +425,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['maintenance'],
       filename: 'maintenance-page.mainpage.html',
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -453,6 +469,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['practice_session'],
       filename: 'practice-session-page.mainpage.html',
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.mainpage.html',
@@ -522,9 +539,10 @@ module.exports = {
       filename: 'splash-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Oppia is a free site for sharing knowledge via ' +
-          'interactive lessons called \'explorations\'. Learn from ' +
-          'user-created explorations, or teach and create your own.'
+        description: 'With Oppia, you can access free lessons on math, ' +
+        'physics, statistics, chemistry, music, history and more from ' +
+        'anywhere in the world. Oppia is a nonprofit with the mission ' +
+        'of providing high-quality education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -602,7 +620,7 @@ module.exports = {
       filename: 'thanks-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Thank you for donating to The Oppia Foundation.'
+        description: 'Thank you for donating to The Oppia Foundation!'
       },
       template: commonPrefix + '/pages/thanks-page/thanks-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -643,9 +661,6 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
-    new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true
-    }),
     new webpack.LoaderOptionsPlugin({
       options: {
         macros: {
@@ -660,32 +675,37 @@ module.exports = {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'assets'),
-        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'core/templates'),
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'typings')
       ],
       use: [
-        'cache-loader',
-        'thread-loader',
         {
           loader: 'ts-loader',
           options: {
-            // this is needed for thread-loader to work correctly
-            happyPackMode: true
+            // Typescript checks do the type checking.
+            transpileOnly: true
           }
+        },
+        {
+          loader: 'angular2-template-loader'
         }
       ]
     },
     {
       test: {
         include: /.html$/,
-        exclude: /directive\.html$/
+        exclude: /(directive|component)\.html$/
       },
       loader: 'underscore-template-loader'
     },
     {
-      test: /directive\.html$/,
-      loader: 'html-loader'
+      test: /(directive|component)\.html$/,
+      loader: 'html-loader',
+      options: {
+        attributes: false,
+        minimize: htmlMinifyConfig,
+      },
     },
     {
       test: /\.css$/,

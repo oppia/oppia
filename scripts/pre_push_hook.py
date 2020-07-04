@@ -16,7 +16,7 @@
 
 """Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
-(By providing the list of files to `scripts.pre_commit_linter`)
+(By providing the list of files to `scripts.linters.pre_commit_linter`)
 To install the hook manually simply execute this script from the oppia root dir
 with the `--install` flag.
 To bypass the validation upon `git push` use the following command:
@@ -51,7 +51,7 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 # CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
-LINTER_MODULE = 'scripts.pre_commit_linter'
+LINTER_MODULE = 'scripts.linters.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
@@ -60,9 +60,12 @@ OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
 YARN_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.17.3', 'bin', 'yarn')
-FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
-TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT = 'check_e2e_tests_are_captured_in_ci'
+    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
+FRONTEND_TEST_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
+TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
+TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -71,6 +74,7 @@ class ChangedBranch(python_utils.OBJECT):
     that need to be linted. It does not change branch when modified files are
     not committed.
     """
+
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
         self.old_branch = subprocess.check_output(get_branch_cmd).strip()
@@ -154,12 +158,15 @@ def get_remote_name():
 
 def git_diff_name_status(left, right, diff_filter=''):
     """Compare two branches/commits etc with git.
+
     Parameter:
         left: the lefthand comperator
         right: the righthand comperator
         diff_filter: arguments given to --diff-filter (ACMRTD...)
+
     Returns:
         List of FileDiffs (tuple with name/status)
+
     Raises:
         ValueError if git command fails.
     """
@@ -190,14 +197,17 @@ def git_diff_name_status(left, right, diff_filter=''):
 
 def compare_to_remote(remote, local_branch, remote_branch=None):
     """Compare local with remote branch with git diff.
+
     Parameter:
         remote: Git remote being pushed to
         local_branch: Git branch being pushed to
         remote_branch: The branch on the remote to test against. If None same
             as local branch.
+
     Returns:
         List of file names that are modified, changed, renamed or added
         but not deleted
+
     Raises:
         ValueError if git command fails.
     """
@@ -219,12 +229,14 @@ def extract_files_to_lint(file_diffs):
 
 def collect_files_being_pushed(ref_list, remote):
     """Collect modified files and filter those that need linting.
+
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
+
     Returns:
         dict: Dict mapping branch names to 2-tuples of the form (list of
-            changed files, list of files to lint).
+        changed files, list of files to lint).
     """
     if not ref_list:
         return {}
@@ -272,12 +284,16 @@ def start_linter(files):
     return task.returncode
 
 
-def start_python_script(scriptname):
-    """Runs the 'start.py' script and returns the returncode of the task."""
-    cmd = [
-        'python', '-m',
-        os.path.join('scripts', scriptname).replace('/', '.')]
-    task = subprocess.Popen(cmd)
+def run_script_and_get_returncode(cmd_list):
+    """Runs script and returns the returncode of the task.
+
+    Args:
+        cmd_list: list(str). The cmd list containing the command to be run.
+
+    Returns:
+        int. The return code from the task executed.
+    """
+    task = subprocess.Popen(cmd_list)
     task.communicate()
     task.wait()
     return task.returncode
@@ -322,36 +338,52 @@ def install_hook():
         raise ValueError(err_chmod_cmd)
 
 
-def does_diff_include_js_or_ts_files(files_to_lint):
+def does_diff_include_js_or_ts_files(diff_files):
     """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in any JavaScript or TypeScript
-            files.
+        files.
     """
 
-    for filename in files_to_lint:
-        if filename.endswith('.ts') or filename.endswith('.js'):
+    for file_path in diff_files:
+        if file_path.endswith('.ts') or file_path.endswith('.js'):
             return True
     return False
 
 
-def does_diff_include_travis_yml_or_js_files(files_to_lint):
+def does_diff_include_ts_files(diff_files):
+    """Returns true if diff includes TypeScript files.
+
+    Args:
+        diff_files: list(str). List of files changed.
+
+    Returns:
+        bool. Whether the diff contains changes in any TypeScript files.
+    """
+
+    for file_path in diff_files:
+        if file_path.endswith('.ts'):
+            return True
+    return False
+
+
+def does_diff_include_travis_yml_or_js_files(diff_files):
     """Returns true if diff includes .travis.yml or Javascript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in travis.yml or
         Javascript files.
     """
 
-    for filename in files_to_lint:
-        if filename.endswith('.js') or filename.endswith('.travis.yml'):
+    for file_path in diff_files:
+        if file_path.endswith('.js') or file_path.endswith('.travis.yml'):
             return True
     return False
 
@@ -390,17 +422,28 @@ def main(args=None):
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
+
+            typescript_checks_status = 0
+            if does_diff_include_ts_files(files_to_lint):
+                typescript_checks_status = run_script_and_get_returncode(
+                    TYPESCRIPT_CHECKS_CMDS)
+            if typescript_checks_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing typescript checks.')
+                sys.exit(1)
+
             frontend_status = 0
             travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
-                frontend_status = start_python_script(FRONTEND_TEST_SCRIPT)
+                frontend_status = run_script_and_get_returncode(
+                    FRONTEND_TEST_CMDS)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
             if does_diff_include_travis_yml_or_js_files(files_to_lint):
-                travis_ci_check_status = start_python_script(
-                    TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
+                travis_ci_check_status = run_script_and_get_returncode(
+                    TRAVIS_CI_PROTRACTOR_CHECK_CMDS)
             if travis_ci_check_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing e2e test configuration check.')

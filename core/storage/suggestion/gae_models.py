@@ -279,8 +279,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are in the given
-                score categories, which are in review, but not created by the
-                given user.
+            score categories, which are in review, but not created by the
+            given user.
         """
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
@@ -303,7 +303,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are of the given
-                type, which are in review, but not created by the given user.
+            type, which are in review, but not created by the given user.
         """
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.suggestion_type == suggestion_type).filter(
@@ -320,11 +320,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are of the given
-                type, which the given user has created.
+            type, which the given user has created.
         """
-        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+        return cls.get_all().filter(
             cls.suggestion_type == suggestion_type).filter(
-                cls.author_id == user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+                cls.author_id == user_id).order(-cls.created_on).fetch(
+                    feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_all_score_categories(cls):
@@ -388,6 +389,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     The ID of the voiceover application will be a random hashed value.
     """
+
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
     target_type = ndb.StringProperty(required=True, indexed=True)
@@ -423,8 +425,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralVoiceoverApplicationModel exists for the user.
+
         Args:
             user_id: str. The ID of the user whose data should be checked.
+
         Returns:
             bool. Whether any models refer to the given user ID.
         """
@@ -473,7 +477,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-                application submitted by the given user.
+            applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
             return cls.query(ndb.AND(
@@ -493,7 +497,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-                application which the given user can review.
+            applications which the given user can review.
         """
         return cls.query(ndb.AND(
             cls.author_id != user_id,
@@ -520,11 +524,36 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function implementation is still pending.
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Exports the data from GeneralVoiceoverApplicationModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from GeneralVoiceoverApplicationModel.
+        """
+        user_data = dict()
+
+        voiceover_models = (
+            cls.query(cls.author_id == user_id).fetch())
+
+        for voiceover_model in voiceover_models:
+            user_data[voiceover_model.id] = {
+                'target_type': voiceover_model.target_type,
+                'target_id': voiceover_model.target_id,
+                'language_code': voiceover_model.language_code,
+                'status': voiceover_model.status,
+                'content': voiceover_model.content,
+                'filename': voiceover_model.filename,
+                'rejection_message': voiceover_model.rejection_message
+            }
+        return user_data
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for author_id and

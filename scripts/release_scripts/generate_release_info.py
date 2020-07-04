@@ -187,8 +187,8 @@ def get_changelog_categories(pulls):
 
     Returns:
         dict(str, list(str)). A list where the keys are the various changelog
-            labels, and the values are the titles of the PRs that fall under
-            that category.
+        labels, and the values are the titles of the PRs that fall under
+        that category.
     """
     result = collections.defaultdict(list)
     for pull in pulls:
@@ -256,7 +256,7 @@ def check_setup_scripts(base_release_tag, changed_only=True):
 
     Returns:
         dict consisting of script --> boolean indicating whether or not it has
-            changed (filtered by default to those that are modified).
+        changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
                      ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',
@@ -353,21 +353,21 @@ def main(personal_access_token):
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
-        # TODO(apb7): duplicate author handling due to email changes.
-        out.write('\n### New Authors:\n')
+        # TODO(apb7): Duplicate author handling due to email changes.
+        out.write('\n%s' % release_constants.NEW_AUTHORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))
 
-        out.write('\n### Existing Authors:\n')
+        out.write('\n%s' % release_constants.EXISTING_AUTHORS_HEADER)
         for name, email in existing_authors:
             out.write('* %s <%s>\n' % (name, email))
 
-        out.write('\n### New Contributors:\n')
+        out.write('\n%s' % release_constants.NEW_CONTRIBUTORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))
 
         # Generate the author sections of the email.
-        out.write('\n### Email C&P Blurbs about authors:\n')
+        out.write('\n%s' % release_constants.EMAIL_HEADER)
         new_author_comma_list = (
             '%s, and %s' % (', '.join(
                 new_author_names[:-1]), new_author_names[-1]))
@@ -382,20 +382,20 @@ def main(personal_access_token):
             'possible.``\n' % existing_author_comma_list)
 
         if personal_access_token:
-            out.write('\n### Changelog:\n')
+            out.write('\n%s' % release_constants.CHANGELOG_HEADER)
             for category in categorized_pr_titles:
                 out.write('%s\n' % category)
                 for pr_title in categorized_pr_titles[category]:
                     out.write('* %s\n' % pr_title)
                 out.write('\n')
 
-        out.write('\n### Commit History:\n')
+        out.write('\n%s' % release_constants.COMMIT_HISTORY_HEADER)
         for name, title in [(log.author, log.message.split('\n\n')[0])
                             for log in new_release_logs]:
             out.write('* %s\n' % title)
 
         if issue_links:
-            out.write('\n### Issues mentioned in commits:\n')
+            out.write('\n%s' % release_constants.ISSUES_HEADER)
             for link in issue_links:
                 out.write('* [%s](%s)\n' % (link, link))
 

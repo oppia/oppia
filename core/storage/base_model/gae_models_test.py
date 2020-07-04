@@ -158,16 +158,19 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
 class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Model that inherits the BaseSnapshotMetadataModel for testing."""
+
     pass
 
 
 class TestSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Model that inherits the BaseSnapshotContentModel for testing."""
+
     pass
 
 
 class TestVersionedModel(base_models.VersionedModel):
     """Model that inherits the VersionedModel for testing."""
+
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
 
@@ -236,6 +239,42 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
 
+    def test_export_data_trivial(self):
+        user_data = (base_models
+                     .BaseSnapshotMetadataModel
+                     .export_data('trivial_user'))
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_nontrivial(self):
+        version_model = TestVersionedModel(id='version_model')
+        model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-1', 'committer_id', 'create', None, None)
+        model1.put()
+        model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
+            [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
+        model2.put()
+        user_data = (version_model
+                     .SNAPSHOT_METADATA_CLASS
+                     .export_data('committer_id'))
+        expected_data = {
+            'model_id-1': {
+                'commit_type': 'create',
+                'commit_message': None,
+                'commit_cmds': None
+            },
+            'model_id-2': {
+                'commit_type': 'create',
+                'commit_message': 'Hi this is a commit.',
+                'commit_cmds': [
+                    {'cmd': 'some_command'},
+                    {'cmd2': 'another_command'}
+                ]
+            }
+        }
+        self.assertEqual(user_data, expected_data)
+
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 
@@ -252,6 +291,7 @@ class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 
 class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Model that inherits the BaseCommitLogEntryModel for testing."""
+
     @classmethod
     def _get_instance_id(cls, target_entity_id, version):
         """A function that returns the id of the log in BaseCommitLogEntryModel.
@@ -392,6 +432,28 @@ class VersionedModelTests(test_utils.GenericTestBase):
             'model_id1'):
             model1.get_snapshots_metadata('model_id1', [10])
 
+    def test_get_version(self):
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        version_model = TestVersionedModel.get_version('model_id1', 2)
+        self.assertEqual(version_model.version, 2)
+
+        version_model = (
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
+        self.assertIsNone(version_model)
+
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
+
+        version_model = (
+            TestVersionedModel.get_version('model_id1', 4, strict=False))
+        self.assertIsNone(version_model)
+
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            TestVersionedModel.get_version('model_id1', 4, strict=True)
+
     def test_get_multi_versions(self):
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
@@ -424,6 +486,7 @@ class TestBaseModel(base_models.BaseModel):
     """Model that inherits BaseModel for testing. This is required as BaseModel
     gets subclassed a lot in other tests and that can create unexpected errors.
     """
+
     pass
 
 

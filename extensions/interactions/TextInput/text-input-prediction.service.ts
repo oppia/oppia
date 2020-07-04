@@ -30,11 +30,6 @@ import { InteractionsExtensionsConstants } from
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 
-export interface IClassifierData {
-  /* eslint-disable camelcase */
-  cv_vocabulary: object;
-  SVM: object;
-}
 @Injectable({
   providedIn: 'root'
 })
@@ -46,8 +41,7 @@ export class TextInputPredictionService {
       private textInputTokenizer: TextInputTokenizer) {
   }
 
-  predict(classifierData: IClassifierData, textInput: string): number {
-    /* eslint-disable camelcase */
+  predict(classifierData: ITextInputClassifierData, textInput: string): number {
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 

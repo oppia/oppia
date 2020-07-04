@@ -29,6 +29,7 @@ import utils
 
 class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     """Tests for subtopic page domain objects."""
+
     topic_id = 'topic_id'
     subtopic_id = 1
 
@@ -131,7 +132,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.5
                     }
                 }
             }
@@ -310,7 +312,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.34343
                         }
                     }
                 }

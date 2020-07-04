@@ -19,6 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -46,20 +48,19 @@ export class baseInteractionValidationService {
     }
     if (missingArgs.length > 0) {
       if (missingArgs.length === 1) {
-        throw 'Expected customization arguments to have property: ' +
-          missingArgs[0];
+        throw new Error(
+          'Expected customization arguments to have property: ' +
+          missingArgs[0]);
       } else {
-        throw 'Expected customization arguments to have properties: ' +
-          missingArgs.join(', ');
+        throw new Error(
+          'Expected customization arguments to have properties: ' +
+          missingArgs.join(', '));
       }
     }
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'answerGroups' is an answer group domain object and can be
-  // typed after AnswerGroupObjectFactory.ts is upgraded.
   getAnswerGroupWarnings(
-      answerGroups: any, stateName: string): IWarning[] {
+      answerGroups: AnswerGroup[], stateName: string): IWarning[] {
     var partialWarningsList = [];
 
     // This does not check the default outcome.
@@ -108,11 +109,8 @@ export class baseInteractionValidationService {
     return partialWarningsList;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'answerGroups' is an answer group domain object and can be
-  // typed after AnswerGroupObjectFactory.ts is upgraded.
   getAllOutcomeWarnings(
-      answerGroups: any, defaultOutcome: Outcome, stateName: string) {
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome, stateName: string) {
     return (
       this.getAnswerGroupWarnings(answerGroups, stateName).concat(
         this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));

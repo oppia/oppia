@@ -43,6 +43,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
     """Manages the creation of a story and receiving of all story summaries for
     display in topic editor page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_any_topic_editor
@@ -86,7 +87,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
 
         story_domain.Story.require_valid_title(title)
@@ -217,7 +217,6 @@ class EditableTopicDataHandler(base.BaseHandler):
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
         """
-        topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         version = self.payload.get('version')
@@ -275,7 +274,6 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
-        topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
@@ -342,8 +340,6 @@ class TopicPublishHandler(base.BaseHandler):
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException
-
-        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         publish_status = self.payload.get('publish_status')
 

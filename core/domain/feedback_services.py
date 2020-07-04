@@ -312,7 +312,7 @@ def get_next_page_of_all_feedback_messages(
             started from the beginning of the list of all messages.
 
     Returns:
-        tuple(messages_on_page, next_urlsafe_start_cursor, more), where:
+        tuple(messages_on_page, next_urlsafe_start_cursor, more). Where:
             messages_on_page: list(FeedbackMessage). Contains the slice of
                 messages that are part of the page pointed to by the given start
                 cursor.
@@ -411,8 +411,9 @@ def _get_thread_from_model(thread_model):
         thread_model.last_nonempty_message_author_id)
 
 
-def get_thread_summaries(user_id, thread_ids):
-    """Returns a list of summaries corresponding to each of the threads given.
+def get_exp_thread_summaries(user_id, thread_ids):
+    """Returns a list of summaries corresponding to the exploration threads from
+    the given thread ids. Non-exploration threads are not included in the list.
     It also returns the number of threads that are currently not read by the
     user.
 
@@ -422,56 +423,62 @@ def get_thread_summaries(user_id, thread_ids):
             the summaries.
 
     Returns:
-        tuple(thread_summaries, number_of_unread_threads), where:
+        tuple(thread_summaries, number_of_unread_threads). Where:
             thread_summaries: list(FeedbackThreadSummary).
             number_of_unread_threads: int. The number of threads not read by the
                 user.
     """
-    thread_user_ids = [
-        feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
-            user_id, thread_id)
-        for thread_id in thread_ids
-    ]
-    thread_exp_ids = [
-        get_exp_id_from_thread_id(thread_id) for thread_id in thread_ids
+    # We need to fetch the thread models first to filter out the threads which
+    # don't refer to an exploration.
+    exp_thread_models = [
+        model for model in feedback_models.GeneralFeedbackThreadModel.get_multi(
+            thread_ids)
+        if model and model.entity_type == feconf.ENTITY_TYPE_EXPLORATION
     ]
 
-    thread_models, thread_user_models, thread_exp_models = (
+    exp_thread_user_model_ids = [
+        feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
+            user_id, model.id)
+        for model in exp_thread_models
+    ]
+    exp_model_ids = [model.entity_id for model in exp_thread_models]
+
+    exp_thread_user_models, exp_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models([
-            ('GeneralFeedbackThreadModel', thread_ids),
-            ('GeneralFeedbackThreadUserModel', thread_user_ids),
-            ('ExplorationModel', thread_exp_ids),
+            ('GeneralFeedbackThreadUserModel', exp_thread_user_model_ids),
+            ('ExplorationModel', exp_model_ids),
         ]))
 
-    threads = [_get_thread_from_model(m) for m in thread_models]
-    flat_last_two_message_models = (
+    threads = [_get_thread_from_model(m) for m in exp_thread_models]
+    flattened_last_two_message_models_of_threads = (
         feedback_models.GeneralFeedbackMessageModel.get_multi(
             itertools.chain.from_iterable(
                 t.get_last_two_message_ids() for t in threads)))
     last_two_message_models_of_threads = [
-        flat_last_two_message_models[i:i + 2]
-        for i in python_utils.RANGE(0, len(flat_last_two_message_models), 2)
+        flattened_last_two_message_models_of_threads[i:i + 2]
+        for i in python_utils.RANGE(
+            0, len(flattened_last_two_message_models_of_threads), 2)
     ]
 
     thread_summaries = []
     number_of_unread_threads = 0
-    for thread, last_two_message_models, user_model, exp_model in (
+    for thread, last_two_message_models, thread_user_model, exp_model in (
             python_utils.ZIP(
-                threads, last_two_message_models_of_threads, thread_user_models,
-                thread_exp_models)):
-        last_message_model, second_last_message_model = last_two_message_models
+                threads, last_two_message_models_of_threads,
+                exp_thread_user_models, exp_models)):
         message_ids_read_by_user = (
-            () if user_model is None else user_model.message_ids_read_by_user)
+            () if thread_user_model is None else
+            thread_user_model.message_ids_read_by_user)
 
-        # The last message is never None because all threads have at least one
-        # message.
+        last_message_model, second_last_message_model = last_two_message_models
+        # We don't need to check if the last message is None because all threads
+        # have at least one message.
         last_message_is_read = (
             last_message_model.message_id in message_ids_read_by_user)
         author_last_message = (
             last_message_model.author_id and
             user_services.get_username(last_message_model.author_id))
-
-        # The second-to-last message, however, can be None.
+        # The second-to-last message, however, might be None.
         second_last_message_is_read = (
             second_last_message_model is not None and
             second_last_message_model.message_id in message_ids_read_by_user)
@@ -743,7 +750,7 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
         author_id: str. One author of the given exploration_id.
 
     Returns:
-        tuple(batch_recipients, other_recipients), where:
+        tuple(batch_recipients, other_recipients). Where:
             batch_recipients: list(str). The user_ids of the authors excluding
                 the given author.
             other_recipients: list(str). The user_ids of the other participants

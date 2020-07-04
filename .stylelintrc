@@ -1,13 +1,16 @@
-{ 
+{
   "extends": "stylelint-config-recommended",
   "processors": ["@mapbox/stylelint-processor-arbitrary-tags"],
+  "plugins": [
+    "stylelint-order"
+  ],
   "rules": {
     "no-duplicate-selectors": true,
     "no-empty-source": null,
     "selector-type-no-unknown": [
       true,
       {
-        ignore: ["custom-elements"]
+        "ignore": ["custom-elements"]
       }
     ],
     "block-closing-brace-newline-after": "always",
@@ -18,5 +21,6 @@
     "block-opening-brace-space-before": "always",
     "declaration-colon-space-after": "always",
     "declaration-colon-space-before": "never",
+    "order/properties-alphabetical-order": true
   }
 }

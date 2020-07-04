@@ -28,6 +28,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -59,6 +60,7 @@ current_user_services = models.Registry.import_current_user_services()
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
+
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
@@ -90,12 +92,12 @@ class AdminHandler(base.BaseHandler):
 
         queued_or_running_job_types = set([
             job['job_type'] for job in unfinished_job_data])
-        one_off_job_specs = [{
+        one_off_job_status_summaries = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
         } for klass in jobs_registry.ONE_OFF_JOB_MANAGERS]
-        audit_job_specs = [{
+        audit_job_status_summaries = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
@@ -127,8 +129,8 @@ class AdminHandler(base.BaseHandler):
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
-            'one_off_job_specs': one_off_job_specs,
-            'audit_job_specs': audit_job_specs,
+            'one_off_job_status_summaries': one_off_job_status_summaries,
+            'audit_job_status_summaries': audit_job_status_summaries,
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
             'updatable_roles': {
@@ -178,6 +180,10 @@ class AdminHandler(base.BaseHandler):
                     self.payload.get('action') ==
                     'generate_dummy_new_structures_data'):
                 self._load_dummy_new_structures_data()
+            elif (
+                    self.payload.get('action') ==
+                    'generate_dummy_new_skill_data'):
+                self._generate_dummy_skill_and_questions()
             elif self.payload.get('action') == (
                     'flush_migration_bot_contribution_data'):
                 user_services.flush_migration_bot_contributions_model()
@@ -288,17 +294,16 @@ class AdminHandler(base.BaseHandler):
 
         state.update_recorded_voiceovers(recorded_voiceovers)
         state.update_written_translations(written_translations)
-        solution_dict = (
-            state_domain.Solution(
-                'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                    'solution', '<p>This is a solution.</p>')).to_dict())
+        solution = state_domain.Solution(
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>This is a hint.</p>')).to_dict()
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
         ]
 
-        state.update_interaction_solution(solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.update_interaction_customization_args({
             'placeholder': 'Enter text here',
@@ -308,7 +313,8 @@ class AdminHandler(base.BaseHandler):
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
-                True, [], None, None).to_dict()
+                True, [], None, None
+            )
         )
         question = question_domain.Question(
             question_id, state,
@@ -329,15 +335,14 @@ class AdminHandler(base.BaseHandler):
         """
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
-        skill.update_explanation(
-            state_domain.SubtitledHtml('1', explanation).to_dict())
+        skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
     def _load_dummy_new_structures_data(self):
@@ -388,9 +393,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev')
+                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev')
+                topic_id_2, 'Empty Topic', 'abbrev', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -403,22 +408,65 @@ class AdminHandler(base.BaseHandler):
             subtopic_page = (
                 subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                     1, topic_id_1))
-            self._reload_exploration('0')
-            self._reload_exploration('16')
-            story = story_domain.Story.create_default_story(
-                story_id, 'Dummy Story 1', topic_id_1)
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'Dummy Chapter 1')
-            story.update_node_destination_node_ids(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), [
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, 2)])
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '0')
+            # These explorations were chosen since they pass the validations
+            # for published stories.
+            self._reload_exploration('15')
+            self._reload_exploration('25')
+            self._reload_exploration('13')
 
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 'Dummy Chapter 2')
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), '16')
+            story = story_domain.Story.create_default_story(
+                story_id, 'Help Jaime win the Arcade', topic_id_1)
+
+            story_node_dicts = [{
+                'exp_id': '15',
+                'title': 'What are the place values?',
+                'description': 'Jaime learns the place value of each digit ' +
+                               'in a big number.'
+            }, {
+                'exp_id': '25',
+                'title': 'Finding the value of a number',
+                'description': 'Jaime understands the value of his ' +
+                               'arcade score.'
+            }, {
+                'exp_id': '13',
+                'title': 'Comparing Numbers',
+                'description': 'Jaime learns if a number is smaller or ' +
+                               'greater than another number.'
+            }]
+
+            def generate_dummy_story_nodes(node_id, exp_id, title, description):
+                """Generates and connects sequential story nodes.
+
+                Args:
+                    node_id: int. The node id.
+                    exp_id: str. The exploration id.
+                    title: str. The title of the story node.
+                    description: str. The description of the story node.
+                """
+
+                story.add_node(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    title)
+                story.update_node_description(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    description)
+                story.update_node_exploration_id(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+                if node_id != len(story_node_dicts):
+                    story.update_node_destination_node_ids(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+
+                exp_services.update_exploration(
+                    self.user_id, exp_id, [exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'Astronomy'
+                    })], 'Change category')
+
+            for i, story_node_dict in enumerate(story_node_dicts):
+                generate_dummy_story_nodes(i + 1, **story_node_dict)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
@@ -436,10 +484,41 @@ class AdminHandler(base.BaseHandler):
             )
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
-            topic_services.publish_topic(topic_id_1, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
 
+    def _generate_dummy_skill_and_questions(self):
+        """Generate and loads the database with a skill and 15 questions
+        linked to the skill.
+
+        Raises:
+            Exception: Cannot load new structures data in production mode.
+            Exception: User does not have enough rights to generate data.
+        """
+        if constants.DEV_MODE:
+            if self.user.role != feconf.ROLE_ID_ADMIN:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
+            skill_id = skill_services.get_new_skill_id()
+            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
+                random.getrandbits(32))
+            skill = self._create_dummy_skill(
+                skill_id, skill_name, '<p>Dummy Explanation 1</p>')
+            skill_services.save_new_skill(self.user_id, skill)
+            for i in python_utils.RANGE(15):
+                question_id = question_services.get_new_question_id()
+                question_name = 'Question number %s %s' % (
+                    python_utils.UNICODE(i), skill_name)
+                question = self._create_dummy_question(
+                    question_id, question_name, [skill_id])
+                question_services.add_question(self.user_id, question)
+                question_difficulty = list(
+                    constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
+                random_difficulty = random.choice(question_difficulty)
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id, skill_id, random_difficulty)
+        else:
+            raise Exception('Cannot generate dummy skills in production.')
 
     def _reload_collection(self, collection_id):
         """Reloads the collection in dev_mode corresponding to the given
@@ -511,10 +590,10 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        view_method = self.request.get('method')
+        filter_criterion = self.request.get('filter_criterion')
 
-        if view_method == feconf.VIEW_METHOD_ROLE:
-            role = self.request.get(feconf.VIEW_METHOD_ROLE)
+        if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
+            role = self.request.get(feconf.USER_FILTER_CRITERION_ROLE)
             users_by_role = {
                 username: role
                 for username in user_services.get_usernames_by_role(role)
@@ -523,8 +602,8 @@ class AdminRoleHandler(base.BaseHandler):
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
                 role=role)
             self.render_json(users_by_role)
-        elif view_method == feconf.VIEW_METHOD_USERNAME:
-            username = self.request.get(feconf.VIEW_METHOD_USERNAME)
+        elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
+            username = self.request.get(feconf.USER_FILTER_CRITERION_USERNAME)
             user_id = user_services.get_user_id_from_username(username)
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
@@ -537,7 +616,8 @@ class AdminRoleHandler(base.BaseHandler):
             }
             self.render_json(user_role_dict)
         else:
-            raise self.InvalidInputException('Invalid method to view roles.')
+            raise self.InvalidInputException(
+                'Invalid filter criterion to view roles.')
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -631,3 +711,230 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
+
+
+class AddCommunityReviewerHandler(base.BaseHandler):
+    """Handles adding reviewer for community dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        new_reviewer_username = self.payload.get('username')
+        new_reviewer_user_id = (
+            user_services.get_user_id_from_username(new_reviewer_username))
+
+        if new_reviewer_user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % new_reviewer_username)
+
+        review_category = self.payload.get('review_category')
+        language_code = self.payload.get('language_code', None)
+
+        if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
+            if not utils.is_supported_audio_language_code(language_code):
+                raise self.InvalidInputException(
+                    'Invalid language_code: %s' % language_code)
+            if user_services.can_review_translation_suggestions(
+                    new_reviewer_user_id, language_code=language_code):
+                raise self.InvalidInputException(
+                    'User %s already has rights to review translation in '
+                    'language code %s' % (
+                        new_reviewer_username, language_code))
+            user_services.allow_user_to_review_translation_in_language(
+                new_reviewer_user_id, language_code)
+        elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
+            if not utils.is_supported_audio_language_code(language_code):
+                raise self.InvalidInputException(
+                    'Invalid language_code: %s' % language_code)
+            if user_services.can_review_voiceover_applications(
+                    new_reviewer_user_id, language_code=language_code):
+                raise self.InvalidInputException(
+                    'User %s already has rights to review voiceover in '
+                    'language code %s' % (
+                        new_reviewer_username, language_code))
+            user_services.allow_user_to_review_voiceover_in_language(
+                new_reviewer_user_id, language_code)
+        elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+            if user_services.can_review_question_suggestions(
+                    new_reviewer_user_id):
+                raise self.InvalidInputException(
+                    'User %s already has rights to review question.' % (
+                        new_reviewer_username))
+            user_services.allow_user_to_review_question(new_reviewer_user_id)
+        else:
+            raise self.InvalidInputException(
+                'Invalid review_category: %s' % review_category)
+
+        email_manager.send_email_to_new_community_reviewer(
+            new_reviewer_user_id, review_category, language_code=language_code)
+        self.render_json({})
+
+
+class RemoveCommunityReviewerHandler(base.BaseHandler):
+    """Handles removing reviewer for community dashboard."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.payload.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+        removal_type = self.payload.get('removal_type')
+
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % username)
+
+        language_code = self.payload.get('language_code', None)
+        if language_code is not None and not (
+                utils.is_supported_audio_language_code(language_code)):
+            raise self.InvalidInputException(
+                'Invalid language_code: %s' % language_code)
+
+        if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
+            user_services.remove_community_reviewer(user_id)
+        elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
+            review_category = self.payload.get('review_category')
+            if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
+                if not user_services.can_review_translation_suggestions(
+                        user_id, language_code=language_code):
+                    raise self.InvalidInputException(
+                        '%s does not have rights to review translation in '
+                        'language %s.' % (username, language_code))
+                user_services.remove_translation_review_rights_in_language(
+                    user_id, language_code)
+            elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
+                if not user_services.can_review_voiceover_applications(
+                        user_id, language_code=language_code):
+                    raise self.InvalidInputException(
+                        '%s does not have rights to review voiceover in '
+                        'language %s.' % (username, language_code))
+                user_services.remove_voiceover_review_rights_in_language(
+                    user_id, language_code)
+            elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+                if not user_services.can_review_question_suggestions(user_id):
+                    raise self.InvalidInputException(
+                        '%s does not have rights to review question.' % (
+                            username))
+                user_services.remove_question_review_rights(user_id)
+            else:
+                raise self.InvalidInputException(
+                    'Invalid review_category: %s' % review_category)
+
+            email_manager.send_email_to_removed_community_reviewer(
+                user_id, review_category, language_code=language_code)
+        else:
+            raise self.InvalidInputException(
+                'Invalid removal_type: %s' % removal_type)
+
+        self.render_json({})
+
+
+class CommunityReviewersListHandler(base.BaseHandler):
+    """Handler to show the existing reviewers."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        review_category = self.request.get('review_category')
+        language_code = self.request.get('language_code', None)
+        if language_code is not None and not (
+                utils.is_supported_audio_language_code(language_code)):
+            raise self.InvalidInputException(
+                'Invalid language_code: %s' % language_code)
+        if review_category not in [
+                constants.REVIEW_CATEGORY_TRANSLATION,
+                constants.REVIEW_CATEGORY_VOICEOVER,
+                constants.REVIEW_CATEGORY_QUESTION]:
+            raise self.InvalidInputException(
+                'Invalid review_category: %s' % review_category)
+        usernames = user_services.get_community_reviewer_usernames(
+            review_category, language_code=language_code)
+        self.render_json({'usernames': usernames})
+
+
+class CommunityReviewerRightsDataHandler(base.BaseHandler):
+    """Handler to show the review rights of a user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % username)
+        user_rights = (
+            user_services.get_user_community_rights(user_id))
+        self.render_json({
+            'can_review_translation_for_language_codes': (
+                user_rights.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (
+                user_rights.can_review_voiceover_for_language_codes),
+            'can_review_questions': user_rights.can_review_questions
+        })
+
+
+class SendDummyMailToAdminHandler(base.BaseHandler):
+    """This function handles sending test emails."""
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        username = self.username
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_dummy_mail_to_admin(username)
+            self.render_json({})
+        else:
+            raise self.InvalidInputException('This app cannot send emails.')
+
+
+class UpdateUsernameHandler(base.BaseHandler):
+    """Handler for renaming usernames."""
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        old_username = self.payload.get('old_username', None)
+        new_username = self.payload.get('new_username', None)
+
+        if old_username is None:
+            raise self.InvalidInputException(
+                'Invalid request: The old username must be specified.')
+
+        if new_username is None:
+            raise self.InvalidInputException(
+                'Invalid request: A new username must be specified.')
+
+        if not isinstance(old_username, python_utils.UNICODE):
+            raise self.InvalidInputException(
+                'Expected old username to be a unicode string, received %s'
+                % old_username)
+
+        if not isinstance(new_username, python_utils.UNICODE):
+            raise self.InvalidInputException(
+                'Expected new username to be a unicode string, received %s'
+                % new_username)
+
+        user_id = user_services.get_user_id_from_username(old_username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % old_username)
+
+        if len(new_username) > constants.MAX_USERNAME_LENGTH:
+            raise self.InvalidInputException(
+                'Expected new username to be less than %s characters, '
+                'received %s' % (constants.MAX_USERNAME_LENGTH, new_username))
+
+        if user_services.is_username_taken(new_username):
+            raise self.InvalidInputException('Username already taken.')
+
+        user_services.set_username(user_id, new_username)
+        user_services.log_username_change(
+            self.user_id, old_username, new_username)
+        self.render_json({})

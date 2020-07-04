@@ -48,6 +48,7 @@ def _require_valid_version(version_from_payload, collection_version):
 
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
+
     pass
 
 
@@ -57,14 +58,6 @@ class CollectionEditorPage(CollectionEditorHandler):
     @acl_decorators.can_edit_collection
     def get(self, _):
         """Handles GET requests."""
-
-        self.values.update({
-            'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
-            'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
-        })
-
         self.render_template('collection-editor-page.mainpage.html')
 
 

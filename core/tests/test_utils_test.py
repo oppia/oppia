@@ -60,6 +60,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                     AssertionError: The argument doesn't match with the mock
                         name.
                 """
+
                 order.append('before')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
@@ -292,7 +293,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'gravatar_example.png')
+            'gravatar_example.webp')
         with python_utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()

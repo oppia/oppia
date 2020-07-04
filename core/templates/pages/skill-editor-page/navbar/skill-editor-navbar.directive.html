@@ -1,0 +1,98 @@
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" id="skill-editor-navbar-desktop"
+    ng-if="!isLoadingSkill()">
+  <li style="margin-right: 5px; margin-top: 8px;">
+    <div uib-dropdown>
+      <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
+              ng-class="{'btn-success': isSkillSaveable()}"
+              ng-click="saveChanges()"
+              style="float: left; width: 155px;"
+              ng-disabled="!isSkillSaveable()">
+        <span ng-if="!isSaveInProgress()">
+          <span title="Publish Changes">
+            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+               alt="Publish Changes">
+              &#xE161;
+            </i>
+            <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
+            <span class="d-none d-md-block float-left" style="opacity:0.5;margin-left: 2px;"
+                  ng-if="getChangeListCount() > 0">
+              (<[getChangeListCount()]>)
+            </span>
+          </span>
+        </span>
+
+        <span ng-if="isSaveInProgress()">
+          <span class="oppia-save-publish-button-label">Publishing</span>
+          <loading-dots></loading-dots>
+        </span>
+      </button>
+      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
+              ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
+      </button>
+      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}" class="dropdown-item">Discard Draft</a></li>
+      </ul>
+    </div>
+  </li>
+</ul>
+
+<div class="skill-editor-nav-mobile">
+  <div class="skill-editor-navbar-mobile-tabs">
+    <div class="discard-changes-btn-container">
+      <button class="btn discard-changes-btn"
+              ng-click="discardChanges()">
+        Discard Changes
+        <span ng-if="getChangeListCount() > 0">
+              (<[getChangeListCount()]>)
+        </span>
+      </button>
+    </div>
+    <div class="publish-button-container">
+      <button type="button"
+              ng-click="saveChanges()"
+              class="btn publish-skill-btn">
+        <span>Publish Skill</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+  skill-editor-navbar .skill-editor-nav-mobile {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-editor-navbar #skill-editor-navbar-desktop {
+      display: none;
+    }
+    skill-editor-navbar .skill-editor-nav-mobile {
+      display: block;
+    }
+    skill-editor-navbar .skill-editor-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    skill-editor-navbar .discard-changes-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    skill-editor-navbar .discard-changes-btn {
+      background-color: #008098;
+      color: #FFFFFF;
+      font-weight: bold;
+      width: 100%;
+    }
+    skill-editor-navbar .publish-skill-btn {
+      background-color: #FFFFFF;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+  }
+</style>

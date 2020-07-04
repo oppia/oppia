@@ -58,7 +58,6 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -67,6 +66,11 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
             'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
@@ -91,7 +95,6 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.save_new_topic(
             topic_id, self.admin_id, name='New name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='New description',
             canonical_story_ids=[canonical_story_id],
             additional_story_ids=[additional_story_id],
@@ -252,7 +255,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 class TopicEditorTests(BaseTopicEditorControllerTests):
 
-    def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
+    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
         self.get_html_response(
@@ -260,6 +263,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_URL_PREFIX,
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(self):
+        # Check that the editor page can not be accessed with an
+        # an invalid topic id.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_topic_id'),
+            expected_status_int=404)
         self.logout()
 
     def test_access_topic_editor_page(self):
@@ -408,7 +421,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.34342
                             }
                         }
                     }
@@ -482,7 +496,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         'en': {
                             'file_size_bytes': 100,
                             'filename': 'test.mp3',
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.34342
                         }
                     }
                 }
@@ -530,7 +545,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Name 1',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description 1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id],
@@ -600,7 +614,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.34342
                             }
                         }
                     }
@@ -633,6 +648,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
+
+    def test_cannot_delete_invalid_topic(self):
+        # Check that an invalid topic can not be deleted.
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                'invalid_topic_id'), expected_status_int=404)
+        self.logout()
 
     def test_editable_topic_handler_delete(self):
         # Check that admins can delete a topic.
