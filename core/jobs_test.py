@@ -526,6 +526,7 @@ class MockSumModel(ndb.Model):
 
 class TestDeferredJobManager(jobs.BaseDeferredJobManager):
     """Base class for testing deferred jobs."""
+
     pass
 
 
@@ -534,6 +535,7 @@ class TestAdditionJobManager(TestDeferredJobManager):
 
     The result is stored in a MockSumModel entity with id SUM_MODEL_ID.
     """
+
     @classmethod
     def _run(cls, additional_job_params):
         total = sum([
@@ -792,6 +794,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
     def test_is_abstract_method_raises_exception_for_abstract_classes(self):
         class TestMockAbstractClass(jobs.BaseJobManager):
             """A sample Abstract Class."""
+
             pass
 
         mock_abstract_base_classes = [TestMockAbstractClass]

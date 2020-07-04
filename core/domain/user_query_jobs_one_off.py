@@ -42,6 +42,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     The reducer function stores all user_ids that satisfy the query in the
     corresponding UserQueryModel.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]
