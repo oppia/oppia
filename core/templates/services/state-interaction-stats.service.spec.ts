@@ -236,7 +236,7 @@ describe('State Interaction Stats Service', () => {
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
-      this.stateInteractionStatsService.computeStats({
+      this.stateInteractionStatsService.computeStats(this.expId, {
         name: 'Fraction',
         interaction: {
           id: 'MultipleChoiceInput',
