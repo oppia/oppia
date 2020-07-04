@@ -16,39 +16,28 @@
  * @fileoverview Directive unit tests for the "click hexbins" visualization.
  */
 
-// TODO(#7222): Remove the following block of unnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 
 describe('Oppia click hexbins visualization', function() {
-  let $compile, $rootScope, AssetsBackendApiService, ContextService,
-    ImagePreloaderService;
+  let $compile, $rootScope;
   let el: JQLite;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+    $provide.value('AssetsBackendApiService', {
+      getImageUrlForPreview: (url: string) => url,
+    });
+    $provide.value('ContextService', {
+      getEntityId: () => 'eid',
+      getEntityType: () => 'exploration',
+    });
+    $provide.value('ImagePreloaderService', {
+      getDimensionsOfImage: (_: string) => ({width: 300, height: 250}),
+    });
   }));
 
-  beforeEach(angular.mock.inject(function(
-      _$compile_, _$rootScope_, _AssetsBackendApiService_, _ContextService_,
-      _ImagePreloaderService_) {
+  beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
-    AssetsBackendApiService = _AssetsBackendApiService_;
-    ContextService = _ContextService_;
-    ImagePreloaderService = _ImagePreloaderService_;
-
-    spyOn(ContextService, 'getEntityId').and.returnValue('eid');
-    spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(AssetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
-      'solar-system.png');
-    spyOn(ImagePreloaderService, 'getDimensionsOfImage').and.returnValue(
-      {width: 300, height: 250});
   }));
 
   beforeEach(() => {
