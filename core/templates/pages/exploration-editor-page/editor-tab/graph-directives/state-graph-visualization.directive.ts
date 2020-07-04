@@ -53,8 +53,6 @@ angular.module('oppia').directive('stateGraphVisualization', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
         graphData: '&',
-        // Object whose keys are ids of nodes to display a warning tooltip over.
-        highlightStates: '=',
         // Id of a second initial state, which will be styled as an initial
         // state.
         initStateId2: '=',
@@ -279,11 +277,6 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
             var getNodeFillOpacity = function(nodeId) {
               return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
-            };
-
-            $scope.isStateFlagged = function(nodeId) {
-              return $scope.highlightStates &&
-                $scope.highlightStates.hasOwnProperty(nodeId);
             };
 
             $scope.getNodeTitle = function(node) {
