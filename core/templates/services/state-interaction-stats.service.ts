@@ -19,13 +19,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { IFractionDict, FractionObjectFactory } from
+import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
+import { IInteractionAnswer, IFractionAnswer, IMultipleChoiceAnswer } from
+  'interactions/answer-defs';
 import { IMultipleChoiceInputCustomizationArgs } from
-  'interactions/customization-args-defs';
+  'extensions/interactions/customization-args-defs';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -35,7 +36,7 @@ import { StateInteractionStatsBackendApiService } from
 type Option = string | string[];
 
 interface IAnswerData {
-  answer: Answer;
+  answer: IInteractionAnswer;
   frequency: number;
   isAddressed: boolean;
 }
@@ -76,15 +77,16 @@ export class StateInteractionStatsService {
   }
 
   // Converts answer to a more-readable representation based on its type.
-  private getReadableAnswerString(state: State, answer: Answer): Answer {
+  private getReadableAnswerString(
+      state: State, answer: IInteractionAnswer): IInteractionAnswer {
     if (state.interaction.id === 'FractionInput') {
-      return (
-        this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString());
+      return this.fractionObjectFactory.fromDict(
+        <IFractionAnswer> answer).toString();
     } else if (state.interaction.id === 'MultipleChoiceInput') {
       const customizationArgs = (
         <IMultipleChoiceInputCustomizationArgs>
         state.interaction.customizationArgs);
-      return customizationArgs.choices.value[Number(answer)];
+      return customizationArgs.choices.value[<IMultipleChoiceAnswer> answer];
     }
     return answer;
   }

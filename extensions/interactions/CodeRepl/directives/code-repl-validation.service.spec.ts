@@ -27,11 +27,13 @@ import { Outcome, OutcomeObjectFactory } from
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { ICodeReplCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('CodeReplValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
   let validatorService: CodeReplValidationService;
-  let currentState: string, customizationArguments: any;
+  let currentState: string, customizationArguments: ICodeReplCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
@@ -84,6 +86,8 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for programming language', () => {
+    // TS ignore is used here to test warnings.
+    // @ts-ignore
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -94,6 +98,8 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for placeholder text', () => {
+    // TS ignore is used here to test warnings.
+    // @ts-ignore
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -104,6 +110,8 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for preCode text', () => {
+    // TS ignore is used here to test warnings.
+    // @ts-ignore
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -114,6 +122,8 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for postCode text', () => {
+    // TS ignore is used here to test warnings.
+    // @ts-ignore
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);

@@ -19,11 +19,16 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IMultipleChoiceAnswer } from 'interactions/answer-defs';
+import { IMultipleChoiceRuleInputs } from 'interactions/rule-input-defs';
+
 @Injectable({
   providedIn: 'root'
 })
 export class MultipleChoiceInputRulesService {
-  Equals(answer: number, inputs: {x: number}): boolean {
+  Equals(
+      answer: IMultipleChoiceAnswer,
+      inputs: IMultipleChoiceRuleInputs): boolean {
     return answer === inputs.x;
   }
 }
