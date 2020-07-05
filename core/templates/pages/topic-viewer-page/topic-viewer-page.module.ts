@@ -44,6 +44,9 @@ import { ObjectsDomainConstants } from
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 
+import { PracticeTabComponent } from './practice-tab/practice-tab.component';
+
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -51,10 +54,10 @@ import { TopicViewerDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent, PracticeTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent, PracticeTabComponent
   ],
   providers: [
     AppConstants,

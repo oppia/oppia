@@ -51,8 +51,8 @@
       <stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
-      <practice-tab subtopics-list="$ctrl.subtopics"
-                    topic-name="$ctrl.topicName">
+      <practice-tab [subtopics-list]="$ctrl.subtopics"
+                    [topic-name]="$ctrl.topicName">
       </practice-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
