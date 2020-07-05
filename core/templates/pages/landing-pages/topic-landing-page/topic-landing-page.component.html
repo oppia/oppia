@@ -1,197 +1,159 @@
 <div class="oppia-landing-page">
-  <div class="oppia-landing-section text-center" style="background-color: #afd2eb">
+  <div class="oppia-landing-section text-center oppia-landing-page-banner">
     <div class="oppia-landing-section-inner">
-      <div class="container-fluid">
-        <background-banner class="oppia-landing-background-image"></background-banner>
-        <div class="row oppia-landing-section-row">
-          <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
-            <picture>
-              <source type="image/webp" ng-srcset="<[$ctrl.image1.src_webp]>">
-              <source type="image/png" ng-srcset="<[$ctrl.image1.src_png]>">
-              <img ng-src="<[$ctrl.image1.src_png]>" class="oppia-landing-image" alt="<[$ctrl.image1.alt]>">
-            </picture>
+      <div class="oppia-flex-box oppia-flex-row oppia-flex-mobile-column oppia-flex-mobile-align-center">
+        <div class="oppia-flex-item oppia-landing-page-image-container oppia-flex-mobile-order-2">
+          <picture>
+            <source type="image/webp" ng-srcset="<[$ctrl.lessonInDevicesWebpImageSrc]>">
+            <source type="image/png" ng-srcset="<[$ctrl.lessonInDevicesPngImageSrc]>">
+            <img class="oppia-devices-image" ng-src="<[$ctrl.lessonInDevicesPngImageSrc]>" alt="Oppia lesson in different devices.">
+          </picture>
+        </div>
+        <div class="oppia-flex-item oppia-flex-box oppia-flex-column">
+          <div class="oppia-flex-item oppia-text-align-left">
+            <h2><[$ctrl.topicTitle]> just got easier. Learn anywhere, anytime with our free and interactive lessons.</h2>
           </div>
-          <div class="col-sm-6 col-sm-pull-6">
-            <div class="oppia-landing-text-box-1">
-              <h1 class="oppia-landing-h1 oppia-text-color-green"><[$ctrl.topicTitle]> just got easier</h1>
-              <h2 class="oppia-landing-h2 oppia-text-color-green">Get your students and kids started with our free, effective <[$ctrl.subject]> lessons.</h2>
-            </div>
-            <button class="btn oppia-landing-page-button" ng-click="$ctrl.onClickGetStartedButton('teacher')">Get Started</button>
-            <button class="btn oppia-landing-page-button oppia-make-button-transparent" ng-click="$ctrl.onClickLearnMoreButton()">Learn More</button>
+          <div class="oppia-flex-item oppia-text-align-left oppia-flex-mobile-order-3">
+            <p>Have your students and children get started today on our <[$ctrl.topicTitle]> lessons. Oppia offers story-based content for learners at many different skill levels, and our resources are free to you, always.</p>
+          </div>
+          <div class="oppia-flex-item oppia-text-align-left oppia-mobile-text-align-center oppia-flex-mobile-order-2">
+            <button class="btn oppia-landing-page-button" ng-click="$ctrl.onClickGetStartedButton()">Explore <[$ctrl.topicTitle]> lessons</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="oppia-landing-section text-center" style="background-color: #e8e7e3">
-    <div class="oppia-landing-section-inner">
-      <div class="container-fluid">
-        <div class="row oppia-landing-section-row">
-          <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
-            <picture>
-              <source type="image/webp" ng-srcset="<[$ctrl.image2.src_webp]>">
-              <source type="image/png" ng-srcset="<[$ctrl.image2.src_png]>">
-              <img ng-src="<[$ctrl.image2.src_png]>" class="oppia-landing-image" alt="<[$ctrl.image2.alt]>">
-            </picture>
-          </div>
-          <div class="col-sm-6 col-sm-pull-6">
-            <div class="oppia-landing-text-box-1">
-              <h1 class="oppia-landing-h1">Fun storytelling for all</h1>
-              <h2 class="oppia-landing-h2">Students are guided through explorations with targeted feedback and immersive storytelling.
-                <br>
-                <br>
-                Oppia guides students step-by-step with helpful hints, so they can complete the lessons on their own.
-              </h2>
+  <div class="oppia-landing-section text-center oppia-white-container">
+    <div class="oppia-landing-section-inner oppia-flex-box oppia-flex-column">
+      <div class="oppia-flex-item">
+        <h2>What is unique about our <[$ctrl.topicTitle]> lessons?</h2>
+      </div>
+      <div class="oppia-flex-item">
+        <div class="oppia-flex-box oppia-flex-row oppia-flex-mobile-column">
+          <div class="oppia-flex-item oppia-langing-page-qualities" ng-repeat="quality in $ctrl.lessonsQualities">
+            <div class="oppia-flex-box oppia-flex-column oppia-flex-mobile-row">
+              <div class="oppia-flex-item oppia-landing-page-image-container">
+                <picture>
+                  <source type="image/webp" ng-srcset="<[$ctrl.getLessonQualityImageSrc(quality.imageWebpFilename)]>">
+                  <source type="image/png" ng-srcset="<[$ctrl.getLessonQualityImageSrc(quality.imagePngFilename)]>">
+                  <img ng-src="<[$ctrl.getLessonQualityImageSrc(quality.imagePngFilename)]>" alt="<[quality.imageAlt]>">
+                </picture>
+              </div>
+              <div class="oppia-flex-item oppia-landing-qualities-description">
+                <div class="oppia-flex-box oppia-flex-column">
+                  <div class="oppia-flex-item oppia-text-align-left">
+                    <h3><[quality.title]></h3>
+                  </div>
+                  <div class="oppia-flex-item oppia-text-align-left">
+                    <p><[quality.description]></p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="oppia-landing-section text-center" style="background-color: #429488;  ">
-    <div class="oppia-landing-section-inner" style="margin-bottom: 2%;">
-      <div class="container-fluid">
-        <div class="row oppia-landing-section-row">
-          <div class="col-sm-6 oppia-landing-image-div">
-            <div class="oppia-landing-video-frame">
-              <video controls type="video/mp4" ng-src="<[$ctrl.getVideoUrl()]>" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
-              </video>
-            </div>
-          </div>
-          <div class="col-sm-6 oppia-landing-text-box-2">
-            <h1 class="oppia-landing-h1" style="color: #FFFFFF;">Easy-to-follow lessons</h1>
-            <h2 class="oppia-landing-h2" style="color: #FFFFFF;">By working through lessons on Oppia, your young learners can apply their knowledge to real-world problems.
-              <br>
-              <br>
-              Our lessons also have audio subtitles, to support students with reading difficulties.
-            </h2>
-          </div>
-        </div>
+      <div class="oppia-flex-item oppia-only-display-in-mobile">
+        <button class="btn oppia-landing-page-button" ng-click="$ctrl.onClickGetStartedButton()">Explore <[$ctrl.topicTitle]> lessons</button>
       </div>
     </div>
   </div>
 
-  <div class="oppia-landing-section text-center" style="background-color: #e8e7e3">
-    <div class="oppia-landing-section-inner">
-      <div class="container-fluid">
-        <div class="row oppia-landing-section-row">
-          <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
-            <img ng-src="<[$ctrl.bookImageUrl]>" class="oppia-landing-image" alt="">
-          </div>
-          <div class="col-sm-6 col-sm-pull-6">
-            <div class="oppia-landing-text-box-1">
-              <h1 class="oppia-landing-h1 text-center">Topics covered in this lesson</h1>
-              <br>
-              <h2 class="oppia-landing-h2 oppia-lessons-title oppia-text-color-green" ng-repeat="lessonTitle in $ctrl.lessons"><[lessonTitle]></h2>
-              <h2 class="oppia-landing-h2 oppia-lessons-title oppia-text-color-black">... and more!</h2>
-            </div>
-          </div>
-        </div>
+  <div class="oppia-landing-section text-center oppia-grey-container">
+    <div class="oppia-landing-section-inner oppia-flex-box oppia-flex-column oppia-container-low-width">
+      <h3>Get started today! Looking to learn something else? We offer more than 10 subjects and you can check them all out in our Lesson Library. </h3>
+      <div class="oppia-flex-item">
+        <button class="btn oppia-landing-page-button" ng-click="$ctrl.onClickGetStartedButton()">Get started with <[$ctrl.topicTitle]></button>
+      </div>
+      <div class="oppia-flex-item">
+        <button class="btn oppia-landing-page-button oppia-make-button-transparent" ng-click="$ctrl.onClickLearnMoreButton()">Go to Lesson Library</button>
       </div>
     </div>
-  </div>
-
-  <div class="oppia-landing-section text-center" style="background-color: #afd2eb">
-    <div class="oppia-landing-section-inner">
-      <div class="container-fluid">
-        <background-banner class="oppia-landing-background-image"></background-banner>
-        <div class="row oppia-landing-section-row">
-          <div class="col-sm-12">
-            <h1 class="oppia-landing-h1 oppia-text-centered oppia-text-color-green" style="padding: 0">Imagine what your students could learn today!</h1>
-          </div>
-        </div>
-        <div class="row oppia-landing-section-row">
-          <div class="col-sm-12">
-            <button class="btn oppia-landing-page-button" ng-click="$ctrl.onClickGetStartedButton('teacher')">Get Started</button>
-          </div>
-        </div>
-        <div class="row oppia-landing-section-row">
-          <div class="col-sm-12">
-            <h2 class="oppia-landing-h2 oppia-text-centered oppia-text-color-green">
-              To see high quality lessons on subjects other than <[$ctrl.topicTitle]>, visit our Library.
-            </h2>
-          </div>
-        </div>
-        <div class="row oppia-landing-section-row oppia-text-color-green">
-          <div class="col-sm-12">
-            <button class="btn oppia-landing-page-button" ng-click="$ctrl.onClickExploreLessonsButton()">Explore Lessons</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <style>
-  .oppia-landing-page h1, h2, button {
+  .oppia-landing-page h2, button {
     font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
-  .oppia-landing-section {
-    height: auto;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
-    position: relative;
+  .oppia-landing-page h2, h3, p {
+    line-height: 1.5;
   }
-  .oppia-landing-section-row {
-    align-items: center;
-    display: flex;
+  .oppia-white-container {
+    background-color: #fff
   }
-  .oppia-landing-background-image {
-    zoom: 2;
-  }
-  .oppia-landing-h1 {
-    font-size: 2.8vw;
-    margin: 0;
-    text-align: left;
-  }
-  .oppia-landing-h2 {
-    font-size: 1.95vmax;
-    line-height: 1.6em;
-    margin-top: 5%;
-    text-align: left;
-    width: 80%;
-  }
-  .oppia-text-centered {
-    margin: 2% 0;
-    padding: 0 25%;
-    text-align: center;
-    width: 100%;
+  .oppia-grey-container {
+    background-color: #e8e7e3
   }
   .oppia-landing-section-inner {
-    height: auto;
     margin-left: auto;
     margin-right: auto;
-    padding-bottom: 8%;
-    padding-top: 6%;
+    max-width: 1200px;
+    padding: 4% 0;
   }
-  .oppia-lessons-title {
-    margin: 10px;
-    text-align: center;
-    width: 100%;
+  .oppia-landing-page-banner {
+    background: no-repeat center/cover url(<[$ctrl.backgroundBannerUrl]>) #afd2eb;
+  }
+  .oppia-langing-page-qualities {
+    width: 30%;
+  }
+  .oppia-flex-box {
+    display: flex;
+    justify-content: center;
+  }
+  .oppia-flex-row {
+    flex-flow: row;
+  }
+  .oppia-flex-column {
+    flex-flow: column;
+  }
+  .oppia-flex-item {
+    padding: 5px;
+  }
+  .oppia-text-align-left {
+    text-align: left;
+  }
+  .oppia-flex-align-center {
+    align-items: center;
   }
   .oppia-landing-page-button {
-    background-color: #015c53;
-    border: 4px solid #265a53;
-    border-radius: 0;
+    background-color: #009688;
+    border: 4px solid #009688;
+    border-radius: 5px;
     color: #fff;
-    font-size: 1.9vmax;
-    margin-right: 15px;
+    margin: 14px 0;
+    min-width: 250px;
     text-transform: uppercase;
-    width: 40%;
   }
   .oppia-make-button-transparent {
     background-color: transparent;
-    color: #265a53;
+    color: #009688;
+  }
+  .oppia-landing-page-image-container {
+    display: block;
+    margin: auto;
+    min-height: 150px;
+    min-width: 200px;
+    width: 80%;
+  }
+  .oppia-devices-image {
+    width: 80%;
+  }
+  .oppia-container-low-width {
+    width: 40%;
+  }
+  .oppia-only-display-in-mobile {
+    display: none;
+  }
+  .oppia-container-margin {
+    margin: 10px;
   }
   .oppia-landing-page-button:hover,
   .oppia-landing-page-button:focus,
   .oppia-landing-page-button:active {
-    background-color: #05beb2;
-    border-color: #05beb2;
+    background-color: #015c53;
+    border-color: #015c53;
     color: #fff;
   }
   .oppia-make-button-transparent:hover,
@@ -201,115 +163,52 @@
     border-color: #05beb2;
     color: #05beb2;
   }
-  .oppia-landing-text-box-1,
-  .oppia-landing-text-box-2 {
-    margin-left: 60px;
-  }
-  .oppia-landing-text-box-2 {
-    margin-left: auto;
-    margin-top: 100px;
-    padding-right: 40px;
-  }
-  .oppia-landing-image {
-    max-height: 400px;
-    max-width: 100%;
-  }
-  .oppia-text-color-black {
-    color: #242424;
-  }
-  .oppia-text-color-green {
-    color: #005c5e;
-  }
-  .oppia-landing-video-frame {
-    background: #000000;
-    border: 11px black solid;
-    border-bottom-width: 50px;
-    border-radius: 36px;
-    border-top-width: 50px;
-    margin: auto;
-    min-height: 500px;
-    position: relative;
-    width: 270px;
-  }
-  .oppia-landing-video-frame:before {
-    background: #333;
-    border-radius: 10px;
-    content: '';
-    display: block;
-    height: 5px;
-    left: 50%;
-    position: absolute;
-    top: -25px;
-    transform: translate(-50%, -50%);
-    width: 60px;
-  }
-  .oppia-landing-video-frame:after {
-    background: #333;
-    border-radius: 50%;
-    bottom: -58px;
-    content: '';
-    display: block;
-    height: 35px;
-    left: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    width: 35px;
-  }
-  video::-webkit-media-controls-fullscreen-button,
-  video::-webkit-media-controls-overlay-play-button,
-  video::-webkit-media-controls-timeline,
-  video::-webkit-media-controls-mute-button,
-  video::-webkit-media-controls-toggle-closed-captions-button,
-  video::-webkit-media-controls-volume-slider {
-    cursor: pointer;
-  }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 780px) {
     .oppia-landing-section-inner,
     .oppia-landing-section {
       height: auto;
     }
-    .oppia-landing-section-row {
-      display: block;
+    .oppia-landing-page-button {
+      margin: 0 0 14px;
     }
-    .oppia-landing-h1 {
-      font-size: 1.6em;
-      padding-top: 40px;
-      text-align: center;
-      white-space: pre-line;
+    .oppia-flex-mobile-column {
+      flex-flow: column;
     }
-    .oppia-landing-h2 {
-      font-size: 1em;
-      padding: 0 10%;
+    .oppia-flex-mobile-order-2 {
+      order: 2;
+    }
+    .oppia-flex-mobile-order-3 {
+      order: 3;
+    }
+    .oppia-flex-mobile-row {
+      flex-flow: row;
+    }
+    .oppia-flex-mobile-align-center {
+      align-items: center;
+    }
+    .oppia-mobile-text-align-center {
       text-align: center;
+    }
+    .oppia-landing-page-image-container {
+      min-height: unset;
+      min-width: unset;
+      width: 35%;
+    }
+    .oppia-langing-page-qualities {
       width: 100%;
     }
-    .oppia-landing-background-image {
-      zoom: 1.3;
+    .oppia-landing-qualities-description {
+      width: 65%;
     }
-    .oppia-landing-image {
-      max-height: 250px;
+    .oppia-container-low-width {
+      width: 75%;
     }
-    .oppia-landing-text-box-1,
-    .oppia-landing-text-box-2 {
-      margin-left: auto;
+    .oppia-only-display-in-mobile {
+      display: block;
     }
-    .oppia-landing-page-button {
-      font-size: 2.3vmax;
-      margin-bottom: 30px;
-      width: auto;
-    }
-    .oppia-landing-text-box-2 {
-      margin-top: 0;
-      padding-right: inherit;
-    }
-  }
-  @media screen and (max-width: 320px) {
-    .oppia-landing-page-button {
-      font-size: 2.8vmax;
-    }
-    .oppia-landing-h1 {
-      white-space: normal;
+    .oppia-container-margin {
+      margin: 0;
     }
   }
 </style>

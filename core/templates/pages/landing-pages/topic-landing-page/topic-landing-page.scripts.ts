@@ -24,3 +24,4 @@ require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.component.ts');
+require('pages/OppiaFooterDirective.ts');
