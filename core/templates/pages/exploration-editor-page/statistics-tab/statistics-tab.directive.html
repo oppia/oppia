@@ -1,32 +1,35 @@
 <div ng-cloak>
   <md-card class="oppia-editor-card" ng-if="!loadingMessage">
-    <div ng-if="$ctrl.explorationHasBeenVisited">
+    <div ng-if="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
-        <pie-chart data="$ctrl.pieChartData"
-                   options="$ctrl.COMPLETION_RATE_PIE_CHART_OPTIONS">
+        <pie-chart data="pieChartData" options="pieChartOptions">
         </pie-chart>
-        <p style="text-align: center;"><span ng-if="$ctrl.numPassersby" style="font-weight: bold;" class="protractor-test-num-passersby"><[$ctrl.numPassersby]></span><span ng-if="!$ctrl.numPassersby" style="font-weight: bold;">0</span> learners browsed this exploration. They left before reaching the second card.</p>
+        <p style="text-align: center;">
+          <span ng-if="numPassersby"
+                style="font-weight: bold;" class="protractor-test-num-passersby">
+            <[numPassersby]> learners browsed this exploration. They left before reaching the second card.
+          </span>
+          <span ng-if="!numPassersby" style="font-weight: bold;">
+            No learners have browsed this exploration yet.
+          </span>
+        </p>
 
         <h3>Card statistics</h3>
-        <div style="font-size: smaller" ng-if="lastUpdated">
-          <em>Last updated: <[$ctrl.getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
-        </div>
         <div class="container">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-              <div state-graph-visualization graph-data="$ctrl.statsGraphData"
+              <div state-graph-visualization
+                   graph-data="statsGraphData"
                    node-fill="darkseagreen"
-                   highlight-states="$ctrl.highlightStates"
-                   state-stats="$ctrl.stateStats"
-                   on-click-function="$ctrl.onClickStateInStatsGraph">
+                   on-click-function="onClickStateInStatsGraph">
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div ng-if="!$ctrl.explorationHasBeenVisited">
+    <div ng-if="!explorationHasBeenVisited">
       <em>
         This exploration has not been visited by anyone yet, so there are no statistics to display.
       </em>

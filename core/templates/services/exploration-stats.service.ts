@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ContextService } from 'services/context.service';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsBackendApiService } from
@@ -32,15 +31,13 @@ export class ExplorationStatsService {
   private statsCache: Promise<ExplorationStats> = null;
 
   constructor(
-      private contextService: ContextService,
       private explorationStatsBackendApiService:
         ExplorationStatsBackendApiService) {}
 
-  getExplorationStats(): Promise<ExplorationStats> {
+  getExplorationStats(expId: string): Promise<ExplorationStats> {
     if (this.statsCache === null) {
       this.statsCache = (
-        this.explorationStatsBackendApiService.fetchExplorationStats(
-          this.contextService.getExplorationId()));
+        this.explorationStatsBackendApiService.fetchExplorationStats(expId));
     }
     return this.statsCache;
   }
