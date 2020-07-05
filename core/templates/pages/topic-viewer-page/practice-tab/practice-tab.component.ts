@@ -31,11 +31,11 @@ import { PracticeSessionPageConstants} from
   styleUrls: []
 })
 export class PracticeTabComponent implements OnInit {
+  @Input() topicName: string;
+  @Input() subtopicsList: Array<Subtopic>;
   selectedSubtopics: Array<Subtopic> = [];
   availableSubtopics: Array<Subtopic> = [];
   selectedSubtopicIndices: Array<Boolean> = [];
-  @Input() topicName: string;
-  @Input() subtopicsList: Array<Subtopic>;
   constructor(
     private urlInterpolationService: UrlInterpolationService
   ) {}
@@ -58,8 +58,8 @@ export class PracticeTabComponent implements OnInit {
     return true;
   }
   openNewPracticeSession(): void {
-    var selectedSubtopicIds = [];
-    for (var idx in this.selectedSubtopicIndices) {
+    const selectedSubtopicIds = [];
+    for (let idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
         selectedSubtopicIds.push(
           this.availableSubtopics[idx].getId());
@@ -73,6 +73,7 @@ export class PracticeTabComponent implements OnInit {
     window.location.href = practiceSessionsUrl;
   }
 }
+
 angular.module('oppia').directive(
   'practiceTab', downgradeComponent(
     {component: PracticeTabComponent}));

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the stories list.
+ * @fileoverview Component for the topic viewer stories list.
  */
 
 import { Component, Input } from '@angular/core';

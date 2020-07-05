@@ -44,9 +44,14 @@ import { ObjectsDomainConstants } from
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 
+
+import { PracticeTabComponent } from
+  'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import { StoriesListComponent } from
+  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { TopicViewerNavbarBreadcrumbComponent } from
-  './navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { PracticeTabComponent } from './practice-tab/practice-tab.component';
+  // eslint-disable-next-line max-len
+  'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
 
 
 @NgModule({
@@ -57,11 +62,11 @@ import { PracticeTabComponent } from './practice-tab/practice-tab.component';
   ],
   declarations: [
     OppiaAngularRootComponent, PracticeTabComponent,
-    TopicViewerNavbarBreadcrumbComponent
+    TopicViewerNavbarBreadcrumbComponent, StoriesListComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent, PracticeTabComponent,
-    TopicViewerNavbarBreadcrumbComponent
+    TopicViewerNavbarBreadcrumbComponent, StoriesListComponent
   ],
   providers: [
     AppConstants,
