@@ -34,6 +34,10 @@
   overflow: hidden;
   position: relative;
 }
+.oppia-visualization-sorted-tile-answer img {
+  height: auto !important;
+  max-width: 100% !important;
+}
 .oppia-visualization-sorted-tile-answer > .more {
   background-image: linear-gradient(transparent, #F5F5F5, #F5F5F5);
   bottom: 0;
