@@ -33,6 +33,7 @@ import feconf
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicModel class."""
+
     TOPIC_NAME = 'tOpic_NaMe'
     TOPIC_CANONICAL_NAME = 'topic_name'
     TOPIC_ID = 'topic_id'
@@ -122,7 +123,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = topic_models.TopicCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.topic_id = 'b'
         commit.put()
@@ -141,7 +142,6 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 entity_id='entity_id',
                 version=1,
                 committer_id='committer_id',
-                committer_username='committer_username',
                 commit_type='create',
                 commit_message='Created new TopicCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
@@ -175,6 +175,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
+
     SUBTOPIC_PAGE_ID = 'subtopic_page_id'
 
     def test_get_deletion_policy(self):
@@ -246,7 +247,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = topic_models.SubtopicPageCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.subtopic_page_id = 'b'
         commit.put()
@@ -265,7 +266,6 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 entity_id='entity_id',
                 version=1,
                 committer_id='committer_id',
-                committer_username='committer_username',
                 commit_type='create',
                 commit_message='Created new SubtopicPageCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
@@ -435,6 +435,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
 class TopicRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
     """Test the TopicRightsModel class."""
+
     TOPIC_ID_1 = '1'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'

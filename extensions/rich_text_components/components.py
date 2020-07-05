@@ -136,13 +136,19 @@ class Svgdiagram(BaseRteComponent):
 class Link(BaseRteComponent):
     """Class for Link component."""
 
+    pass
+
 
 class Math(BaseRteComponent):
     """Class for Math component."""
 
+    pass
+
 
 class Skillreview(BaseRteComponent):
     """Class for Skillreview component."""
+
+    pass
 
 
 class Tabs(BaseRteComponent):

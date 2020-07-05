@@ -250,6 +250,8 @@ var ExplorationEditorPage = function() {
     await waitFor.elementToBeClickable(
       navigateToMainTabButton, 'Main tab is not clickable');
     await navigateToMainTabButton.click();
+    await waitFor.elementToBeClickable(
+      neutralElement, 'Neutral element is not clickable');
     await neutralElement.click();
   };
 

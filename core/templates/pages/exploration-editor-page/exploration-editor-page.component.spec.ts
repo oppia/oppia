@@ -562,8 +562,12 @@ describe('Exploration editor page component', function() {
           // should be declared.
           spyOn(window, '$').and.returnValue(element);
           var animateSpy = spyOn(element, 'animate').and.callThrough();
+          // @ts-ignore Angular element method doesn't expect to receive
+          // 1 argument in the lints.
           spyOn(angular, 'element').withArgs('#tutorialStateContent').and
-            .returnValue(<any>{
+            .returnValue({
+              // @ts-ignore Angular element should have more properties than
+              // just offset in the lint settings.
               offset: () => ({
                 top: 5
               })
@@ -584,8 +588,12 @@ describe('Exploration editor page component', function() {
           // should be declared.
           spyOn(window, '$').and.returnValue(element);
           var animateSpy = spyOn(element, 'animate').and.callThrough();
+          // @ts-ignore Angular element method doesn't expect to receive
+          // 1 argument in the lints.
           spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-            .returnValue(<any>{
+            .returnValue({
+              // @ts-ignore Angular element should have more properties than
+              // just offset in the lint settings.
               offset: () => ({
                 top: 20
               })
@@ -606,8 +614,12 @@ describe('Exploration editor page component', function() {
           // should be declared.
           spyOn(window, '$').and.returnValue(element);
           var animateSpy = spyOn(element, 'animate').and.callThrough();
+          // @ts-ignore Angular element method doesn't expect to receive
+          // 1 argument in the lints.
           spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
-            .returnValue(<any>{
+            .returnValue({
+              // @ts-ignore Angular element should have more properties than
+              // just offset in the lint settings.
               offset: () => ({
                 top: 5
               })
@@ -628,8 +640,12 @@ describe('Exploration editor page component', function() {
           // should be declared.
           spyOn(window, '$').and.returnValue(element);
           var animateSpy = spyOn(element, 'animate').and.callThrough();
+          // @ts-ignore Angular element method doesn't expect to receive
+          // 1 argument in the lints.
           spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-            .returnValue(<any>{
+            .returnValue({
+              // @ts-ignore Angular element should have more properties than
+              // just offset in the lint settings.
               offset: () => ({
                 top: 20
               })
@@ -650,8 +666,12 @@ describe('Exploration editor page component', function() {
           // should be declared.
           spyOn(window, '$').and.returnValue(element);
           var animateSpy = spyOn(element, 'animate').and.callThrough();
+          // @ts-ignore Angular element method doesn't expect to receive
+          // 1 argument in the lints.
           spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
-            .returnValue(<any>{
+            .returnValue({
+              // @ts-ignore Angular element should have more properties than
+              // just offset in the lint settings.
               offset: () => ({
                 top: 5
               })
@@ -672,8 +692,12 @@ describe('Exploration editor page component', function() {
           // should be declared.
           spyOn(window, '$').and.returnValue(element);
           var animateSpy = spyOn(element, 'animate').and.callThrough();
+          // @ts-ignore Angular element method doesn't expect to receive
+          // 1 argument in the lints.
           spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-            .returnValue(<any>{
+            .returnValue({
+              // @ts-ignore Angular element should have more properties than
+              // just offset in the lint settings.
               offset: () => ({
                 top: 20
               })

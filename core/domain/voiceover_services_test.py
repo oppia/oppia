@@ -37,6 +37,7 @@ import python_utils
 
 class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     """Provides testing of the voiceover services."""
+
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 

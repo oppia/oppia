@@ -20,6 +20,11 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface IQuestionSummaryBackendDict {
+  'id': string;
+  'question_content': string;
+}
+
 export class QuestionSummary {
   _questionId: string;
   _questionContent: string;
@@ -47,7 +52,8 @@ export class QuestionSummary {
   providedIn: 'root'
 })
 export class QuestionSummaryObjectFactory {
-  createFromBackendDict(backendDict: any): QuestionSummary {
+  createFromBackendDict(
+      backendDict: IQuestionSummaryBackendDict): QuestionSummary {
     return new QuestionSummary(
       backendDict.id,
       backendDict.question_content);
