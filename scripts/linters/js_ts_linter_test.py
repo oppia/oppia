@@ -82,6 +82,7 @@ INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_comments.ts')
+UNLISTED_SERVICE_PATH = os.path.join(LINTER_TESTS_DIR, 'unlisted.service.ts')
 
 
 class JsTsLintTests(test_utils.GenericTestBase):
@@ -575,6 +576,64 @@ class JsTsLintTests(test_utils.GenericTestBase):
             'An instance of HttpClient is found in this file. You are not '
             'allowed to create http requests from files that are not '
             'backend api services.'], self.linter_stdout)
+
+    def test_oppia_root_component(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    UNLISTED_SERVICE_PATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+        with self.print_swap, compile_all_ts_files_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [UNLISTED_SERVICE_PATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+
+        self.assert_same_list_elements([
+            'Please import UnlistedService to Oppia Angular Root Component in '
+            './core/templates/components/oppia-angular-root.component.ts',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'Please add a static class member unlistedService to Oppia Angular'
+            ' Root Component in ',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'static unlistedService: UnlistedService;',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'Please add the class UnlistedService to Oppia Angular Root '
+            'Component constructor in ',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'private unlistedService: UnlistedService',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'The static variable hasn\'t been assigned value in Oppia Angular '
+            'Root Component in ',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'OppiaAngularRootComponent.unlistedService = this.unlistedService',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'The class UnlistedService hasn\'t been added to ANGULAR_SERVICES '
+            'in  oppia-root.directive.ts. in ',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            './core/templates/base-components/oppia-root.directive.ts',
+        ], self.linter_stdout)
+        self.assert_same_list_elements([
+            'FAILED OppiaAngularRootComponent linting failed'
+        ], self.linter_stdout)
 
     def test_missing_punctuation_at_end_of_comment(self):
         def mock_compile_all_ts_files():
