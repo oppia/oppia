@@ -19,29 +19,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IGraphAnswer } from 'interactions/answer-defs';
+
 export interface IEdgeCentre {
   x: number;
   y: number;
-}
-
-interface IGraphVertex {
-  x: number;
-  y: number;
-  label: string;
-}
-
-interface IGraphEdge {
-  src: number;
-  dst: number;
-  weight: number;
-}
-
-export interface IGraphBackendDict {
-  isDirected?: boolean;
-  isWeighted?: boolean;
-  isLabeled?: boolean;
-  vertices?: IGraphVertex[];
-  edges?: IGraphEdge[];
 }
 
 @Injectable({
@@ -51,7 +33,7 @@ export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
 
-  getDirectedEdgeArrowPoints(graph: IGraphBackendDict, index: number): string {
+  getDirectedEdgeArrowPoints(graph: IGraphAnswer, index: number): string {
     var ARROW_WIDTH = 5;
     var ARROW_HEIGHT = 10;
 
@@ -84,7 +66,7 @@ export class GraphDetailService {
     return ret;
   }
 
-  getEdgeCentre(graph: IGraphBackendDict, index: number): IEdgeCentre {
+  getEdgeCentre(graph: IGraphAnswer, index: number): IEdgeCentre {
     var edge = graph.edges[index];
     var srcVertex = graph.vertices[edge.src];
     var dstVertex = graph.vertices[edge.dst];

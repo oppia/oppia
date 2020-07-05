@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
+import { IInteractionAnswer } from 'interactions/answer-defs';
 import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { IBackendRuleDict, Rule, RuleObjectFactory } from
@@ -29,17 +29,17 @@ import { IBackendRuleDict, Rule, RuleObjectFactory } from
 export interface IAnswerGroupBackendDict {
   'rule_specs': IBackendRuleDict[];
   'outcome': IOutcomeBackendDict;
-  'training_data': Answer;
+  'training_data': IInteractionAnswer;
   'tagged_skill_misconception_id': string;
 }
 
 export class AnswerGroup {
   rules: Rule[];
   outcome: Outcome;
-  trainingData: Answer;
+  trainingData: IInteractionAnswer;
   taggedSkillMisconceptionId: string;
   constructor(
-      rules: Rule[], outcome: Outcome, trainingData: Answer,
+      rules: Rule[], outcome: Outcome, trainingData: IInteractionAnswer,
       taggedSkillMisconceptionId: string) {
     this.rules = rules;
     this.outcome = outcome;
@@ -72,7 +72,7 @@ export class AnswerGroupObjectFactory {
   }
 
   createNew(
-      rules: Rule[], outcome: Outcome, trainingData: Answer,
+      rules: Rule[], outcome: Outcome, trainingData: IInteractionAnswer,
       taggedSkillMisconceptionId: string): AnswerGroup {
     return new AnswerGroup(
       rules, outcome, trainingData, taggedSkillMisconceptionId);

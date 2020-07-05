@@ -27,8 +27,7 @@ import { IGraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
+import { IGraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
 
@@ -96,7 +95,7 @@ export class GraphInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
-        var gInputs = (<IGraphBackendDict>rule.inputs.g);
+        var gInputs = (<IGraphAnswer>rule.inputs.g);
         try {
           if (rule.type === 'HasGraphProperty') {
             continue;

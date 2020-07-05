@@ -19,6 +19,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IInteractiveMapAnswer } from 'interactions/answer-defs';
+import { IInteractiveMapRuleInputs } from 'interactions/rule-input-defs';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -47,12 +50,16 @@ export class InteractiveMapRulesService {
       2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
   }
 
-  Within(answer: number[], inputs: {p: number[], d: number}) {
+  Within(
+      answer: IInteractiveMapAnswer,
+      inputs: IInteractiveMapRuleInputs) {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(
       inputs.p, answer);
     return actualDistance <= inputs.d;
   }
-  NotWithin(answer: number[], inputs: {p: number[], d: number}) {
+  NotWithin(
+      answer: IInteractiveMapAnswer,
+      inputs: IInteractiveMapRuleInputs) {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(
       inputs.p, answer);
     return actualDistance > inputs.d;

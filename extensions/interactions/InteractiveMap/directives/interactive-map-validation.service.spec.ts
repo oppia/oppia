@@ -28,6 +28,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { IInteractiveMapCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('InteractiveMapValidationService', () => {
   let validatorService: InteractiveMapValidationService;
@@ -35,7 +37,7 @@ describe('InteractiveMapValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let customizationArguments: any;
+  let customizationArguments: IInteractiveMapCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 

@@ -21,6 +21,7 @@ import { GraphInputRulesService } from
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { TestBed } from '@angular/core/testing';
+import { IGraphAnswer } from 'interactions/answer-defs';
 
 describe('Graph Input service', () => {
   let girs: GraphInputRulesService = null;
@@ -181,8 +182,8 @@ describe('Graph Input service', () => {
       ], [2, 0, 1])).toBe(true);
     });
   });
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedEmptyGraph = (): any => {
+
+  let undirectedEmptyGraph = (): IGraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -191,8 +192,8 @@ describe('Graph Input service', () => {
       isLabeled: false
     };
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedNullGraph = (numVertices: number): any => {
+
+  let undirectedNullGraph = (numVertices: number): IGraphAnswer => {
     var graph = undirectedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -203,8 +204,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedCycleGraph = (numVertices: number): any => {
+
+  let undirectedCycleGraph = (numVertices: number): IGraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;
@@ -218,8 +219,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedCompleteGraph = (numVertices: number): any => {
+
+  let undirectedCompleteGraph = (numVertices: number): IGraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 0; i < numVertices; i++) {
       for (var j = i + 1; j < numVertices; j++) {
@@ -232,8 +233,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedStarGraph = (numVertices: number): any => {
+
+  let undirectedStarGraph = (numVertices: number): IGraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 1; i < numVertices; i++) {
       graph.edges.push({
@@ -244,8 +245,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let directedEmptyGraph = (): any => {
+
+  let directedEmptyGraph = (): IGraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -254,8 +255,8 @@ describe('Graph Input service', () => {
       isLabeled: false
     };
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let directedNullGraph = (numVertices: number): any => {
+
+  let directedNullGraph = (numVertices: number): IGraphAnswer => {
     var graph = directedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -266,8 +267,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let directedCycleGraph = (numVertices: number): any => {
+
+  let directedCycleGraph = (numVertices: number): IGraphAnswer => {
     var graph = directedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;

@@ -33,10 +33,6 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/html-escaper.service.ts');
 
-export interface IReadableNote {
-  readableNoteName: string;
-}
-
 interface MusicNote {
   baseNoteMidiNumber: number;
   offset: number;

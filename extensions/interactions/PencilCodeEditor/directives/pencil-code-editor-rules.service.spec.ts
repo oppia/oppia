@@ -51,7 +51,10 @@ describe('Pencil Code Editor rules service', () => {
           'def x():\n' +
           '    y = \'ab    c\'\n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
     });
 
@@ -63,7 +66,10 @@ describe('Pencil Code Editor rules service', () => {
           '    y = \'ab    c\'\n' +
           '    \n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
 
       // Extra trailing whitespace on first line.
@@ -72,7 +78,10 @@ describe('Pencil Code Editor rules service', () => {
           'def x():        \n' +
           '    y = \'ab    c\'\n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
 
       // ---- Tab character ----
@@ -81,7 +90,10 @@ describe('Pencil Code Editor rules service', () => {
           'def x(): \t\n' +
           '    y = \'ab    c\'\n' +
           '    return x\n\n\n'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
     });
 
@@ -91,7 +103,10 @@ describe('Pencil Code Editor rules service', () => {
           'def x():\n' +
           '  y = \'ab    c\'\n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
     });
 
@@ -101,7 +116,10 @@ describe('Pencil Code Editor rules service', () => {
           'def x():' +
           '    y = \'ab    c\'\n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
     });
 
@@ -111,7 +129,10 @@ describe('Pencil Code Editor rules service', () => {
           'def x():' +
           '    y = \'ab c\'\n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
     });
   });
@@ -127,13 +148,22 @@ describe('Pencil Code Editor rules service', () => {
           'def x():\n' +
           '    y = \'ab c\'\n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.CodeContains({
-        code: '    def x():\n'
+        code: '    def x():\n',
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.CodeContains({
-        code: 'print 0'
+        code: 'print 0',
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
     });
   });
@@ -149,13 +179,22 @@ describe('Pencil Code Editor rules service', () => {
           'def x():\n' +
           '    y = \'ab c\'\n' +
           '    return x'
-        )
+        ),
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.CodeDoesNotContain({
-        code: '    def x():\n'
+        code: '    def x():\n',
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.CodeDoesNotContain({
-        code: 'print 0'
+        code: 'print 0',
+        error: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
     });
   });
@@ -167,16 +206,28 @@ describe('Pencil Code Editor rules service', () => {
 
     it('should compare normalized output', () => {
       expect(pcers.OutputEquals({
-        output: '1'
+        output: '1',
+        code: '',
+        error: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.OutputEquals({
-        output: '\n1\n'
+        output: '\n1\n',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.OutputEquals({
-        output: ''
+        output: '',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.OutputEquals({
-        output: 'bad output'
+        output: 'bad output',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
     });
   });
@@ -188,26 +239,47 @@ describe('Pencil Code Editor rules service', () => {
 
     it('should compare normalized output', () => {
       expect(pcers.OutputRoughlyEquals({
-        output: '1\n   a   W ?   b'
+        output: '1\n   a   W ?   b',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.OutputRoughlyEquals({
-        output: '\n1\na  w?B'
+        output: '\n1\na  w?B',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.OutputRoughlyEquals({
-        output: '   1\n\na w?b    \n\n\n'
+        output: '   1\n\na w?b    \n\n\n',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
 
       expect(pcers.OutputRoughlyEquals({
-        output: '1 a w ? b'
+        output: '1 a w ? b',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.OutputRoughlyEquals({
-        output: '1 \n a w b'
+        output: '1 \n a w b',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.OutputRoughlyEquals({
-        output: 'b ? w a \n 1'
+        output: 'b ? w a \n 1',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.OutputRoughlyEquals({
-        output: 'bad output'
+        output: 'bad output',
+        error: '',
+        code: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
     });
   });
@@ -217,13 +289,22 @@ describe('Pencil Code Editor rules service', () => {
 
     it('should check if error is not empty', () => {
       expect(pcers.ResultsInError({
-        error: ''
+        error: '',
+        code: '',
+        output: '',
+        evaluation: ''
       })).toBe(false);
       expect(pcers.ResultsInError({
-        error: ' \t\n'
+        error: ' \t\n',
+        code: '',
+        output: '',
+        evaluation: ''
       })).toBe(false);
       expect(pcers.ResultsInError({
-        error: 'bad output'
+        error: 'bad output',
+        code: '',
+        output: '',
+        evaluation: ''
       })).toBe(true);
     });
   });
@@ -235,22 +316,40 @@ describe('Pencil Code Editor rules service', () => {
 
     it('should check if error message appears', () => {
       expect(pcers.ErrorContains({
-        error: 'bad'
+        error: 'bad',
+        code: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.ErrorContains({
-        error: '  bad  '
+        error: '  bad  ',
+        code: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.ErrorContains({
-        error: 'not bad'
+        error: 'not bad',
+        code: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(true);
       expect(pcers.ErrorContains({
-        error: 'error'
+        error: 'error',
+        code: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.ErrorContains({
-        error: 'b a d'
+        error: 'b a d',
+        code: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
       expect(pcers.ErrorContains({
-        error: ''
+        error: '',
+        code: '',
+        output: '',
+        evaluation: ''
       }, RULE_INPUT)).toBe(false);
     });
   });

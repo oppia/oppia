@@ -19,13 +19,13 @@
 
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { Answer } from 'domain/exploration//AnswerStatsObjectFactory';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IAnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
+import { IInteractionAnswer } from 'interactions/answer-defs';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
@@ -71,12 +71,12 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/state-top-answers-stats.service.ts');
 
 class MockAnswerStats {
-  answer: Answer;
+  answer: IInteractionAnswer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
   constructor(
-      answer: Answer, answerHtml: string, frequency: number,
+      answer: IInteractionAnswer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     this.answer = angular.copy(answer);
     this.answerHtml = answerHtml;

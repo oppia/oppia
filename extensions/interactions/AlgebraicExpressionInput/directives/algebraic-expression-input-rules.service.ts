@@ -22,12 +22,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import nerdamer from 'nerdamer';
 
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { IAlgebraicExpressionAnswer } from 'interactions/answer-defs';
+import { IAlgebraicExpressionRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlgebraicExpressionInputRulesService {
-  MatchesExactlyWith(answer: string, inputs: {x: string}): boolean {
+  MatchesExactlyWith(
+      answer: IAlgebraicExpressionAnswer,
+      inputs: IAlgebraicExpressionRuleInputs): boolean {
     let mis = new MathInteractionsService();
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
@@ -36,7 +40,9 @@ export class AlgebraicExpressionInputRulesService {
     return nerdamer(nerdamer(answer).text()).eq(nerdamer(inputs.x).text());
   }
 
-  IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
+  IsEquivalentTo(
+      answer: IAlgebraicExpressionAnswer,
+      inputs: IAlgebraicExpressionRuleInputs): boolean {
     let mis = new MathInteractionsService();
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);

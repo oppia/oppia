@@ -19,47 +19,53 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { ISetInputAnswer } from 'interactions/answer-defs';
+import { ISetInputRuleInputs } from 'interactions/rule-input-defs';
+
 @Injectable({
   providedIn: 'root'
 })
 export class SetInputRulesService {
-  Equals(answer: string[], inputs: {x:string[]}): boolean {
+  Equals(answer: ISetInputAnswer, inputs: ISetInputRuleInputs): boolean {
     return answer.length === inputs.x.length && inputs.x.every(function(val) {
       return answer.indexOf(val) >= 0;
     });
   }
 
-  IsSubsetOf(answer: string[], inputs: {x:string[]}): boolean {
+  IsSubsetOf(answer: ISetInputAnswer, inputs: ISetInputRuleInputs): boolean {
     return answer.length < inputs.x.length && answer.every(function(val) {
       return inputs.x.indexOf(val) >= 0;
     });
   }
 
-  IsSupersetOf(answer: string[], inputs: {x:string[]}): boolean {
+  IsSupersetOf(answer: ISetInputAnswer, inputs: ISetInputRuleInputs): boolean {
     return answer.length > inputs.x.length && inputs.x.every(function(val) {
       return answer.indexOf(val) >= 0;
     });
   }
 
-  HasElementsIn(answer: string[], inputs: {x:string[]}): boolean {
+  HasElementsIn(answer: ISetInputAnswer, inputs: ISetInputRuleInputs): boolean {
     return inputs.x.some(function(val) {
       return answer.indexOf(val) >= 0;
     });
   }
 
-  HasElementsNotIn(answer: string[], inputs: {x:string[]}): boolean {
+  HasElementsNotIn(
+      answer: ISetInputAnswer, inputs: ISetInputRuleInputs): boolean {
     return answer.some(function(val) {
       return inputs.x.indexOf(val) === -1;
     });
   }
 
-  OmitsElementsIn(answer: string[], inputs: {x:string[]}): boolean {
+  OmitsElementsIn(
+      answer: ISetInputAnswer, inputs: ISetInputRuleInputs): boolean {
     return inputs.x.some(function(val) {
       return answer.indexOf(val) === -1;
     });
   }
 
-  IsDisjointFrom(answer: string[], inputs: {x:string[]}): boolean {
+  IsDisjointFrom(
+      answer: ISetInputAnswer, inputs: ISetInputRuleInputs): boolean {
     return inputs.x.every(function(val) {
       return answer.indexOf(val) === -1;
     });

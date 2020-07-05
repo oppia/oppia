@@ -85,9 +85,15 @@ describe('ImageClickInputValidationService', () => {
         value: {
           imagePath: '/path/to/image',
           labeledRegions: [{
-            label: 'FirstLabel'
+            label: 'FirstLabel',
+            region: {
+              area: [[0]]
+            }
           }, {
-            label: 'SecondLabel'
+            label: 'SecondLabel',
+            region: {
+              area: [[0]]
+            }
           }]
         }
       }

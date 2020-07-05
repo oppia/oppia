@@ -19,7 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IFractionDict, Fraction, FractionObjectFactory } from
+import { IFractionAnswer } from 'interactions/answer-defs';
+import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
@@ -130,7 +131,7 @@ export class FractionInputValidationService {
         switch (rule.type) {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
-              var fractionDict: IFractionDict = rule.inputs.f;
+              var fractionDict: IFractionAnswer = rule.inputs.f;
               var fractionInSimplestForm = this.fof.fromDict(
                 fractionDict).convertToSimplestForm();
               if (!angular.equals(fractionDict, fractionInSimplestForm)) {

@@ -54,6 +54,8 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { IImageClickAnswer, IMathExpressionAnswer } from './answer-defs';
+import { IImageClickRuleInputs, IMathExpressionRuleInputs } from './rule-input-defs';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
@@ -109,18 +111,14 @@ describe('Rule spec services', function() {
     $provide.value('ContinueRulesService', {});
     $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
-      // TODO(#7165): Replace 'any' with the exact type. This has been
-      // typed as 'any' since 'answer' is a complex object having varying types.
-      // A general type needs to be found. Same goes for 'inputs'.
-      IsInRegion: function(answer: any, inputs: any) {
+      IsInRegion: function(
+          answer: IImageClickAnswer, inputs: IImageClickRuleInputs) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
     $provide.value('MathExpressionInputRulesService', {
-      // TODO(#7165): Replace 'any' with the exact type. This has been
-      // typed as 'any' since 'answer' is a complex object having varying types.
-      // A general type needs to be found. Same goes for 'inputs'.
-      IsMathematicallyEquivalentTo: function(answer: any, inputs: any) {
+      IsMathematicallyEquivalentTo: function(
+          answer: IMathExpressionAnswer, inputs: IMathExpressionRuleInputs) {
         return (
           MathExpression.fromLatex(answer.latex).equals(
             MathExpression.fromLatex(inputs.x)));
