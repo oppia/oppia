@@ -25,7 +25,13 @@ export interface SubscriberSummaryBackendDict {
   'subscriber_impact': number;
 }
 
-export class SubscriberSummary {
+export interface CreatorSummaryBackendDict {
+  'creator_picture_data_url': string;
+  'creator_username': string;
+  'creator_impact': number;
+}
+
+export class ProfileSummary {
   constructor(
     public pictureDataUrl: string,
     public username: string,
@@ -35,16 +41,24 @@ export class SubscriberSummary {
 @Injectable({
   providedIn: 'root'
 })
-export class SubscriberSummaryObjectFactory {
-  createFromBackendDict(
+export class ProfileSummaryObjectFactory {
+  createFromSubscriberBackendDict(
       sumamryBackendDict: SubscriberSummaryBackendDict) {
-    return new SubscriberSummary(
+    return new ProfileSummary(
       sumamryBackendDict.subscriber_picture_data_url,
       sumamryBackendDict.subscriber_username,
       sumamryBackendDict.subscriber_impact);
   }
+
+  createFromCreatorBackendDict(
+      sumamryBackendDict: CreatorSummaryBackendDict) {
+    return new ProfileSummary(
+      sumamryBackendDict.creator_picture_data_url,
+      sumamryBackendDict.creator_username,
+      sumamryBackendDict.creator_impact);
+  }
 }
 
 angular.module('oppia').factory(
-  'SubscriberSummaryObjectFactory',
-  downgradeInjectable(SubscriberSummaryObjectFactory));
+  'ProfileSummaryObjectFactory',
+  downgradeInjectable(ProfileSummaryObjectFactory));

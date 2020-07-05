@@ -28,7 +28,7 @@ describe('Exploration summary object factory', () => {
 
   it('should correctly convert backend dict to exp summary object', () => {
     let backendDict = {
-      last_updated: 1591296737470.528,
+      last_updated_msec: 1591296737470.528,
       community_owned: false,
       objective: 'Test Objective',
       id: '44LKoKLlIbGe',
@@ -44,7 +44,7 @@ describe('Exploration summary object factory', () => {
 
     let collectionSummaryObject = csof.createFromBackendDict(backendDict);
 
-    expect(collectionSummaryObject.lastUpdated).toEqual(1591296737470.528);
+    expect(collectionSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
     expect(collectionSummaryObject.communityOwned).toEqual(false);
     expect(collectionSummaryObject.objective).toEqual('Test Objective');
     expect(collectionSummaryObject.id).toEqual('44LKoKLlIbGe');

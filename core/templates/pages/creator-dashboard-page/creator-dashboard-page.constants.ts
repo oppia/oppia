@@ -38,8 +38,8 @@ export class CreatorDashboardConstants {
   };
 
   public static SUBSCRIPTION_SORT_BY_KEYS = {
-    USERNAME: 'subscriberUsername',
-    IMPACT: 'subscriberImpact'
+    USERNAME: 'username',
+    IMPACT: 'impact'
   };
 
   public static HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = {

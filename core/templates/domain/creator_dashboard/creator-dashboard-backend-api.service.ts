@@ -47,10 +47,10 @@ import {
   SuggestionObjectFactory
 } from 'domain/suggestion/SuggestionObjectFactory';
 import {
-  SubscriberSummary,
+  ProfileSummary,
   SubscriberSummaryBackendDict,
-  SubscriberSummaryObjectFactory
-} from 'domain/creator_dashboard/subscriber-summary-object.factory';
+  ProfileSummaryObjectFactory
+} from 'domain/profile/profile-summary-object.factory';
 import {
   SuggestionThread,
   SuggestionThreadObjectFactory
@@ -84,7 +84,7 @@ interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
   lastWeekStats: CreatorDashboardStats;
   displayPreference: 'card' | 'list';
-  subscribersList: SubscriberSummary[];
+  subscribersList: ProfileSummary[];
   threadsForCreatedSuggestionsList: FeedbackThread[];
   threadsForSuggestionsToReviewList: FeedbackThread[];
   createdSuggestionsList: Suggestion[];
@@ -108,7 +108,7 @@ export class CreatorDashboardBackendApiService {
     CreatorDashboardStatsObjectFactory,
     private creatorExplorationSummaryObjectFactory:
     CreatorExplorationSummaryObjectFactory,
-    private subscriberSummaryObjectFactory: SubscriberSummaryObjectFactory,
+    private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private suggestionObjectFactory: SuggestionObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -156,8 +156,8 @@ export class CreatorDashboardBackendApiService {
             .createFromBackendDict(dashboardData.last_week_stats)) : null,
         displayPreference: dashboardData.display_preference,
         subscribersList: dashboardData.subscribers_list.map(
-          subscriber => this.subscriberSummaryObjectFactory
-            .createFromBackendDict(subscriber)),
+          subscriber => this.profileSummaryObjectFactory
+            .createFromSubscriberBackendDict(subscriber)),
         threadsForCreatedSuggestionsList: (
           dashboardData.threads_for_created_suggestions_list.map(
             feedbackThread => this.feedbackThreadObjectFactory

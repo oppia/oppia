@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 export interface CollectionSummaryBackendDict {
   'category': string;
   'community_owned': boolean;
-  'last_updated': number;
+  'last_updated_msec': number;
   'id': string;
   'created_on': number;
   'language_code': string;
@@ -38,7 +38,7 @@ export class CollectionSummary {
   constructor(
     public category: string,
     public communityOwned: boolean,
-    public lastUpdated: number,
+    public lastUpdatedMsec: number,
     public id: string,
     public createdOn: number,
     public languageCode: string,
@@ -59,7 +59,7 @@ export class CollectionSummaryObjectFactory {
     return new CollectionSummary(
       collectionSummaryDict.category,
       collectionSummaryDict.community_owned,
-      collectionSummaryDict.last_updated,
+      collectionSummaryDict.last_updated_msec,
       collectionSummaryDict.id,
       collectionSummaryDict.created_on,
       collectionSummaryDict.language_code,

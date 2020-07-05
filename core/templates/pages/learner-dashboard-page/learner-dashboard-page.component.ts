@@ -346,6 +346,20 @@ angular.module('oppia').component('learnerDashboardPage', {
         );
       };
 
+      /**
+       * This was needed beacause javascript returns -1 using inBuilt indexOf
+       * even when there are identical objects.
+       * Refer -> https://rb.gy/kh5ry5
+       */
+      var findIndex = (arr, element) => {
+        for (var i = 0; i < arr.length; i++) {
+          if (JSON.stringify(arr[i]) === JSON.stringify(element)) {
+            return i;
+          }
+        }
+        return -1;
+      };
+
       ctrl.openRemoveActivityModal = function(
           sectionNameI18nId, subsectionName, activity) {
         $uibModal.open({
@@ -370,13 +384,13 @@ angular.module('oppia').component('learnerDashboardPage', {
               LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
             if (subsectionName ===
                 LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-              var index = ctrl.incompleteExplorationsList.indexOf(activity);
+              var index = findIndex(ctrl.incompleteExplorationsList, activity);
               if (index !== -1) {
                 ctrl.incompleteExplorationsList.splice(index, 1);
               }
             } else if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-              var index = ctrl.incompleteCollectionsList.indexOf(activity);
+              var index = findIndex(ctrl.incompleteCollectionsList, activity);
               if (index !== -1) {
                 ctrl.incompleteCollectionsList.splice(index, 1);
               }
@@ -385,13 +399,13 @@ angular.module('oppia').component('learnerDashboardPage', {
                     LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
             if (subsectionName ===
                 LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-              var index = ctrl.explorationPlaylist.indexOf(activity);
+              var index = findIndex(ctrl.explorationPlaylist, activity);
               if (index !== -1) {
                 ctrl.explorationPlaylist.splice(index, 1);
               }
             } else if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-              var index = ctrl.collectionPlaylist.indexOf(activity);
+              var index = findIndex(ctrl.collectionPlaylist, activity);
               if (index !== -1) {
                 ctrl.collectionPlaylist.splice(index, 1);
               }
@@ -455,59 +469,34 @@ angular.module('oppia').component('learnerDashboardPage', {
             ctrl.startIncompleteCollectionIndex = 0;
             ctrl.startCompletedCollectionIndex = 0;
             ctrl.completedExplorationsList = (
-              responseData.completed_explorations_list
-            );
+              responseData.completedExplorationsList);
             ctrl.completedCollectionsList = (
-              responseData.completed_collections_list
-            );
+              responseData.completedCollectionsList);
             ctrl.incompleteExplorationsList = (
-              responseData.incomplete_explorations_list
-            );
+              responseData.incompleteExplorationsList);
             ctrl.incompleteCollectionsList = (
-              responseData.incomplete_collections_list
-            );
-            ctrl.subscriptionsList = (
-              responseData.subscription_list
-            );
+              responseData.incompleteCollectionsList);
+            ctrl.subscriptionsList = responseData.subscriptionList;
             ctrl.numberNonexistentIncompleteExplorations = (
-              responseData.number_of_nonexistent_activities
-                .incomplete_explorations
-            );
+              responseData.numberOfNonexistentActivities
+                .incompleteExplorations);
             ctrl.numberNonexistentIncompleteCollections = (
-              responseData.number_of_nonexistent_activities
-                .incomplete_collections
-            );
+              responseData.numberOfNonexistentActivities.incompleteCollections);
             ctrl.numberNonexistentCompletedExplorations = (
-              responseData.number_of_nonexistent_activities
-                .completed_explorations
-            );
+              responseData.numberOfNonexistentActivities.completedExplorations);
             ctrl.numberNonexistentCompletedCollections = (
-              responseData.number_of_nonexistent_activities
-                .completed_collections
-            );
+              responseData.numberOfNonexistentActivities.completedCollections);
             ctrl.numberNonexistentExplorationsFromPlaylist = (
-              responseData.number_of_nonexistent_activities
-                .exploration_playlist
-            );
+              responseData.numberOfNonexistentActivities.explorationPlaylist);
             ctrl.numberNonexistentCollectionsFromPlaylist = (
-              responseData.number_of_nonexistent_activities
-                .collection_playlist
-            );
+              responseData.numberOfNonexistentActivities.collectionPlaylist);
             ctrl.completedToIncompleteCollections = (
-              responseData.completed_to_incomplete_collections
-            );
-            var threadSummaryDicts = responseData.thread_summaries;
-            ctrl.threadSummaries = [];
-            for (
-              var index = 0; index < threadSummaryDicts.length; index++) {
-              ctrl.threadSummaries.push(
-                FeedbackThreadSummaryObjectFactory.createFromBackendDict(
-                  threadSummaryDicts[index]));
-            }
+              responseData.completedToIncompleteCollections);
+            ctrl.threadSummaries = responseData.threadSummaries;
             ctrl.numberOfUnreadThreads =
-              responseData.number_of_unread_threads;
-            ctrl.explorationPlaylist = responseData.exploration_playlist;
-            ctrl.collectionPlaylist = responseData.collection_playlist;
+              responseData.numberOfUnreadThreads;
+            ctrl.explorationPlaylist = responseData.explorationPlaylist;
+            ctrl.collectionPlaylist = responseData.collectionPlaylist;
             ctrl.activeSection =
               LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
             ctrl.activeSubsection = (

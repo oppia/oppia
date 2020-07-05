@@ -58,7 +58,7 @@ describe('Creator dashboard controller', () => {
   var creatorExplorationSummaryObjectFactory = null;
   var CsrfService = null;
   var feedbackThreadObjectFactory = null;
-  var subscriberSummaryObjectFactory = null;
+  var profileSummaryObjectFactory = null;
   var SuggestionModalForCreatorDashboardService = null;
   var suggestionObjectFactory = null;
   var suggestionsService = null;
@@ -94,8 +94,8 @@ describe('Creator dashboard controller', () => {
     CsrfService = $injector.get('CsrfTokenService');
     feedbackThreadObjectFactory = $injector.get(
       'FeedbackThreadObjectFactory');
-    subscriberSummaryObjectFactory = $injector.get(
-      'SubscriberSummaryObjectFactory');
+    profileSummaryObjectFactory = $injector.get(
+      'ProfileSummaryObjectFactory');
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
     suggestionObjectFactory = $injector.get(
@@ -286,8 +286,8 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(dashboardData.last_week_stats)) : null,
             displayPreference: dashboardData.display_preference,
             subscribersList: dashboardData.subscribers_list.map(
-              subscriber => subscriberSummaryObjectFactory
-                .createFromBackendDict(subscriber)),
+              subscriber => profileSummaryObjectFactory
+                .createFromSubscriberBackendDict(subscriber)),
             threadsForCreatedSuggestionsList: (
               dashboardData.threads_for_created_suggestions_list.map(
                 feedbackThread => feedbackThreadObjectFactory
@@ -362,8 +362,8 @@ describe('Creator dashboard controller', () => {
 
       it('should set explorations sorting options', function() {
         expect(ctrl.isCurrentSortDescending).toBe(true);
-        expect(ctrl.currentSortType).toBe('num_open_threads');
-        ctrl.setExplorationsSortingOptions('num_open_threads');
+        expect(ctrl.currentSortType).toBe('numOpenThreads');
+        ctrl.setExplorationsSortingOptions('numOpenThreads');
         expect(ctrl.isCurrentSortDescending).toBe(false);
 
         ctrl.setExplorationsSortingOptions('new_open');
@@ -372,8 +372,8 @@ describe('Creator dashboard controller', () => {
 
       it('should set subscription sorting options', function() {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
-        expect(ctrl.currentSubscribersSortType).toBe('subscriber_username');
-        ctrl.setSubscriptionSortingOptions('subscriber_username');
+        expect(ctrl.currentSubscribersSortType).toBe('username');
+        ctrl.setSubscriptionSortingOptions('username');
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
 
         ctrl.setSubscriptionSortingOptions('new_subscriber');
@@ -382,17 +382,17 @@ describe('Creator dashboard controller', () => {
 
       it('should sort subscription function', function() {
         var entity = {
-          subscriber_username: 'subscriber_username'
+          username: 'username'
         };
         expect(ctrl.sortSubscriptionFunction(entity)).toBe(
-          'subscriber_username');
+          'username');
 
-        ctrl.setSubscriptionSortingOptions('subscriber_impact');
+        ctrl.setSubscriptionSortingOptions('impact');
         expect(ctrl.sortSubscriptionFunction({})).toBe(0);
       });
 
       it('should sort by function', function() {
-        expect(ctrl.currentSortType).toBe('num_open_threads');
+        expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('title');
         expect(ctrl.currentSortType).toBe('title');
 
@@ -401,11 +401,11 @@ describe('Creator dashboard controller', () => {
           status: 'private'
         })).toBe('Untitled');
 
-        ctrl.setExplorationsSortingOptions('num_views');
-        expect(ctrl.currentSortType).toBe('num_views');
+        ctrl.setExplorationsSortingOptions('numViews');
+        expect(ctrl.currentSortType).toBe('numViews');
 
         expect(ctrl.sortByFunction({
-          num_views: '',
+          numViews: '',
           status: 'private'
         })).toBe(0);
 
@@ -414,11 +414,11 @@ describe('Creator dashboard controller', () => {
 
         expect(ctrl.sortByFunction({})).toBe(0);
 
-        ctrl.setExplorationsSortingOptions('last_updated_msec');
-        expect(ctrl.currentSortType).toBe('last_updated_msec');
+        ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
+        expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
 
         expect(ctrl.sortByFunction({
-          last_updated_msec: 1
+          lastUpdatedMsec: 1
         })).toBe(1);
       });
 
@@ -559,8 +559,8 @@ describe('Creator dashboard controller', () => {
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
-            subscriber => subscriberSummaryObjectFactory
-              .createFromBackendDict(subscriber)),
+            subscriber => profileSummaryObjectFactory
+              .createFromSubscriberBackendDict(subscriber)),
           threadsForCreatedSuggestionsList: (
             dashboardData.threads_for_created_suggestions_list.map(
               feedbackThread => feedbackThreadObjectFactory
@@ -657,8 +657,8 @@ describe('Creator dashboard controller', () => {
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
-            subscriber => subscriberSummaryObjectFactory
-              .createFromBackendDict(subscriber)),
+            subscriber => profileSummaryObjectFactory
+              .createFromSubscriberBackendDict(subscriber)),
           threadsForCreatedSuggestionsList: (
             dashboardData.threads_for_created_suggestions_list.map(
               feedbackThread => feedbackThreadObjectFactory
