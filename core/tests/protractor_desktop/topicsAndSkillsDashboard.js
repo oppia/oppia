@@ -67,7 +67,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_UNASSIGNED);
+      Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
     await topicsAndSkillsDashboardPage.get();
@@ -77,11 +77,11 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_ASSIGNED);
+      Constants.SKILL_STATUS_ASSIGNED);
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_UNASSIGNED);
+      Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
@@ -135,7 +135,7 @@ describe('Topics and skills dashboard functionality', function() {
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        SKILL_STATUS_UNASSIGNED);
+        Constants.SKILL_STATUS_UNASSIGNED);
       await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
       await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
 
@@ -183,7 +183,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_UNASSIGNED);
+      Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(
       0, 0);
     await topicsAndSkillsDashboardPage.get();
