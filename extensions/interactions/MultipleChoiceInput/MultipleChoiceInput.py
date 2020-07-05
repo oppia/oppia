@@ -71,7 +71,7 @@ class MultipleChoiceInput(base.BaseInteraction):
 
     _answer_visualization_specs = [{
         'id': 'SortedTiles',
-        'options': {'header': '', 'use_percentages': True},
+        'options': {'header': 'Top answers', 'use_percentages': True},
         'calculation_id': 'AnswerFrequencies',
         'addressed_info_is_supported': True,
     }]
