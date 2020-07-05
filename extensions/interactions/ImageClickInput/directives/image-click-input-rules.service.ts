@@ -19,14 +19,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IImageClickAnswer } from 'interactions/answer-defs';
+import { IImageClickRuleInputs } from 'interactions/rule-input-defs';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ImageClickInputRulesService {
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'answer' is a complex object having varying types. A general
-  // type needs to be found. Same goes for 'inputs'.
-  IsInRegion(answer: any, inputs: any): boolean {
+  IsInRegion(
+      answer: IImageClickAnswer, inputs: IImageClickRuleInputs): boolean {
     return answer.clickedRegions.indexOf(inputs.x) !== -1;
   }
 }

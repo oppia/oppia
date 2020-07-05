@@ -24,10 +24,10 @@ import {
   AnswerClassificationResult, AnswerClassificationResultObjectFactory
 } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
+import { IInteractionAnswer } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
@@ -63,7 +63,9 @@ export class AnswerClassificationService {
    * @return AnswerClassificationResult domain object.
    */
   private classifyAnswer(
-      answer: Answer, answerGroups: AnswerGroup[], defaultOutcome: Outcome,
+      answer: IInteractionAnswer,
+      answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome,
       interactionRulesService): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
@@ -106,7 +108,9 @@ export class AnswerClassificationService {
    * @return The resulting AnswerClassificationResult domain object.
    */
   getMatchingClassificationResult(
-      stateName: string, interactionInOldState: Interaction, answer: Answer,
+      stateName: string,
+      interactionInOldState: Interaction,
+      answer: IInteractionAnswer,
       interactionRulesService): AnswerClassificationResult {
     var answerClassificationResult = null;
 
@@ -176,7 +180,7 @@ export class AnswerClassificationService {
   }
 
   isClassifiedExplicitlyOrGoesToNewState(
-      stateName: string, state: State, answer: Answer,
+      stateName: string, state: State, answer: IInteractionAnswer,
       interactionRulesService): boolean {
     const result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);

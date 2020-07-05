@@ -29,6 +29,8 @@ import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { FeaturedTranslationLanguageObjectFactory} from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
@@ -173,6 +175,38 @@ describe('Contribution Opportunities backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith(
         sampleVoiceoverOpportunitiesResponse);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should successfully fetch the featured translation languages',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const featuredTranslationLanguageObjectFactory = TestBed.get(
+        FeaturedTranslationLanguageObjectFactory);
+
+      contributionOpportunitiesBackendApiService
+        .fetchFeaturedTranslationLanguages()
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        '/retrivefeaturedtranslationlanguages'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        featured_translation_languages:
+          [{ language_code: 'en', explanation: 'English' }]
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith([
+        featuredTranslationLanguageObjectFactory.createFromBackendDict(
+          { language_code: 'en', explanation: 'English' }
+        )
+      ]);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

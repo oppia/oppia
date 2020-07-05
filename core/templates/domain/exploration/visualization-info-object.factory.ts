@@ -21,20 +21,11 @@ import { Injectable } from '@angular/core';
 
 import { AnswerStats } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { IFractionDict } from
-  'domain/objects/FractionObjectFactory.ts';
-/* eslint-disable max-len */
-import { INote } from 'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
-/* eslint-enable max-len */
+import { IInteractionAnswer } from
+  'interactions/answer-defs';
 
 export interface IAnswerStatsBackendDict {
-  'answer': (
-    string | number | IFractionDict | INumberWithUnitsBackendDict | string[] |
-    INote[] | number[] | IGraphBackendDict| string[][]);
+  'answer': IInteractionAnswer;
   'frequency': number;
 
   // N/A when the visualization can not present addressed answers.

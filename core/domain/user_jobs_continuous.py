@@ -46,6 +46,7 @@ class RecentUpdatesRealtimeModel(
     jobs.BaseRealtimeDatastoreClassForContinuousComputations class for more
     details.
     """
+
     pass
 
 
@@ -58,6 +59,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     propagating new updates to the dashboard; the length of the delay will be
     approximately the time it takes a batch job to run.
     """
+
     @classmethod
     def get_event_types_listened_to(cls):
         """Returns a list of event types that this class subscribes to."""
@@ -111,6 +113,7 @@ class RecentUpdatesMRJobManager(
     """Manager for a MapReduce job that computes a list of recent notifications
     for explorations, collections, and feedback threads watched by a user.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return DashboardRecentUpdatesAggregator
@@ -322,6 +325,7 @@ class UserStatsRealtimeModel(
     jobs.BaseRealtimeDatastoreClassForContinuousComputations class for more
     details.
     """
+
     total_plays = ndb.IntegerProperty(default=0)
     num_ratings = ndb.IntegerProperty(default=0)
     average_ratings = ndb.FloatProperty(indexed=True)
@@ -336,6 +340,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     new updates to the view; the length of the delay will be approximately the
     time it takes a batch job to run.
     """
+
     @classmethod
     def get_event_types_listened_to(cls):
         """Returns a list of event types that this class subscribes to."""
@@ -512,6 +517,7 @@ class UserStatsMRJobManager(
             reach: sum(card.answers_given for card in all_cards) ^ (2 / 3).
             fractional_contribution: percent of commits by this user.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return UserStatsAggregator

@@ -94,6 +94,23 @@ angular.module('oppia').directive('storiesList', [
             });
           };
 
+          $scope.onMoveStoryFinish = function(toIndex) {
+            $scope.toIndex = toIndex;
+            if ($scope.fromIndex === $scope.toIndex) {
+              return;
+            }
+            TopicUpdateService.rearrangeCanonicalStory(
+              $scope.getTopic(), $scope.fromIndex, $scope.toIndex);
+            var storySummary = (
+              angular.copy($scope.storySummaries[$scope.fromIndex]));
+            $scope.storySummaries.splice($scope.fromIndex, 1);
+            $scope.storySummaries.splice($scope.toIndex, 0, storySummary);
+          };
+
+          $scope.onMoveStoryStart = function(fromIndex) {
+            $scope.fromIndex = fromIndex;
+          };
+
           ctrl.$onInit = function() {
             $scope.STORY_TABLE_COLUMN_HEADINGS = [
               'title', 'node_count', 'publication_status'];

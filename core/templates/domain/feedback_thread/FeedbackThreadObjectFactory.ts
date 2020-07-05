@@ -25,7 +25,7 @@ import { ThreadMessage } from
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
-interface IFeedbackThreadBackendDict {
+export interface IFeedbackThreadBackendDict {
   'status': string;
   'subject': string;
   'summary': string;
