@@ -123,7 +123,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = topic_models.TopicCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.topic_id = 'b'
         commit.put()
@@ -142,7 +142,6 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 entity_id='entity_id',
                 version=1,
                 committer_id='committer_id',
-                committer_username='committer_username',
                 commit_type='create',
                 commit_message='Created new TopicCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
@@ -248,7 +247,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = topic_models.SubtopicPageCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.subtopic_page_id = 'b'
         commit.put()
@@ -267,7 +266,6 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 entity_id='entity_id',
                 version=1,
                 committer_id='committer_id',
-                committer_username='committer_username',
                 commit_type='create',
                 commit_message='Created new SubtopicPageCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
