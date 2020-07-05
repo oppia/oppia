@@ -482,9 +482,6 @@ import { StateGraphLayoutService } from
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
-import { StateImprovementSuggestionService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -498,9 +495,6 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { StatePropertyService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
@@ -838,14 +832,12 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateEditorService: StateEditorService;
   static stateGraphLayoutService: StateGraphLayoutService;
   static stateHintsService: StateHintsService;
-  static stateImprovementSuggestionService: StateImprovementSuggestionService;
   static stateInteractionIdService: StateInteractionIdService;
   static stateInteractionStatsBackendApiService: StateInteractionStatsBackendApiService;
   static stateInteractionStatsService: StateInteractionStatsService;
   static stateNameService: StateNameService;
   static stateObjectFactory: StateObjectFactory;
   static stateParamChangesService: StateParamChangesService;
-  static statePropertyService: StatePropertyService;
   static stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   static stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService;
   static stateSolutionService: StateSolutionService;
@@ -1123,14 +1115,12 @@ private stateCustomizationArgsService: StateCustomizationArgsService,
 private stateEditorService: StateEditorService,
 private stateGraphLayoutService: StateGraphLayoutService,
 private stateHintsService: StateHintsService,
-private stateImprovementSuggestionService: StateImprovementSuggestionService,
 private stateInteractionIdService: StateInteractionIdService,
 private stateInteractionStatsBackendApiService: StateInteractionStatsBackendApiService,
 private stateInteractionStatsService: StateInteractionStatsService,
 private stateNameService: StateNameService,
 private stateObjectFactory: StateObjectFactory,
 private stateParamChangesService: StateParamChangesService,
-private statePropertyService: StatePropertyService,
 private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
 private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
 private stateSolutionService: StateSolutionService,
@@ -1409,14 +1399,12 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;
     OppiaAngularRootComponent.stateHintsService = this.stateHintsService;
-    OppiaAngularRootComponent.stateImprovementSuggestionService = this.stateImprovementSuggestionService;
     OppiaAngularRootComponent.stateInteractionIdService = this.stateInteractionIdService;
     OppiaAngularRootComponent.stateInteractionStatsBackendApiService = this.stateInteractionStatsBackendApiService;
     OppiaAngularRootComponent.stateInteractionStatsService = this.stateInteractionStatsService;
     OppiaAngularRootComponent.stateNameService = this.stateNameService;
     OppiaAngularRootComponent.stateObjectFactory = this.stateObjectFactory;
     OppiaAngularRootComponent.stateParamChangesService = this.stateParamChangesService;
-    OppiaAngularRootComponent.statePropertyService = this.statePropertyService;
     OppiaAngularRootComponent.stateRecordedVoiceoversService = this.stateRecordedVoiceoversService;
     OppiaAngularRootComponent.stateSolicitAnswerDetailsService = this.stateSolicitAnswerDetailsService;
     OppiaAngularRootComponent.stateSolutionService = this.stateSolutionService;

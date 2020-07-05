@@ -137,16 +137,9 @@ class SkillModel(base_models.VersionedModel):
         super(SkillModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()

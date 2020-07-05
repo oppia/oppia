@@ -26,7 +26,7 @@ import { NormalizeWhitespacePipe } from
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { IStateRulesStats, StateInteractionStatsService } from
+import { IStateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
@@ -56,6 +56,7 @@ describe('State Interaction Stats Service', () => {
   afterEach(() => this.httpTestingController.verify());
 
   beforeEach(() => {
+    this.expId = 'expid';
     this.mockState = {
       name: 'Hola',
       interaction: {
@@ -87,18 +88,14 @@ describe('State Interaction Stats Service', () => {
   });
 
   describe('when gathering stats from the backend', () => {
-    beforeEach(() => {
-      spyOn(this.contextService, 'getExplorationId').and.returnValue('expid');
-    });
-
     it('should provide cached results after first call', fakeAsync(() => {
       this.statsCaptured = [];
-      const captureStats = (stats: IStateRulesStats) => {
+      const captureStats = (stats: IStateInteractionStats) => {
         expect(stats).toBeDefined();
         this.statsCaptured.push(stats);
       };
 
-      this.stateInteractionStatsService.computeStats(this.mockState)
+      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
         .then(captureStats);
       const req = this.httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -114,7 +111,7 @@ describe('State Interaction Stats Service', () => {
       });
       flushMicrotasks();
 
-      this.stateInteractionStatsService.computeStats(this.mockState)
+      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
         .then(captureStats);
       this.httpTestingController.expectNone(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -127,12 +124,12 @@ describe('State Interaction Stats Service', () => {
 
     it('should have separate caches for different states', fakeAsync(() => {
       this.statsCaptured = [];
-      const captureStats = (stats: IStateRulesStats) => {
+      const captureStats = (stats: IStateInteractionStats) => {
         expect(stats).toBeDefined();
         this.statsCaptured.push(stats);
       };
 
-      this.stateInteractionStatsService.computeStats(this.mockState)
+      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
         .then(captureStats);
       const holaReq = this.httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -149,7 +146,7 @@ describe('State Interaction Stats Service', () => {
       flushMicrotasks();
 
       this.mockState.name = 'Adios';
-      this.stateInteractionStatsService.computeStats(this.mockState)
+      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
         .then(captureStats);
       const adiosReq = this.httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Adios');
@@ -174,7 +171,7 @@ describe('State Interaction Stats Service', () => {
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
-      this.stateInteractionStatsService.computeStats(this.mockState)
+      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
         .then(this.onSuccess, this.onFailure);
 
       const req = this.httpTestingController.expectOne(
@@ -209,8 +206,8 @@ describe('State Interaction Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionStatsService.computeStats(this.mockState)
-          .then(this.onSuccess, this.onFailure);
+        this.stateInteractionStatsService.computeStats(
+          this.expId, this.mockState).then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');
@@ -241,7 +238,7 @@ describe('State Interaction Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionStatsService.computeStats({
+        this.stateInteractionStatsService.computeStats(this.expId, {
           name: 'Fraction', interaction: {id: 'FractionInput'}
         }).then(this.onSuccess, this.onFailure);
 
