@@ -129,23 +129,15 @@ class TopicModel(base_models.VersionedModel):
         super(TopicModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
             status = constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            status, False
+            self.id, self.version, committer_id, commit_type,
+            commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
@@ -360,16 +352,10 @@ class SubtopicPageModel(base_models.VersionedModel):
         """
         super(SubtopicPageModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
 
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
@@ -538,14 +524,7 @@ class TopicRightsModel(base_models.VersionedModel):
         super(TopicRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
@@ -554,7 +533,6 @@ class TopicRightsModel(base_models.VersionedModel):
         TopicCommitLogEntryModel(
             id=('rights-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
-            username=committer_username,
             topic_id=self.id,
             commit_type=commit_type,
             commit_message=commit_message,
