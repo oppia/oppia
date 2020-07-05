@@ -259,8 +259,8 @@ describe('State Interaction Stats Service', () => {
       expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
         visualizationsInfo: [this.joC({
           data: [
-            this.joC({answer: 'foo'}),
-            this.joC({answer: 'bar'}),
+            this.joC({answer: '<p>foo</p>'}),
+            this.joC({answer: '<p>bar</p>'}),
           ]
         })]
       }));
