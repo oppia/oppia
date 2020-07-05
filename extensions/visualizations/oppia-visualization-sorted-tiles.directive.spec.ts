@@ -115,19 +115,19 @@ describe('Oppia sorted tiles visualization', function() {
   });
 
   describe('Very long content', () => {
+    const veryLongAnswer = (
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ' +
+      'eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ' +
+      'ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut ' +
+      'aliquip ex ea commodo consequat. Duis aute irure dolor in ' +
+      'reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla ' +
+      'pariatur. Excepteur sint occaecat cupidatat non proident, sunt in ' +
+      'culpa qui officia deserunt mollit anim id est laborum.');
     let element: JQLite;
 
     beforeEach(() => {
       spyOn(utilsService, 'isOverflowing').and.returnValue(true);
 
-      const veryLongAnswer = (
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ' +
-        'eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ' +
-        'ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut ' +
-        'aliquip ex ea commodo consequat. Duis aute irure dolor in ' +
-        'reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla ' +
-        'pariatur. Excepteur sint occaecat cupidatat non proident, sunt in ' +
-        'culpa qui officia deserunt mollit anim id est laborum.');
       element = newDirective(
         [{answer: veryLongAnswer, frequency: 3}],
         {header: 'Pretty Tiles!', use_percentages: true});
@@ -138,7 +138,7 @@ describe('Oppia sorted tiles visualization', function() {
     });
 
     it('should open the answer content modal when prompted for more', () => {
-      const openModalSpy = spyOn($uibModal, 'open').and.stub();
+      const openModalSpy = spyOn($uibModal, 'open').and.callThrough();
 
       element.find('.more > a').click();
       expect(openModalSpy).toHaveBeenCalledWith(jasmine.objectContaining({
