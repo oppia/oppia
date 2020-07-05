@@ -49,46 +49,7 @@ describe('Topic Landing Page', function() {
       }
     });
     ctrl.$onInit();
-
-    expect(ctrl.subject).toBe('math');
     expect(ctrl.topicTitle).toBe('Ratios');
-    expect(ctrl.lessons).toEqual([
-      'What is a Ratio?',
-      'Equivalent Ratios',
-      'Ratios & Proportional Reasoning',
-      'Writing Ratios in Simplest Form'
-    ]);
-    expect(ctrl.bookImageUrl).toBe('/assets/images/splash/books.svg');
-    expect(ctrl.image1).toEqual({
-      src_png: '/assets/images/landing/math/ratios/ratios_James.png',
-      src_webp: '/assets/images/landing/math/ratios/ratios_James.webp',
-      alt: 'A boy showing 2 is to 3 ratio on a card.'
-    });
-    expect(ctrl.image2).toEqual({
-      src_png: '/assets/images/landing/math/ratios/ratios_question.png',
-      src_webp: '/assets/images/landing/math/ratios/ratios_question.webp',
-      alt: 'A smoothie shop and a card having question "What does a' +
-      ' ratio tell us?" with options.'
-    });
-  });
-
-  it('should get video url', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/math/ratios'
-      }
-    });
-    ctrl.$onInit();
-
-    expect(ctrl.getVideoUrl()).toBe(
-      '/assets/videos/landing/math/ratios/ratios_video.mp4');
-  });
-
-  it('should not get video url if it does not exist', function() {
-    expect(function() {
-      ctrl.getVideoUrl();
-    }).toThrowError(
-      'There is no video data available for this landing page.');
   });
 
   it('should click get started button', function() {
@@ -124,16 +85,6 @@ describe('Topic Landing Page', function() {
     ctrl.onClickLearnMoreButton();
     $timeout.flush(150);
 
-    expect(windowRef.nativeWindow.location).toBe('/');
-  });
-
-  it('should click exploration lessons button', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
-    });
-    ctrl.onClickExploreLessonsButton();
-    $timeout.flush(150);
-
     expect(windowRef.nativeWindow.location).toBe('/community-library');
   });
 
@@ -148,5 +99,13 @@ describe('Topic Landing Page', function() {
       expect($window.document.title).toBe('Fractions | ' +
         'Add, Subtract, Multiply and Divide | Oppia');
     }, 150, false);
+  });
+
+  it('should return correct lesson quality image src', function() {
+    var imageSrc = ctrl.getLessonQualityImageSrc('someImage.png');
+    expect(imageSrc).toBe('/assets/images/landing/someImage.png');
+
+    imageSrc = ctrl.getLessonQualityImageSrc('someOtherImage.png');
+    expect(imageSrc).toBe('/assets/images/landing/someOtherImage.png');
   });
 });
