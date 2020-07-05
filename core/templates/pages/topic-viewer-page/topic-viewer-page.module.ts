@@ -44,6 +44,8 @@ import { ObjectsDomainConstants } from
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 
+import { TopicViewerNavbarBreadcrumbComponent } from
+  './navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
 import { PracticeTabComponent } from './practice-tab/practice-tab.component';
 
 
@@ -54,10 +56,12 @@ import { PracticeTabComponent } from './practice-tab/practice-tab.component';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent, PracticeTabComponent
+    OppiaAngularRootComponent, PracticeTabComponent,
+    TopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent, PracticeTabComponent
+    OppiaAngularRootComponent, PracticeTabComponent,
+    TopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
     AppConstants,
