@@ -28,6 +28,7 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
     """Test the 'contains_balanced_brackets' and 'is_algebraic' helper
     functions.
     """
+
     def test_contains_balanced_brackets(self):
         """Tests for contains_balanced_brackets method."""
         self.assertTrue(expression_parser.contains_balanced_brackets(''))

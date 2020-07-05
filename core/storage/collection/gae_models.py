@@ -32,11 +32,13 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
+
     pass
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
+
     pass
 
 
@@ -46,6 +48,7 @@ class CollectionModel(base_models.VersionedModel):
     This class should only be imported by the collection services file
     and the collection model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = CollectionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionSnapshotContentModel
     ALLOW_REVERT = True
@@ -65,6 +68,8 @@ class CollectionModel(base_models.VersionedModel):
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
         required=True, default=1, indexed=True)
+    # DEPRECATED in v2.4.2. Do not use.
+    nodes = ndb.JsonProperty(default={}, indexed=False)
 
     # A dict representing the contents of a collection. Currently, this
     # contains the list of nodes. This dict should contain collection data
@@ -127,20 +132,14 @@ class CollectionModel(base_models.VersionedModel):
         super(CollectionModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         collection_rights = CollectionRightsModel.get_by_id(self.id)
 
         # TODO(msl): Test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when collections
         # are changed).
         collection_commit_log = CollectionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds, collection_rights.status,
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, collection_rights.status,
             collection_rights.community_owned
         )
         collection_commit_log.collection_id = self.id
@@ -167,12 +166,6 @@ class CollectionModel(base_models.VersionedModel):
             commit_message, force_deletion=force_deletion)
 
         if not force_deletion:
-            committer_user_settings_model = (
-                user_models.UserSettingsModel.get_by_id(committer_id))
-            committer_username = (
-                committer_user_settings_model.username
-                if committer_user_settings_model else '')
-
             commit_log_models = []
             collection_rights_models = CollectionRightsModel.get_multi(
                 entity_ids, include_deleted=True)
@@ -180,7 +173,7 @@ class CollectionModel(base_models.VersionedModel):
             for model, rights_model in python_utils.ZIP(
                     versioned_models, collection_rights_models):
                 collection_commit_log = CollectionCommitLogEntryModel.create(
-                    model.id, model.version, committer_id, committer_username,
+                    model.id, model.version, committer_id,
                     cls._COMMIT_TYPE_DELETE,
                     commit_message, [{'cmd': cls.CMD_DELETE_COMMIT}],
                     rights_model.status, rights_model.community_owned
@@ -193,12 +186,14 @@ class CollectionModel(base_models.VersionedModel):
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
+
     pass
 
 
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
+
     pass
 
 
@@ -207,6 +202,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     The id of each instance is the id of the corresponding collection.
     """
+
     SNAPSHOT_METADATA_CLASS = CollectionRightsSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionRightsSnapshotContentModel
     ALLOW_REVERT = False
@@ -389,18 +385,12 @@ class CollectionRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
-            committer_user_settings_model = (
-                user_models.UserSettingsModel.get_by_id(committer_id))
-            committer_username = (
-                committer_user_settings_model.username
-                if committer_user_settings_model else '')
             # TODO(msl): Test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when collections
             # are changed).
             CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
-                username=committer_username,
                 collection_id=self.id,
                 commit_type=commit_type,
                 commit_message=commit_message,
@@ -453,6 +443,7 @@ class CollectionRightsAllUsersModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding collection.
     """
+
     # The user_ids of users who are (or were in history) members of owner_ids,
     # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
     all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -523,6 +514,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'collection-[collection_id]-[version]'.
     """
+
     # The id of the collection being edited.
     collection_id = ndb.StringProperty(indexed=True, required=True)
 

@@ -97,6 +97,144 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             model.get(model_id)
 
+    def test_put(self):
+        model = base_models.BaseModel()
+        self.assertIsNone(model.created_on)
+        self.assertIsNone(model.last_updated)
+
+        # Field last_updated will get updated anyway because it is None.
+        model.put(update_last_updated_time=False)
+        model_id = model.id
+        self.assertIsNotNone(
+            base_models.BaseModel.get_by_id(model_id).created_on)
+        self.assertIsNotNone(
+            base_models.BaseModel.get_by_id(model_id).last_updated)
+        last_updated = model.last_updated
+
+        # Field last_updated won't get updated because update_last_updated_time
+        # is set to False and last_updated already has some value.
+        model.put(update_last_updated_time=False)
+        self.assertEqual(
+            base_models.BaseModel.get_by_id(model_id).last_updated,
+            last_updated)
+
+        # Field last_updated will get updated because update_last_updated_time
+        # is set to True (by default).
+        model.put()
+        self.assertNotEqual(
+            base_models.BaseModel.get_by_id(model_id).last_updated,
+            last_updated)
+
+    def test_put_async(self):
+        model = base_models.BaseModel()
+        self.assertIsNone(model.created_on)
+        self.assertIsNone(model.last_updated)
+
+        # Field last_updated will get updated anyway because it is None.
+        future = model.put_async(update_last_updated_time=False)
+        future.get_result()
+        model_id = model.id
+        self.assertIsNotNone(
+            base_models.BaseModel.get_by_id(model_id).created_on)
+        self.assertIsNotNone(
+            base_models.BaseModel.get_by_id(model_id).last_updated)
+        last_updated = model.last_updated
+
+        # Field last_updated won't get updated because update_last_updated_time
+        # is set to False and last_updated already has some value.
+        future = model.put_async(update_last_updated_time=False)
+        future.get_result()
+        self.assertEqual(
+            base_models.BaseModel.get_by_id(model_id).last_updated,
+            last_updated)
+
+        # Field last_updated will get updated because update_last_updated_time
+        # is set to True (by default).
+        future = model.put_async()
+        future.get_result()
+        self.assertNotEqual(
+            base_models.BaseModel.get_by_id(model_id).last_updated,
+            last_updated)
+
+    def test_put_multi(self):
+        models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
+        for model in models_1:
+            self.assertIsNone(model.created_on)
+            self.assertIsNone(model.last_updated)
+
+        # Field last_updated will get updated anyway because it is None.
+        base_models.BaseModel.put_multi(
+            models_1, update_last_updated_time=False)
+        model_ids = [model.id for model in models_1]
+        last_updated_values = []
+        for model_id in model_ids:
+            model = base_models.BaseModel.get_by_id(model_id)
+            self.assertIsNotNone(model.created_on)
+            self.assertIsNotNone(model.last_updated)
+            last_updated_values.append(model.last_updated)
+
+        # Field last_updated won't get updated because update_last_updated_time
+        # is set to False and last_updated already has some value.
+        models_2 = base_models.BaseModel.get_multi(model_ids)
+        base_models.BaseModel.put_multi(
+            models_2, update_last_updated_time=False)
+        for model_id, last_updated in python_utils.ZIP(
+                model_ids, last_updated_values):
+            model = base_models.BaseModel.get_by_id(model_id)
+            self.assertEqual(model.last_updated, last_updated)
+
+        # Field last_updated will get updated because update_last_updated_time
+        # is set to True (by default).
+        models_3 = base_models.BaseModel.get_multi(model_ids)
+        base_models.BaseModel.put_multi(models_3)
+        for model_id, last_updated in python_utils.ZIP(
+                model_ids, last_updated_values):
+            model = base_models.BaseModel.get_by_id(model_id)
+            self.assertNotEqual(model.last_updated, last_updated)
+
+    def test_put_multi_async(self):
+        models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
+        for model in models_1:
+            self.assertIsNone(model.created_on)
+            self.assertIsNone(model.last_updated)
+
+        # Field last_updated will get updated anyway because it is None.
+        futures = base_models.BaseModel.put_multi_async(
+            models_1, update_last_updated_time=False)
+        for future in futures:
+            future.get_result()
+        model_ids = [model.id for model in models_1]
+        last_updated_values = []
+        for model_id in model_ids:
+            model = base_models.BaseModel.get_by_id(model_id)
+            self.assertIsNotNone(model.created_on)
+            self.assertIsNotNone(model.last_updated)
+            last_updated_values.append(model.last_updated)
+
+        # Field last_updated won't get updated because update_last_updated_time
+        # is set to False and last_updated already has some value.
+        models_2 = base_models.BaseModel.get_multi(model_ids)
+        futures = base_models.BaseModel.put_multi_async(
+            models_2, update_last_updated_time=False)
+        for future in futures:
+            future.get_result()
+        for model_id, last_updated in python_utils.ZIP(
+                model_ids, last_updated_values):
+            model = base_models.BaseModel.get_by_id(model_id)
+            self.assertEqual(model.last_updated, last_updated)
+
+        # Field last_updated will get updated because update_last_updated_time
+        # is set to True (by default).
+        models_3 = base_models.BaseModel.get_multi(model_ids)
+        futures = base_models.BaseModel.put_multi_async(models_3)
+        for future in futures:
+            future.get_result()
+        for model_id, last_updated in python_utils.ZIP(
+                model_ids, last_updated_values):
+            model = base_models.BaseModel.get_by_id(model_id)
+            self.assertNotEqual(model.last_updated, last_updated)
+
+
     def test_get_multi(self):
         model1 = base_models.BaseModel()
         model2 = base_models.BaseModel()
@@ -158,16 +296,19 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
 class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Model that inherits the BaseSnapshotMetadataModel for testing."""
+
     pass
 
 
 class TestSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Model that inherits the BaseSnapshotContentModel for testing."""
+
     pass
 
 
 class TestVersionedModel(base_models.VersionedModel):
     """Model that inherits the VersionedModel for testing."""
+
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
 
@@ -288,6 +429,7 @@ class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 
 class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Model that inherits the BaseCommitLogEntryModel for testing."""
+
     @classmethod
     def _get_instance_id(cls, target_entity_id, version):
         """A function that returns the id of the log in BaseCommitLogEntryModel.
@@ -308,7 +450,6 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
     def test_get_commit(self):
         model1 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            committer_username='username',
             commit_cmds={}, commit_type='create',
             commit_message='New commit created.', version=1,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
@@ -327,14 +468,12 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
     def test_get_all_commits(self):
         model1 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            committer_username='username',
             commit_cmds={}, commit_type='create',
             commit_message='New commit created.', version=1,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
         model2 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            committer_username='username',
             commit_cmds={}, commit_type='edit',
             commit_message='New commit created.', version=2,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
@@ -482,6 +621,7 @@ class TestBaseModel(base_models.BaseModel):
     """Model that inherits BaseModel for testing. This is required as BaseModel
     gets subclassed a lot in other tests and that can create unexpected errors.
     """
+
     pass
 
 

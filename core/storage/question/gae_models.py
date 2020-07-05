@@ -22,7 +22,6 @@ import random
 
 from constants import constants
 from core.platform import models
-import core.storage.user.gae_models as user_models
 import feconf
 import python_utils
 import utils
@@ -37,11 +36,13 @@ from google.appengine.ext import ndb
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""
+
     pass
 
 
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
+
     pass
 
 
@@ -50,6 +51,7 @@ class QuestionModel(base_models.VersionedModel):
 
     The ID of instances of this class are in form of random hash of 12 chars.
     """
+
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
     ALLOW_REVERT = True
@@ -138,16 +140,9 @@ class QuestionModel(base_models.VersionedModel):
         super(QuestionModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         question_commit_log = QuestionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
         question_commit_log.put()
@@ -611,6 +606,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'question-[question_id]-[version]'.
     """
+
     # The id of the question being edited.
     question_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -656,6 +652,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     The key of each instance is the question id.
     """
+
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).

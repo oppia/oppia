@@ -22,13 +22,8 @@ import { Injectable } from '@angular/core';
 
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-
-export interface IFractionDict {
-  isNegative: boolean;
-  wholeNumber: number;
-  numerator: number;
-  denominator: number;
-}
+import { IFractionAnswer } from
+  'interactions/answer-defs';
 
 export class Fraction {
   isNegative: boolean;
@@ -61,7 +56,7 @@ export class Fraction {
     return fractionString === '' ? '0' : fractionString;
   }
 
-  toDict(): IFractionDict {
+  toDict(): IFractionAnswer {
     return {
       isNegative: this.isNegative,
       wholeNumber: this.wholeNumber,
@@ -149,7 +144,7 @@ export class FractionObjectFactory {
     return new Fraction(isNegative, wholeNumber, numerator, denominator);
   }
 
-  fromDict(fractionDict: IFractionDict) {
+  fromDict(fractionDict: IFractionAnswer) {
     return new Fraction(
       fractionDict.isNegative,
       fractionDict.wholeNumber,

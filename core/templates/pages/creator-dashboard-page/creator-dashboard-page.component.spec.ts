@@ -385,7 +385,7 @@ describe('Creator dashboard controller', () => {
         ctrl.setActiveThread(threadId);
         $httpBackend.flush();
 
-        // showSuggestionModal is mocked otherwise using its original
+        // Method showSuggestionModal is mocked otherwise using its original
         // implementation will throw an error: 'appendTo element not found.
         // Make sure that the element passed is in DOM.'
         // This error does not happen often and it's related to the usage of

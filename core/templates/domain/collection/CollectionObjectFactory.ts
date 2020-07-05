@@ -28,15 +28,15 @@ import {
   CollectionNodeObjectFactory
 } from 'domain/collection/collection-node-object.factory';
 
-interface ICollectionBackendDict {
-  'id'?: string;
-  'title'?: string;
-  'objective'?: string;
-  'language_code'?: string;
-  'tags'?: string[];
-  'category'?: string;
-  'version'?: number;
-  'nodes'?: ICollectionNodeBackendDict[];
+export interface ICollectionBackendDict {
+  'id': string;
+  'title': string;
+  'objective': string;
+  'language_code': string;
+  'tags': string[];
+  'category': string;
+  'version': number;
+  'nodes': ICollectionNodeBackendDict[];
 }
 
 export class Collection {
@@ -279,6 +279,13 @@ export class CollectionObjectFactory {
   // tests.
   createEmptyCollection(): Collection {
     return new Collection({
+      id: null,
+      title: null,
+      objective: null,
+      language_code: null,
+      tags: null,
+      category: null,
+      version: null,
       nodes: [],
     }, this.collectionNodeObjectFactory);
   }

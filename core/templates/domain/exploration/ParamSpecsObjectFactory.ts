@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { IParamSpecBackendDict, ParamSpec, ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 
-interface IParamSpecsBackendDict {
+export interface IParamSpecsBackendDict {
   [paramName: string]: IParamSpecBackendDict;
 }
 
