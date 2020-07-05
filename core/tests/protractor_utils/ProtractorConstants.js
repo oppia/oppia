@@ -13,23 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for inspecting and managing suggestion objects.
+ * @fileoverview Provides constant global variables, for use in Protractor
+ * tests.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { ISuggestionBackendDict } from
-  'domain/suggestion/SuggestionObjectFactory';
-
-@Injectable({providedIn: 'root'})
-export class SuggestionsService {
-  getThreadIdFromSuggestionBackendDict(
-      suggestionBackendDict: ISuggestionBackendDict): string {
-    return suggestionBackendDict.suggestion_id;
-  }
-}
-
-angular.module('oppia').factory(
-  'SuggestionsService',
-  downgradeInjectable(SuggestionsService));
+exports.protractorConstants = {
+  SKILL_STATUS_UNASSIGNED: 'Unassigned'
+};

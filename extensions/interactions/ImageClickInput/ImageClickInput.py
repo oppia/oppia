@@ -61,14 +61,11 @@ class ImageClickInput(base.BaseInteraction):
 
     _answer_visualization_specs = [{
         # Bar chart with answer counts.
-        'id': 'BarChart',
-        'options': {
-            'x_axis_label': 'Answer',
-            'y_axis_label': 'Count',
-        },
+        'id': 'ClickHexbins',
+        'options': {},
         'calculation_id': 'AnswerFrequencies',
-        # Bar charts don't have any useful way to display which answers are
-        # addressed yet. By setting this option to False, we consequentially
-        # avoid doing extra computation.
+        # Adding addressed info for hexbins needs more design work, but
+        # conceptually should be possible by highlighting which hexagons are
+        # explicitly addressed.
         'addressed_info_is_supported': False,
     }]

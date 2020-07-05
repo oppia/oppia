@@ -20,6 +20,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
@@ -27,14 +28,13 @@ var TopicsAndSkillsDashboardPage = require(
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
+
 describe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
-  var SKILL_STATUS_UNASSIGNED = 'Unassigned';
-  var SKILL_STATUS_ASSIGNED = 'Assigned';
 
   beforeAll(async function() {
     topicsAndSkillsDashboardPage = (
