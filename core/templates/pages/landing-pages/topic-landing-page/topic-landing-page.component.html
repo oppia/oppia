@@ -24,8 +24,7 @@
     </div>
   </div>
 
-
-  <div class="oppia-landing-section text-center" style="background-color: #fff">
+  <div class="oppia-landing-section text-center oppia-white-container">
     <div class="oppia-landing-section-inner oppia-flex-box oppia-flex-column">
       <div class="oppia-flex-item">
         <h2>What is unique about our <[$ctrl.topicTitle]> lessons?</h2>
@@ -41,7 +40,7 @@
                   <img ng-src="<[$ctrl.getLessonQualityImageSrc(quality.imagePngFilename)]>" alt="<[quality.imageAlt]>">
                 </picture>
               </div>
-              <div class="oppia-flex-item">
+              <div class="oppia-flex-item oppia-landing-qualities-description">
                 <div class="oppia-flex-box oppia-flex-column">
                   <div class="oppia-flex-item oppia-text-align-left">
                     <h3><[quality.title]></h3>
@@ -54,13 +53,14 @@
             </div>
           </div>
         </div>
+      </div>
       <div class="oppia-flex-item oppia-only-display-in-mobile">
         <button class="btn oppia-landing-page-button" ng-click="$ctrl.onClickGetStartedButton()">Explore <[$ctrl.topicTitle]> lessons</button>
       </div>
     </div>
   </div>
 
-  <div class="oppia-landing-section text-center" style="background-color: #e8e7e3">
+  <div class="oppia-landing-section text-center oppia-grey-container">
     <div class="oppia-landing-section-inner oppia-flex-box oppia-flex-column oppia-container-low-width">
       <h3>Get started today! Looking to learn something else? We offer more than 10 subjects and you can check them all out in our Lesson Library. </h3>
       <div class="oppia-flex-item">
@@ -71,7 +71,6 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <style>
@@ -80,6 +79,12 @@
   }
   .oppia-landing-page h2, h3, p {
     line-height: 1.5;
+  }
+  .oppia-white-container {
+    background-color: #fff
+  }
+  .oppia-grey-container {
+    background-color: #e8e7e3
   }
   .oppia-landing-section-inner {
     margin-left: auto;
@@ -105,7 +110,6 @@
   }
   .oppia-flex-item {
     padding: 5px;
-    flex-basis:  | auto;
   }
   .oppia-text-align-left {
     text-align: left;
@@ -118,7 +122,7 @@
     border: 4px solid #009688;
     border-radius: 5px;
     color: #fff;
-    margin: 10px 0;
+    margin: 14px 0;
     min-width: 250px;
     text-transform: uppercase;
   }
@@ -166,7 +170,7 @@
       height: auto;
     }
     .oppia-landing-page-button {
-      margin: 0 0 12px;
+      margin: 0 0 14px;
     }
     .oppia-flex-mobile-column {
       flex-flow: column;
@@ -189,7 +193,13 @@
     .oppia-landing-page-image-container {
       min-height: unset;
       min-width: unset;
-      width: 90%;
+      width: 35%;
+    }
+    .oppia-langing-page-qualities {
+      width: 100%;
+    }
+    .oppia-landing-qualities-description {
+      width: 65%;
     }
     .oppia-container-low-width {
       width: 75%;
