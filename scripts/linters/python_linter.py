@@ -42,10 +42,35 @@ for path in _PATHS_TO_INSERT:
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 from pylint import lint  # isort:skip
+from pylint.reporters import text# isort:skip
 import isort  # isort:skip
 import pycodestyle # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
+
+
+class StringMessageStream(python_utils.OBJECT):
+    """Save and return output stream."""
+
+    def __init__(self):
+        """Constructs a StringMessageStream object."""
+        self.messages = []
+
+    def write(self, message):
+        """Writes the given message to messages list.
+
+        Args:
+            message: str. The message to be written.
+        """
+        self.messages.append(message)
+
+    def read(self):
+        """Returns the output messages as a list.
+
+        Returns:
+            list(str). The list of output messages.
+        """
+        return self.messages
 
 
 class PythonLintChecksManager(python_utils.OBJECT):
@@ -55,6 +80,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, file_cache, verbose_mode_enabled):
         """Constructs a PythonLintChecksManager object.
@@ -304,6 +330,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyPythonLintChecksManager object.
@@ -319,6 +346,41 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.files_to_lint
+
+    @staticmethod
+    def _get_trimmed_error_output(lint_messages):
+        """Remove extra bits from pylint error messages.
+
+        Args:
+            lint_messages: list(str). Messages returned by the python linter.
+
+        Returns:
+            str. A string with the trimmed error messages.
+        """
+        trimmed_error_messages = []
+        # Remove newlines and coverage report from the end of message.
+        # we need to remove last five items from the list because starting from
+        # end we have three lines with empty string(''), fourth line
+        # contains the coverage report i.e.
+        # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
+        # and one line with dashes(---).
+        newlines_present = lint_messages[-1] == '\n' and (
+            lint_messages[-2] == '\n' and lint_messages[-4] == '\n')
+        coverage_present = re.search(
+            r'previous run: \d+.\d+/\d+,', lint_messages[-3])
+        dashes_present = re.search(r'-+', lint_messages[-5])
+        if newlines_present and coverage_present and dashes_present:
+            lint_messages = lint_messages[:-5]
+        for message in lint_messages:
+            # Every pylint message has a message id inside the brackets
+            # we are removing them here.
+            if message.endswith(')'):
+                # Replace message-id with empty string('').
+                trimmed_error_messages.append(
+                    re.sub(r'\((\w+-*)+\)$', '', message))
+            else:
+                trimmed_error_messages.append(message)
+        return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_py_files(self, config_pylint, config_pycodestyle):
         """Prints a list of lint errors in the given list of Python files.
@@ -358,8 +420,10 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             with linter_utils.redirect_stdout(stdout):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
+                pylint_report = StringMessageStream()
                 pylinter = lint.Run(
                     current_files_to_lint + [config_pylint],
+                    reporter=text.TextReporter(pylint_report),
                     exit=False).linter
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
@@ -370,8 +434,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
+                pylint_error_messages = (
+                    self._get_trimmed_error_output(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
                 python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
                 are_there_errors = True
 
             current_batch_start_index = current_batch_end_index
@@ -441,13 +509,19 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
                 python_utils.PRINT('Messages for Python 3 support:')
+                pylint_report = StringMessageStream()
                 pylinter_for_python3 = lint.Run(
-                    current_files_to_lint + ['--py3k'], exit=False).linter
+                    current_files_to_lint + ['--py3k'],
+                    reporter=text.TextReporter(pylint_report),
+                    exit=False).linter
 
             if pylinter_for_python3.msg_status != 0:
                 summary_message = stdout.getvalue()
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
+                pylint_error_messages = (
+                    self._get_trimmed_error_output(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
                 any_errors = True
 
             current_batch_start_index = current_batch_end_index

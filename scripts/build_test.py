@@ -59,6 +59,7 @@ EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
 
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
+
     def tearDown(self):
         super(BuildTests, self).tearDown()
         build.safe_delete_directory_tree(TEST_DIR)
