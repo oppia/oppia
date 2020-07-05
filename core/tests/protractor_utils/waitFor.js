@@ -126,7 +126,7 @@ var fileToBeDownloaded = async function(filename) {
   var name = global.downloadsPath + '/' + filename;
   browser.driver.wait(function() {
     return fs.existsSync(name);
-  }, 30000);
+  });
 };
 
 exports.alertToBePresent = alertToBePresent;

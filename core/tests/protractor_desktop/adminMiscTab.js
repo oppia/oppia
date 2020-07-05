@@ -23,8 +23,6 @@ var AdminPage = require('../protractor_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
-var fs = require('fs');
-var dPath = './downloads/topic_similarities.csv';
 
 describe('Admin misc test tab', function() {
   var adminPage = null;
@@ -43,11 +41,11 @@ describe('Admin misc test tab', function() {
       'miscTabTester@miscTab.com', 'miscTabTester');
 
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic('miscTabTopic',
-      'A topic to test the misc tab', false);
+    await topicsAndSkillsDashboardPage.createTopic('adminPageMiscTabTestTopic',
+      'A topic to test the admin page\'s misc tab', false);
     await browser.getCurrentUrl().then((url) => {
-      var startIndex = url.split('/', 4).join('/').length + 1;
-      topicId = url.substring(startIndex, url.length - 2);
+      topicId = url.split('/')[4];
+      topicId = topicId.substring(0, topicId.length - 1);
     });
     await topicEditorPage.publishTopic();
   });
@@ -93,7 +91,7 @@ describe('Admin misc test tab', function() {
       await adminPage.regenerateContributionsForTopic('0');
       await adminPage.expectRegenerationError('0');
       allowedErrors.push('500', 'Entity');
-      await adminPage.regenerateContributionsForTopic(topicId.substring(1));
+      await adminPage.regenerateContributionsForTopic(topicId);
       await adminPage.expectConributionsToBeRegeneratedForTopic();
     });
 

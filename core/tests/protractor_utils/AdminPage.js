@@ -316,7 +316,7 @@ var AdminPage = function() {
 
   this.uploadTopicSimilarities =
     async function(relativePathToSimilaritiesFile) {
-      absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
+      var absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
       await waitFor.visibilityOf(chooseSimilarityFileInput,
         'Similarity upload form is not visible');
       await chooseSimilarityFileInput.sendKeys(absPath);
@@ -326,9 +326,13 @@ var AdminPage = function() {
     };
 
   this.expectSimilaritiesToBeUploaded = async function() {
+    await waitFor.visibilityOf(statusMessage);
+    await waitFor.elementToBeClickable(similarityDownloadButton,
+      'Similarity upload failed – download similarities button not clickable.');
     await waitFor.textToBePresentInElement(statusMessage,
       'Topic similarities uploaded successfully.');
-    return true;
+    expect(await statusMessage.getText()).toEqual(
+      'Topic similarities uploaded successfully.');
   };
 
   this.expectUploadError = async function() {
@@ -356,7 +360,8 @@ var AdminPage = function() {
   this.expectSearchIndexToBeCleared = async function() {
     await waitFor.textToBePresentInElement(statusMessage,
       'Index successfully cleared.');
-    return true;
+    expect(statusMessage.getText()).toEqual(
+      'Index successfully cleared.');
   };
 
   this.flushMigrationBotContributions = async function() {
@@ -375,6 +380,7 @@ var AdminPage = function() {
 
   this.fillExtractDataForm = async function(expID, expVer, state, ans) {
     await waitFor.pageToFullyLoad();
+    var parentHandle = await browser.getWindowHandle();
     await extractDataExplorationIdInput.sendKeys(expID);
     await extractDataExplorationVersionInput.sendKeys(expVer);
     await extractDataStateNameInput.sendKeys(state);
@@ -385,11 +391,10 @@ var AdminPage = function() {
     var url = '/explorationdataextractionhandler?exp_id=0&exp_version' +
       '=0&state_name=0&num_answers=0';
     expect(protractor.ExpectedConditions.urlContains(url)).toBeTruthy();
-    browser.getAllWindowHandles().then((handles) => {
-      browser.driver.switchTo().window(handles[2]);
-      browser.driver.close();
-      browser.driver.switchTo().window(handles[1]);
-    });
+    var currTab = await browser.getWindowHandle();
+    await browser.driver.switchTo(currTab);
+    await browser.driver.close();
+    await browser.driver.switchTo(parentHandle);
   };
 
   this.regenerateContributionsForTopic = async function(topicId) {
