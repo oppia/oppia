@@ -47,6 +47,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -1105,6 +1106,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for testing the time the user last edited an
     exploration updates correctly.
     """
+
     EXP_ID = 'exp'
 
     def setUp(self):
@@ -1175,6 +1177,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for the time the user last created an exploration
     updates correctly.
     """
+
     EXP_ID_A = 'exp_a'
     EXP_ID_B = 'exp_b'
 

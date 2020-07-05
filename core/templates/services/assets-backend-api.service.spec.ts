@@ -212,6 +212,78 @@ describe('Assets Backend API Service', function() {
       $rootScope.$apply();
     });
 
+    it('should successfully save a math SVG', function(done) {
+      var successMessage = 'Math SVG was successfully saved.';
+      // @ts-ignore in order to ignore JQuery properties that should
+      // be declarated.
+      spyOn($, 'ajax').and.callFake(function() {
+        var d = $.Deferred();
+        d.resolve(successMessage);
+        return d.promise();
+      });
+      var imageFile = new Blob();
+      AssetsBackendApiService.saveMathExpresionImage(
+        imageFile, 'newMathExpression.svg', 'exploration', 'expid12345')
+        .then(function(response) {
+          // Below checks assert that the correct data is sent to the backend.
+          var dataArguementForAjaxCall = (
+            // @ts-ignore in order to ignore JQuery properties that should
+            // be declarated.
+            $.ajax.calls.mostRecent().args[0].data);
+          expect(dataArguementForAjaxCall instanceof FormData).toBeTruthy();
+          var rawImageSentToBackend = null;
+          var payLoadSentoBackend = null;
+          dataArguementForAjaxCall.forEach((value, key) => {
+            if (key === 'image') {
+              rawImageSentToBackend = value;
+            } else if (key === 'payload') {
+              payLoadSentoBackend = value;
+            }
+          });
+          expect(rawImageSentToBackend instanceof File).toBeTruthy();
+          expect(payLoadSentoBackend).toEqual(JSON.stringify({
+            filename: 'newMathExpression.svg',
+            filename_prefix: 'image'
+          }));
+          expect(response).toBe(successMessage);
+        }).then(done, done.fail);
+
+      // $q Promises need to be forcibly resolved through a JavaScript digest,
+      // which is what $apply helps kick-start.
+      $rootScope.$apply();
+    });
+
+    it('should handle rejection when saving a math SVG fails ', function(done) {
+      var errorMessage = 'Math SVG was not successfully saved.';
+      // @ts-ignore in order to ignore JQuery properties that should
+      // be declarated.
+      spyOn($, 'ajax').and.callFake(function() {
+        var d = $.Deferred();
+        d.reject({
+          // The responseText contains a XSSI Prefix, which is represented by
+          // )]}' string. That's why double quotes is being used here. It's not
+          // possible to use \' instead of ' so the XSSI Prefix won't be
+          // evaluated correctly.
+          /* eslint-disable quotes */
+          responseText: ")]}'\n{ \"message\": \"" + errorMessage + "\" }"
+          /* eslint-enable quotes */
+        });
+        return d.promise();
+      });
+      var imageFile = new Blob();
+      AssetsBackendApiService.saveMathExpresionImage(
+        imageFile, 'new.svg', 'exploration', 'expid12345')
+        .then(done, function(response) {
+          expect(response).toEqual({
+            message: errorMessage
+          });
+          done();
+        });
+      // $q Promises need to be forcibly resolved through a JavaScript digest,
+      // which is what $apply helps kick-start.
+      $rootScope.$apply();
+    });
+
     it('should handle rejection when saving a file fails', function(done) {
       var errorMessage = 'Error on saving audio';
       // @ts-ignore in order to ignore JQuery properties that should
@@ -219,8 +291,8 @@ describe('Assets Backend API Service', function() {
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.reject({
-          // responseText contains a XSSI Prefix, which is represented by )]}'
-          // string. That's why double quotes is being used here. It's not
+          // The responseText contains a XSSI Prefix, which is represented by
+          // )]}' string. That's why double quotes is being used here. It's not
           // possible to use \' instead of ' so the XSSI Prefix won't be
           // evaluated correctly.
           /* eslint-disable quotes */

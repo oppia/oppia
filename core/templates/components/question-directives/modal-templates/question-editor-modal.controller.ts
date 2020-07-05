@@ -27,21 +27,25 @@ require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
-  'QuestionUndoRedoService', 'QuestionValidationService',
-  'SkillSummaryObjectFactory', 'UrlInterpolationService',
-  'associatedSkillSummaries', 'canEditQuestion',
+  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
+  'ImageLocalStorageService', 'QuestionUndoRedoService',
+  'QuestionValidationService', 'SkillSummaryObjectFactory',
+  'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
+  'rubrics', 'skillNames',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService,
-      QuestionUndoRedoService, QuestionValidationService,
-      SkillSummaryObjectFactory, UrlInterpolationService,
-      associatedSkillSummaries, canEditQuestion,
+      $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
+      ImageLocalStorageService, QuestionUndoRedoService,
+      QuestionValidationService, SkillSummaryObjectFactory,
+      UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
-      newQuestionIsBeingCreated, question, questionId, questionStateData) {
+      newQuestionIsBeingCreated, question, questionId, questionStateData,
+      rubrics, skillNames) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
@@ -54,11 +58,12 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.misconceptionsBySkill = misconceptionsBySkill;
     $scope.canEditQuestion = canEditQuestion;
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
+    $scope.skillNames = skillNames;
+    $scope.rubrics = rubrics;
 
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;
     };
-
     $scope.removeSkill = function(skillId) {
       if ($scope.associatedSkillSummaries.length === 1) {
         AlertsService.addInfoMessage(
@@ -169,15 +174,15 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           !$scope.isQuestionValid();
     };
 
-
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
       }
+      ContextService.resetImageSaveDestination();
       $uibModalInstance.close(returnModalObject);
     };
     // Checking if Question contains all requirement to enable
-    // Save and Publish Question
+    // Save and Publish Question.
     $scope.isQuestionValid = function() {
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);
@@ -193,6 +198,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
+          ContextService.resetImageSaveDestination();
+          ImageLocalStorageService.flushStoredImagesData();
           $uibModalInstance.dismiss('cancel');
         }, function() {
           // Note to developers:
@@ -200,6 +207,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           // clicked. No further action is needed.
         });
       } else {
+        ContextService.resetImageSaveDestination();
+        ImageLocalStorageService.flushStoredImagesData();
         $uibModalInstance.dismiss('cancel');
       }
     };

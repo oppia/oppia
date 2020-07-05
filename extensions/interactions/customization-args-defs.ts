@@ -25,6 +25,9 @@ import { IReadableNote } from
   // eslint-disable-next-line max-len
   'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive';
 
+
+export interface IAlgebraicExpressionInputCustomizationArgs { }
+
 export interface ICodeReplCustomizationArgs {
   language?: {
     value: string;
@@ -80,26 +83,26 @@ export interface IGraphInputCustomizationArgs {
   graph?: {
     value: IGraphBackendDict;
   };
-  canAddVertex?: {
-    value: string;
+  canAddVertex: {
+    value: boolean;
   };
-  canDeleteVertex?: {
-    value: string;
+  canDeleteVertex: {
+    value: boolean;
   };
-  canEditVertexLabel?: {
-    value: string;
+  canEditVertexLabel: {
+    value: boolean;
   };
-  canMoveVertex?: {
-    value: string;
+  canMoveVertex: {
+    value: boolean;
   };
-  canAddEdge?: {
-    value: string;
+  canAddEdge: {
+    value: boolean;
   };
-  canDeleteEdge?: {
-    value: string;
+  canDeleteEdge: {
+    value: boolean;
   };
-  canEditEdgeWeight?: {
-    value: string;
+  canEditEdgeWeight: {
+    value: boolean;
   };
 }
 
@@ -142,6 +145,8 @@ export interface ILogicCustomizationArgs {
   };
 }
 
+export interface IMathEquationInputCustomizationArgs { }
+
 export interface IMultipleChoiceInputCustomizationArgs {
   showChoicesInShuffledOrder?: {
     value: string;
@@ -181,15 +186,14 @@ export interface ITextInputCustomizationArgs {
   };
 }
 
-export interface IMathExpressionCustomizationArgs {
+export interface IMathExpressionCustomizationArgs { }
 
-}
+export interface INumericInputCustomizationArgs { }
 
-export interface INumericInputCustomizationArgs {
-
-}
+export interface INumberWithUnitsCustomizationArgs { }
 
 export type IInteractionCustomizationArgs = (
+  IAlgebraicExpressionInputCustomizationArgs |
   ICodeReplCustomizationArgs |
   IContinueCustomizationArgs |
   IDragAndDropSortInputCustomizationArgs |
@@ -200,10 +204,12 @@ export type IInteractionCustomizationArgs = (
   IInteractiveMapCustomizationArgs |
   IItemSelectionInputCustomizationArgs |
   ILogicCustomizationArgs |
+  IMathEquationInputCustomizationArgs |
+  IMathExpressionCustomizationArgs |
   IMultipleChoiceInputCustomizationArgs |
   IMusicNotesInputCustomizationArgs |
+  INumberWithUnitsCustomizationArgs |
+  INumericInputCustomizationArgs |
   IPencilCodeCustomizationArgs |
   ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs |
-  IMathExpressionCustomizationArgs |
-  INumericInputCustomizationArgs);
+  ITextInputCustomizationArgs);

@@ -31,11 +31,11 @@ def post_to_mailgun(data):
     the requests library's post method.
 
     Args:
-        - data: dict. The data to be sent in the request's body.
+        data: dict. The data to be sent in the request's body.
 
     Returns:
-         Response from the server. The object is a file-like object.
-         https://docs.python.org/2/library/urllib2.html
+        Response from the server. The object is a file-like object.
+        https://docs.python.org/2/library/urllib2.html
     """
     if not feconf.MAILGUN_API_KEY:
         raise Exception('Mailgun API key is not available.')
@@ -62,23 +62,23 @@ def send_mail(
     email_manager._send_email().
 
     Args:
-      - sender_email: str. the email address of the sender. This should be in
-          the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-      - recipient_email: str. the email address of the recipient.
-      - subject: str. The subject line of the email.
-      - plaintext_body: str. The plaintext body of the email.
-      - html_body: str. The HTML body of the email. Must fit in a datastore
-          entity.
-      - bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
-      - reply_to_id: str. The unique id of the sender.
+        sender_email: str. the email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+        recipient_email: str. the email address of the recipient.
+        subject: str. The subject line of the email.
+        plaintext_body: str. The plaintext body of the email.
+        html_body: str. The HTML body of the email. Must fit in a datastore
+            entity.
+        bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
+        reply_to_id: str. The unique id of the sender.
 
     Raises:
-      Exception: if the configuration in feconf.py forbids emails from being
-        sent.
-      Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
-      Exception: if mailgun domain name is not stored in
-        feconf.MAILGUN_DOMAIN_NAME.
-      (and possibly other exceptions, due to mail.send_mail() failures)
+        Exception: if the configuration in feconf.py forbids emails from being
+            sent.
+        Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
+        Exception: if mailgun domain name is not stored in
+            feconf.MAILGUN_DOMAIN_NAME.
+            (and possibly other exceptions, due to mail.send_mail() failures)
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
@@ -109,23 +109,21 @@ def send_bulk_mail(
     email_manager._send_email().
 
     Args:
-      - sender_email: str. the email address of the sender. This should be in
-          the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-      - recipient_emails: list. list of the email addresses of recipients.
-      - subject: str. The subject line of the email.
-      - plaintext_body: str. The plaintext body of the email.
-      - html_body: str. The HTML body of the email. Must fit in a datastore
-          entity.
-      - reply_to_id: str or None. The unique reply-to id used in reply-to email
-          sent to recipient.
+        sender_email: str. the email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+        recipient_emails: list(str). list of the email addresses of recipients.
+        subject: str. The subject line of the email.
+        plaintext_body: str. The plaintext body of the email.
+        html_body: str. The HTML body of the email. Must fit in a datastore
+            entity.
 
     Raises:
-      Exception: if the configuration in feconf.py forbids emails from being
-        sent.
-      Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
-      Exception: if mailgun domain name is not stored in
-        feconf.MAILGUN_DOMAIN_NAME.
-      (and possibly other exceptions, due to mail.send_mail() failures)
+        Exception: if the configuration in feconf.py forbids emails from being
+            sent.
+        Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
+        Exception: if mailgun domain name is not stored in
+            feconf.MAILGUN_DOMAIN_NAME.
+            (and possibly other exceptions, due to mail.send_mail() failures)
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')

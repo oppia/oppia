@@ -279,8 +279,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are in the given
-                score categories, which are in review, but not created by the
-                given user.
+            score categories, which are in review, but not created by the
+            given user.
         """
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
@@ -303,7 +303,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are of the given
-                type, which are in review, but not created by the given user.
+            type, which are in review, but not created by the given user.
         """
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.suggestion_type == suggestion_type).filter(
@@ -320,7 +320,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are of the given
-                type, which the given user has created.
+            type, which the given user has created.
         """
         return cls.get_all().filter(
             cls.suggestion_type == suggestion_type).filter(
@@ -389,6 +389,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     The ID of the voiceover application will be a random hashed value.
     """
+
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
     target_type = ndb.StringProperty(required=True, indexed=True)
@@ -476,7 +477,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-                application submitted by the given user.
+            applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
             return cls.query(ndb.AND(
@@ -496,7 +497,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-                application which the given user can review.
+            applications which the given user can review.
         """
         return cls.query(ndb.AND(
             cls.author_id != user_id,

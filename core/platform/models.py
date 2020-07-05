@@ -146,6 +146,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
+
         model_classes = []
         for module in cls.import_models(model_names):
             for member_name, member_obj in inspect.getmembers(module):
@@ -232,7 +233,7 @@ class _Gae(Platform):
 
         Raises:
             Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
-            to a valid email_services module.
+                to a valid email_services module.
         """
         if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
             from core.platform.email import gae_email_services

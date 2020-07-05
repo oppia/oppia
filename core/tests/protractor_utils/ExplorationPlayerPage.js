@@ -29,6 +29,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-suggestion-description-input'));
   var closeSuggestionModalButton = element(
     by.css('.protractor-test-exploration-close-suggestion-modal-btn'));
+  var conversationSkinCardsContainer = element(
+    by.css('.protractor-test-conversation-skin-cards-container'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
   var conversationFeedback = element.all(
@@ -79,6 +81,45 @@ var ExplorationPlayerPage = function() {
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
   var suggestionPopupLink =
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
+
+  var audioBarExpandButton = element(by.css('.protractor-test-audio-bar'));
+  var voiceoverLanguageSelector = element(
+    by.css('.protractor-test-audio-lang-select'));
+  var playButton = element(by.css('.protractor-test-play-circle'));
+  var pauseButton = element(by.css('.protractor-test-pause-circle'));
+
+  this.expandAudioBar = async function() {
+    await waitFor.elementToBeClickable(audioBarExpandButton,
+      'Audio bar taking too long to be clickable');
+    await audioBarExpandButton.click();
+  };
+
+  this.pressPlayButton = async function() {
+    await waitFor.elementToBeClickable(playButton,
+      'Play button taking too long to be clickable');
+    await playButton.click();
+  };
+
+  this.expectAudioToBePlaying = async function() {
+    expect(await pauseButton.isPresent()).toBeTruthy();
+  };
+
+  this.pressPauseButton = async function() {
+    await waitFor.elementToBeClickable(pauseButton,
+      'Pause button taking too long to be clickable');
+    await pauseButton.click();
+  };
+
+  this.expectAudioToBePaused = async function() {
+    expect(await playButton.isPresent()).toBeTruthy();
+  };
+
+  this.changeVoiceoverLanguage = async function(language) {
+    await waitFor.visibilityOf(voiceoverLanguageSelector,
+      'Language selector takes too long to appear.');
+    await voiceoverLanguageSelector.element(
+      by.cssContainingText('option', language)).click();
+  };
 
   this.clickThroughToNextCard = async function() {
     await waitFor.elementToBeClickable(
@@ -224,6 +265,9 @@ var ExplorationPlayerPage = function() {
   // Additional arguments may be sent to this function, and they will be
   // passed on to the relevant interaction's detail checker.
   this.expectInteractionToMatch = async function(interactionId) {
+    await waitFor.visibilityOf(
+      conversationSkinCardsContainer,
+      'Conversation skill cards take too long to appear.');
     // Convert additional arguments to an array to send on.
     var args = [conversationInput];
     for (var i = 1; i < arguments.length; i++) {

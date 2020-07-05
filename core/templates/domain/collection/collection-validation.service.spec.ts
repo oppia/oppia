@@ -19,8 +19,8 @@
 import { TestBed } from '@angular/core/testing';
 
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
-import { Collection, CollectionObjectFactory } from
+  'domain/collection/collection-node-object.factory';
+import { ICollectionBackendDict, Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
@@ -29,7 +29,7 @@ describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;
   let collectionObjectFactory: CollectionObjectFactory = null;
   let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
-  let sampleCollectionBackendObject: any = null;
+  let sampleCollectionBackendObject: ICollectionBackendDict = null;
   let _sampleCollection: Collection = null;
 
   let EXISTS: boolean = true;
@@ -51,8 +51,10 @@ describe('Collection validation service', function() {
       title: 'a title',
       objective: 'an objective',
       category: 'a category',
-      version: '1',
-      nodes: []
+      version: 1,
+      nodes: [],
+      language_code: null,
+      tags: null
     };
     _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);

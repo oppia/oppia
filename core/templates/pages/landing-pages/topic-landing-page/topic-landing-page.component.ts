@@ -53,7 +53,9 @@ angular.module('oppia').component('topicLandingPage', {
           title: 'Accessible lessons',
           description: (
             'Our lessons come with audio translations in different ' +
-            'languages, require little bandwidth, and are mobile friendly.'),
+            'languages, can be used on mobile phones, and don\'t require a ' +
+            'lot of data so that they can be used and enjoyed by anyone, ' +
+            'anywhere.'),
           imagePngFilename: 'accessible_lessons.png',
           imageWebpFilename: 'accessible_lessons.webp',
           imageAlt: 'Lesson accessibility presentation.'

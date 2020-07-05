@@ -176,10 +176,11 @@ export class DragAndDropSortInputValidationService {
               }
             }
 
-            if (areAnyItemsEmpty) {
+            if (areAnyItemsEmpty || xInputs.length === 0) {
+              var message = areAnyItemsEmpty ? 'the items are' : 'the list is';
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are nonempty.'
+                message: `Please ensure ${message} nonempty.`
               });
             }
 
@@ -187,6 +188,19 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Please ensure the items are unique.'
+              });
+            }
+
+            if (!customizationArgs.allowMultipleItemsInSamePosition.value &&
+                rule.type === (
+                  'IsEqualToOrderingWithOneItemAtIncorrectPosition')) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                  (i + 1) + ' will never be matched because there will be ' +
+                  'at least 2 elements at incorrect positions if multiple ' +
+                  'elements cannot occupy the same position.')
               });
             }
             break;

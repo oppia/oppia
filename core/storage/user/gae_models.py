@@ -44,6 +44,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
     gae_id = ndb.StringProperty(required=True, indexed=True)
@@ -311,6 +312,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of all the explorations completed by the user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections completed by the user.
@@ -386,6 +388,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # The ids of the explorations partially completed by the user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The ids of the collections partially completed by the user.
@@ -461,6 +464,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     ID for this model is of format '[user_id].[exploration_id]'.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration id.
@@ -523,7 +527,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form '[user_id].[exploration_id]'.
+            of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -554,8 +558,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             ExpUserLastPlaythroughModel. The ExpUserLastPlaythroughModel
-                instance which matches with the given user_id and
-                exploration_id.
+            instance which matches with the given user_id and
+            exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExpUserLastPlaythroughModel, cls).get(
@@ -592,6 +596,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of all the explorations in the playlist of the user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections in the playlist of the user.
@@ -666,6 +671,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of explorations that this user has created
     # Includes subsequently deleted and private explorations.
     created_exploration_ids = ndb.StringProperty(
@@ -743,6 +749,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # The user's preference for receiving general site updates. This is set to
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
@@ -805,6 +812,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of activities (e.g., explorations) that this user subscribes to.
     # TODO(bhenning): Rename this to exploration_ids and perform a migration.
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
@@ -1056,6 +1064,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     This is computed using a MapReduce batch job and may not be up to date.
     Instances of this class are keyed by the user id.
     """
+
     # The output of the batch job.
     output = ndb.JsonProperty(indexed=False)
     # The time, in milliseconds since the epoch, when the job that computed
@@ -1120,6 +1129,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     The impact score is 0 for an exploration with 0 playthroughs or with an
     average rating of less than 2.5.
     """
+
     # The impact score.
     impact_score = ndb.FloatProperty(indexed=True)
     # The total plays of all the explorations.
@@ -1202,8 +1212,8 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             UserStatsModel. Either an existing one which matches the
-                given user_id, or the newly created one if it did not already
-                exist.
+            given user_id, or the newly created one if it did not already
+            exist.
         """
         entity = cls.get(user_id, strict=False)
         if not entity:
@@ -1220,7 +1230,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             dict. The user-relevant properties of UserStatsModel in a python
-                dict format.
+            dict format.
         """
         user_model = UserStatsModel.get(user_id, strict=False)
         if user_model is None:
@@ -1255,6 +1265,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     ID for this model is of format '[user_id].[exploration_id]'.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration id.
@@ -1335,7 +1346,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form '[user_id].[exploration_id]'.
+            of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -1352,7 +1363,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The newly created
-                ExplorationUserDataModel instance.
+            ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -1369,7 +1380,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-                which matches with the given user_id and exploration_id.
+            which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
@@ -1386,7 +1397,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-                which matches with the given user_ids and exploration_id.
+            which matches with the given user_ids and exploration_id.
         """
         instance_ids = (
             cls._generate_id(user_id, exploration_id) for user_id in user_ids)
@@ -1447,6 +1458,7 @@ class CollectionProgressModel(base_models.BaseModel):
     the data store, otherwise it should remove the instance of the completion
     model.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The collection id.
@@ -1507,7 +1519,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form '[user_id].[collection_id]'.
+            of the form '[user_id].[collection_id]'.
         """
         return '%s.%s' % (user_id, collection_id)
 
@@ -1524,7 +1536,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The newly created CollectionProgressModel
-                instance.
+            instance.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return cls(
@@ -1541,7 +1553,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The CollectionProgressModel instance which
-                matches the given user_id and collection_id.
+            matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
@@ -1578,8 +1590,8 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. Either an existing one which
-                matches the given user_id and collection_id, or the newly
-                created one if it does not already exist.
+            matches the given user_id and collection_id, or the newly
+            created one if it does not already exist.
         """
         instance_model = cls.get(user_id, collection_id)
         if instance_model:
@@ -1618,6 +1630,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     ID for this model is of format '[user_id].[story_id]'.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The story id.
@@ -1693,7 +1706,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The newly created StoryProgressModel
-                instance.
+            instance.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return cls(
@@ -1712,7 +1725,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The StoryProgressModel instance which
-                matches the given user_id and story_id.
+            matches the given user_id and story_id.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return super(StoryProgressModel, cls).get(
@@ -1729,7 +1742,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             list(StoryProgressModel). The list of StoryProgressModel
-                instances which matches the given user_id and story_ids.
+            instances which matches the given user_id and story_ids.
         """
         instance_ids = [cls._generate_id(user_id, story_id)
                         for story_id in story_ids]
@@ -1752,8 +1765,8 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. Either an existing one which
-                matches the given user_id and story_id, or the newly created
-                one if it does not already exist.
+            matches the given user_id and story_id, or the newly created
+            one if it does not already exist.
         """
         instance_model = cls.get(user_id, story_id, strict=False)
         if instance_model is not None:
@@ -1786,6 +1799,7 @@ class UserQueryModel(base_models.BaseModel):
     The id of each instance of this model is alphanumeric id of length 12
     unique to each model instance.
     """
+
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever
@@ -1880,8 +1894,8 @@ class UserQueryModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            3-tuple of (query_models, cursor, more) as described in fetch_page()
-            at:
+            3-tuple of (query_models, cursor, more). As described in
+            fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 query_models: List of UserQueryModel instances.
@@ -1905,6 +1919,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
     sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -2118,7 +2133,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(str). A list of score_categories where the user has score above
-                the threshold.
+            the threshold.
         """
         scoring_models = cls.get_all().filter(cls.user_id == user_id).filter(
             cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
@@ -2134,7 +2149,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(UserContributionsScoringModel). All instances for the given
-                user.
+            user.
         """
         return cls.get_all().filter(cls.user_id == user_id).fetch()
 
@@ -2149,7 +2164,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(UserContributionsScoringModel). All instances for the given
-                category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
+            category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
         """
         return cls.get_all().filter(
             cls.score_category == score_category).filter(
@@ -2231,6 +2246,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     can_review_translation_for_language_codes = ndb.StringProperty(
         repeated=True, indexed=True)
     can_review_voiceover_for_language_codes = ndb.StringProperty(
@@ -2358,6 +2374,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # The email of the user.
     email = ndb.StringProperty(required=True)
     # Whether the deletion is completed.

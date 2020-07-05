@@ -40,8 +40,8 @@ gae_search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-# TODO(bhenning): test CollectionSummaryModel changes if collections are
-# updated, reverted, deleted, created, rights changed. See TODO(msl): at
+# TODO(bhenning): Test CollectionSummaryModel changes if collections are
+# updated, reverted, deleted, created, rights changed. See TODO(msl): At
 # the top of exp_services_test for more original context.
 
 
@@ -598,6 +598,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     """Tests collection query methods which operate on CollectionSummary
     objects.
     """
+
     COL_ID_0 = '0_arch_bridges_in_england'
     COL_ID_1 = '1_welcome_introduce_oppia'
     COL_ID_2 = '2_welcome_introduce_oppia_interactions'
@@ -1897,7 +1898,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID,
             {albert_id: 2, bob_id: 2})
 
-        # TODO(madiyar): uncomment after revert_collection implementation
+        # TODO(madiyar): Uncomment after revert_collection implementation
         # Have Albert revert to version 3. Version 5
         # collection_services.revert_collection(albert_id,
         #       self.COLLECTION_ID, 4, 3)

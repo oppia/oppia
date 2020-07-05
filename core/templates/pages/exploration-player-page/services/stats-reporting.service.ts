@@ -17,36 +17,16 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { ContextService } from 'services/context.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
 import { MessengerService } from 'services/messenger.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { IAggregatedStats, StatsReportingBackendApiService } from
+  'domain/exploration/stats-reporting-backend-api.service';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
-interface IStateStats {
-  'total_answers_count': number;
-  'useful_feedback_count': number;
-  'total_hit_count': number;
-  'first_hit_count': number;
-  'num_times_solution_viewed': number;
-  'num_completions': number;
-}
-interface IAggregatedStats {
-  'num_starts': number;
-  'num_completions': number;
-  'num_actual_starts': number;
-  'state_stats_mapping': {
-    [stateName: string]: IStateStats
-  };
-}
 
 @Injectable({
   providedIn: 'root'
@@ -54,12 +34,11 @@ interface IAggregatedStats {
 export class StatsReportingService {
   constructor(
       private contextService: ContextService,
-      private http: HttpClient,
       private messengerService: MessengerService,
       private playthroughService: PlaythroughService,
       private siteAnalyticsService: SiteAnalyticsService,
-      private stopwatchObjectFactory: StopwatchObjectFactory,
-      private urlInterpolationService: UrlInterpolationService) {
+      private statsReportingBackendApiService: StatsReportingBackendApiService,
+      private stopwatchObjectFactory: StopwatchObjectFactory) {
     StatsReportingService.editorPreviewMode = (
       this.contextService.isInExplorationEditorPage());
     StatsReportingService.questionPlayerMode = (
@@ -114,38 +93,6 @@ export class StatsReportingService {
     };
   }
 
-  // TODO(#8038): Move this into a backend-api.service.
-  private getFullStatsUrl(urlIdentifier: string): string {
-    try {
-      return this.urlInterpolationService.interpolateUrl(
-        ExplorationPlayerConstants.STATS_REPORTING_URLS[urlIdentifier], {
-          exploration_id: StatsReportingService.explorationId
-        });
-    } catch (e) {
-      let additionalInfo = ('\nUndefined exploration id error debug logs:' +
-        '\nThe event being recorded: ' + urlIdentifier +
-        '\nExploration ID: ' + this.contextService.getExplorationId()
-      );
-      if (StatsReportingService.currentStateName) {
-        additionalInfo += (
-          '\nCurrent State name: ' + StatsReportingService.currentStateName);
-      }
-      if (StatsReportingService.nextExpId) {
-        additionalInfo += (
-          '\nRefresher exp id: ' + StatsReportingService.nextExpId);
-      }
-      if (
-        StatsReportingService.previousStateName &&
-        StatsReportingService.nextStateName) {
-        additionalInfo += (
-          '\nOld State name: ' + StatsReportingService.previousStateName +
-          '\nNew State name: ' + StatsReportingService.nextStateName);
-      }
-      e.message += additionalInfo;
-      throw e;
-    }
-  }
-
   private startStatsTimer(): void {
     if (!StatsReportingService.editorPreviewMode &&
       !StatsReportingService.questionPlayerMode ) {
@@ -160,13 +107,18 @@ export class StatsReportingService {
     if (StatsReportingService.explorationIsComplete) {
       return;
     }
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('STATS_EVENTS'), {
-      aggregated_stats: StatsReportingService.aggregatedStats,
-      exp_version: StatsReportingService.explorationVersion
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.postsStats(
+      StatsReportingService.aggregatedStats,
+      StatsReportingService.explorationVersion,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
+
     this.refreshAggregatedStats();
   }
 
@@ -202,24 +154,26 @@ export class StatsReportingService {
     this.postStatsToBackend();
 
     StatsReportingService.currentStateName = stateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('EXPLORATION_STARTED'), {
-      params: params,
-      session_id: StatsReportingService.sessionId,
-      state_name: stateName,
-      version: StatsReportingService.explorationVersion
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordExpStarted(
+      params, StatsReportingService.sessionId, stateName,
+      StatsReportingService.explorationVersion,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
 
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('STATE_HIT'), {
-      client_time_spent_in_secs: 0.0,
-      exploration_version: StatsReportingService.explorationVersion,
-      new_state_name: stateName,
-      old_params: params,
-      session_id: StatsReportingService.sessionId,
-    }).toPromise().then(() => {
+    this.statsReportingBackendApiService.recordStateHit(
+      0.0, StatsReportingService.explorationVersion, stateName,
+      params, StatsReportingService.sessionId,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
 
@@ -242,12 +196,15 @@ export class StatsReportingService {
     }
     StatsReportingService.aggregatedStats.num_actual_starts += 1;
     StatsReportingService.currentStateName = stateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
-      exploration_version: StatsReportingService.explorationVersion,
-      state_name: stateName,
-      session_id: StatsReportingService.sessionId
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordExplorationActuallyStarted(
+      StatsReportingService.explorationVersion, stateName,
+      StatsReportingService.sessionId,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
 
@@ -260,14 +217,17 @@ export class StatsReportingService {
     StatsReportingService.aggregatedStats.state_stats_mapping[
       stateName].num_times_solution_viewed += 1;
     StatsReportingService.currentStateName = stateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('SOLUTION_HIT'), {
-      exploration_version: StatsReportingService.explorationVersion,
-      state_name: stateName,
-      session_id: StatsReportingService.sessionId,
-      time_spent_in_state_secs: (
-        StatsReportingService.stateStopwatch.getTimeInSecs())
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordSolutionHit(
+      StatsReportingService.stateStopwatch.getTimeInSecs(),
+      StatsReportingService.explorationVersion,
+      stateName,
+      StatsReportingService.sessionId,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
   }
@@ -276,15 +236,18 @@ export class StatsReportingService {
       stateName: string, refresherExpId: string): void {
     StatsReportingService.currentStateName = stateName;
     StatsReportingService.nextExpId = refresherExpId;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
-      exploration_version: StatsReportingService.explorationVersion,
-      refresher_exp_id: refresherExpId,
-      state_name: stateName,
-      session_id: StatsReportingService.sessionId,
-      time_spent_in_state_secs: (
-        StatsReportingService.stateStopwatch.getTimeInSecs())
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordLeaveForRefresherExp(
+      StatsReportingService.explorationVersion,
+      refresherExpId,
+      stateName,
+      StatsReportingService.sessionId,
+      StatsReportingService.stateStopwatch.getTimeInSecs(),
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
   }
@@ -305,16 +268,18 @@ export class StatsReportingService {
 
     StatsReportingService.previousStateName = oldStateName;
     StatsReportingService.nextStateName = newStateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('STATE_HIT'), {
-      // This is the time spent since the last submission.
-      client_time_spent_in_secs: (
-        StatsReportingService.stateStopwatch.getTimeInSecs()),
-      exploration_version: StatsReportingService.explorationVersion,
-      new_state_name: newStateName,
-      old_params: oldParams,
-      session_id: StatsReportingService.sessionId,
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordStateHit(
+      StatsReportingService.stateStopwatch.getTimeInSecs(),
+      StatsReportingService.explorationVersion,
+      newStateName,
+      oldParams,
+      StatsReportingService.sessionId,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
 
@@ -343,14 +308,17 @@ export class StatsReportingService {
       stateName].num_completions += 1;
 
     StatsReportingService.currentStateName = stateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('STATE_COMPLETED'), {
-      exp_version: StatsReportingService.explorationVersion,
-      state_name: stateName,
-      session_id: StatsReportingService.sessionId,
-      time_spent_in_state_secs: (
-        StatsReportingService.stateStopwatch.getTimeInSecs())
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordStateCompleted(
+      StatsReportingService.explorationVersion,
+      StatsReportingService.sessionId,
+      stateName,
+      StatsReportingService.stateStopwatch.getTimeInSecs(),
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
   }
@@ -360,16 +328,19 @@ export class StatsReportingService {
   recordExplorationCompleted(stateName: string, params: Object): void {
     StatsReportingService.aggregatedStats.num_completions += 1;
     StatsReportingService.currentStateName = stateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('EXPLORATION_COMPLETED'), {
-      client_time_spent_in_secs: (
-        StatsReportingService.stateStopwatch.getTimeInSecs()),
-      collection_id: StatsReportingService.optionalCollectionId,
-      params: params,
-      session_id: StatsReportingService.sessionId,
-      state_name: stateName,
-      version: StatsReportingService.explorationVersion
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordExplorationCompleted(
+      StatsReportingService.stateStopwatch.getTimeInSecs(),
+      StatsReportingService.optionalCollectionId,
+      params,
+      StatsReportingService.sessionId,
+      stateName,
+      StatsReportingService.explorationVersion,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
 
@@ -385,7 +356,6 @@ export class StatsReportingService {
     this.playthroughService.recordExplorationQuitAction(
       stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
 
-    this.playthroughService.recordPlaythrough(true);
     StatsReportingService.explorationIsComplete = true;
   }
 
@@ -403,19 +373,20 @@ export class StatsReportingService {
         stateName].useful_feedback_count += 1;
     }
     StatsReportingService.currentStateName = stateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('ANSWER_SUBMITTED'), {
-      answer: answer,
-      params: params,
-      version: StatsReportingService.explorationVersion,
-      session_id: StatsReportingService.sessionId,
-      client_time_spent_in_secs: (
-        StatsReportingService.stateStopwatch.getTimeInSecs()),
-      old_state_name: stateName,
-      answer_group_index: answerGroupIndex,
-      rule_spec_index: ruleIndex,
-      classification_categorization: classificationCategorization
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordAnswerSubmitted(
+      answer, params, StatsReportingService.explorationVersion,
+      StatsReportingService.sessionId,
+      StatsReportingService.stateStopwatch.getTimeInSecs(),
+      stateName,
+      answerGroupIndex,
+      ruleIndex,
+      classificationCategorization,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
   }
@@ -424,16 +395,19 @@ export class StatsReportingService {
   // on the stateName.
   recordMaybeLeaveEvent(stateName: string, params: Object): void {
     StatsReportingService.currentStateName = stateName;
-    // TODO(#8038): Move this into a backend-api.service.
-    this.http.post(this.getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
-      client_time_spent_in_secs: (
-        StatsReportingService.stateStopwatch.getTimeInSecs()),
-      collection_id: StatsReportingService.optionalCollectionId,
-      params: params,
-      session_id: StatsReportingService.sessionId,
-      state_name: stateName,
-      version: StatsReportingService.explorationVersion
-    }).toPromise().then(() => {
+
+    this.statsReportingBackendApiService.recordMaybeLeaveEvent(
+      StatsReportingService.stateStopwatch.getTimeInSecs(),
+      StatsReportingService.optionalCollectionId,
+      params,
+      StatsReportingService.sessionId,
+      stateName,
+      StatsReportingService.explorationVersion,
+      StatsReportingService.explorationId,
+      StatsReportingService.currentStateName,
+      StatsReportingService.nextExpId,
+      StatsReportingService.previousStateName,
+      StatsReportingService.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
 
@@ -441,7 +415,7 @@ export class StatsReportingService {
 
     this.playthroughService.recordExplorationQuitAction(
       stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
-    this.playthroughService.recordPlaythrough(false);
+    this.playthroughService.storePlaythrough();
   }
 
   recordAnswerSubmitAction(

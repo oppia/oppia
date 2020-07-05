@@ -49,7 +49,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'state_name': 'state_1',
-        'new_value': 'new suggestion content'
+        'new_value': {
+            'content_id': 'content',
+            'html': 'new suggestion content'
+        }
     }
 
     AUTHOR_EMAIL = 'author@example.com'
@@ -81,6 +84,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
+
         def __init__(self, exploration_id, states):
             self.id = exploration_id
             self.states = states
@@ -120,7 +124,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
-                'new_value': 'new suggestion content',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'new suggestion content'
+                },
                 'old_value': None
             },
             'score_category': self.score_category
@@ -367,6 +374,58 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             last_message = thread_messages[len(thread_messages) - 1]
             self.assertEqual(
                 last_message.text, 'review message')
+
+    def test_accept_suggestion_with_invalid_math_fails(self):
+        """Test that the method for accepting suggestions raises error when
+        a suggestion with invalid math-tags is tried to be accepted.
+        """
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': ('<oppia-noninteractive-math raw_latex-with-value="&am'
+                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                         'uot;"></oppia-noninteractive-math>')
+            }
+        }
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, change_dict, 'test description',
+                    self.reviewer_id)
+
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+
+        with self.swap(
+            exp_services, 'update_exploration', self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        with self.assertRaisesRegexp(
+                            Exception,
+                            'Invalid math tags found in the suggestion'):
+                            suggestion_services.accept_suggestion(
+                                suggestion, self.reviewer_id,
+                                self.COMMIT_MESSAGE, 'review message')
+
 
     def test_accept_suggestion_handled_suggestion_failure(self):
         with self.swap(
@@ -652,6 +711,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
+
         def __init__(self, exploration_id, states):
             self.id = exploration_id
             self.states = states

@@ -58,7 +58,7 @@ describe('NumericInputValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        audio_translations: {},
+        content_id: '',
         html: ''
       },
       labelled_as_correct: false,
@@ -88,7 +88,7 @@ describe('NumericInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });
@@ -172,5 +172,7 @@ describe('NumericInputValidationService', () => {
     expect(filter('.35')).toEqual(0.35);
     expect(filter('.3')).toEqual(0.3);
     expect(filter('0.')).toEqual(0);
+    expect(filter('1,23,000')).toEqual(123000);
+    expect(filter('     7,00,00,000  ')).toEqual(70000000);
   });
 });

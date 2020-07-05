@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 import { Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { GuestCollectionProgressService } from
@@ -74,7 +74,9 @@ describe('Guest collection progress service', () => {
       objective: 'an objective',
       category: 'a category',
       version: 1,
-      nodes: []
+      nodes: [],
+      language_code: null,
+      tags: null
     };
     return collectionObjectFactory.create(collectionBackendObject);
   };
@@ -94,7 +96,7 @@ describe('Guest collection progress service', () => {
 
   // TODO(bhenning): Find a way to de-duplicate & share this with
   // CollectionLinearizerServiceSpec.
-  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2
+  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2.
   var _createLinearCollection = function(collectionId) {
     var collection = _createCollection(collectionId, 'Collection title');
 

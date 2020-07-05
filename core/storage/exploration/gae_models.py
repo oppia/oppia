@@ -32,11 +32,13 @@ from google.appengine.ext import ndb
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
+
     pass
 
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
+
     pass
 
 
@@ -46,6 +48,7 @@ class ExplorationModel(base_models.VersionedModel):
     This class should only be imported by the exploration services file
     and the exploration model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
     ALLOW_REVERT = True
@@ -163,7 +166,7 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # TODO(msl): test if put_async() leads to any problems (make
+        # TODO(msl): Test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
         # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
@@ -247,7 +250,7 @@ class ExplorationContextModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -263,12 +266,14 @@ class ExplorationContextModel(base_models.BaseModel):
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
+
     pass
 
 
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
+
     pass
 
 
@@ -464,6 +469,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
+
         super(ExplorationRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
@@ -475,7 +481,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             committer_username = (
                 committer_user_settings_model.username
                 if committer_user_settings_model else '')
-            # TODO(msl): test if put_async() leads to any problems (make
+            # TODO(msl): Test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when explorations
             # are changed).
             ExplorationCommitLogEntryModel(
@@ -536,6 +542,7 @@ class ExplorationRightsAllUsersModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding exploration.
     """
+
     # The user_ids of users who are (or were in history) members of owner_ids,
     # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
     all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -607,6 +614,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     The id for this model is of the form
     'exploration-[exploration_id]-[version]'.
     """
+
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -654,7 +662,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
         Returns:
             str. A string containing exploration ID and
-                exploration version.
+            exploration version.
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
 
@@ -674,8 +682,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 commits are needed.
 
         Returns:
-            3-tuple of (results, cursor, more) which were created which were
-            created no earlier than max_age before the current time where:
+            3-tuple of (results, cursor, more). Created no earlier than the
+            max_age before the current time where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this will
@@ -868,7 +876,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with the top rated exp summaries that are
-                public in descending order of scaled_average_rating.
+            public in descending order of scaled_average_rating.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
@@ -888,7 +896,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with private exp summaries that are at least
-                viewable by the given user.
+            viewable by the given user.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
@@ -910,7 +918,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with exp summaries that are at least
-                editable by the given user.
+            editable by the given user.
         """
         return ExpSummaryModel.query().filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
@@ -927,9 +935,9 @@ class ExpSummaryModel(base_models.BaseModel):
             limit: int. The maximum number of results to return.
 
         Returns:
-            An iterable with exp summaries that are recently published. The
-                returned list is sorted by the time of publication with latest
-                being first in the list.
+            iterable. An iterable with exp summaries that are
+            recently published. The returned list is sorted by the time of
+            publication with latest being first in the list.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC

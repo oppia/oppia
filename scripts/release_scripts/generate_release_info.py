@@ -187,8 +187,8 @@ def get_changelog_categories(pulls):
 
     Returns:
         dict(str, list(str)). A list where the keys are the various changelog
-            labels, and the values are the titles of the PRs that fall under
-            that category.
+        labels, and the values are the titles of the PRs that fall under
+        that category.
     """
     result = collections.defaultdict(list)
     for pull in pulls:
@@ -256,7 +256,7 @@ def check_setup_scripts(base_release_tag, changed_only=True):
 
     Returns:
         dict consisting of script --> boolean indicating whether or not it has
-            changed (filtered by default to those that are modified).
+        changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
                      ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',
@@ -353,7 +353,7 @@ def main(personal_access_token):
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
-        # TODO(apb7): duplicate author handling due to email changes.
+        # TODO(apb7): Duplicate author handling due to email changes.
         out.write('\n%s' % release_constants.NEW_AUTHORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))

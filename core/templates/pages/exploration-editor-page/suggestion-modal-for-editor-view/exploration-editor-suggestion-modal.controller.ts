@@ -38,9 +38,7 @@ angular.module('oppia').controller(
       $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
         suggestionIsValid && !unsavedChangesExist;
 
-      if (!$scope.canEdit) {
-        $scope.errorMessage = '';
-      } else if (!$scope.isNotHandled) {
+      if (!$scope.isNotHandled) {
         $scope.errorMessage =
           ['accepted', 'fixed'].includes(suggestionStatus) ?
             SuggestionModalService.SUGGESTION_ACCEPTED_MSG :

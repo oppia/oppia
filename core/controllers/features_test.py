@@ -31,6 +31,7 @@ def exploration_features_url(exp_id):
 
 class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
     """Does common exploration set up for testing feature handlers."""
+
     EXP_ID = 'expId'
 
     def setUp(self):

@@ -322,10 +322,10 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
         Returns:
             tuple(str, list(tuple), dict). A tuple with first element as
-                external model name, second element as a tuple of
-                cls.external_instance_details and the third element
-                as a properties dict with key as property name in summary
-                model and value as property name in external model.
+            external model name, second element as a tuple of
+            cls.external_instance_details and the third element
+            as a properties dict with key as property name in summary
+            model and value as property name in external model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -487,7 +487,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
 
         Returns:
             change_domain.BaseChange. A domain object class for the
-                changes made by commit commands of the model.
+            changes made by commit commands of the model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -687,10 +687,10 @@ class BaseUserModelValidator(BaseModelValidator):
 
         Returns:
             list(tuple(str, str, list, str, list).
-                A list of tuple which consists of External model name,
-                property name in model, list of property value in model,
-                property name in external model, list of property value
-                in external model.
+            A list of tuple which consists of External model name,
+            property name in model, list of property value in model,
+            property name in external model, list of property value
+            in external model.
         """
         return []
 
@@ -4957,9 +4957,9 @@ class TaskEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'closed_by_ids': (
+            'resolver_ids': (
                 user_models.UserSettingsModel,
-                [item.closed_by] if item.closed_by is not None else []),
+                [item.resolver_id] if item.resolver_id is not None else []),
             'entity_ids': (exp_models.ExplorationModel, [item.entity_id])
         }
 
@@ -4987,23 +4987,23 @@ class TaskEntryModelValidator(BaseModelValidator):
         Args:
             item: improvements_models.TaskEntryModel.
         """
-        if item.status == improvements_models.STATUS_OPEN:
-            if item.closed_by:
+        if item.status == improvements_models.TASK_STATUS_OPEN:
+            if item.resolver_id:
                 cls.errors['status field check'].append(
-                    'Entity id %s: status is open but closed_by is "%s", '
-                    'should be empty.' % (item.id, item.closed_by))
-            if item.closed_on:
+                    'Entity id %s: status is open but resolver_id is "%s", '
+                    'should be empty.' % (item.id, item.resolver_id))
+            if item.resolved_on:
                 cls.errors['status field check'].append(
-                    'Entity id %s: status is open but closed_on is "%s", '
-                    'should be empty.' % (item.id, item.closed_on))
-        elif item.status == improvements_models.STATUS_RESOLVED:
-            if item.closed_by is None:
+                    'Entity id %s: status is open but resolved_on is "%s", '
+                    'should be empty.' % (item.id, item.resolved_on))
+        elif item.status == improvements_models.TASK_STATUS_RESOLVED:
+            if item.resolver_id is None:
                 cls.errors['status field check'].append(
-                    'Entity id %s: status is resolved but closed_by is not '
+                    'Entity id %s: status is resolved but resolver_id is not '
                     'set' % (item.id,))
-            if item.closed_on is None:
+            if item.resolved_on is None:
                 cls.errors['status field check'].append(
-                    'Entity id %s: status is resolved but closed_on is not '
+                    'Entity id %s: status is resolved but resolved_on is not '
                     'set' % (item.id,))
 
     @classmethod

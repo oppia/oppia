@@ -29,13 +29,16 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
   'SkillEditorStateService', 'SkillUpdateService',
   'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
+  'WindowDimensionsService',
   function(
-      SkillEditorStateService, SkillUpdateService
-      , TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService) {
+      SkillEditorStateService, SkillUpdateService,
+      TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
+      WindowDimensionsService) {
     return {
       restrict: 'E',
       scope: {},
@@ -85,7 +88,8 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',
               size: 'xl'
-            }).result.then(function(skillId) {
+            }).result.then(function(summary) {
+              var skillId = summary.id;
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(
                   'A skill cannot be a prerequisite of itself', 5000);
@@ -106,8 +110,14 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             });
           };
 
+          $scope.togglePrerequisiteSkills = function() {
+            $scope.prerequisiteSkillsAreShown = (
+              !$scope.prerequisiteSkillsAreShown);
+          };
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
+            $scope.prerequisiteSkillsAreShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.skillIdToSummaryMap = {};
 
             for (var name in groupedSkillSummaries) {

@@ -101,7 +101,7 @@ var ExplorationEditorPage = function() {
   /*
    * Workflows
    */
-  // CONTROLS
+  // ---- CONTROLS ----
 
   this.publishCardExploration = async function(
       title, objective, category, language, tags) {
@@ -230,7 +230,7 @@ var ExplorationEditorPage = function() {
     expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
-  // NAVIGATION
+  // ---- NAVIGATION ----
 
   this.navigateToHistoryTab = async function() {
     await waitFor.elementToBeClickable(
@@ -250,6 +250,8 @@ var ExplorationEditorPage = function() {
     await waitFor.elementToBeClickable(
       navigateToMainTabButton, 'Main tab is not clickable');
     await navigateToMainTabButton.click();
+    await waitFor.elementToBeClickable(
+      neutralElement, 'Neutral element is not clickable');
     await neutralElement.click();
   };
 
