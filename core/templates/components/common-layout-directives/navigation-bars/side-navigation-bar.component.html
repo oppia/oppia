@@ -91,35 +91,39 @@
     <li ng-class="{'active': currentUrl === '/community-library'}">
       <a href="/community-library" class="protractor-mobile-test-library-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
-        <span [innerHTML]="'I18N_SIDEBAR_LIBRARY_LINK' | translate"></span>
+        <!--TODO(orthodoxparadox): Fix translate-->
+        <span translate="I18N_SIDEBAR_LIBRARY_LINK"></span>
       </a>
     </li>
 
     <li ng-class="{'active': currentUrl === '/about'}">
       <a href="/about" class="protractor-mobile-test-about-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
-        <span [innerHTML]="'I18N_SIDEBAR_ABOUT_LINK' | translate"></span>
+        <!--TODO(orthodoxparadox): Fix translate-->
+        <span translate="I18N_SIDEBAR_ABOUT_LINK"></span>
       </a>
     </li>
 
     <li ng-class="{'active': currentUrl === '/get-started'}">
       <a href="/get-started" class="protractor-mobile-test-get-started-link">
         <i class="oppia-sidebar-menu-icon fa">&#xf135;</i>
-        <span [innerHTML]="'I18N_SIDEBAR_GET_STARTED' | translate"></span>
+        <!--TODO(orthodoxparadox): Fix translate-->        
+        <span translate="I18N_SIDEBAR_GET_STARTED"></span>
       </a>
     </li>
 
     <li ng-class="{'active': currentUrl === '/teach'}">
       <a href="/teach" class="protractor-mobile-test-teach-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-        <span [innerHTML]="'I18N_SIDEBAR_TEACH_WITH_OPPIA' | translate"></span>
+        <span translate="I18N_SIDEBAR_TEACH_WITH_OPPIA"></span>
       </a>
     </li>
 
     <li ng-class="{'active': currentUrl === '/donate'}">
       <a href="/donate" class="protractor-mobile-test-donate-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
-        <span [innerHTML]="'I18N_SIDEBAR_DONATE' | translate"></span>
+        <!--TODO(orthodoxparadox): Fix translate-->
+        <span translate="I18N_SIDEBAR_DONATE"></span>
       </a>
     </li>
 
@@ -130,14 +134,16 @@
           <source type="image/png" srcset="{{ getStaticImageUrl('/sidebar/blogger.png') }}">
           <img src="{{ getStaticImageUrl('/sidebar/blogger.png') }}" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
         </picture>
-        <span [innerHTML]="'I18N_SIDEBAR_BLOG' | translate"></span>
+        <!--TODO(orthodoxparadox): Fix translate-->
+        <span translate="I18N_SIDEBAR_BLOG"></span>
       </a>
     </li>
 
     <li ng-class="{'active': currentUrl === '/contact'}">
       <a href="/contact" class="protractor-mobile-test-contact-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE0BE;</i>
-        <span [innerHTML]="'I18N_SIDEBAR_CONTACT_US' | translate"></span>
+        <!--TODO(orthodoxparadox): Fix translate-->
+        <span translate="I18N_SIDEBAR_CONTACT_US"></span>
       </a>
     </li>
 
@@ -148,7 +154,8 @@
           <source type="image/png" srcset="{{ getStaticImageUrl('/sidebar/oppia-foundation-logo.png') }}">
           <img src="{{ getStaticImageUrl('/sidebar/oppia-foundation-logo.png') }}" class="oppia-sidebar-menu-icon" alt="Oppia Foundation">
         </picture>
-        <span [innerHTML]="'I18N_SIDEBAR_OPPIA_FOUNDATION' | translate"></span>
+        <!--TODO(orthodoxparadox): Fix translate-->
+        <span translate="I18N_SIDEBAR_OPPIA_FOUNDATION"></span>
       </a>
     </li>
   </ul>
