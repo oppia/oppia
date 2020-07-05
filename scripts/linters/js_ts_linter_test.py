@@ -60,6 +60,8 @@ VALID_CONSTANT_OUTSIDE_CLASS_AJS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_constant_outside_class.constants.ajs.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
+VALID_UNLISTED_SERVICE_PATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
 INVALID_ANY_TYPE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_any_type.ts')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
@@ -82,8 +84,6 @@ INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_comments.ts')
-VALID_UNLISTED_SERVICE_PATH = os.path.join(
-    LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
 
 
 class JsTsLintTests(test_utils.GenericTestBase):

@@ -490,7 +490,6 @@ def main(args=None):
         python_utils.PRINT('No files to check.')
         python_utils.PRINT('---------------------------')
         return
-    # Adding these files for OppiaAngularRoot Linter.
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
