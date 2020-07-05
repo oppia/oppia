@@ -19,6 +19,28 @@
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 
+var initializeMockDocument = function(svgFilenameCtrl) {
+  var mockDocument = document.createElement('div');
+  var colors = ['stroke', 'fill', 'bg'];
+  for (var i = 0; i < 3; i++) {
+    var colorDiv = document.createElement('div');
+    colorDiv.setAttribute('id', colors[i] + '-color');
+    var topAlphaDiv = document.createElement('div');
+    topAlphaDiv.setAttribute('id', 'top-' + colors[i] + '-alpha');
+    var bottomAlphaDiv = document.createElement('div');
+    bottomAlphaDiv.setAttribute('id', 'bottom-' + colors[i] + '-alpha');
+    colorDiv.appendChild(topAlphaDiv);
+    colorDiv.appendChild(bottomAlphaDiv);
+    mockDocument.appendChild(colorDiv);
+  }
+  var mockCanvas = document.createElement('canvas');
+  mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
+  mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
+  mockDocument.appendChild(mockCanvas);
+  var $document = angular.element(document);
+  $document.find('body').append(mockDocument.outerHTML);
+};
+
 describe('SvgFilenameEditor', function() {
   var alertSpy = null;
   var contextService = null;
@@ -139,25 +161,7 @@ describe('SvgFilenameEditor', function() {
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
-    var mockDocument = document.createElement('div');
-    var colors = ['stroke', 'fill', 'bg'];
-    for (var i = 0; i < 3; i++) {
-      var colorDiv = document.createElement('div');
-      colorDiv.setAttribute('id', colors[i] + '-color');
-      var topAlphaDiv = document.createElement('div');
-      topAlphaDiv.setAttribute('id', 'top-' + colors[i] + '-alpha');
-      var bottomAlphaDiv = document.createElement('div');
-      bottomAlphaDiv.setAttribute('id', 'bottom-' + colors[i] + '-alpha');
-      colorDiv.appendChild(topAlphaDiv);
-      colorDiv.appendChild(bottomAlphaDiv);
-      mockDocument.appendChild(colorDiv);
-    }
-    var mockCanvas = document.createElement('canvas');
-    mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
-    mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
-    mockDocument.appendChild(mockCanvas);
-    var $document = angular.element(document);
-    $document.find('body').append(mockDocument.outerHTML);
+    initializeMockDocument(svgFilenameCtrl);
     svgFilenameCtrl.$onInit();
     svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
     svgFilenameCtrl.initializeMouseEvents();
@@ -448,25 +452,7 @@ describe('SvgFilenameEditor initialized with value attribute',
       svgFilenameCtrl = $componentController('svgFilenameEditor', null, {
         value: 'svgimageFilename1.svg'
       });
-      var mockDocument = document.createElement('div');
-      var colors = ['stroke', 'fill', 'bg'];
-      for (var i = 0; i < 3; i++) {
-        var colorDiv = document.createElement('div');
-        colorDiv.setAttribute('id', colors[i] + '-color');
-        var topAlphaDiv = document.createElement('div');
-        topAlphaDiv.setAttribute('id', 'top-' + colors[i] + '-alpha');
-        var bottomAlphaDiv = document.createElement('div');
-        bottomAlphaDiv.setAttribute('id', 'bottom-' + colors[i] + '-alpha');
-        colorDiv.appendChild(topAlphaDiv);
-        colorDiv.appendChild(bottomAlphaDiv);
-        mockDocument.appendChild(colorDiv);
-      }
-      var mockCanvas = document.createElement('canvas');
-      mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
-      mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
-      mockDocument.appendChild(mockCanvas);
-      var $document = angular.element(document);
-      $document.find('body').append(mockDocument.outerHTML);
+      initializeMockDocument(svgFilenameCtrl);
     }));
 
     afterEach(function() {
@@ -576,25 +562,7 @@ describe('SvgFilenameEditor with image save destination as ' +
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
-    var mockDocument = document.createElement('div');
-    var colors = ['stroke', 'fill', 'bg'];
-    for (var i = 0; i < 3; i++) {
-      var colorDiv = document.createElement('div');
-      colorDiv.setAttribute('id', colors[i] + '-color');
-      var topAlphaDiv = document.createElement('div');
-      topAlphaDiv.setAttribute('id', 'top-' + colors[i] + '-alpha');
-      var bottomAlphaDiv = document.createElement('div');
-      bottomAlphaDiv.setAttribute('id', 'bottom-' + colors[i] + '-alpha');
-      colorDiv.appendChild(topAlphaDiv);
-      colorDiv.appendChild(bottomAlphaDiv);
-      mockDocument.appendChild(colorDiv);
-    }
-    var mockCanvas = document.createElement('canvas');
-    mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
-    mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
-    mockDocument.appendChild(mockCanvas);
-    var $document = angular.element(document);
-    $document.find('body').append(mockDocument.outerHTML);
+    initializeMockDocument(svgFilenameCtrl);
     svgFilenameCtrl.$onInit();
     svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
     svgFilenameCtrl.initializeMouseEvents();
