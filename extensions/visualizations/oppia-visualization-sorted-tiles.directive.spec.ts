@@ -69,7 +69,7 @@ describe('Oppia sorted tiles visualization', function() {
       expect(
         element.find('div.oppia-visualization-sorted-tile-content > div')
           .map((_, el) => el.textContent.trim()).toArray())
-        .toEqual(['foo', '3 times', 'bar', '1 times']);
+        .toEqual(['foo', '3 times', 'bar', '1 time']);
     });
   });
 
