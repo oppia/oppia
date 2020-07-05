@@ -84,9 +84,7 @@ export class StateInteractionStatsService {
       const customizationArgs = (
         <IMultipleChoiceInputCustomizationArgs>
         state.interaction.customizationArgs);
-      const answerHtml = customizationArgs.choices.value[Number(answer)];
-      return new DOMParser().parseFromString(answerHtml, 'text/html')
-        .documentElement.textContent.trim();
+      return customizationArgs.choices.value[Number(answer)];
     }
     return answer;
   }
