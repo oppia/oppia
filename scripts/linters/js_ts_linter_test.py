@@ -82,7 +82,8 @@ INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_comments.ts')
-UNLISTED_SERVICE_PATH = os.path.join(LINTER_TESTS_DIR, 'unlisted.service.ts')
+VALID_UNLISTED_SERVICE_PATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
 
 
 class JsTsLintTests(test_utils.GenericTestBase):
@@ -586,14 +587,14 @@ class JsTsLintTests(test_utils.GenericTestBase):
                     js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
                     'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
                     'true', 'es5', './node_modules/@types',
-                    UNLISTED_SERVICE_PATH)
+                    VALID_UNLISTED_SERVICE_PATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
         compile_all_ts_files_swap = self.swap(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
         with self.print_swap, compile_all_ts_files_swap:
             js_ts_linter.JsTsLintChecksManager(
-                [], [UNLISTED_SERVICE_PATH], FILE_CACHE,
+                [], [VALID_UNLISTED_SERVICE_PATH], FILE_CACHE,
                 True).perform_all_lint_checks()
 
         shutil.rmtree(
