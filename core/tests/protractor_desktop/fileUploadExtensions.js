@@ -49,7 +49,7 @@ describe('rich-text components', function() {
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');
-      await richTextEditor.appendPlainText(' This is a math expression');
+      await richTextEditor.appendPlainText('This is a math expression');
       // TODO(Jacob): Add test for image RTE component.
       await richTextEditor.addRteComponent('Math', 'x^2 + y^2');
     });
@@ -59,7 +59,7 @@ describe('rich-text components', function() {
     await explorationPlayerPage.expectContentToMatch(
       async function(richTextChecker) {
         await richTextChecker.readBoldText('bold');
-        await richTextChecker.readPlainText(' This is a math expression');
+        await richTextChecker.readPlainText('This is a math expression');
         await richTextChecker.readRteComponent('Math', 'x^2 + y^2');
       });
 
