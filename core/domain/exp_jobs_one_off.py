@@ -360,7 +360,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(ExplorationMigrationJobManager, cls).enqueue(
-			job_id, shard_count=64)
+            job_id, shard_count=64)
 
     @staticmethod
     def map(item):
