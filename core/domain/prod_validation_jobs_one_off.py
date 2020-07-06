@@ -5156,13 +5156,11 @@ class PlaythroughModelValidator(BaseModelValidator):
             else:
                 issue_index, issue = issues[0]
                 id_indices = []
-                reference_count = 0
                 for id_index, playthrough_id in enumerate(
                         issue['playthrough_ids']):
                     if playthrough_id == item.id:
-                        reference_count += 1
                         id_indices.append(id_index)
-                if reference_count > 1:
+                if len(id_indices) > 1:
                     cls.errors['reference check'].append(
                         'Entity id %s: referenced multiple times in an '
                         'issue (index=%s) of the corresponding exploration '
