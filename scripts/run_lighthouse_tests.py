@@ -35,6 +35,10 @@ _PARSER.add_argument(
     '--disable_compression',
     help='optional; if specified does not serve compressed assets',
     action='store_true')
+_PARSER.add_argument(
+    '--only_install_nginx',
+    help='optional; if specified only instals nginx and does not run the check',
+    action='store_true')
 
 RUNNING_PROCESSES = []
 
@@ -159,6 +163,12 @@ def cleanup():
 def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    # This is to be used by the CI to only install nginx.
+    if parsed_args.only_install_nginx:
+        download_and_install_nginx()
+        return
+
     atexit.register(cleanup)
     build.main(args=['--prod_env'])
 
