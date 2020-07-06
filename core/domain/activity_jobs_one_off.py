@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core import jobs
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -175,6 +177,51 @@ class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield ('SUCCESS_ALREADY_REMOVED - %s' % class_name, commit_model.id)
         # pylint: enable=protected-access
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the last_updated in *CommitLogEntryModels to created_on if
+    the last_updated is in the timespan when user ID migration was done.
+    """
+
+    MIGRATION_START = datetime.datetime.strptime(
+        '2020-06-29T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+    MIGRATION_END = datetime.datetime.strptime(
+        '2020-06-29T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(FixCommitLastUpdatedOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.SubtopicPageCommitLogEntryModel
+        ]
+
+    @staticmethod
+    def map(commit_model):
+        class_name = commit_model.__class__.__name__
+        last_updated = commit_model.last_updated
+        if (FixCommitLastUpdatedOneOffJob.MIGRATION_START < last_updated <
+                FixCommitLastUpdatedOneOffJob.MIGRATION_END):
+            commit_model.last_updated = commit_model.created_on
+            commit_model.put(update_last_updated_time=False)
+            yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
+        else:
+            yield ('SUCCESS_ALREADY_CORRECT - %s' % class_name, commit_model.id)
 
     @staticmethod
     def reduce(key, values):
