@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
-const { fabric } = require('fabric');
+import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 
 describe('SvgFilenameEditor', function() {
@@ -76,6 +76,21 @@ describe('SvgFilenameEditor', function() {
     }
   };
 
+  var mockWindowDimenesionService = {
+    getResizeEvent: function() {
+      return {
+        subscribe: function(callback) {
+          callback();
+          return {
+            unsubscribe: function() {
+              return 'Unsubscribe Successful';
+            }
+          };
+        }
+      };
+    }
+  };
+
   class mockImageObject {
     source = null;
     onload = null;
@@ -100,6 +115,7 @@ describe('SvgFilenameEditor', function() {
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+    $provide.value('WindowDimensionsService', mockWindowDimenesionService);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController, $q) {
     contextService = $injector.get('ContextService');
@@ -134,6 +150,7 @@ describe('SvgFilenameEditor', function() {
     mockDocument.appendChild(fillDiv);
     mockDocument.appendChild(bgDiv);
     var mockCanvas = document.createElement('canvas');
+    mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
     mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
     mockDocument.appendChild(mockCanvas);
     var $document = angular.element(document);
@@ -141,13 +158,18 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.$onInit();
     svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
     svgFilenameCtrl.initializeMouseEvents();
-    var mockFillPicker = {
+    var mockPicker = {
       setOptions: function(data) {
         return 'The value is set.';
       }
     };
-    svgFilenameCtrl.fillPicker = mockFillPicker;
+    svgFilenameCtrl.fillPicker = mockPicker;
+    svgFilenameCtrl.strokePicker = mockPicker;
   }));
+
+  afterAll(function() {
+    svgFilenameCtrl.$onDestroy();
+  });
 
   it('should update diagram size', function() {
     var WIDTH = 100;
@@ -202,8 +224,6 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.createClosedPolygon();
     expect(svgFilenameCtrl.isClosedPolygonEnabled()).toBe(true);
     svgFilenameCtrl.createClosedPolygon();
-    svgFilenameCtrl.copyColor();
-    expect(svgFilenameCtrl.isEyeDropperEnabled()).toBe(true);
   });
 
   it('should undo and redo the creation of shapes', function() {
@@ -264,8 +284,8 @@ describe('SvgFilenameEditor', function() {
     expect(textObj.get('fontSize')).toBe(12);
   });
 
-  it('should trigger mouse events', function() {
-    svgFilenameCtrl.drawMode = 'polygon';
+  it('should draw polygon using mouse events', function() {
+    svgFilenameCtrl.createClosedPolygon();
     svgFilenameCtrl.canvas.trigger('mouse:down', {
       e: {
         pageX: 0,
@@ -280,32 +300,38 @@ describe('SvgFilenameEditor', function() {
     });
     svgFilenameCtrl.canvas.trigger('mouse:dblclick');
     expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('polyline');
-    svgFilenameCtrl.drawMode = 'eyedropper';
-    var mockCanvasElement = {
-      getContext: function(data) {
-        return {
-          getImageData: function(data) {
-            return {
-              data: [1, 2, 3, 4]
-            };
-          }
-        };
-      }
-    };
-    svgFilenameCtrl.canvasElement = mockCanvasElement;
+    svgFilenameCtrl.createClosedPolygon();
+    svgFilenameCtrl.isTouchDevice = true;
     svgFilenameCtrl.canvas.trigger('mouse:down', {
       e: {
         pageX: 0,
         pageY: 0
       }
     });
-    expect(svgFilenameCtrl.fabricjsOptions.fill).toBe('rgba(1,2,3,4)');
+    svgFilenameCtrl.canvas.trigger('mouse:down', {
+      e: {
+        pageX: 10,
+        pageY: 10
+      }
+    });
+    svgFilenameCtrl.createClosedPolygon();
+    expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('polyline');
+  });
+
+  it('should trigger object selection events', function() {
+    svgFilenameCtrl.createRect();
+    svgFilenameCtrl.createText();
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[0]);
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[1]);
+    expect(svgFilenameCtrl.displayFontStyles).toBe(true);
   });
 
   it('should save svg file created by the editor', function() {
     svgFilenameCtrl.createText();
 
-    // responseText contains a XSSI Prefix, which is represented by )]}'
+    // The responseText contains a XSSI Prefix, which is represented by )]}'
     // string. That's why double quotes is being used here. It's not
     // possible to use \' instead of ' so the XSSI Prefix won't be
     // evaluated correctly.
@@ -343,8 +369,8 @@ describe('SvgFilenameEditor', function() {
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.reject({
-        // responseText contains a XSSI Prefix, which is represented by )]}'
-        // string. That's why double quotes is being used here. It's not
+        // Variable responseText contains a XSSI Prefix, which is represented by
+        // )]}' string. That's why double quotes is being used here. It's not
         // possible to use \' instead of ' so the XSSI Prefix won't be
         // evaluated correctly.
         /* eslint-disable quotes */
@@ -419,16 +445,19 @@ describe('SvgFilenameEditor initialized with value attribute',
       mockDocument.appendChild(fillDiv);
       mockDocument.appendChild(bgDiv);
       var mockCanvas = document.createElement('canvas');
+      mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
       mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
       mockDocument.appendChild(mockCanvas);
       var $document = angular.element(document);
       $document.find('body').append(mockDocument.outerHTML);
-      svgFilenameCtrl.$onInit();
-      svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
-      svgFilenameCtrl.initializeMouseEvents();
     }));
 
+    afterEach(function() {
+      svgFilenameCtrl.$onDestroy();
+    });
+
     it('should load the svg file', function() {
+      svgFilenameCtrl.$onInit();
       $httpBackend.expect(
         'GET', '/imageurl_exploration_1_svgimageFilename1.svg'
       ).respond(samplesvg);
@@ -541,6 +570,7 @@ describe('SvgFilenameEditor with image save destination as ' +
     mockDocument.appendChild(fillDiv);
     mockDocument.appendChild(bgDiv);
     var mockCanvas = document.createElement('canvas');
+    mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
     mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
     mockDocument.appendChild(mockCanvas);
     var $document = angular.element(document);
@@ -550,6 +580,9 @@ describe('SvgFilenameEditor with image save destination as ' +
     svgFilenameCtrl.initializeMouseEvents();
   }));
 
+  afterEach(function() {
+    svgFilenameCtrl.$onDestroy();
+  });
 
   it('should save svg file to local storage created by the svg editor',
     function() {
@@ -591,6 +624,10 @@ describe('should fail svg tag validation', function() {
     svgFilenameCtrl = $componentController('svgFilenameEditor');
   }));
 
+  afterEach(function() {
+    svgFilenameCtrl.$onDestroy();
+  });
+
   it('should fail svg validation', function() {
     var invalidSvgTag = (
       '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
@@ -621,6 +658,10 @@ describe('should fail svg attribute validation', function() {
   beforeEach(angular.mock.inject(function($componentController) {
     svgFilenameCtrl = $componentController('svgFilenameEditor');
   }));
+
+  afterEach(function() {
+    svgFilenameCtrl.$onDestroy();
+  });
 
   it('should fail svg validation', function() {
     var invalidWidthAttribute = (

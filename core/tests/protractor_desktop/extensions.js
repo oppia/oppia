@@ -50,7 +50,7 @@ describe('rich-text components', function() {
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');
       await richTextEditor.appendPlainText(' ');
-      // TODO(Jacob): add test for image RTE component
+      // TODO(Jacob): Add test for image RTE component.
       await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       await richTextEditor.addRteComponent('Math', 'abc');
       await richTextEditor.addRteComponent(
@@ -239,12 +239,12 @@ describe('Interactions', function() {
         'Math', '16x^{12}/4x^2');
     });
 
-    await explorationEditorMainTab.setInteraction('MathExpressionInput');
+    await explorationEditorMainTab.setInteraction('AlgebraicExpressionInput');
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
-      'MathExpressionInput', await forms.toRichText('Good job!'), 'End', true,
-      'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
-    // Expecting answer to be 4x^10
+      'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',
+      true, 'IsEquivalentTo', '(16(x^12))/4x^2');
+    // Expecting answer to be 4x^10.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText(
@@ -282,7 +282,7 @@ describe('Interactions', function() {
 
     // Play Math Expression Input interaction.
     await explorationPlayerPage.submitAnswer(
-      'MathExpressionInput', '4 * x^(10)');
+      'AlgebraicExpressionInput', '4 * x^10');
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('Good job!'));
     await explorationPlayerPage.clickThroughToNextCard();

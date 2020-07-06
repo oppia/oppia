@@ -110,6 +110,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        state_solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
         state_written_translations_dict = {
             'translations_mapping': {
                 'content': {
@@ -173,7 +186,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
 
         state_solution_dict = {
-            'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': [
                 ['<p>state customization arg html 1</p>'],
@@ -291,7 +303,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ),
         ]
         state_solution_dict = {
-            'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
@@ -390,7 +401,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         state_solution_dict = {
-            'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': [
                 '<p>state customization arg html 1</p>',
@@ -802,9 +812,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': (
-                    '<p><oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-                    '</oppia-noninteractive-math></p>')
+                    '<p>Value</p><oppia-noninteractive-math math_content-with'
+                    '-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,'
+                    '+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+                    ';&amp;quot;}"></oppia-noninteractive-math>')
             },
         }
 
@@ -839,9 +850,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
                 'default_outcome', (
-                    '<p><oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-                    '</oppia-noninteractive-math></p>')),
+                    '<p>Value</p><oppia-noninteractive-math math_content-with'
+                    '-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,'
+                    '+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+                    ';&amp;quot;}"></oppia-noninteractive-math>')),
             False, [], None, None
         )
 
@@ -1349,6 +1361,1107 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict, add_dimensions_to_image_tags),
                 state_dict_with_image_dimensions)
+
+    def test_convert_html_fields_in_state_with_drag_and_drop_interaction(self):
+        """Test the method for converting all the HTML in a state having
+        DragAndDropSortInput interaction.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        written_translations_dict_with_old_math_schema = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': html_with_old_math_schema,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': html_with_old_math_schema,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_with_new_math_schema = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': html_with_new_math_schema,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': html_with_new_math_schema,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+
+        answer_group_dict_with_old_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': html_with_old_math_schema,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': html_with_old_math_schema,
+                    'y': html_with_old_math_schema
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        answer_group_dict_with_new_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': html_with_new_math_schema,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': html_with_new_math_schema,
+                    'y': html_with_new_math_schema
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [answer_group_dict_with_old_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            html_with_old_math_schema,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_old_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+
+            },
+            'written_translations': (
+                written_translations_dict_with_old_math_schema)
+        }
+
+        state_dict_with_new_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [answer_group_dict_with_new_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            html_with_new_math_schema,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_new_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_new_math_schema
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_new_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+
+            },
+            'written_translations': (
+                written_translations_dict_with_new_math_schema)
+        }
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_old_math_schema,
+                html_validation_service.
+                add_math_content_to_math_rte_components),
+            state_dict_with_new_math_schema)
+
+    def test_convert_html_fields_in_state_with_item_selection_interaction(self):
+        """Test the method for converting all the HTML in a state having
+        ItemSelection interaction.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        answer_group_with_old_math_schema = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'IsProperSubsetOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'DoesNotContainAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_old_math_schema
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        answer_group_with_new_math_schema = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }, {
+                'rule_type': 'IsProperSubsetOf',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }, {
+                'rule_type': 'DoesNotContainAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_new_math_schema
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        html_with_old_math_schema,
+                        '<p>state customization arg html 2</p>',
+                        '<p>state customization arg html 3</p>',
+                        '<p>state customization arg html 4</p>'
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                },
+                'answer_groups': answer_group_with_old_math_schema,
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'choices': {
+                        'value': [
+                            '<p>init_state customization arg html 1</p>',
+                            html_with_old_math_schema,
+                            '<p>init_state customization arg html 3</p>',
+                            '<p>init_state customization arg html 4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'ItemSelectionInput',
+                'hints': []
+            }
+        }
+
+        state_dict_with_new_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        html_with_new_math_schema,
+                        '<p>state customization arg html 2</p>',
+                        '<p>state customization arg html 3</p>',
+                        '<p>state customization arg html 4</p>'
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                },
+                'answer_groups': answer_group_with_new_math_schema,
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'choices': {
+                        'value': [
+                            '<p>init_state customization arg html 1</p>',
+                            html_with_new_math_schema,
+                            '<p>init_state customization arg html 3</p>',
+                            '<p>init_state customization arg html 4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'ItemSelectionInput',
+                'hints': []
+            }
+        }
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput'))
+        interaction.can_have_solution = True
+
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_old_math_schema,
+                html_validation_service.
+                add_math_content_to_math_rte_components),
+            state_dict_with_new_math_schema)
+
+    def test_convert_html_fields_in_state_with_text_input_interaction(self):
+        """Test the method for converting all the HTML in a state having
+        TextInput interaction.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        answer_group_with_old_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': html_with_old_math_schema
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        answer_group_with_new_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': html_with_new_math_schema
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_old_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': 'Answer1',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_with_old_math_schema
+                    }
+                },
+                'answer_groups': [answer_group_with_old_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_old_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': ''
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'TextInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }]
+            }
+        }
+
+
+        state_dict_with_new_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_new_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': 'Answer1',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_with_new_math_schema
+                    }
+                },
+                'answer_groups': [answer_group_with_new_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_new_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': ''
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'TextInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_new_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_new_math_schema
+                        }
+                    }]
+            }
+        }
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_old_math_schema,
+                html_validation_service.
+                add_math_content_to_math_rte_components),
+            state_dict_with_new_math_schema)
+
+    def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(
+            self):
+        """Test the method for converting the HTML in a state
+        when the rule_spec has invalid html format.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        answer_group_with_old_math_schema = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_old_math_schema
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': answer_group_with_old_math_schema,
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'choices': {
+                        'value': [
+                            '<p>init_state customization arg html 1</p>',
+                            html_with_old_math_schema,
+                            '<p>init_state customization arg html 3</p>',
+                            '<p>init_state customization arg html 4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'ItemSelectionInput',
+                'hints': []
+            }
+        }
+
+        mock_html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        for html_type_dict in (
+                mock_html_field_types_to_rule_specs_dict.values()):
+            html_type_dict['format'] = 'invalid format'
+
+        def mock_get_file_contents(unused_file_path):
+            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+
+        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The rule spec does not belong to a valid format.'):
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict_with_old_math_schema,
+                    html_validation_service.
+                    add_math_content_to_math_rte_components)
+
+    def test_convert_html_fields_in_rule_spec_with_invalid_input_variable(self):
+        """Test the method for converting the HTML in a state
+        when the rule_spec has invalid input variable.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        answer_group_with_old_math_schema = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_old_math_schema
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': answer_group_with_old_math_schema,
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'choices': {
+                        'value': [
+                            '<p>init_state customization arg html 1</p>',
+                            html_with_old_math_schema,
+                            '<p>init_state customization arg html 3</p>',
+                            '<p>init_state customization arg html 4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'ItemSelectionInput',
+                'hints': []
+            }
+        }
+
+        mock_html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        for html_type_dict in (
+                mock_html_field_types_to_rule_specs_dict.values()):
+            if html_type_dict['interactionId'] == 'ItemSelectionInput':
+                html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
+                    ['y'])
+
+        def mock_get_file_contents(unused_file_path):
+            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+
+        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Rule spec should have at least one valid input variable with '
+                'Html in it.'):
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict_with_old_math_schema,
+                    html_validation_service.
+                    add_math_content_to_math_rte_components)
+
+    def test_convert_html_fields_in_rule_spec_with_invalid_correct_answer(self):
+        """Test the method for converting the HTML in a state when the
+        interaction solution has invalid answer type.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_old_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'interaction_id': '',
+                    'answer_is_exclusive': True,
+                    'correct_answer': 'Answer1',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_with_old_math_schema
+                    }
+                },
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_old_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': ''
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'TextInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }
+                ]
+            }
+        }
+
+        mock_html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
+            mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString'))
+
+        def mock_get_file_contents(unused_file_path):
+            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+
+        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The solution does not have a valid '
+                'correct_answer type.'):
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict_with_old_math_schema,
+                    html_validation_service.
+                    add_math_content_to_math_rte_components)
+
+    def test_convert_html_fields_in_state_when_interaction_is_none(self):
+        """Test the method for converting all the HTML in a state having
+        no interaction.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_old_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_old_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': None,
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }]
+            }
+        }
+
+        state_dict_with_new_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_new_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_new_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': None,
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_new_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_new_math_schema
+                        }
+                    }]
+            }
+        }
+        solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': html_with_old_math_schema
+            }
+        }
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_old_math_schema,
+                html_validation_service.
+                add_math_content_to_math_rte_components),
+            state_dict_with_new_math_schema)
+        # Assert that no action is performed on a solution dict when the
+        # interaction ID is None.
+        self.assertEqual(
+            state_domain.Solution.convert_html_in_solution(
+                None, solution_dict,
+                html_validation_service.
+                add_math_content_to_math_rte_components), solution_dict)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""

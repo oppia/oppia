@@ -20,7 +20,6 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.directive.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
@@ -49,7 +48,7 @@ angular.module('oppia').directive('questionsTab', [
         'topic-questions-tab.directive.html'),
       controller: [
         '$scope', '$q', '$uibModal', '$window',
-        'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',
+        'AlertsService', 'TopicEditorStateService',
         'UrlService', 'EditableQuestionBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
         'SkillBackendApiService', 'MisconceptionObjectFactory',
@@ -59,7 +58,7 @@ angular.module('oppia').directive('questionsTab', [
         'NUM_QUESTIONS_PER_PAGE', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED', function(
             $scope, $q, $uibModal, $window,
-            AlertsService, TopicEditorStateService, QuestionCreationService,
+            AlertsService, TopicEditorStateService,
             UrlService, EditableQuestionBackendApiService,
             TopicsAndSkillsDashboardBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,

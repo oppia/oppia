@@ -20,25 +20,36 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service';
+import { GuppyInitializationService } from
+  'services/guppy-initialization.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 declare global {
   interface Window {
     Guppy: Object;
+    GuppyOSK: Object;
   }
+}
+
+class MockGuppyOSK {
+  constructor(config: Object) {}
 }
 
 class MockGuppy {
   constructor(id: string, config: Object) {}
 
-  event(name: string, handler: Function): void {
-    handler();
-  }
   asciimath(): string {
     return 'Dummy value';
   }
-  render(): void {}
   configure(name: string, val: Object): void {}
+  static event(name: string, handler: Function): void {
+    handler();
+  }
+  static configure(name: string, val: Object): void {}
   static 'remove_global_symbol'(symbol: string): void {}
+  static 'use_osk'(osk: MockGuppyOSK): void {}
 }
 
 class MockComponent {
@@ -58,6 +69,7 @@ describe('GuppyConfigurationService', () => {
   beforeAll(() => {
     guppyConfigurationService = TestBed.get(GuppyConfigurationService);
     window.Guppy = MockGuppy;
+    window.GuppyOSK = MockGuppyOSK;
   });
 
   describe('Individual service', () => {
@@ -66,6 +78,24 @@ describe('GuppyConfigurationService', () => {
       spyOn(Guppy, 'remove_global_symbol');
       guppyConfigurationService.init();
       expect(Guppy.remove_global_symbol).toHaveBeenCalled();
+    });
+
+    it('should not attach osk if user is not on mobile device', () => {
+      GuppyConfigurationService.serviceIsInitialized = false;
+      spyOn(Guppy, 'use_osk');
+      guppyConfigurationService.init();
+      expect(Guppy.use_osk).not.toHaveBeenCalled();
+    });
+
+    it('should attach osk if user is on mobile device', () => {
+      GuppyConfigurationService.serviceIsInitialized = false;
+      let deviceInfoService = new DeviceInfoService(new WindowRef());
+      let guppyConfigService = new GuppyConfigurationService(deviceInfoService);
+      spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+      spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+      spyOn(Guppy, 'use_osk');
+      guppyConfigService.init();
+      expect(Guppy.use_osk).toHaveBeenCalled();
     });
 
     it('should not configure guppy if service is initialized', () => {
@@ -77,29 +107,32 @@ describe('GuppyConfigurationService', () => {
   });
 
   describe('Components calling the service', () => {
-    let MathEditorCtrl = null;
+    let ctrl = null;
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
         'GuppyConfigurationService', guppyConfigurationService);
+      $provide.value('MathInteractionsService', new MathInteractionsService());
+      $provide.value('GuppyInitializationService',
+        new GuppyInitializationService());
     }));
     beforeEach(angular.mock.inject(function($componentController) {
-      MathEditorCtrl = $componentController('mathEditor');
+      ctrl = $componentController('algebraicExpressionEditor');
     }));
 
     it('should configure guppy on the first initialization', () => {
       GuppyConfigurationService.serviceIsInitialized = false;
       spyOn(Guppy, 'remove_global_symbol');
-      MathEditorCtrl.$onInit();
+      ctrl.$onInit();
       expect(Guppy.remove_global_symbol).toHaveBeenCalled();
     });
 
     it('should not configure guppy on multiple initializations', () => {
-      MathEditorCtrl.$onInit();
+      ctrl.$onInit();
 
       spyOn(Guppy, 'remove_global_symbol');
-      MathEditorCtrl.$onInit();
+      ctrl.$onInit();
       expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
 
       let mockComponent = new MockComponent(guppyConfigurationService);

@@ -24,7 +24,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
-from core.domain import topic_fetchers
 from core.domain import value_generators_domain
 import feconf
 import python_utils
@@ -57,7 +56,7 @@ class AssetDevHandler(base.BaseHandler):
     _SUPPORTED_PAGE_CONTEXTS = [
         feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
         feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
-        feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_SUBTOPIC
+        feconf.ENTITY_TYPE_QUESTION
     ]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -78,7 +77,7 @@ class AssetDevHandler(base.BaseHandler):
                 subtopic: topic_name of the topic that it is part of.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
-              string is encoded in the frontend using encodeURIComponent().
+                string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
@@ -98,16 +97,8 @@ class AssetDevHandler(base.BaseHandler):
             if page_context not in self._SUPPORTED_PAGE_CONTEXTS:
                 raise self.InvalidInputException
 
-            if page_context == feconf.ENTITY_TYPE_SUBTOPIC:
-                entity_type = feconf.ENTITY_TYPE_TOPIC
-                topic = topic_fetchers.get_topic_by_name(page_identifier)
-                entity_id = topic.id
-            else:
-                entity_type = page_context
-                entity_id = page_identifier
-
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(entity_type, entity_id))
+                fs_domain.GcsFileSystem(page_context, page_identifier))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

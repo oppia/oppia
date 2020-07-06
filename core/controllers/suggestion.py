@@ -60,7 +60,7 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
 
     Returns:
         dict. Dict mapping target_id to corresponding exploration opportunity
-            summary dict.
+        summary dict.
     """
     target_ids = set([s.target_id for s in suggestions])
     opportunities = (

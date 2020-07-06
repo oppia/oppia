@@ -44,7 +44,7 @@ angular.module('oppia').component('teachPage', {
       ctrl.activeTabName = ctrl.TAB_ID_TEACH;
 
       ctrl.onTabClick = function(tabName) {
-        // Update hash
+        // ---- Update hash ----
         WindowRef.nativeWindow.location.hash = '#' + tabName;
         ctrl.activeTabName = tabName;
       };

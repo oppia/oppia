@@ -186,7 +186,7 @@ describe('Learner dashboard functionality', function() {
       await adminPage.reloadExploration(
         'protractor_mobile_test_exploration.yaml');
     } else {
-      // Create exploration 'Dummy Exploration'
+      // Create exploration 'Dummy Exploration'.
       await createDummyExplorationOnDesktop();
       // Create a second exploration named 'Test Exploration'.
       await workflow.createAndPublishExploration(
@@ -267,7 +267,7 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.get();
       await libraryPage.findExploration('Dummy Exploration');
       await libraryPage.playExploration('Dummy Exploration');
-      // Wait for player page to completely load
+      // Wait for player page to completely load.
       await waitFor.pageToFullyLoad();
       var explorationId = await general.getExplorationIdFromPlayer();
       await general.openEditor(explorationId);

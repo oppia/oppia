@@ -50,12 +50,12 @@ export class VersionTreeService {
     this._snapshots = {};
     var numberOfVersions = snapshotsData.length;
 
-    // Populate _snapshots so _snapshots[i] corresponds to version i
+    // Populate _snapshots so _snapshots[i] corresponds to version i.
     for (var i = 0; i < numberOfVersions; i++) {
       this._snapshots[i + 1] = snapshotsData[i];
     }
 
-    // Generate the version tree of an exploration from its snapshots
+    // Generate the version tree of an exploration from its snapshots.
     for (var versionNum = 2; versionNum <= numberOfVersions; versionNum++) {
       if (this._snapshots[versionNum].commit_type === 'revert') {
         for (
@@ -89,7 +89,7 @@ export class VersionTreeService {
 
   // Finds lowest common ancestor of v1 and v2 in the version tree.
   findLCA(v1: number, v2: number): number {
-    // Find paths from root to v1 and v2
+    // Find paths from root to v1 and v2.
     var pathToV1 = [];
     var pathToV2 = [];
     while (this._treeParents[v1] !== -1) {
@@ -112,7 +112,7 @@ export class VersionTreeService {
     pathToV2.push(1);
     pathToV2.reverse();
 
-    // Compare paths
+    // ---- Compare paths ----
     var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
     var lca = null;
     for (var i = maxIndex; i >= 0; i--) {

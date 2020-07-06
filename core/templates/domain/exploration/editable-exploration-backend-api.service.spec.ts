@@ -62,7 +62,7 @@ describe('Editable exploration backend API service', function() {
       return deferred.promise;
     });
 
-    // Sample exploration object returnable from the backend
+    // Sample exploration object returnable from the backend.
     sampleDataResults = {
       exploration_id: '0',
       init_state_name: 'Introduction',
@@ -175,7 +175,7 @@ describe('Editable exploration backend API service', function() {
     $httpBackend.expect('PUT', '/createhandler/data/0').respond(
       exploration);
 
-    // Send a request to update exploration
+    // Send a request to update exploration.
     EditableExplorationBackendApiService.updateExploration(
       exploration.exploration_id, exploration.version,
       exploration.title, []
@@ -210,7 +210,7 @@ describe('Editable exploration backend API service', function() {
     $httpBackend.expect('PUT', '/createhandler/data/0')
       .respond(exploration);
 
-    // Send a request to update exploration
+    // Send a request to update exploration.
     EditableExplorationBackendApiService.updateExploration(
       exploration.exploration_id,
       exploration.version,
@@ -245,7 +245,7 @@ describe('Editable exploration backend API service', function() {
     $httpBackend.expect('PUT', '/createhandler/data/0')
       .respond(exploration);
 
-    // Send a request to update exploration
+    // Send a request to update exploration.
     EditableExplorationBackendApiService.updateExploration(
       exploration.exploration_id,
       exploration.version,

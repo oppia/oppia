@@ -29,7 +29,7 @@
 </div>
 
 <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <div class="conversation-skin-cards-container conversation-skin-animate-cards"
+  <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
@@ -39,6 +39,7 @@
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card displayed-card="displayedCard"
                   is-learn-again-button="isLearnAgainButton()"
+                  avatar-image-is-shown="true"
                   start-card-change-animation="startCardChangeAnimation">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
@@ -121,14 +122,14 @@
                                   exploration-title="exp.title"
                                   node-id="nextNodeId"
                                   parent-exploration-ids="parentExplorationIds"
-                                  last-updated-msec="exp.last_updated_msec"
+                                  last-updated-msec="exp.lastUpdatedMsec"
                                   objective="exp.objective"
                                   category="exp.category"
                                   ratings="exp.ratings"
-                                  thumbnail-icon-url="exp.thumbnail_icon_url"
-                                  thumbnail-bg-color="exp.thumbnail_bg_color"
-                                  num-views="exp.num_views"
-                                  is-community-owned="exp.community_owned"
+                                  thumbnail-icon-url="exp.thumbnailIconUrl"
+                                  thumbnail-bg-color="exp.thumbnailBgColor"
+                                  num-views="exp.numViews"
+                                  is-community-owned="exp.communityOwned"
                                   style="margin-left: 10px;">
         </exploration-summary-tile>
       </div>
@@ -234,8 +235,8 @@ otherwise they will interfere with the iframed conversation skin directive.
     /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
        below should be changed to match. */
     min-width: 360px;
-    width: 42%;
     position: relative;
+    width: 42%;
     z-index: 3;
   }
 
@@ -258,16 +259,16 @@ otherwise they will interfere with the iframed conversation skin directive.
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     flex-shrink: 1;
     margin-left: 12px;
-    width: 650px;
     position: relative;
+    width: 650px;
     z-index: 2;
   }
 
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-learner-answer-content {
     margin-bottom: 12px;
-    padding: 8px 12px;
     overflow: auto;
+    padding: 8px 12px;
     word-wrap: break-word;
   }
 
@@ -307,41 +308,41 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   .conversation-skin-feedback-dot-one {
-    -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.0s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
+    -moz-animation: dot 1.0s infinite;
     animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
     animation-delay: 0.0s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-two {
-    -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.2s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
+    -moz-animation: dot 1.0s infinite;
     animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
     animation-delay: 0.2s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-three {
-    -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.4s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
+    -moz-animation: dot 1.0s infinite;
     animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
     animation-delay: 0.4s;
     opacity: 0;
   }
 
   .conversation-skin-final-ratings {
-    text-align: center;
     background-color: white;
-    width: 38%;
     margin: 0 auto 60px;
     padding: 11px;
+    text-align: center;
+    width: 38%;
   }
   .conversation-skin-final-ratings-header {
     color: #064b46;
@@ -445,9 +446,9 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
 
     .oppia-learner-view-card {
+      margin-left: 0;
       padding-bottom: 0;
       padding-left: 0;
-      margin-left: 0;
     }
 
     .conversation-skin-final-summary {

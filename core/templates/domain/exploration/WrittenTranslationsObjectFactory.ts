@@ -26,7 +26,7 @@ import {
   WrittenTranslationObjectFactory
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
-interface IWrittenTranslationsBackendDict {
+export interface IWrittenTranslationsBackendDict {
   'translations_mapping': {
     [contentId: string]: {
       [langCode: string]: ITranslationBackendDict

@@ -16,8 +16,10 @@
  * @fileoverview Service for initializing Guppy instances.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
 
 const SYMBOLS_TO_REMOVE = [
   'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
@@ -30,14 +32,32 @@ const SYMBOLS_TO_REMOVE = [
 export class GuppyConfigurationService {
   static serviceIsInitialized = false;
 
+  constructor(private deviceInfoService: DeviceInfoService) {}
+
   init(): void {
     if (GuppyConfigurationService.serviceIsInitialized) {
       return;
     }
+
+    if (
+      this.deviceInfoService.isMobileUserAgent() &&
+      this.deviceInfoService.hasTouchEvents()) {
+      // Use on-screen keyboard for mobile.
+      var osk = new GuppyOSK({
+        goto_tab: 'arithmetic',
+        attach: 'focus'
+      });
+      Guppy.use_osk(osk);
+    }
+
     // Remove symbols since they are not supported.
-    for (var symbol of SYMBOLS_TO_REMOVE) {
+    for (let symbol of SYMBOLS_TO_REMOVE) {
       Guppy.remove_global_symbol(symbol);
     }
+    Guppy.configure('buttons', ['controls']);
+    Guppy.configure(
+      'empty_content',
+      '\\color{grey}{\\text{\\small{Type a formula here.}}}');
     GuppyConfigurationService.serviceIsInitialized = true;
   }
 }

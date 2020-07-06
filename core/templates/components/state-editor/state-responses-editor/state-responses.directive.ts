@@ -274,7 +274,7 @@ angular.module('oppia').directive('stateResponses', [
 
           $scope.isLinearWithNoFeedback = function(outcome) {
             // Returns false if current interaction is linear and has no
-            // feedback
+            // feedback.
             if (outcome && typeof outcome === 'object' &&
               outcome.constructor.name === 'Outcome') {
               return $scope.isCurrentInteractionLinear() &&
@@ -288,7 +288,7 @@ angular.module('oppia').directive('stateResponses', [
               return 'Self-loops should not be labelled as correct.';
             }
 
-            // Outcome tooltip depends on whether feedback is displayed
+            // Outcome tooltip depends on whether feedback is displayed.
             if ($scope.isLinearWithNoFeedback(outcome)) {
               return 'Please direct the learner to a different card.';
             } else {
@@ -582,12 +582,17 @@ angular.module('oppia').directive('stateResponses', [
             });
 
             $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-              ResponsesService.updateAnswerChoices(
-                newAnswerChoices, function(newAnswerGroups) {
-                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  $scope.refreshWarnings()();
-                });
+              ResponsesService.updateAnswerChoices(newAnswerChoices);
             });
+            $scope.$on(
+              'handleCustomArgsUpdate',
+              function(evt, newAnswerChoices) {
+                ResponsesService.handleCustomArgsUpdate(
+                  newAnswerChoices, function(newAnswerGroups) {
+                    $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                    $scope.refreshWarnings()();
+                  });
+              });
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
             // the helper. This is a bug in jQueryUI that has not been fixed

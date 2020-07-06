@@ -219,7 +219,7 @@ describe('Collection rights backend API service', function() {
         expect(collectionRightsBackendApiService.isCached('0'))
           .toBe(false);
 
-        // Cache a collection
+        // Cache a collection.
         let sampleCollectionRights =
           collectionRightsObjectFactory.create(sampleDataResults);
         collectionRightsBackendApiService.cacheCollectionRights('0',

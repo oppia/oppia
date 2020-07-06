@@ -53,7 +53,8 @@ angular.module('oppia').directive('explorationFooter', [
                 $scope.$applyAsync();
               });
             $scope.contributorNames = [];
-            if (!ContextService.isInQuestionPlayerMode()) {
+            if (!ContextService.isInQuestionPlayerMode() ||
+                ContextService.getQuestionPlayerIsManuallySet()) {
               ExplorationSummaryBackendApiService
                 .loadPublicAndPrivateExplorationSummaries([
                   $scope.explorationId])

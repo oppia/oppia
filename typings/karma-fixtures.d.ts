@@ -97,6 +97,10 @@ interface IRuleDescription {
 }
 
 interface IRuleTemplates {
+  AlgebraicExpressionInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+  };
   CodeRepl: {
     CodeEquals: IRuleDescription;
     CodeContains: IRuleDescription;
@@ -146,6 +150,10 @@ interface IRuleTemplates {
     Correct: IRuleDescription;
     NotCorrect: IRuleDescription;
     NotCorrectByCategory: IRuleDescription;
+  };
+  MathEquationInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
   };
   MathExpressionInput: {
     IsMathematicallyEquivalentTo: IRuleDescription;

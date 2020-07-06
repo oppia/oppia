@@ -158,7 +158,7 @@ angular.module('oppia').component('learnerDashboardPage', {
               LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
             if (ctrl.startIncompleteCollectionIndex +
               ctrl.PAGE_SIZE <=
-                ctrl.startIncompleteCollectionIndex.length) {
+                ctrl.incompleteCollectionsList.length) {
               ctrl.startIncompleteCollectionIndex += ctrl.PAGE_SIZE;
             }
           }
@@ -174,7 +174,7 @@ angular.module('oppia').component('learnerDashboardPage', {
             subsection === (
               LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
             if (ctrl.startCompletedCollectionIndex +
-              ctrl.PAGE_SIZE <= ctrl.startCompletedCollectionIndex.length) {
+              ctrl.PAGE_SIZE <= ctrl.completedCollectionsList.length) {
               ctrl.startCompletedCollectionIndex += ctrl.PAGE_SIZE;
             }
           }
@@ -191,11 +191,11 @@ angular.module('oppia').component('learnerDashboardPage', {
       };
 
       ctrl.setSubscriptionSortingOptions = function(sortType) {
-        if (sortType === ctrl.currentSubscriptionSortType) {
+        if (sortType === ctrl.currentSubscribersSortType) {
           ctrl.isCurrentSubscriptionSortDescending = (
             !ctrl.isCurrentSubscriptionSortDescending);
         } else {
-          ctrl.currentSubscriptionSortType = sortType;
+          ctrl.currentSubscribersSortType = sortType;
         }
       };
 
@@ -230,10 +230,6 @@ angular.module('oppia').component('learnerDashboardPage', {
           value = (value || 0);
         }
         return value;
-      };
-
-      ctrl.sortFeedbackThreadsFunction = function(feedbackThread) {
-        return feedbackThread[ctrl.currentFeedbackThreadsSortType];
       };
 
       var getPlaylistSortableOptions = function(activityType) {
@@ -289,10 +285,10 @@ angular.module('oppia').component('learnerDashboardPage', {
           if (ctrl.threadSummaries[index].threadId === threadId) {
             threadIndex = index;
             var threadSummary = ctrl.threadSummaries[index];
-            threadSummary.markTheLastTwoMessagesAsRead();
             if (!threadSummary.lastMessageRead) {
               ctrl.numberOfUnreadThreads -= 1;
             }
+            threadSummary.markTheLastTwoMessagesAsRead();
           }
         }
 

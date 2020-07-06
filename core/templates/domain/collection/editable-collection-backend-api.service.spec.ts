@@ -26,7 +26,7 @@ describe('Editable collection backend API service', () => {
   let editableCollectionBackendApiService:
     EditableCollectionBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  // Sample collection object returnable from the backend
+  // Sample collection object returnable from the backend.
   let sampleDataResults = {
     collection: {
       id: '0',
@@ -119,7 +119,7 @@ describe('Editable collection backend API service', () => {
         collection: collection
       };
 
-      // Send a request to update collection
+      // Send a request to update collection.
       editableCollectionBackendApiService.updateCollection(
         collection.id, collection.version, collection.title, []
       ).then(successHandler, failHandler);

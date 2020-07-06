@@ -9,7 +9,7 @@
     </i>
   </div>
   <div class="svg-editor" ng-if="!$ctrl.isDiagramSaved()">
-    <div class="fabric-canvas">
+    <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
       <canvas ng-attr-id="<[$ctrl.canvasID]>"></canvas>
     </div>
     <div class="vertical-toolbar">
@@ -49,11 +49,6 @@
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isEyeDropperEnabled()}"
-                ng-click="$ctrl.copyColor()"
-                tooltip-placement="right" uib-tooltip="Eye Dropper" ng-disabled="!$ctrl.isEyeDropperEnabled()">
-          <i class="fas fa-eye-dropper"></i>
-        </button>
         <div class="vert-bottom-toolbar">
           <div>
             <div class="color-well">
@@ -91,7 +86,18 @@
         </div>
       </div>
     </div>
-    <div class="horizontal-toolbar">
+    <div class="horizontal-toolbar top-toolbar">
+      <div class="info-tag" ng-if="$ctrl.isDrawModePencil()">
+        Click the pencil button to exit free drawing mode.
+      </div>
+      <div class="info-tag" ng-if="$ctrl.isDrawModePolygon() && $ctrl.isTouchDevice">
+        Click the polygon button to complete the diagram.
+      </div>
+      <div class="info-tag" ng-if="$ctrl.isDrawModePolygon() && !$ctrl.isTouchDevice">
+        Double click to complete the polygon.
+      </div>
+    </div>
+    <div class="horizontal-toolbar bottom-toolbar">
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
         <span style="padding-left: 3px;">Italic</span>
@@ -109,12 +115,6 @@
         <select ng-model="$ctrl.fabricjsOptions.size" ng-options="size for size in $ctrl.sizes"
                 ng-change="$ctrl.onSizeChange()">
         </select>
-      </div>
-      <div class="input-tag" ng-if="$ctrl.isDrawModePencil()" style="color: #f00101;">
-        Click the pencil button to exit free drawing mode.
-      </div>
-      <div class="input-tag" ng-if="$ctrl.isDrawModePolygon()" style="color: #f00101;">
-        Double click to complete the polygon.
       </div>
     </div>
   </div>
@@ -140,6 +140,7 @@
 
   .diagram-editor-saved-image-container .edit-icon {
     color: #000000;
+    cursor: pointer;
     position: absolute;
     right: 6px;
     text-shadow: 0px 0px 1px #ffffff;
@@ -158,8 +159,8 @@
 
   .svg-editor,
   .svg-editor * {
-    -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box
   }
 
@@ -168,8 +169,9 @@
     bottom: 31px;
     cursor: default;
     left: 62px;
+    overflow: hidden;
     right: 0;
-    top: 0;
+    top: 31px;
   }
 
   .svg-editor .horizontal-toolbar {
@@ -178,7 +180,14 @@
     height: 31px;
     left: 62px;
     right: 0;
+  }
+
+  .svg-editor .horizontal-toolbar.bottom-toolbar {
     bottom: 0;
+  }
+
+  .svg-editor .horizontal-toolbar.top-toolbar {
+    top: 0;
   }
 
   .svg-editor .horizontal-toolbar .input-tag {
@@ -190,6 +199,19 @@
     padding-left: 3px;
     padding-top: 5px;
     position: relative;
+  }
+
+  .svg-editor .horizontal-toolbar .info-tag {
+    color: #f00101;
+    font-size: 13px;
+    padding-left: 3px;
+    padding-top: 5px;
+  }
+
+  @media only screen and (max-width: 400px) {
+    .svg-editor .horizontal-toolbar .info-tag {
+      font-size: 3vw;
+    }
   }
 
   .svg-editor .vertical-toolbar {
@@ -215,8 +237,8 @@
   }
 
   .svg-editor .vertical-toolbar .icon-tool.disabled {
-    opacity: 0.4;
     filter: alpha(opacity=40);
+    opacity: 0.4;
   }
 
   .svg-editor .vertical-toolbar .thin-button {
@@ -246,17 +268,17 @@
   .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well {
     float: left;
     font-size: 10px;
-    text-align: center;
     padding-bottom: 3px;
+    text-align: center;
     width: 60px
   }
 
   .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well .colorPicker {
+    background-color: #000000;
     border: 1px solid #000000;
     border-radius: 3px;
     height: 28px;
     margin: 0 auto;
     width: 28px;
-    background-color: #000000;
   }
 </style>

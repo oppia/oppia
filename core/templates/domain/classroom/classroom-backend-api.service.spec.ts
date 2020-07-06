@@ -61,7 +61,7 @@ describe('Classroom backend API service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
     topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
 
-    // Sample topic object returnable from the backend
+    // Sample topic object returnable from the backend.
     sampleDataResultsObjects = {
       topic_summary_objects: [
         topicSummaryObjectFactory.createFromBackendDict(
