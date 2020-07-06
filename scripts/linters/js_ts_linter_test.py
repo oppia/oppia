@@ -621,8 +621,6 @@ class JsTsLintTests(test_utils.GenericTestBase):
         self.assert_same_list_elements([
             'The class UnlistedService hasn\'t been added to ANGULAR_SERVICES '
             'in  oppia-root.directive.ts. in ',
-        ], self.linter_stdout)
-        self.assert_same_list_elements([
             './core/templates/base-components/oppia-root.directive.ts',
         ], self.linter_stdout)
         self.assert_same_list_elements([

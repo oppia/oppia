@@ -1105,7 +1105,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     get_injectable_class_name(file_content))
                 if class_name in injectables_to_ignore:
                     continue
-                import_statement = 'import { ' + class_name
+                import_statement = 'import { %s' % class_name
                 if not import_statement in oppia_angular_root:
                     summary_message = (
                         'Please import %s to Oppia Angular Root Component in %s'
@@ -1116,7 +1116,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     total_error_count += 1
 
                 static_declaration = (
-                    'static ' + camel_case_class_name + ': ' + class_name)
+                    'static %s: %s' % (camel_case_class_name, class_name))
                 if not static_declaration in oppia_angular_root:
                     total_error_count += 1
                     summary_message = (
@@ -1130,7 +1130,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     python_utils.PRINT('')
 
                 dependency_injection_statement = (
-                    'private ' + camel_case_class_name + ': ' + class_name)
+                    'private %s: %s' % (camel_case_class_name, class_name))
                 if not dependency_injection_statement in oppia_angular_root:
                     total_error_count += 1
                     summary_message = (
@@ -1144,9 +1144,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     python_utils.PRINT('')
 
                 static_variable_assignment = (
-                    'OppiaAngularRootComponent.' + camel_case_class_name +
-                    ' = ' + 'this.' + camel_case_class_name + ';'
-                )
+                    'OppiaAngularRootComponent.%s = this.%s;' % (
+                        camel_case_class_name, camel_case_class_name))
                 if not static_variable_assignment in oppia_angular_root:
                     total_error_count += 1
                     summary_message = (
@@ -1158,7 +1157,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
-                class_name_in_quotes = '\'' + class_name + '\''
+                class_name_in_quotes = '\'%s\'' % class_name
                 if not class_name_in_quotes in oppia_root_directive:
                     total_error_count += 1
                     summary_message = (
