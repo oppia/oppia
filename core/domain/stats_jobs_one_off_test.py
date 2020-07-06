@@ -173,6 +173,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
 
 class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Unit tests for RegenerateMissingV1StatsModelsOneOffJob."""
+
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob)
     EXP_ID = 'EXP_ID1'
@@ -1406,6 +1407,7 @@ class RecomputeStatisticsValidationCopyOneOffJobTests(OneOffJobTestBase):
 
 class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Tests the regeneration of missing stats models."""
+
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob)
 

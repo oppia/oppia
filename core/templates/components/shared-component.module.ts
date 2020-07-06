@@ -24,16 +24,28 @@ import { CommonModule } from '@angular/common';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SharingLinksComponent } from
+  './common-layout-directives/common-elements/sharing-links.component';
+import { ExplorationEmbedButtonModalComponent } from
+  './button-directives/exploration-embed-button-modal.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SocialButtonsComponent } from
-  './button-directives/social-buttons.component';
+  'components/button-directives/social-buttons.component';
+
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
+    SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SocialButtonsComponent],
-  entryComponents: [BackgroundBannerComponent,
-    SocialButtonsComponent],
-  exports: [BackgroundBannerComponent, TranslatePipe]
+  entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+    // These elements will remain here even after migration.
+    ExplorationEmbedButtonModalComponent, SocialButtonsComponent
+  ],
+  exports: [
+    BackgroundBannerComponent, TranslatePipe,
+    SharingLinksComponent,
+  ],
 })
 
 export class SharedComponentsModule { }

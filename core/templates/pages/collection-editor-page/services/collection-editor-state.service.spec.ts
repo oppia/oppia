@@ -290,10 +290,10 @@ describe('Collection editor state service', function() {
 
   it('should initially return an empty collection', function() {
     var collection = CollectionEditorStateService.getCollection();
-    expect(collection.getId()).toBeUndefined();
-    expect(collection.getTitle()).toBeUndefined();
-    expect(collection.getObjective()).toBeUndefined();
-    expect(collection.getCategory()).toBeUndefined();
+    expect(collection.getId()).toBeNull();
+    expect(collection.getTitle()).toBeNull();
+    expect(collection.getObjective()).toBeNull();
+    expect(collection.getCategory()).toBeNull();
     expect(collection.getCollectionNodes()).toEqual([]);
   });
 

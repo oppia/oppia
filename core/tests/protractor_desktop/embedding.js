@@ -118,6 +118,11 @@ describe('Embedding', function() {
     }];
 
     var playCountingExploration = async function(version) {
+      // Protractor's waitForAngularEnabled does not work well inside
+      // iframes. see: https://github.com/angular/protractor/issues/4678
+      // Current, work-around is to use browser.sleep() before executing
+      // functions that require angular to be present inside the iframe.
+      await browser.sleep(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText((version === 2) ?
@@ -257,6 +262,11 @@ describe('Embedding', function() {
 
         await browser.switchTo().frame(await driver.findElement(
           by.css('.protractor-test-embedded-exploration > iframe')));
+        // Protractor's waitForAngularEnabled does not work well inside
+        // iframes. see: https://github.com/angular/protractor/issues/4678
+        // Current, work-around is to use browser.sleep() before executing
+        // functions that require angular to be present inside the iframe.
+        await browser.sleep(5000);
         await waitFor.pageToFullyLoad();
 
         expect(await (await driver.findElement(

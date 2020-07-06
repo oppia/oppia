@@ -71,7 +71,7 @@ describe('Skills List Directive', function() {
     ctrl.$onInit();
     const skillHeadings = [
       'index', 'description', 'worked_examples_count',
-      'misconception_count', 'status', 'options'];
+      'misconception_count', 'status'];
 
     expect(ctrl.SKILL_HEADINGS).toEqual(skillHeadings);
   });
@@ -125,6 +125,29 @@ describe('Skills List Directive', function() {
       expect($rootScope.$broadcast).toHaveBeenCalledWith(
         'topicsAndSkillsDashboardReinitialized');
     });
+
+  it('should select and show edit options for a skill', function() {
+    const skillId1 = 'uXcdsad3f42';
+    const skillId2 = 'aEdf44DGfre';
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
+
+    ctrl.changeEditOptions(skillId1);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(true);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
+
+    ctrl.changeEditOptions(skillId1);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
+
+    ctrl.changeEditOptions(skillId2);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(true);
+
+    ctrl.changeEditOptions(skillId2);
+    expect(ctrl.showEditOptions(skillId1)).toEqual(false);
+    expect(ctrl.showEditOptions(skillId2)).toEqual(false);
+  });
 
   it('should reinitialize the page after merging the skill',
     function() {
