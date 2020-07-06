@@ -36,7 +36,10 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { CollectionFooterComponent } from
-  './collection-footer/collection-footer.component';
+  'pages/collection-player-page/collection-footer/collection-footer.component';
+import { CollectionNodeListComponent } from
+// eslint-disable-next-line max-len
+  'pages/collection-player-page/collection-node-list/collection-node-list.component';
 
 
 import { AppConstants } from 'app.constants';
@@ -53,11 +56,13 @@ import { ObjectsDomainConstants } from
   ],
   declarations: [
     OppiaAngularRootComponent,
-    CollectionFooterComponent
+    CollectionFooterComponent,
+    CollectionNodeListComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    CollectionFooterComponent
+    CollectionFooterComponent,
+    CollectionNodeListComponent
   ],
   providers: [
     AppConstants,

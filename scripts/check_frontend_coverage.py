@@ -86,7 +86,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-navbar.directive.ts',
     'collection-node-creator.directive.ts',
     'collection-node-editor.directive.ts',
-    'collection-node-list.directive.ts',
+    'collection-node-list.component.ts',
     'collection-node-object.factory.ts',
     'collection-permissions-card.directive.ts',
     'collection-player-page.directive.ts',

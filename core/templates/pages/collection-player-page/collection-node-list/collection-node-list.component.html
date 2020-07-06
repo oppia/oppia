@@ -1,5 +1,5 @@
-<exploration-summary-tile ng-repeat="collectionNode in $ctrl.getCollectionNodes()"
-                          collection-id="$ctrl.getCollectionId()"
+<exploration-summary-tile *ngFor="collectionNode in collectionNodes"
+                          collection-id="collectionId"
                           exploration-id="collectionNode.getExplorationId()"
                           exploration-title="collectionNode.getExplorationSummaryObject().title"
                           last-updated-msec="collectionNode.getExplorationSummaryObject().last_updated_msec"
