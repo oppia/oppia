@@ -5133,7 +5133,8 @@ class PlaythroughModelValidator(BaseModelValidator):
                         and issue_type == item.issue_type):
                     issue_customization_args = issue['issue_customization_args']
                     identifying_arg = (
-                        stats_models.ISSUE_TYPE_KEYNAME_MAPPING[issue_type])
+                        stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+                            issue_type])
                     if (
                             issue_customization_args[identifying_arg] ==
                             item.issue_customization_args[identifying_arg]):
