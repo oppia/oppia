@@ -22,10 +22,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import python_utils
 
 
-class TakeoutExport(python_utils.OBJECT):
+class TakeoutDomain(python_utils.OBJECT):
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(self, user_data, user_images):
+        """Constructs a TakeoutDomain domain object.
+
+        Args:
+            user_data: dict. User's Takeout data stored as a dictionary.
+            user_images: list. List of TakeoutImage objects representing user's
+            images.
+        """
         self.user_data = user_data
         self.user_images = user_images
 
@@ -34,5 +41,29 @@ class TakeoutImage(python_utils.OBJECT):
     """Domain object for storing image data exported as part of Takeout."""
 
     def __init__(self, b64_image_data, image_export_path):
+        """Constructs a TakeoutImage domain object.
+
+        Args:
+            b64_image_data: str. Base64 encoded string representing image.
+            image_export_path: str. Path to write image to in Takeout zip.
+        """
         self.b64_image_data = b64_image_data
         self.image_export_path = image_export_path
+
+class TakeoutImageReplacementInstruction(python_utils.OBJECT):
+    """Domain object for storing the instructions for replacing a user image
+    with a path corresponding to a file in the final zip.
+    """
+
+    def __init__(self, dictionary_path, export_filename, new_key):
+        """Constructs a TakeoutImageReplacementInstruction object.
+
+        Args:
+            dictionary_path: tuple. sequence of keys indicating position in
+            user data dictionary.
+            export_filename: str. the filename of the new file created.
+            new_key: str. the new key name after value replacement.
+        """
+        self.dictionary_path = dictionary_path
+        self.export_filename = export_filename
+        self.new_key = new_key

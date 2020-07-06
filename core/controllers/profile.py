@@ -382,7 +382,7 @@ class ExportAccountHandler(base.BaseHandler):
         temp_file = python_utils.string_io()
         with zipfile.ZipFile(
             temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
-            zfile.writestr('oppia_data.json', json.dumps(user_data))
+            zfile.writestr('oppia_takeout_data.json', json.dumps(user_data))
             for image in user_images:
                 b64_png_no_header = image.b64_image_data.split(',')[1]
                 decoded_png = base64.b64decode(
@@ -391,7 +391,7 @@ class ExportAccountHandler(base.BaseHandler):
 
         # Render file for download.
         self.render_downloadable_file(
-            temp_file.getvalue(), 'oppia_data.zip', 'text/plain')
+            temp_file.getvalue(), 'oppia_takeout_data.zip', 'text/plain')
 
 
 class PendingAccountDeletionPage(base.BaseHandler):

@@ -860,19 +860,23 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 '/export-account-handler', 'text/plain')
 
             # Check downloaded zip file.
-            filename = 'oppia_data.zip'
+            filename = 'oppia_takeout_data.zip'
             self.assertEqual(data.headers['Content-Disposition'],
                              'attachment; filename=%s' % filename)
             zf_saved = zipfile.ZipFile(
                 python_utils.string_io(buffer_value=data.body))
             self.assertEqual(
                 zf_saved.namelist(),
-                ['oppia_data.json', 'images/user_settings_profile_picture.png'])
+                [
+                    'oppia_takeout_data.json',
+                    'images/user_settings_profile_picture.png'
+                ]
+            )
 
             # Load golden zip file.
             golden_zip_filepath = os.path.join(
                 feconf.TESTS_DATA_DIR,
-                'oppia_data.zip')
+                'oppia_takeout_data.zip')
             with python_utils.open_file(
                 golden_zip_filepath, 'rb', encoding=None) as f:
                 golden_zipfile = f.read()
@@ -880,8 +884,8 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 python_utils.string_io(buffer_value=golden_zipfile))
 
             self.assertEqual(
-                zf_saved.open('oppia_data.json').read(),
-                zf_gold.open('oppia_data.json').read()
+                zf_saved.open('oppia_takeout_data.json').read(),
+                zf_gold.open('oppia_takeout_data.json').read()
             )
             self.assertEqual(
                 zf_saved.open(

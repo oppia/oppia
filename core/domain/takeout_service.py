@@ -71,24 +71,33 @@ def export_data_for_user(user_id):
     # as a dictionary mapping tuples to strings. The tuple value indicates the
     # "path" to take to the image in the user's data dictionary, and the string
     # indicates the filename that the exported image will be saved to.
-    image_positions = {
-        ('user_settings_data', 'profile_picture_data_url'):
-            'user_settings_profile_picture.png'
-    }
-    image_files = []
-    for image_position in image_positions:
+    replacement_instructions = [
+        takeout_domain.TakeoutImageReplacementInstruction(
+            ('user_settings_data', 'profile_picture_data_url'),
+            'user_settings_profile_picture.png',
+            'profile_picture_filename'
+        )
+    ]
+    takeout_image_files = []
+    for replacement_instruction in replacement_instructions:
+        dict_pos = replacement_instruction.dictionary_path
+        repl_filename = replacement_instruction.export_filename
+        repl_key = replacement_instruction.new_key
+
         # Move pointer to the position indicated by the tuple.
         pointer = exported_data
-        for key in image_position[:-1]:
+        for key in dict_pos[:-1]:
             pointer = pointer[key]
 
         # Swap out data with replacement filename.
-        image_key = image_position[-1]
+        image_key = dict_pos[-1]
         image_data = pointer[image_key]
-        if pointer[image_key] != None:
-            replacement_filename = image_positions[image_position]
-            image_files.append(
-                takeout_domain.TakeoutImage(image_data, replacement_filename))
-            pointer[image_key] = replacement_filename
+        if image_data is not None:
+            takeout_image_files.append(
+                takeout_domain.TakeoutImage(image_data, repl_filename))
+            pointer[image_key] = repl_filename
+        
+        # Rename the key.
+        pointer[repl_key] = pointer.pop(image_key)
 
-    return takeout_domain.TakeoutExport(exported_data, image_files)
+    return takeout_domain.TakeoutDomain(exported_data, takeout_image_files)
