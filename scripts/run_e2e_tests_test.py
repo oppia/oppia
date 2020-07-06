@@ -729,7 +729,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_google_app_engine_server(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_open(
+                unused_port,
+                wait_time=common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
             return
 
         def mock_ensure_screenshots_dir_is_removed():
@@ -822,7 +824,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_google_app_engine_server(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_open(
+                unused_port,
+                wait_time=common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
             return
 
         def mock_ensure_screenshots_dir_is_removed():
@@ -915,7 +919,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_google_app_engine_server(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_open(
+                unused_port,
+                wait_time=common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
             return
 
         def mock_ensure_screenshots_dir_is_removed():
@@ -967,7 +973,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True,)])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),

@@ -30,7 +30,7 @@
             "uses-responsive-images": ["error", {"minScore": 1}],
             "uses-optimized-images": ["error", {"minScore": 1}],
             "uses-rel-preconnect": ["error", {"minScore": 0.5}],
-            "time-to-first-byte": ["warn", {"minScore": 1}],
+            "time-to-first-byte": ["off", {"minScore": 1}],
             "redirects": ["error", {"minScore": 1}],
             "uses-rel-preload": ["error", {"minScore": 1}],
             "efficient-animated-content": ["error",{"minScore": 1}],
@@ -42,7 +42,7 @@
             "external-anchors-use-rel-noopener": ["error", {"minScore": 1}],
             "geolocation-on-start": ["error", {"minScore": 1}],
             "doctype": ["error", {"minScore": 1}],
-            "no-vulnerable-libraries": ["warn", {"minScore": 1}],
+            "no-vulnerable-libraries": ["off", {"minScore": 1}],
             "js-libraries": ["error", {"minScore": 1}],
             "notification-on-start": ["error", {"minScore": 1}],
             "deprecations": ["error", {"minScore": 1}],
@@ -65,6 +65,7 @@
         {
           "matchingUrlPattern": "http://[^/]+/about$",
           "assertions": {
+            "deprecations": ["off", {"minScore": 1}],
             "offscreen-images": ["error", {"minScore": 0}],
             "render-blocking-resources": ["error", {"minScore": 0}],
             "uses-http2": ["error", {"minScore": 0}]
