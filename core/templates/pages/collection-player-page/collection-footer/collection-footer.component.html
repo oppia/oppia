@@ -11,8 +11,7 @@
       <div class="float-right">
         <ul>
           <li>
-            <!--TODO(orthodoxparadox): Fix translate-->
-            <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
+            <h4 [innerHTML]="'I18N_PLAYER_SHARE_THIS_COLLECTION' | translate" class="oppia-share-collection-footer"></h4>
           </li>
           <li>
             <sharing-links (click)="$event.stopPropagation()"
