@@ -606,23 +606,16 @@ class JsTsLintTests(test_utils.GenericTestBase):
         ], self.linter_stdout)
         self.assert_same_list_elements([
             'Please add a static class member unlistedService to Oppia Angular'
-            ' Root Component in ',
-        ], self.linter_stdout)
-        self.assert_same_list_elements([
-            'static unlistedService: UnlistedService;',
+            ' Root Component in ', 'static unlistedService: UnlistedService;'
         ], self.linter_stdout)
         self.assert_same_list_elements([
             'Please add the class UnlistedService to Oppia Angular Root '
             'Component constructor in ',
-        ], self.linter_stdout)
-        self.assert_same_list_elements([
             'private unlistedService: UnlistedService',
         ], self.linter_stdout)
         self.assert_same_list_elements([
             'The static variable hasn\'t been assigned value in Oppia Angular '
             'Root Component in ',
-        ], self.linter_stdout)
-        self.assert_same_list_elements([
             'OppiaAngularRootComponent.unlistedService = this.unlistedService',
         ], self.linter_stdout)
         self.assert_same_list_elements([

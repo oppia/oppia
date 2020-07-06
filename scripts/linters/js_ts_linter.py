@@ -1121,12 +1121,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     total_error_count += 1
                     summary_message = (
                         'Please add a static class member %s '
-                        'to Oppia Angular Root Component in %s:' % (
-                            camel_case_class_name, oppia_angular_root_path))
-                    summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    summary_message = (
-                        ' static %s: %s;' % (
+                        'to Oppia Angular Root Component in %s:' 
+                        '  static %s: %s;' % (
+                            camel_case_class_name, oppia_angular_root_path,
                             camel_case_class_name, class_name))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
@@ -1138,13 +1135,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     total_error_count += 1
                     summary_message = (
                         'Please add the class %s to Oppia Angular'
-                        ' Root Component constructor in %s:' % (
-                            class_name, oppia_angular_root_path)
-                    )
-                    summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    summary_message = (
+                        ' Root Component constructor in %s:'
                         '  private %s: %s' % (
+                            class_name, oppia_angular_root_path,
                             camel_case_class_name, class_name))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
@@ -1158,13 +1151,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     total_error_count += 1
                     summary_message = (
                         'The static variable hasn\'t been assigned value'
-                        ' in Oppia Angular Root Component in %s:') % (
-                            oppia_angular_root_path)
-                    summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    summary_message = (
+                        ' in Oppia Angular Root Component in %s:'
                         '  OppiaAngularRootComponent.%s = this.%s' % (
-                            camel_case_class_name, camel_case_class_name))
+                            oppia_angular_root_path,camel_case_class_name,
+                            camel_case_class_name))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
@@ -1187,7 +1177,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     total_files_checked, total_error_count))
                 summary_message = (
                     '%sOppiaAngularRootComponent linting failed, fix the'
-                    'errors listed above' % (
+                    ' errors listed above' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
                 summary_messages.append(summary_message)
             else:
