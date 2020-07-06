@@ -2452,65 +2452,92 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
 
-
-        def convert_to_subtitled(
-                obj_type, customization_arg_value, customization_arg_name=None):
-            """
-            """
-            if obj_type == 'SubtitledUnicode':
-                translation_value_key = 'unicode_str'
-            elif obj_type == 'SubtitledHtml':
-                translation_value_key = 'html'
-
-            if not translation_value_key:
-                raise Exception(
-                    'Invalid obj_type passed to convert_to_subtitled: %s' %
-                    obj_type
-                )
-
-            if (
-                isinstance(customization_arg_value, str) or
-                isinstance(customization_arg_value, unicode)
-            ):
-                return {
-                    'content_id': '',
-                    translation_value_key: customization_arg_value
-                }
-            elif isinstance(customization_arg_value, list):
-                return [{
-                    'content_id': '',
-                    translation_value_key: x
-                } for x in customization_arg_value]
-            elif isinstance(customization_arg_value, dict):
-                customization_arg_value[customization_arg_name] = {
-                    'content_id': '',
-                    translation_value_key: customization_arg_value
-                }
-                return customization_arg_value
-
         with python_utils.open_file(
             feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
         ) as interaction_specs_json:
             interaction_specs = json.load(interaction_specs_json)
 
             for state_dict in states_dict.values():
-                state_dict['next_content_id_index'] = 0
+                translations_mapping = state_dict[
+                    'written_translations']['translations_mapping']
+                for content_id in translations_mapping:
+                    for lang_code in translations_mapping[content_id]:
+                        translations_mapping[
+                            content_id][lang_code]['type'] = 'html'
+
+                # Since we cannot use nonlocal in python2, we use a dict to 
+                # let inner function modify the value
+                next_content_id_index = {'value': 0}
+
+                def convert_to_subtitled(
+                        obj_type, cust_arg_value, content_id_prefix,
+                        cust_arg_name=None):
+                    """
+                    """
+
+                    if obj_type == 'SubtitledUnicode':
+                        translation_value_key = 'unicode_str'
+                    elif obj_type == 'SubtitledHtml':
+                        translation_value_key = 'html'
+
+                    
+                    if not translation_value_key:
+                        raise Exception(
+                            'Invalid obj_type passed to convert_to_subtitled: %s' %
+                            obj_type)
+                        
+                    if (
+                        isinstance(cust_arg_value, str) or
+                        isinstance(cust_arg_value, unicode)
+                    ):
+                        return {
+                            'content_id': content_id_prefix,
+                            translation_value_key: cust_arg_value
+                        }
+                    elif isinstance(cust_arg_value, list):
+                        for i in range(len(cust_arg_value)):
+                            content_id = (
+                                content_id_prefix + '_' +
+                                str(next_content_id_index['value'])
+                            )
+                            next_content_id_index['value'] += 1
+
+                            if (isinstance(cust_arg_value, dict) and
+                                    'content_id' in cust_arg_value[i]):
+                                cust_arg_value['content_id'] = content_id_prefix
+                                return cust_arg_value
+
+                            cust_arg_value[i] = {
+                                'content_id': content_id,
+                                translation_value_key:
+                                    cust_arg_value[i]
+                            }
+                        return cust_arg_value
+                    elif isinstance(cust_arg_value, dict):
+                        if 'content_id' in cust_arg_value:
+                            cust_arg_value['content_id'] = content_id_prefix
+                            return cust_arg_value
+
+                        cust_arg_value[cust_arg_name] = {
+                            'content_id': content_id_prefix,
+                            translation_value_key: cust_arg_value
+                        }
+                        return cust_arg_value
 
                 interaction_id = state_dict['interaction']['id']
-                if interaction_id is None:
-                    continue
+                if interaction_id:
+                    customization_arg_specs = interaction_specs[
+                        interaction_id]['customization_arg_specs']
+                    customization_args = state_dict[
+                        'interaction']['customization_args']
+
+                    customization_args_util.convert_translatable_in_cust_args(
+                            customization_args,
+                            customization_arg_specs,
+                            convert_to_subtitled)
+                state_dict['next_content_id_index'] = next_content_id_index[
+                    'value']
                 
-                customization_arg_specs = interaction_specs[
-                    interaction_id]['customization_arg_specs']
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-
-                (customization_args_util
-                    .convert_translatable_in_customization_arguments(
-                        customization_args,
-                        customization_arg_specs,
-                        convert_to_subtitled))
-
         return states_dict
 
 

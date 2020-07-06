@@ -430,7 +430,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: custarg_placeholder
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -445,6 +447,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 0
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:

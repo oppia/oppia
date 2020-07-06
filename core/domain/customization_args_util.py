@@ -124,43 +124,57 @@ def validate_customization_args_and_values(
             # state context parameters?).
             pass
 
-def convert_translatable_in_customization_arguments(
+def convert_translatable_in_cust_args(
         customization_args, customization_arg_specs, conversion_fn):
     """
     """
 
-    def find_translatable(customization_arg, customization_arg_spec):
+    def find_translatable(
+            customization_arg, customization_arg_spec,
+            content_id_prefix='custarg'):
         """
         """
         if 'schema' in customization_arg_spec:
             schema = customization_arg_spec['schema']
         else:
             schema = customization_arg_spec
-
+            
         schema_type = schema['type']
         schema_obj_type = None
         if schema_type == "custom":
             schema_obj_type = schema['obj_type']
 
+        if 'name' in customization_arg_spec:
+            content_id_prefix += '_' + customization_arg_spec['name']
+
         if (
             schema_obj_type == "SubtitledUnicode" or 
             schema_obj_type == "SubtitledHtml"
-        )
+        ):
             customization_arg['value'] = conversion_fn(
                 schema_obj_type,
                 customization_arg['value'],
+                content_id_prefix,
                 customization_arg_spec.get('name', None))
         elif (schema_type == "list"):
             find_translatable(
-                customization_arg, customization_arg_spec['schema']['items'])
+                customization_arg,
+                customization_arg_spec['schema']['items'],
+                content_id_prefix)
         elif (schema_type == "dict"):
             for i in range(len(customization_arg_spec['properties'])):
                 find_translatable(
                     customization_arg,
-                    customization_arg_spec['schema']['properties'][i]['schema'])
+                    customization_arg_spec['schema']['properties'][i],
+                    content_id_prefix)
 
     for customization_arg_spec in customization_arg_specs:
-        if customization_arg_spec['name'] in customization_args:
-            find_translatable(
-                customization_args[customization_arg_spec['name']],
-                customization_arg_spec)
+        customization_arg_spec_name = customization_arg_spec['name']
+        if customization_arg_spec_name not in customization_args:
+            customization_args[customization_arg_spec_name] = {
+                'value': customization_arg_spec['default_value']
+            }
+ 
+        find_translatable(
+            customization_args[customization_arg_spec_name],
+            customization_arg_spec)

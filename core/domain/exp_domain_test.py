@@ -5780,7 +5780,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -5844,7 +5844,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -6339,7 +6339,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -6494,7 +6494,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -6558,7 +6558,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -6668,7 +6668,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -6732,7 +6732,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -6831,7 +6831,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -6899,7 +6899,7 @@ states:
           value: true
         customPlaceholder:
           value:
-            content_id: ''
+            content_id: custarg_customPlaceholder
             unicode_str: ''
         placeholder:
           value: ''
@@ -7020,7 +7020,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -7626,7 +7626,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -7704,9 +7704,9 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ''
+          - content_id: custarg_choices_0
             html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - content_id: ''
+          - content_id: custarg_choices_1
             html: <p>This is value2 for <br>MultipleChoice</p>
         showChoicesInShuffledOrder:
           value: false
@@ -7785,11 +7785,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ''
+          - content_id: custarg_choices_0
             html: <p>This is value1 for ItemSelection</p>
-          - content_id: ''
+          - content_id: custarg_choices_1
             html: <p>This is value2 for ItemSelection</p>
-          - content_id: ''
+          - content_id: custarg_choices_2
             html: <p>This is value3 for ItemSelection</p>
         maxAllowableSelectionCount:
           value: 1
@@ -7979,7 +7979,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -8043,7 +8043,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1

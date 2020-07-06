@@ -755,46 +755,62 @@ class InteractionInstance(python_utils.OBJECT):
 
         return html_list
 
+    @staticmethod
     def convert_html_in_interaction(
-            self, interaction_dict, states_schema_version, conversion_fn):
+            interaction_dict, states_schema_version, conversion_fn):
         with python_utils.open_file(
             feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
         ) as interaction_specs_json:
             interaction_specs = json.load(interaction_specs_json)
 
             customization_arg_specs = interaction_specs[
-                interaction_id]['customization_arg_specs']
+                interaction_dict['id']]['customization_arg_specs']
             customization_args = interaction_dict['customization_args']
 
             def convert_cust_args(
-                obj_type, customization_arg_value,
-                customization_arg_name=None
+                    obj_type, cust_arg_value, _, cust_arg_name=None
             ):
                 if obj_type == 'SubtitledUnicode':
-                    return customization_arg_value
+                    return cust_arg_value
 
-                if (
-                    isinstance(customization_arg_value, str) or
-                    isinstance(customization_arg_value, unicode)
-                ):
-                    
-                    return customization_arg_value[]
-                elif isinstance(customization_arg_value, list):
-                    return [{
-                        'content_id': '',
-                        translation_value_key: x
-                    } for x in customization_arg_value]
-                elif isinstance(customization_arg_value, dict):
-                    customization_arg_value[customization_arg_name] = {
-                        'content_id': '',
-                        translation_value_key: customization_arg_value
-                    }
-                    return customization_arg_value
+                if states_schema_version < 40:
+                    if (
+                        isinstance(cust_arg_value, str) or
+                        isinstance(cust_arg_value, unicode)
+                    ):
+                        return conversion_fn(cust_arg_value)
+                    elif isinstance(cust_arg_value, list):
+                        return [
+                            conversion_fn(x) for x in cust_arg_value
+                        ]
+                    elif isinstance(cust_arg_value, dict):
+                        cust_arg_value[cust_arg_name] = (
+                            conversion_fn(
+                                cust_arg_value[cust_arg_name]
+                            ))
+                        return cust_arg_value
+                else:
+                    if cust_arg_name:
+                        cust_arg_value[cust_arg_name]['html'] = (
+                            conversion_fn(
+                                cust_arg_value[cust_arg_name]['html'])
+                        )
+                        return cust_arg_value
+                    elif isinstance(cust_arg_value, list):
+                        for i in range(len(cust_arg_value)):
+                            cust_arg_value[i]['html'] = (
+                                conversion_fn(cust_arg_value[i]['html']))
+                        return cust_arg_value
+                    else:
+                        cust_arg_value['html'] = (
+                                conversion_fn(cust_arg_value['html']))
 
-            customization_args_util.convert_translatable_in_customization_arguments(
-                customization_args,
-                customization_arg_specs,
-                convert_cust_args)
+            customization_args_util.convert_translatable_in_cust_args(
+                    customization_args,
+                    customization_arg_specs,
+                    convert_cust_args)
+
+        return interaction_dict
 
 class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
@@ -2599,22 +2615,6 @@ class State(python_utils.OBJECT):
                     state_dict['interaction'], states_schema_version,
                     conversion_fn
                 ))
-
-        # if states_schema_version < 40:
-        #     interaction_customization_arg_has_html = False
-        #     for customization_arg_spec in interaction.customization_arg_specs:
-        #         schema = customization_arg_spec.schema
-        #         if schema['type'] == 'list' and schema['items']['type'] == 'html':
-        #             interaction_customization_arg_has_html = True
-
-        #     if interaction_customization_arg_has_html:
-        #         if 'choices' in (
-        #                 state_dict['interaction']['customization_args'].keys()):
-        #             for value_index, value in enumerate(
-        #                     state_dict['interaction']['customization_args'][
-        #                         'choices']['value']):
-        #                 state_dict['interaction']['customization_args']['choices'][
-        #                     'value'][value_index] = conversion_fn(value)
 
         return state_dict
 
