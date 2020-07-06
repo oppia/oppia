@@ -1072,11 +1072,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             class_name = file_content.split(
                 '@Injectable({')[1].split(
                     'export class ')[1].split('{')[0].replace(' ', '')
-            if 'extends' in class_name: 
+            if 'extends' in class_name:
                 class_name = class_name.split('extends')[0]
-            if 'implements' in class_name: 
+            if 'implements' in class_name:
                 class_name = class_name.split('implements')[0]
-            if '<' in class_name: class_name = class_name.split('<')[0]
+            if '<' in class_name:
+                class_name = class_name.split('<')[0]
             camel_case_class_name = class_name[0].lower() + class_name[1:]
             return class_name, camel_case_class_name
 
