@@ -45,7 +45,7 @@
             "no-vulnerable-libraries": ["off", {"minScore": 1}],
             "js-libraries": ["error", {"minScore": 1}],
             "notification-on-start": ["error", {"minScore": 1}],
-            "deprecations": ["error", {"minScore": 1}],
+            "deprecations": ["off", {"minScore": 1}],
             "password-inputs-can-be-pasted-into": ["error", {"minScore": 1}],
             "image-aspect-ratio": ["error", {"minScore": 1}],
             "unminified-css": ["error", {"minScore": 1}],
@@ -65,7 +65,6 @@
         {
           "matchingUrlPattern": "http://[^/]+/about$",
           "assertions": {
-            "deprecations": ["off", {"minScore": 1}],
             "offscreen-images": ["error", {"minScore": 0}],
             "render-blocking-resources": ["error", {"minScore": 0}],
             "uses-http2": ["error", {"minScore": 0}]
