@@ -4,21 +4,13 @@ window.MathJax = {
   // @ts-ignore
   skipStartupTypeset: true,
   messageStyle: 'none',
-  jax: ['input/TeX', 'output/SVG'],
-  extensions: ['tex2jax.js', 'MathMenu.js', 'MathZoom.js'],
-  showMathMenu: false,
-  showProcessingMessages: false,
-  SVG: {
-    useGlobalCache: false,
+  'HTML-CSS': {
+    imageFont: null,
     linebreaks: {
       automatic: true,
       width: '500px'
     },
     scale: 91,
-    showMathMenu: false,
-    useFontCache: false
-  },
-  TeX: {
-    extensions: ['AMSmath.js', 'AMSsymbols.js', 'autoload-all.js']
+    showMathMenu: false
   }
 };
