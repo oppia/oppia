@@ -8,7 +8,7 @@
       <!-- TODO(orthodoxparadox): Fix translate-->
       <span translate="I18N_TOPIC_VIEWER_SELECT_SKILLS"></span>
     </span>
-    <md-checkbox *ngFor="subtopic in availableSubtopics" ng-model="selectedSubtopicIndices[$index]">
+    <md-checkbox *ngFor="let subtopic of availableSubtopics" ng-model="selectedSubtopicIndices[$index]">
       {{ subtopic.getTitle() }}
     </md-checkbox>
     <md-button ng-disabled="isStartButtonDisabled()"
