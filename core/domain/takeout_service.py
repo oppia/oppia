@@ -96,7 +96,7 @@ def export_data_for_user(user_id):
             takeout_image_files.append(
                 takeout_domain.TakeoutImage(image_data, repl_filename))
             pointer[image_key] = repl_filename
-        
+
         # Rename the key.
         pointer[repl_key] = pointer.pop(image_key)
 

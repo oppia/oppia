@@ -31,7 +31,7 @@ class TakeoutDomain(python_utils.OBJECT):
         Args:
             user_data: dict. User's Takeout data stored as a dictionary.
             user_images: list. List of TakeoutImage objects representing user's
-            images.
+                images.
         """
         self.user_data = user_data
         self.user_images = user_images
@@ -50,6 +50,7 @@ class TakeoutImage(python_utils.OBJECT):
         self.b64_image_data = b64_image_data
         self.image_export_path = image_export_path
 
+
 class TakeoutImageReplacementInstruction(python_utils.OBJECT):
     """Domain object for storing the instructions for replacing a user image
     with a path corresponding to a file in the final zip.
@@ -60,7 +61,7 @@ class TakeoutImageReplacementInstruction(python_utils.OBJECT):
 
         Args:
             dictionary_path: tuple. sequence of keys indicating position in
-            user data dictionary.
+                user data dictionary.
             export_filename: str. the filename of the new file created.
             new_key: str. the new key name after value replacement.
         """
