@@ -1087,28 +1087,15 @@ def update_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def mark_user_for_deletion(
-        user_id, exploration_ids, collection_ids):
-    """Set deleted of the user with given user_id to True and create
-    PendingDeletionRequestModel for that user.
+def mark_user_for_deletion(user_id):
+    """Set deleted of the user with given user_id to True.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
-        exploration_ids: list(str). List of exploration ids that were soft
-            deleted and should be hard deleted later.
-        collection_ids: list(str). List of collection ids that were soft
-            deleted and should be hard deleted later.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-
-    user_models.PendingDeletionRequestModel(
-        id=user_id,
-        email=user_settings.email,
-        exploration_ids=exploration_ids,
-        collection_ids=collection_ids,
-    ).put()
 
 
 def get_human_readable_user_ids(user_ids):

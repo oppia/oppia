@@ -44,6 +44,7 @@ class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page
@@ -87,6 +88,7 @@ class StoryProgressHandler(base.BaseHandler):
     """Marks a story node as completed after completing and returns exp ID of
     next chapter (if applicable).
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page

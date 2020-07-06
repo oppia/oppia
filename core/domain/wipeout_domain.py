@@ -12,24 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for wipeout."""
+"""Domain objects for Wipeout."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import collection_services
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import user_services
 from core.platform import models
 import python_utils
 
-current_user_services = models.Registry.import_current_user_services()
-(base_models, story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.story, models.NAMES.user])
-transaction_services = models.Registry.import_transaction_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
-MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
 class PendingDeletionRequest(python_utils.OBJECT):
     """Domain object for a PendingDeletionRequest."""
@@ -56,64 +48,16 @@ class PendingDeletionRequest(python_utils.OBJECT):
 
     @classmethod
     def create_default(cls, user_id, email, exploration_ids, collection_ids):
-        """Creates a Subtopic object with default values.
+        """Creates a PendingDeletionRequest object with default values.
 
         Args:
-            email: str.
+            user_id: str. The ID of the user who is being deleted.
+            email: str. The email of the user who is being deleted.
             exploration_ids: list(str).
             collection_ids: list(str).
 
         Returns:
-            PendingDeletionRequest. A pending deletion request given email, title and empty skill ids
-            list.
+            PendingDeletionRequest. The default pending deletion request
+            domain object.
         """
         return cls(user_id, email, False, exploration_ids, collection_ids, None)
-
-    def validate(self):
-        """Validates various properties of the Subtopic object.
-
-        Raises:
-            ValidationError: One or more attributes of the subtopic are
-                invalid.
-        """
-        self.require_valid_thumbnail_filename(self.thumbnail_filename)
-        if self.thumbnail_bg_color is not None and not (
-                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
-            raise utils.ValidationError(
-                'Subtopic thumbnail background color %s is not supported.' % (
-                    self.thumbnail_bg_color))
-        if self.thumbnail_bg_color and self.thumbnail_filename is None:
-            raise utils.ValidationError(
-                'Subtopic thumbnail image is not provided.')
-        if self.thumbnail_filename and self.thumbnail_bg_color is None:
-            raise utils.ValidationError(
-                'Subtopic thumbnail background color is not specified.')
-        if not isinstance(self.id, int):
-            raise utils.ValidationError(
-                'Expected subtopic id to be an int, received %s' % self.id)
-
-        if not isinstance(self.title, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected subtopic title to be a string, received %s' %
-                self.title)
-
-        title_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_TITLE
-        if len(self.title) > title_limit:
-            raise utils.ValidationError(
-                'Expected subtopic title to be less than %d characters, '
-                'received %s' % (title_limit, self.title))
-
-        if not isinstance(self.skill_ids, list):
-            raise utils.ValidationError(
-                'Expected skill ids to be a list, received %s' %
-                self.skill_ids)
-
-        for skill_id in self.skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each skill id to be a string, received %s' %
-                    skill_id)
-
-        if len(self.skill_ids) > len(set(self.skill_ids)):
-            raise utils.ValidationError(
-                'Expected all skill ids to be distinct.')

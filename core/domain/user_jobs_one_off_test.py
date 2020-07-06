@@ -48,6 +48,7 @@ search_services = models.Registry.import_search_services()
 
 class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -197,6 +198,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'ab@example.com'
@@ -312,6 +314,7 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
 class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off long userbio length job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_A_BIO = 'I am less than 500'
@@ -408,6 +411,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     COLLECTION_ID_1 = 'col_id_1'
@@ -807,6 +811,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager

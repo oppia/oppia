@@ -133,21 +133,21 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn(['NOT DELETED', [self.user_1_id]], output)
 
     def test_deleted_success(self):
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        wipeout_service.delete_user(pending_deletion_model)
-        pending_deletion_model.deletion_complete = True
-        pending_deletion_model.put()
+        pending_deletion_request = (
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        wipeout_service.delete_user(pending_deletion_request)
+        pending_deletion_request.deletion_complete = True
+        wipeout_service.save_pending_deletion_request(pending_deletion_request)
 
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
 
     def test_deleted_failure(self):
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        wipeout_service.delete_user(pending_deletion_model)
-        pending_deletion_model.deletion_complete = True
-        pending_deletion_model.put()
+        pending_deletion_request = (
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        wipeout_service.delete_user(pending_deletion_request)
+        pending_deletion_request.deletion_complete = True
+        wipeout_service.save_pending_deletion_request(pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]

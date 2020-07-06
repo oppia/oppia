@@ -21,6 +21,7 @@ from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import user_services
+from core.domain import wipeout_domain
 from core.platform import models
 import python_utils
 
@@ -30,6 +31,68 @@ current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
+
+
+def get_pending_deletion_request(user_id):
+    """Return the pending deletion request.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        PendingDeletionRequest. The pending deletion request domain object.
+    """
+    pending_deletion_request_model = (
+        user_models.PendingDeletionRequestModel.get_by_id(user_id))
+    return wipeout_domain.PendingDeletionRequest(
+        pending_deletion_request_model.id,
+        pending_deletion_request_model.email,
+        pending_deletion_request_model.deletion_complete,
+        pending_deletion_request_model.exploration_ids,
+        pending_deletion_request_model.collection_ids,
+        pending_deletion_request_model.story_mappings
+    )
+
+
+def save_pending_deletion_request(pending_deletion_request):
+    """Save a pending deletion request domain object as
+    a PendingDeletionRequestModel entity in the datastore.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+    """
+    pending_deletion_request_dict = {
+        'email': pending_deletion_request.email,
+        'deletion_complete': pending_deletion_request.deletion_complete,
+        'exploration_ids': pending_deletion_request.exploration_ids,
+        'collection_ids': pending_deletion_request.collection_ids,
+        'story_mappings': pending_deletion_request.story_mappings
+    }
+
+    pending_deletion_request_model = (
+        user_models.PendingDeletionRequestModel.get_by_id(
+            pending_deletion_request.user_id))
+    if pending_deletion_request_model is not None:
+        pending_deletion_request_model.populate(**pending_deletion_request_dict)
+        pending_deletion_request_model.put()
+    else:
+        pending_deletion_request_dict['id'] = pending_deletion_request.user_id
+        user_models.PendingDeletionRequestModel(
+            **pending_deletion_request_dict
+        ).put()
+
+
+def delete_pending_deletion_request(user_id):
+    """Delete PendingDeletionRequestModel entity in the datastore.
+
+    Args:
+        user_id: str. The unique ID of the user that
+            the PendingDeletionRequestModel belongs to.
+    """
+    pending_deletion_request_model = (
+        user_models.PendingDeletionRequestModel.get_by_id(user_id))
+    pending_deletion_request_model.delete()
 
 
 def pre_delete_user(user_id):
@@ -64,38 +127,44 @@ def pre_delete_user(user_id):
     # ordinary emails that could be sent to the users.
     user_services.update_email_preferences(user_id, False, False, False, False)
 
-    user_services.mark_user_for_deletion(
-        user_id,
-        explorations_to_be_deleted_ids,
-        collections_to_be_deleted_ids,
+    email = user_services.get_user_settings(user_id, strict=True).email
+    user_services.mark_user_for_deletion(user_id)
+
+    save_pending_deletion_request(
+        wipeout_domain.PendingDeletionRequest.create_default(
+            user_id,
+            email,
+            explorations_to_be_deleted_ids,
+            collections_to_be_deleted_ids
+        )
     )
 
 
-def delete_user(pending_deletion_model):
-    """Delete all the models for user specified in pending_deletion_model.
+def delete_user(pending_deletion):
+    """Delete all the models for user specified in pending_deletion.
 
     Args:
-        pending_deletion_model: PendingDeletionRequestModel.
+        pending_deletion: PendingDeletionRequest.
     """
-    _delete_user_models(pending_deletion_model.id)
-    _hard_delete_explorations_and_collections(pending_deletion_model)
-    _delete_story_models(pending_deletion_model)
+    _delete_user_models(pending_deletion.user_id)
+    _hard_delete_explorations_and_collections(pending_deletion)
+    _delete_story_models(pending_deletion)
 
 
-def verify_user_deleted(pending_deletion_model):
-    """Verify that all the models for user specified in pending_deletion_model
+def verify_user_deleted(pending_deletion_request):
+    """Verify that all the models for user specified in pending_deletion
     are deleted.
 
     Args:
-        pending_deletion_model: PendingDeletionRequestModel.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
 
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    user_id = pending_deletion_model.id
     return all((
-        _verify_user_models_deleted(user_id),
-        _verify_story_models_pseudonymized(user_id)
+        _verify_user_models_deleted(pending_deletion_request.user_id),
+        _verify_story_models_pseudonymized(pending_deletion_request.user_id)
     ))
 
 
@@ -113,20 +182,20 @@ def _delete_user_models(user_id):
             model_class.apply_deletion_policy(user_id)
 
 
-def _hard_delete_explorations_and_collections(pending_deletion_model):
+def _hard_delete_explorations_and_collections(pending_deletion):
     """Hard delete the exploration and collection models that are private and
     solely owned by the user.
 
     Args:
-        pending_deletion_model: PendingDeletionRequestModel.
+        pending_deletion: PendingDeletionRequest.
     """
     exp_services.delete_explorations(
-        pending_deletion_model.id,
-        pending_deletion_model.exploration_ids,
+        pending_deletion.user_id,
+        pending_deletion.exploration_ids,
         force_deletion=True)
     collection_services.delete_collections(
-        pending_deletion_model.id,
-        pending_deletion_model.collection_ids,
+        pending_deletion.user_id,
+        pending_deletion.collection_ids,
         force_deletion=True)
 
 
@@ -148,13 +217,14 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     }
 
 
-def _delete_story_models(pending_deletion_model):
+def _delete_story_models(pending_deletion_request):
     """Pseudonymize the story models for the user with user_id.
 
     Args:
-        pending_deletion_model: PendingDeletionRequestModel.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
     """
-    user_id = pending_deletion_model.id
+    user_id = pending_deletion_request.user_id
     metadata_models = story_models.StorySnapshotMetadataModel.query(
         story_models.StorySnapshotMetadataModel.committer_id == user_id
     ).fetch()
@@ -165,10 +235,10 @@ def _delete_story_models(pending_deletion_model):
     ).fetch()
     story_ids = story_ids | set(model.story_id for model in commit_log_models)
 
-    if not pending_deletion_model.story_mappings:
-        pending_deletion_model.story_mappings = (
+    if not pending_deletion_request.story_mappings:
+        pending_deletion_request.story_mappings = (
             _generate_activity_to_pseudonymized_ids_mapping(story_ids))
-        pending_deletion_model.put()
+        save_pending_deletion_request(pending_deletion_request)
 
     def _pseudonymize_models(story_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
@@ -184,18 +254,16 @@ def _delete_story_models(pending_deletion_model):
             if isinstance(model, story_models.StorySnapshotMetadataModel)]
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_user_id
-        story_models.StorySnapshotMetadataModel.put_multi(
-            metadata_models, update_last_updated_time=False)
+        story_models.StorySnapshotMetadataModel.put_multi(metadata_models)
 
         commit_log_models = [
             model for model in story_related_models
             if isinstance(model, story_models.StoryCommitLogEntryModel)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_user_id
-        story_models.StoryCommitLogEntryModel.put_multi(
-            commit_log_models, update_last_updated_time=False)
+        story_models.StoryCommitLogEntryModel.put_multi(commit_log_models)
 
-    story_mappings = pending_deletion_model.story_mappings
+    story_mappings = pending_deletion_request.story_mappings
     for story_id, pseudonymized_user_id in story_mappings.items():
         story_related_models = [
             model for model in metadata_models

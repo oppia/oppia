@@ -96,6 +96,14 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+/* The following classes' styles are overriden by Guppy's OSK stylesheet and
+they end up rotating the tooltips which are placed on the left or right. This is
+why they need to be overriden.  */
+.left, .right {
+  -webkit-transform: none !important;
+  transform: none !important;
+}
+
 .md-button {
   font-size: 16px;
   line-height: 22px;
@@ -4546,4 +4554,50 @@ div.oppia-issues-learner-action {
 
 .oppia-rule-preview {
   word-wrap: break-word;
+}
+
+.fx-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.fx-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.fx-main-start {
+  justify-content: start;
+}
+
+.fx-main-center {
+  justify-content: center;
+}
+
+.fx-main-end {
+  justify-content: end;
+}
+
+.fx-main-space-evenly {
+  justify-content: space-evenly;
+}
+
+.fx-main-space-around {
+  justify-content: space-around;
+}
+
+.fx-main-pace-between {
+  justify-content: space-between;
+}
+
+.fx-cross-start {
+  align-items: start;
+}
+
+.fx-cross-center {
+  align-items: center;
+}
+
+.fx-cross-end {
+  align-items: end;
 }

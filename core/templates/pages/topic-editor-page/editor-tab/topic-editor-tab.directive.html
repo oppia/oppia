@@ -6,62 +6,71 @@
       </a>
       <span><[editableName]></span>
     </p>
-    <md-card class="item-list-card oppia-long-text">
-      <label class="form-heading">Topic Thumbnail</label>
-      <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                          filename="topic.getThumbnailFilename()"
-                          update-filename="updateTopicThumbnailFilename"
-                          bg-color="topic.getThumbnailBgColor()"
-                          update-bg-color="updateTopicThumbnailBgColor"
-                          allowed-bg-colors="allowedBgColors"
-                          aspect-ratio="'4:3'"
-                          preview-title="editableName"
-                          preview-description=""
-                          preview-description-bg-color="'#2F6687'"
-                          preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
-      </thumbnail-uploader>
-
-      <div class="topic-name">
-        <label for="topicName" class="form-heading protractor-test-topic-name-heading">Topic Name</label>
-        <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
-               ng-disabled="!topicRights.canEditTopic()"
-               ng-model="editableName" ng-blur="updateTopicName(editableName)"
-               placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
-        <span class="oppia-input-box-subtitle">
-          <i>
-            Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
-          </i>
-        </span>
-      </div>
-
-      <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
-        <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
-        <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
-                  ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
-                  ng-change="updateTopicDescriptionStatus(editableDescription)"
-                  ng-blur="updateTopicDescription(editableDescription)"
-                  placeholder="Enter the description of the topic">
-        </textarea>
-        <span class="oppia-input-box-subtitle">
-          <i>
-            Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
-          </i>
-        </span>
-        <div class="topic-preview-container">
-          <button class="btn btn-secondary" ng-click="togglePreview()">Show/Hide Preview</button>
-          <div ng-if="topic.getId() && topicPreviewCardIsShown">
-            <preview-thumbnail name="editableName"
-                               description="editableDescription"
-                               preview-footer="getPreviewFooter()"
-                               filename = "topic.getThumbnailFilename()"
-                               thumbnail-bg-color="topic.getThumbnailBgColor()"
-                               bg-color="'#2F6687'">
-            </preview-thumbnail>
-          </div>
+    <md-card class="oppia-long-text">
+      <div class="topic-editor-main-container">
+        <label class="form-heading">Topic Thumbnail</label>
+        <thumbnail-uploader disabled="!topicRights.canEditTopic()"
+                            filename="topic.getThumbnailFilename()"
+                            update-filename="updateTopicThumbnailFilename"
+                            bg-color="topic.getThumbnailBgColor()"
+                            update-bg-color="updateTopicThumbnailBgColor"
+                            allowed-bg-colors="allowedBgColors"
+                            aspect-ratio="'4:3'"
+                            preview-title="editableName"
+                            preview-description=""
+                            preview-description-bg-color="'#2F6687'"
+                            preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
+        </thumbnail-uploader>
+        <div class="topic-name">
+          <label for="topicName" class="form-heading protractor-test-topic-name-heading">Topic Name</label>
+          <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
+                 ng-disabled="!topicRights.canEditTopic()"
+                 ng-model="editableName" ng-blur="updateTopicName(editableName)"
+                 placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
+          <span class="oppia-input-box-subtitle">
+            <i>
+              Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+            </i>
+          </span>
         </div>
-        <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text" style="font-size: smaller">
-        What does this topic contain?
-        </span>
+        <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+          <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
+          <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
+                    ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                    ng-change="updateTopicDescriptionStatus(editableDescription)"
+                    ng-blur="updateTopicDescription(editableDescription)"
+                    placeholder="Enter the description of the topic">
+          </textarea>
+          <span class="oppia-input-box-subtitle">
+            <i>
+              Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+            </i>
+          </span>
+          <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
+            What does this topic contain?
+          </span>
+        </div>
+      </div>
+      <div ng-if="!topicPreviewCardIsShown" >
+        <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
+          Preview Topic Card
+          <i class="fa fa-angle-down"></i>
+        </button>
+      </div>
+      <div ng-if="topicPreviewCardIsShown">
+        <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
+          Collapse Topic Card
+          <i class="fa fa-angle-up"></i>
+        </button>
+      </div>
+      <div ng-if="topic.getId() && topicPreviewCardIsShown">
+        <preview-thumbnail name="editableName"
+                           description="editableDescription"
+                           preview-footer="getPreviewFooter()"
+                           filename = "topic.getThumbnailFilename()"
+                           thumbnail-bg-color="topic.getThumbnailBgColor()"
+                           bg-color="'#2F6687'">
+        </preview-thumbnail>
       </div>
     </md-card>
     <md-card class="item-list-card">
@@ -265,6 +274,19 @@
     display: block;
     font-size: 26px;
     height: 40px;
+  }
+
+  .topic-editor .topic-editor-main-container {
+    font-family: Roboto, Arial, sans-serif;
+    padding: 30px 55px 30px 45px;
+  }
+
+  .topic-editor .show-topic-preview-button {
+    border-top: 1px solid #c1c1c1;
+    color: #419889;
+    font-size: 15px;
+    padding: 10px 0;
+    width: 100%;
   }
 
   .topic-editor .form-heading {

@@ -46,7 +46,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    activity_jobs_one_off.ReplaceAdminIdOneOffJob,
+    activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob,

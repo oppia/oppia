@@ -402,6 +402,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""
+
     USER_ID_A = 'user.id.a'
     USER_ID_B = 'user_id_b'
     THREAD_ID_A = 'exploration.exp_id.thread_id_a'

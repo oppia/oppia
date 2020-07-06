@@ -28,21 +28,25 @@ datastore_services = models.Registry.import_datastore_services()
 
 class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for running the user deletion."""
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [user_models.PendingDeletionRequestModel]
 
     @staticmethod
-    def map(pending_deletion_model):
+    def map(pending_deletion_request_model):
         """Implements the map function for this job."""
-        if pending_deletion_model.deletion_complete:
-            yield ('ALREADY DONE', pending_deletion_model.id)
+        pending_deletion_request = wipeout_service.get_pending_deletion_request(
+            pending_deletion_request_model.id)
+        if pending_deletion_request.deletion_complete:
+            yield ('ALREADY DONE', pending_deletion_request.user_id)
         else:
-            wipeout_service.delete_user(pending_deletion_model)
-            pending_deletion_model.deletion_complete = True
-            pending_deletion_model.put()
-            yield ('SUCCESS', pending_deletion_model.id)
+            wipeout_service.delete_user(pending_deletion_request)
+            pending_deletion_request.deletion_complete = True
+            wipeout_service.save_pending_deletion_request(
+                pending_deletion_request)
+            yield ('SUCCESS', pending_deletion_request.user_id)
 
     @staticmethod
     def reduce(key, values):
@@ -51,28 +55,34 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for verifying the user deletion."""
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [user_models.PendingDeletionRequestModel]
 
     @staticmethod
-    def map(pending_deletion_model):
+    def map(pending_deletion_request_model):
         """Implements the map function for this job."""
         # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
         # for the user. The verification will be done in the next run of
         # VerifyUserDeletionOneOffJob.
-        if not pending_deletion_model.deletion_complete:
-            yield ('NOT DELETED', pending_deletion_model.id)
-        elif wipeout_service.verify_user_deleted(pending_deletion_model):
-            pending_deletion_model.delete()
+        pending_deletion_request = wipeout_service.get_pending_deletion_request(
+            pending_deletion_request_model.id)
+        if not pending_deletion_request.deletion_complete:
+            yield ('NOT DELETED', pending_deletion_request.user_id)
+        elif wipeout_service.verify_user_deleted(pending_deletion_request):
+            wipeout_service.delete_pending_deletion_request(
+                pending_deletion_request.user_id)
             email_manager.send_account_deleted_email(
-                pending_deletion_model.id, pending_deletion_model.email)
-            yield ('SUCCESS', pending_deletion_model.id)
+                pending_deletion_request.user_id,
+                pending_deletion_request.email)
+            yield ('SUCCESS', pending_deletion_request.user_id)
         else:
-            pending_deletion_model.deletion_complete = False
-            pending_deletion_model.put()
-            yield ('FAILURE', pending_deletion_model.id)
+            pending_deletion_request.deletion_complete = False
+            wipeout_service.save_pending_deletion_request(
+                pending_deletion_request)
+            yield ('FAILURE', pending_deletion_request.user_id)
 
     @staticmethod
     def reduce(key, values):

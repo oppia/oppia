@@ -47,6 +47,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -66,6 +67,7 @@ class MockUserStatsMRJobManager(
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
+
     def test_set_and_get_username(self):
         gae_id = 'someUser'
         username = 'username'
@@ -534,28 +536,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gae_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
-        exploration_ids = ['exp_id']
-        collection_ids = ['col_id']
 
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_services.mark_user_for_deletion(
-            user_id, exploration_ids, collection_ids)
+        user_services.mark_user_for_deletion(user_id)
 
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertTrue(user_settings.deleted)
-
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(user_id))
-        self.assertEqual(
-            pending_deletion_model.email, user_settings.email)
-        self.assertFalse(
-            pending_deletion_model.deletion_complete)
-        self.assertEqual(
-            pending_deletion_model.exploration_ids, exploration_ids)
-        self.assertEqual(
-            pending_deletion_model.collection_ids, collection_ids)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -1104,6 +1092,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for testing the time the user last edited an
     exploration updates correctly.
     """
+
     EXP_ID = 'exp'
 
     def setUp(self):
@@ -1174,6 +1163,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for the time the user last created an exploration
     updates correctly.
     """
+
     EXP_ID_A = 'exp_a'
     EXP_ID_B = 'exp_b'
 
