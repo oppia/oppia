@@ -253,9 +253,15 @@ var RichTextEditor = async function(elem) {
       }
       await richTextComponents.getComponent(componentName)
         .customizeComponent.apply(null, args);
-      await modal.element(
-        by.css('.protractor-test-close-rich-text-component-editor')).click();
-
+      var doneButton = modal.element(
+        by.css(
+          '.protractor-test-close-rich-text-component-editor'));
+      await waitFor.elementToBeClickable(
+        doneButton,
+        'save button taking too long to be clickable');
+      await doneButton.click();
+      await waitFor.invisibilityOf(
+        modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
       if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
@@ -523,7 +529,9 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
-      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      if (componentName !== 'Math') {
+        expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      }
 
       // Need to convert arguments to an actual array; we tell the component
       // which element to act on but drop the componentName.
