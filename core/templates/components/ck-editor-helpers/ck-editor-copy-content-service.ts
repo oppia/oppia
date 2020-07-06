@@ -18,10 +18,10 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 interface CkEditorCopyEvent {
   rootElement: HTMLElement;
@@ -32,7 +32,7 @@ interface CkEditorCopyEvent {
   providedIn: 'root'
 })
 export class CkEditorCopyContentService {
-  private copyEventSubject = new Subject();
+  private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
   private ckeditorToSubscription: {[id: string]: Subscription} = {};
 
   copyModeActive = false;
@@ -133,7 +133,7 @@ export class CkEditorCopyContentService {
       return;
     }
 
-    this.copyEventSubject.next(
+    this.copyEventEmitter.emit(
       this._handleCopy(target)
     );
   }
@@ -145,7 +145,7 @@ export class CkEditorCopyContentService {
   bindPasteHandler(
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
   ) {
-    this.ckeditorToSubscription[editor.id] = this.copyEventSubject.subscribe(
+    this.ckeditorToSubscription[editor.id] = this.copyEventEmitter.subscribe(
       ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
         if (editor.status === 'destroyed') {
           this.ckeditorToSubscription[editor.id].unsubscribe();
