@@ -32,16 +32,28 @@ import { LoadingDotsComponent } from
 import { SideNavigationBarComponent } from
   './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SharingLinksComponent } from
+  './common-layout-directives/common-elements/sharing-links.component';
+import { ExplorationEmbedButtonModalComponent } from
+  './button-directives/exploration-embed-button-modal.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
+    SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     AttributionGuideComponent, LazyLoadingComponent, LoadingDotsComponent,
     SideNavigationBarComponent],
-  entryComponents: [BackgroundBannerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SideNavigationBarComponent],
-  exports: [BackgroundBannerComponent, TranslatePipe]
+  entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+    // These elements will remain here even after migration.
+    ExplorationEmbedButtonModalComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SideNavigationBarComponent
+  ],
+  exports: [
+    BackgroundBannerComponent, TranslatePipe,
+    SharingLinksComponent,
+  ],
 })
 
 export class SharedComponentsModule { }

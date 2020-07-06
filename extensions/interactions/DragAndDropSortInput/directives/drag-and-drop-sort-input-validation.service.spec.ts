@@ -31,6 +31,8 @@ import { Rule, RuleObjectFactory } from
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { IDragAndDropSortInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('DragAndDropSortInputValidationService', () => {
   let validatorService: DragAndDropSortInputValidationService;
@@ -42,7 +44,7 @@ describe('DragAndDropSortInputValidationService', () => {
   let equalsListWithEmptyValuesRule: Rule, equalsListWithDuplicatesRule: Rule,
     equalsListWithAllowedValuesRule: Rule, equalsListWithValuesRule: Rule,
     goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule;
-  let customizationArgs: any;
+  let customizationArgs: IDragAndDropSortInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
@@ -164,7 +166,7 @@ describe('DragAndDropSortInputValidationService', () => {
   });
 
   it('should not allow multiple items in same position', () => {
-    customizationArgs.allowMultipleItemsInSamePosition = false;
+    customizationArgs.allowMultipleItemsInSamePosition.value = false;
     var rules = [rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
@@ -184,7 +186,7 @@ describe('DragAndDropSortInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Multiple items in a single position are not allowed.'
     }]);
-    customizationArgs.allowMultipleItemsInSamePosition = true;
+    customizationArgs.allowMultipleItemsInSamePosition.value = true;
   });
 
   it('should expect all items to be nonempty', () => {
@@ -277,7 +279,7 @@ describe('DragAndDropSortInputValidationService', () => {
     'multiple choices in the same position are note allowed',
     () => {
       answerGroups[0].rules = [equalsListWithValuesRule];
-      customizationArgs.allowMultipleItemsInSamePosition = false;
+      customizationArgs.allowMultipleItemsInSamePosition.value = false;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -286,6 +288,6 @@ describe('DragAndDropSortInputValidationService', () => {
           'there will be at least 2 elements at incorrect positions if ' +
           'multiple elements cannot occupy the same position.'
       }]);
-      customizationArgs.allowMultipleItemsInSamePosition = true;
+      customizationArgs.allowMultipleItemsInSamePosition.value = true;
     });
 });
