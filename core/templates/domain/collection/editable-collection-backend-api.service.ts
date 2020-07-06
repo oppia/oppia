@@ -20,8 +20,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
-
 import { Collection, CollectionBackendDict, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionEditorPageConstants } from
@@ -97,9 +95,8 @@ export class EditableCollectionBackendApiService {
 
     this.http.get<EditableCollectionBackendResponse>(
       collectionDataUrl).toPromise().then(response => {
-      var collection = cloneDeep(response.collection);
       var collectionObject = this.collectionObjectFactory.create(
-        collection);
+        response.collection);
       if (successCallback) {
         successCallback(collectionObject);
       }
@@ -128,8 +125,8 @@ export class EditableCollectionBackendApiService {
     this.http.put<EditableCollectionBackendResponse>(
       editableCollectionDataUrl, putData).toPromise().then(response => {
       // The returned data is an updated collection dict.
-      var collection = cloneDeep(response.collection);
-      var collectionObject = this.collectionObjectFactory.create(collection);
+      var collectionObject = this.collectionObjectFactory.create(
+        response.collection);
 
       // Update the ReadOnlyCollectionBackendApiService's cache with the new
       // collection.

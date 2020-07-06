@@ -122,12 +122,12 @@ export class CreatorDashboardBackendApiService {
     var numberOfSuggestions = feedbackDicts.length;
     var suggestionThreads: SuggestionThread[] = [];
 
-    for (var i = 0; i < numberOfSuggestions; i++) {
-      if (suggestionDicts.length !== numberOfSuggestions) {
-        this.loggerService.error(
-          'Number of suggestions does not match number of suggestion threads');
-      }
+    if (suggestionDicts.length !== numberOfSuggestions) {
+      this.loggerService.error(
+        'Number of suggestions does not match number of suggestion threads');
+    }
 
+    for (var i = 0; i < numberOfSuggestions; i++) {
       for (var j = 0; j < numberOfSuggestions; j++) {
         var suggestionThreadId = this.suggestionsService
           .getThreadIdFromSuggestionBackendDict(suggestionDicts[j]);

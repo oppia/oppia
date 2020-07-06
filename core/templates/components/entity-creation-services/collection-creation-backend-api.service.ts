@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-interface ICollectionCreationResponse {
+interface CollectionCreationResponse {
   collectionId: string
 }
 
@@ -33,7 +33,7 @@ export class CollectionCreationBackendService {
   private _createCollection(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: string) => void): void {
-    this.http.post<ICollectionCreationResponse>(
+    this.http.post<CollectionCreationResponse>(
       '/collection_editor_handler/create_new', {}).toPromise()
       .then(response => {
         if (successCallback) {
@@ -50,7 +50,7 @@ export class CollectionCreationBackendService {
   }
 
 
-  createCollection(): Promise<ICollectionCreationResponse> {
+  createCollection(): Promise<CollectionCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createCollection(resolve, reject);
     });

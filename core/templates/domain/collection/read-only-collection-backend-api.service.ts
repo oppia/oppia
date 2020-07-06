@@ -75,10 +75,9 @@ export class ReadOnlyCollectionBackendApiService {
 
     this.http.get<ReadOnlyCollectionBackendResponse>(
       collectionDataUrl).toPromise().then(response => {
-      var collection = cloneDeep(response.collection);
       this._cacheCollectionDetails(response);
       var collectionObject = this.collectionObjectFactory.create(
-        collection);
+        response.collection);
       if (successCallback) {
         successCallback(collectionObject);
       }
