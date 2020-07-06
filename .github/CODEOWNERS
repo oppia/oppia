@@ -278,10 +278,10 @@
 /core/templates/domain/improvements/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
+/core/templates/services/exploration-improvements-backend-api*.ts @brianrodri
 /core/templates/services/exploration-stats.service*.ts @brianrodri
 /core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
-/core/templates/services/improvements-backend-api*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
 /core/templates/services/state-interaction-stats.service*.ts @brianrodri
