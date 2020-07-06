@@ -35,6 +35,7 @@ import python_utils
 
 class ExplorationRetrievalTests(test_utils.GenericTestBase):
     """Test the exploration retrieval methods."""
+
     EXP_1_ID = 'exploration_1_id'
     EXP_2_ID = 'exploration_2_id'
     EXP_3_ID = 'exploration_3_id'
@@ -171,6 +172,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 

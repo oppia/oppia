@@ -49,6 +49,7 @@ describe('Topic editor tab directive', function() {
   var StoryCreationService = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
+  var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -56,6 +57,7 @@ describe('Topic editor tab directive', function() {
     ContextService = $injector.get('ContextService');
     $uibModalInstance = $injector.get('$uibModal');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
     directive = $injector.get('topicEditorTabDirective')[0];
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
@@ -67,6 +69,9 @@ describe('Topic editor tab directive', function() {
       getTrustedResourceUrlForThumbnailFilename: (filename,
           entityType,
           entityId) => (entityType + '/' + entityId + '/' + filename)
+    };
+    var MockWindowDimensionsService = {
+      isWindowNarrow: () => false
     };
     SkillCreationService = $injector.get('SkillCreationService');
     TopicUpdateService = $injector.get('TopicUpdateService');
@@ -84,6 +89,7 @@ describe('Topic editor tab directive', function() {
       UndoRedoService: UndoRedoService,
       TopicUpdateService: TopicUpdateService,
       TopicEditorRoutingService: TopicEditorRoutingService,
+      WindowDimensionsService: MockWindowDimensionsService,
       StoryCreationService: StoryCreationService,
       TopicEditorStateService: TopicEditorStateService,
       EntityCreationService: EntityCreationService
@@ -100,6 +106,12 @@ describe('Topic editor tab directive', function() {
     expect($scope.topic).toEqual(topic);
     expect($scope.allowedBgColors).toEqual(['#C6DCDA']);
     expect($scope.topicDescriptionChanged).toEqual(false);
+    expect($scope.subtopicsListIsShown).toEqual(true);
+    expect($scope.skillsListIsShown).toEqual(true);
+    expect($scope.storiesListIsShown).toEqual(true);
+    expect($scope.SUBTOPIC_LIST).toEqual('subtopic');
+    expect($scope.SKILL_LIST).toEqual('skill');
+    expect($scope.STORY_LIST).toEqual('story');
   });
 
   it('should call EntityCreationService to create skill', function() {
@@ -266,5 +278,31 @@ describe('Topic editor tab directive', function() {
     expect($scope.getPreviewFooter()).toEqual('0 Stories');
     topic._canonicalStoryReferences = [subtopic1];
     expect($scope.getPreviewFooter()).toEqual('1 Story');
+  });
+
+  it('should toggle preview of entity lists', function() {
+    expect($scope.subtopicsListIsShown).toEqual(true);
+    expect($scope.skillsListIsShown).toEqual(true);
+    expect($scope.storiesListIsShown).toEqual(true);
+
+    $scope.togglePreviewListCards('subtopic');
+    expect($scope.subtopicsListIsShown).toEqual(false);
+    expect($scope.skillsListIsShown).toEqual(true);
+    expect($scope.storiesListIsShown).toEqual(true);
+
+    $scope.togglePreviewListCards('skill');
+    expect($scope.subtopicsListIsShown).toEqual(false);
+    expect($scope.skillsListIsShown).toEqual(false);
+    expect($scope.storiesListIsShown).toEqual(true);
+
+    $scope.togglePreviewListCards('story');
+    expect($scope.subtopicsListIsShown).toEqual(false);
+    expect($scope.skillsListIsShown).toEqual(false);
+    expect($scope.storiesListIsShown).toEqual(false);
+
+    $scope.togglePreviewListCards('skill');
+    expect($scope.subtopicsListIsShown).toEqual(false);
+    expect($scope.skillsListIsShown).toEqual(true);
+    expect($scope.storiesListIsShown).toEqual(false);
   });
 });

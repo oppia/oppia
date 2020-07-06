@@ -1088,6 +1088,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     """Tests for check_can_release_ownership function."""
+
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
@@ -1129,6 +1130,7 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
 
 class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
     """Tests for check_can_unpublish_activity function."""
+
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
     private_col_id = 'col_id_1'

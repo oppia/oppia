@@ -28,6 +28,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
     """
+
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_language_codes,

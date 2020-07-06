@@ -78,6 +78,7 @@ class Registry(python_utils.OBJECT):
         value_generators_dict: dict(str : BaseValueGenerator). Dictionary
             mapping value generator class names to their classes.
     """
+
     value_generators_dict = {}
 
     @classmethod
