@@ -190,15 +190,7 @@
 
 
 # Global components and filters.
-<<<<<<< HEAD
-/core/templates/components/button-directives/exploration-embed-button.service.ts @ankita240796
-/core/templates/components/button-directives/exploration-embed-button.directive.html @ankita240796
-/core/templates/components/button-directives/exploration-embed-button-modal.controller*.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.component.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.component.html @ankita240796
-=======
 /core/templates/components/button-directives/* @ankita240796
->>>>>>> upstream/develop
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
