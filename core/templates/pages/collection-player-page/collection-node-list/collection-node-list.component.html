@@ -1,4 +1,4 @@
-<exploration-summary-tile *ngFor="collectionNode in collectionNodes"
+<exploration-summary-tile *ngFor="let collectionNode of collectionNodes"
                           collection-id="collectionId"
                           exploration-id="collectionNode.getExplorationId()"
                           exploration-title="collectionNode.getExplorationSummaryObject().title"
