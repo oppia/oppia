@@ -278,7 +278,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
           ck.destroy();
         });
 
-        CkEditorCopyContentService.bindPasteHandler(scope, ck);
+        CkEditorCopyContentService.bindPasteHandler(ck);
       }
     };
   }

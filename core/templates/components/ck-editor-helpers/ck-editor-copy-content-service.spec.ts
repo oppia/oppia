@@ -32,36 +32,34 @@ const generateContent = (html: string): HTMLElement => {
  * @fileoverview Unit tests for the Ck editor copy content service.
  */
 
-describe('Ck editor copy content service', () => {
+fdescribe('Ck editor copy content service', () => {
   let loggerService = new LoggerService();
   let htmlEscaperService = new HtmlEscaperService(loggerService);
-  let service;
 
-  let rootScope;
-  let ckEditorScope;
-  let ckEditorStub: Partial<CKEDITOR.editor> = {
-    insertHtml: (_: string) => {},
-    execCommand: (_: string): boolean => true
-  };
+  let service: CkEditorCopyContentService;
+  let ckEditorStub: Partial<CKEDITOR.editor>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(($injector) => {
+  beforeEach(() => {
+    ckEditorStub = {
+      id: 'editor1',
+      insertHtml: (_: string) => {},
+      execCommand: (_: string): boolean => true,
+    };
     service = new CkEditorCopyContentService(htmlEscaperService);
-
-    rootScope = $injector.get('$rootScope');
-    ckEditorScope = rootScope.$new();
-
-    spyOn(rootScope, '$broadcast').and.callThrough();
-  }));
+  });
 
   it('not broadcast copy if copy mode is not active', () => {
     expect(service.copyModeActive).toBe(false);
 
     const pElement = generateContent('<p>Hello</p>');
-    service.bindPasteHandler(ckEditorScope, ckEditorStub);
-    service.broadcastCopy(rootScope, pElement);
+    const insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
+    const execCommandSpy = spyOn(ckEditorStub, 'execCommand');
 
-    expect(rootScope.$broadcast).not.toHaveBeenCalled();
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(pElement);
+
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
+    expect(execCommandSpy).not.toHaveBeenCalled();
   });
 
   it('copy and paste plain html elements', () => {
@@ -73,11 +71,8 @@ describe('Ck editor copy content service', () => {
 
     const insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
 
-    service.bindPasteHandler(ckEditorScope, ckEditorStub);
-    service.broadcastCopy(rootScope, pElement);
-    rootScope.$digest();
-
-    expect(rootScope.$broadcast).toHaveBeenCalled();
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(pElement);
 
     expect(insertHtmlSpy).toHaveBeenCalledWith('<p>Hello</p>');
   });
@@ -97,11 +92,8 @@ describe('Ck editor copy content service', () => {
     expect(innerMostLiElement.innerText).toEqual('Grandchild bullet');
 
     const insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
-    service.bindPasteHandler(ckEditorScope, ckEditorStub);
-    service.broadcastCopy(rootScope, innerMostLiElement);
-    rootScope.$digest();
-
-    expect(rootScope.$broadcast).toHaveBeenCalled();
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(innerMostLiElement);
 
     expect(insertHtmlSpy).toHaveBeenCalledWith(listHtml);
   });
@@ -119,11 +111,8 @@ describe('Ck editor copy content service', () => {
 
     const execCommandSpy = spyOn(ckEditorStub, 'execCommand');
 
-    service.bindPasteHandler(ckEditorScope, ckEditorStub);
-    service.broadcastCopy(rootScope, imageWidgetElement);
-    rootScope.$digest();
-
-    expect(rootScope.$broadcast).toHaveBeenCalled();
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(imageWidgetElement);
 
     expect(execCommandSpy).toHaveBeenCalledWith(
       'oppiaimage',
@@ -147,15 +136,13 @@ describe('Ck editor copy content service', () => {
       'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
       'ame&amp;quot;:&amp;quot;&amp;quot;}"><span></span></oppia-noninteracti' +
       've-math></p>');
-    const nestedMathWidgetElement = mathWidgetElement.firstChild.firstChild;
+    const nestedMathWidgetElement = (
+      <HTMLElement>mathWidgetElement.firstChild.firstChild);
 
     const execCommandSpy = spyOn(ckEditorStub, 'execCommand');
 
-    service.bindPasteHandler(ckEditorScope, ckEditorStub);
-    service.broadcastCopy(rootScope, nestedMathWidgetElement);
-    rootScope.$digest();
-
-    expect(rootScope.$broadcast).toHaveBeenCalled();
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(nestedMathWidgetElement);
 
     expect(execCommandSpy).toHaveBeenCalledWith(
       'oppiamath',
@@ -181,11 +168,8 @@ describe('Ck editor copy content service', () => {
 
     const execCommandSpy = spyOn(ckEditorStub, 'execCommand');
 
-    service.bindPasteHandler(ckEditorScope, ckEditorStub);
-    service.broadcastCopy(rootScope, mathWidgetElement);
-    rootScope.$digest();
-
-    expect(rootScope.$broadcast).toHaveBeenCalled();
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(mathWidgetElement);
 
     expect(execCommandSpy).toHaveBeenCalledWith(
       'oppiamath',
@@ -197,5 +181,19 @@ describe('Ck editor copy content service', () => {
         }
       }
     );
+  });
+
+  it('not copy and paste after editor is destroyed', () => {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+    const pElement = generateContent('<p>Hello</p>');
+    const insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
+
+    ckEditorStub = { ...ckEditorStub, status: 'destroyed' };
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(pElement);
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
   });
 });

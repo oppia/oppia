@@ -19,16 +19,22 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { IRootScopeService } from 'angular';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { Subject, Subscription } from 'rxjs';
 
+interface CkEditorCopyEvent {
+  rootElement: HTMLElement;
+  containedWidgetTagName?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CkEditorCopyContentService {
-  private readonly COPY_EVENT = 'copy-element-to-translation-editor';
+  private copyEventSubject = new Subject();
+  private ckeditorToSubscription: {[id: string]: Subscription} = {};
+
   copyModeActive = false;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
@@ -38,15 +44,12 @@ export class CkEditorCopyContentService {
    * tags.
    * @param {HTMLElement} target The element target that contains or is a
    *  descendant of a widget, or a plain HTML element/group.
-   * @returns {Object} Returns an object with keys rootElement and
-   *  containedWidgetTagName. rootElement is the root ancestor of target, and is
-   *  always a child of angular-html-bind. containedWidgetTagName is tag name
-   *  of a widget, if found in ancestors or descendants.
+   * @returns {CkEditorCopyEvent} Returns an object of type CkEditorCopyEvent,
+   *  where rootElement is the root ancestor of target and is
+   *  always a child of angular-html-bind. containedWidgetTagName is the tag
+   *  name of the widget if found in ancestors or descendants.
    */
-  private _handleCopy(target: HTMLElement): {
-      rootElement: HTMLElement,
-      containedWidgetTagName?: string
-  } {
+  private _handleCopy(target: HTMLElement): CkEditorCopyEvent {
     let containedWidgetTagName;
     let currentElement = target;
 
@@ -113,7 +116,6 @@ export class CkEditorCopyContentService {
         startupData[key] = JSON.parse(
           this.htmlEscaperService.escapedStrToUnescapedStr(value));
       }
-
       editor.execCommand(widgetName, { startupData });
     }
   }
@@ -123,44 +125,36 @@ export class CkEditorCopyContentService {
   }
 
   /**
-   * Broadcasts to editor to copy target.
-   * @param {IRootScopeService} contentScope The scope of parent editor, in
-   *  which the copy event is broadcasted to.
+   * Broadcasts to subject to copy target.
    * @param {HTMLElement} target The element to copy.
    */
-  broadcastCopy(
-      contentScope: IRootScopeService,
-      target: HTMLElement,
-  ) {
+  broadcastCopy(target: HTMLElement) {
     if (!this.copyModeActive) {
       return;
     }
 
-    const { rootElement, containedWidgetTagName } = this._handleCopy(target);
-
-    contentScope.$broadcast(
-      this.COPY_EVENT,
-      rootElement,
-      containedWidgetTagName
+    this.copyEventSubject.next(
+      this._handleCopy(target)
     );
   }
 
   /**
-   * Binds editor and editor scope to listen for copy events.
-   * @param {IRootScopeService} editorScope The scope to bind listener on to
-   *  respond to copy event.
+   * Binds ckeditor to subject.
    * @param {CKEDITOR.editor} editor The editor to add copied content to.
    */
   bindPasteHandler(
-      editorScope: IRootScopeService,
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
   ) {
-    editorScope.$on(
-      this.COPY_EVENT,
-      (_, element: HTMLElement, containedWidgetTagName?: string
-      ) =>
+    this.ckeditorToSubscription[editor.id] = this.copyEventSubject.subscribe(
+      ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
+        if (editor.status === 'destroyed') {
+          this.ckeditorToSubscription[editor.id].unsubscribe();
+          delete this.ckeditorToSubscription[editor.id];
+          return;
+        }
         this._handlePaste(
-          editor, element, containedWidgetTagName)
+          editor, rootElement, containedWidgetTagName);
+      }
     );
   }
 }
