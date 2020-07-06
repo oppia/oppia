@@ -79,7 +79,9 @@ angular.module('oppia').component('skillPreviewTab', {
           ctrl.questionsFetched = true;
           ctrl.questionDicts = response;
           ctrl.displayedQuestions = response;
-          ctrl.selectQuestionToPreview(0);
+          if (ctrl.questionDicts.length) {
+            ctrl.selectQuestionToPreview(0);
+          }
         });
       };
 

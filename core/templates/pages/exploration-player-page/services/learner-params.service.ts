@@ -22,27 +22,23 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+interface ExplorationParams {
+  [paramName: string]: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerParamsService {
-  private _paramDict = {};
+  private _paramDict: ExplorationParams = {};
   // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'initParamSpecs' is a dict with ParamSpec type object
-  // values which is in AngularJS. Replace this with the exact type once it is
-  // upgraded.
-  init(initParamSpecs: any): void {
+  init(initParamSpecs: ExplorationParams): void {
     // The initParamSpecs arg is a dict mapping the parameter names used in
     // the exploration to their default values.
     this._paramDict = cloneDeep(initParamSpecs);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since the return type is a dict with ParamSpec type object
-  // values which is in AngularJS. Replace this with the exact type once it is
-  // upgraded.
-  getValue(paramName: string): any {
+  getValue(paramName: string): string {
     if (!this._paramDict.hasOwnProperty(paramName)) {
       throw new Error('Invalid parameter name: ' + paramName);
     } else {
@@ -60,7 +56,7 @@ export class LearnerParamsService {
     }
   }
 
-  getAllParams(): {} {
+  getAllParams(): ExplorationParams {
     return cloneDeep(this._paramDict);
   }
 }

@@ -31,7 +31,7 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
-CHROME_DRIVER_VERSION = '2.41'
+CHROME_DRIVER_VERSION = '77.0.3865.40'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -113,6 +113,12 @@ _PARSER.add_argument(
          'core/test/protractor/ dirs. e.g. for the file'
          'core/tests/protractor/accessibility.js use --suite=accessibility.'
          'For performing a full test, no argument is required.')
+
+_PARSER.add_argument(
+    '--auto_select_chromedriver',
+    help='Automatically sets the chromedriver version depending on the version '
+         'of Chrome installed in the environment.',
+    action='store_true')
 
 _PARSER.add_argument(
     '--debug_mode',
@@ -214,7 +220,8 @@ def run_webdriver_manager(parameters):
     """
     web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
     web_driver_command.extend(parameters)
-    python_utils.PRINT(common.run_cmd(web_driver_command))
+    p = subprocess.Popen(web_driver_command)
+    p.communicate()
 
 
 def update_community_dashboard_status_in_feconf_file(
@@ -302,13 +309,17 @@ def undo_webdriver_tweak():
         os.rename(GECKO_PROVIDER_BAK_FILE_PATH, GECKO_PROVIDER_FILE_PATH)
 
 
-def start_webdriver_manager():
-    """Update and start webdriver manager."""
+def start_webdriver_manager(version):
+    """Update and start webdriver manager.
+
+    Args:
+        version: str. The chromedriver version.
+    """
     with tweak_webdriver_manager():
         run_webdriver_manager(
-            ['update', '--versions.chrome', CHROME_DRIVER_VERSION])
+            ['update', '--versions.chrome', version])
         run_webdriver_manager(
-            ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
+            ['start', '--versions.chrome', version,
              '--detach', '--quiet'])
 
 
@@ -400,6 +411,21 @@ def start_google_app_engine_server(dev_mode_setting):
     SUBPROCESSES.append(p)
 
 
+def get_chrome_driver_version():
+    """Fetches the latest supported version of chromedriver depending on the
+    Chrome version.
+    This method follows the steps mentioned here:
+    https://chromedriver.chromium.org/downloads/version-selection
+    """
+    output = os.popen('google-chrome --version').read()
+    chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
+    chrome_version = '.'.join(chrome_version.split('.')[:-1])
+    response = python_utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
+        % chrome_version)
+    return response.read()
+
+
 def main(args=None):
     """Run the scripts to start end-to-end tests."""
 
@@ -420,7 +446,10 @@ def main(args=None):
     if not parsed_args.skip_build:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
-    start_webdriver_manager()
+    version = (
+        get_chrome_driver_version() if parsed_args.auto_select_chromedriver
+        else CHROME_DRIVER_VERSION)
+    start_webdriver_manager(version)
 
     start_google_app_engine_server(dev_mode)
 

@@ -30,6 +30,7 @@ class QuestionsListHandler(base.BaseHandler):
     """Manages receiving of all question summaries for display in topic editor
     and skill editor page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access

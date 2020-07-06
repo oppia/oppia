@@ -57,6 +57,10 @@ export class ExplorationStats {
     return [...this.stateStatsMapping.keys()];
   }
 
+  hasStateStates(stateName: string): boolean {
+    return this.stateStatsMapping.has(stateName);
+  }
+
   getStateStats(stateName: string): StateStats {
     if (!this.stateStatsMapping.has(stateName)) {
       throw new Error('no stats exist for state: ' + stateName);

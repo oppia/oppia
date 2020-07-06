@@ -126,17 +126,6 @@ with the same id on the page. -->
                   x
                 </text>
               </g>
-              <g ng-if="highlightStates && isStateFlagged(node.id)">
-                <rect ng-click="onClickFunction(node.id)" class="highlight clickable"
-                      width="22" height="22" ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                      ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
-                </rect>
-                <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
-                      ng-attr-y="<[node.y0 + 17]>" style="font-size: 22px;"
-                      ng-attr-transform="<[getHighlightTextTransform(node.x0, node.y0)]>">
-                  ⚠
-                </text>
-              </g>
             </g>
           </g>
 
