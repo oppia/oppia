@@ -529,7 +529,9 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
-      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      if (componentName !== 'Math') {
+        expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      }
 
       // Need to convert arguments to an actual array; we tell the component
       // which element to act on but drop the componentName.
