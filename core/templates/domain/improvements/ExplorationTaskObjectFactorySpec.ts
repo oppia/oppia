@@ -89,7 +89,7 @@ describe('Exploration task object factory', () => {
     expect(task.entityId).toEqual('eid');
     expect(task.entityVersion).toEqual(1);
     expect(task.taskType).toEqual('high_bounce_rate');
-    expect(task.targetType).toEqual('Introduction');
+    expect(task.targetId).toEqual('Introduction');
     expect(task.isResolved()).toBeTrue();
   });
 
@@ -99,7 +99,7 @@ describe('Exploration task object factory', () => {
     expect(task.entityId).toEqual('eid');
     expect(task.entityVersion).toEqual(1);
     expect(task.taskType).toEqual('high_bounce_rate');
-    expect(task.targetType).toEqual('Introduction');
+    expect(task.targetId).toEqual('Introduction');
     expect(task.isObsolete()).toBeTrue();
   });
 
