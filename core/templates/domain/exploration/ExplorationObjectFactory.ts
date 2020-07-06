@@ -24,29 +24,54 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
 import { LoggerService } from 'services/contextual/logger.service';
+import { IParamChangeBackendDict, ParamChange } from
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from
+import { IParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { IEndExplorationCustomizationArgs, IInteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { Interaction } from
+  'domain/exploration/InteractionObjectFactory';
+import { IBindableVoiceovers } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
+import {
+  IStateObjectsBackendDict,
+  IVoiceoverObjectsDict,
+  States,
+  StatesObjectFactory
+} from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
+interface IExplorationBackendDict {
+  'init_state_name': string;
+  'param_changes': IParamChangeBackendDict[];
+  'param_specs': IParamSpecsBackendDict;
+  'states': IStateObjectsBackendDict;
+  'title': string;
+  'language_code': string;
+}
+
 export class Exploration {
-  initStateName;
-  paramChanges;
-  paramSpecs;
-  states;
-  title;
-  languageCode;
+  initStateName: string;
+  paramChanges: ParamChange[];
+  paramSpecs: ParamSpecs;
+  states: States;
+  title: string;
+  languageCode: string;
   logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
-  // TODO(#7165): Replace any with exact type.
+
   constructor(
-      initStateName: string, paramChanges: any, paramSpecs: any, states: any,
-      title: string, languageCode: string, loggerService: LoggerService,
+      initStateName: string, paramChanges: ParamChange[],
+      paramSpecs: ParamSpecs, states: States, title: string,
+      languageCode: string, loggerService: LoggerService,
       urlInterpolationService: UrlInterpolationService) {
     this.initStateName = initStateName;
     this.paramChanges = paramChanges;
@@ -65,21 +90,21 @@ export class Exploration {
         INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
   }
 
-  // TODO(#7165): Replace any with exact type.
-  getAuthorRecommendedExpIds(stateName: string): any {
+  getAuthorRecommendedExpIds(stateName: string): string[] {
     if (!this.isStateTerminal(stateName)) {
       throw new Error(
         'Tried to get recommendations for a non-terminal state: ' +
           stateName);
     }
 
-    const customizationArgs = this.getInteractionCustomizationArgs(stateName);
+    const customizationArgs = (
+      <IEndExplorationCustomizationArgs> this.getInteractionCustomizationArgs(
+        stateName));
     return customizationArgs && customizationArgs.recommendedExplorationIds ?
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
-  // TODO(#7165): Replace any with exact type.
-  getInteraction(stateName: string): any {
+  getInteraction(stateName: string): Interaction {
     let state = this.states.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -96,8 +121,8 @@ export class Exploration {
     return interaction.id;
   }
 
-  // TODO(#7165): Replace any with exact type.
-  getInteractionCustomizationArgs(stateName: string): any {
+  getInteractionCustomizationArgs(
+      stateName: string): IInteractionCustomizationArgs {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -118,8 +143,7 @@ export class Exploration {
             '');
   }
 
-  // TODO(#7165): Replace any with exact type.
-  getInteractionThumbnailSrc(stateName: string): any {
+  getInteractionThumbnailSrc(stateName: string): string {
     // TODO(sll): Unify this with the 'choose interaction' modal in
     // state_editor_interaction.html.
     let interactionId = this.getInteractionId(stateName);
@@ -139,16 +163,15 @@ export class Exploration {
         INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
-  // TODO(#7165): Replace any with exact type.
-  getStates(): any {
+  getStates(): States {
     return cloneDeep(this.states);
   }
-  // TODO(#7165): Replace any with exact type.
-  getState(stateName: string): any {
+
+  getState(stateName: string): State {
     return this.states.getState(stateName);
   }
-  // TODO(#7165): Replace any with exact type.
-  getInitialState(): any {
+
+  getInitialState(): State {
     return this.getState(this.initStateName);
   }
 
@@ -159,8 +182,8 @@ export class Exploration {
   getUninterpolatedContentHtml(stateName: string): string {
     return this.getState(stateName).content.getHtml();
   }
-  // TODO(#7165): Replace any with exact type.
-  getVoiceovers(stateName: string): any {
+
+  getVoiceovers(stateName: string): IBindableVoiceovers {
     let state = this.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -171,9 +194,9 @@ export class Exploration {
     return recordedVoiceovers.getBindableVoiceovers(
       contentId);
   }
-  // TODO(#7165): Replace any with exact type.
+
   getVoiceover(
-      stateName: string, languageCode: string): any {
+      stateName: string, languageCode: string): Voiceover {
     let state = this.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -184,8 +207,8 @@ export class Exploration {
     const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
     return voiceovers || null;
   }
-  // TODO(#7165): Replace any with exact type.
-  getAllVoiceovers(languageCode: string): any {
+
+  getAllVoiceovers(languageCode: string): IVoiceoverObjectsDict {
     return this.states.getAllVoiceovers(languageCode);
   }
 
@@ -193,7 +216,7 @@ export class Exploration {
     return this.languageCode;
   }
 
-  getAllVoiceoverLanguageCodes(): Array<string> {
+  getAllVoiceoverLanguageCodes(): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
   }
 }
@@ -208,9 +231,8 @@ export class ExplorationObjectFactory {
               private statesObjectFactory: StatesObjectFactory,
               private urlInterpolationService: UrlInterpolationService) {}
 
-  // TODO(#7165): Replace any with exact type.
-  createFromBackendDict(explorationBackendDict: any): Exploration {
-    /* eslint-enable dot-notation */
+  createFromBackendDict(
+      explorationBackendDict: IExplorationBackendDict): Exploration {
     return new Exploration(
       explorationBackendDict.init_state_name,
       this.paramChangesObjectFactory.createFromBackendList(
