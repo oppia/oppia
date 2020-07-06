@@ -128,6 +128,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(self, js_files, ts_files, file_cache, verbose_mode_enabled):
         """Constructs a JsTsLintChecksManager object.
 
@@ -1100,6 +1101,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
     Attributes:
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyJsTsLintChecksManager object.

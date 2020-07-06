@@ -1081,6 +1081,7 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
     make sure they match counts stored in StateCounterModel. It also checks for
     some possible error cases like negative counts.
     """
+
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
 
     @classmethod

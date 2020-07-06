@@ -186,6 +186,9 @@ var RichTextEditor = async function(elem) {
     await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
+    await waitFor.elementToBeClickable(
+      elem.element(by.css('.' + buttonName)),
+      'Toolbar button takes too long to be clickable.');
     await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {

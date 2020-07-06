@@ -96,6 +96,14 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+/* The following classes' styles are overriden by Guppy's OSK stylesheet and
+they end up rotating the tooltips which are placed on the left or right. This is
+why they need to be overriden.  */
+.left, .right {
+  -webkit-transform: none !important;
+  transform: none !important;
+}
+
 .md-button {
   font-size: 16px;
   line-height: 22px;

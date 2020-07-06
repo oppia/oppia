@@ -450,6 +450,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         class MockFile(python_utils.OBJECT):
             def readlines(self):
                 """Read lines of the file object."""
+
                 return mock_readlines()
         def mock_readlines():
             check_function_calls['readlines_gets_called'] += 1
