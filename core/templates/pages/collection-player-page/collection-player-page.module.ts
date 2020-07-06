@@ -35,6 +35,9 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { CollectionFooterComponent } from
+  './collection-footer/collection-footer.component';
+
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -49,10 +52,12 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionFooterComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionFooterComponent
   ],
   providers: [
     AppConstants,
