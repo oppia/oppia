@@ -1629,7 +1629,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: 'custarg_placeholder'
             unicode_str: ''
         rows:
           value: 1
@@ -1667,7 +1667,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ''
+            content_id: 'custarg_placeholder'
             unicode_str: ''
         rows:
           value: 1
@@ -1726,7 +1726,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: custarg_placeholder
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1741,6 +1743,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -1761,7 +1764,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: custarg_placeholder
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1776,6 +1781,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -3732,7 +3738,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
-          value: Continue
+          value:
+            content_id: custarg_buttonText
+            unicode_str: Continue
       default_outcome:
         dest: END
         feedback:
@@ -3745,6 +3753,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:

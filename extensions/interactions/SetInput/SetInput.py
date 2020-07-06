@@ -45,7 +45,8 @@ class SetInput(base.BaseInteraction):
             'type': 'custom',
             'obj_type': 'SubtitledUnicode'
         },
-        'default_value': {'content_id': '', 'unicode_str': 'Add Item'}
+        'default_value': {
+            'content_id': 'custarg_buttonText', 'unicode_str': 'Add Item'}
     }]
 
     _answer_visualization_specs = [{

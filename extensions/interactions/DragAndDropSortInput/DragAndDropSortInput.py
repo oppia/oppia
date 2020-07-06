@@ -64,7 +64,9 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'add_element_text': 'Add a new item',
             }
         },
-        'default_value': [{'content_id': '', 'html': ''}],
+        'default_value': [{
+            'content_id': 'custarg_choices_default', 'html': ''
+        }],
     }, {
         'name': 'allowMultipleItemsInSamePosition',
         'description': 'Allow multiple sort items in the same position',

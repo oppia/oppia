@@ -63,7 +63,8 @@ class FractionInput(base.BaseInteraction):
             'type': 'custom',
             'obj_type': 'SubtitledUnicode'
         },
-        'default_value': {'content_id': '', 'unicode_str': ''}
+        'default_value': {
+            'content_id': 'custarg_customPlaceholder', 'unicode_str': ''}
     }]
 
     _answer_visualization_specs = [{

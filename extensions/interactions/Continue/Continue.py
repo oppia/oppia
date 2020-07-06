@@ -48,5 +48,8 @@ class Continue(base.BaseInteraction):
             'type': 'custom',
             'obj_type': 'SubtitledUnicode'
         },
-        'default_value': { 'content_id': '', 'unicode_str': 'Continue' },
+        'default_value': {
+            'content_id': 'custarg_buttonText',
+            'unicode_str': 'Continue'
+        },
     }]

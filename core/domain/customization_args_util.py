@@ -156,12 +156,12 @@ def convert_translatable_in_cust_args(
                 customization_arg['value'],
                 content_id_prefix,
                 customization_arg_spec.get('name', None))
-        elif (schema_type == "list"):
+        elif schema_type == "list":
             find_translatable(
                 customization_arg,
                 customization_arg_spec['schema']['items'],
                 content_id_prefix)
-        elif (schema_type == "dict"):
+        elif schema_type == "dict":
             for i in range(len(customization_arg_spec['properties'])):
                 find_translatable(
                     customization_arg,
@@ -170,11 +170,7 @@ def convert_translatable_in_cust_args(
 
     for customization_arg_spec in customization_arg_specs:
         customization_arg_spec_name = customization_arg_spec['name']
-        if customization_arg_spec_name not in customization_args:
-            customization_args[customization_arg_spec_name] = {
-                'value': customization_arg_spec['default_value']
-            }
- 
-        find_translatable(
-            customization_args[customization_arg_spec_name],
-            customization_arg_spec)
+        if customization_arg_spec_name in customization_args:
+            find_translatable(
+                customization_args[customization_arg_spec_name],
+                customization_arg_spec)

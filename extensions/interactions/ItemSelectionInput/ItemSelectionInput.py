@@ -77,7 +77,8 @@ class ItemSelectionInput(base.BaseInteraction):
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': [{'content_id': '', 'html': ''}],
+        'default_value': [{
+            'content_id': 'custarg_choices_default', 'html': ''}],
     }]
 
     _answer_visualization_specs = [{
