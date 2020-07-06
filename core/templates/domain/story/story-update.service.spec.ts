@@ -16,16 +16,13 @@
  * @fileoverview Tests for Story update service.
  */
 
+import { TestBed } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // story-update.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
-import { StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { AlertsService } from 'services/alerts.service';
 // ^^^ This block is to be removed.
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -37,16 +34,16 @@ describe('Story update service', function() {
   var UndoRedoService = null;
   var _sampleStory = null;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: []
+    });
+  });
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
-    $provide.value(
-      'StoryContentsObjectFactory', new StoryContentsObjectFactory(
-        new StoryNodeObjectFactory()));
-    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
-    $provide.value(
-      'StoryObjectFactory', new StoryObjectFactory(
-        new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
+    $provide.value('ChangeObjectFactory', TestBed.get(ChangeObjectFactory));
+    $provide.value('AlertsService', TestBed.get(AlertsService));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

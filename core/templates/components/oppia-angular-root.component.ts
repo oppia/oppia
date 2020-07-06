@@ -219,7 +219,7 @@ import { ExplorationRecommendationsService } from
   'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
-import { ExplorationStatsObjectFactory } from
+import { ExplorationStatsObjectFactory, ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationSummaryObjectFactory } from
@@ -602,6 +602,11 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { TaskEntryObjectFactory } from 'domain/improvements/TaskEntryObjectFactory';
+import { MockCsrfTokenService } from 'services/request-interceptor.service';
+import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
+import { TranslateService } from 'services/translate.service';
 
 @Component({
   selector: 'oppia-angular-root',
@@ -892,6 +897,12 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static workedExampleObjectFactory: WorkedExampleObjectFactory;
   static writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
   static writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  static explorationStats: ExplorationStats;
+  static conceptCardBackendApiService: ConceptCardBackendApiService;
+  static taskEntryObjectFactory: TaskEntryObjectFactory;
+  static translationsBackendApiService: TranslationsBackendApiService;
+  static mockCsrfTokenService: MockCsrfTokenService;
+  static translateService: TranslateService;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -1174,7 +1185,13 @@ private windowRef: WindowRef,
 private winnowingPreprocessingService: WinnowingPreprocessingService,
 private workedExampleObjectFactory: WorkedExampleObjectFactory,
 private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
-private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
+private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory,
+private explorationStats: ExplorationStats,
+private conceptCardBackendApiService: ConceptCardBackendApiService,
+private taskEntryObjectFactory: TaskEntryObjectFactory,
+private translationsBackendApiService: TranslationsBackendApiService,
+private mockCsrfTokenService: MockCsrfTokenService,
+private translateService: TranslateService
   ) {}
 
   public ngAfterViewInit() {
@@ -1460,6 +1477,12 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.workedExampleObjectFactory = this.workedExampleObjectFactory;
     OppiaAngularRootComponent.writtenTranslationObjectFactory = this.writtenTranslationObjectFactory;
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = this.writtenTranslationsObjectFactory;
+    OppiaAngularRootComponent.explorationStats = this.explorationStats;
+    OppiaAngularRootComponent.conceptCardBackendApiService = this.conceptCardBackendApiService;
+    OppiaAngularRootComponent.taskEntryObjectFactory = this.taskEntryObjectFactory;
+    OppiaAngularRootComponent.translationsBackendApiService = this.translationsBackendApiService;
+    OppiaAngularRootComponent.mockCsrfTokenService = this.mockCsrfTokenService;
+    OppiaAngularRootComponent.translateService = this.translateService;
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }

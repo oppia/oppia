@@ -394,9 +394,6 @@ import { StateGraphLayoutService } from
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
-import { StateImprovementSuggestionService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -607,7 +604,7 @@ export const ANGULAR_SERVICES = [
   SpeechSynthesisChunkerService, StateCardObjectFactory,
   StateClassifierMappingService, StateContentService,
   StateCustomizationArgsService, StateEditorService, StateGraphLayoutService,
-  StateHintsService, StateImprovementSuggestionService,
+  StateHintsService,
   StateInteractionIdService, StateInteractionStatsService, StateNameService,
   StateObjectFactory, StateParamChangesService, StatePropertyService,
   StateRecordedVoiceoversService, StateSolicitAnswerDetailsService,
@@ -726,7 +723,7 @@ export const ANGULAR_SERVICES_NAMES = [
   'StateCardObjectFactory', 'StateClassifierMappingService',
   'StateContentService', 'StateCustomizationArgsService', 'StateEditorService',
   'StateGraphLayoutService', 'StateHintsService',
-  'StateImprovementSuggestionService', 'StateInteractionIdService',
+  'StateInteractionIdService',
   'StateInteractionStatsService', 'StateNameService', 'StateObjectFactory',
   'StateParamChangesService', 'StatePropertyService',
   'StateRecordedVoiceoversService', 'StateSolicitAnswerDetailsService',

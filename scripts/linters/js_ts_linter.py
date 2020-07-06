@@ -1074,6 +1074,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     'export class ')[1].split('{')[0].replace(' ', '')
             if 'extends' in class_name: 
                 class_name = class_name.split('extends')[0]
+            if 'implements' in class_name: 
+                class_name = class_name.split('implements')[0]
             if '<' in class_name: class_name = class_name.split('<')[0]
             camel_case_class_name = class_name[0].lower() + class_name[1:]
             return class_name, camel_case_class_name
@@ -1082,6 +1084,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             './core/templates/components/oppia-angular-root.component.ts')
         oppia_root_directive_path = (
             './core/templates/base-components/oppia-root.directive.ts')
+        injectables_to_ignore = [
+            'NormalizeWhitespacePunctuationAndCasePipe\n',
+            'StatePropertyService'
+        ]
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Oppia Angular Root file check')
             python_utils.PRINT('----------------------------------------')
@@ -1096,6 +1102,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 total_files_checked += 1
                 class_name, camel_case_class_name = (
                     get_injectable_class_name(file_content))
+                if class_name in injectables_to_ignore:
+                    continue
                 import_statement = 'import { ' + class_name
                 if not import_statement in oppia_angular_root:
                     summary_message = (

@@ -27,7 +27,21 @@ describe('Rte Helper Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var $timeout = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
 
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
+  }));
 
   describe('when customization args has a valid youtube video', function() {
     var customizationArgSpecs = [{
@@ -37,21 +51,6 @@ describe('Rte Helper Modal Controller', function() {
       name: 'video_id',
       default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU'
     }];
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [...ANGULAR_SERVICES],
-        schemas: [NO_ERRORS_SCHEMA]
-      });
-    });
-
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      for (let i in ANGULAR_SERVICES) {
-        $provide.value(ANGULAR_SERVICES_NAMES[i],
-          TestBed.get(ANGULAR_SERVICES[i]));
-      }
-    }));
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');

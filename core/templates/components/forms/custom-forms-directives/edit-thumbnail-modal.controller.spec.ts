@@ -15,6 +15,11 @@
 /**
  * @fileoverview Unit tests for EditThumbnailModalController.
  */
+import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
+  'tests/angular-services.index';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Edit Thumbnail Modal Controller', function() {
   let $q = null;
@@ -34,7 +39,21 @@ describe('Edit Thumbnail Modal Controller', function() {
   const uploadedImage = new File([], 'uploaded.png');
   const uploadedImageMimeType = 'image/svg+xml';
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $q = $injector.get('$q');
     const $rootScope = $injector.get('$rootScope');

@@ -17,6 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
+  'tests/angular-services.index';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -160,27 +164,20 @@ describe('Exploration editor page component', function() {
     }
   };
   var getPermissionsSpy = null;
-
-  beforeEach(function() {
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        ContextService,
-        EditabilityService,
-        ExplorationFeaturesBackendApiService,
-        ExplorationFeaturesService,
-        PageTitleService,
-        LoaderService,
-        ParamChangesObjectFactory,
-        ParamSpecsObjectFactory,
-        SiteAnalyticsService,
-        StateClassifierMappingService,
-        StateEditorService,
-        StateTopAnswersStatsBackendApiService,
-        UserExplorationPermissionsService,
-        UrlInterpolationService
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
     });
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
+  }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationDataService', mockExplorationDataService);
