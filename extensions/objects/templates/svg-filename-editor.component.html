@@ -1,9 +1,7 @@
 <div ng-model="$ctrl.data" ui-validate="'$ctrl.validate()'" class="fs-container">
   <div ng-if="!$ctrl.isDiagramSaved()" class="diagram-editor-size-toolbar">
-    Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()"
-                  max="$ctrl.maxDiagramWidth">
-    Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()"
-                   max="$ctrl.maxDiagramHeight">
+    Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()">
+    Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()">
     <i class="material-icons" title="<[$ctrl.getDiagramSizeInfo()]>">
       &#xE887;
     </i>
@@ -53,15 +51,24 @@
           <div>
             <div class="color-well">
               <div>Stroke</div>
-              <div id="stroke-color" class="colorPicker"></div>
+              <div id="stroke-color" class="colorPicker">
+                <div id="top-stroke-alpha" class="alphaSquare top"></div>
+                <div id="bottom-stroke-alpha" class="alphaSquare bottom"></div>
+              </div>
             </div>
             <div class="color-well">
               <div>Fill</div>
-              <div id="fill-color" class="colorPicker"></div>
+              <div id="fill-color" class="colorPicker">
+                <div id="top-fill-alpha" class="alphaSquare top"></div>
+                <div id="bottom-fill-alpha" class="alphaSquare bottom"></div>
+              </div>
             </div>
             <div class="color-well">
               <div>bg</div>
-              <div id="bg-color" class="colorPicker"></div>
+              <div id="bg-color" class="colorPicker">
+                <div id="top-bg-alpha" class="alphaSquare top"></div>
+                <div id="bottom-bg-alpha" class="alphaSquare bottom"></div>
+              </div>
             </div>
           </div>
           <div>
@@ -128,7 +135,7 @@
     </div>
   </div>
   <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
-    <button type="button" class="btn btn-success" ng-click="$ctrl.saveSVGFile()" ng-disabled="$ctrl.isUserDrawing()">
+    <button type="button" class="btn btn-success float-right" ng-click="$ctrl.saveSVGFile()" ng-disabled="$ctrl.isUserDrawing()">
       Use This Image
     </button>
   </div>
@@ -202,7 +209,6 @@
   }
 
   .svg-editor .horizontal-toolbar .info-tag {
-    color: #f00101;
     font-size: 13px;
     padding-left: 3px;
     padding-top: 5px;
@@ -280,5 +286,16 @@
     height: 28px;
     margin: 0 auto;
     width: 28px;
+  }
+
+  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well .alphaSquare {
+    background-color: #000000;
+    height: 13px;
+    width: 13px;
+  }
+
+  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well .alphaSquare.bottom {
+    left: 50%;
+    position: absolute;
   }
 </style>
