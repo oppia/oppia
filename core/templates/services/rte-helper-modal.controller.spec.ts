@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for RteHelperModalController.
  */
-import { AppConstants } from 'app.constants';
 
 import { TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -84,7 +83,6 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should save modal customization args when closing it', function() {
       var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
-      expect($scope.disableSaveButtonForMathRte()).toBe(false);
       $scope.save();
       expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
       expect($uibModalInstance.close).toHaveBeenCalledWith({
@@ -92,166 +90,6 @@ describe('Rte Helper Modal Controller', function() {
         video_id: 'Ntcw0H0hwPU'
       });
     });
-  });
-
-  describe('when the editor is Math expression editor', function() {
-    var customizationArgSpecs = [{
-      name: 'math_content',
-      default_value: {
-        raw_latex: '',
-        svg_filename: ''
-      }
-    }];
-    var $q = null;
-    var AssetsBackendApiService = null;
-    var ImageUploadHelperService = null;
-    var ImageLocalStorageService = null;
-    var ContextService = null;
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      $timeout = $injector.get('$timeout');
-      var $rootScope = $injector.get('$rootScope');
-      $q = $injector.get('$q');
-
-      AssetsBackendApiService = $injector.get('AssetsBackendApiService');
-      ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-      ImageLocalStorageService = $injector.get('ImageLocalStorageService');
-      ContextService = $injector.get('ContextService');
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
-      $scope = $rootScope.$new();
-      $controller(
-        'RteHelperModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance,
-          attrsCustomizationArgsDict: {
-            math_content: {
-              raw_latex: '',
-              svg_filename: ''
-            }
-          },
-          customizationArgSpecs: customizationArgSpecs,
-        });
-    }));
-
-    it('should load modal correctly', function() {
-      expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);
-      expect($scope.currentRteIsMathExpressionEditor).toBe(true);
-    });
-
-    it('should close modal when clicking on cancel button', function() {
-      $scope.cancel();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
-
-    it('should save modal customization args when closing it', function() {
-      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
-      $scope.tmpCustomizationArgs = [{
-        name: 'math_content',
-        value: {
-          raw_latex: 'x^2',
-          svgFile: 'Svg Data',
-          svg_filename: 'mathImage.svg',
-          mathExpressionSvgIsBeingProcessed: true
-        }
-      }];
-      expect($scope.disableSaveButtonForMathRte()).toBe(true);
-      $scope.tmpCustomizationArgs[0].value.mathExpressionSvgIsBeingProcessed = (
-        false);
-      expect($scope.disableSaveButtonForMathRte()).toBe(false);
-      var response = {
-        filename: 'mathImage.svg'
-      };
-      var imageFile = new Blob();
-      spyOn(AssetsBackendApiService, 'saveMathExpresionImage').and.returnValue(
-        $q.resolve(response));
-      spyOn(
-        ImageUploadHelperService,
-        'convertImageDataToImageFile').and.returnValue(imageFile);
-      $scope.save();
-      $scope.$apply();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-      expect($uibModalInstance.close).toHaveBeenCalledWith({
-        math_content: {
-          raw_latex: 'x^2',
-          svg_filename: 'mathImage.svg'
-        }
-      });
-    });
-
-    it('should cancel the modal when saving of math SVG fails', function() {
-      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
-      $scope.tmpCustomizationArgs = [{
-        name: 'math_content',
-        value: {
-          raw_latex: 'x^2',
-          svgFile: 'Svg Data',
-          svg_filename: 'mathImage.svg'
-        }
-      }];
-      var response = {
-        filename: 'mathImage.svg'
-      };
-      var imageFile = new Blob();
-      spyOn(AssetsBackendApiService, 'saveMathExpresionImage').and.returnValue(
-        $q.reject({}));
-      spyOn(
-        ImageUploadHelperService,
-        'convertImageDataToImageFile').and.returnValue(imageFile);
-      $scope.save();
-      $scope.$apply();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
-
-    it('should cancel the modal when if the rawLatex or filename field is' +
-       'empty for a math expression', function() {
-      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
-      $scope.tmpCustomizationArgs = [{
-        name: 'math_content',
-        value: {
-          raw_latex: '',
-          svgFile: null,
-          svg_filename: ''
-        }
-      }];
-      $scope.save();
-      $scope.$apply();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
-
-    it('should save modal customization args while in local storage',
-      function() {
-        var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
-        $scope.tmpCustomizationArgs = [{
-          name: 'math_content',
-          value: {
-            raw_latex: 'x^2',
-            svgFile: 'Svg Data',
-            svg_filename: 'mathImage.svg'
-          }
-        }];
-        var response = {
-          filename: 'mathImage.svg'
-        };
-        var imageFile = new Blob();
-        spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
-          AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-        spyOn(
-          ImageUploadHelperService,
-          'convertImageDataToImageFile').and.returnValue(imageFile);
-        $scope.save();
-        $scope.$apply();
-        expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-        expect($uibModalInstance.close).toHaveBeenCalledWith({
-          math_content: {
-            raw_latex: 'x^2',
-            svg_filename: 'mathImage.svg'
-          }
-        });
-      });
   });
 
   describe('when customization args doesn\'t have a valid youtube video',
