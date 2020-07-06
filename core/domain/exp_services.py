@@ -1134,7 +1134,9 @@ def delete_exploration_summaries(exploration_ids):
     """
     summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
     summary_models = [
-        sum_model for sum_model in summary_models if sum_model is not None]
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
     exp_models.ExpSummaryModel.delete_multi(summary_models)
 
 

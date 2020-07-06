@@ -2367,7 +2367,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # Story to pseudonymous user ID mapping.
+    # Dict of story IDs as keys and pseudonymous user IDs as values. For
+    # different story we used different pseudonymous user ID.
     story_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
@@ -2406,21 +2407,21 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
 
 class PseudonymizedUserModel(base_models.BaseModel):
-    """Model for storing anonymized user IDs."""
+    """Model for storing pseudonymized user IDs."""
 
     @staticmethod
     def get_deletion_policy():
-        """PseudonymizedUserModel contains only anonymous ids."""
+        """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_export_policy():
-        """PseudonymizedUserModel contains only anonymous ids."""
+        """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():
-        """PseudonymizedUserModel contains only anonymous ids."""
+        """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod

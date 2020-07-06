@@ -1100,7 +1100,9 @@ def delete_collection_summaries(collection_ids):
     summary_models = (
         collection_models.CollectionSummaryModel.get_multi(collection_ids))
     summary_models = [
-        sum_model for sum_model in summary_models if sum_model is not None]
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
     collection_models.CollectionSummaryModel.delete_multi(summary_models)
 
 

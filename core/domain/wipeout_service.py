@@ -130,7 +130,7 @@ def _hard_delete_explorations_and_collections(pending_deletion_model):
         force_deletion=True)
 
 
-def _generate_activity_to_user_ids_mapping(activity_ids):
+def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     """Generate mapping from activity IDs to user IDs.
 
     Args:
@@ -139,7 +139,8 @@ def _generate_activity_to_user_ids_mapping(activity_ids):
 
     Returns:
         dict(str, str). Mapping between the activity IDs and pseudonymized
-        user IDs.
+        user IDs. For each activity (with distinct ID) we generate new
+        pseudonymized user ID.
     """
     return {
         activity_id: user_models.PseudonymizedUserModel.get_new_id()
@@ -166,14 +167,14 @@ def _delete_story_models(pending_deletion_model):
 
     if not pending_deletion_model.story_mappings:
         pending_deletion_model.story_mappings = (
-            _generate_activity_to_user_ids_mapping(story_ids))
+            _generate_activity_to_pseudonymized_ids_mapping(story_ids))
         pending_deletion_model.put()
 
     def _pseudonymize_models(story_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
 
         Args:
-            story_related_models: list(ndb.Model). Models which user IDs should
+            story_related_models: list(ndb.Model). Models whose user IDs should
                 be pseudonymized.
             pseudonymized_user_id: str. New pseudonymized user ID to be used for
                 the models.
@@ -191,7 +192,6 @@ def _delete_story_models(pending_deletion_model):
             if isinstance(model, story_models.StoryCommitLogEntryModel)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_user_id
-            commit_log_model.username = 'ANONYMOUS'
         story_models.StoryCommitLogEntryModel.put_multi(
             commit_log_models, update_last_updated_time=False)
 
@@ -237,7 +237,7 @@ def _verify_story_models_pseudonymized(user_id):
         user_id: str. The id of the user to be deleted.
 
     Returns:
-        bool. True if all the story models were correctly deleted, False
+        bool. True if all the story models were correctly pseudonymized, False
         otherwise.
     """
     return not any((
