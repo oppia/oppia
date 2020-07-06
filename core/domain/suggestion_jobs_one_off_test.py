@@ -970,8 +970,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
