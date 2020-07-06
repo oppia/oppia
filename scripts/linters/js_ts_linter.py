@@ -1178,13 +1178,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     '%sOppiaAngularRootComponent linting failed, fix the'
                     ' errors listed above' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
-                summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s OppiaAngularRootComponent linting linting passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
-                summary_messages.append(summary_message)
 
+            summary_messages.append(summary_message)
             python_utils.PRINT('')
             python_utils.PRINT(summary_message)
             python_utils.PRINT('OppiaAngularRootComponent linting finished.')
