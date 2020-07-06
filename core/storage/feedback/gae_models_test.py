@@ -94,50 +94,6 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
-    def test_migrate_model(self):
-        id_ = '%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random')
-        feedback_models.GeneralFeedbackThreadModel(
-            id=id_,
-            entity_type=self.ENTITY_TYPE,
-            entity_id=self.ENTITY_ID,
-            original_author_id=self.OLD_USER_1_ID,
-            subject=self.SUBJECT,
-            last_nonempty_message_author_id=self.OLD_USER_2_ID,
-        ).put()
-
-        feedback_models.GeneralFeedbackThreadModel.migrate_model(
-            self.OLD_USER_1_ID, self.NEW_USER_1_ID)
-        migrated_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(id_))
-        self.assertEqual(migrated_model.original_author_id, self.NEW_USER_1_ID)
-        self.assertEqual(
-            migrated_model.last_nonempty_message_author_id, self.OLD_USER_2_ID)
-
-        feedback_models.GeneralFeedbackThreadModel.migrate_model(
-            self.OLD_USER_2_ID, self.NEW_USER_2_ID)
-        migrated_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(id_))
-        self.assertEqual(migrated_model.original_author_id, self.NEW_USER_1_ID)
-        self.assertEqual(
-            migrated_model.last_nonempty_message_author_id, self.NEW_USER_2_ID)
-
-        feedback_models.GeneralFeedbackThreadModel(
-            id=id_,
-            entity_type=self.ENTITY_TYPE,
-            entity_id=self.ENTITY_ID,
-            original_author_id=self.OLD_USER_1_ID,
-            subject=self.SUBJECT,
-            last_nonempty_message_author_id=self.OLD_USER_1_ID,
-        ).put()
-
-        feedback_models.GeneralFeedbackThreadModel.migrate_model(
-            self.OLD_USER_1_ID, self.NEW_USER_1_ID)
-        migrated_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(id_))
-        self.assertEqual(migrated_model.original_author_id, self.NEW_USER_1_ID)
-        self.assertEqual(
-            migrated_model.last_nonempty_message_author_id, self.NEW_USER_1_ID)
-
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
         # Test create method.

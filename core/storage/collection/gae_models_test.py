@@ -280,51 +280,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(expected_collection_ids, collection_ids)
 
 
-class CollectionRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
-    """Test the CollectionRightsModel class."""
-
-    COLLECTION_ID_1 = '1'
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_3 = 'id_3'
-
-    def setUp(self):
-        super(CollectionRightsAllUsersModelUnitTest, self).setUp()
-        user_models.UserSettingsModel(
-            id=self.USER_ID_1,
-            gae_id='gae_1_id',
-            email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        user_models.UserSettingsModel(
-            id=self.USER_ID_2,
-            gae_id='gae_2_id',
-            email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        collection_models.CollectionRightsAllUsersModel(
-            id=self.COLLECTION_ID_1,
-            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
-        ).put()
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            collection_models.CollectionRightsAllUsersModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertTrue(
-            collection_models.CollectionRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_1))
-        self.assertTrue(
-            collection_models.CollectionRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_2))
-        self.assertFalse(
-            collection_models.CollectionRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_3))
-
-
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionCommitLogEntryModel class."""
 
