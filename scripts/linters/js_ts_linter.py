@@ -1071,9 +1071,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             # Going through all ts files and looking for @Injectable classes.
             class_name = file_content.split(
                 '@Injectable({')[1].split(
-                    'export class ')[1].split('{')[0].replace(' ', '')
+                    'export class ')[1].split('Service')[0].replace(' ', '')
             camel_case_class_name = class_name[0].lower() + class_name[1:]
-            return class_name, camel_case_class_name
+            return class_name + 'Service', camel_case_class_name + 'Service'
 
         oppia_angular_root_path = (
             './core/templates/components/oppia-angular-root.component.ts')
