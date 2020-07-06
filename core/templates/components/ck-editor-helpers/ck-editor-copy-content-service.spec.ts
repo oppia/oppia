@@ -32,7 +32,7 @@ const generateContent = (html: string): HTMLElement => {
  * @fileoverview Unit tests for the Ck editor copy content service.
  */
 
-fdescribe('Ck editor copy content service', () => {
+describe('Ck editor copy content service', () => {
   let loggerService = new LoggerService();
   let htmlEscaperService = new HtmlEscaperService(loggerService);
 
