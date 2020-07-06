@@ -74,7 +74,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
     def test_get_all_visualization_ids(self):
         visualization_ids = (
             visualization_registry.Registry.get_all_visualization_ids())
-        expected_visualizations = ['FrequencyTable', 'BarChart',
+        expected_visualizations = ['FrequencyTable', 'BarChart', 'ClickHexbins',
                                    'EnumeratedFrequencyTable', 'SortedTiles']
 
         self.assertEqual(
@@ -121,7 +121,7 @@ class VisualizationsNameTests(test_utils.GenericTestBase):
 
         expected_visualizations = ['BaseVisualization', 'FrequencyTable',
                                    'BarChart', 'EnumeratedFrequencyTable',
-                                   'SortedTiles']
+                                   'ClickHexbins', 'SortedTiles']
 
         self.assertEqual(
             sorted(all_visualizations), sorted(expected_visualizations))
