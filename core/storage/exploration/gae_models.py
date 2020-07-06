@@ -32,11 +32,13 @@ from google.appengine.ext import ndb
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
+
     pass
 
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
+
     pass
 
 
@@ -46,6 +48,7 @@ class ExplorationModel(base_models.VersionedModel):
     This class should only be imported by the exploration services file
     and the exploration model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
     ALLOW_REVERT = True
@@ -155,21 +158,14 @@ class ExplorationModel(base_models.VersionedModel):
         super(ExplorationModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
         # TODO(msl): Test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
         # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds, exp_rights.status,
-            exp_rights.community_owned
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, exp_rights.status, exp_rights.community_owned
         )
         exploration_commit_log.exploration_id = self.id
         exploration_commit_log.put()
@@ -195,12 +191,6 @@ class ExplorationModel(base_models.VersionedModel):
             commit_message, force_deletion=force_deletion)
 
         if not force_deletion:
-            committer_user_settings_model = (
-                user_models.UserSettingsModel.get_by_id(committer_id))
-            committer_username = (
-                committer_user_settings_model.username
-                if committer_user_settings_model else '')
-
             commit_log_models = []
             exp_rights_models = ExplorationRightsModel.get_multi(
                 entity_ids, include_deleted=True)
@@ -210,7 +200,7 @@ class ExplorationModel(base_models.VersionedModel):
                 versioned_models, exp_rights_models)
             for model, rights_model in versioned_and_exp_rights_models:
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
-                    model.id, model.version, committer_id, committer_username,
+                    model.id, model.version, committer_id,
                     cls._COMMIT_TYPE_DELETE,
                     commit_message, [{'cmd': cls.CMD_DELETE_COMMIT}],
                     rights_model.status, rights_model.community_owned
@@ -263,12 +253,14 @@ class ExplorationContextModel(base_models.BaseModel):
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
+
     pass
 
 
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
+
     pass
 
 
@@ -464,24 +456,19 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
+
         super(ExplorationRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
         # Create and delete events will already be recorded in the
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
-            committer_user_settings_model = (
-                user_models.UserSettingsModel.get_by_id(committer_id))
-            committer_username = (
-                committer_user_settings_model.username
-                if committer_user_settings_model else '')
             # TODO(msl): Test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when explorations
             # are changed).
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
-                username=committer_username,
                 exploration_id=self.id,
                 commit_type=commit_type,
                 commit_message=commit_message,
@@ -536,6 +523,7 @@ class ExplorationRightsAllUsersModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding exploration.
     """
+
     # The user_ids of users who are (or were in history) members of owner_ids,
     # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
     all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -607,6 +595,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     The id for this model is of the form
     'exploration-[exploration_id]-[version]'.
     """
+
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
 

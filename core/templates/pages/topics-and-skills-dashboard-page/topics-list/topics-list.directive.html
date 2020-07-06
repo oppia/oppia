@@ -34,7 +34,7 @@
           <div>
             <span class="topic-classroom protractor-test-topic-classroom">
               <span ng-if="topic.classroom"><[topic.classroom]></span>
-              <span ng-if="!topic.classroom">Unassigned</span>
+              <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="bottom" ng-if="!topic.classroom">No classroom assigned.</span>
             </span>
           </div>
           <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
@@ -244,9 +244,10 @@
     text-decoration: none;
   }
   topics-list .topic-classroom {
-    font-size: 15px;
+    font-size: 13px;
+    font-style: italic;
     margin: 4px 0;
-    text-transform: uppercase;
+    text-transform: capitalize;
   }
   topics-list .topic-description {
     font-size: 15px;
@@ -287,7 +288,7 @@
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
-    word-break: break-all;
+    word-break: break-word;
   }
 
   @media (max-width: 768px) {
