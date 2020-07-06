@@ -470,6 +470,8 @@ def main(args=None):
     if not parsed_args.skip_build:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
+    else:
+        build.modify_constants(prod_env=not dev_mode, maintenance_mode=False)
     version = (
         get_chrome_driver_version() if parsed_args.auto_select_chromedriver
         else CHROME_DRIVER_VERSION)
