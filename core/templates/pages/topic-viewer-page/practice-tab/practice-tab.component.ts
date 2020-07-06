@@ -37,8 +37,7 @@ export class PracticeTabComponent implements OnInit {
   availableSubtopics: Array<Subtopic> = [];
   selectedSubtopicIndices: Array<Boolean> = [];
   constructor(
-    private urlInterpolationService: UrlInterpolationService
-  ) {}
+    private urlInterpolationService: UrlInterpolationService) {}
   ngOnInit(): void {
     this.selectedSubtopics = [];
     this.availableSubtopics = this.subtopicsList.filter(
