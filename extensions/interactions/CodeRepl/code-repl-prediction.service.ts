@@ -254,7 +254,7 @@ export class CodeReplPredictionService {
 
     const nearestNeighborsIndexes = (
       this.findNearestNeighborsIndexes(knnData, program));
-    const nearesNeighborsClasses = [];
+    const nearesNeighborsClasses: number[][] = [];
 
     // Find classes of nearest neighbor programs.
     nearestNeighborsIndexes.forEach((neighbor: number[]) => {
@@ -267,7 +267,7 @@ export class CodeReplPredictionService {
 
     // Count how many times a class appears in nearest neighbors.
     const classCount = {};
-    nearesNeighborsClasses.forEach((neighbor: any[]) => {
+    nearesNeighborsClasses.forEach(neighbor => {
       const outputClass = neighbor[0];
       if (classCount.hasOwnProperty(outputClass)) {
         classCount[outputClass] += 1;

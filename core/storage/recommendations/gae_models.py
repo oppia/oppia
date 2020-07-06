@@ -34,6 +34,7 @@ class ExplorationRecommendationsModel(
 
     Instances of this class are keyed by exploration id.
     """
+
     # Ids of recommended explorations.
     recommended_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=False)
@@ -84,6 +85,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     Currently, topics are the same as the default categories. However, this may
     change in the future.
     """
+
     content = ndb.JsonProperty(required=True)
 
     @staticmethod

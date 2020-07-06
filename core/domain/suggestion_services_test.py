@@ -84,6 +84,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
+
         def __init__(self, exploration_id, states):
             self.id = exploration_id
             self.states = states
@@ -698,6 +699,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
+
         def __init__(self, exploration_id, states):
             self.id = exploration_id
             self.states = states

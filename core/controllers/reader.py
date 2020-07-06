@@ -683,6 +683,7 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
     """Handles operations related to the activities in the incomplete list of
     the user.
     """
+
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, activity_id):
         """Removes exploration or collection from incomplete list.

@@ -314,11 +314,6 @@ class SuggestionEditStateContent(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_CONTENT,
                     self.get_score_type()))
 
-        if self.get_score_sub_type() not in constants.ALL_CATEGORIES:
-            raise utils.ValidationError(
-                'Expected the second part of score_category to be a valid'
-                ' category, received %s' % self.get_score_sub_type())
-
         if self.change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
@@ -474,18 +469,16 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to be an ExplorationChange, received %s'
                 % type(self.change))
-
+        # The score sub_type needs to match the validation for exploration
+        # category, i.e the second part of the score_category should match
+        # the target exploration's category and we have a prod validation
+        # for the same.
         if self.get_score_type() != suggestion_models.SCORE_TYPE_TRANSLATION:
             raise utils.ValidationError(
                 'Expected the first part of score_category to be %s '
                 ', received %s' % (
                     suggestion_models.SCORE_TYPE_TRANSLATION,
                     self.get_score_type()))
-
-        if self.get_score_sub_type() not in constants.ALL_CATEGORIES:
-            raise utils.ValidationError(
-                'Expected the second part of score_category to be a valid'
-                ' category, received %s' % self.get_score_sub_type())
 
         if self.change.cmd != exp_domain.CMD_ADD_TRANSLATION:
             raise utils.ValidationError(

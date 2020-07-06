@@ -109,7 +109,7 @@
 
 
 # Dev workflow team.
-/.circleci/ @kevinlee12
+/.circleci/ @kevinlee12 @U8NWXD
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -119,7 +119,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @kevinlee12
+/.travis.yml @kevinlee12 @U8NWXD
 /.yarnrc @kevinlee12
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -190,11 +190,7 @@
 
 
 # Global components and filters.
-/core/templates/components/button-directives/exploration-embed-button.service.ts @ankita240796
-/core/templates/components/button-directives/exploration-embed-button.directive.html @ankita240796
-/core/templates/components/button-directives/exploration-embed-button-modal.controller*.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.directive.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.directive.html @ankita240796
+/core/templates/components/button-directives/* @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
@@ -207,8 +203,8 @@
 /core/templates/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @ankita240796
 /core/templates/components/profile-link-directives/ @ankita240796
 /core/templates/components/summary-tile/ @ankita240796
 /core/templates/directives/angular-html-bind.directive*.ts @ankita240796
@@ -442,21 +438,6 @@
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
 
-# QA team.
-/core/tests/ @nithusha21
-/core/tests/protractor_utils/ @U8NWXD
-/core/tests/protractor_desktop/ @U8NWXD
-/core/tests/protractor/ @U8NWXD
-/core/tests/protractor.conf.js @U8NWXD
-/extensions/interactions/*/protractor.js @U8NWXD
-/extensions/interactions/protractor.js @U8NWXD
-/extensions/rich_text_components/*/protractor.js @U8NWXD
-/extensions/rich_text_components/protractor.js @U8NWXD
-/extensions/objects/protractor.js @U8NWXD
-/assets/ @nithusha21
-/data/ @nithusha21
-
-
 # Release team.
 /scripts/release_scripts/ @ankita240796
 
@@ -530,6 +511,7 @@
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
+/puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @jimbyo @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
@@ -565,6 +547,22 @@
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
+
+
+# QA team.
+/core/tests/ @nithusha21
+/assets/ @nithusha21
+/data/ @nithusha21
+/core/tests/protractor_utils/ @U8NWXD
+/core/tests/protractor_desktop/ @U8NWXD
+/core/tests/protractor/ @U8NWXD
+/core/tests/protractor.conf.js @U8NWXD
+/extensions/interactions/*/protractor.js @U8NWXD
+/extensions/interactions/protractor.js @U8NWXD
+/extensions/rich_text_components/*/protractor.js @U8NWXD
+/extensions/rich_text_components/protractor.js @U8NWXD
+/extensions/objects/protractor.js @U8NWXD
+
 
 # Critical files.
 #

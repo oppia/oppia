@@ -16,8 +16,8 @@ jobs:
       matrix:
         os: [ubuntu-18.04]
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: '2.x'
           architecture: 'x64'
