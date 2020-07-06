@@ -20,7 +20,7 @@
 require('components/profile-link-directives/profile-link-image.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'sharing-links.directive.ts');
+  'sharing-links.component.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 require(
