@@ -52,7 +52,9 @@ describe('Exploration Embed Button Modal Controller', function() {
   it('should add range from a click event', function() {
     var removeAllRanges = jasmine.createSpy('removeAllRanges');
     var addRange = jasmine.createSpy('addRange');
-    spyOn(window, 'getSelection').and.returnValue(<any>{
+    // @ts-ignore window getSelection method return more properties than
+    // removeAllRanges and addRange.
+    spyOn(window, 'getSelection').and.returnValue({
       removeAllRanges: removeAllRanges,
       addRange: addRange
     });

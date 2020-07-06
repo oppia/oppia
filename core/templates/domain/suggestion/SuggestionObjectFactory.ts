@@ -32,7 +32,7 @@ interface ISuggestionChangeBackendDict {
   'old_value': ISuggestionChangeValue;
 }
 
-interface ISuggestionBackendDict {
+export interface ISuggestionBackendDict {
   'suggestion_type': string;
   'suggestion_id': string;
   'target_type': string;

@@ -64,12 +64,12 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
+
     pass
 
 
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
-
 
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
@@ -531,6 +531,7 @@ class FetchIssuesHandler(EditorHandler):
     exploration. This removes the invalid issues and returns the remaining
     unresolved ones.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
