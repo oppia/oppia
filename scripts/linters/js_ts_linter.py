@@ -1121,7 +1121,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     total_error_count += 1
                     summary_message = (
                         'Please add a static class member %s '
-                        'to Oppia Angular Root Component in %s:' 
+                        'to Oppia Angular Root Component in %s:'
                         '  static %s: %s;' % (
                             camel_case_class_name, oppia_angular_root_path,
                             camel_case_class_name, class_name))
@@ -1153,7 +1153,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         'The static variable hasn\'t been assigned value'
                         ' in Oppia Angular Root Component in %s:'
                         '  OppiaAngularRootComponent.%s = this.%s' % (
-                            oppia_angular_root_path,camel_case_class_name,
+                            oppia_angular_root_path, camel_case_class_name,
                             camel_case_class_name))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
