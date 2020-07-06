@@ -277,8 +277,8 @@ import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -688,6 +688,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService;
   static explorationFeaturesService: ExplorationFeaturesService;
   static explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  static explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService;
   static explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   static explorationObjectFactory: ExplorationObjectFactory;
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
@@ -728,7 +729,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
   static improvementActionButtonObjectFactory: ImprovementActionButtonObjectFactory;
-  static improvementsBackendApiService: ImprovementsBackendApiService;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
@@ -971,6 +971,7 @@ private explorationDraftObjectFactory: ExplorationDraftObjectFactory,
 private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
 private explorationFeaturesService: ExplorationFeaturesService,
 private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+private explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService,
 private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
@@ -1011,7 +1012,6 @@ private idGenerationService: IdGenerationService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
 private improvementActionButtonObjectFactory: ImprovementActionButtonObjectFactory,
-private improvementsBackendApiService: ImprovementsBackendApiService,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
@@ -1255,6 +1255,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationFeaturesBackendApiService = this.explorationFeaturesBackendApiService;
     OppiaAngularRootComponent.explorationFeaturesService = this.explorationFeaturesService;
     OppiaAngularRootComponent.explorationHtmlFormatterService = this.explorationHtmlFormatterService;
+    OppiaAngularRootComponent.explorationImprovementsBackendApiService = this.explorationImprovementsBackendApiService;
     OppiaAngularRootComponent.explorationMetadataObjectFactory = this.explorationMetadataObjectFactory;
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
@@ -1295,7 +1296,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
     OppiaAngularRootComponent.improvementActionButtonObjectFactory = this.improvementActionButtonObjectFactory;
-    OppiaAngularRootComponent.improvementsBackendApiService = this.improvementsBackendApiService;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;

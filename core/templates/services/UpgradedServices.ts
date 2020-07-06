@@ -233,8 +233,8 @@ import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -1161,14 +1161,14 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ExplorationImprovementsBackendApiService'] =
+      new ExplorationImprovementsBackendApiService(
+        upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
       new ExplorationStatsBackendApiService(
         upgradedServices['ExplorationStatsObjectFactory'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
-    upgradedServices['ImprovementsBackendApiService'] =
-      new ImprovementsBackendApiService(
-        upgradedServices['ExplorationTaskObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
