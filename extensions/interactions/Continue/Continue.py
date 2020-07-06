@@ -46,7 +46,7 @@ class Continue(base.BaseInteraction):
         'description': 'Button label',
         'schema': {
             'type': 'custom',
-            'obj_type': 'TranslatableUnicodeString'
+            'obj_type': 'SubtitledUnicode'
         },
         'default_value': { 'content_id': '', 'unicode_str': 'Continue' },
     }]

@@ -49,7 +49,7 @@ class TextInput(base.BaseInteraction):
         'description': 'Placeholder text (optional)',
         'schema': {
             'type': 'custom',
-            'obj_type': 'TranslatableUnicodeString'
+            'obj_type': 'SubtitledUnicode'
         },
         'default_value': {'content_id': '', 'unicode_str': ''}
     }, {

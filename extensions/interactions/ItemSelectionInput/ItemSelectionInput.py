@@ -67,7 +67,7 @@ class ItemSelectionInput(base.BaseInteraction):
             'type': 'list',
             'items': {
                 'type': 'custom',
-                'obj_type': 'TranslatableHtml',
+                'obj_type': 'SubtitledHtml',
                 'ui_config': {
                     'hide_complex_extensions': True,
                     'placeholder': 'Sample item answer',

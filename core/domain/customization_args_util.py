@@ -21,10 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+import feconf
 import python_utils
 import schema_utils
 import utils
-
 
 def get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
@@ -123,3 +123,44 @@ def validate_customization_args_and_values(
             # not involved (If they are, can we get sample values for the
             # state context parameters?).
             pass
+
+def convert_translatable_in_customization_arguments(
+        customization_args, customization_arg_specs, conversion_fn):
+    """
+    """
+
+    def find_translatable(customization_arg, customization_arg_spec):
+        """
+        """
+        if 'schema' in customization_arg_spec:
+            schema = customization_arg_spec['schema']
+        else:
+            schema = customization_arg_spec
+
+        schema_type = schema['type']
+        schema_obj_type = None
+        if schema_type == "custom":
+            schema_obj_type = schema['obj_type']
+
+        if (
+            schema_obj_type == "SubtitledUnicode" or 
+            schema_obj_type == "SubtitledHtml"
+        )
+            customization_arg['value'] = conversion_fn(
+                schema_obj_type,
+                customization_arg['value'],
+                customization_arg_spec.get('name', None))
+        elif (schema_type == "list"):
+            find_translatable(
+                customization_arg, customization_arg_spec['schema']['items'])
+        elif (schema_type == "dict"):
+            for i in range(len(customization_arg_spec['properties'])):
+                find_translatable(
+                    customization_arg,
+                    customization_arg_spec['schema']['properties'][i]['schema'])
+
+    for customization_arg_spec in customization_arg_specs:
+        if customization_arg_spec['name'] in customization_args:
+            find_translatable(
+                customization_args[customization_arg_spec['name']],
+                customization_arg_spec)

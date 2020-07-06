@@ -27,7 +27,7 @@ describe('WrittenTranslation object factory', () => {
     beforeEach(() => {
       wtof = new WrittenTranslationObjectFactory();
       writtenTranslation = wtof.createFromBackendDict({
-        translation_type: 'html',
+        type: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       });
@@ -35,7 +35,7 @@ describe('WrittenTranslation object factory', () => {
 
     it('should set and get html value correctly', () => {
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-        translation_type: 'html',
+        type: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       }));
@@ -43,7 +43,7 @@ describe('WrittenTranslation object factory', () => {
       writtenTranslation.translation = '<p>New HTML</p>';
       expect(writtenTranslation.translation).toEqual('<p>New HTML</p>');
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-        translation_type: 'html',
+        type: 'html',
         translation: '<p>New HTML</p>',
         needs_update: false
       }));
@@ -52,13 +52,13 @@ describe('WrittenTranslation object factory', () => {
     it('should correctly mark written translation as needing update',
       () => {
         expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-          translation_type: 'html',
+          type: 'html',
           translation: '<p>HTML</p>',
           needs_update: false
         }));
         writtenTranslation.markAsNeedingUpdate();
         expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-          translation_type: 'html',
+          type: 'html',
           translation: '<p>HTML</p>',
           needs_update: true
         }));
@@ -66,20 +66,20 @@ describe('WrittenTranslation object factory', () => {
 
     it('should toggle needs update attribute correctly', () => {
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-        translation_type: 'html',
+        type: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       }));
       writtenTranslation.toggleNeedsUpdateAttribute();
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-        translation_type: 'html',
+        type: 'html',
         translation: '<p>HTML</p>',
         needs_update: true
       }));
 
       writtenTranslation.toggleNeedsUpdateAttribute();
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-        translation_type: 'html',
+        type: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       }));
@@ -87,7 +87,7 @@ describe('WrittenTranslation object factory', () => {
 
     it('should convert to backend dict correctly', () => {
       expect(writtenTranslation.toBackendDict()).toEqual({
-        translation_type: 'html',
+        type: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       });
@@ -96,7 +96,7 @@ describe('WrittenTranslation object factory', () => {
     it('should create a new written translation translation', () => {
       expect(wtof.createNewHtml('New')).toEqual(
         wtof.createFromBackendDict({
-          translation_type: 'html',
+          type: 'html',
           translation: 'New',
           needs_update: false
         })

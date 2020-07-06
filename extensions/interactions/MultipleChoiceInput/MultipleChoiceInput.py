@@ -50,7 +50,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             }],
             'items': {
                 'type': 'custom',
-                'obj_type': 'TranslatableHtml',
+                'obj_type': 'SubtitledHtml',
                 'ui_config': {
                     'hide_complex_extensions': True,
                     'placeholder': 'Enter an option for the learner to select',

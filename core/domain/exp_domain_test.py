@@ -1046,14 +1046,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1075,14 +1075,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1098,14 +1098,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>New state translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>New State translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1126,14 +1126,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': True
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1155,19 +1155,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi-en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     },
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -6898,7 +6898,9 @@ states:
         allowNonzeroIntegerPart:
           value: true
         customPlaceholder:
-          value: ''
+          value:
+            content_id: ''
+            unicode_str: ''
         placeholder:
           value: ''
         requireSimplestForm:

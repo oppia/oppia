@@ -16,7 +16,7 @@
  * @fileoverview Directive for translatable HTML editor.
  */
 
-angular.module('oppia').directive('translatableHtmlEditor', [
+angular.module('oppia').directive('SubtitledHtmlEditor', [
   function() {
     return {
       restrict: 'E',

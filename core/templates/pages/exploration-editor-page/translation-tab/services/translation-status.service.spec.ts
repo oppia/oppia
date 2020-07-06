@@ -189,14 +189,14 @@ describe('Translation status service', function() {
               default_outcome: {},
               feedback_2: {
                 hi: {
-                  translation_type: 'html',
+                  type: 'html',
                   translation: '<p>This is feedback 1.</p>',
                   needs_update: false
                 }
               },
               feedback_1: {
                 hi: {
-                  translation_type: 'html',
+                  type: 'html',
                   translation: '<p>This is first card.</p>',
                   needs_update: false
                 }

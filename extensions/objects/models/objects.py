@@ -122,7 +122,7 @@ class UnicodeString(BaseObject):
     }
 
 
-class TranslatableUnicodeString(UnicodeString):
+class SubtitledUnicode(UnicodeString):
     """Translatable Unicode string class."""
 
     description = 'An Unicode string that supports translations.'
@@ -152,7 +152,7 @@ class Html(BaseObject):
     }
 
 
-class TranslatableHtml(BaseObject):
+class SubtitledHtml(BaseObject):
     """Translatable HTML string class."""
 
     description = 'An HTML string that supports translations.'
@@ -688,7 +688,7 @@ class Graph(BaseObject):
             'schema': Real.SCHEMA
         }, {
             'name': 'label',
-            'schema': TranslatableUnicodeString.SCHEMA
+            'schema': SubtitledUnicode.SCHEMA
         }]
     }
     _EDGE_SCHEMA = {
@@ -899,7 +899,7 @@ class ImageWithRegions(BaseObject):
                     'type': 'dict',
                     'properties': [{
                         'name': 'label',
-                        'schema': TranslatableUnicodeString.SCHEMA
+                        'schema': SubtitledUnicode.SCHEMA
                     }, {
                         'name': 'region',
                         'schema': ImageRegion.SCHEMA

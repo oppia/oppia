@@ -1063,7 +1063,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
@@ -2907,7 +2907,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
@@ -2989,14 +2989,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'hint_2': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
                 'hint_1': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>Test1!</p>',
                         'needs_update': True
                     }
@@ -3310,24 +3310,24 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'hello',
                         'needs_update': True
                     },
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'Testing!',
                         'needs_update': False
                     },
                     'en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3358,7 +3358,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
@@ -3379,7 +3379,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
@@ -3428,7 +3428,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'feedback_1': {
                     'en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3449,7 +3449,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3520,7 +3520,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     123: {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3540,7 +3540,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'ed': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3559,7 +3559,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
@@ -3597,7 +3597,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
@@ -3617,7 +3617,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'translation_type': 'html',
+                        'type': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': True
                     }

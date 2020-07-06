@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 type TranslationType = 'unicode' | 'html';
 
 export interface ITranslationBackendDict {
-  'translation_type': TranslationType;
+  'type': TranslationType;
   'translation': string;
   'needs_update': boolean;
 }
@@ -59,7 +59,7 @@ export class WrittenTranslation {
 
   toBackendDict(): ITranslationBackendDict {
     return {
-      translation_type: this.translationType,
+      type: this.translationType,
       translation: this.translation,
       needs_update: this.needsUpdate
     };
@@ -76,7 +76,7 @@ export class WrittenTranslationObjectFactory {
 
   createFromBackendDict(translationBackendDict: ITranslationBackendDict) {
     return new WrittenTranslation(
-      translationBackendDict.translation_type,
+      translationBackendDict.type,
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }

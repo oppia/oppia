@@ -107,7 +107,7 @@
         "schema": {
           "items": {
             "type": "custom",
-            "obj_type": "TranslatableHtml",
+            "obj_type": "SubtitledHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to drag and drop."
@@ -194,7 +194,7 @@
         "schema": {
           "items": {
             "type": "custom",
-            "obj_type": "TranslatableHtml",
+            "obj_type": "SubtitledHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Sample item answer"
@@ -238,7 +238,7 @@
         "name": "buttonText",
         "schema": {
           "type": "custom",
-          "obj_type": "TranslatableUnicodeString"
+          "obj_type": "SubtitledUnicode"
         },
         "default_value": { "content_id": "", "unicode_str": "Continue" }
       }
@@ -418,7 +418,7 @@
         "name": "buttonText",
         "schema": {
           "type": "custom",
-          "obj_type": "TranslatableUnicodeString"
+          "obj_type": "SubtitledUnicode"
         },
         "default_value": {"content_id": "", "unicode_str": "Add item"}
       }
@@ -597,7 +597,7 @@
         "schema": {
           "items": {
             "type": "custom",
-            "obj_type": "TranslatableHtml",
+            "obj_type": "SubtitledHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to select"
@@ -690,7 +690,7 @@
         "name": "placeholder",
         "schema": {
           "type": "custom",
-          "obj_type": "TranslatableUnicodeString"
+          "obj_type": "SubtitledUnicode"
         },
         "default_value": {"content_id": "", "unicode_str": ""}
       },
@@ -917,7 +917,7 @@
         "name": "customPlaceholder",
         "schema": {
           "type": "custom",
-          "obj_type": "TranslatableUnicodeString"
+          "obj_type": "SubtitledUnicode"
         },
         "default_value": {"content_id": "", "unicode_str": ""}
       }

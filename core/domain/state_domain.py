@@ -755,6 +755,46 @@ class InteractionInstance(python_utils.OBJECT):
 
         return html_list
 
+    def convert_html_in_interaction(
+            self, interaction_dict, states_schema_version, conversion_fn):
+        with python_utils.open_file(
+            feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
+        ) as interaction_specs_json:
+            interaction_specs = json.load(interaction_specs_json)
+
+            customization_arg_specs = interaction_specs[
+                interaction_id]['customization_arg_specs']
+            customization_args = interaction_dict['customization_args']
+
+            def convert_cust_args(
+                obj_type, customization_arg_value,
+                customization_arg_name=None
+            ):
+                if obj_type == 'SubtitledUnicode':
+                    return customization_arg_value
+
+                if (
+                    isinstance(customization_arg_value, str) or
+                    isinstance(customization_arg_value, unicode)
+                ):
+                    
+                    return customization_arg_value[]
+                elif isinstance(customization_arg_value, list):
+                    return [{
+                        'content_id': '',
+                        translation_value_key: x
+                    } for x in customization_arg_value]
+                elif isinstance(customization_arg_value, dict):
+                    customization_arg_value[customization_arg_name] = {
+                        'content_id': '',
+                        translation_value_key: customization_arg_value
+                    }
+                    return customization_arg_value
+
+            customization_args_util.convert_translatable_in_customization_arguments(
+                customization_args,
+                customization_arg_specs,
+                convert_cust_args)
 
 class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
@@ -1011,7 +1051,7 @@ class WrittenTranslation(python_utils.OBJECT):
             needs_update: bool. Whether translation is marked for needing
                 review.
         """
-        self.translation_type = translation_type
+        self.type = translation_type
         self.translation = translation
         self.needs_update = needs_update
 
@@ -1025,7 +1065,7 @@ class WrittenTranslation(python_utils.OBJECT):
             dict. A dict, mapping all fields of WrittenTranslation instance.
         """
         return {
-            'translation_type': self.translation_type,
+            'type': self.type,
             'translation': self.translation,
             'needs_update': self.needs_update,
         }
@@ -1043,7 +1083,7 @@ class WrittenTranslation(python_utils.OBJECT):
             object.
         """
         return cls(
-            written_translation_dict['translation_type'],
+            written_translation_dict['type'],
             written_translation_dict['translation'],
             written_translation_dict['needs_update'])
 
@@ -1054,16 +1094,16 @@ class WrittenTranslation(python_utils.OBJECT):
             ValidationError: One or more attributes of the WrittenTranslation
                 are invalid.
         """
-        if not isinstance(self.translation_type, python_utils.BASESTRING):
+        if not isinstance(self.type, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid translation_type: %s' % self.translation_type)
+                'Invalid type: %s' % self.type)
 
         if not (
-            self.translation_type == 'unicode'
-            or self.translation_type == 'html'
+            self.type == 'unicode'
+            or self.type == 'html'
         ):
             raise utils.ValidationError(
-                'Invalid translation_type: %s' % self.translation_type)
+                'Invalid type: %s' % self.type)
 
         if not isinstance(self.translation, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -2506,7 +2546,8 @@ class State(python_utils.OBJECT):
             False, 0)
 
     @classmethod
-    def convert_html_fields_in_state(cls, state_dict, conversion_fn):
+    def convert_html_fields_in_state(cls, state_dict, conversion_fn, 
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -2551,23 +2592,29 @@ class State(python_utils.OBJECT):
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                state_dict['interaction']['id']))
-        interaction_customization_arg_has_html = False
-        for customization_arg_spec in interaction.customization_arg_specs:
-            schema = customization_arg_spec.schema
-            if schema['type'] == 'list' and schema['items']['type'] == 'html':
-                interaction_customization_arg_has_html = True
+        interaction_id = state_dict['interaction']['id']
+        if interaction_id is not None:
+            state_dict['interaction'] = (
+                InteractionInstance.convert_html_in_interaction(
+                    state_dict['interaction'], states_schema_version,
+                    conversion_fn
+                ))
 
-        if interaction_customization_arg_has_html:
-            if 'choices' in (
-                    state_dict['interaction']['customization_args'].keys()):
-                for value_index, value in enumerate(
-                        state_dict['interaction']['customization_args'][
-                            'choices']['value']):
-                    state_dict['interaction']['customization_args']['choices'][
-                        'value'][value_index] = conversion_fn(value)
+        # if states_schema_version < 40:
+        #     interaction_customization_arg_has_html = False
+        #     for customization_arg_spec in interaction.customization_arg_specs:
+        #         schema = customization_arg_spec.schema
+        #         if schema['type'] == 'list' and schema['items']['type'] == 'html':
+        #             interaction_customization_arg_has_html = True
+
+        #     if interaction_customization_arg_has_html:
+        #         if 'choices' in (
+        #                 state_dict['interaction']['customization_args'].keys()):
+        #             for value_index, value in enumerate(
+        #                     state_dict['interaction']['customization_args'][
+        #                         'choices']['value']):
+        #                 state_dict['interaction']['customization_args']['choices'][
+        #                     'value'][value_index] = conversion_fn(value)
 
         return state_dict
 

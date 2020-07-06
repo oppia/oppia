@@ -33,6 +33,7 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import customization_args_util
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -2453,13 +2454,12 @@ class Exploration(python_utils.OBJECT):
 
 
         def convert_to_subtitled(
-            customization_arg, customization_arg_spec, obj_type
-        ):
+                obj_type, customization_arg_value, customization_arg_name=None):
             """
             """
-            if obj_type == 'TranslatableUnicodeString':
+            if obj_type == 'SubtitledUnicode':
                 translation_value_key = 'unicode_str'
-            elif obj_type == 'TranslatableHtml':
+            elif obj_type == 'SubtitledHtml':
                 translation_value_key = 'html'
 
             if not translation_value_key:
@@ -2468,57 +2468,25 @@ class Exploration(python_utils.OBJECT):
                     obj_type
                 )
 
-            raise Exception(customization_arg)
-            if isinstance(customization_arg['value'], str):
-                customization_arg['value'] = {
+            if (
+                isinstance(customization_arg_value, str) or
+                isinstance(customization_arg_value, unicode)
+            ):
+                return {
                     'content_id': '',
-                    translation_value_key: customization_arg['value']
+                    translation_value_key: customization_arg_value
                 }
-            elif isinstance(customization_arg['value'], list):
-                    customization_arg['value'][i] = {
-                        'content_id': '',
-                        translation_value_key: customization_arg['value'][i]
-                    }
-            elif isinstance(customization_arg['value'], dict):
-                customization_arg['value'][customization_arg_spec['name']] = {
+            elif isinstance(customization_arg_value, list):
+                return [{
                     'content_id': '',
-                    translation_value_key: customization_arg['value']
+                    translation_value_key: x
+                } for x in customization_arg_value]
+            elif isinstance(customization_arg_value, dict):
+                customization_arg_value[customization_arg_name] = {
+                    'content_id': '',
+                    translation_value_key: customization_arg_value
                 }
-
-
-        def convert_all_to_subtitled(customization_arg, customization_arg_spec):
-            """
-            """            
-            if 'schema' not in customization_arg_spec:
-                schema_type = customization_arg_spec['type']
-            else:
-                schema_type = customization_arg_spec['schema']['type']
-
-            schema_obj_type = None
-            if schema_type == "custom":
-                if 'schema' not in customization_arg_spec:
-                    schema_obj_type = customization_arg_spec['obj_type']
-                else:
-                    schema_obj_type = customization_arg_spec[
-                        'schema']['obj_type']
-
-            if (schema_obj_type == "TranslatableUnicodeString" or 
-                schema_obj_type == "TranslatableHtml"):
-                convert_to_subtitled(
-                    customization_arg,
-                    customization_arg_spec,
-                    schema_obj_type)
-            elif (schema_type == "list"):
-                convert_all_to_subtitled(
-                    customization_arg,
-                    customization_arg_spec['schema']['items'])
-            elif (schema_type == "dict"):
-                for i in range(len(customization_arg_spec['properties'])):
-                    convert_all_to_subtitled(
-                        customization_arg,
-                        customization_arg_spec[
-                            'schema']['properties'][i]['schema'])
-            return
+                return customization_arg_value
 
         with python_utils.open_file(
             feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
@@ -2532,17 +2500,16 @@ class Exploration(python_utils.OBJECT):
                 if interaction_id is None:
                     continue
                 
-                customization_arg_specs = interaction_specs[interaction_id][
-                    'customization_arg_specs']
+                customization_arg_specs = interaction_specs[
+                    interaction_id]['customization_arg_specs']
                 customization_args = state_dict[
                     'interaction']['customization_args']
-                
-                for customization_arg_spec in customization_arg_specs:
-                    if customization_arg_spec['name'] in customization_args:
-                        convert_all_to_subtitled(
-                            customization_args[customization_arg_spec['name']],
-                            customization_arg_spec)
 
+                (customization_args_util
+                    .convert_translatable_in_customization_arguments(
+                        customization_args,
+                        customization_arg_specs,
+                        convert_to_subtitled))
 
         return states_dict
 
@@ -3749,10 +3716,10 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 39
 
-        # if exploration_schema_version == 39:
-        #     exploration_dict = cls._convert_v39_dict_to_v40_dict(
-        #         exploration_dict)
-        #     exploration_schema_version = 40
+        if exploration_schema_version == 39:
+            exploration_dict = cls._convert_v39_dict_to_v40_dict(
+                exploration_dict)
+            exploration_schema_version = 40
         
         return (exploration_dict, initial_schema_version)
 
