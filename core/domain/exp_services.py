@@ -70,6 +70,9 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # search query.
 MAX_ITERATIONS = 10
 
+# Asset directories that should not be bundled for download.
+DOWNLOAD_RESTRICTED_ASSET_DIRS = ['audio']
+
 
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user has permissions to edit the exploration.
@@ -284,6 +287,8 @@ def export_to_zip_file(exploration_id, version=None):
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
+            if filepath.startswith(tuple(DOWNLOAD_RESTRICTED_ASSET_DIRS)):
+                continue
             file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
