@@ -164,6 +164,8 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
@@ -186,8 +188,6 @@ import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
-import { ExplorationImprovementsBackendApiService } from
-  'services/exploration-improvements-backend-api.service';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/exploration-recommendations.service.ts';
