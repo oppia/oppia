@@ -39,6 +39,7 @@ export class Subtopic {
   _id: number;
   _title: string;
   _skillSummaries: SkillSummary[];
+  _skillIds: string[];
   _skillSummaryObjectFactory: SkillSummaryObjectFactory;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
@@ -49,6 +50,7 @@ export class Subtopic {
       thumbnailFilename: string, thumbnailBgColor: string) {
     this._id = subtopicId;
     this._title = title;
+    this._skillIds = skillIds;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
@@ -110,6 +112,10 @@ export class Subtopic {
   // Returns the summaries of the skills in the subtopic.
   getSkillSummaries(): SkillSummary[] {
     return this._skillSummaries.slice();
+  }
+
+  getSkillIds(): Array<string> {
+    return this._skillIds;
   }
 
   hasSkill(skillId: string): boolean {

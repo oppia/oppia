@@ -201,6 +201,24 @@ def delete_question_skill_link(user_id, question_id, skill_id):
     question_skill_link_model.delete()
 
 
+def get_question_count_by_skill_ids(skill_ids):
+    """Returns the number of questions assigned to the given skill_ids.
+
+    Args:
+        skill_ids: list(str). Skill IDs for which the question count is
+            requested.
+
+    Returns:
+        question_count: int. The number of questions assigned to the
+        given skill_ids.
+    """
+    question_count = (
+        question_models.QuestionSkillLinkModel.get_question_count_by_skill_ids(
+            skill_ids))
+
+    return question_count
+
+
 def get_questions_by_skill_ids(
         total_question_count, skill_ids, require_medium_difficulty):
     """Returns constant number of questions linked to each given skill id.

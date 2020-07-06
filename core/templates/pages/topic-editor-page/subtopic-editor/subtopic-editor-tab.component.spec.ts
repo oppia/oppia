@@ -41,6 +41,7 @@ describe('Subtopic editor tab', function() {
   var TopicEditorRoutingService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
+  var QuestionBackendApiService = null;
   var SkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
 
@@ -58,8 +59,12 @@ describe('Subtopic editor tab', function() {
     SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
+    QuestionBackendApiService = $injector.get('QuestionBackendApiService');
     directive = $injector.get('subtopicEditorTabDirective')[0];
 
+    var MockQuestionBackendApiService = {
+      fetchQuestionCountBySkillIds: () => Promise.resolve(2)
+    };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
@@ -74,7 +79,9 @@ describe('Subtopic editor tab', function() {
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
 
-    ctrl = $componentController('subtopicEditorTab');
+    ctrl = $componentController('subtopicEditorTab', {
+      QuestionBackendApiService: MockQuestionBackendApiService
+    });
     ctrl.$onInit();
   }));
 

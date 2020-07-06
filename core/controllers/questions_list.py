@@ -89,3 +89,30 @@ class QuestionsListHandler(base.BaseHandler):
             'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
+
+
+class QuestionCountDataHandler(base.BaseHandler):
+    """Provides data regarding the number of questions assigned to the given
+    skill ids.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, comma_separated_skill_ids):
+        """Handles GET requests."""
+        skill_ids = comma_separated_skill_ids.split(',')
+
+        for skill_id in skill_ids:
+            try:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+            except Exception:
+                raise self.PageNotFoundException(Exception('Invalid skill id'))
+
+        question_count = question_services.get_question_count_by_skill_ids(
+            skill_ids)
+
+        self.values.update({
+            'question_count': question_count
+        })
+        self.render_json(self.values)

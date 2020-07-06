@@ -27,6 +27,7 @@ require('domain/utilities/url-interpolation.service.ts');
 const subtopicConstants2 = require('constants.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/question-backend-api.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
@@ -40,7 +41,7 @@ angular.module('oppia').component('subtopicEditorTab', {
     '$scope', 'SubtopicValidationService', 'TopicEditorStateService',
     'TopicUpdateService',
     'EntityCreationService',
-    'TopicEditorRoutingService',
+    'TopicEditorRoutingService', 'QuestionBackendApiService',
     'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
     'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
@@ -48,7 +49,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         $scope, SubtopicValidationService, TopicEditorStateService,
         TopicUpdateService,
         EntityCreationService,
-        TopicEditorRoutingService,
+        TopicEditorRoutingService, QuestionBackendApiService,
         UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
         EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
         MAX_CHARS_IN_SUBTOPIC_TITLE) {
@@ -64,7 +65,11 @@ angular.module('oppia').component('subtopicEditorTab', {
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
-
+          var skillIds = ctrl.subtopic.getSkillIds();
+          QuestionBackendApiService.fetchQuestionCountBySkillIds(skillIds).then(
+            (response) => {
+              ctrl.questionCount = response;
+            });
           ctrl.editableTitle = ctrl.subtopic.getTitle();
           ctrl.editableThumbnailFilename = (
             ctrl.subtopic.getThumbnailFilename());
