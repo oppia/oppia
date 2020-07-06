@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for landing page.
+ * @fileoverview Provides constant global variables, for use in Protractor
+ * tests.
  */
 
-// The module needs to be loaded before everything else since it defines the
-// main module the elements are attached to.
-require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
-
-require(
-  'pages/landing-pages/topic-landing-page/topic-landing-page.component.ts');
-require('pages/OppiaFooterDirective.ts');
+exports.protractorConstants = {
+  SKILL_STATUS_UNASSIGNED: 'Unassigned'
+};
