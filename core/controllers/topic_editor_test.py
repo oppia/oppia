@@ -145,7 +145,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
             {'title': 'Story title'},
             csrf_token=csrf_token)
-        story_id = json_response['storyId']
+        story_id = json_response['storyId'] # pylint: disable=snake-case-for-dictionary-keys
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
