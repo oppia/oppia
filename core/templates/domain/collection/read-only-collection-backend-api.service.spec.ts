@@ -204,7 +204,7 @@ describe('Read only collection backend API service', () => {
     // Cache a collection.
     readOnlyCollectionBackendApiService.cacheCollection('0', collection);
 
-    // It should now be cached.CollectionPlaythroughObjectFactory
+    // It should now be cached.CollectionPlaythroughObjectFactory.
     expect(readOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
 
     // A new collection should not have been fetched from the backend. Also,

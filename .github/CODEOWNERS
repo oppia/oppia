@@ -532,6 +532,7 @@
 # User’s profile page.
 /core/controllers/profile*.py @vojtechjelinek
 /core/templates/domain/user/ @vojtechjelinek
+/core/templates/domain/profile/ @vojtechjelinek
 /core/templates/pages/profile-page/ @vojtechjelinek
 /core/templates/services/user.service*.ts @vojtechjelinek
 

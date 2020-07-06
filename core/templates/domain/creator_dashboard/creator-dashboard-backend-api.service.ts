@@ -150,7 +150,7 @@ export class CreatorDashboardBackendApiService {
       return {
         dashboardStats: this.creatorDashboardStatsObjectFactory
           .createFromBackendDict(dashboardData.dashboard_stats),
-        // Because lastWeekStats may be null
+        // Because lastWeekStats may be null.
         lastWeekStats: dashboardData.last_week_stats ? (
           this.creatorDashboardStatsObjectFactory
             .createFromBackendDict(dashboardData.last_week_stats)) : null,

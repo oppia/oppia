@@ -789,7 +789,7 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
-      // Exploration with id 2
+      // Exploration with id 2.
       var activity = learnerExplorationSummaryObjectFactory
         .createFromBackendDict(
           learnerDashboardData.exploration_playlist[1]);

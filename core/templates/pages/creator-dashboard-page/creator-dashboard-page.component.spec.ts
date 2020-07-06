@@ -280,7 +280,7 @@ describe('Creator dashboard controller', () => {
           .and.returnValue($q.resolve({
             dashboardStats: creatorDashboardStatsObjectFactory
               .createFromBackendDict(dashboardData.dashboard_stats),
-            // Because lastWeekStats may be null
+            // Because lastWeekStats may be null.
             lastWeekStats: dashboardData.last_week_stats ? (
               creatorDashboardStatsObjectFactory
                 .createFromBackendDict(dashboardData.last_week_stats)) : null,
@@ -553,7 +553,7 @@ describe('Creator dashboard controller', () => {
         .and.returnValue($q.resolve({
           dashboardStats: creatorDashboardStatsObjectFactory
             .createFromBackendDict(dashboardData.dashboard_stats),
-          // Because lastWeekStats may be null
+          // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
             creatorDashboardStatsObjectFactory
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
@@ -651,7 +651,7 @@ describe('Creator dashboard controller', () => {
         .and.returnValue($q.resolve({
           dashboardStats: creatorDashboardStatsObjectFactory
             .createFromBackendDict(dashboardData.dashboard_stats),
-          // Because lastWeekStats may be null
+          // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
             creatorDashboardStatsObjectFactory
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
