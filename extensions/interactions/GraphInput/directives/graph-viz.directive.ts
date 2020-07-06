@@ -60,8 +60,7 @@ angular.module('oppia').directive('graphViz', [
             ADD_VERTEX: 2,
             DELETE: 3
           };
-          var vizContainer = (
-            <SVGSVGElement><any>$($element).find('.oppia-graph-viz-svg'));
+          var vizContainer = $($element).find('.oppia-graph-viz-svg');
           // Styling functions.
           var DELETE_COLOR = 'red';
           var HOVER_COLOR = 'aqua';
@@ -209,12 +208,11 @@ angular.module('oppia').directive('graphViz', [
           };
 
           var initViewboxSize = function() {
-            var svgContainer = (
-              <SVGSVGElement><any>$($element).find('.oppia-graph-viz-svg')[0]);
+            var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
             var boundingBox = svgContainer.getBBox();
             var viewBoxHeight = Math.max(
               boundingBox.height + boundingBox.y,
-              parseInt(svgContainer.getAttribute('height')));
+              svgContainer.getAttribute('height'));
             ctrl.svgViewBox = (
               0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
                 ' ' + (viewBoxHeight));
@@ -568,7 +566,7 @@ angular.module('oppia').directive('graphViz', [
               ctrl.isMobile = true;
             }
 
-            ctrl.vizWidth = vizContainer.width;
+            ctrl.vizWidth = vizContainer.width();
 
             ctrl.graphOptions = [{
               text: 'Labeled',
