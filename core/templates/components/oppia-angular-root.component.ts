@@ -712,7 +712,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationStatsBackendApiService: ExplorationStatsBackendApiService;
   static explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   static explorationStatsService: ExplorationStatsService;
-  static learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory;
   static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
@@ -760,6 +759,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static learnerDashboardActivityIdsObjectFactory: LearnerDashboardActivityIdsObjectFactory;
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   static learnerDashboardIdsBackendApiService: LearnerDashboardIdsBackendApiService;
+  static learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory;
   static learnerParamsService: LearnerParamsService;
   static localStorageService: LocalStorageService;
   static loaderService: LoaderService;
@@ -1000,7 +1000,6 @@ private explorationRecommendationsService: ExplorationRecommendationsService,
 private explorationStatsBackendApiService: ExplorationStatsBackendApiService,
 private explorationStatsObjectFactory: ExplorationStatsObjectFactory,
 private explorationStatsService: ExplorationStatsService,
-private learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory,
 private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
@@ -1048,6 +1047,7 @@ private learnerAnswerInfoObjectFactory: LearnerAnswerInfoObjectFactory,
 private learnerDashboardActivityIdsObjectFactory: LearnerDashboardActivityIdsObjectFactory,
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
 private learnerDashboardIdsBackendApiService: LearnerDashboardIdsBackendApiService,
+private learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory,
 private learnerParamsService: LearnerParamsService,
 private localStorageService: LocalStorageService,
 private loaderService: LoaderService,
@@ -1289,7 +1289,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationStatsBackendApiService = this.explorationStatsBackendApiService;
     OppiaAngularRootComponent.explorationStatsObjectFactory = this.explorationStatsObjectFactory;
     OppiaAngularRootComponent.explorationStatsService = this.explorationStatsService;
-    OppiaAngularRootComponent.learnerExplorationSummaryObjectFactory = this.learnerExplorationSummaryObjectFactory;
     OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
@@ -1337,6 +1336,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.learnerDashboardActivityIdsObjectFactory = this.learnerDashboardActivityIdsObjectFactory;
     OppiaAngularRootComponent.learnerDashboardBackendApiService = this.learnerDashboardBackendApiService;
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = this.learnerDashboardIdsBackendApiService;
+    OppiaAngularRootComponent.learnerExplorationSummaryObjectFactory = this.learnerExplorationSummaryObjectFactory;
     OppiaAngularRootComponent.learnerParamsService = this.learnerParamsService;
     OppiaAngularRootComponent.localStorageService = this.localStorageService;
     OppiaAngularRootComponent.loaderService = this.loaderService;
