@@ -87,7 +87,7 @@
           <div class="form-group" ng-if="$ctrl.formData.updateRole.newRole==='TOPIC_MANAGER'">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Topic for Topic Manager</label>
             <div class="col-md-8 col-lg-8 col-sm-8">
-              <select ng-options="topic.id as topic.name for topic in $ctrl.topicSummaries" ng-model="$ctrl.formData.updateRole.topicId" class="form-control protractor-update-form-role-select">
+              <select ng-options="topic.getId() as topic.getName() for topic in $ctrl.topicSummaries" ng-model="$ctrl.formData.updateRole.topicId" class="form-control protractor-update-form-role-select">
               </select>
             </div>
           </div>
