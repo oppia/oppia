@@ -171,7 +171,9 @@
       "off"
     ],
     "no-unused-vars": [
-      "off"
+      "error", {
+        "vars": "all"
+      }
     ],
     "one-var": [
       "off"
