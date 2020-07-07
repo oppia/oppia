@@ -96,7 +96,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             new_story_id, title, topic_id)
         story_services.save_new_story(self.user_id, story)
         topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
-        self.render_json({ # pylint: disable=snake-case-for-dictionary-keys
+        self.render_json({
             'storyId': new_story_id
         })
 

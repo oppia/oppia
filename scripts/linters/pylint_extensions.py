@@ -75,7 +75,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
 
     name = 'explicit-keyword-args'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0001': (
             'Keyword argument %s should be named explicitly in %s call of %s.',
             'non-explicit-keyword-args',
@@ -175,7 +175,7 @@ class HangingIndentChecker(checkers.BaseChecker):
 
     name = 'hanging-indent'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0002': (
             (
                 'There should be a break after parenthesis when content within '
@@ -253,7 +253,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     __implements__ = interfaces.IAstroidChecker
 
     name = 'parameter_documentation'
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'W9005': ('"%s" has constructor parameters '
                   'documented in class and __init__',
                   'multiple-constructor-doc',
@@ -825,7 +825,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
 
     name = 'import-only-modules'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0003': (
             'Import \"%s\" from \"%s\" is not a module.',
             'import-only-modules',
@@ -875,7 +875,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):
 
     name = 'backslash-continuation'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0004': (
             (
                 'Backslash should not be used to break continuation lines. '
@@ -906,7 +906,7 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
     __implements__ = interfaces.IAstroidChecker
     name = 'function-args-order'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0005': (
             'Wrong order of arguments in function definition '
             '\'self\' should come first.',
@@ -943,7 +943,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
     __implements__ = interfaces.IAstroidChecker
     name = 'invalid-import'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0009': (
             'Importing %s layer in %s layer is prohibited.',
             'invalid-import',
@@ -1010,7 +1010,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
     __implements__ = interfaces.IRawChecker
     name = 'newline-at-eof'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0007': (
             'Files should end in a single newline character.',
             'newline-at-eof',
@@ -1046,7 +1046,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
 
     name = 'single-space-after-yield'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0010': (
             'Not using \'yield\' or a single space after yield statement.',
             'single-space-after-yield',
@@ -1103,7 +1103,7 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
 
     name = 'excessive-new-lines'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0011': (
             'Excessive new lines between function definations.',
             'excessive-new-lines',
@@ -1161,7 +1161,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
     __implements__ = interfaces.IRawChecker
     name = 'single-space-above-args-raises-returns'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0012': (
             'Files must have a single newline above args in doc string.',
             'single-space-above-args',
@@ -1239,7 +1239,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
     __implements__ = interfaces.IRawChecker
     name = 'division-operator-used'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0015': (
             'Division Operator is used.',
             'division-operator-used',
@@ -1301,7 +1301,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
     __implements__ = interfaces.IRawChecker
     name = 'incorrectly_styled_comment'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0016': (
             'Invalid punctuation is used.',
             'invalid-punctuation-used',
@@ -1420,7 +1420,7 @@ class DocstringChecker(checkers.BaseChecker):
     __implements__ = interfaces.IRawChecker
     name = 'invalid-docstring-format'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0019': (
             'Period is not used at the end of the docstring.',
             'no-period-used',
@@ -1682,7 +1682,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     __implements__ = interfaces.IRawChecker
     name = 'space_between_imports_and_file-overview'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0024': (
             'No empty line used below the fileoverview docstring.',
             'no-empty-line-provided-below-fileoverview',
@@ -1742,7 +1742,7 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
     __implements__ = interfaces.IAstroidChecker
     name = 'newline-below-class-docstring'
     priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
+    msgs = {
         'C0026': (
             'Missing single newline below class docstring.',
             'newline-below-class-docstring',
@@ -1781,82 +1781,6 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
             self.add_message('newline-below-class-docstring', node=node)
 
 
-class SnakeCaseForDictionaryKeysChecker(checkers.BaseChecker):
-    """Checks for snake_case naming style in dictionary keys."""
-
-    __implements__ = interfaces.IAstroidChecker
-    name = 'snake_case_for_dictionary_keys'
-    priority = -1
-    msgs = { # pylint: disable=snake-case-for-dictionary-keys
-        'C0027': (
-            'Snake case naming style for dictionary key strings not followed.',
-            'snake-case-for-dictionary-keys',
-            'Please follow snake case naming style for dictionary key strings.'
-        )
-    }
-
-    def visit_subscript(self, node):
-        """Visits all subscripted dictionaries in a python file and checks that
-        key names follow snake_case naming style.
-
-        Args:
-            node: astroid.node_classes.Subscript. Node for
-                a subscript in the AST.
-        """
-
-        key_string = node.slice.as_string()
-        snake_case_followed = False
-        possible_regex = ['^(_[a-z][a-z0-9]*)(_[a-z0-9]+)*$',
-                          '^([a-z][a-z0-9]*)(_[a-z0-9]+)*$']
-
-        # Consider only the unicode key strings.
-        if key_string[0] == 'u':
-            actual_key_string = key_string.strip('u').strip('\'\"')
-            for regex in possible_regex:
-                results = re.match(regex, actual_key_string)
-                try:
-                    _ = results.groups()
-                    snake_case_followed = True
-                except AttributeError:
-                    pass
-                if snake_case_followed is True:
-                    break
-            if snake_case_followed is False:
-                self.add_message('snake-case-for-dictionary-keys',
-                                 node=node)
-
-    def visit_dict(self, node):
-        """Visits all dictionaries in a python file and checks that
-        key names follow snake_case naming convention.
-
-        Args:
-            node: astroid.node_classes.Dict. Node for a dict in the AST.
-        """
-
-        possible_regex = ['^(_[a-z][a-z0-9]*)(_[a-z0-9]+)*$',
-                          '^([a-z][a-z0-9]*)(_[a-z0-9]+)*$']
-        all_dict_keys = [key.as_string() for key, _ in node.items]
-
-        for key_name in all_dict_keys:
-            snake_case_followed = False
-
-            # Consider only the unicode key strings.
-            if key_name[0] == 'u':
-                actual_key_string = key_name.strip('u').strip('\'\"')
-                for regex in possible_regex:
-                    results = re.match(regex, actual_key_string)
-                    try:
-                        _ = results.groups()
-                        snake_case_followed = True
-                    except AttributeError:
-                        pass
-                    if snake_case_followed is True:
-                        break
-                if snake_case_followed is False:
-                    self.add_message('snake-case-for-dictionary-keys',
-                                     node=node)
-
-
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1879,4 +1803,3 @@ def register(linter):
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(NewlineBelowClassDocstring(linter))
-    linter.register_checker(SnakeCaseForDictionaryKeysChecker(linter))
