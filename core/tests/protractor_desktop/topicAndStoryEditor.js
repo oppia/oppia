@@ -23,6 +23,7 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
@@ -41,7 +42,6 @@ describe('Topic editor functionality', function() {
   var skillEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
-  var SKILL_STATUS_UNASSIGNED = 'Unassigned';
 
   beforeAll(async function() {
     topicsAndSkillsDashboardPage = (
@@ -91,7 +91,7 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_UNASSIGNED);
+      Constants.protractorConstants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
     await topicEditorPage.get(topicId);
@@ -177,7 +177,7 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        SKILL_STATUS_UNASSIGNED);
+        Constants.protractorConstants.SKILL_STATUS_UNASSIGNED);
       await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
         0, TOPIC_NAME);
 

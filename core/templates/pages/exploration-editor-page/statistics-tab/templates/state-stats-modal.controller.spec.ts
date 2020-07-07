@@ -26,12 +26,13 @@ describe('State Stats Modal Controller', function() {
   var $uibModalInstance = null;
   var RouterService = null;
 
-  var improvementType = '';
   var stateName = 'State 1';
   var stateStats = {
-    useful_feedback_count: 0,
-    total_answers_count: 10,
-    num_times_solution_viewed: 4
+    usefulFeedbackCount: 0,
+    totalAnswersCount: 10,
+    numTimesSolutionViewed: 4,
+    totalHitCount: 13,
+    numCompletions: 8
   };
   var stateStatsModalIsOpen = true;
   var visualizationsInfo = [{
@@ -40,6 +41,8 @@ describe('State Stats Modal Controller', function() {
     id: '1',
     addressed_info_is_supported: true
   }];
+  var interactionArgs = {
+  };
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -59,7 +62,7 @@ describe('State Stats Modal Controller', function() {
     $controller('StateStatsModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      improvementType: improvementType,
+      interactionArgs: interactionArgs,
       stateName: stateName,
       stateStats: stateStats,
       stateStatsModalIsOpen: stateStatsModalIsOpen,
@@ -69,8 +72,10 @@ describe('State Stats Modal Controller', function() {
 
   it('should init the variables', function() {
     expect($scope.stateName).toBe(stateName);
-    expect($scope.stateStats).toEqual(stateStats);
-    expect($scope.improvementType).toBe(improvementType);
+    expect($scope.numEnters).toEqual(stateStats.totalHitCount);
+    expect($scope.numQuits)
+      .toEqual(stateStats.totalHitCount - stateStats.numCompletions);
+    expect($scope.interactionArgs).toBe(interactionArgs);
     expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
   });
 
