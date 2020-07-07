@@ -106,6 +106,16 @@ describe('NumericExpressionInputInteractive', function() {
     expect(ctrl.warningText).toBe('/ is not a valid postfix operator.');
   });
 
+  it('should submit the answer if valid', function() {
+    ctrl.hasBeenTouched = true;
+    ctrl.value = '1+1';
+
+    spyOn(mockCurrentInteractionService, 'onSubmit');
+    ctrl.submitAnswer();
+    expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
+    expect(ctrl.warningText).toBe('');
+  });
+
   it('should correctly validate current answer', function() {
     // This should be validated as true if the editor hasn't been touched.
     ctrl.value = '';
