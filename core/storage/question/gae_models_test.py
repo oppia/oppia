@@ -268,7 +268,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(question_skill_links), 0)
 
-    def test_get_question_count_by_skill_ids(self):
+    def test_get_question_count_for_skill_ids(self):
         skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_1, 'user', description='Description 1')
         skill_id_2 = skill_services.get_new_skill_id()
@@ -292,22 +292,34 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         question_skill_link_model = question_models.QuestionSkillLinkModel
         question_count = (
-            question_skill_link_model.get_question_count_by_skill_ids(
+            question_skill_link_model.get_question_count_for_skill_ids(
                 [skill_id_1, skill_id_2]))
 
         self.assertEqual(question_count, 3)
 
         question_count = (
-            question_skill_link_model.get_question_count_by_skill_ids(
+            question_skill_link_model.get_question_count_for_skill_ids(
                 [skill_id_1]))
 
         self.assertEqual(question_count, 2)
 
         question_count = (
-            question_skill_link_model.get_question_count_by_skill_ids(
+            question_skill_link_model.get_question_count_for_skill_ids(
+                [skill_id_1, skill_id_1]))
+
+        self.assertEqual(question_count, 2)
+
+        question_count = (
+            question_skill_link_model.get_question_count_for_skill_ids(
                 [skill_id_2]))
 
         self.assertEqual(question_count, 1)
+
+        question_count = (
+            question_skill_link_model.get_question_count_for_skill_ids(
+                [skill_id_1, skill_id_2, skill_id_1]))
+
+        self.assertEqual(question_count, 3)
 
     def test_get_question_skill_links_by_skill_ids(self):
         skill_id_1 = skill_services.get_new_skill_id()

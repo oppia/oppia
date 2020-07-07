@@ -273,7 +273,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_count_by_skill_ids(cls, skill_ids):
+    def get_question_count_for_skill_ids(cls, skill_ids):
         """Returns the number of questions assigned to the given skill_ids.
 
         Args:

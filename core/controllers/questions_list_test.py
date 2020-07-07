@@ -172,21 +172,27 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
                 feconf.QUESTIONS_COUNT_URL_PREFIX,
                 self.skill_id, self.skill_id_2
             ))
-        self.assertEqual(json_response['question_count'], 2)
+        self.assertEqual(json_response['total_question_count'], 2)
 
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.QUESTIONS_COUNT_URL_PREFIX,
                 self.skill_id
             ))
-        self.assertEqual(json_response['question_count'], 1)
+        self.assertEqual(json_response['total_question_count'], 1)
 
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.QUESTIONS_COUNT_URL_PREFIX,
                 self.skill_id_2
             ))
-        self.assertEqual(json_response['question_count'], 1)
+        self.assertEqual(json_response['total_question_count'], 1)
+
+    def test_get_question_count_when_no_question_is_assigned_to_skill(self):
+        self.login(self.ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.QUESTIONS_COUNT_URL_PREFIX, self.skill_id))
+        self.assertEqual(json_response['total_question_count'], 0)
 
     def test_get_question_count_fails_with_invalid_skill_ids(self):
         self.get_json('%s/%s?' % (feconf.QUESTIONS_COUNT_URL_PREFIX, 'id1'),

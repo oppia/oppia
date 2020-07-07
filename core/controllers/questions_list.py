@@ -109,10 +109,9 @@ class QuestionCountDataHandler(base.BaseHandler):
             except Exception:
                 raise self.PageNotFoundException(Exception('Invalid skill id'))
 
-        question_count = question_services.get_question_count_by_skill_ids(
-            skill_ids)
+        total_question_count = (
+            question_services.get_question_count_for_skill_ids(skill_ids))
 
-        self.values.update({
-            'question_count': question_count
+        return self.render_json({
+            'total_question_count': total_question_count
         })
-        self.render_json(self.values)

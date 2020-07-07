@@ -66,10 +66,10 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
           var skillIds = ctrl.subtopic.getSkillIds();
-          QuestionBackendApiService.fetchQuestionCountBySkillIds(skillIds).then(
-            (response) => {
-              ctrl.questionCount = response;
-            });
+          QuestionBackendApiService.fetchQuestionCountForSkillIds(
+            skillIds).then((questionCount) => {
+            ctrl.questionCount = questionCount;
+          });
           ctrl.editableTitle = ctrl.subtopic.getTitle();
           ctrl.editableThumbnailFilename = (
             ctrl.subtopic.getThumbnailFilename());

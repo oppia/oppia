@@ -153,13 +153,13 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/questions_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchQuestionCountBySkillIds(
+      questionBackendApiService.fetchQuestionCountForSkillIds(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
       expect(req.request.method).toEqual('GET');
       req.flush({
-        question_count: 2
+        total_question_count: 2
       });
 
       flushMicrotasks();
@@ -176,7 +176,7 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/questions_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchQuestionCountBySkillIds(
+      questionBackendApiService.fetchQuestionCountForSkillIds(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
