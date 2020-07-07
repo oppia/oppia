@@ -59,6 +59,9 @@ import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
@@ -91,6 +94,8 @@ export class InteractionRulesRegistryService {
       private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
       private musicNotesInputRulesService: MusicNotesInputRulesService,
       private numberWithUnitsRulesService: NumberWithUnitsRulesService,
+      private numericExpressionInputRulesService:
+        NumericExpressionInputRulesService,
       private numericInputRulesService: NumericInputRulesService,
       private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
       private setInputRulesService: SetInputRulesService,
@@ -113,6 +118,8 @@ export class InteractionRulesRegistryService {
       MultipleChoiceInputRulesService: this.multipleChoiceInputRulesService,
       MusicNotesInputRulesService: this.musicNotesInputRulesService,
       NumberWithUnitsRulesService: this.numberWithUnitsRulesService,
+      NumericExpressionInputRulesService:
+        this.numericExpressionInputRulesService,
       NumericInputRulesService: this.numericInputRulesService,
       PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
       SetInputRulesService: this.setInputRulesService,

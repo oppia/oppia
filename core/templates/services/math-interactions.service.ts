@@ -183,6 +183,100 @@ export class MathInteractionsService {
     }
     return modifiedExpressionList.join('');
   }
+
+  getTerms(expressionString: string, splitByAddition = true): Array<string> {
+    let listOfTerms: Array<string> = [];
+    let currentTerm: string = '';
+    let bracketBalance: number = 0;
+    let shouldModifyTerm: boolean = false;
+    let modifyTerm = function(termString: string): string {
+      // If the shouldModifyTerm flag is set to true, we add the '-' sign,
+      // raise the term to a power of -1. This ensures that when the final
+      // list is joined by the '+'/'*' sign, it matches with the original
+      // expression. For eg.
+      // '3/10' would be split as [3, 10^(-1)] and
+      // '3-10' would be split as [3, -(10)].
+      if (splitByAddition) {
+        return '-(' + termString + ')';
+      } else {
+        return '(' + termString + ')^(-1)';
+      }
+    }
+    const delimiters: Array<string> = splitByAddition ? ['+', '-'] : ['*', '/'];
+
+    expressionString = expressionString.split(' ').join('');
+
+    // Temporarily replacing all unary negation signs with '~' so as to avoid
+    // splitting terms by them. We only need to split terms by binary
+    // subtraction signs and not unary negation signs. A '-' sign is considered
+    // to be binary subtraction iff it is preceded by an alphanumeric or a
+    // closing bracket, otherwise it is considered as unary negation operation.
+    // NOTE: The replace function is called twice to deal with cases where there
+    // might be overlapping matches.
+    // For eg. 4----5 would be converted to 4-~-~5 after the first call. So we
+    // need a second call to convert it to the desired result, which is 4-~~~5.
+    expressionString = expressionString.replace(/([^a-zA-Z0-9\)])-/g, '$1~');
+    expressionString = expressionString.replace(/([^a-zA-Z0-9\)])-/g, '$1~');
+
+    for (let i = 0; i < expressionString.length; i++) {
+      let currentVal = expressionString[i];
+      if (currentVal === '(' || currentVal === ')') {
+        bracketBalance += (currentVal === '(') ? 1 : -1;
+      }
+  
+      // Split term only if we are not inside a set of parens and the current
+      // value is a delimiter.
+      if (bracketBalance === 0 && delimiters.indexOf(currentVal) !== -1) {
+        if (currentTerm.length !== 0) {
+          if (shouldModifyTerm) {
+            currentTerm = modifyTerm(currentTerm);
+            shouldModifyTerm = false;
+          }
+          listOfTerms.push(currentTerm);
+          currentTerm = '';
+        }
+        if (currentVal === delimiters[1]) {
+          shouldModifyTerm = true;
+        }
+      } else {
+        currentTerm += currentVal;
+      }
+    }
+    if (shouldModifyTerm) {
+      currentTerm = modifyTerm(currentTerm);
+      shouldModifyTerm = false;
+    }
+    listOfTerms.push(currentTerm);
+
+    // Reverting the temporary '~' replace in the final list of terms.
+    for (let i = 0; i < listOfTerms.length; i++) {
+      listOfTerms[i] = listOfTerms[i].replace(/~/g, '-');
+    }
+    return listOfTerms;
+  }
+
+  termsMatch(term1: string, term2: string): boolean {
+    // We split both terms by multiplication and division and try to match terms
+    // from both inputs by checking equivalency.
+    let termsList1 = this.getTerms(term1, false);
+    let termsList2 = this.getTerms(term2, false);
+
+    // NOTE: We only need to iterate from the top in the termsList1 list since
+    // in the termsList2 list, we will break the loop each time an element is
+    // removed from it, thus, indexing errors would only arise in the outer
+    // loop.
+    for (let i = termsList1.length - 1; i >= 0; i--) {
+      for (let j = 0; j < termsList2.length; j++) {
+        if (nerdamer(termsList1[i]).eq(nerdamer(termsList2[j]).toString())) {
+          termsList1.splice(i, 1);
+          termsList2.splice(j, 1);
+          break;
+        }
+      }
+    }
+
+    return termsList1.length === 0 && termsList2.length === 0;
+  }
 }
 
 angular.module('oppia').factory(

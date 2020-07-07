@@ -358,6 +358,12 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NumberAttemptsService } from
   'pages/exploration-player-page/services/number-attempts.service';
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import { NumericInputValidationService } from
   'interactions/NumericInput/directives/numeric-input-validation.service';
 import { NumberWithUnitsObjectFactory } from
@@ -768,6 +774,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe;
   static numberAttemptsService: NumberAttemptsService;
+  static numericExpressionInputRulesService: NumericExpressionInputRulesService;
+  static numericExpressionInputValidationService: NumericExpressionInputValidationService;
   static numericInputValidationService: NumericInputValidationService;
   static numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
   static numberWithUnitsValidationService: NumberWithUnitsValidationService;
@@ -1051,6 +1059,8 @@ private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe,
 private numberAttemptsService: NumberAttemptsService,
+private numericExpressionInputRulesService: NumericExpressionInputRulesService,
+private numericExpressionInputValidationService: NumericExpressionInputValidationService,
 private numericInputValidationService: NumericInputValidationService,
 private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
 private numberWithUnitsValidationService: NumberWithUnitsValidationService,
@@ -1335,6 +1345,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.normalizeWhitespacePipe = this.normalizeWhitespacePipe;
     OppiaAngularRootComponent.normalizeWhitespacePunctuationAndCasePipe = this.normalizeWhitespacePunctuationAndCasePipe;
     OppiaAngularRootComponent.numberAttemptsService = this.numberAttemptsService;
+    OppiaAngularRootComponent.numericExpressionInputRulesService = this.numericExpressionInputRulesService;
+    OppiaAngularRootComponent.numericExpressionInputValidationService = this.numericExpressionInputValidationService;
     OppiaAngularRootComponent.numericInputValidationService = this.numericInputValidationService;
     OppiaAngularRootComponent.numberWithUnitsObjectFactory = this.numberWithUnitsObjectFactory;
     OppiaAngularRootComponent.numberWithUnitsValidationService = this.numberWithUnitsValidationService;

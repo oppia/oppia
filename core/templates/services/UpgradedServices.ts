@@ -317,6 +317,9 @@ import { NumberWithUnitsObjectFactory } from
 import { NumberWithUnitsValidationService } from
   // eslint-disable-next-line max-len
   'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
+import { NumericExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PageTitleService } from 'services/page-title.service';
 import { ParamChangeObjectFactory } from
@@ -865,7 +868,7 @@ export class UpgradedServices {
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
-      new MathExpressionInputValidationService(
+      new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MessengerService'] = new MessengerService(
       upgradedServices['LoggerService'],
@@ -887,6 +890,9 @@ export class UpgradedServices {
       new NumberWithUnitsObjectFactory(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['FractionObjectFactory']);
+    upgradedServices['NumericExpressionInputValidationService'] =
+      new NumericExpressionInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['PageTitleService'] = new PageTitleService(
@@ -1113,6 +1119,7 @@ export class UpgradedServices {
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
         upgradedServices['NumberWithUnitsRulesService'],
+        upgradedServices['NumericExpressionInputRulesService'],
         upgradedServices['NumericInputRulesService'],
         upgradedServices['PencilCodeEditorRulesService'],
         upgradedServices['SetInputRulesService'],

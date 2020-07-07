@@ -279,4 +279,72 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.replaceAbsSymbolWithText(
       '||')).toBe('abs()');
   });
+
+  it('should get terms from given expression', function() {
+    // Split by addition.
+    expect(mathInteractionsService.getTerms('3+4*a')).toEqual(
+      ['3', '4*a']);
+    expect(mathInteractionsService.getTerms('4-(-beta)')).toEqual(
+      ['4', '-((-beta))']);
+    expect(mathInteractionsService.getTerms('3*10^(-1)')).toEqual(
+      ['3*10^(-1)']);
+    expect(mathInteractionsService.getTerms('a-x+4.5')).toEqual(
+      ['a', '-(x)', '4.5']);
+    expect(mathInteractionsService.getTerms('4----5')).toEqual(
+      ['4', '-(---5)']);
+    expect(mathInteractionsService.getTerms('100 + 20 + 3')).toEqual(
+      ['100', '20', '3']);
+    expect(mathInteractionsService.getTerms('4-sqrt(x + alpha)')).toEqual(
+      ['4', '-(sqrt(x+alpha))']);
+    expect(mathInteractionsService.getTerms('a^2+b^2+2*a*b')).toEqual(
+      ['a^2', 'b^2', '2*a*b']);
+    expect(mathInteractionsService.getTerms('pi/(4+3)')).toEqual(
+      ['pi/(4+3)']);
+    expect(mathInteractionsService.getTerms('tan(30)-(-cos(60))')).toEqual(
+      ['tan(30)', '-((-cos(60)))']);
+    
+    // Split by multiplication.
+    expect(mathInteractionsService.getTerms('4*a', false)).toEqual(
+      ['4', 'a']);
+    expect(mathInteractionsService.getTerms('4/beta', false)).toEqual(
+      ['4', '(beta)^(-1)']);
+    expect(mathInteractionsService.getTerms('3*10^(-1)', false)).toEqual(
+      ['3', '10^(-1)']);
+    expect(mathInteractionsService.getTerms('(a)/((x)/(3))', false)).toEqual(
+      ['(a)', '(((x)/(3)))^(-1)']);
+    expect(mathInteractionsService.getTerms('2*2*3*4', false)).toEqual(
+      ['2', '2', '3', '4']);
+    expect(mathInteractionsService.getTerms('100 + 20 + 3', false)).toEqual(
+      ['100+20+3']);
+    expect(mathInteractionsService.getTerms('4/sqrt(x+alpha)', false)).toEqual(
+      ['4', '(sqrt(x+alpha))^(-1)']);
+    expect(mathInteractionsService.getTerms('(x+y)*(x-y)', false)).toEqual(
+      ['(x+y)', '(x-y)']);
+    expect(mathInteractionsService.getTerms('pi/(4+3)', false)).toEqual(
+      ['pi', '((4+3))^(-1)']);
+  });
+
+  it('should correctly match terms', function() {
+    expect(mathInteractionsService.termsMatch('4*5', '5*4')).toBeTrue();
+    expect(mathInteractionsService.termsMatch(
+      '3*10^2', '3/10^(-2)')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('1/3', '1*3^(-1)')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('sqrt(4)', '2')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('abs(-4)', '4')).toBeTrue();
+    expect(mathInteractionsService.termsMatch(
+      'sqrt(x^2)', 'abs(x)')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('(x^2)/2', '(x*x)/2')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('2*pi*r', 'r*pi*2')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('x*(y+z)', '(y+z)*x')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('2*4.5', '(9/2)*2')).toBeTrue();
+    
+    expect(mathInteractionsService.termsMatch('4*5', '20')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('3*10^2', '300')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('1/3', '3^(-1)')).toBeFalse();
+    expect(mathInteractionsService.termsMatch(
+      'pi*r^2', '(pi*r^3)/r')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('1/3', '0.333')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('4*(5+3)', '32')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('sqrt(x^2)', 'x')).toBeFalse();
+  });
 });

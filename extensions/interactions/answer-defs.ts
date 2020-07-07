@@ -105,6 +105,8 @@ export interface INumberWithUnitsAnswer {
   units: IUnit[];
 }
 
+export type INumericExpressionAnswer = string;
+
 export type INumericInputAnswer = number;
 
 export interface IPencilCodeEditorAnswer {
