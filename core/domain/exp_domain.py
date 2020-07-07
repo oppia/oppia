@@ -2464,8 +2464,8 @@ class Exploration(python_utils.OBJECT):
                         translations_mapping[
                             content_id][lang_code]['type'] = 'html'
 
-                # Since we cannot use nonlocal in python2, we use a dict to 
-                # let inner function modify the value
+                # Since we cannot use nonlocal in python2, we use a dict to
+                # let inner function modify the value.
                 next_content_id_index = {'value': 0}
 
                 def convert_to_subtitled(
@@ -2492,11 +2492,6 @@ class Exploration(python_utils.OBJECT):
                     elif obj_type == 'SubtitledHtml':
                         translation_value_key = 'html'
 
-                    if not translation_value_key:
-                        raise Exception(
-                            'Invalid obj_type passed to convert_to_subtitled: %s' %
-                            obj_type)
-
                     if isinstance(cust_arg_value, (str, unicode)):
                         return {
                             'content_id': content_id_prefix,
@@ -2504,12 +2499,15 @@ class Exploration(python_utils.OBJECT):
                         }
                     elif isinstance(cust_arg_value, list):
                         for i in python_utils.RANGE(len(cust_arg_value)):
+                            # Let function access outer next_content_id_index.
+                            # pylint: disable=cell-var-from-loop
                             content_id = (
                                 content_id_prefix + '_' +
                                 python_utils.UNICODE(
                                     next_content_id_index['value'])
                             )
-                            next_content_id_index['value'] += 1
+                            
+                            next_content_id_index['value'] += 1 
 
                             if (isinstance(cust_arg_value, dict) and
                                     'content_id' in cust_arg_value[i]):
@@ -2541,9 +2539,9 @@ class Exploration(python_utils.OBJECT):
                         'interaction']['customization_args']
 
                     customization_args_util.convert_translatable_in_cust_args(
-                            customization_args,
-                            customization_arg_specs,
-                            convert_to_subtitled)
+                        customization_args,
+                        customization_arg_specs,
+                        convert_to_subtitled)
                 state_dict['next_content_id_index'] = next_content_id_index[
                     'value']
 

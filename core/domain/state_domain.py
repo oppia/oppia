@@ -1934,6 +1934,8 @@ class State(python_utils.OBJECT):
             solicit_answer_details: bool. Whether the creator wants to ask
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
+            next_content_id_index: int. The next content_id index to use for
+                new content_id's of content in lists.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -2580,7 +2582,7 @@ class State(python_utils.OBJECT):
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn, 
-            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
+                states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -2588,6 +2590,9 @@ class State(python_utils.OBJECT):
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
+            states_schema_version: int. The current version of the states
+                schema. This is used to determine how to extract html from
+                interactions.
 
         Returns:
             dict. The converted state_dict.
