@@ -134,6 +134,7 @@ export type IInteractionAnswer = (
   IMathExpressionAnswer |
   IMultipleChoiceAnswer |
   IMusicNotesAnswer |
+  INumericExpressionAnswer |
   INumberWithUnitsAnswer |
   INumericInputAnswer |
   IPencilCodeEditorAnswer |

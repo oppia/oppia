@@ -220,6 +220,7 @@ export type IInteractionRuleInputs = (
   IMathExpressionRuleInputs |
   IMultipleChoiceRuleInputs |
   IMusicNotesRuleInputs |
+  INumericExpressionRuleInputs |
   INumberWithUnitsRuleInputs |
   INumericInputRuleInputs |
   IPencilCodeEditorRuleInputs |
