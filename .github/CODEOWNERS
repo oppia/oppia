@@ -190,11 +190,7 @@
 
 
 # Global components and filters.
-/core/templates/components/button-directives/exploration-embed-button.service.ts @ankita240796
-/core/templates/components/button-directives/exploration-embed-button.directive.html @ankita240796
-/core/templates/components/button-directives/exploration-embed-button-modal.controller*.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.directive.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.directive.html @ankita240796
+/core/templates/components/button-directives/* @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
@@ -207,8 +203,8 @@
 /core/templates/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @ankita240796
 /core/templates/components/profile-link-directives/ @ankita240796
 /core/templates/components/summary-tile/ @ankita240796
 /core/templates/directives/angular-html-bind.directive*.ts @ankita240796
@@ -273,6 +269,8 @@
 /core/domain/visualization_registry*.py @brianrodri
 /core/storage/improvements/ @brianrodri
 /core/storage/statistics/ @brianrodri
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
 /core/templates/domain/statistics/ @brianrodri
 /core/templates/domain/improvements/ @brianrodri
@@ -515,6 +513,7 @@
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
+/puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @jimbyo @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek

@@ -4555,3 +4555,49 @@ div.oppia-issues-learner-action {
 .oppia-rule-preview {
   word-wrap: break-word;
 }
+
+.fx-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.fx-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.fx-main-start {
+  justify-content: start;
+}
+
+.fx-main-center {
+  justify-content: center;
+}
+
+.fx-main-end {
+  justify-content: end;
+}
+
+.fx-main-space-evenly {
+  justify-content: space-evenly;
+}
+
+.fx-main-space-around {
+  justify-content: space-around;
+}
+
+.fx-main-pace-between {
+  justify-content: space-between;
+}
+
+.fx-cross-start {
+  align-items: start;
+}
+
+.fx-cross-center {
+  align-items: center;
+}
+
+.fx-cross-end {
+  align-items: end;
+}
