@@ -199,7 +199,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Handles Delete requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        skill_services.delete_skill_from_all_topics(self.user_id, skill_id)
+        skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
 
         if skill_services.skill_has_associated_questions(skill_id):
             raise self.InvalidInputException(

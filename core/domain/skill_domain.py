@@ -1446,10 +1446,10 @@ class SkillAssignments(python_utils.OBJECT):
 
     def __init__(
             self, topic_id, topic_version, subtopic_id):
-        """Constructs an SkillAssignments domain object.
+        """Constructs a SkillAssignments domain object.
 
         Args:
-            topic_id: str. The unique id of the skill.
+            topic_id: str. The unique id of the topic.
             topic_version: int. The current version of the topic to which the
                 skill is assigned.
             subtopic_id: str or None. The id of the subtopic to which the skill

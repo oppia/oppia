@@ -659,7 +659,7 @@ def get_all_topics_assigned_to_skill(skill_id):
     return assigned_topics
 
 
-def delete_skill_from_all_topics(user_id, skill_id):
+def remove_skill_from_all_topics(user_id, skill_id):
     """Deletes the skill with the given id from all the associated topics.
 
     Args:
@@ -686,7 +686,8 @@ def delete_skill_from_all_topics(user_id, skill_id):
             skill_name = get_skill_by_id(skill_id).description
             topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
-                'Removed skill %s from the topic' % skill_name)
+                'Removed skill with id %s and name %s from the topic' % (
+                    skill_id, skill_name))
 
 
 def get_skill_summary_by_id(skill_id, strict=True):

@@ -811,7 +811,7 @@ class SkillAssignmentsTests(test_utils.GenericTestBase):
         self.skill_assignments = skill_domain.SkillAssignments(
             'topic_id1', 2, 1)
 
-    def test_augmented_skill_summary_gets_created(self):
+    def test_skill_assignments_gets_created(self):
         skill_assignments_dict = {
             'topic_id': 'topic_id1',
             'topic_version': 2,

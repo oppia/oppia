@@ -592,7 +592,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(assigned_topics['Topic2'].topic_version, 1)
         self.assertEqual(assigned_topics['Topic2'].subtopic_id, 1)
 
-    def test_delete_skill_from_all_topics(self):
+    def test_remove_skill_from_all_topics(self):
         topic_id = topic_services.get_new_topic_id()
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
@@ -617,7 +617,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
 
-        skill_services.delete_skill_from_all_topics(self.USER_ID, self.SKILL_ID)
+        skill_services.remove_skill_from_all_topics(self.USER_ID, self.SKILL_ID)
         assigned_topics = (
             skill_services.get_all_topics_assigned_to_skill(self.SKILL_ID))
         self.assertEqual(len(assigned_topics), 0)
