@@ -100,4 +100,4 @@ def export_data_for_user(user_id):
         # Rename the key.
         pointer[repl_key] = pointer.pop(image_key)
 
-    return takeout_domain.TakeoutDomain(exported_data, takeout_image_files)
+    return takeout_domain.TakeoutData(exported_data, takeout_image_files)

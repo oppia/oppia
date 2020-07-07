@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import python_utils
 
 
-class TakeoutDomain(python_utils.OBJECT):
+class TakeoutData(python_utils.OBJECT):
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(self, user_data, user_images):
