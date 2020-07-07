@@ -201,7 +201,7 @@ export class MathInteractionsService {
       } else {
         return '(' + termString + ')^(-1)';
       }
-    }
+    };
     const delimiters: Array<string> = splitByAddition ? ['+', '-'] : ['*', '/'];
 
     expressionString = expressionString.split(' ').join('');
@@ -223,7 +223,7 @@ export class MathInteractionsService {
       if (currentVal === '(' || currentVal === ')') {
         bracketBalance += (currentVal === '(') ? 1 : -1;
       }
-  
+
       // Split term only if we are not inside a set of parens and the current
       // value is a delimiter.
       if (bracketBalance === 0 && delimiters.indexOf(currentVal) !== -1) {

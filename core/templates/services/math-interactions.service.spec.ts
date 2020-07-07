@@ -302,7 +302,7 @@ describe('MathInteractionsService', () => {
       ['pi/(4+3)']);
     expect(mathInteractionsService.getTerms('tan(30)-(-cos(60))')).toEqual(
       ['tan(30)', '-((-cos(60)))']);
-    
+
     // Split by multiplication.
     expect(mathInteractionsService.getTerms('4*a', false)).toEqual(
       ['4', 'a']);
@@ -337,7 +337,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.termsMatch('2*pi*r', 'r*pi*2')).toBeTrue();
     expect(mathInteractionsService.termsMatch('x*(y+z)', '(y+z)*x')).toBeTrue();
     expect(mathInteractionsService.termsMatch('2*4.5', '(9/2)*2')).toBeTrue();
-    
+
     expect(mathInteractionsService.termsMatch('4*5', '20')).toBeFalse();
     expect(mathInteractionsService.termsMatch('3*10^2', '300')).toBeFalse();
     expect(mathInteractionsService.termsMatch('1/3', '3^(-1)')).toBeFalse();

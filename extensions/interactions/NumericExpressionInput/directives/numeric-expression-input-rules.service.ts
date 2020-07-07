@@ -33,7 +33,7 @@ export class NumericExpressionInputRulesService {
       answer: INumericExpressionAnswer,
       inputs: INumericExpressionRuleInputs): boolean {
     let mis = new MathInteractionsService();
-    
+
     // The expression is first split into terms by addition and subtraction.
     let answerTerms = mis.getTerms(answer);
     let inputTerms = mis.getTerms(inputs.x);
@@ -52,7 +52,7 @@ export class NumericExpressionInputRulesService {
         }
       }
     }
-    
+
     // The two expressions are considered an exact match if both lists are empty
     // implying that each term in the answer got uniquely matched with a term
     // in the input.
@@ -70,7 +70,7 @@ export class NumericExpressionInputRulesService {
       inputs: INumericExpressionRuleInputs): boolean {
     // At least one term should match between answer and input.
     let mis = new MathInteractionsService();
-    
+
     // The expression is first split into terms by addition and subtraction.
     let answerTerms = mis.getTerms(answer);
     let inputTerms = mis.getTerms(inputs.x);
@@ -91,11 +91,11 @@ export class NumericExpressionInputRulesService {
     // There must be at least one term in the input that is not present in the
     // answer.
     let mis = new MathInteractionsService();
-    
+
     // The expression is first split into terms by addition and subtraction.
     let answerTerms = mis.getTerms(answer);
     let inputTerms = mis.getTerms(inputs.x);
-    
+
     for (let inputTerm of inputTerms) {
       let matched = false;
       for (let answerTerm of answerTerms) {
