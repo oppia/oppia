@@ -753,7 +753,7 @@ class InteractionInstance(python_utils.OBJECT):
             if ca_name:
                 customization_args_html_list.append(ca_value[ca_name]['html'])
             elif isinstance(ca_value, list):
-                for i in range(len(ca_value)):
+                for i in python_utils.RANGE(len(ca_value)):
                     customization_args_html_list.append(ca_value[i]['html'])
             else:
                 customization_args_html_list.append(ca_value['html'])
@@ -813,7 +813,7 @@ class InteractionInstance(python_utils.OBJECT):
                         )
                         return cust_arg_value
                     elif isinstance(cust_arg_value, list):
-                        for i in range(len(cust_arg_value)):
+                        for i in python_utils.RANGE(len(cust_arg_value)):
                             cust_arg_value[i]['html'] = (
                                 conversion_fn(cust_arg_value[i]['html']))
                         return cust_arg_value

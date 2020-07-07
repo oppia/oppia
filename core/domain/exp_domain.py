@@ -2495,10 +2495,11 @@ class Exploration(python_utils.OBJECT):
                             translation_value_key: cust_arg_value
                         }
                     elif isinstance(cust_arg_value, list):
-                        for i in range(len(cust_arg_value)):
+                        for i in python_utils.RANGE(len(cust_arg_value)):
                             content_id = (
                                 content_id_prefix + '_' +
-                                str(next_content_id_index['value'])
+                                python_utils.UNICODE(
+                                    next_content_id_index['value'])
                             )
                             next_content_id_index['value'] += 1
 

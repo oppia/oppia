@@ -162,7 +162,9 @@ def convert_translatable_in_cust_args(
                 customization_arg_spec['schema']['items'],
                 content_id_prefix)
         elif schema_type == "dict":
-            for i in range(len(customization_arg_spec['properties'])):
+            for i in python_utils.RANGE(
+                len(customization_arg_spec['properties'])
+            ):
                 find_translatable(
                     customization_arg,
                     customization_arg_spec['schema']['properties'][i],
