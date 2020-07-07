@@ -774,6 +774,18 @@ class InteractionInstance(python_utils.OBJECT):
     @staticmethod
     def convert_html_in_interaction(
             interaction_dict, states_schema_version, conversion_fn):
+        """Checks for HTML fields in the outcome and converts it
+        according to the conversion function.
+
+        Args:
+            interaction_dict: dict. The interaction dict.
+            states_schema_version: int. The state schema version.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        
+        Returns:
+            dict. The converted interaction dict.
+        """
         with python_utils.open_file(
             feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
         ) as interaction_specs_json:
@@ -784,8 +796,21 @@ class InteractionInstance(python_utils.OBJECT):
             customization_args = interaction_dict['customization_args']
 
             def convert_cust_args(
-                    obj_type, cust_arg_value, _, cust_arg_name=None
-            ):
+                    obj_type, cust_arg_value, _, cust_arg_name=None):
+                """Applies conversion function on SubtitledHtml objects in
+                customization arguments.
+
+                Args:
+                    obj_type: string. Indicates object type, from customization
+                        argument spect.
+                    cust_arg_value: dict. A dictionary from key 'value' to the
+                        customization argument value.
+                    cust_arg_name: string. Name of the customization argument
+                        if present in spec.
+
+                Returns:
+                    dict. The converted customization argument value.
+                """
                 if obj_type == 'SubtitledUnicode':
                     return cust_arg_value
 
@@ -1879,7 +1904,7 @@ class SubtitledUnicode(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the SubtitledUnicode are
-            invalid.
+                invalid.
         """
         if not isinstance(self.content_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -2572,8 +2597,9 @@ class State(python_utils.OBJECT):
             False, 0)
 
     @classmethod
-    def convert_html_fields_in_state(cls, state_dict, conversion_fn, 
-                states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
+    def convert_html_fields_in_state(
+            cls, state_dict, conversion_fn, 
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 

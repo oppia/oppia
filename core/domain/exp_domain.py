@@ -2506,8 +2506,8 @@ class Exploration(python_utils.OBJECT):
                                 python_utils.UNICODE(
                                     next_content_id_index['value'])
                             )
-                            
-                            next_content_id_index['value'] += 1 
+
+                            next_content_id_index['value'] += 1
 
                             if (isinstance(cust_arg_value, dict) and
                                     'content_id' in cust_arg_value[i]):

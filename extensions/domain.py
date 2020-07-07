@@ -32,6 +32,11 @@ class CustomizationArgSpec(python_utils.OBJECT):
         self.default_value = default_value
 
     def to_dict(self):
+        """Returns a dict representing this CustomizationArgSpec domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of CustomizationArgSpec instance.
+        """
         return {
             'name': self.name,
             'description': self.description,
