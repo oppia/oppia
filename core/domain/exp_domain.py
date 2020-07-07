@@ -37,7 +37,6 @@ from core.domain import customization_args_util
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import rte_component_registry
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -2435,7 +2434,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_math_content_to_math_rte_components)
-        
+
         return states_dict
 
     @classmethod
@@ -2472,7 +2471,20 @@ class Exploration(python_utils.OBJECT):
                 def convert_to_subtitled(
                         obj_type, cust_arg_value, content_id_prefix,
                         cust_arg_name=None):
-                    """
+                    """Conversion function that converts unsubtitled content to
+                    SubtitledHtml or SubtitledUnicode.
+
+                    args:
+                        obj_type: string. Indicates the obj_type found in
+                            the customization arguments schema.
+                        cust_arg_value: dict. Dictionary of key 'value' to
+                            original value of customization argument.
+                        content_id_prefix: string. The content_id generated from
+                            traversing the customization argument spec.
+                        cust_arg_name: string. In the case that the value being
+                            converted is a value of a dictionary in
+                            cust_arg_value, cust_arg_name provides the key of
+                            the property to edit.
                     """
 
                     if obj_type == 'SubtitledUnicode':
@@ -2480,16 +2492,12 @@ class Exploration(python_utils.OBJECT):
                     elif obj_type == 'SubtitledHtml':
                         translation_value_key = 'html'
 
-                    
                     if not translation_value_key:
                         raise Exception(
                             'Invalid obj_type passed to convert_to_subtitled: %s' %
                             obj_type)
-                        
-                    if (
-                        isinstance(cust_arg_value, str) or
-                        isinstance(cust_arg_value, unicode)
-                    ):
+
+                    if isinstance(cust_arg_value, (str, unicode)):
                         return {
                             'content_id': content_id_prefix,
                             translation_value_key: cust_arg_value
@@ -2538,7 +2546,7 @@ class Exploration(python_utils.OBJECT):
                             convert_to_subtitled)
                 state_dict['next_content_id_index'] = next_content_id_index[
                     'value']
-                
+
         return states_dict
 
 
@@ -3748,7 +3756,7 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v39_dict_to_v40_dict(
                 exploration_dict)
             exploration_schema_version = 40
-        
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
