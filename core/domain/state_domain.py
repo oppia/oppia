@@ -757,7 +757,7 @@ class InteractionInstance(python_utils.OBJECT):
                     customization_args_html_list.append(ca_value[i]['html'])
             else:
                 customization_args_html_list.append(ca_value['html'])
-            
+
             return ca_value
 
         customization_arg_specs = [
@@ -790,20 +790,15 @@ class InteractionInstance(python_utils.OBJECT):
                     return cust_arg_value
 
                 if states_schema_version < 40:
-                    if (
-                        isinstance(cust_arg_value, str) or
-                        isinstance(cust_arg_value, unicode)
-                    ):
+                    if isinstance(cust_arg_value, (str, unicode)):
                         return conversion_fn(cust_arg_value)
                     elif isinstance(cust_arg_value, list):
                         return [
-                            conversion_fn(x) for x in cust_arg_value
-                        ]
+                            conversion_fn(x) for x in cust_arg_value]
                     elif isinstance(cust_arg_value, dict):
                         cust_arg_value[cust_arg_name] = (
                             conversion_fn(
-                                cust_arg_value[cust_arg_name]
-                            ))
+                                cust_arg_value[cust_arg_name]))
                         return cust_arg_value
                 else:
                     if cust_arg_name:
@@ -819,12 +814,12 @@ class InteractionInstance(python_utils.OBJECT):
                         return cust_arg_value
                     else:
                         cust_arg_value['html'] = (
-                                conversion_fn(cust_arg_value['html']))
+                            conversion_fn(cust_arg_value['html']))
 
             customization_args_util.convert_translatable_in_cust_args(
-                    customization_args,
-                    customization_arg_specs,
-                    convert_cust_args)
+                customization_args,
+                customization_arg_specs,
+                convert_cust_args)
 
         return interaction_dict
 
@@ -1088,7 +1083,7 @@ class WrittenTranslation(python_utils.OBJECT):
         self.needs_update = needs_update
 
         if translation_type == 'html':
-            self.translation = html_cleaner.clean(self.translation)        
+            self.translation = html_cleaner.clean(self.translation)
 
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
@@ -1130,12 +1125,8 @@ class WrittenTranslation(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid type: %s' % self.type)
 
-        if not (
-            self.type == 'unicode'
-            or self.type == 'html'
-        ):
-            raise utils.ValidationError(
-                'Invalid type: %s' % self.type)
+        if not (self.type == 'unicode' or self.type == 'html'):
+            raise utils.ValidationError('Invalid type: %s' % self.type)
 
         if not isinstance(self.translation, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1310,8 +1301,8 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         if content_id in self.translations_mapping:
             if language_code in self.translations_mapping[content_id]:
-                return (self.translations_mapping
-                    [content_id][language_code].translation)
+                return self.translations_mapping[
+                    content_id][language_code].translation
             else:
                 raise Exception(
                     'Translation for the given content_id %s does not exist in '
@@ -1850,7 +1841,7 @@ class SubtitledUnicode(python_utils.OBJECT):
         Args:
             content_id: str. A unique id referring to the other assets for this
                 content.
-            html: str. A piece of user submitted unicode.
+            unicode_str: str. A piece of user submitted unicode.
         """
         self.content_id = content_id
         self.unicode_str = unicode_str
