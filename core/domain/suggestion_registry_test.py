@@ -287,6 +287,23 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected author_id to be a string'):
             suggestion.validate()
 
+    def test_validate_author_id_format(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.author_id = ''
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_id to be in a valid user ID format'):
+            suggestion.validate()
+
     def test_validate_final_reviewer_id(self):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -302,6 +319,24 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.final_reviewer_id = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected final_reviewer_id to be a string'):
+            suggestion.validate()
+
+    def test_validate_final_reviewer_id_format(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.final_reviewer_id = ''
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected final_reviewer_id to be in a valid user ID format'):
             suggestion.validate()
 
     def test_validate_score_category(self):
@@ -830,6 +865,24 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected author_id to be a string'):
             suggestion.validate()
 
+    def test_validate_author_id_format(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.author_id = ''
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected author_id to be in a valid user ID format.'):
+            suggestion.validate()
+
     def test_validate_final_reviewer_id(self):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -845,6 +898,24 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.final_reviewer_id = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected final_reviewer_id to be a string'):
+            suggestion.validate()
+
+    def test_validate_final_reviewer_id_format(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.final_reviewer_id = ''
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected final_reviewer_id to be in a valid user ID format.'):
             suggestion.validate()
 
     def test_validate_score_category(self):
@@ -1559,6 +1630,76 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'old question_dict'):
             suggestion.pre_update_validate(
                 question_domain.QuestionSuggestionChange(change))
+
+    def test_validate_author_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.author_id = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_id to be a string'):
+            suggestion.validate()
+
+    def test_validate_author_id_format(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.author_id = ''
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected author_id to be in a valid user ID format.'):
+            suggestion.validate()
+
+    def test_validate_final_reviewer_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.final_reviewer_id = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected final_reviewer_id to be a string'):
+            suggestion.validate()
+
+    def test_validate_final_reviewer_id_format(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.final_reviewer_id = ''
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected final_reviewer_id to be in a valid user ID format.'):
+            suggestion.validate()
 
     def test_get_all_html_content_strings(self):
         suggestion = suggestion_registry.SuggestionAddQuestion(

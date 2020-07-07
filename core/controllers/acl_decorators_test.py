@@ -1465,7 +1465,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
             self.SUGGESTION_TYPE, self.TARGET_TYPE,
             self.exploration_id, self.target_version_id,
             self.author_id,
-            self.change_dict, '', None)
+            self.change_dict, '')
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', self.exploration_id)])[0]
@@ -1535,7 +1535,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
             self.SUGGESTION_TYPE, self.TARGET_TYPE,
             self.EXPLORATION_ID, self.TARGET_VERSION_ID,
             self.author_id,
-            self.CHANGE_DICT, '', None)
+            self.CHANGE_DICT, '')
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', self.EXPLORATION_ID)])[0]
