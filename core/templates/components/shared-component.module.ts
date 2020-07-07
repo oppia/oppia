@@ -30,6 +30,8 @@ import { LazyLoadingComponent } from
 import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SkillMasteryViewerComponent } from
+  './skill-mastery/skill-mastery.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -41,20 +43,16 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [CommonModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
-    AttributionGuideComponent, LazyLoadingComponent, LoadingDotsComponent],
+    SkillMasteryViewerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     // These elements will remain here even after migration.
-    ExplorationEmbedButtonModalComponent,
-    AttributionGuideComponent,
-    LazyLoadingComponent,
-    LoadingDotsComponent
+    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent,
+    AttributionGuideComponent, LazyLoadingComponent, LoadingDotsComponent
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent,
-    AttributionGuideComponent,
-    LazyLoadingComponent,
-    LoadingDotsComponent
   ],
 })
 

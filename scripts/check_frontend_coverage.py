@@ -376,7 +376,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-editor-navbar-breadcrumb.directive.ts',
     'skill-editor-navbar.directive.ts',
     'skill-editor-state.service.ts',
-    'skill-mastery.directive.ts',
+    'skill-mastery.component.ts',
     'skill-misconceptions-editor.directive.ts',
     'skill-prerequisite-skills-editor.directive.ts',
     'skill-questions-tab.directive.ts',
