@@ -28,6 +28,7 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import user_id_migration
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -156,11 +157,27 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
-            if self.final_reviewer_id:
+        if (
+                self.author_id is not None and
+                not user_id_migration.verify_user_id_correct(self.author_id)
+        ):
+            raise utils.ValidationError(
+                'Expected author_id to be in a valid user ID format, '
+                'received %s' % self.author_id)
+
+        if self.final_reviewer_id is not None:
+            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
+            if (
+                    not user_id_migration.verify_user_id_correct(
+                        self.final_reviewer_id) and
+                    self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
+            ):
+                raise utils.ValidationError(
+                    'Expected final_reviewer_id to be in a valid user ID '
+                    'format, received %s' % self.final_reviewer_id)
 
         if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -259,7 +276,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -422,7 +439,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -545,7 +562,7 @@ class SuggestionAddQuestion(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
