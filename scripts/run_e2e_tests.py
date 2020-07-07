@@ -135,6 +135,13 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
+    '--server_log_level',
+    help='Sets the log level for the appengine server. The default value is '
+         'set to critical.',
+    default='critical',
+    choices=['critical', 'error', 'warning', 'info'])
+
+_PARSER.add_argument(
     '--community_dashboard_enabled', action='store_true',
     help='Run the test after enabling the community dashboard page.')
 
@@ -414,21 +421,23 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_app_engine_server(dev_mode_setting):
+def start_google_app_engine_server(dev_mode_setting, log_level):
     """Start the Google App Engine server.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
             in dev mode.
+        log_level: str. The log level for the google app engine server.
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
 
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true %s' % (
+        '--clear_datastore=yes --dev_appserver_log_level=%s '
+        '--log_level=%s --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath), shell=True)
+            GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
+        shell=True)
     SUBPROCESSES.append(p)
 
 
@@ -472,7 +481,7 @@ def main(args=None):
         else CHROME_DRIVER_VERSION)
     start_webdriver_manager(version)
 
-    start_google_app_engine_server(dev_mode)
+    start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
