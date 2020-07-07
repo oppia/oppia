@@ -287,17 +287,18 @@
                 <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
               </span>
             </li>
-            <li>
+            <li flex="100">
               <sharing-links ng-if="exploration.status !== 'private'"
                              ng-click="$event.stopPropagation()"
-                             style="position: relative; right: 1px; bottom: 2px;"
+                             style="position: relative; right: 1px; bottom: 2px; width: 100%;"
                              flex="100"
                              class="dashboard-hide-mobile"
                              layout-type="row"
-                             layout-align-type="center left"
+                             layout-align-type="space-around center"
                              twitter-text="$ctrl.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
                              share-type="exploration"
-                             exploration-id="exploration.id">
+                             small-font="true"
+                             [exploration-id]="exploration.id">
               </sharing-links>
             </li>
           </ul>
