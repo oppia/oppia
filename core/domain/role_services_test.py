@@ -27,6 +27,7 @@ import python_utils
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
     """Tests for PARENT_ROLES and ROLE_ACTIONS."""
+
     PARENT_ROLES = role_services.PARENT_ROLES
     ACTIONS = role_services.ROLE_ACTIONS
 

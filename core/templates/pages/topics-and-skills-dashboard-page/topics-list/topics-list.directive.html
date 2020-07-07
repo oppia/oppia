@@ -23,17 +23,18 @@
       <td>
         <[$ctrl.getSerialNumberForTopic($index)]>.
       </td>
-      <td>
+      <td class="topic-primary-information-container">
         <div class="list-summary list-summary-name protractor-test-topics-list-item">
           <div>
             <a class="topic-name protractor-test-topic-name"
-               ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>"><[topic.name]>
+               ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+              <[topic.name]>
             </a>
           </div>
           <div>
             <span class="topic-classroom protractor-test-topic-classroom">
               <span ng-if="topic.classroom"><[topic.classroom]></span>
-              <span ng-if="!topic.classroom">Unassigned</span>
+              <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="bottom" ng-if="!topic.classroom">No classroom assigned.</span>
             </span>
           </div>
           <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
@@ -64,8 +65,8 @@
       <td class="text-center topic-list-status">
         <span class="topic-list-status-text" ng-if="topic.is_published"> Published </span>
         <span class="topic-list-status-text" ng-if="!topic.is_published"> Not Published </span>
-        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.enableEditOptions(topic.id)"></p>
-        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
+        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
+        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
@@ -78,6 +79,74 @@
       </td>
     </tr>
   </table>
+  <div class="topics-list-mobile">
+    <div ng-repeat="topic in getTopicSummaries() track by $index">
+      <div class="topic-item">
+        <div class="topic-item-header">
+          <div class="topic-item-name-box">
+            <div class="topic-item-name">
+              <span>
+                <[$ctrl.getSerialNumberForTopic($index)]>.
+              </span>
+              <a ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+                <[topic.name]>
+              </a>
+            </div>
+            <div class="topic-item-classroom">
+              <span ng-if="topic.classroom"><[topic.classroom]></span>
+              <span ng-if="!topic.classroom">Unassigned</span>
+            </div>
+          </div>
+          <div class="topic-item-options">
+            <p class="fas fa-ellipsis-v topic-edit-box-icon" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
+            <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options">
+              <a class="topic-edit-options-edit" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+                <i class="fa fa-pen"></i>
+                <span>Edit</span>
+              </a>
+              <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id, topic.name)">
+                <i class="fas fa-trash-alt"></i>
+                <span>Delete</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="topic-item-description">
+          <span><[topic.description]></span>
+        </div>
+        <div class="topic-item-entities">
+          <div class="topic-item-entity">
+            <div class="topic-item-value">
+              <span><[topic.canonical_story_count]></span>
+            </div>
+            <div class="topic-item-type">
+              Stories
+            </div>
+          </div>
+          <div class="topic-item-entity">
+            <div class="topic-item-value">
+              <span><[topic.subtopic_count]></span>
+            </div>
+            <div class="topic-item-type">
+              Subtopics
+            </div>
+          </div>
+          <div class="topic-item-entity">
+            <div class="topic-item-value">
+              <span><[topic.total_skill_count]></span>
+            </div>
+            <div class="topic-item-type">
+              Skills
+            </div>
+          </div>
+          <div class="topic-item-entity topic-item-status">
+            <div class="topic-item-value" ng-if="topic.is_published">Published</div>
+            <div class="topic-item-value" ng-if="!topic.is_published">Not Published</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </md-card>
 
 <style>
@@ -85,6 +154,9 @@
     background: #fff;
     box-shadow: none;
     margin-top: 50px;
+  }
+  topics-list .topics-list-mobile {
+    display: none;
   }
   topics-list .dashboard-table-index-column {
     width: 5%;
@@ -119,8 +191,8 @@
     margin: 0;
   }
   topics-list .topic-edit-options {
-    background-color: #ffffff;
-    border: 1px solid black;
+    background-color: #fff;
+    border: 1px solid #000;
     display: flex;
     flex-wrap: wrap;
     left: 0;
@@ -135,8 +207,11 @@
     text-decoration: none;
     width: 100%;
   }
+  topics-list .topic-primary-information-container {
+    overflow: auto;
+  }
   topics-list .topic-edit-options-edit {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #000;
     color: inherit;
     text-decoration: none;
   }
@@ -169,9 +244,10 @@
     text-decoration: none;
   }
   topics-list .topic-classroom {
-    font-size: 15px;
+    font-size: 13px;
+    font-style: italic;
     margin: 4px 0;
-    text-transform: uppercase;
+    text-transform: capitalize;
   }
   topics-list .topic-description {
     font-size: 15px;
@@ -212,13 +288,63 @@
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
-    word-break: break-all;
+    word-break: break-word;
   }
 
   @media (max-width: 768px) {
+    topics-list .topics-list-mobile {
+      display: block;
+      margin: 0 auto;
+      width: 95%;
+    }
+    topics-list .dashboard-table {
+      display: none;
+    }
+    topics-list .topic-item {
+      border-bottom: 1px solid #c0bebe;
+      margin: 20px 0;
+      padding: 10px 0;
+    }
     topics-list .list-view-item {
       margin: 0;
-      width: 100%;
+    }
+    topics-list .topic-item-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    topics-list .topic-item-classroom span {
+      color: #707070;
+    }
+    .topic-item-description {
+      margin: 10px 0;
+    }
+    topics-list .topic-item-entities {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      text-align: center;
+    }
+    topics-list .topic-item-options {
+      position: relative;
+    }
+    topics-list .topic-item-name a {
+      color: inherit;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    topics-list .topic-item-entity {
+      border-right: 2px solid #0844aa;
+      display: inline-block;
+      width: 25%;
+    }
+    topics-list .topic-item-status {
+      border-right: none;
+    }
+    topics-list .topic-edit-options {
+      left: auto;
+      right: 10px;
+      top: 10px;
     }
   }
 </style>

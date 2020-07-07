@@ -54,6 +54,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     The id of instances of this class has the form
         [entity_type].[entity_id].[generated_string]
     """
+
     # The type of entity the thread is linked to.
     entity_type = ndb.StringProperty(required=True, indexed=True)
     # The ID of the entity the thread is linked to.
@@ -257,6 +258,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     The id of instances of this class has the form [thread_id].[message_id]
     """
+
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = ndb.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
@@ -634,6 +636,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
     The key of each instance is the exploration ID.
     """
+
     # The number of open feedback threads for this exploration.
     num_open_threads = ndb.IntegerProperty(default=None, indexed=True)
     # Total number of feedback threads for this exploration.
