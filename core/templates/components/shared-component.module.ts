@@ -24,6 +24,8 @@ import { CommonModule } from '@angular/common';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SkillMasteryViewerComponent } from
+  './skill-mastery/skill-mastery.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -34,10 +36,11 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [CommonModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, ExplorationEmbedButtonModalComponent],
+    SharingLinksComponent, ExplorationEmbedButtonModalComponent,
+    SkillMasteryViewerComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     // These elements will remain here even after migration.
-    ExplorationEmbedButtonModalComponent
+    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
