@@ -50,5 +50,3 @@ export class CollectionFooterComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
-
-
