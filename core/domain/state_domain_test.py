@@ -59,10 +59,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_customization_args_dict = {
             'choices': {
                 'value': [
-                    '<p>state customization arg html 1</p>',
-                    '<p>state customization arg html 2</p>',
-                    '<p>state customization arg html 3</p>',
-                    '<p>state customization arg html 4</p>'
+                    {
+                        'content_id': 'custarg_choices_default',
+                        'html': '<p>state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'custarg_choices_1',
+                        'html': '<p>state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'custarg_choices_2',
+                        'html': '<p>state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'custarg_choices_3',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
                 ]
             },
             'allowMultipleItemsInSamePosition': {
@@ -127,51 +136,71 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p>state written_translation content-en</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation content-en</p>',
                         'needs_update': True
                     },
                     'hi': {
-                        'html': '<p>state written_translation content-hi</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation content-hi</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>state written_translation outcome-hi</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation outcome-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation outcome-en</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation outcome-en</p>',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': '<p>state written_translation feedback-hi</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation feedback-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation feedback-en</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation feedback-en</p>',
                         'needs_update': False
                     }
                 },
                 'hint_1': {
                     'hi': {
-                        'html': '<p>state written_translation hint_1-hi</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation hint_1-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation hint_1-en</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation hint_1-en</p>',
                         'needs_update': False
                     }
                 },
                 'solution': {
                     'hi': {
-                        'html': '<p>state written_translation solution-hi</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation solution-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation solution-en</p>',
+                        'type': 'html',
+                        'translation':
+                            '<p>state written_translation solution-en</p>',
                         'needs_update': False
                     }
                 }
@@ -357,10 +386,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'choices': {
                 'value': [
-                    '<p>init_state customization arg html 1</p>',
-                    '<p>init_state customization arg html 2</p>',
-                    '<p>init_state customization arg html 3</p>',
-                    '<p>init_state customization arg html 4</p>'
+                    {
+                        'content_id': 'custarg_choices_default',
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'custarg_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'custarg_choices_2',
+                        'html': '<p>init_state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'custarg_choices_3',
+                        'html': '<p>init_state customization arg html 4</p>'
+                    },
                 ]
             }
         }
@@ -562,10 +600,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'choices': {
                 'value': [
-                    '<p>init_state customization arg html 1</p>',
-                    '<p>init_state customization arg html 2</p>',
-                    '<p>init_state customization arg html 3</p>',
-                    '<p>init_state customization arg html 4</p>'
+                    {
+                        'content_id': 'custarg_choices_default',
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'custarg_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'custarg_choices_2',
+                        'html': '<p>init_state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'custarg_choices_3',
+                        'html': '<p>init_state customization arg html 4</p>'
+                    }
                 ]
             }
         }
@@ -610,10 +657,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_customization_args_dict = {
             'choices': {
                 'value': [
-                    '<p>state customization arg html 1</p>',
-                    '<p>state customization arg html 2</p>',
-                    '<p>state customization arg html 3</p>',
-                    '<p>state customization arg html 4</p>'
+                    {
+                        'content_id': 'custarg_choices_default',
+                        'html': '<p>state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'custarg_choices_1',
+                        'html': '<p>state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'custarg_choices_2',
+                        'html': '<p>state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'custarg_choices_3',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
                 ]
             },
             'allowMultipleItemsInSamePosition': {
@@ -717,6 +773,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {

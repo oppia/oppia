@@ -122,26 +122,6 @@ class UnicodeString(BaseObject):
     }
 
 
-class SubtitledUnicode(UnicodeString):
-    """Translatable Unicode string class."""
-
-    description = 'An Unicode string that supports translations.'
-    SCHEMA = {
-        'type': 'dict',
-        'properties': [{
-            'name': 'content_id',
-            'schema': UnicodeString.SCHEMA,
-        }, {
-            'name': 'unicode_str',
-            'schema': UnicodeString.SCHEMA,
-        }]
-    }
-    default_value = {
-        'content_id': '',
-        'unicode_str': ''
-    }
-
-
 class Html(BaseObject):
     """HTML string class."""
 
@@ -149,26 +129,6 @@ class Html(BaseObject):
 
     SCHEMA = {
         'type': 'html',
-    }
-
-
-class SubtitledHtml(BaseObject):
-    """Translatable HTML string class."""
-
-    description = 'An HTML string that supports translations.'
-    SCHEMA = {
-        'type': 'dict',
-        'properties': [{
-            'name': 'content_id',
-            'schema': UnicodeString.SCHEMA,
-        }, {
-            'name': 'html',
-            'schema': UnicodeString.SCHEMA,
-        }]
-    }
-    default_value = {
-        'content_id': '',
-        'html': ''
     }
 
 
@@ -688,7 +648,7 @@ class Graph(BaseObject):
             'schema': Real.SCHEMA
         }, {
             'name': 'label',
-            'schema': SubtitledUnicode.SCHEMA
+            'schema': UnicodeString.SCHEMA
         }]
     }
     _EDGE_SCHEMA = {
@@ -899,7 +859,7 @@ class ImageWithRegions(BaseObject):
                     'type': 'dict',
                     'properties': [{
                         'name': 'label',
-                        'schema': SubtitledUnicode.SCHEMA
+                        'schema': UnicodeString.SCHEMA
                     }, {
                         'name': 'region',
                         'schema': ImageRegion.SCHEMA
@@ -1012,6 +972,7 @@ class Fraction(BaseObject):
 
 class Units(BaseObject):
     """Units class."""
+
     # Validation of the units is performed only in the frontend using math.js.
     # math.js is not available in the backend.
 

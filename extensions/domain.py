@@ -30,3 +30,11 @@ class CustomizationArgSpec(python_utils.OBJECT):
         self.description = description
         self.schema = schema
         self.default_value = default_value
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'schema': self.schema,
+            'default_value': self.default_value
+        }

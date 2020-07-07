@@ -745,13 +745,29 @@ class InteractionInstance(python_utils.OBJECT):
                                 'The solution does not have a valid '
                                 'correct_answer type.')
 
+        customization_args_html_list = []
+        def dummy_conversion_fn(obj_type, ca_value, _, ca_name):
+            if obj_type == 'SubtitledUnicode':
+                return ca_value
 
-        if self.id in (
-                'ItemSelectionInput', 'MultipleChoiceInput',
-                'DragAndDropSortInput'):
-            customization_args_html_list = (
-                self.customization_args['choices']['value'])
-            html_list = html_list + customization_args_html_list
+            if ca_name:
+                customization_args_html_list.append(ca_value[ca_name]['html'])
+            elif isinstance(ca_value, list):
+                for i in range(len(ca_value)):
+                    customization_args_html_list.append(ca_value[i]['html'])
+            else:
+                customization_args_html_list.append(ca_value['html'])
+            
+            return ca_value
+
+        customization_arg_specs = [
+            x.to_dict() for x in interaction.customization_arg_specs]
+
+        customization_args_util.convert_translatable_in_cust_args(
+            self.customization_args,
+            customization_arg_specs,
+            dummy_conversion_fn)
+        html_list += customization_args_html_list
 
         return html_list
 
@@ -1365,8 +1381,9 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         html_string_list = []
         for translations in self.translations_mapping.values():
-            for translation in translations.values():
-                html_string_list.append(translation.html)
+            for written_translation in translations.values():
+                if written_translation.type == 'html':
+                    html_string_list.append(written_translation.translation)
         return html_string_list
 
     @staticmethod

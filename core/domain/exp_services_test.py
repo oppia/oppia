@@ -1629,7 +1629,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: 'custarg_placeholder'
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -1667,7 +1667,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: 'custarg_placeholder'
+            content_id: custarg_placeholder
             unicode_str: ''
         rows:
           value: 1
@@ -1971,7 +1971,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: custarg_placeholder
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -1986,6 +1988,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 0
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
@@ -2009,7 +2012,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: custarg_placeholder
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -2024,6 +2029,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 0
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
@@ -2048,7 +2054,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: custarg_placeholder
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -2063,6 +2071,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 0
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
@@ -2110,6 +2119,7 @@ written_translations:
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
         self.assertEqual(exploration.version, 1)
@@ -3720,6 +3730,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
