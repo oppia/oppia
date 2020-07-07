@@ -467,11 +467,11 @@ def main(args=None):
     update_community_dashboard_status_in_feconf_file(
         FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
 
-    if not parsed_args.skip_build:
+    if parsed_args.skip_build:
+        build.modify_constants(prod_env=parsed_args.prod_env)
+    else:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
-    else:
-        build.modify_constants(prod_env=not dev_mode, maintenance_mode=False)
     version = (
         get_chrome_driver_version() if parsed_args.auto_select_chromedriver
         else CHROME_DRIVER_VERSION)

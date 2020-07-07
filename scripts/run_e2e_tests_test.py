@@ -832,7 +832,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, maintenance_mode=False):  # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager(unused_arg):
@@ -873,7 +873,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
         modify_constants_swap = self.swap_with_checks(
             build, 'modify_constants', mock_modify_constants,
-            expected_kwargs=[{'maintenance_mode': False, 'prod_env': False}])
+            expected_kwargs=[{'prod_env': False}])
         start_webdriver_swap = self.swap_with_checks(
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
