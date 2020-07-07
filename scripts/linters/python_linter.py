@@ -80,6 +80,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, file_cache, verbose_mode_enabled):
         """Constructs a PythonLintChecksManager object.
@@ -329,6 +330,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyPythonLintChecksManager object.

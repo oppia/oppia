@@ -86,10 +86,10 @@
       <div ng-click="selectText($event)"><[explorationLink]></div>
       <span ng-show="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
     </div>
-    <sharing-links flex="100" layout-type="row"
+    <sharing-links layout-type="row"
                    layout-align-type="center center"
                    share-type="exploration"
-                   exploration-id="explorationId">
+                   [exploration-id]="explorationId">
     </sharing-links>
     <button class="btn btn-secondary oppia-share-publish-close protractor-test-share-publish-close"
             ng-click="cancel()">
