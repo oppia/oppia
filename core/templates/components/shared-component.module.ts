@@ -40,7 +40,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   imports: [CommonModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, ExplorationEmbedButtonModalComponent],
+    SharingLinksComponent, ExplorationEmbedButtonModalComponent,
+    AttributionGuideComponent, LazyLoadingComponent, LoadingDotsComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
