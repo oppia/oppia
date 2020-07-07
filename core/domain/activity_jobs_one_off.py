@@ -190,9 +190,9 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     MIGRATION_START = datetime.datetime.strptime(
-        '2020-06-29T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+        '2020-06-28T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
     MIGRATION_END = datetime.datetime.strptime(
-        '2020-06-29T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+        '2020-06-30T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
@@ -215,15 +215,23 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(commit_model):
         class_name = commit_model.__class__.__name__
         last_updated = commit_model.last_updated
+        created_on = commit_model.created_on
         if (FixCommitLastUpdatedOneOffJob.MIGRATION_START < last_updated <
                 FixCommitLastUpdatedOneOffJob.MIGRATION_END):
             commit_model.last_updated = commit_model.created_on
             commit_model.put(update_last_updated_time=False)
             yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
+        elif (datetime.timedelta(0) < last_updated - created_on <
+              datetime.timedelta(7)):
+            yield ('SUCCESS_CORRECT - %s' % class_name, commit_model.id)
         else:
-            yield ('SUCCESS_ALREADY_CORRECT - %s' % class_name, commit_model.id)
+            yield ('SUCCESS_INCORRECT - %s' % class_name, commit_model.id)
+
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        yield (key, len(values))
+        if key.startswith('SUCCESS_INCORRECT'):
+            yield (key, values)
+        else:
+            yield (key, len(values))
