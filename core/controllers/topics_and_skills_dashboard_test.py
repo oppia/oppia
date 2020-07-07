@@ -166,7 +166,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.logout()
 
 
-class UnassignSkillDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
+class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_get(self):
         self.login(self.ADMIN_EMAIL)
@@ -205,13 +205,15 @@ class UnassignSkillDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(json_response['assigned_topics']), 2)
         self.assertTrue('Topic1' in json_response['assigned_topics'])
         self.assertEqual(
-            json_response['assigned_topics']['Topic1']['id'], topic_id_1)
-        self.assertTrue('subtopic_id' not in
+            json_response['assigned_topics']['Topic1']['topic_id'], topic_id_1)
+        self.assertTrue('subtopic_id' in
                         json_response['assigned_topics']['Topic1'])
+        self.assertIsNone(
+            json_response['assigned_topics']['Topic1']['subtopic_id'])
 
         self.assertTrue('Topic2' in json_response['assigned_topics'])
         self.assertEqual(
-            json_response['assigned_topics']['Topic2']['id'], topic_id_2)
+            json_response['assigned_topics']['Topic2']['topic_id'], topic_id_2)
         self.assertEqual(
             json_response['assigned_topics']['Topic2']['subtopic_id'], 1)
 

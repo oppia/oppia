@@ -166,30 +166,19 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class UnassignSkillDataHandler(base.BaseHandler):
-    """Provides data for Unassign skill modal."""
+class SkillAssignmentsHandler(base.BaseHandler):
+    """Retrieving information about which topics contain the given skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id):
         """Handles GET requests."""
-        skill_ids_assigned_to_some_topic = (
-            topic_services.get_all_skill_ids_assigned_to_some_topic())
+        assigned_topics = skill_services.get_all_topics_assigned_to_skill(
+            skill_id)
 
-        assigned_topics = {}
-        topics = topic_fetchers.get_all_topics()
-        if skill_id in skill_ids_assigned_to_some_topic:
-            for topic in topics:
-                if skill_id in topic.get_all_skill_ids():
-                    assigned_topics[topic.name] = {
-                        'id': topic.id,
-                        'version': topic.version
-                    }
-                    for subtopic in topic.subtopics:
-                        if skill_id in subtopic.skill_ids:
-                            assigned_topics[topic.name].update(
-                                {'subtopic_id': subtopic.id})
+        for topic_name in assigned_topics:
+            assigned_topics[topic_name] = assigned_topics[topic_name].to_dict()
 
         self.render_json({
             'assigned_topics': assigned_topics

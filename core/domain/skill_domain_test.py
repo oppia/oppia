@@ -802,3 +802,21 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.augmented_skill_summary.to_dict(),
             augmented_skill_summary_dict)
+
+
+class SkillAssignmentsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SkillAssignmentsTests, self).setUp()
+        self.skill_assignments = skill_domain.SkillAssignments(
+            'topic_id1', 2, 1)
+
+    def test_augmented_skill_summary_gets_created(self):
+        skill_assignments_dict = {
+            'topic_id': 'topic_id1',
+            'topic_version': 2,
+            'subtopic_id': 1,
+        }
+        self.assertEqual(
+            self.skill_assignments.to_dict(),
+            skill_assignments_dict)

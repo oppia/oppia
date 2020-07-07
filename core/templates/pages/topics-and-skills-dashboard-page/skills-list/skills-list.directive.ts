@@ -145,8 +145,9 @@ angular.module('oppia').directive('skillsList', [
                   uncategorized_skill_id: skillId
                 });
                 EditableTopicBackendApiService.updateTopic(
-                  topicsToUnassign[topic].id, topicsToUnassign[topic].version,
-                  'Unassigned skill with id ' + skillId + ' from the topic.',
+                  topicsToUnassign[topic].topic_id,
+                  topicsToUnassign[topic].topic_version,
+                  `Unassigned skill with id ${skillId} from the topic.`,
                   changeList
                 ).then(function() {
                   $timeout(function() {

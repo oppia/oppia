@@ -17,35 +17,37 @@
  */
 
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { TopicsAndSkillsDashboardBackendApiService } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 describe('Unassign Skill from Topics Modal', function() {
   var $scope = null;
   var $rootScope = null;
   var $q = null;
   var $uibModalInstance = null;
-  var TopicsAndSkillsDashboardBackendApiService = null;
   var topicIdDict = {
     topic1: {id: 'tasd42'}
   };
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [TopicsAndSkillsDashboardBackendApiService]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+    $provide.value('TopicsAndSkillsDashboardBackendApiService',
+      TestBed.get(TopicsAndSkillsDashboardBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
-    TopicsAndSkillsDashboardBackendApiService = (
-      $injector.get('TopicsAndSkillsDashboardBackendApiService'));
     var MockTopicsAndSkillsDashboardBackendApiService = {
       fetchAssignedSkillData: () => {
         var deferred = $q.defer();
@@ -62,8 +64,8 @@ describe('Unassign Skill from Topics Modal', function() {
     $controller('UnassignSkillFromTopicModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      TopicsAndSkillsDashboardBackendApiService:
-      MockTopicsAndSkillsDashboardBackendApiService,
+      TopicsAndSkillsDashboardBackendApiService: (
+        MockTopicsAndSkillsDashboardBackendApiService),
       skillId: 'asd'
     });
     $scope.init();

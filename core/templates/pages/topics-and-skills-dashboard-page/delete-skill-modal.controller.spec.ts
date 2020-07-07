@@ -17,32 +17,36 @@
  */
 
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { TopicsAndSkillsDashboardBackendApiService } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 describe('Delete Skill Modal Controller', function() {
   var $scope = null;
   var $rootScope = null;
   var $q = null;
   var $uibModalInstance = null;
-  var TopicsAndSkillsDashboardBackendApiService = null;
   var skillId = 'skillId1';
-  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [TopicsAndSkillsDashboardBackendApiService]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+    $provide.value('TopicsAndSkillsDashboardBackendApiService',
+      TestBed.get(TopicsAndSkillsDashboardBackendApiService));
   }));
 
   describe('when skill has no assigned topics', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = (
-        $injector.get('TopicsAndSkillsDashboardBackendApiService'));
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -58,10 +62,10 @@ describe('Delete Skill Modal Controller', function() {
       $scope = $rootScope.$new();
       $controller('DeleteSkillModalController', {
         $scope: $scope,
-        TopicsAndSkillsDashboardBackendApiService:
-        MockTopicsAndSkillsDashboardBackendApiService,
+        TopicsAndSkillsDashboardBackendApiService: (
+          MockTopicsAndSkillsDashboardBackendApiService),
         $uibModalInstance: $uibModalInstance,
-        skillId
+        skillId: skillId
       });
     }));
 
@@ -79,8 +83,6 @@ describe('Delete Skill Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = (
-        $injector.get('TopicsAndSkillsDashboardBackendApiService'));
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -96,10 +98,10 @@ describe('Delete Skill Modal Controller', function() {
       $scope = $rootScope.$new();
       $controller('DeleteSkillModalController', {
         $scope: $scope,
-        TopicsAndSkillsDashboardBackendApiService:
-        MockTopicsAndSkillsDashboardBackendApiService,
+        TopicsAndSkillsDashboardBackendApiService: (
+          MockTopicsAndSkillsDashboardBackendApiService),
         $uibModalInstance: $uibModalInstance,
-        skillId
+        skillId: skillId
       });
     }));
 

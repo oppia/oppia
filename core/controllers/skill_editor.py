@@ -22,7 +22,6 @@ from core.controllers import base
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
-from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
@@ -199,29 +198,8 @@ class EditableSkillDataHandler(base.BaseHandler):
     def delete(self, skill_id):
         """Handles Delete requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill_ids_assigned_to_some_topic = (
-            topic_services.get_all_skill_ids_assigned_to_some_topic())
 
-        if skill_id in skill_ids_assigned_to_some_topic:
-            all_topics = topic_fetchers.get_all_topics()
-            for topic in all_topics:
-                change_list = []
-                if skill_id in topic.get_all_skill_ids():
-                    for subtopic in topic.subtopics:
-                        if skill_id in subtopic.skill_ids:
-                            change_list.append(topic_domain.TopicChange({
-                                'cmd': 'remove_skill_id_from_subtopic',
-                                'subtopic_id': subtopic.id,
-                                'skill_id': skill_id
-                            }))
-
-                    change_list.append(topic_domain.TopicChange({
-                        'cmd': 'remove_uncategorized_skill_id',
-                        'uncategorized_skill_id': skill_id
-                    }))
-                    topic_services.update_topic_and_subtopic_pages(
-                        self.user_id, topic.id, change_list,
-                        'Removed %s from the topic' % skill_id)
+        skill_services.delete_skill_from_all_topics(self.user_id, skill_id)
 
         if skill_services.skill_has_associated_questions(skill_id):
             raise self.InvalidInputException(

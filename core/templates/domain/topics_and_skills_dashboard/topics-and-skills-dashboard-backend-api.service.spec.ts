@@ -119,7 +119,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
           status: 500
         });
         expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith(
+          'Error loading assigned skill data.');
       })
     );
 
