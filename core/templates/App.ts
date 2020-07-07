@@ -16,7 +16,6 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-require('@angular/material/prebuilt-themes/deeppurple-amber.css');
 /**
  * Angular material (v8) requires hammerjs for gesture recognition.
  * You can look at point 2 here:
