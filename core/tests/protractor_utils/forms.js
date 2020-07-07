@@ -529,10 +529,15 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
-      if (componentName !== 'Math') {
+      // TODO(#9821) :The Math rich text components are now rendered as SVGs by
+      // Math-Jax, and the XPATH_SELECTOR defined in the method expectRichText()
+      // cannot effectively parse the SVG tags, hence the elem.getText() won't
+      // work for Math components.
+      if (componentName === 'Math') {
+        expect(await elem.element(by.tagName('script')).isPresent()).toBe(true);
+      } else {
         expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
       }
-
       // Need to convert arguments to an actual array; we tell the component
       // which element to act on but drop the componentName.
       var args = [elem];
