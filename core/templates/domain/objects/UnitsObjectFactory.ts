@@ -16,26 +16,22 @@
  * @fileoverview Factory for creating instances of Units domain objects.
  */
 
-export interface IUnit {
-  unit: string;
-  exponent: number;
-}
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-export interface IUnitsBackendDict {
+import { createUnit, unit } from 'mathjs';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+import { IUnit } from
+  'interactions/answer-defs';
+
+interface IUnitsBackendDict {
   units: IUnit[];
 }
 
 interface UnitsDict {
   [unit: string]: number;
 }
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { createUnit, unit } from 'mathjs';
-
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 
 export class Units {
   units: IUnit[];
