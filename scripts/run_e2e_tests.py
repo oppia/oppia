@@ -97,7 +97,7 @@ _PARSER.add_argument(
     help='If true, skips building files. The default value is false.',
     action='store_true')
 _PARSER.add_argument(
-    '--sharding-instances', type=int, default=1,
+    '--sharding-instances', type=int, default=3,
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
          ' or 1 to --sharding-instances) if running any tests in isolation'

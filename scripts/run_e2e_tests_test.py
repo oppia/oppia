@@ -784,7 +784,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(1, 'full', True)])
+            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
                 common.NODE_BIN_PATH, '--unhandled-rejections=strict',
@@ -877,7 +877,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(1, 'full', True)])
+            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
                 common.NODE_BIN_PATH, '--inspect-brk',
@@ -977,7 +977,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(1, 'full', True)])
+            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
                 common.NODE_BIN_PATH, '--unhandled-rejections=strict',
