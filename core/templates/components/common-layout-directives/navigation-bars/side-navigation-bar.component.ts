@@ -21,6 +21,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { TranslateService } from 'services/translate.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'side-navigation-bar',
@@ -30,9 +32,18 @@ import { UrlInterpolationService } from
 export class SideNavigationBarComponent implements OnInit {
   currentUrl: string = '';
   constructor(
-    private urlInterplationService: UrlInterpolationService
-  ) {}
+    private urlInterplationService: UrlInterpolationService,
+    private translateService: TranslateService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {
+    translateService.use('en');
+  }
   ngOnInit() {
+    this.translateService.use(
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+      (code) => this.translateService.use(code)
+    );
     this.currentUrl = window.location.pathname;
   }
   getStaticImageUrl(imagePath: string): string {
