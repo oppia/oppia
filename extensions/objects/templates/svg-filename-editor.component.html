@@ -8,7 +8,7 @@
   </div>
   <div class="svg-editor" ng-if="!$ctrl.isDiagramSaved()">
     <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
-      <canvas ng-attr-id="<[$ctrl.canvasID]>"></canvas>
+      <canvas ng-attr-id="<[$ctrl.canvasID]>" class="fabric-canvas-container"></canvas>
     </div>
     <div class="vertical-toolbar">
       <div>
@@ -186,9 +186,25 @@
     bottom: 31px;
     cursor: default;
     left: 62px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     right: 0;
     top: 31px;
+  }
+
+  .svg-editor .fabric-canvas::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 7px;
+  }
+
+  .svg-editor .fabric-canvas::-webkit-scrollbar-thumb {
+    background-color: #7c7c7c;
+    border-radius: 4px;
+  }
+
+  .svg-editor .fabric-canvas .fabric-canvas-container {
+    height: 338px;
+    width: 496px;
   }
 
   .svg-editor .horizontal-toolbar {

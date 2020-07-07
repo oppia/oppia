@@ -98,21 +98,6 @@ describe('SvgFilenameEditor', function() {
     }
   };
 
-  var mockWindowDimenesionService = {
-    getResizeEvent: function() {
-      return {
-        subscribe: function(callback) {
-          callback();
-          return {
-            unsubscribe: function() {
-              return 'Unsubscribe Successful';
-            }
-          };
-        }
-      };
-    }
-  };
-
   class mockImageObject {
     source = null;
     onload = null;
@@ -137,7 +122,6 @@ describe('SvgFilenameEditor', function() {
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
-    $provide.value('WindowDimensionsService', mockWindowDimenesionService);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController, $q) {
     contextService = $injector.get('ContextService');
@@ -173,10 +157,6 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.fillPicker = mockPicker;
     svgFilenameCtrl.strokePicker = mockPicker;
   }));
-
-  afterAll(function() {
-    svgFilenameCtrl.$onDestroy();
-  });
 
   it('should update diagram size', function() {
     var WIDTH = 100;
@@ -470,10 +450,6 @@ describe('SvgFilenameEditor initialized with value attribute',
       initializeMockDocument(svgFilenameCtrl);
     }));
 
-    afterEach(function() {
-      svgFilenameCtrl.$onDestroy();
-    });
-
     it('should load the svg file', function() {
       svgFilenameCtrl.$onInit();
       $httpBackend.expect(
@@ -583,10 +559,6 @@ describe('SvgFilenameEditor with image save destination as ' +
     svgFilenameCtrl.initializeMouseEvents();
   }));
 
-  afterEach(function() {
-    svgFilenameCtrl.$onDestroy();
-  });
-
   it('should save svg file to local storage created by the svg editor',
     function() {
       svgFilenameCtrl.createRect();
@@ -627,10 +599,6 @@ describe('should fail svg tag validation', function() {
     svgFilenameCtrl = $componentController('svgFilenameEditor');
   }));
 
-  afterEach(function() {
-    svgFilenameCtrl.$onDestroy();
-  });
-
   it('should fail svg validation', function() {
     var invalidSvgTag = (
       '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
@@ -661,10 +629,6 @@ describe('should fail svg attribute validation', function() {
   beforeEach(angular.mock.inject(function($componentController) {
     svgFilenameCtrl = $componentController('svgFilenameEditor');
   }));
-
-  afterEach(function() {
-    svgFilenameCtrl.$onDestroy();
-  });
 
   it('should fail svg validation', function() {
     var invalidWidthAttribute = (

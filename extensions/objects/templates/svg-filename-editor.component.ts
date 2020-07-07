@@ -39,12 +39,12 @@ angular.module('oppia').component('svgFilenameEditor', {
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'UrlInterpolationService',
-    'WindowDimensionsService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     function($http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, UrlInterpolationService,
-        WindowDimensionsService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
       const ctrl = this;
       // These max width and height paramameters were determined by manual
       // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
@@ -59,8 +59,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       const DRAW_MODE_NONE = 'none';
       const OPEN_POLYGON_MODE = 'open';
       const CLOSED_POLYGON_MODE = 'closed';
-      ctrl.canvasMaxWidth = 0;
-      ctrl.canvasMaxHeight = 0;
+      // The canvas height and width were determined based on the initial
+      // modal dimensions.
+      const CANVAS_WIDTH = 496;
+      const CANVAS_HEIGHT = 338;
       ctrl.drawMode = DRAW_MODE_NONE;
       ctrl.polygonMode = CLOSED_POLYGON_MODE;
       ctrl.isTouchDevice = DeviceInfoService.hasTouchEvents();
@@ -95,7 +97,6 @@ angular.module('oppia').component('svgFilenameEditor', {
       // when there are multiple RTEs in the same page.
       var randomId = Math.floor(Math.random() * 100000).toString();
       ctrl.canvasID = 'canvas' + randomId;
-      ctrl.canvasContainerId = 'canvasContainer' + randomId;
       ctrl.canvasElement = null;
       ctrl.fillPicker = null;
       ctrl.strokePicker = null;
@@ -125,7 +126,6 @@ angular.module('oppia').component('svgFilenameEditor', {
         italic: false
       };
       ctrl.objectIsSelected = false;
-      ctrl.resizeSubscription = null;
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
@@ -376,8 +376,6 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.diagramStatus = STATUS_EDITING;
         ctrl.data = {};
         angular.element(document).ready(function() {
-          ctrl.canvasMaxHeight = 0;
-          ctrl.canvasMaxWidth = 0;
           initializeFabricJs();
           fabric.loadSVGFromString(
             ctrl.savedSVGDiagram, function(objects, options, elements) {
@@ -897,33 +895,14 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.setCanvasDimensions = function() {
-        ctrl.canvasContainer = document.getElementById(ctrl.canvasContainerId);
-        var width = ctrl.canvasContainer.offsetWidth;
-        var height = ctrl.canvasContainer.offsetHeight;
-        // Set the size of the canvas to be equal to that of the
-        // parent element only if it is greater than the current
-        // canvas size.
-        if (ctrl.canvasMaxHeight < height) {
-          ctrl.canvas.setHeight(height);
-          ctrl.canvasMaxHeight = height;
-        }
-        if (ctrl.canvasMaxWidth < width) {
-          ctrl.canvas.setWidth(width);
-          ctrl.canvasMaxWidth = width;
-        }
+        ctrl.canvas.setHeight(CANVAS_HEIGHT);
+        ctrl.canvas.setWidth(CANVAS_WIDTH);
         ctrl.canvas.renderAll();
       };
 
       var initializeFabricJs = function() {
         ctrl.canvas = new fabric.Canvas(ctrl.canvasID);
         ctrl.setCanvasDimensions();
-
-        ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-          subscribe(evt => {
-            ctrl.setCanvasDimensions();
-            $scope.$applyAsync();
-          });
-
         ctrl.canvas.selection = false;
         ctrl.initializeMouseEvents();
         createColorPicker('stroke');
@@ -944,12 +923,6 @@ angular.module('oppia').component('svgFilenameEditor', {
           angular.element(document).ready(function() {
             initializeFabricJs();
           });
-        }
-      };
-
-      ctrl.$onDestroy = function() {
-        if (ctrl.resizeSubscription) {
-          ctrl.resizeSubscription.unsubscribe();
         }
       };
     }
