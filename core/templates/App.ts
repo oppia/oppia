@@ -17,11 +17,11 @@
  */
 
 /**
- * Angular material (v8) requires hammerjs for gesture recognition.
+ * Angular Material (v8) requires hammerjs for gesture recognition.
  * You can look at point 2 here:
  * https://v8.material.angular.io/guide/getting-started#install-angular-material
- * It won't be reequired in angular 9.
- * TODO(#9172): Remove the import when upgraded to angular 9.
+ * It won't be required in Angular 9.
+ * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
 import 'hammerjs';
 require('app.constants.ajs.ts');
