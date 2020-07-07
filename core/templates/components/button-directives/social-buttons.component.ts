@@ -37,17 +37,15 @@ export class SocialButtonsComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService) {
     this.translateService.use('en');
   }
-  ngOnInit(): void {
+  ngOnInit() {
     this.translateService.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => this.translateService.use(code));
   }
-  getStaticImageUrl(imagePath): string {
+  getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
 
-angular.module('oppia').directive(
-  'socialButtons', downgradeComponent(
-    {component: SocialButtonsComponent}));
+
