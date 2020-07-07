@@ -28,9 +28,10 @@ import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+
 
 
 @NgModule({
