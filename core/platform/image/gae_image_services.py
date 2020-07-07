@@ -26,8 +26,6 @@ from constants import constants
 from core.platform import models
 import python_utils
 
-from google.appengine.api import images
-
 app_identity_services = models.Registry.import_app_identity_services()
 
 
@@ -67,7 +65,9 @@ def compress_image(image_content, scaling_factor):
         str. Returns the content of the compressed image.
     """
     if not constants.DEV_MODE:
-        height, width = get_image_dimensions(image_content)
+        img = Image.open(io.BytesIO(image_content))
+        width, height = img.height, img.width
+        
         new_width = int(width * scaling_factor)
         new_height = int(height * scaling_factor)
         if (new_width > MAX_RESIZE_DIMENSION_PX
@@ -79,9 +79,12 @@ def compress_image(image_content, scaling_factor):
                     MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
-        return images.resize(
-            image_data=image_content,
-            width=min(new_width, MAX_RESIZE_DIMENSION_PX),
-            height=min(new_height, MAX_RESIZE_DIMENSION_PX))
+        img = img.resize((min(new_width, MAX_RESIZE_DIMENSION_PX),
+                           min(new_height, MAX_RESIZE_DIMENSION_PX)))
+        with io.BytesIO() as output:
+            img.save(output, format="PNG")
+            contents = output.getvalue()
+
+        return contents
     else:
         return image_content
