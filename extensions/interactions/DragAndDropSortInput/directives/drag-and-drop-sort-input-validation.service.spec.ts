@@ -209,7 +209,7 @@ describe('DragAndDropSortInputValidationService', () => {
       message: 'Please ensure the items are nonempty.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 options do not match '+
+      message: 'Rule 1 from answer group 1 options do not match ' +
         'customization argument choices.'
     }]);
   });
@@ -225,7 +225,7 @@ describe('DragAndDropSortInputValidationService', () => {
       message: 'Please ensure the items are unique.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 options do not match '+
+      message: 'Rule 1 from answer group 1 options do not match ' +
         'customization argument choices.'
     }]);
   });
