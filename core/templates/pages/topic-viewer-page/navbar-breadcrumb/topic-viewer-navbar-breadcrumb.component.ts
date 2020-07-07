@@ -36,7 +36,7 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlService: UrlService
   ) {}
-  ngOnInit(): void {
+  ngOnInit() {
     this.topicViewerBackendApiService.fetchTopicData(
       this.urlService.getTopicNameFromLearnerUrl()).then(
       (readOnlyTopic: ReadOnlyTopic) => {
