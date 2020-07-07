@@ -130,11 +130,17 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
           ctrl.currentDiagramWidth = ctrl.diagramWidth;
+        } else {
+          ctrl.diagramWidth = MAX_DIAGRAM_WIDTH;
+          ctrl.currentDiagramWidth = ctrl.diagramWidth;
         }
       };
 
       ctrl.onHeightInputBlur = function() {
         if (ctrl.diagramHeight < MAX_DIAGRAM_HEIGHT) {
+          ctrl.currentDiagramHeight = ctrl.diagramHeight;
+        } else {
+          ctrl.diagramHeight = MAX_DIAGRAM_HEIGHT;
           ctrl.currentDiagramHeight = ctrl.diagramHeight;
         }
       };
@@ -181,6 +187,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         };
         ctrl.value = filename;
         if (setData) {
+          var dimensions = (
+            ImagePreloaderService.getDimensionsOfImage(filename));
+          ctrl.svgContainerStyle = {
+            height: dimensions.height + 'px',
+            width: dimensions.width + 'px'
+          };
+          ctrl.diagramWidth = dimensions.width;
+          ctrl.diagramHeight = dimensions.height;
           $http.get(ctrl.data.savedSVGUrl).then(function(response) {
             ctrl.savedSVGDiagram = response.data;
           });
@@ -362,6 +376,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.diagramStatus = STATUS_EDITING;
         ctrl.data = {};
         angular.element(document).ready(function() {
+          ctrl.canvasMaxHeight = 0;
+          ctrl.canvasMaxWidth = 0;
           initializeFabricJs();
           fabric.loadSVGFromString(
             ctrl.savedSVGDiagram, function(objects, options, elements) {
@@ -734,6 +750,13 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
         picker.onChange = function(color) {
           parent.style.background = color.rgbaString;
+          var topAlphaSquare = document.getElementById(
+            'top-' + value + '-alpha');
+          var bottomAlphaSquare = document.getElementById(
+            'bottom-' + value + '-alpha');
+          var opacity = 1 - color.rgba[3];
+          topAlphaSquare.style.opacity = opacity.toString();
+          bottomAlphaSquare.style.opacity = opacity.toString();
           ctrl.fabricjsOptions[value] = color.rgbaString;
           onChangeFunc[value]();
         };
@@ -809,6 +832,22 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.objectRedoStack = [];
           }
           ctrl.isRedo = false;
+        });
+
+        ctrl.canvas.on('object:scaling', function() {
+          if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
+            var text = ctrl.canvas.getActiveObject();
+            var scaleX = text.get('scaleX');
+            var scaleY = text.get('scaleY');
+            var width = text.get('width');
+            var height = text.get('height');
+            ctrl.canvas.getActiveObject().set({
+              width: width * scaleX,
+              height: height * scaleY,
+              scaleX: 1,
+              scaleY: 1
+            });
+          }
         });
 
         ctrl.canvas.on('selection:created', function() {

@@ -738,10 +738,10 @@ export class UpgradedServices {
       new MathEquationInputRulesService();
     upgradedServices['MathExpressionInputRulesService'] =
       new MathExpressionInputRulesService();
-    upgradedServices['MultipleChoiceInputRulesService'] =
-      new MultipleChoiceInputRulesService();
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
+    upgradedServices['MultipleChoiceInputRulesService'] =
+      new MultipleChoiceInputRulesService();
     upgradedServices['MusicPhrasePlayerService'] =
       new MusicPhrasePlayerService();
     upgradedServices['NeedsGuidingResponsesTaskObjectFactory'] =
