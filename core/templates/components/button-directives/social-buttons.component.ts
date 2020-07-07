@@ -47,5 +47,3 @@ export class SocialButtonsComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
-
-
