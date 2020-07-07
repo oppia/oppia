@@ -17,77 +17,82 @@
  * from the backend.
  */
 
-require('services/alerts.service.ts');
-require('services/validators.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
-  '$http', '$q', 'AlertsService',
-  'ValidatorsService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-  function(
-      $http, $q, AlertsService,
-      ValidatorsService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
-    var _fetchExpSummaries = function(
-        explorationIds, includePrivateExplorations, successCallback,
-        errorCallback) {
-      if (!explorationIds.every(ValidatorsService.isValidExplorationId)) {
-        AlertsService.addWarning('Please enter a valid exploration ID.');
+import { AlertsService } from 'services/alerts.service';
+import { ValidatorsService } from 'services/validators.service';
+import { AppConstants } from 'app.constants';
 
-        var returnValue = [];
-        for (var i = 0; i < explorationIds.length; i++) {
-          returnValue.push(null);
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationSummaryBackendApiService {
+  constructor(
+    private httpClient: HttpClient,
+    private alertsService: AlertsService,
+    private validatorsService: ValidatorsService) {}
 
-        if (errorCallback) {
-          errorCallback(returnValue);
-        }
-        return;
+  _fetchExpSummaries(explorationIds: Array<string>,
+      includePrivateExplorations: boolean,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reson?: any) => void): void {
+    if (!explorationIds.every(this.validatorsService.isValidExplorationId)) {
+      this.alertsService.addWarning('Please enter a valid exploration ID.');
+
+      var returnValue = [];
+      for (var i = 0; i < explorationIds.length; i++) {
+        returnValue.push(null);
       }
 
-      var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
-
-      $http.get(explorationSummaryDataUrl, {
-        params: {
-          stringified_exp_ids: JSON.stringify(explorationIds),
-          include_private_explorations: JSON.stringify(
-            includePrivateExplorations)
-        }
-      }).then(function(response) {
-        var summaries = angular.copy(response.data.summaries);
-        if (successCallback) {
-          if (summaries === null) {
-            var summariesError = (
-              'Summaries fetched are null for explorationIds: ' + explorationIds
-            );
-            throw new Error(summariesError);
-          }
-          successCallback(summaries);
-        }
-      })['catch'](function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data || errorResponse);
-        }
-      });
-    };
-
-    return {
-      /**
-       * Fetches a list of public exploration summaries and private
-       * exploration summaries for which the current user has access from the
-       * backend for each exploration ID provided. The provided list of
-       * exploration summaries are in the same order as input exploration IDs
-       * list, though some may be missing (if the exploration doesn't exist or
-       * or the user does not have access to it).
-       */
-      loadPublicAndPrivateExplorationSummaries: function(explorationIds) {
-        return $q(function(resolve, reject) {
-          _fetchExpSummaries(explorationIds, true, resolve, reject);
-        });
-      },
-      loadPublicExplorationSummaries: function(explorationIds) {
-        return $q(function(resolve, reject) {
-          _fetchExpSummaries(explorationIds, false, resolve, reject);
-        });
+      if (errorCallback) {
+        errorCallback(returnValue);
       }
-    };
+      return;
+    }
+    var explorationSummaryDataUrl =
+    AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
+
+    this.httpClient.get(explorationSummaryDataUrl, {
+      params: {
+        stringified_exp_ids: JSON.stringify(explorationIds),
+        include_private_explorations: JSON.stringify(
+          includePrivateExplorations)
+      }
+    }).toPromise().then((response: any) => {
+      var summaries = angular.copy(response.data.summaries);
+      if (successCallback) {
+        if (summaries === null) {
+          var summariesError = (
+            'Summaries fetched are null for explorationIds: ' + explorationIds
+          );
+          throw new Error(summariesError);
+        }
+        successCallback(summaries);
+      }
+    }, (errorResponse) =>{
+      if (errorCallback) {
+        errorCallback(errorResponse.data || errorResponse);
+      }
+    });
   }
-]);
+
+  loadPublicAndPrivateExplorationSummaries(
+      explorationIds: Array<string>): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchExpSummaries(explorationIds, true, resolve, reject);
+    });
+  }
+
+  loadPublicExplorationSummaries(
+      explorationIds: Array<string>): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchExpSummaries(explorationIds, false, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationSummaryBackendApiService',
+  downgradeInjectable(ExplorationSummaryBackendApiService));
