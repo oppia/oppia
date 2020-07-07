@@ -338,6 +338,9 @@ import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+import { MultipleChoiceInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MultipleChoiceInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
@@ -762,6 +765,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static messengerService: MessengerService;
   static metaTagCustomizationService: MetaTagCustomizationService;
   static misconceptionObjectFactory: MisconceptionObjectFactory;
+  static multipleChoiceInputRulesService: MultipleChoiceInputRulesService;
   static multipleChoiceInputValidationService: MultipleChoiceInputValidationService;
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
@@ -1046,6 +1050,7 @@ private mathInteractionsService: MathInteractionsService,
 private messengerService: MessengerService,
 private metaTagCustomizationService: MetaTagCustomizationService,
 private misconceptionObjectFactory: MisconceptionObjectFactory,
+private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
 private multipleChoiceInputValidationService: MultipleChoiceInputValidationService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
@@ -1331,6 +1336,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.messengerService = this.messengerService;
     OppiaAngularRootComponent.metaTagCustomizationService = this.metaTagCustomizationService;
     OppiaAngularRootComponent.misconceptionObjectFactory = this.misconceptionObjectFactory;
+    OppiaAngularRootComponent.multipleChoiceInputRulesService = this.multipleChoiceInputRulesService;
     OppiaAngularRootComponent.multipleChoiceInputValidationService = this.multipleChoiceInputValidationService;
     OppiaAngularRootComponent.musicNotesInputValidationService = this.musicNotesInputValidationService;
     OppiaAngularRootComponent.musicPhrasePlayerService = this.musicPhrasePlayerService;
