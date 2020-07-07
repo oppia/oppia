@@ -232,6 +232,40 @@ describe('State Interaction Stats Service', () => {
         expect(this.onFailure).not.toHaveBeenCalled();
       }));
 
+    it('should return content of MultipleChoiceInput answers', fakeAsync(() => {
+      this.onSuccess = jasmine.createSpy('success');
+      this.onFailure = jasmine.createSpy('failure');
+
+      this.stateInteractionStatsService.computeStats(this.expId, {
+        name: 'Fraction',
+        interaction: {
+          id: 'MultipleChoiceInput',
+          customizationArgs: {
+            choices: {value: ['<p>foo</p>', '<p>bar</p>']},
+          },
+        }
+      }).then(this.onSuccess, this.onFailure);
+
+      const req = this.httpTestingController.expectOne(
+        '/createhandler/state_interaction_stats/expid/Fraction');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        visualizations_info: [{
+          data: [{answer: 0, frequency: 3}, {answer: 1, frequency: 5}],
+        }]
+      });
+      flushMicrotasks();
+
+      expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
+        visualizationsInfo: [this.joC({
+          data: [
+            this.joC({answer: '<p>foo</p>'}),
+            this.joC({answer: '<p>bar</p>'}),
+          ]
+        })]
+      }));
+    }));
+
     it(
       'should return FractionInput answers as readable strings',
       fakeAsync(() => {

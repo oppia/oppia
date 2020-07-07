@@ -109,6 +109,16 @@ export class UtilsService {
       default: return value instanceof Error;
     }
   }
+
+  isOverflowing(element: HTMLElement): boolean {
+    if (!element) {
+      return false;
+    } else {
+      return (
+        element.offsetWidth < element.scrollWidth ||
+        element.offsetHeight < element.scrollHeight);
+    }
+  }
 }
 
 angular.module('oppia').factory(

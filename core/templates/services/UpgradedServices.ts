@@ -290,6 +290,9 @@ import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+import { MultipleChoiceInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MultipleChoiceInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
@@ -690,6 +693,8 @@ export class UpgradedServices {
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
+    upgradedServices['MultipleChoiceInputRulesService'] =
+      new MultipleChoiceInputRulesService();
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['MusicPhrasePlayerService'] =

@@ -23,8 +23,10 @@ import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
-import { IInteractionAnswer, IFractionAnswer } from
+import { IInteractionAnswer, IFractionAnswer, IMultipleChoiceAnswer } from
   'interactions/answer-defs';
+import { IMultipleChoiceInputCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -78,9 +80,13 @@ export class StateInteractionStatsService {
   private getReadableAnswerString(
       state: State, answer: IInteractionAnswer): IInteractionAnswer {
     if (state.interaction.id === 'FractionInput') {
-      return (
-        this.fractionObjectFactory.fromDict(
-          <IFractionAnswer> answer).toString());
+      return this.fractionObjectFactory.fromDict(
+        <IFractionAnswer> answer).toString();
+    } else if (state.interaction.id === 'MultipleChoiceInput') {
+      const customizationArgs = (
+        <IMultipleChoiceInputCustomizationArgs>
+        state.interaction.customizationArgs);
+      return customizationArgs.choices.value[<IMultipleChoiceAnswer> answer];
     }
     return answer;
   }

@@ -19,37 +19,131 @@
 
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
-describe('Oppia sorted tiles visualization', function() {
-  let $compile, $rootScope, element: JQuery;
+import { TestBed } from '@angular/core/testing';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
-    $compile = _$compile_;
-    $rootScope = _$rootScope_;
+import { IAnswerStatsBackendDict, AnswerStatsObjectFactory } from
+  'domain/exploration/AnswerStatsObjectFactory';
+import { UtilsService } from 'services/utils.service';
+
+describe('Oppia sorted tiles visualization', function() {
+  let $compile, $rootScope, $uibModal;
+  let answerStatsObjectFactory: AnswerStatsObjectFactory;
+  let utilsService: UtilsService;
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    utilsService = TestBed.get(UtilsService);
+    $provide.value('UtilsService', utilsService);
+  }));
+  beforeEach(angular.mock.inject(function($injector) {
+    $compile = $injector.get('$compile');
+    $rootScope = $injector.get('$rootScope');
+    $uibModal = $injector.get('$uibModal');
+    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
   }));
 
-  beforeEach(() => {
-    const elementHtml = (
-      '<oppia-visualization-sorted-tiles data="data" options="options">' +
-      '</oppia-visualization-sorted-tiles>');
-    const $scope = $rootScope.$new();
-    $scope.data = [
-      {answer: 'foo', frequency: 3},
-      {answer: 'bar', frequency: 1},
-    ];
-    $scope.options = {
-      header: 'Pretty Tiles!'
-    };
-    element = $compile(elementHtml)($scope);
-    $rootScope.$digest();
+  const newDirective = (
+    (data: IAnswerStatsBackendDict[], options: Object): JQLite => {
+      const elementHtml = (
+        '<oppia-visualization-sorted-tiles data="data" options="options">' +
+        '</oppia-visualization-sorted-tiles>');
+      const scope = $rootScope.$new();
+      scope.data = (
+        data.map(d => answerStatsObjectFactory.createFromBackendDict(d)));
+      scope.options = options;
+      const element = $compile(elementHtml)(scope);
+      $rootScope.$digest();
+      return element;
+    });
+
+  describe('Without percentages', () => {
+    let element: JQLite;
+
+    beforeEach(() => {
+      element = newDirective(
+        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
+        {header: 'Pretty Tiles!', use_percentages: false});
+    });
+
+    it('should render the provided data and their frequencies', () => {
+      expect(element.find('strong').text()).toEqual('Pretty Tiles!');
+      expect(
+        element.find('div.oppia-visualization-sorted-tile-content > div')
+          .map((_, el) => el.textContent.trim()).toArray())
+        .toEqual(['foo', '3 times', 'bar', '1 time']);
+    });
   });
 
-  it('should render the provided scope bindings', () => {
-    expect(element.find('strong').text()).toEqual('Pretty Tiles!');
-    expect(element.find('li > div').map((_, el) => el.textContent).toArray())
-      .toEqual([
-        'foo', '3 times',
-        'bar', '1 times',
-      ]);
+  describe('With percentages', () => {
+    let element: JQLite;
+
+    beforeEach(() => {
+      element = newDirective(
+        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
+        {header: 'Pretty Tiles!', use_percentages: true});
+    });
+
+    it('should render the provided data with percentages', () => {
+      expect(
+        element.find('div.oppia-visualization-sorted-tile-content > div')
+          .map((_, el) => el.textContent.trim()).toArray())
+        .toEqual(['foo', '75%', 'bar', '25%']);
+    });
+
+    describe('Tooltip behavior', () => {
+      it('should not show frequency tooltip by default', () => {
+        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+          .toEqual(0);
+      });
+
+      it('should show and hide tooltip when hovering the percentage', () => {
+        element.find('.oppia-visualization-sorted-tile-content:first')
+          .trigger('mouseover');
+
+        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+          .toEqual(1);
+        expect(
+          element.find('.oppia-visualization-sorted-tile-tooltip')
+            .get(0).innerText.trim())
+          .toEqual('3 times');
+
+        element.find('.oppia-visualization-sorted-tile-content:first')
+          .trigger('mouseleave');
+        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
+          .toEqual(0);
+      });
+    });
+  });
+
+  describe('Very long content', () => {
+    const veryLongAnswer = (
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ' +
+      'eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ' +
+      'ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut ' +
+      'aliquip ex ea commodo consequat. Duis aute irure dolor in ' +
+      'reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla ' +
+      'pariatur. Excepteur sint occaecat cupidatat non proident, sunt in ' +
+      'culpa qui officia deserunt mollit anim id est laborum.');
+    let element: JQLite;
+
+    beforeEach(() => {
+      spyOn(utilsService, 'isOverflowing').and.returnValue(true);
+
+      element = newDirective(
+        [{answer: veryLongAnswer, frequency: 3}],
+        {header: 'Pretty Tiles!', use_percentages: true});
+    });
+
+    it('should respect that the answer is too long', () => {
+      expect(element.find('.answer-0 > .more').length).toEqual(1);
+    });
+
+    it('should open the answer content modal when prompted for more', () => {
+      const openModalSpy = spyOn($uibModal, 'open').and.callThrough();
+
+      element.find('.more > a').click();
+      expect(openModalSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+        controller: 'AnswerContentModalController'
+      }));
+    });
   });
 });
