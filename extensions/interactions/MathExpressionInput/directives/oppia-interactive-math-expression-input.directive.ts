@@ -29,6 +29,7 @@ require(
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/debouncer.service.ts');
+require('services/guppy-configuration.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
@@ -46,11 +47,11 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
       controller: [
         '$scope', '$attrs', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
-        'CurrentInteractionService',
+        'CurrentInteractionService', 'GuppyConfigurationService',
         function(
             $scope, $attrs, $element, LABEL_FOR_CLEARING_FOCUS,
             DebouncerService, DeviceInfoService, WindowDimensionsService,
-            CurrentInteractionService) {
+            CurrentInteractionService, GuppyConfigurationService) {
           var ctrl = this;
           var guppyDivElt, guppyDivId, guppyInstance: Guppy;
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
@@ -169,6 +170,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               answer, MathExpressionInputRulesService);
           };
           ctrl.$onInit = function() {
+            GuppyConfigurationService.init();
             guppyDivElt = $element[0].querySelector('.guppy-div');
 
             // Dynamically assigns a unique id to the guppy-div.
@@ -176,11 +178,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               'id', 'guppy_' + Math.floor(Math.random() * 100000000));
             guppyDivId = guppyDivElt.id;
             guppyInstance = new Guppy(guppyDivId, {
-              settings: {
-                empty_content: (
-                  '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
-                buttons: []
-              },
               events: {
                 ready: function() {
                   if (DeviceInfoService.isMobileUserAgent() &&
