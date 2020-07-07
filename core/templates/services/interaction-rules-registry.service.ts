@@ -37,8 +37,6 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { ImageClickInputRulesService } from
   'interactions/ImageClickInput/directives/image-click-input-rules.service';
-import { InteractionSpecsConstants } from
-  'pages/interaction-specs.constants';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { ItemSelectionInputRulesService } from
