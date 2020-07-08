@@ -927,7 +927,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(unused_prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
@@ -971,7 +971,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(unused_prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
@@ -1005,7 +1005,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(unused_prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(

@@ -198,7 +198,7 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         prod_yaml_file.write(content)
 
 
-def modify_constants(prod_env, maintenance_mode=False):
+def modify_constants(prod_env=False, maintenance_mode=False):
     """Modify constants.ts and feconf.py.
 
     Args:
@@ -1323,7 +1323,7 @@ def main(args=None):
                 'set in non-prod env.')
 
     modify_constants(
-        options.prod_env, maintenance_mode=options.maintenance_mode)
+        prod_env=options.prod_env, maintenance_mode=options.maintenance_mode)
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
