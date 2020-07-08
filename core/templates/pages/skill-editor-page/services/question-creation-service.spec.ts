@@ -213,6 +213,9 @@ describe('Question Creation Service', function() {
       expect(qcs.getDifficultyString(0.3)).toEqual('Easy');
       expect(qcs.getDifficultyString(0.6)).toEqual('Medium');
       expect(qcs.getDifficultyString(1)).toEqual('Hard');
+      expect(qcs.getDifficultyString(10)).toEqual('Hard');
+      expect(qcs.getDifficultyString(2)).toEqual('Hard');
+      expect(qcs.getDifficultyString(1.5)).toEqual('Hard');
     });
 
     it('should open question editor modal', function() {
