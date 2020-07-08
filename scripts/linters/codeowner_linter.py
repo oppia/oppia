@@ -47,7 +47,8 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party_libs.py',
     '/.github/',
     '/.github/CODEOWNERS',
-    '/.github/stale.yml']
+    '/.github/stale.yml',
+    '/.github/workflows/']
 
 
 def _walk_with_gitignore(root, exclude_dirs):
