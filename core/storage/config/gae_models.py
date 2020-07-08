@@ -27,11 +27,13 @@ from google.appengine.ext import ndb
 class ConfigPropertySnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a config property snapshot."""
+
     pass
 
 
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
+
     pass
 
 
@@ -40,6 +42,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     The id is the name of the property.
     """
+
     SNAPSHOT_METADATA_CLASS = ConfigPropertySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
 
@@ -55,11 +58,6 @@ class ConfigPropertyModel(base_models.VersionedModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ConfigPropertyModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)

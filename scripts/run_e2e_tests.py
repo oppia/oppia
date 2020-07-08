@@ -31,10 +31,8 @@ from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-from scripts import setup
-from scripts import setup_gae
 
-CHROME_DRIVER_VERSION = '2.41'
+CHROME_DRIVER_VERSION = '77.0.3865.40'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -72,7 +70,6 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
-HASHES_FILE_PATH = os.path.join('assets', 'hashes.json')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -120,6 +117,12 @@ _PARSER.add_argument(
          'For performing a full test, no argument is required.')
 
 _PARSER.add_argument(
+    '--auto_select_chromedriver',
+    help='Automatically sets the chromedriver version depending on the version '
+         'of Chrome installed in the environment.',
+    action='store_true')
+
+_PARSER.add_argument(
     '--debug_mode',
     help='Runs the protractor test in debugging mode. Follow the instruction '
          'provided in following URL to run e2e tests in debugging mode: '
@@ -130,6 +133,13 @@ _PARSER.add_argument(
     '--deparallelize_terser',
     help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
     action='store_true')
+
+_PARSER.add_argument(
+    '--server_log_level',
+    help='Sets the log level for the appengine server. The default value is '
+         'set to critical.',
+    default='critical',
+    choices=['critical', 'error', 'warning', 'info'])
 
 _PARSER.add_argument(
     '--community_dashboard_enabled', action='store_true',
@@ -238,7 +248,8 @@ def run_webdriver_manager(parameters):
     """
     web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
     web_driver_command.extend(parameters)
-    python_utils.PRINT(common.run_cmd(web_driver_command))
+    p = subprocess.Popen(web_driver_command)
+    p.communicate()
 
 
 def update_community_dashboard_status_in_feconf_file(
@@ -260,8 +271,6 @@ def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
-    setup.main(args=[])
-    setup_gae.main(args=[])
     if os.getenv('TRAVIS'):
         install_chrome_on_travis.main(args=[])
 
@@ -282,10 +291,6 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
         else:
             build.main(args=['--prod_env'])
     else:
-        # The 'hashes.json' file is used by the `url-interpolation` service.
-        if not os.path.isfile(HASHES_FILE_PATH):
-            with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
-                hash_file.write('{}')
         build.main(args=[])
         run_webpack_compilation()
 
@@ -332,13 +337,17 @@ def undo_webdriver_tweak():
         os.rename(GECKO_PROVIDER_BAK_FILE_PATH, GECKO_PROVIDER_FILE_PATH)
 
 
-def start_webdriver_manager():
-    """Update and start webdriver manager."""
+def start_webdriver_manager(version):
+    """Update and start webdriver manager.
+
+    Args:
+        version: str. The chromedriver version.
+    """
     with tweak_webdriver_manager():
         run_webdriver_manager(
-            ['update', '--versions.chrome', CHROME_DRIVER_VERSION])
+            ['update', '--versions.chrome', version])
         run_webdriver_manager(
-            ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
+            ['start', '--versions.chrome', version,
              '--detach', '--quiet'])
 
 
@@ -412,22 +421,39 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_app_engine_server(dev_mode_setting):
+def start_google_app_engine_server(dev_mode_setting, log_level):
     """Start the Google App Engine server.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
             in dev mode.
+        log_level: str. The log level for the google app engine server.
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
 
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true %s' % (
+        '--clear_datastore=yes --dev_appserver_log_level=%s '
+        '--log_level=%s --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath), shell=True)
+            GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
+        shell=True)
     SUBPROCESSES.append(p)
+
+
+def get_chrome_driver_version():
+    """Fetches the latest supported version of chromedriver depending on the
+    Chrome version.
+    This method follows the steps mentioned here:
+    https://chromedriver.chromium.org/downloads/version-selection
+    """
+    output = os.popen('google-chrome --version').read()
+    chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
+    chrome_version = '.'.join(chrome_version.split('.')[:-1])
+    response = python_utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
+        % chrome_version)
+    return response.read()
 
 
 def main(args=None):
@@ -450,9 +476,12 @@ def main(args=None):
     if not parsed_args.skip_build:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
-    start_webdriver_manager()
+    version = (
+        get_chrome_driver_version() if parsed_args.auto_select_chromedriver
+        else CHROME_DRIVER_VERSION)
+    start_webdriver_manager(version)
 
-    start_google_app_engine_server(dev_mode)
+    start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)

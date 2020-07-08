@@ -554,6 +554,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
 class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     """Test the opportunity services methods."""
+
     def setUp(self):
         super(OpportunityServicesUnitTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

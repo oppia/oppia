@@ -41,8 +41,12 @@
         <picture>
           <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.webp')]>">
           <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>">
-          <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
+          <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>"
+               class="oppia-logo"
+               ng-class="'oppia-logo-wide'"
+               alt="Oppia Logo">
         </picture>
+        Return to Oppia Library Page
       </a>
       <ul class="nav navbar-nav oppia-navbar-breadcrumb">
         <li>

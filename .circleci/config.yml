@@ -40,6 +40,20 @@ anchor_for_job_defaults: &job_defaults
     - image: *docker_image
 
 commands:
+  install_chrome:
+    # Chrome version installed should be consistent with that installed on Travis CI.
+    description: "Install Chrome"
+    steps:
+      - run:
+          name:  Install chrome version 77.0.3865.75-1
+          command: |
+            sudo apt-get update
+            sudo apt-get install lsb-release
+            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
+            sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+            sudo dpkg -i google-chrome.deb
+            google-chrome --version
+
   merge_target_branch:
     description: "Merge to target branch"
     steps:
@@ -115,6 +129,7 @@ jobs:
     steps:
       - checkout
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -147,6 +162,7 @@ jobs:
       - checkout
       - check_release_chaneglog_update_branch
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -180,6 +196,7 @@ jobs:
       - checkout
       - check_release_chaneglog_update_branch
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -212,6 +229,7 @@ jobs:
       - checkout
       - check_release_chaneglog_update_branch
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -221,15 +239,15 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --server_log_level=info
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info
       - run:
           name: Run e2e topic and story editor test
           command: |

@@ -34,8 +34,6 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
-from scripts import setup
-from scripts import setup_gae
 
 
 class MockProcessClass(python_utils.OBJECT):
@@ -300,6 +298,31 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             with isdir_swap:
                 run_e2e_tests.run_webpack_compilation()
 
+    def test_get_chrome_driver_version(self):
+        def mock_popen(unused_arg):
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def read(self):
+                    """Return required method."""
+                    return '77.0.3865'
+            return Ret()
+
+        popen_swap = self.swap(os, 'popen', mock_popen)
+        def mock_url_open(unused_arg):
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def read(self):
+                    """Return required method."""
+                    return run_e2e_tests.CHROME_DRIVER_VERSION
+            return Ret()
+
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
+        with popen_swap, url_open_swap:
+            version = run_e2e_tests.get_chrome_driver_version()
+            self.assertEqual(version, run_e2e_tests.CHROME_DRIVER_VERSION)
+
     def test_run_webpack_compilation_failed(self):
         def mock_isdir(unused_port):
             return False
@@ -327,67 +350,46 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common.NODE_BIN_PATH, run_e2e_tests.WEBDRIVER_MANAGER_BIN_PATH,
             'start', '--detach']
 
-        stdout = 'stdout'
-        def mock_run_cmd(unused_commands):
-            return stdout
+        def mock_popen(unused_command):
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
 
-        mock_run_cmd.called = False
-        run_cmd_swap = self.swap_with_checks(
-            common, 'run_cmd', mock_run_cmd,
-            expected_args=[(expected_commands,)])
-        print_swap = self.print_swap(expected_args=[(stdout,)])
-        with print_swap, run_cmd_swap:
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=[
+                (expected_commands,)], expected_kwargs=[{}])
+        with popen_swap:
             run_e2e_tests.run_webdriver_manager(['start', '--detach'])
 
     def test_setup_and_install_dependencies_without_skip(self):
-        # pylint: disable=unused-argument
-        def mock_setup_main(args):
-            return
 
         def mock_install_third_party_libs_main():
             return
 
-        def mock_setup_gae_main(args):
-            return
-        # pylint: enable=unused-argument
-
-        setup_swap = self.swap_with_checks(
-            setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
-        setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main,
-            expected_kwargs=[{'args': []}]
-        )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main)
 
-        with setup_swap, setup_gae_swap, install_swap:
+        with install_swap:
             run_e2e_tests.setup_and_install_dependencies(False)
 
     def test_setup_and_install_dependencies_on_travis(self):
-        # pylint: disable=unused-argument
-        def mock_setup_main(args):
-            return
 
         def mock_install_third_party_libs_main():
             return
 
-        def mock_setup_gae_main(args):
+        def mock_install_chrome_main(args):  # pylint: disable=unused-argument
             return
-
-        def mock_install_chrome_main(args):
-            return
-        # pylint: enable=unused-argument
 
         def mock_getenv(unused_variable_name):
             return True
 
-        setup_swap = self.swap_with_checks(
-            setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
-        setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main,
-            expected_kwargs=[{'args': []}]
-            )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main)
@@ -397,49 +399,29 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('TRAVIS',)])
 
-        with setup_swap, setup_gae_swap, install_swap, install_chrome_swap:
+        with install_swap, install_chrome_swap:
             with getenv_swap:
                 run_e2e_tests.setup_and_install_dependencies(False)
 
     def test_setup_and_install_dependencies_with_skip(self):
-        # pylint: disable=unused-argument
-        def mock_setup_main(args):
+
+        def mock_install_third_party_libs_main(unused_args):
             return
 
-        def mock_install_third_party_libs_main(args):
-            return
-
-        def mock_setup_gae_main(args):
-            return
-        # pylint: enable=unused-argument
-
-        setup_swap = self.swap_with_checks(
-            setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
-        setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main,
-            expected_kwargs=[{'args': []}]
-            )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main, called=False)
 
-        with setup_swap, setup_gae_swap, install_swap:
+        with install_swap:
             run_e2e_tests.setup_and_install_dependencies(True)
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self):
         def mock_isdir(unused_path):
             return True
 
-        def mock_is_file(unused_path):
-            return True
-
         expected_commands = [
             self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
             'webpack.dev.config.ts']
-
-        is_file_swap = self.swap_with_checks(
-            os.path, 'isfile', mock_is_file,
-            expected_args=[(run_e2e_tests.HASHES_FILE_PATH,)])
 
         isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
         check_call_swap = self.swap_with_checks(
@@ -450,42 +432,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap, check_call_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with is_file_swap, build_main_swap, isdir_swap:
+                with build_main_swap, isdir_swap:
                     run_e2e_tests.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_hash_file_not_exist(self):
-
-        def mock_isdir(unused_path):
-            return True
-
-        expected_commands = [
-            self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
-            'webpack.dev.config.ts']
-        mock_hash_file_path = 'NOT_A_FILE.json'
-
-        hash_file_path_swap = self.swap(
-            run_e2e_tests, 'HASHES_FILE_PATH', mock_hash_file_path)
-        isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
-        check_call_swap = self.swap_with_checks(
-            subprocess, 'check_call', self.mock_check_call,
-            expected_args=[(expected_commands,)])
-        build_main_swap = self.swap_with_checks(
-            build, 'main', self.mock_build_main, expected_kwargs=[{'args': []}])
-        print_swap = self.print_swap(called=False)
-        with print_swap, self.constant_file_path_swap, check_call_swap:
-            with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with hash_file_path_swap, build_main_swap, isdir_swap:
-                    run_e2e_tests.build_js_files(True)
-
-        with python_utils.open_file(mock_hash_file_path, 'r') as f:
-            content = f.readlines()
-        os.remove(mock_hash_file_path)
-        self.assertEqual(content, ['{}'])
 
     def test_build_js_files_in_dev_mode_with_exception_raised(self):
-
-        def mock_is_file(unused_path):
-            return True
 
         def mock_check_call(commands):
             raise subprocess.CalledProcessError(
@@ -498,10 +448,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
             'webpack.dev.config.ts']
 
-        is_file_swap = self.swap_with_checks(
-            os.path, 'isfile', mock_is_file,
-            expected_args=[(run_e2e_tests.HASHES_FILE_PATH,)])
-
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', mock_check_call,
             expected_args=[(expected_commands,)])
@@ -512,7 +458,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         print_swap = self.print_swap(expected_args=[('ERROR',)])
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with check_call_swap, is_file_swap, exit_swap, build_main_swap:
+                with check_call_swap, exit_swap, build_main_swap:
                     run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_prod_mode(self):
@@ -676,7 +622,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'run_webdriver_manager', mock_run_webdriver_manager,
             expected_args=expected_commands)
         with tweak_swap, run_swap:
-            run_e2e_tests.start_webdriver_manager()
+            run_e2e_tests.start_webdriver_manager(
+                run_e2e_tests.CHROME_DRIVER_VERSION)
 
     def test_get_parameter_for_one_sharding_instance(self):
         result = run_e2e_tests.get_parameter_for_sharding(1)
@@ -728,7 +675,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(expected_command,)],
             expected_kwargs=[{'shell': True}])
         with popen_swap:
-            run_e2e_tests.start_google_app_engine_server(True)
+            run_e2e_tests.start_google_app_engine_server(True, 'critical')
 
     def test_start_google_app_engine_server_in_prod_mode(self):
 
@@ -743,7 +690,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(expected_command,)],
             expected_kwargs=[{'shell': True}])
         with popen_swap:
-            run_e2e_tests.start_google_app_engine_server(False)
+            run_e2e_tests.start_google_app_engine_server(False, 'critical')
 
     def test_start_tests_when_other_instances_not_stopped(self):
         def mock_exit(unused_exit_code):
@@ -776,10 +723,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
             return
 
-        def mock_start_webdriver_manager():
+        def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_start_google_app_engine_server(unused_arg):
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
@@ -820,11 +767,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(True,)])
         start_webdriver_swap = self.swap_with_checks(
             run_e2e_tests, 'start_webdriver_manager',
-            mock_start_webdriver_manager)
+            mock_start_webdriver_manager,
+            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True,)])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             run_e2e_tests, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
@@ -868,10 +816,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
             return
 
-        def mock_start_webdriver_manager():
+        def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_start_google_app_engine_server(unused_arg):
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
@@ -912,11 +860,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(True,)])
         start_webdriver_swap = self.swap_with_checks(
             run_e2e_tests, 'start_webdriver_manager',
-            mock_start_webdriver_manager)
+            mock_start_webdriver_manager,
+            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True,)])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             run_e2e_tests, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
@@ -942,6 +891,107 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
                             run_e2e_tests.main(args=['--debug_mode'])
+
+    def test_start_tests_in_with_autoselected_chromedriver(self):
+
+        def mock_is_oppia_server_already_running(*unused_args):
+            return False
+
+        def mock_setup_and_install_dependencies(unused_arg):
+            return
+
+        def mock_register(unused_func):
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
+            return
+
+        def mock_start_webdriver_manager(unused_arg):
+            return
+
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
+            return
+
+        def mock_wait_for_port_to_be_open(unused_port):
+            return
+
+        def mock_ensure_screenshots_dir_is_removed():
+            return
+
+        def mock_get_e2e_test_parameters(
+                unused_sharding_instances, unused_suite, unused_dev_mode):
+            return ['commands']
+
+        def mock_popen(unused_commands):
+            def mock_communicate():
+                return
+            result = MockProcessClass()
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            return result
+
+        def mock_exit(unused_code):
+            return
+
+        def mock_get_chrome_driver_version():
+            return run_e2e_tests.CHROME_DRIVER_VERSION
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
+        check_swap = self.swap_with_checks(
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
+
+        setup_and_install_swap = self.swap_with_checks(
+            run_e2e_tests, 'setup_and_install_dependencies',
+            mock_setup_and_install_dependencies, expected_args=[(False,)])
+
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[(mock_cleanup,)])
+
+        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        build_swap = self.swap_with_checks(
+            run_e2e_tests, 'build_js_files', mock_build_js_files,
+            expected_args=[(True,)])
+        start_webdriver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_webdriver_manager',
+            mock_start_webdriver_manager,
+            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
+        start_google_app_engine_server_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_google_app_engine_server',
+            mock_start_google_app_engine_server,
+            expected_args=[(True, 'critical')])
+        wait_swap = self.swap_with_checks(
+            run_e2e_tests, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open,
+            expected_args=[
+                (run_e2e_tests.WEB_DRIVER_PORT,),
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+        ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
+            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
+            mock_ensure_screenshots_dir_is_removed)
+        get_parameters_swap = self.swap_with_checks(
+            run_e2e_tests, 'get_e2e_test_parameters',
+            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=[([
+                common.NODE_BIN_PATH, '--unhandled-rejections=strict',
+                run_e2e_tests.PROTRACTOR_BIN_PATH, 'commands'],)])
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
+        with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
+            with build_swap, start_webdriver_swap:
+                with start_google_app_engine_server_swap:
+                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                        with get_parameters_swap, popen_swap, exit_swap:
+                            with get_chrome_driver_version_swap:
+                                run_e2e_tests.main(
+                                    args=['--auto_select_chromedriver'])
 
     def test_update_community_dashboard_status_with_dashboard_enabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
