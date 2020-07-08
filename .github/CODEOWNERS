@@ -504,8 +504,8 @@
 /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
 /core/templates/base-components/ @jameesjohn @vojtechjelinek
 /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-/core/templates/pages/oppia_footer_directive.html @jameesjohn @vojtechjelinek
-/core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
+/core/templates/pages/oppia-footer.component.html @jameesjohn @vojtechjelinek
+/core/templates/pages/oppia-footer.component.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek

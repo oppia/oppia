@@ -22,6 +22,6 @@ require('pages/preferences-page/preferences-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/OppiaFooterDirective.ts');
+require('pages/oppia-footer.component.ts');
 
 require('pages/preferences-page/preferences-page.component.ts');

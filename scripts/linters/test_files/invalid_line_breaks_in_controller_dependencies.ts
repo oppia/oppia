@@ -19,7 +19,7 @@
  */
 
 require('base-components/warning-loader.directive.ts');
-require('pages/OppiaFooterDirective.ts');
+require('pages/oppia-footer.component.ts');
 
 require('domain/sidebar/sidebar-status.service.ts');
 require('services/contextual/url.service.ts');

@@ -1,0 +1,40 @@
+<footer class="oppia-footer" role="contentinfo">
+  <div class="oppia-footer-container">
+    <div class="row">
+      <div class="col-sm-3">
+        <h4 translate="I18N_FOOTER_ABOUT_ALL_CAPS"></h4>
+        <ul>
+          <li><a href="/about" [innerHTML]="'I18N_FOOTER_ABOUT' | translate"></a></li>
+          <li><a href="http://oppiafoundation.org/" [innerHTML]="'I18N_FOOTER_OPPIA_FOUNDATION' | translate"></a></li>
+          <li><a href="/terms" class="protractor-test-terms-link" [innerHTML]="'I18N_FOOTER_TERMS_OF_SERVICE' | translate"></a></li>
+          <li><a href="/privacy-policy" class="protractor-test-privacy-policy-link" [innerHTML]="'I18N_FOOTER_PRIVACY_POLICY' | translate"></a></li>
+          <li><a href="/contact" [innerHTML]="'I18N_FOOTER_CONTACT_US' | translate"></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <h4 [innerHTML]="'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate"></h4>
+        <ul>
+          <li><a href="/get-started" [innerHTML]="'I18N_FOOTER_GET_STARTED' | translate"></a></li>
+          <li><a href="/teach#participation" [innerHTML]="'I18N_FOOTER_PARTICIPATION_PLAYBOOK' | translate"></a></li>
+          <li><a href="/community-library" [innerHTML]="'I18N_FOOTER_BROWSE_LIBRARY' | translate"></a></li>
+          <li><a href="https://groups.google.com/forum/?place=forum/oppia#!forum/oppia" [innerHTML]="'I18N_FOOTER_FORUM' | translate"></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <h4 translate="I18N_FOOTER_CONTRIBUTE_ALL_CAPS"></h4>
+        <ul>
+          <li><a href="https://oppiafoundation.org/volunteer" translate="I18N_FOOTER_GET_INVOLVED"></a></li>
+          <li><a href="/teach#teach" translate="I18N_FOOTER_TEACH"></a></li>
+          <li *ngIf="siteFeedbackFormUrl"><a [href]="siteFeedbackFormUrl" target="_blank" rel="noopener" [innerHTML]="'I18N_SPLASH_SITE_FEEDBACK' | translate" ></a></li>
+          <li><a href="/donate" class="protractor-test-donate-link"  translate="I18N_FOOTER_DONATE"></a></li>
+          <li><a href="/about#credits" [innerHTML]="'I18N_FOOTER_CREDITS' | translate"></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <h4><span [innerHTML]="'I18N_LANGUAGE_FOOTER_VIEW_IN' | translate"></span></h4>
+        <i18n-footer></i18n-footer>
+        <social-buttons></social-buttons>
+      </div>
+    </div>
+  </div>
+</footer>
