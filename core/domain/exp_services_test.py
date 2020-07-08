@@ -2435,8 +2435,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [{
                 'content_id': 'custarg_choices_default',
                 'html': '<p>Option A</p>'
-            },
-            {
+            }, {
                 'content_id': 'custarg_choices_0',
                 'html': '<p>Option B</p>'
             }]

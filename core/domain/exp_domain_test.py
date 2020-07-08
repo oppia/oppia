@@ -1198,11 +1198,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.get_content_count(), 2)
 
-        # Adds 1 to content count to exploration.
+        # Adds 2 to content count to exploration.
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
-        self.assertEqual(
-            exploration.get_content_count(), 3)
 
         # Adds 1 to content count to exploration.
         init_state.update_interaction_id('TextInput')
