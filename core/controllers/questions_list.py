@@ -24,6 +24,7 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
 import feconf
+import utils
 
 
 class QuestionsListHandler(base.BaseHandler):
@@ -38,12 +39,12 @@ class QuestionsListHandler(base.BaseHandler):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
         skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = list(set(skill_ids))
 
-        for skill_id in skill_ids:
-            try:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-            except Exception:
-                raise self.PageNotFoundException(Exception('Invalid skill id'))
+        try:
+            skill_domain.Skill.require_valid_skill_ids(skill_ids)
+        except utils.ValidationError:
+            raise self.InvalidInputException('Invalid skill id')
 
         try:
             skill_services.get_multi_skills(skill_ids)
@@ -102,12 +103,12 @@ class QuestionCountDataHandler(base.BaseHandler):
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
         skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = list(set(skill_ids))
 
-        for skill_id in skill_ids:
-            try:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-            except Exception:
-                raise self.PageNotFoundException(Exception('Invalid skill id'))
+        try:
+            skill_domain.Skill.require_valid_skill_ids(skill_ids)
+        except utils.ValidationError:
+            raise self.InvalidInputException('Invalid skill id')
 
         total_question_count = (
             question_services.get_question_count_for_skill_ids(skill_ids))

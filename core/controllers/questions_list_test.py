@@ -137,7 +137,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
     def test_get_fails_when_skill_id_not_valid(self):
         self.get_json('%s/%s?cursor=' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, '1,2'),
-                      expected_status_int=404)
+                      expected_status_int=400)
 
     def test_get_fails_when_skill_does_not_exist(self):
         self.get_json('%s/%s?cursor=' % (
@@ -169,21 +169,21 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
 
         json_response = self.get_json(
             '%s/%s,%s' % (
-                feconf.QUESTIONS_COUNT_URL_PREFIX,
+                feconf.QUESTION_COUNT_URL_PREFIX,
                 self.skill_id, self.skill_id_2
             ))
         self.assertEqual(json_response['total_question_count'], 2)
 
         json_response = self.get_json(
             '%s/%s' % (
-                feconf.QUESTIONS_COUNT_URL_PREFIX,
+                feconf.QUESTION_COUNT_URL_PREFIX,
                 self.skill_id
             ))
         self.assertEqual(json_response['total_question_count'], 1)
 
         json_response = self.get_json(
             '%s/%s' % (
-                feconf.QUESTIONS_COUNT_URL_PREFIX,
+                feconf.QUESTION_COUNT_URL_PREFIX,
                 self.skill_id_2
             ))
         self.assertEqual(json_response['total_question_count'], 1)
@@ -191,9 +191,9 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
     def test_get_question_count_when_no_question_is_assigned_to_skill(self):
         self.login(self.ADMIN_EMAIL)
         json_response = self.get_json(
-            '%s/%s' % (feconf.QUESTIONS_COUNT_URL_PREFIX, self.skill_id))
+            '%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, self.skill_id))
         self.assertEqual(json_response['total_question_count'], 0)
 
     def test_get_question_count_fails_with_invalid_skill_ids(self):
-        self.get_json('%s/%s?' % (feconf.QUESTIONS_COUNT_URL_PREFIX, 'id1'),
-                      expected_status_int=404)
+        self.get_json('%s/%s?' % (feconf.QUESTION_COUNT_URL_PREFIX, 'id1'),
+                      expected_status_int=400)

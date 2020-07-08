@@ -209,8 +209,7 @@ def get_question_count_for_skill_ids(skill_ids):
             requested.
 
     Returns:
-        question_count: int. The total number of questions assigned to the
-        given skill_ids.
+        int. The total number of questions assigned to the given skill_ids.
     """
     question_count = (
         question_models.QuestionSkillLinkModel.get_question_count_for_skill_ids(
