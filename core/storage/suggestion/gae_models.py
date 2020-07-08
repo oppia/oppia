@@ -97,6 +97,10 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
                                      ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
 
+# The message to be shown when rejecting a suggestion with a target ID of a
+# deleted skill.
+DELETED_SKILL_REJECT_MESSAGE = ('The associated skill no longer exists.')
+
 # The amount to increase the score of the author by after successfuly getting an
 # accepted suggestion.
 INCREMENT_SCORE_OF_AUTHOR_BY = 1

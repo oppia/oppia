@@ -301,6 +301,20 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         None, review_message)
 
 
+def reject_question_suggestions_with_skill_target_id(skill_id):
+    suggestions = query_suggestions(
+        [
+            ('suggestion_type',
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+            ('target_id', skill_id)
+        ]
+    )
+    for suggestion in suggestions:
+        reject_suggestion(
+            suggestion, feconf.SUGGESTION_BOT_USER_ID,
+            suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
+
+
 def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     """Resubmit a rejected suggestion.
 

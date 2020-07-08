@@ -21,7 +21,9 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_domain
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -1016,6 +1018,42 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             '<p>new content</p>')
 
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_delete_skill_rejects_question_suggestion(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', skill_id)])
+        self.assertEqual(len(suggestions), 1)
+
+        skill_services.delete_skill(self.author_id, skill_id)
+
+        # Suggestion should be rejected after corresponding skill is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', skill_id)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0].status,
+            suggestion_models.STATUS_REJECTED)
 
 
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):
