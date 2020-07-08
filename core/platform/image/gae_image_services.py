@@ -81,7 +81,7 @@ def compress_image(image_content, scaling_factor):
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
         maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
-                            min(new_height, MAX_RESIZE_DIMENSION_PX))
+                   min(new_height, MAX_RESIZE_DIMENSION_PX))
         img.thumbnail(maxsize, Image.ANTIALIAS)
         with io.BytesIO() as output:
             img.save(output, format=img_format)
