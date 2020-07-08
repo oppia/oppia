@@ -52,7 +52,7 @@ export class ItemSelectionInputValidationService {
     var numChoices = customizationArgs.choices.value.length;
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i];
+      var choice = customizationArgs.choices.value[i].html;
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }

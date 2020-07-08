@@ -23,6 +23,8 @@ import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { ITextInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 interface IWarning {
   type: string,
@@ -35,13 +37,15 @@ interface IWarning {
 export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
   // TODO(#7165): Replace 'any' with the exact type.
-  getCustomizationArgsWarnings(customizationArgs: any): Array<IWarning> {
+  getCustomizationArgsWarnings(
+      customizationArgs: ITextInputCustomizationArgs
+  ): Array<IWarning> {
     var warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
       ['placeholder', 'rows']);
 
-    var placeholder = customizationArgs.placeholder.value;
+    var placeholder = customizationArgs.placeholder.value.unicode_str;
     if (!angular.isString(placeholder)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,

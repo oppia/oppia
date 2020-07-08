@@ -125,7 +125,10 @@
           }
         },
         "default_value": [
-          {"content_id": "", "html": ""}
+          {
+            "content_id": "custarg_choices_default",
+            "html": ""
+          }
         ]
       },
       {
@@ -206,7 +209,7 @@
           }
         },
         "default_value": [
-          {"content_id": "", "html": ""}
+          {"content_id": "custarg_choices_default", "html": ""}
         ]
       }
     ],
@@ -240,7 +243,10 @@
           "type": "custom",
           "obj_type": "SubtitledUnicode"
         },
-        "default_value": { "content_id": "", "unicode_str": "Continue" }
+        "default_value": {
+          "content_id": "custarg_buttonText",
+          "unicode_str": "Continue"
+        }
       }
     ],
     "is_terminal": false,
@@ -420,7 +426,10 @@
           "type": "custom",
           "obj_type": "SubtitledUnicode"
         },
-        "default_value": {"content_id": "", "unicode_str": "Add item"}
+        "default_value": {
+          "content_id": "custarg_buttonText",
+          "unicode_str": "Add item"
+        }
       }
     ],
     "is_terminal": false,
@@ -615,7 +624,7 @@
           }
         },
         "default_value": [{
-          "content_id": "",
+          "content_id": "custarg_choices_default",
           "html": ""
         }]
       }, {
@@ -692,7 +701,10 @@
           "type": "custom",
           "obj_type": "SubtitledUnicode"
         },
-        "default_value": {"content_id": "", "unicode_str": ""}
+        "default_value": {
+          "content_id": "custarg_placeholder",
+          "unicode_str": ""
+        }
       },
       {
         "description": "Height (in rows)",
@@ -919,7 +931,10 @@
           "type": "custom",
           "obj_type": "SubtitledUnicode"
         },
-        "default_value": {"content_id": "", "unicode_str": ""}
+        "default_value": {
+          "content_id": "custarg_customPlaceholder",
+          "unicode_str": ""
+        }
       }
     ],
     "is_terminal": false,

@@ -26,7 +26,8 @@ import { IReadableNote } from
   'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive';
 import { ISubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-
+import { ISubtitledUnicodeBackendDict } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 export interface IAlgebraicExpressionInputCustomizationArgs {
 
@@ -49,13 +50,13 @@ export interface ICodeReplCustomizationArgs {
 
 export interface IContinueCustomizationArgs {
   buttonText?: {
-    value: string;
+    value: ISubtitledUnicodeBackendDict;
   };
 }
 
 export interface IDragAndDropSortInputCustomizationArgs {
   choices?: {
-    value: string[];
+    value: ISubtitledHtmlBackendDict[];
   };
   allowMultipleItemsInSamePosition?: {
     value: string;
@@ -79,7 +80,7 @@ export interface IFractionInputCustomizationArgs {
     value: string;
   };
   customPlaceholder?: {
-    value: string;
+    value: ISubtitledUnicodeBackendDict;
   };
 }
 
@@ -133,7 +134,7 @@ export interface IInteractiveMapCustomizationArgs {
 
 export interface IItemSelectionInputCustomizationArgs {
   choices?: {
-    value: string[];
+    value: ISubtitledHtmlBackendDict[];
   };
   maxAllowableSelectionCount?: {
     value: number;
@@ -179,13 +180,13 @@ export interface IPencilCodeCustomizationArgs {
 
 export interface ISetInputCustomizationArgs {
   buttonText?: {
-    value: string;
+    value: ISubtitledUnicodeBackendDict;
   };
 }
 
 export interface ITextInputCustomizationArgs {
   placeholder?: {
-    value: string;
+    value: ISubtitledUnicodeBackendDict;
   };
   rows?: {
     value: number;
