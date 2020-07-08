@@ -2488,23 +2488,19 @@ class Exploration(python_utils.OBJECT):
             new_content_ids = []
 
             def convert_to_subtitled(
-                    obj_type, cust_arg_value, content_id_prefix,
-                    cust_arg_name=None):
+                    ca_value, obj_type, content_id, in_list):
                 """Conversion function that converts unsubtitled content to
                 SubtitledHtml or SubtitledUnicode.
 
                 Args:
-                    obj_type: str. Indicates the obj_type found in
-                        the customization arguments schema.
-                    cust_arg_value: dict. Dictionary of key 'value' to
+                    ca_value: dict. Dictionary of key 'value' to
                         original value of customization argument.
-                    content_id_prefix: str. The content_id generated from
+                    obj_type: str. Indicates the obj_type found in
+                        the customization arguments schema.    
+                    content_id: str. The content_id generated from
                         traversing the customization argument spec.
-                    cust_arg_name: str. In the case that the value being
-                        converted is a value of a dictionary in
-                        cust_arg_value, cust_arg_name provides the key of
-                        the property to edit.
-
+                    in_list: bool. Indicates if the content_id requires a
+                        content index.
                 Returns:
                     str. The updated customization argument value.
                 """
@@ -2516,44 +2512,20 @@ class Exploration(python_utils.OBJECT):
                 elif obj_type == 'SubtitledHtml':
                     translation_value_key = 'html'
 
-                if isinstance(cust_arg_value, str):
-                    new_content_ids.append(content_id_prefix)
-                    return {
-                        'content_id': content_id_prefix,
-                        translation_value_key: cust_arg_value
-                    }
-                elif isinstance(cust_arg_value, list):
-                    for i in python_utils.RANGE(len(cust_arg_value)):
-                        content_id = (
-                            content_id_prefix + '_' +
-                            python_utils.UNICODE(
-                                next_content_id_index['value'])
-                        )
-                        new_content_ids.append(content_id)
-                        next_content_id_index['value'] += 1
+                if in_list:
+                    content_id += ('_' + python_utils.UNICODE(
+                        next_content_id_index['value']))
+                    next_content_id_index['value'] += 1
+                new_content_ids.append(content_id)
 
-                        if (isinstance(cust_arg_value, dict) and
-                                'content_id' in cust_arg_value[i]):
-                            cust_arg_value['content_id'] = content_id_prefix
-                            return cust_arg_value
+                if 'content_id' in ca_value:
+                    ca_value['content_id'] = content_id
+                    return ca_value
 
-                        cust_arg_value[i] = {
-                            'content_id': content_id,
-                            translation_value_key:
-                                cust_arg_value[i]
-                        }
-                    return cust_arg_value
-                elif isinstance(cust_arg_value, dict):
-                    new_content_ids.append(content_id_prefix)
-                    if 'content_id' in cust_arg_value:
-                        cust_arg_value['content_id'] = content_id_prefix
-                        return cust_arg_value
-
-                    cust_arg_value[cust_arg_name] = {
-                        'content_id': content_id_prefix,
-                        translation_value_key: cust_arg_value
-                    }
-                    return cust_arg_value
+                return {
+                    'content_id': content_id,
+                    translation_value_key: ca_value
+                }
 
             interaction_id = state_dict['interaction']['id']
             if interaction_id:

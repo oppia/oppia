@@ -133,7 +133,7 @@ def validate_customization_args_and_values(
             pass
 
 
-def find_translatable(
+def find_subtitled(
         customization_arg, ca_spec, conversion_fn,
         content_id_prefix='custarg'):
     """Helper function that recursively traverses a customization argument
@@ -169,13 +169,43 @@ def find_translatable(
 
     if (schema_obj_type == 'SubtitledUnicode' or
             schema_obj_type == 'SubtitledHtml'):
-        customization_arg['value'] = conversion_fn(
-            schema_obj_type,
-            customization_arg['value'],
-            content_id_prefix,
-            ca_spec.get('name', None))
+        ca_value = customization_arg['value']
+        if isinstance(
+            ca_value,
+            (python_utils.BASESTRING, python_utils.UNICODE)
+        ):
+            customization_arg['value'] = conversion_fn(
+                customization_arg['value'],
+                schema_obj_type,
+                content_id_prefix,
+                False
+            )
+        elif isinstance(ca_value, list):
+            for i in range(len(ca_value)):
+                customization_arg['value'][i] = conversion_fn(
+                    customization_arg['value'][i],
+                    schema_obj_type,
+                    content_id_prefix,
+                    True
+                )
+        elif isinstance(ca_value, dict):
+            # Check if already a Subtitled object.
+            if 'content_id' in ca_value:
+                customization_arg['value'] = conversion_fn(
+                    customization_arg['value'],
+                    schema_obj_type,
+                    content_id_prefix,
+                    False
+                )
+            else:
+                customization_arg['value'][ca_spec.name] = conversion_fn(
+                    customization_arg['value'][ca_spec.name],
+                    schema_obj_type,
+                    content_id_prefix,
+                    False
+                )
     elif schema_type == 'list':
-        find_translatable(
+        find_subtitled(
             customization_arg,
             ca_spec['schema']['items'],
             conversion_fn,
@@ -183,7 +213,7 @@ def find_translatable(
     elif schema_type == 'dict':
         for i in python_utils.RANGE(
                 len(ca_spec['properties'])):
-            find_translatable(
+            find_subtitled(
                 customization_arg,
                 ca_spec['schema']['properties'][i],
                 conversion_fn,
@@ -209,7 +239,7 @@ def convert_translatable_in_cust_args(
     for ca_spec in ca_specs:
         ca_spec_name = ca_spec.name
         if ca_spec_name in ca_values:
-            find_translatable(
+            find_subtitled(
                 ca_values[ca_spec_name],
                 ca_spec.to_dict(),
                 conversion_fn)
@@ -231,7 +261,7 @@ def get_all_content_ids_in_cust_args(ca_values, ca_specs):
     """
     content_ids = []
     def dummy_conversion(
-            unused_obj_type, ca_value, unused_content_id_prefix, ca_name):
+            ca_value, unused_obj_type, unused_content_id, unused_in_list):
         """Conversion function used to extract all content_ids. Customization
         argument is returned unmodified.
 
@@ -240,31 +270,23 @@ def get_all_content_ids_in_cust_args(ca_values, ca_specs):
                 the customization arguments schema.
             ca_value: dict. Dictionary of key 'value' to
                 original value of customization argument.
-            unused_content_id_prefix: str. The content_id generated from
+            unused_content_id: str. The content_id generated from
                 traversing the customization argument spec.
-            ca_name: str. In the case that the value being
-                converted is a value of a dictionary in
-                cust_arg_value, cust_arg_name provides the key of
-                the property to edit.
+            unused_in_list: bool. Indicates if the content_id requires a
+                content index.
 
         Returns:
             str. The unmodified customization argument value.
         """
-        if isinstance(ca_value, list):
-            for content in ca_value:
-                content_ids.append(content['content_id'])
-        elif isinstance(ca_value, dict):
-            if 'content_id' in ca_value:
-                content_ids.append(ca_value['content_id'])
-            else:
-                content_ids.append(ca_value[ca_name]['content_id'])
+        if 'content_id' in ca_value:
+            content_ids.append(ca_value['content_id'])
 
         return ca_value
 
     for ca_spec in ca_specs:
         ca_spec_name = ca_spec.name
         if ca_spec_name in ca_values:
-            find_translatable(
+            find_subtitled(
                 ca_values[ca_spec_name],
                 ca_spec.to_dict(),
                 dummy_conversion)
@@ -289,7 +311,7 @@ def get_all_html_in_cust_args(ca_values, ca_specs):
     html = []
 
     def dummy_conversion(
-            obj_type, ca_value, unused_content_id_prefix, ca_name):
+            ca_value, obj_type, unused_content_id, unused_in_list):
         """Conversion function used to extract all html. Customization
         argument is returned unmodified.
 
@@ -298,12 +320,10 @@ def get_all_html_in_cust_args(ca_values, ca_specs):
                 the customization arguments schema.
             ca_value: dict. Dictionary of key 'value' to
                 original value of customization argument.
-            unused_content_id_prefix: str. The content_id generated from
+            unused_content_id: str. The content_id generated from
                 traversing the customization argument spec.
-            ca_name: str. In the case that the value being
-                converted is a value of a dictionary in
-                cust_arg_value, cust_arg_name provides the key of
-                the property to edit.
+            unused_in_list: bool. Indicates if the content_id requires a
+                content index.
 
         Returns:
             str. The unmodified customization argument value.
@@ -311,21 +331,15 @@ def get_all_html_in_cust_args(ca_values, ca_specs):
         if obj_type == 'SubtitledUnicode':
             return ca_value
 
-        if isinstance(ca_value, list):
-            for content in ca_value:
-                html.append(content['html'])
-        elif isinstance(ca_value, dict):
-            if 'html' in ca_value:
-                html.append(ca_value['html'])
-            else:
-                html.append(ca_value[ca_name]['html'])
+        if 'html' in ca_value:
+            html.append(ca_value['html'])
 
         return ca_value
 
     for ca_spec in ca_specs:
         ca_spec_name = ca_spec.name
         if ca_spec_name in ca_values:
-            find_translatable(
+            find_subtitled(
                 ca_values[ca_spec_name],
                 ca_spec.to_dict(),
                 dummy_conversion)

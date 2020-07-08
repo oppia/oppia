@@ -148,6 +148,70 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     }
                 },
+                'custarg_choices_default': {
+                    'hi': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_defa'
+                            'ult-hi</p>'),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_defa'
+                            'ult-en</p>'),
+                        'needs_update': False
+                    }
+                },
+                'custarg_choices_1': {
+                    'hi': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_1-hi'
+                            '</p>'),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_1-en'
+                            '</p>'),
+                        'needs_update': False
+                    }
+                },
+                'custarg_choices_2': {
+                    'hi': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_2-hi'
+                            '</p>'),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_2-en'
+                            '</p>'),
+                        'needs_update': False
+                    }
+                },
+                'custarg_choices_3': {
+                    'hi': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_3-hi'
+                            '</p>'),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'type': 'html',
+                        'translation':
+                            ('<p>state written_translation custarg_choices_3-en'
+                            '</p>'),
+                        'needs_update': False
+                    }
+                },
                 'default_outcome': {
                     'hi': {
                         'type': 'html',
@@ -247,19 +311,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('owner_id', exploration)
 
         html_list = state.get_all_html_content_strings()
+
         self.assertEqual(
             html_list,
             [
-                '<p>state written_translation content-hi</p>',
-                '<p>state written_translation content-en</p>',
-                '<p>state written_translation outcome-hi</p>',
-                '<p>state written_translation outcome-en</p>',
-                '<p>state written_translation feedback-hi</p>',
-                '<p>state written_translation feedback-en</p>',
-                '<p>state written_translation hint_1-hi</p>',
-                '<p>state written_translation hint_1-en</p>',
+                '<p>state written_translation custarg_choices_2-hi</p>',
+                '<p>state written_translation custarg_choices_2-en</p>',
                 '<p>state written_translation solution-hi</p>',
                 '<p>state written_translation solution-en</p>',
+                '<p>state written_translation content-hi</p>',
+                '<p>state written_translation content-en</p>',
+                '<p>state written_translation custarg_choices_3-hi</p>',
+                '<p>state written_translation custarg_choices_3-en</p>',
+                '<p>state written_translation custarg_choices_1-hi</p>',
+                '<p>state written_translation custarg_choices_1-en</p>',
+                '<p>state written_translation hint_1-hi</p>',
+                '<p>state written_translation hint_1-en</p>',
+                '<p>state written_translation outcome-hi</p>',
+                '<p>state written_translation outcome-en</p>',
+                '<p>state written_translation custarg_choices_default-hi</p>',
+                '<p>state written_translation custarg_choices_default-en</p>',
+                '<p>state written_translation feedback-hi</p>',
+                '<p>state written_translation feedback-en</p>',
                 '<p>State Feedback</p>',
                 '<p>IsEqualToOrdering rule_spec htmls</p>',
                 '<p>HasElementXAtPositionY rule_spec html</p>',
@@ -1597,12 +1670,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [
-                            html_with_old_math_schema,
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
+                        'value': [{
+                            'content_id': 'custarg_choices_default',
+                            'html': html_with_old_math_schema
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>4</p>'
+                        }]
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -1669,12 +1749,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [
-                            html_with_new_math_schema,
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
+                        'value': [{
+                            'content_id': 'custarg_choices_default',
+                            'html': html_with_new_math_schema
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>4</p>'
+                        }]
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -1852,12 +1939,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'choices': {
-                        'value': [
-                            '<p>init_state customization arg html 1</p>',
-                            html_with_old_math_schema,
-                            '<p>init_state customization arg html 3</p>',
-                            '<p>init_state customization arg html 4</p>'
-                        ]
+                        'value': [{
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>init_state customization arg html 1</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': html_with_old_math_schema
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>init_state customization arg html 3</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>init_state customization arg html 4</p>'
+                        }]
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -1914,12 +2008,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'choices': {
-                        'value': [
-                            '<p>init_state customization arg html 1</p>',
-                            html_with_new_math_schema,
-                            '<p>init_state customization arg html 3</p>',
-                            '<p>init_state customization arg html 4</p>'
-                        ]
+                        'value': [{
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>init_state customization arg html 1</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': html_with_new_math_schema
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>init_state customization arg html 3</p>'
+                        }, {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>init_state customization arg html 4</p>'
+                        }]
                     }
                 },
                 'confirmed_unclassified_answers': [],

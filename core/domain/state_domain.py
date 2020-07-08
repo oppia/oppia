@@ -753,7 +753,7 @@ class InteractionInstance(python_utils.OBJECT):
 
     @staticmethod
     def convert_html_in_interaction(
-            interaction_dict, states_schema_version, conversion_fn):
+            interaction_dict, conversion_fn):
         """Checks for HTML fields in the outcome and converts it
         according to the conversion function.
 
@@ -773,51 +773,32 @@ class InteractionInstance(python_utils.OBJECT):
         customization_args = interaction_dict['customization_args']
 
         def convert_cust_args(
-                obj_type, cust_arg_value, _, cust_arg_name=None):
-            """Applies conversion function on SubtitledHtml objects in
+                ca_value, obj_type, unused_content_id, unused_in_list):
+            """Conversion function that converts html content in
             customization arguments.
 
             Args:
-                obj_type: string. Indicates object type, from customization
-                    argument spect.
-                cust_arg_value: dict. A dictionary from key 'value' to the
-                    customization argument value.
-                _: string. content_id generated from spec.
-                cust_arg_name: string. Name of the customization argument
-                    if present in spec.
-
+                ca_value: dict. Dictionary of key 'value' to
+                    original value of customization argument.
+                obj_type: str. Indicates the obj_type found in
+                    the customization arguments schema.    
+                unused_content_id: str. The content_id generated from
+                    traversing the customization argument spec.
+                unused_in_list: bool. Indicates if the content_id requires a
+                    content index.
             Returns:
-                dict. The converted customization argument value.
+                str. The updated customization argument value.
             """
             if obj_type == 'SubtitledUnicode':
-                return cust_arg_value
+                return ca_value
 
-            if states_schema_version < 40:
-                if isinstance(cust_arg_value, str):
-                    return conversion_fn(cust_arg_value)
-                elif isinstance(cust_arg_value, list):
-                    return [
-                        conversion_fn(x) for x in cust_arg_value]
-                elif isinstance(cust_arg_value, dict):
-                    cust_arg_value[cust_arg_name] = (
-                        conversion_fn(
-                            cust_arg_value[cust_arg_name]))
-                    return cust_arg_value
-            else:
-                if cust_arg_name:
-                    cust_arg_value[cust_arg_name]['html'] = (
-                        conversion_fn(
-                            cust_arg_value[cust_arg_name]['html'])
-                    )
-                    return cust_arg_value
-                elif isinstance(cust_arg_value, list):
-                    for i in python_utils.RANGE(len(cust_arg_value)):
-                        cust_arg_value[i]['html'] = (
-                            conversion_fn(cust_arg_value[i]['html']))
-                    return cust_arg_value
-                else:
-                    cust_arg_value['html'] = (
-                        conversion_fn(cust_arg_value['html']))
+            if isinstance(ca_value, dict) and 'content_id' in ca_value:
+                ca_value['html'] = conversion_fn(ca_value['html'])
+                return ca_value
+            elif isinstance(ca_value, str):
+                return conversion_fn(ca_value)
+
+            return ca_value
 
         customization_args_util.convert_translatable_in_cust_args(
             customization_args,
@@ -2647,9 +2628,7 @@ class State(python_utils.OBJECT):
             False, 0)
 
     @classmethod
-    def convert_html_fields_in_state(
-            cls, state_dict, conversion_fn,
-            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
+    def convert_html_fields_in_state(cls, state_dict, conversion_fn):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -2701,7 +2680,7 @@ class State(python_utils.OBJECT):
         if interaction_id is not None:
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(
-                    state_dict['interaction'], states_schema_version,
+                    state_dict['interaction'],
                     conversion_fn
                 ))
 
