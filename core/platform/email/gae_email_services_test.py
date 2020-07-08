@@ -32,18 +32,19 @@ class EmailTests(test_utils.GenericTestBase):
     SENDER_EMAIL = 'Sender <sender@example.com>'
     emails_dict = {}
 
-    def mock_send_emails(self, sender_email, recipient_email, subject, plaintext_body, html_body,
-        bcc_admin=False, reply_to_id=None, *_):
+    def mock_send_emails(
+            self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc_admin, reply_to_id, *_):
         bcc = []
-        reply_to = ""
+        reply_to = ''
         if not feconf.CAN_SEND_EMAILS:
             raise Exception('This app cannot send emails.')
 
-        if not gae_email_services._is_email_valid(recipient_email):
+        if not gae_email_services.is_email_valid(recipient_email):
             raise ValueError(
                 'Malformed recipient email address: %s' % recipient_email)
 
-        if not gae_email_services._is_sender_email_valid(sender_email):
+        if not gae_email_services.is_sender_email_valid(sender_email):
             raise ValueError(
                 'Malformed sender email address: %s' % sender_email)
 
@@ -51,8 +52,9 @@ class EmailTests(test_utils.GenericTestBase):
         if bcc_admin:
             bcc = [feconf.ADMIN_EMAIL_ADDRESS]
         if reply_to_id:
-            reply_to = gae_email_services.get_incoming_email_address(reply_to_id)
-        if(recipient_email not in self.emails_dict):
+            reply_to = (
+                gae_email_services.get_incoming_email_address(reply_to_id))
+        if recipient_email not in self.emails_dict:
             self.emails_dict[recipient_email] = []
         self.emails_dict[recipient_email].append(
             {
@@ -64,7 +66,7 @@ class EmailTests(test_utils.GenericTestBase):
                 'reply_to': reply_to
             }
         )
-    
+
     def mock_get_sent_messages(self, to, *_):
         return self.emails_dict[to] if to in self.emails_dict else []
 
@@ -75,9 +77,9 @@ class EmailTests(test_utils.GenericTestBase):
             Exception, 'This app cannot send emails.')
         messages = self.mock_get_sent_messages(to=feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(0, len(messages))
-        
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False), email_exception,\
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
@@ -86,8 +88,8 @@ class EmailTests(test_utils.GenericTestBase):
 
         messages = self.mock_get_sent_messages(to=feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(0, len(messages))
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
@@ -99,8 +101,8 @@ class EmailTests(test_utils.GenericTestBase):
         self.emails_dict = {}
         messages = self.mock_get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html', bcc_admin=True)
@@ -113,8 +115,8 @@ class EmailTests(test_utils.GenericTestBase):
         self.emails_dict = {}
         messages = self.mock_get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html', bcc_admin=False)
@@ -129,8 +131,8 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
 
         reply_to_id = 'reply_to_id'
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html', reply_to_id=reply_to_id)
@@ -145,8 +147,8 @@ class EmailTests(test_utils.GenericTestBase):
         self.emails_dict = {}
         messages = self.mock_get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html')
@@ -165,8 +167,8 @@ class EmailTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 malformed_sender_email, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html')
@@ -180,8 +182,8 @@ class EmailTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 malformed_sender_email, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html')
@@ -196,8 +198,8 @@ class EmailTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 malformed_sender_email, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html')
@@ -212,8 +214,8 @@ class EmailTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 malformed_sender_email, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html')
@@ -228,8 +230,8 @@ class EmailTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 malformed_sender_email, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html')
@@ -245,8 +247,8 @@ class EmailTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, malformed_recipient_email,
                 'subject', 'body', 'html')
@@ -256,8 +258,8 @@ class EmailTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_mail', self.mock_send_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(gae_email_services, 'send_mail', self.mock_send_emails)):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, malformed_recipient_email,
                 'subject', 'body', 'html')
@@ -274,21 +276,24 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 
     emails_dict = {}
 
-    def mock_send_bulk_emails(self, sender_email, recipient_emails, subject, plaintext_body, html_body, *_):
+    def mock_send_bulk_emails(
+            self, sender_email, recipient_emails, subject, plaintext_body,
+            html_body, *_):
+
         if not feconf.CAN_SEND_EMAILS:
             raise Exception('This app cannot send emails.')
 
         for recipient_email in recipient_emails:
-            if not gae_email_services._is_email_valid(recipient_email):
+            if not gae_email_services.is_email_valid(recipient_email):
                 raise ValueError(
                     'Malformed recipient email address: %s' % recipient_email)
 
-        if not gae_email_services._is_sender_email_valid(sender_email):
+        if not gae_email_services.is_sender_email_valid(sender_email):
             raise ValueError(
                 'Malformed sender email address: %s' % sender_email)
 
         for recipient_email in recipient_emails:
-            if(recipient_email not in self.emails_dict):
+            if recipient_email not in self.emails_dict:
                 self.emails_dict[recipient_email] = []
             self.emails_dict[recipient_email].append(
                 {
@@ -298,7 +303,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
                     'html': html_body
                 }
             )
-    
+
     def mock_get_sent_messages(self, to, *_):
         return self.emails_dict[to] if to in self.emails_dict else []
 
@@ -308,10 +313,12 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         self.assertEqual(len(message_a), 0)
         message_b = self.mock_get_sent_messages(
             to=self.RECIPIENT_EMAILS[1])
+
         self.assertEqual(len(message_b), 0)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 self.SENDER_EMAIL, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
@@ -330,11 +337,13 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         message_b = self.mock_get_sent_messages(
             to=self.RECIPIENT_EMAILS[1])
         self.assertEqual(len(message_b), 0)
+
         email_exception = self.assertRaisesRegexp(
             Exception, 'This app cannot send emails.')
-        with email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+        with email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 self.SENDER_EMAIL, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
@@ -361,9 +370,11 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 malformed_sender_email, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
@@ -385,9 +396,11 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 malformed_sender_email, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
@@ -405,14 +418,16 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(message_a))
         message_b = self.mock_get_sent_messages(
             to=self.RECIPIENT_EMAILS[1])
+
         self.assertEqual(0, len(message_b))
         malformed_sender_email = '<malformed_sender_email@example.com>'
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 malformed_sender_email, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
@@ -435,9 +450,11 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 malformed_sender_email, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
@@ -460,9 +477,11 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 malformed_sender_email, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
@@ -483,9 +502,11 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_emails[0])
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 self.SENDER_EMAIL, malformed_recipient_emails,
                 'subject', 'body', 'html')
@@ -501,12 +522,15 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_emails[0])
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 self.SENDER_EMAIL, malformed_recipient_emails,
                 'subject', 'body', 'html')
+
         messages_a = self.mock_get_sent_messages(
             to=malformed_recipient_emails[0])
         self.assertEqual(len(messages_a), 0)
@@ -516,12 +540,14 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 
         # Case when one of the recipient email address strings is None.
         malformed_recipient_emails = [self.RECIPIENT_A_EMAIL, None]
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 self.SENDER_EMAIL, malformed_recipient_emails,
                 'subject', 'body', 'html')
+
         messages_a = self.mock_get_sent_messages(
             to=malformed_recipient_emails[0])
         self.assertEqual(len(messages_a), 0)
@@ -531,9 +557,10 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 
         # Case when one of the recipient email address strings is empty.
         malformed_recipient_emails = [self.RECIPIENT_A_EMAIL, '']
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, \
-            self.swap(gae_email_services, 'send_bulk_mail', \
-                      self.mock_send_bulk_emails):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception, (
+            self.swap(
+                gae_email_services, 'send_bulk_mail',
+                self.mock_send_bulk_emails)):
             gae_email_services.send_bulk_mail(
                 self.SENDER_EMAIL, malformed_recipient_emails,
                 'subject', 'body', 'html')
