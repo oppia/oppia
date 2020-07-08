@@ -319,7 +319,7 @@ var AdminPage = function() {
   };
 
   this.uploadTopicSimilarities =
-    async function(relativePathToSimilaritiesFile) {
+    async function(relativePathToSimilaritiesFile, isValidFile) {
       var absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
       await waitFor.visibilityOf(chooseSimilarityFileInput,
         'Similarity upload form is not visible');
@@ -327,25 +327,27 @@ var AdminPage = function() {
       await waitFor.elementToBeClickable(similarityFileUploadButton,
         'Upload button taking too long to be clickable');
       await similarityFileUploadButton.click();
+      if(isValidFile) {
+        await waitFor.visibilityOf(statusMessage,
+          'Status message not visible');
+        await waitFor.textToBePresentInElement(statusMessage,
+          'Topic similarities uploaded successfully.');
+        expect(await statusMessage.getText()).toEqual(
+          'Topic similarities uploaded successfully.');
+      }
+      else {
+        var text = await statusMessage.getText();
+        await waitFor.visibilityOf(statusMessage,
+          'Status message not visible');
+        await waitFor.textToBePresentInElement(statusMessage,
+          text, 'Text not showing up in status message');
+        expect(await statusMessage.getText()).toEqual(text);
+      }
     };
 
   this.expectSimilaritiesToBeUploaded = async function() {
-    await waitFor.visibilityOf(statusMessage);
     await waitFor.elementToBeClickable(similarityDownloadButton,
       'Similarity upload failed – download similarities button not clickable.');
-    await waitFor.textToBePresentInElement(statusMessage,
-      'Topic similarities uploaded successfully.');
-    expect(await statusMessage.getText()).toEqual(
-      'Topic similarities uploaded successfully.');
-  };
-
-  this.expectUploadError = async function() {
-    var text = await statusMessage.getText();
-    if (text === 'Server error: \'ascii\' codec can\'t encode characters in ' +
-          'position 1024-1025: ordinal not in range (128)') {
-      return true;
-    }
-    return false;
   };
 
   this.downloadSimilarityFile = async function() {
@@ -412,13 +414,15 @@ var AdminPage = function() {
   this.expectRegenerationError = async function(topic) {
     var text = 'Server error: Entity for class TopicModel with id ' +
       topic + ' not found';
-    await waitFor.visibilityOf(regenerationMessage);
+    await waitFor.visibilityOf(regenerationMessage,
+      'Regeneration message not visible');
     expect(regenerationMessage.getText()).toEqual(text);
   };
 
   this.expectConributionsToBeRegeneratedForTopic = async function() {
     var text = 'No. of opportunities model created: 0';
-    await waitFor.visibilityOf(regenerationMessage);
+    await waitFor.visibilityOf(regenerationMessage, 
+      'Regeneration message not visible');
     expect(regenerationMessage.getText()).toEqual(text);
   };
 
@@ -435,16 +439,20 @@ var AdminPage = function() {
   };
 
   this.changeUsername = async function(oldUsername, newUsername) {
-    await waitFor.visibilityOf(oldUsernameInput);
+    await waitFor.visibilityOf(oldUsernameInput,
+      'Current username input not visible');
     await oldUsernameInput.sendKeys(oldUsername);
-    await waitFor.visibilityOf(newUsernameInput);
+    await waitFor.visibilityOf(newUsernameInput,
+      'New username input not visible');
     await newUsernameInput.sendKeys(newUsername);
-    await waitFor.visibilityOf(usernameChangeSubmitButton);
+    await waitFor.visibilityOf(usernameChangeSubmitButton,
+      'Change username submit button not visible');
     await waitFor.elementToBeClickable(usernameChangeSubmitButton,
       'Username change submit button not clickable');
     await usernameChangeSubmitButton.click();
     var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
-    await waitFor.textToBePresentInElement(statusMessage, text);
+    await waitFor.textToBePresentInElement(statusMessage, text,
+      'Username was not successfully changed');
   };
 
   this.expectUsernameToBeChanged = async function(newUsername) {

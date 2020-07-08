@@ -19,6 +19,8 @@
 
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
+var path = require('path');
+var DPATH = path.resolve(__dirname, '../downloads');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
 // server since the mobile tests are run on a real
@@ -123,10 +125,10 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
  */
 
 var fileToBeDownloaded = async function(filename) {
-  var name = global.downloadsPath + '/' + filename;
+  var name = DPATH + '/' + filename;
   browser.driver.wait(function() {
     return fs.existsSync(name);
-  });
+  }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
 };
 
 exports.alertToBePresent = alertToBePresent;

@@ -54,12 +54,11 @@ describe('Admin misc test tab', function() {
     await adminPage.get();
     await adminPage.getMiscTab();
     await adminPage.uploadTopicSimilarities(
-      '../data/sample_topic_similarities.csv');
+      '../data/sample_topic_similarities.csv', true);
     allowedErrors.push('encode', 'Object', 'resource');
     await adminPage.expectSimilaritiesToBeUploaded();
     await browser.refresh();
-    await adminPage.uploadTopicSimilarities('../data/cafe.mp3');
-    await adminPage.expectUploadError();
+    await adminPage.uploadTopicSimilarities('../data/cafe.mp3', false);
     await adminPage.downloadSimilarityFile();
     await waitFor.fileToBeDownloaded('topic_similarities.csv');
   });
