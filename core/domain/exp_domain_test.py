@@ -680,7 +680,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
-        interaction.customization_args = {'placeholder': ''}
+        interaction.customization_args = {'placeholder': {
+          'value': {
+            'content_id': 'custarg_placeholder',
+            'unicode_str': ''
+          }
+        }}
         exploration.validate()
 
         interaction.answer_groups = {}
@@ -1191,6 +1196,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
+        # TODO: shavavo add comment counts
         init_state.update_interaction_id('TextInput')
 
         answer_group_dict = {
@@ -1235,7 +1241,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
-        self.assertEqual(exploration.get_content_count(), 7)
+        self.assertEqual(exploration.get_content_count(), 8)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -5796,17 +5802,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -5865,11 +5873,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -6355,17 +6365,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6510,17 +6522,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6577,17 +6591,19 @@ states:
           html: <p>Correct!</p>
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         hint_1: {}
 states_schema_version: 35
@@ -6684,17 +6700,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6756,11 +6774,12 @@ states:
         explanation:
           content_id: solution
           html: ''
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         hint_1: {}
         solution: {}
@@ -6768,6 +6787,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         hint_1: {}
         solution: {}
@@ -6847,17 +6867,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6924,11 +6946,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_customPlaceholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_customPlaceholder: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -7036,17 +7060,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -7652,12 +7678,14 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         solution: {}
   state2:
@@ -7704,9 +7732,9 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: custarg_choices_0
+          - content_id: custarg_choices_3
             html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - content_id: custarg_choices_1
+          - content_id: custarg_choices_4
             html: <p>This is value2 for <br>MultipleChoice</p>
         showChoicesInShuffledOrder:
           value: false
@@ -7730,11 +7758,13 @@ states:
             forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_choices_3: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
         feedback_2: {}
@@ -7744,6 +7774,8 @@ states:
     written_translations:
       translations_mapping:
         content: {}
+        custarg_choices_3: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
         feedback_2: {}
@@ -7785,11 +7817,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: custarg_choices_0
-            html: <p>This is value1 for ItemSelection</p>
-          - content_id: custarg_choices_1
-            html: <p>This is value2 for ItemSelection</p>
           - content_id: custarg_choices_2
+            html: <p>This is value1 for ItemSelection</p>
+          - content_id: custarg_choices_3
+            html: <p>This is value2 for ItemSelection</p>
+          - content_id: custarg_choices_4
             html: <p>This is value3 for ItemSelection</p>
         maxAllowableSelectionCount:
           value: 1
@@ -7807,17 +7839,23 @@ states:
       hints: []
       id: ItemSelectionInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_choices_2: {}
+        custarg_choices_3: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_choices_2: {}
+        custarg_choices_3: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
 states_schema_version: 35
@@ -7995,17 +8033,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -8064,11 +8104,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -8245,22 +8287,43 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         }
         customization_args_dict2 = {
             'choices': {'value': [
-                '<p>This is value1 for MultipleChoice</p>',
-                '<p>This is value2 for MultipleChoice</p>'
+                {
+                  'content_id': '',
+                  'html': '<p>This is value1 for MultipleChoice</p>'
+                },
+                {
+                  'content_id': '',
+                  'html': '<p>This is value2 for MultipleChoice</p>'
+                }
             ]},
             'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
             'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-                '<p>This is value3 for ItemSelection</p>'
+                {
+                  'content_id': '',
+                  'html': '<p>This is value1 for ItemSelection</p>'
+                },
+                {
+                  'content_id': '',
+                  'html': '<p>This is value2 for ItemSelection</p>'
+                },
+                {
+                  'content_id': '',
+                  'html': '<p>This is value3 for ItemSelection</p>'
+                }
             ]}
         }
         customization_args_dict4 = {
             'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
+              {
+                'content_id': '',
+                'html': '<p>This is value1 for DragAndDropSortInput</p>'
+              },
+              {
+                'content_id': '',
+                'html': '<p>This is value2 for DragAndDropSortInput</p>'
+              }
             ]}
         }
 

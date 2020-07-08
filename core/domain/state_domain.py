@@ -456,11 +456,7 @@ class InteractionInstance(python_utils.OBJECT):
         return {
             'id': self.id,
             'customization_args': (
-                {} if self.id is None else
-                customization_args_util.get_full_customization_args(
-                    self.customization_args,
-                    interaction_registry.Registry.get_interaction_by_id(
-                        self.id).customization_arg_specs)),
+                {} if self.id is None else self.customization_args),
             'answer_groups': [group.to_dict() for group in self.answer_groups],
             'default_outcome': (
                 self.default_outcome.to_dict()
@@ -760,12 +756,9 @@ class InteractionInstance(python_utils.OBJECT):
 
             return ca_value
 
-        customization_arg_specs = [
-            x.to_dict() for x in interaction.customization_arg_specs]
-
         customization_args_util.convert_translatable_in_cust_args(
             self.customization_args,
-            customization_arg_specs,
+            interaction.customization_arg_specs,
             dummy_conversion_fn)
         html_list += customization_args_html_list
 
@@ -782,69 +775,67 @@ class InteractionInstance(python_utils.OBJECT):
             states_schema_version: int. The state schema version.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-        
+
         Returns:
             dict. The converted interaction dict.
         """
-        with python_utils.open_file(
-            feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
-        ) as interaction_specs_json:
-            interaction_specs = json.load(interaction_specs_json)
+        interaction_id = interaction_dict['id']
+        interaction = (interaction_registry.Registry
+            .get_interaction_by_id(interaction_id))
+        customization_arg_specs = interaction.customization_arg_specs
+        customization_args = interaction_dict['customization_args']
 
-            customization_arg_specs = interaction_specs[
-                interaction_dict['id']]['customization_arg_specs']
-            customization_args = interaction_dict['customization_args']
+        def convert_cust_args(
+                obj_type, cust_arg_value, _, cust_arg_name=None):
+            """Applies conversion function on SubtitledHtml objects in
+            customization arguments.
 
-            def convert_cust_args(
-                    obj_type, cust_arg_value, _, cust_arg_name=None):
-                """Applies conversion function on SubtitledHtml objects in
-                customization arguments.
+            Args:
+                obj_type: string. Indicates object type, from customization
+                    argument spect.
+                cust_arg_value: dict. A dictionary from key 'value' to the
+                    customization argument value.
+                _: string. content_id generated from spec.
+                cust_arg_name: string. Name of the customization argument
+                    if present in spec.
 
-                Args:
-                    obj_type: string. Indicates object type, from customization
-                        argument spect.
-                    cust_arg_value: dict. A dictionary from key 'value' to the
-                        customization argument value.
-                    cust_arg_name: string. Name of the customization argument
-                        if present in spec.
+            Returns:
+                dict. The converted customization argument value.
+            """
+            if obj_type == 'SubtitledUnicode':
+                return cust_arg_value
 
-                Returns:
-                    dict. The converted customization argument value.
-                """
-                if obj_type == 'SubtitledUnicode':
+            if states_schema_version < 40:
+                if isinstance(cust_arg_value, (str, unicode)):
+                    return conversion_fn(cust_arg_value)
+                elif isinstance(cust_arg_value, list):
+                    return [
+                        conversion_fn(x) for x in cust_arg_value]
+                elif isinstance(cust_arg_value, dict):
+                    cust_arg_value[cust_arg_name] = (
+                        conversion_fn(
+                            cust_arg_value[cust_arg_name]))
                     return cust_arg_value
-
-                if states_schema_version < 40:
-                    if isinstance(cust_arg_value, (str, unicode)):
-                        return conversion_fn(cust_arg_value)
-                    elif isinstance(cust_arg_value, list):
-                        return [
-                            conversion_fn(x) for x in cust_arg_value]
-                    elif isinstance(cust_arg_value, dict):
-                        cust_arg_value[cust_arg_name] = (
-                            conversion_fn(
-                                cust_arg_value[cust_arg_name]))
-                        return cust_arg_value
+            else:
+                if cust_arg_name:
+                    cust_arg_value[cust_arg_name]['html'] = (
+                        conversion_fn(
+                            cust_arg_value[cust_arg_name]['html'])
+                    )
+                    return cust_arg_value
+                elif isinstance(cust_arg_value, list):
+                    for i in python_utils.RANGE(len(cust_arg_value)):
+                        cust_arg_value[i]['html'] = (
+                            conversion_fn(cust_arg_value[i]['html']))
+                    return cust_arg_value
                 else:
-                    if cust_arg_name:
-                        cust_arg_value[cust_arg_name]['html'] = (
-                            conversion_fn(
-                                cust_arg_value[cust_arg_name]['html'])
-                        )
-                        return cust_arg_value
-                    elif isinstance(cust_arg_value, list):
-                        for i in python_utils.RANGE(len(cust_arg_value)):
-                            cust_arg_value[i]['html'] = (
-                                conversion_fn(cust_arg_value[i]['html']))
-                        return cust_arg_value
-                    else:
-                        cust_arg_value['html'] = (
-                            conversion_fn(cust_arg_value['html']))
+                    cust_arg_value['html'] = (
+                        conversion_fn(cust_arg_value['html']))
 
-            customization_args_util.convert_translatable_in_cust_args(
-                customization_args,
-                customization_arg_specs,
-                convert_cust_args)
+        customization_args_util.convert_translatable_in_cust_args(
+            customization_args,
+            customization_arg_specs,
+            convert_cust_args)
 
         return interaction_dict
 
@@ -2033,6 +2024,17 @@ class State(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
+        
+        if self.interaction.id:
+            interaction = (interaction_registry.Registry
+                .get_interaction_by_id(self.interaction.id))
+            interaction_content_ids = (
+                customization_args_util.get_all_content_ids_in_cust_args(
+                    self.interaction.customization_args,
+                    interaction.customization_arg_specs
+                )
+            )
+            content_id_list.extend(interaction_content_ids)
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
@@ -2265,7 +2267,37 @@ class State(python_utils.OBJECT):
         Args:
             interaction_id: str. The new interaction id to set.
         """
+        old_content_id_list = []
+        new_content_id_list = []
+
+        customization_arg_specs = (interaction_registry.Registry
+            .get_interaction_by_id(interaction_id)
+            .customization_arg_specs
+        )
+
+        if self.interaction.id:
+            old_ca_content_ids = (
+                customization_args_util.get_all_content_ids_in_cust_args(
+                    self.interaction.customization_args,
+                    customization_arg_specs
+                )
+            )
+            old_content_id_list.extend(old_ca_content_ids)
+
+        customization_args, new_ca_content_ids = (
+            customization_args_util.get_full_customization_args(
+                {},
+                customization_arg_specs
+            )
+        )
+        new_content_id_list.extend(new_ca_content_ids)
+
         self.interaction.id = interaction_id
+        self.interaction.customization_args = customization_args
+
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
+
         # TODO(sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
         # updates interaction_answer_groups directly after this, but we should
@@ -2558,6 +2590,22 @@ class State(python_utils.OBJECT):
         Returns:
             State. The corresponding State domain object.
         """
+
+        # if self.interaction.id:
+        #     customization_args_specs = (interaction_registry.Registry
+        #         .get_interaction_by_id(self.interaction.id).customization_arg_specs)
+        #     _, new_content_ids = (customization_args_util
+        #         .get_full_customization_args(
+        #             self.interaction.customization_args,
+        #             customization_args_specs
+        #         )
+        #     )
+
+        #     for new_content_id in new_content_ids:
+        #         self.written_translations.translations_mapping[
+        #             new_content_id] = {}
+        #         self.recorded_voiceovers.voiceovers_mapping[
+        #             new_content_id] = {}
         return cls(
             SubtitledHtml.from_dict(state_dict['content']),
             [param_domain.ParamChange.from_dict(param)
@@ -2598,7 +2646,7 @@ class State(python_utils.OBJECT):
 
     @classmethod
     def convert_html_fields_in_state(
-            cls, state_dict, conversion_fn, 
+            cls, state_dict, conversion_fn,
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.

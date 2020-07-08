@@ -45,22 +45,27 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         # Check if no new key is added to customization arg dict if all specs
         # are present.
+        cust_args, new_content_ids = (customization_args_util
+            .get_full_customization_args(
+                complete_customization_args, ca_continue_specs))
         self.assertEqual(
             complete_customization_args,
-            customization_args_util.get_full_customization_args(
-                complete_customization_args, ca_continue_specs
-            )
+            cust_args
         )
+        self.assertEqual(0, len(new_content_ids))
 
         # Check if no new key is added to customization arg dict and extra keys
         # are not removed if all specs are present.
-        self.assertEqual(
-            complete_customization_args_with_extra_arg,
-            customization_args_util.get_full_customization_args(
+        cust_args, new_content_ids = (customization_args_util
+            .get_full_customization_args(
                 complete_customization_args_with_extra_arg,
                 ca_continue_specs
-            )
+            ))
+        self.assertEqual(
+            complete_customization_args_with_extra_arg,
+            cust_args
         )
+        self.assertEqual(0, len(new_content_ids))
 
         ca_fraction_input_specs = (
             interaction_registry.Registry.get_interaction_by_id(
@@ -82,35 +87,53 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''}
+            'customPlaceholder': {
+                'value': {
+                    'content_id': 'custarg_customPlaceholder',
+                    'unicode_str': ''
+                }
+            }
         }
 
         expected_complete_customization_args_with_extra_arg = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''},
+            'customPlaceholder': {
+                'value': {
+                    'content_id': 'custarg_customPlaceholder',
+                    'unicode_str': ''
+                }
+            },
             'extraArg': {'value': ''}
         }
 
         # Check if missing specs are added to customization arg dict without
         # making any other change.
+        cust_args, new_content_ids = (customization_args_util
+            .get_full_customization_args(
+                incomplete_customization_args, ca_fraction_input_specs
+            ))
         self.assertEqual(
             expected_complete_customization_args,
-            customization_args_util.get_full_customization_args(
-                incomplete_customization_args, ca_fraction_input_specs
-            )
+            cust_args
         )
+        self.assertEqual(['custarg_customPlaceholder'], new_content_ids)
+
 
         # Check if missing specs are added to customization arg dict without
         # making any other change and without removing extra args.
-        self.assertEqual(
-            expected_complete_customization_args_with_extra_arg,
-            customization_args_util.get_full_customization_args(
+        cust_args, new_content_ids = (customization_args_util
+            .get_full_customization_args(
                 incomplete_customization_args_with_extra_arg,
                 ca_fraction_input_specs
-            )
+            ))
+        self.assertEqual(
+            expected_complete_customization_args_with_extra_arg,
+            cust_args
         )
+        self.assertEqual(['custarg_customPlaceholder'], new_content_ids)
+
 
     def test_validate_customization_args_and_values(self):
         """Test validate customization args and values method."""
@@ -253,7 +276,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''}
+            'customPlaceholder': {
+                'value': {
+                    'content_id': 'custarg_customPlaceholder',
+                    'unicode_str': ''
+                }
+            }
         }
 
         expected_customization_args_after_validation_with_invalid_arg_type = (

@@ -583,6 +583,8 @@ class Exploration(python_utils.OBJECT):
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
 
+            state.next_content_id_index = sdict['next_content_id_index']
+
             state.solicit_answer_details = sdict['solicit_answer_details']
 
             exploration.states[state_name] = state
@@ -2450,100 +2452,118 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
+        for state_dict in states_dict.values():
+            max_existing_content_id_index = -1
+            translations_mapping = state_dict[
+                'written_translations']['translations_mapping']
+            for content_id in translations_mapping:
+                content_id_suffix = content_id.split('_')[-1]
+                if content_id_suffix.isdigit():
+                    max_existing_content_id_index = max(
+                        max_existing_content_id_index,
+                        int(content_id_suffix)
+                    )
+                for lang_code in translations_mapping[content_id]:
+                    translations_mapping[
+                        content_id][lang_code]['type'] = 'html'
 
-        with python_utils.open_file(
-            feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
-        ) as interaction_specs_json:
-            interaction_specs = json.load(interaction_specs_json)
+            # Since we cannot use nonlocal in python2, we use a dict to
+            # let inner function convert_to_subtitled modify the value.
+            next_content_id_index = {'value': max_existing_content_id_index + 1}
+            new_content_ids = []
 
-            for state_dict in states_dict.values():
-                translations_mapping = state_dict[
-                    'written_translations']['translations_mapping']
-                for content_id in translations_mapping:
-                    for lang_code in translations_mapping[content_id]:
-                        translations_mapping[
-                            content_id][lang_code]['type'] = 'html'
+            def convert_to_subtitled(
+                    obj_type, cust_arg_value, content_id_prefix,
+                    cust_arg_name=None):
+                """Conversion function that converts unsubtitled content to
+                SubtitledHtml or SubtitledUnicode.
 
-                # Since we cannot use nonlocal in python2, we use a dict to
-                # let inner function modify the value.
-                next_content_id_index = {'value': 0}
+                args:
+                    obj_type: string. Indicates the obj_type found in
+                        the customization arguments schema.
+                    cust_arg_value: dict. Dictionary of key 'value' to
+                        original value of customization argument.
+                    content_id_prefix: string. The content_id generated from
+                        traversing the customization argument spec.
+                    cust_arg_name: string. In the case that the value being
+                        converted is a value of a dictionary in
+                        cust_arg_value, cust_arg_name provides the key of
+                        the property to edit.
+                """
+                # Let function access outer next_content_id_index and
+                # new_content_ids.
+                # pylint: disable=cell-var-from-loop
+                if obj_type == 'SubtitledUnicode':
+                    translation_value_key = 'unicode_str'
+                elif obj_type == 'SubtitledHtml':
+                    translation_value_key = 'html'
 
-                def convert_to_subtitled(
-                        obj_type, cust_arg_value, content_id_prefix,
-                        cust_arg_name=None):
-                    """Conversion function that converts unsubtitled content to
-                    SubtitledHtml or SubtitledUnicode.
+                if isinstance(cust_arg_value, (str, unicode)):
+                    new_content_ids.append(content_id_prefix)
+                    return {
+                        'content_id': content_id_prefix,
+                        translation_value_key: cust_arg_value
+                    }
+                elif isinstance(cust_arg_value, list):
+                    for i in python_utils.RANGE(len(cust_arg_value)):
+                        content_id = (
+                            content_id_prefix + '_' +
+                            python_utils.UNICODE(
+                                next_content_id_index['value'])
+                        )
+                        new_content_ids.append(content_id)
+                        next_content_id_index['value'] += 1
 
-                    args:
-                        obj_type: string. Indicates the obj_type found in
-                            the customization arguments schema.
-                        cust_arg_value: dict. Dictionary of key 'value' to
-                            original value of customization argument.
-                        content_id_prefix: string. The content_id generated from
-                            traversing the customization argument spec.
-                        cust_arg_name: string. In the case that the value being
-                            converted is a value of a dictionary in
-                            cust_arg_value, cust_arg_name provides the key of
-                            the property to edit.
-                    """
-
-                    if obj_type == 'SubtitledUnicode':
-                        translation_value_key = 'unicode_str'
-                    elif obj_type == 'SubtitledHtml':
-                        translation_value_key = 'html'
-
-                    if isinstance(cust_arg_value, (str, unicode)):
-                        return {
-                            'content_id': content_id_prefix,
-                            translation_value_key: cust_arg_value
-                        }
-                    elif isinstance(cust_arg_value, list):
-                        for i in python_utils.RANGE(len(cust_arg_value)):
-                            # Let function access outer next_content_id_index.
-                            # pylint: disable=cell-var-from-loop
-                            content_id = (
-                                content_id_prefix + '_' +
-                                python_utils.UNICODE(
-                                    next_content_id_index['value'])
-                            )
-
-                            next_content_id_index['value'] += 1
-
-                            if (isinstance(cust_arg_value, dict) and
-                                    'content_id' in cust_arg_value[i]):
-                                cust_arg_value['content_id'] = content_id_prefix
-                                return cust_arg_value
-
-                            cust_arg_value[i] = {
-                                'content_id': content_id,
-                                translation_value_key:
-                                    cust_arg_value[i]
-                            }
-                        return cust_arg_value
-                    elif isinstance(cust_arg_value, dict):
-                        if 'content_id' in cust_arg_value:
+                        if (isinstance(cust_arg_value, dict) and
+                                'content_id' in cust_arg_value[i]):
                             cust_arg_value['content_id'] = content_id_prefix
                             return cust_arg_value
 
-                        cust_arg_value[cust_arg_name] = {
-                            'content_id': content_id_prefix,
-                            translation_value_key: cust_arg_value
+                        cust_arg_value[i] = {
+                            'content_id': content_id,
+                            translation_value_key:
+                                cust_arg_value[i]
                         }
+                    return cust_arg_value
+                elif isinstance(cust_arg_value, dict):
+                    new_content_ids.append(content_id_prefix)
+                    if 'content_id' in cust_arg_value:
+                        cust_arg_value['content_id'] = content_id_prefix
                         return cust_arg_value
 
-                interaction_id = state_dict['interaction']['id']
-                if interaction_id:
-                    customization_arg_specs = interaction_specs[
-                        interaction_id]['customization_arg_specs']
-                    customization_args = state_dict[
-                        'interaction']['customization_args']
+                    cust_arg_value[cust_arg_name] = {
+                        'content_id': content_id_prefix,
+                        translation_value_key: cust_arg_value
+                    }
+                    return cust_arg_value
 
-                    customization_args_util.convert_translatable_in_cust_args(
-                        customization_args,
-                        customization_arg_specs,
-                        convert_to_subtitled)
-                state_dict['next_content_id_index'] = next_content_id_index[
-                    'value']
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id:
+                customization_arg_specs = (
+                    interaction_registry.Registry
+                        .get_interaction_by_id(interaction_id)
+                        .customization_arg_specs
+                    )
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+
+                customization_args_util.convert_translatable_in_cust_args(
+                    customization_args,
+                    customization_arg_specs,
+                    convert_to_subtitled)
+
+            state_dict[
+                'next_content_id_index'] = next_content_id_index['value']
+
+            for new_content_id in new_content_ids:
+                state_dict[
+                    'written_translations'][
+                        'translations_mapping'][new_content_id] = {}
+
+                state_dict[
+                    'recorded_voiceovers'][
+                        'voiceovers_mapping'][new_content_id] = {}
+                
 
         return states_dict
 
@@ -3815,7 +3835,6 @@ class Exploration(python_utils.OBJECT):
             raise Exception(
                 'Expected a YAML version <= 9, received: %d' % (
                     initial_schema_version))
-
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

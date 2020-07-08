@@ -658,7 +658,7 @@ class ExplorationIssue(python_utils.OBJECT):
                 customization_args_util.get_full_customization_args(
                     self.issue_customization_args,
                     playthrough_issue_registry.Registry.get_issue_by_type(
-                        self.issue_type).customization_arg_specs)),
+                        self.issue_type).customization_arg_specs)[0]),
             'playthrough_ids': self.playthrough_ids,
             'schema_version': self.schema_version,
             'is_valid': self.is_valid
@@ -784,7 +784,7 @@ class LearnerAction(python_utils.OBJECT):
                 customization_args_util.get_full_customization_args(
                     self.action_customization_args,
                     action_registry.Registry.get_action_by_type(
-                        self.action_type).customization_arg_specs)),
+                        self.action_type).customization_arg_specs)[0]),
             'schema_version': self.schema_version
         }
 
