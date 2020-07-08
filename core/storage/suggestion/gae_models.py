@@ -99,7 +99,7 @@ DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
 
 # The message to be shown when rejecting a suggestion with a target ID of a
 # deleted skill.
-DELETED_SKILL_REJECT_MESSAGE = ('The associated skill no longer exists.')
+DELETED_SKILL_REJECT_MESSAGE = 'The associated skill no longer exists.'
 
 # The amount to increase the score of the author by after successfuly getting an
 # accepted suggestion.
