@@ -685,8 +685,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.customization_args = {'placeholder': {
             'value': {
-              'content_id': 'custarg_placeholder',
-              'unicode_str': ''
+                'content_id': 'custarg_placeholder',
+                'unicode_str': ''
             }
         }}
         exploration.validate()
