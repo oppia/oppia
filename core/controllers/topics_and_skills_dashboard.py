@@ -29,6 +29,7 @@ from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain

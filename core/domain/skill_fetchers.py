@@ -21,11 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import skill_domain
 from core.platform import models
 import feconf
 import python_utils
-
-from core.domain import skill_domain
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 memcache_services = models.Registry.import_memcache_services()

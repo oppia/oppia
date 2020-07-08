@@ -302,9 +302,17 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
 
 
 def reject_question_suggestions_with_skill_target_id(skill_id):
+    """Rejects all SuggestionAddQuestions with target ID matching the supplied
+    skill ID. Reviewer ID is set to Oppia Bot.
+
+    Args:
+        skill_id: The skill ID corresponding to the target ID of the
+            SuggestionAddQuestion.
+    """
     suggestions = query_suggestions(
         [
-            ('suggestion_type',
+            (
+                'suggestion_type',
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
             ('target_id', skill_id)
         ]

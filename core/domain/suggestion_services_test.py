@@ -1052,8 +1052,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', skill_id)])
         self.assertEqual(len(suggestions), 1)
-        self.assertEqual(suggestions[0].status,
-            suggestion_models.STATUS_REJECTED)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
 
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):

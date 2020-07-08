@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import copy
 import logging
 
 from constants import constants
@@ -330,7 +329,7 @@ def get_rubrics_of_skills(skill_ids):
         dict, list(str). The skill rubrics of skills keyed by their
         corresponding ids and the list of deleted skill ids, if any.
     """
-    skills = get_multi_skills(skill_ids, strict=False)
+    skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
     skill_id_to_rubrics_dict = {}
 
     for skill in skills:

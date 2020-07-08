@@ -19,17 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-import random
-
-from constants import constants
-from core.domain import config_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import topic_services
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -240,4 +233,3 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID, version=2)
         self.assertEqual(skill.id, self.SKILL_ID)
         self.assertEqual(skill.language_code, 'bn')
-
