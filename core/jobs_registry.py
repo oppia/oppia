@@ -69,7 +69,6 @@ ONE_OFF_JOB_MANAGERS = [
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
-    stats_jobs_one_off.PlaythroughAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
     stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob,
@@ -223,6 +222,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.SkillOpportunityModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PlaythroughModelAuditOneOffJob,
 ]
 
 # List of all ContinuousComputation managers to show controls for on the
