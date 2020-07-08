@@ -44,6 +44,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -66,7 +67,7 @@ import utils
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
-    recommendations_models, skill_models,
+    recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
     user_models,) = (
         models.Registry.import_models([
@@ -76,8 +77,8 @@ import utils
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-            models.NAMES.user]))
+            models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
@@ -985,9 +986,7 @@ class CollectionModelValidator(BaseModelValidator):
                 snapshot_model_ids),
             'snapshot_content_ids': (
                 collection_models.CollectionSnapshotContentModel,
-                snapshot_model_ids),
-            'all_users_model_ids': (
-                collection_models.CollectionRightsAllUsersModel, [item.id])
+                snapshot_model_ids)
         }
 
 
@@ -1108,19 +1107,6 @@ class CollectionRightsSnapshotContentModelValidator(
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.find('-')]]),
-        }
-
-
-class CollectionRightsAllUsersModelValidator(BaseModelValidator):
-    """Class for validating CollectionRightsAllUsersModel."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'collection_rights_ids': (
-                collection_models.CollectionRightsModel, [item.id]),
-            'all_user_ids': (
-                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -1783,9 +1769,7 @@ class ExplorationModelValidator(BaseModelValidator):
                 snapshot_model_ids),
             'snapshot_content_ids': (
                 exp_models.ExplorationSnapshotContentModel,
-                snapshot_model_ids),
-            'all_users_model_ids': (
-                exp_models.ExplorationRightsAllUsersModel, [item.id])
+                snapshot_model_ids)
         }
 
 
@@ -1910,19 +1894,6 @@ class ExplorationRightsSnapshotContentModelValidator(
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.find('-')]]),
-        }
-
-
-class ExplorationRightsAllUsersModelValidator(BaseModelValidator):
-    """Class for validating ExplorationRightsAllUsersModel."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_rights_ids': (
-                exp_models.ExplorationRightsModel, [item.id]),
-            'all_user_ids': (
-                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -3302,9 +3273,7 @@ class TopicModelValidator(BaseModelValidator):
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
                 ['%s-%s' % (
-                    item.id, subtopic['id']) for subtopic in item.subtopics]),
-            'all_users_model_ids': (
-                topic_models.TopicRightsAllUsersModel, [item.id])
+                    item.id, subtopic['id']) for subtopic in item.subtopics])
         }
 
     @classmethod
@@ -3452,19 +3421,6 @@ class TopicRightsSnapshotContentModelValidator(
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
                 [item.id[:item.id.find('-')]]),
-        }
-
-
-class TopicRightsAllUsersModelValidator(BaseModelValidator):
-    """Class for validating TopicRightsAllUsersModel."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'topic_rights_ids': (
-                topic_models.TopicRightsModel, [item.id]),
-            'all_user_ids': (
-                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -5059,6 +5015,142 @@ class TaskEntryModelValidator(BaseModelValidator):
         ]
 
 
+class PlaythroughModelValidator(BaseModelValidator):
+    """Class for validating PlaythroughModel."""
+
+    # The playthrough design was finalized at the end of GSOC 2018: 2018-09-01.
+    PLAYTHROUGH_INTRODUCTION_DATETIME = datetime.datetime(2018, 9, 1)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        exp_id = item.exp_id
+        exp_version = item.exp_version
+        exp_issues_id = (
+            stats_models.ExplorationIssuesModel.get_entity_id(
+                exp_id, exp_version)
+        )
+
+        return {
+            'exp_ids': (
+                exp_models.ExplorationModel, [item.exp_id]),
+            'exp_issues': (
+                stats_models.ExplorationIssuesModel, [exp_issues_id])
+        }
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^[A-Za-z0-9-_]{1,%s}\.[A-Za-z0-9-_]{1,%s}$' % (
+            base_models.ID_LENGTH, base_models.ID_LENGTH)
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return stats_services.get_playthrough_from_model(item)
+
+    @classmethod
+    def _validate_exploration_id_in_whitelist(cls, item):
+        """Validate the exploration id in playthrough model is in
+        the whitelist.
+
+        Args:
+            item: ndb.Model. PlaythroughModel to validate.
+        """
+        whitelisted_exp_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+
+        if item.exp_id not in whitelisted_exp_ids_for_playthroughs:
+            cls.errors['exploration id check'].append(
+                'Entity id %s: recorded in exploration_id:%s which '
+                'has not been curated for recording.' % (
+                    item.id, item.exp_id)
+            )
+
+    @classmethod
+    def _validate_reference(cls, item):
+        """Validate the playthrough reference relations.
+
+        Args:
+            item: ndb.Model. PlaythroughModel to validate.
+        """
+        exp_issues_tuples = cls.external_instance_details['exp_issues']
+        for _, _, exp_issues in exp_issues_tuples:
+            # The case for missing ExplorationIssues external model is
+            # ignored here since errors for missing email external model
+            # are already checked and stored in
+            # _validate_external_id_relationships function.
+            exp_id = item.exp_id
+            exp_version = item.exp_version
+
+            issues = []
+            for issue_index, issue in enumerate(exp_issues.unresolved_issues):
+                issue_type = issue['issue_type']
+                if (
+                        item.id in issue['playthrough_ids']
+                        and issue_type == item.issue_type):
+                    issue_customization_args = issue['issue_customization_args']
+                    identifying_arg = (
+                        stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+                            issue_type])
+                    if (
+                            issue_customization_args[identifying_arg] ==
+                            item.issue_customization_args[identifying_arg]):
+                        issues.append((issue_index, issue))
+
+            if len(issues) == 0:
+                cls.errors['reference check'].append(
+                    'Entity id %s: not referenced by any issue of the'
+                    ' corresponding exploration (id=%s, version=%s).' % (
+                        item.id, exp_id, exp_version)
+                )
+            elif len(issues) > 1:
+                issue_indices = [index for index, _ in issues]
+                cls.errors['reference check'].append(
+                    'Entity id %s: referenced by more than one issues of the '
+                    'corresponding exploration (id=%s, version=%s), '
+                    'issue indices: %s.' % (
+                        item.id, exp_id, exp_version, issue_indices)
+                )
+            else:
+                issue_index, issue = issues[0]
+                id_indices = []
+                for id_index, playthrough_id in enumerate(
+                        issue['playthrough_ids']):
+                    if playthrough_id == item.id:
+                        id_indices.append(id_index)
+                if len(id_indices) > 1:
+                    cls.errors['reference check'].append(
+                        'Entity id %s: referenced multiple times in an '
+                        'issue (index=%s) of the corresponding exploration '
+                        '(id=%s, version=%s), duplicated id indices: %s.' % (
+                            item.id, issue_index, exp_id, exp_version,
+                            id_indices)
+                    )
+
+    @classmethod
+    def _validate_created_datetime(cls, item):
+        """Validate the playthrough is created after the GSoC 2018 submission
+        deadline.
+
+        Args:
+            item: ndb.Model. PlaythroughModel to validate.
+        """
+        created_on_datetime = item.created_on
+        if created_on_datetime < cls.PLAYTHROUGH_INTRODUCTION_DATETIME:
+            cls.errors['create datetime check'].append(
+                'Entity id %s: released on %s, which is before the '
+                'GSoC 2018 submission deadline (2018-09-01) and should '
+                'therefore not exist.' % (
+                    item.id, item.created_on.strftime('%Y-%m-%d'))
+            )
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_exploration_id_in_whitelist,
+            cls._validate_reference,
+            cls._validate_created_datetime,
+        ]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -5079,8 +5171,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         CollectionRightsSnapshotContentModelValidator),
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
-    collection_models.CollectionRightsAllUsersModel: (
-        CollectionRightsAllUsersModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
     config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
     config_models.ConfigPropertySnapshotMetadataModel: (
@@ -5103,8 +5193,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ExplorationRightsSnapshotMetadataModelValidator),
     exp_models.ExplorationRightsSnapshotContentModel: (
         ExplorationRightsSnapshotContentModelValidator),
-    exp_models.ExplorationRightsAllUsersModel: (
-        ExplorationRightsAllUsersModelValidator),
     exp_models.ExplorationCommitLogEntryModel: (
         ExplorationCommitLogEntryModelValidator),
     exp_models.ExpSummaryModel: ExpSummaryModelValidator,
@@ -5165,7 +5253,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         TopicRightsSnapshotMetadataModelValidator),
     topic_models.TopicRightsSnapshotContentModel: (
         TopicRightsSnapshotContentModelValidator),
-    topic_models.TopicRightsAllUsersModel: TopicRightsAllUsersModelValidator,
     topic_models.TopicCommitLogEntryModel: (
         TopicCommitLogEntryModelValidator),
     topic_models.TopicSummaryModel: TopicSummaryModelValidator,
@@ -5199,7 +5286,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         UserContributionScoringModelValidator),
     user_models.UserCommunityRightsModel: UserCommunityRightsModelValidator,
     user_models.PendingDeletionRequestModel: (
-        PendingDeletionRequestModelValidator)
+        PendingDeletionRequestModelValidator),
+    stats_models.PlaythroughModel: PlaythroughModelValidator,
 }
 
 
@@ -5359,14 +5447,6 @@ class CollectionRightsSnapshotContentModelAuditOneOffJob(
         return [collection_models.CollectionRightsSnapshotContentModel]
 
 
-class CollectionRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates CollectionRightsAllUsersModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [collection_models.CollectionRightsAllUsersModel]
-
-
 class CollectionCommitLogEntryModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
     """Job that audits and validates CollectionCommitLogEntryModel."""
@@ -5502,15 +5582,6 @@ class ExplorationRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationRightsSnapshotContentModel]
-
-
-class ExplorationRightsAllUsersModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates ExplorationRightsAllUsersModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsAllUsersModel]
 
 
 class ExplorationCommitLogEntryModelAuditOneOffJob(
@@ -5818,14 +5889,6 @@ class TopicRightsSnapshotContentModelAuditOneOffJob(
         return [topic_models.TopicRightsSnapshotContentModel]
 
 
-class TopicRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates TopicRightsAllUsersModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [topic_models.TopicRightsAllUsersModel]
-
-
 class TopicCommitLogEntryModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
     """Job that audits and validates TopicCommitLogEntryModel."""
@@ -6066,3 +6129,11 @@ class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [improvements_models.TaskEntryModel]
+
+
+class PlaythroughModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlaythroughModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.PlaythroughModel]
