@@ -2432,14 +2432,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.interaction.customization_args[
                 'choices']['value'],
-                [{
+                [
+                    {
                         'content_id': 'custarg_choices_default',
                         'html': '<p>Option A</p>'
                     },
                     {
                         'content_id': 'custarg_choices_0',
                         'html': '<p>Option B</p>'
-                }]
+                    }
+                ]
         )
 
     def test_update_interaction_handlers_fails(self):
@@ -4490,10 +4492,12 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                         },
                         {
                             'content_id': 'custarg_choices_1',
-                            'html': ('<oppia-noninteractive-math raw_latex-with'
+                            'html': (
+                                '<oppia-noninteractive-math raw_latex-with'
                                 '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
                                 '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
-                                'math>')
+                                'math>'
+                            )
                         },
                         {
                             'content_id': 'custarg_choices_2',

@@ -52,7 +52,7 @@ def get_full_customization_args(customization_args, ca_specs):
 
     for ca_spec in ca_specs:
         if ca_spec.name not in customization_args:
-            ca_value = { 'value': ca_spec.default_value }
+            ca_value = {'value': ca_spec.default_value}
             customization_args[ca_spec.name] = ca_value
             new_content_ids = get_all_content_ids_in_cust_args(
                 {ca_spec.name: ca_value},
@@ -223,10 +223,31 @@ def get_all_content_ids_in_cust_args(ca_values, ca_specs):
             single key, 'value', whose corresponding value is the value of
             the customization arg.
         ca_specs: list(CustomizationArgSpec). List of spec dictionaries.
+
+    Returns:
+        list(str). List of all content_id's in customization arguments.
     """
     content_ids = []
     def dummy_conversion(
             unused_obj_type, ca_value, unused_content_id_prefix, ca_name):
+        """Conversion function used to extract all content_ids. Customization
+        argument is returned unmodified.
+
+        Args:
+            unused_obj_type: str. Indicates the obj_type found in
+                the customization arguments schema.
+            ca_value: dict. Dictionary of key 'value' to
+                original value of customization argument.
+            unused_content_id_prefix: str. The content_id generated from
+                traversing the customization argument spec.
+            ca_name: str. In the case that the value being
+                converted is a value of a dictionary in
+                cust_arg_value, cust_arg_name provides the key of
+                the property to edit.
+
+        Returns:
+            str. The unmodified customization argument value.
+        """
         if isinstance(ca_value, list):
             for content in ca_value:
                 content_ids.append(content['content_id'])
@@ -245,7 +266,7 @@ def get_all_content_ids_in_cust_args(ca_values, ca_specs):
                 ca_values[ca_spec_name],
                 ca_spec.to_dict(),
                 dummy_conversion)
-    
+
     return content_ids
 
 
@@ -259,10 +280,32 @@ def get_all_html_in_cust_args(ca_values, ca_specs):
             single key, 'value', whose corresponding value is the value of
             the customization arg.
         ca_specs: list(CustomizationArgSpec). List of spec dictionaries.
+
+    Returns:
+        list(str). List of all html in customization arguments.
     """
     html = []
+
     def dummy_conversion(
             obj_type, ca_value, unused_content_id_prefix, ca_name):
+        """Conversion function used to extract all html. Customization
+        argument is returned unmodified.
+
+        Args:
+            obj_type: str. Indicates the obj_type found in
+                the customization arguments schema.
+            ca_value: dict. Dictionary of key 'value' to
+                original value of customization argument.
+            unused_content_id_prefix: str. The content_id generated from
+                traversing the customization argument spec.
+            ca_name: str. In the case that the value being
+                converted is a value of a dictionary in
+                cust_arg_value, cust_arg_name provides the key of
+                the property to edit.
+
+        Returns:
+            str. The unmodified customization argument value.
+        """
         if obj_type == 'SubtitledUnicode':
             return ca_value
 
@@ -284,5 +327,5 @@ def get_all_html_in_cust_args(ca_values, ca_specs):
                 ca_values[ca_spec_name],
                 ca_spec.to_dict(),
                 dummy_conversion)
-    
+
     return html

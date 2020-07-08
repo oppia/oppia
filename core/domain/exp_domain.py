@@ -27,7 +27,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import functools
-import json
 import re
 import string
 
@@ -2494,17 +2493,20 @@ class Exploration(python_utils.OBJECT):
                 """Conversion function that converts unsubtitled content to
                 SubtitledHtml or SubtitledUnicode.
 
-                args:
-                    obj_type: string. Indicates the obj_type found in
+                Args:
+                    obj_type: str. Indicates the obj_type found in
                         the customization arguments schema.
                     cust_arg_value: dict. Dictionary of key 'value' to
                         original value of customization argument.
-                    content_id_prefix: string. The content_id generated from
+                    content_id_prefix: str. The content_id generated from
                         traversing the customization argument spec.
-                    cust_arg_name: string. In the case that the value being
+                    cust_arg_name: str. In the case that the value being
                         converted is a value of a dictionary in
                         cust_arg_value, cust_arg_name provides the key of
                         the property to edit.
+
+                Returns:
+                    str. The updated customization argument value.
                 """
                 # Let function access outer next_content_id_index and
                 # new_content_ids.
@@ -2555,11 +2557,10 @@ class Exploration(python_utils.OBJECT):
 
             interaction_id = state_dict['interaction']['id']
             if interaction_id:
-                customization_arg_specs = (
-                    interaction_registry.Registry
-                        .get_interaction_by_id(interaction_id)
-                        .customization_arg_specs
-                    )
+                customization_arg_specs = (interaction_registry.Registry
+                    .get_interaction_by_id(interaction_id)
+                    .customization_arg_specs
+                )
                 customization_args = state_dict[
                     'interaction']['customization_args']
 

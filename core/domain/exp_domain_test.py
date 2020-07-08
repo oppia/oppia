@@ -684,10 +684,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid customization arg name')
 
         interaction.customization_args = {'placeholder': {
-          'value': {
-            'content_id': 'custarg_placeholder',
-            'unicode_str': ''
-          }
+            'value': {
+              'content_id': 'custarg_placeholder',
+              'unicode_str': ''
+            }
         }}
         exploration.validate()
 
@@ -1193,13 +1193,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_get_content_count(self):
+        # Adds 2 to content count to exploration.
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_content_count(), 2)
 
+        # Adds 1 to content count to exploration.
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
-        # TODO: shavavo add comment counts
+        self.assertEqual(
+            exploration.get_content_count(), 3)
+
+        # Adds 1 to content count to exploration.
         init_state.update_interaction_id('TextInput')
 
         answer_group_dict = {
@@ -1223,6 +1228,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        # Adds 1 to content count to exploration.
         init_state.update_interaction_answer_groups([answer_group_dict])
 
         hints_list = [
@@ -1230,6 +1236,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
             )
         ]
+        # Adds 1 to content count to exploration.
         init_state.update_interaction_hints(hints_list)
 
         solution_dict = {
@@ -1242,6 +1249,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
+        # Adds 1 to content count to exploration.
         init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 8)
@@ -8291,12 +8299,12 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict2 = {
             'choices': {'value': [
                 {
-                  'content_id': '',
-                  'html': '<p>This is value1 for MultipleChoice</p>'
+                    'content_id': '',
+                    'html': '<p>This is value1 for MultipleChoice</p>'
                 },
                 {
-                  'content_id': '',
-                  'html': '<p>This is value2 for MultipleChoice</p>'
+                    'content_id': '',
+                    'html': '<p>This is value2 for MultipleChoice</p>'
                 }
             ]},
             'showChoicesInShuffledOrder': {'value': True}
@@ -8304,29 +8312,29 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict3 = {
             'choices': {'value': [
                 {
-                  'content_id': '',
-                  'html': '<p>This is value1 for ItemSelection</p>'
+                    'content_id': '',
+                    'html': '<p>This is value1 for ItemSelection</p>'
                 },
                 {
-                  'content_id': '',
-                  'html': '<p>This is value2 for ItemSelection</p>'
+                    'content_id': '',
+                    'html': '<p>This is value2 for ItemSelection</p>'
                 },
                 {
-                  'content_id': '',
-                  'html': '<p>This is value3 for ItemSelection</p>'
+                    'content_id': '',
+                    'html': '<p>This is value3 for ItemSelection</p>'
                 }
             ]}
         }
         customization_args_dict4 = {
             'choices': {'value': [
-              {
-                'content_id': '',
-                'html': '<p>This is value1 for DragAndDropSortInput</p>'
-              },
-              {
-                'content_id': '',
-                'html': '<p>This is value2 for DragAndDropSortInput</p>'
-              }
+                {
+                    'content_id': '',
+                    'html': '<p>This is value1 for DragAndDropSortInput</p>'
+                },
+                {
+                    'content_id': '',
+                    'html': '<p>This is value2 for DragAndDropSortInput</p>'
+                }
             ]}
         }
 

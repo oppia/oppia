@@ -45,9 +45,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         # Check if no new key is added to customization arg dict if all specs
         # are present.
-        cust_args, new_content_ids = (customization_args_util
-            .get_full_customization_args(
-                complete_customization_args, ca_continue_specs))
+        cust_args, new_content_ids = (
+            customization_args_util.get_full_customization_args(
+                complete_customization_args, ca_continue_specs
+            )
+        )
         self.assertEqual(
             complete_customization_args,
             cust_args
@@ -56,11 +58,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         # Check if no new key is added to customization arg dict and extra keys
         # are not removed if all specs are present.
-        cust_args, new_content_ids = (customization_args_util
-            .get_full_customization_args(
+        cust_args, new_content_ids = (
+            customization_args_util.get_full_customization_args(
                 complete_customization_args_with_extra_arg,
                 ca_continue_specs
-            ))
+            )
+        )
         self.assertEqual(
             complete_customization_args_with_extra_arg,
             cust_args
@@ -110,10 +113,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         # Check if missing specs are added to customization arg dict without
         # making any other change.
-        cust_args, new_content_ids = (customization_args_util
-            .get_full_customization_args(
+        cust_args, new_content_ids = (
+            customization_args_util.get_full_customization_args(
                 incomplete_customization_args, ca_fraction_input_specs
-            ))
+            )
+        )
         self.assertEqual(
             expected_complete_customization_args,
             cust_args
@@ -123,11 +127,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         # Check if missing specs are added to customization arg dict without
         # making any other change and without removing extra args.
-        cust_args, new_content_ids = (customization_args_util
-            .get_full_customization_args(
+        cust_args, new_content_ids = (
+            customization_args_util.get_full_customization_args(
                 incomplete_customization_args_with_extra_arg,
                 ca_fraction_input_specs
-            ))
+            )
+        )
         self.assertEqual(
             expected_complete_customization_args_with_extra_arg,
             cust_args

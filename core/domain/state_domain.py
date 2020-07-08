@@ -742,8 +742,8 @@ class InteractionInstance(python_utils.OBJECT):
                                 'correct_answer type.')
 
 
-        customization_args_html_list = (customization_args_util
-            .get_all_html_in_cust_args(
+        customization_args_html_list = (
+            customization_args_util.get_all_html_in_cust_args(
                 self.customization_args,
                 interaction.customization_arg_specs)
         )
@@ -767,8 +767,8 @@ class InteractionInstance(python_utils.OBJECT):
             dict. The converted interaction dict.
         """
         interaction_id = interaction_dict['id']
-        interaction = (interaction_registry.Registry
-            .get_interaction_by_id(interaction_id))
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(interaction_id))
         customization_arg_specs = interaction.customization_arg_specs
         customization_args = interaction_dict['customization_args']
 
@@ -825,6 +825,7 @@ class InteractionInstance(python_utils.OBJECT):
             convert_cust_args)
 
         return interaction_dict
+
 
 class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
@@ -1905,6 +1906,7 @@ class SubtitledUnicode(python_utils.OBJECT):
         """
         return cls(content_id, '')
 
+
 class State(python_utils.OBJECT):
     """Domain object for a state."""
 
@@ -2011,10 +2013,13 @@ class State(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
-        
+
         if self.interaction.id:
-            interaction = (interaction_registry.Registry
-                .get_interaction_by_id(self.interaction.id))
+            interaction = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    self.interaction.id
+                )
+            )
             interaction_content_ids = (
                 customization_args_util.get_all_content_ids_in_cust_args(
                     self.interaction.customization_args,
@@ -2301,7 +2306,7 @@ class State(python_utils.OBJECT):
         ca_specs = (interaction_registry.Registry
             .get_interaction_by_id(self.interaction.id)
             .customization_arg_specs)
-        
+
         old_content_id_list.extend(
             customization_args_util.get_all_content_ids_in_cust_args(
                 self.interaction.customization_args,
@@ -2599,22 +2604,6 @@ class State(python_utils.OBJECT):
         Returns:
             State. The corresponding State domain object.
         """
-
-        # if self.interaction.id:
-        #     customization_args_specs = (interaction_registry.Registry
-        #         .get_interaction_by_id(self.interaction.id).customization_arg_specs)
-        #     _, new_content_ids = (customization_args_util
-        #         .get_full_customization_args(
-        #             self.interaction.customization_args,
-        #             customization_args_specs
-        #         )
-        #     )
-
-        #     for new_content_id in new_content_ids:
-        #         self.written_translations.translations_mapping[
-        #             new_content_id] = {}
-        #         self.recorded_voiceovers.voiceovers_mapping[
-        #             new_content_id] = {}
         return cls(
             SubtitledHtml.from_dict(state_dict['content']),
             [param_domain.ParamChange.from_dict(param)
