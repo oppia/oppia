@@ -123,6 +123,10 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
+    '--chrome_driver_version',
+    help='Uses the specified version of the chrome driver ')
+
+_PARSER.add_argument(
     '--debug_mode',
     help='Runs the protractor test in debugging mode. Follow the instruction '
          'provided in following URL to run e2e tests in debugging mode: '
@@ -467,7 +471,8 @@ def main(args=None):
     if not parsed_args.skip_build:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
-    version = (
+
+    version = parsed_args.chrome_driver_version or (
         get_chrome_driver_version() if parsed_args.auto_select_chromedriver
         else CHROME_DRIVER_VERSION)
     start_webdriver_manager(version)
