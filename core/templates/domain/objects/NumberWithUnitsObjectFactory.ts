@@ -20,19 +20,14 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IFractionDict, Fraction, FractionObjectFactory } from
+import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory.ts';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { IUnit, Units, UnitsObjectFactory } from
+import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory.ts';
-
-export interface INumberWithUnitsBackendDict {
-  type: string;
-  real: number;
-  fraction: IFractionDict;
-  units: IUnit[];
-}
+import { IUnit, INumberWithUnitsAnswer } from
+  'interactions/answer-defs';
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -255,7 +250,7 @@ export class NumberWithUnitsObjectFactory {
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
-  fromDict(numberWithUnitsDict: INumberWithUnitsBackendDict): NumberWithUnits {
+  fromDict(numberWithUnitsDict: INumberWithUnitsAnswer): NumberWithUnits {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,

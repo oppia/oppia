@@ -26,6 +26,7 @@ from core.tests import test_utils
 
 class EmailServicesTest(test_utils.GenericTestBase):
     """Tests for email_services functions."""
+
     def test_reply_info_email_objects_are_created_and_queried_correctly(self):
         model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user1', 'exploration.exp1.1')
