@@ -2266,8 +2266,11 @@ class State(python_utils.OBJECT):
             old_ca_content_ids = (
                 customization_args_util.get_all_content_ids_in_cust_args(
                     self.interaction.customization_args,
-                    (interaction_registry.Registry.get_interaction_by_id(
-                        self.interaction.id).customization_arg_specs)
+                    (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).customization_arg_specs
+                    )
                 )
             )
             old_content_id_list.extend(old_ca_content_ids)
@@ -2275,8 +2278,11 @@ class State(python_utils.OBJECT):
         customization_args, new_ca_content_ids = (
             customization_args_util.get_full_customization_args(
                 {},
-                (interaction_registry.Registry.get_interaction_by_id(
-                    interaction_id).customization_arg_specs)
+                (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        interaction_id
+                    ).customization_arg_specs
+                )
             )
         )
         new_content_id_list.extend(new_ca_content_ids)
