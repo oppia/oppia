@@ -5,6 +5,7 @@
     left: 0;
     position: fixed;
     top: 0;
+    -ms-transform: translate(-100%, 0);
     -webkit-transform: translate3d(-100%, 0, 0);
     transform: translate3d(-100%, 0, 0);
     width: 270px;
@@ -17,7 +18,6 @@
   side-navigation-bar .oppia-sidebar-menu::after {
     background: rgba(0,0,0,0.2);
     content: '';
-    display: none;
     height: 100%;
     opacity: 1;
     position: absolute;
@@ -88,52 +88,59 @@
   </div>
 
   <ul>
-    <li ng-class="{'active': NAV_MODE === 'library'}">
-      <a href="/library">
+    <li ng-class="{'active': $ctrl.currentUrl === '/library'}">
+      <a href="/library" class="protractor-mobile-test-library-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
         <span translate="I18N_SIDEBAR_LIBRARY_LINK"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': NAV_MODE === 'about'}">
-      <a href="/about">
+    <li ng-class="{'active': $ctrl.currentUrl === '/about'}">
+      <a href="/about" class="protractor-mobile-test-about-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
         <span translate="I18N_SIDEBAR_ABOUT_LINK"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': NAV_MODE === 'get_started'}">
-      <a href="/get_started">
+    <li ng-class="{'active': $ctrl.currentUrl === '/get_started'}">
+      <a href="/get_started" class="protractor-mobile-test-get-started-link">
         <i class="oppia-sidebar-menu-icon fa">&#xf135;</i>
         <span translate="I18N_SIDEBAR_GET_STARTED"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': NAV_MODE === 'teach'}">
-      <a href="/teach">
+    <li ng-class="{'active': $ctrl.currentUrl === '/teach'}">
+      <a href="/teach" class="protractor-mobile-test-teach-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
         <span translate="I18N_SIDEBAR_TEACH_WITH_OPPIA"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': NAV_MODE === 'donate'}">
-      <a href="/donate">
+    <li ng-class="{'active': $ctrl.currentUrl === '/donate'}">
+      <a href="/donate" class="protractor-mobile-test-donate-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
         <span translate="I18N_SIDEBAR_DONATE"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': NAV_MODE === 'blog'}">
-      <a href="/blog">
-        <img ng-src="<[getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
+    <li>
+      <a href="https://medium.com/oppia-org" target="_blank" rel="noopener">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
         <span translate="I18N_SIDEBAR_BLOG"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': NAV_MODE === 'contact'}">
-      <a href="/contact">
+    <li ng-class="{'active': $ctrl.currentUrl === '/contact'}">
+      <a href="/contact" class="protractor-mobile-test-contact-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE0BE;</i>
         <span translate="I18N_SIDEBAR_CONTACT_US"></span>
+      </a>
+    </li>
+
+    <li>
+      <a href="http://oppiafoundation.org/" target="_blank" rel="noopener">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')]>" class="oppia-sidebar-menu-icon" alt="Oppia Foundation">
+        <span translate="I18N_SIDEBAR_OPPIA_FOUNDATION"></span>
       </a>
     </li>
   </ul>
