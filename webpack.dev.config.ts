@@ -16,7 +16,7 @@
  * @fileoverview Development environment config file for Webpack.
  */
 
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.config.ts');
 const path = require('path');
 
