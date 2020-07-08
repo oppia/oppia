@@ -221,10 +221,50 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
     };
 
+    $scope.populateEmptyContentIds = function() {
+      let ca = StateCustomizationArgsService.displayed;
+      let caSpecs = (INTERACTION_SPECS[StateInteractionIdService.displayed]
+        .customization_arg_specs);
+
+      let findEmptyContentIds = (
+          ca: {[id: string]: {value: any}},
+          caSpec: any,
+          contentIdPrefix: string = 'custarg'
+      ) => {
+        const schema = 'schema' in caSpec ? caSpec.schema : caSpec;
+        const schemaType = schema.type;
+        let schemaObjType;
+        if (schemaType === 'custom') {
+          schemaObjType = schema.obj_type;
+        }
+
+        if ('name' in caSpec) {
+          contentIdPrefix += '_' + caSpec.name;
+        }
+
+        if (schemaObjType === 'SubtitledUnicode' ||
+            schemaObjType === 'SubtitledHtml') {
+          console.log(ca, contentIdPrefix);
+        } else if (schemaType === 'list') {
+          findEmptyContentIds(ca, caSpec.schema.items, contentIdPrefix);
+        } else if (schemaType === 'dict') {
+          for (let i = 0; i < caSpec.properties.length; i++) {
+            findEmptyContentIds(
+              ca, caSpec.schema.properties[i], contentIdPrefix);
+          }
+        }
+      };
+
+      for (const caSpec of caSpecs) {
+        findEmptyContentIds(ca[caSpec.name], caSpec);
+      }
+    };
+
     $scope.save = function() {
-      EditorFirstTimeEventsService
-        .registerFirstSaveInteractionEvent();
-      $uibModalInstance.close();
+      $scope.populateEmptyContentIds();
+      // EditorFirstTimeEventsService
+      //   .registerFirstSaveInteractionEvent();
+      // $uibModalInstance.close();
     };
   }
 ]);

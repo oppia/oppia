@@ -793,7 +793,7 @@ class InteractionInstance(python_utils.OBJECT):
                 return cust_arg_value
 
             if states_schema_version < 40:
-                if isinstance(cust_arg_value, (str, unicode)):
+                if isinstance(cust_arg_value, str):
                     return conversion_fn(cust_arg_value)
                 elif isinstance(cust_arg_value, list):
                     return [

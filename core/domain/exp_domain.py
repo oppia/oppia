@@ -2516,7 +2516,7 @@ class Exploration(python_utils.OBJECT):
                 elif obj_type == 'SubtitledHtml':
                     translation_value_key = 'html'
 
-                if isinstance(cust_arg_value, (str, unicode)):
+                if isinstance(cust_arg_value, str):
                     new_content_ids.append(content_id_prefix)
                     return {
                         'content_id': content_id_prefix,
