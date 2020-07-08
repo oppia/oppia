@@ -54,7 +54,7 @@ describe('Delete Skill Modal Controller', function() {
         fetchAssignedSkillData: () => {
           var deferred = $q.defer();
           deferred.resolve({
-            assigned_topics: {}
+            assigned_topics_dict: {}
           });
           return deferred.promise;
         }
@@ -90,7 +90,7 @@ describe('Delete Skill Modal Controller', function() {
         fetchAssignedSkillData: () => {
           var deferred = $q.defer();
           deferred.resolve({
-            assigned_topics: topicIdDict
+            assigned_topics_dict: topicIdDict
           });
           return deferred.promise;
         }

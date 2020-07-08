@@ -174,15 +174,15 @@ class SkillAssignmentsHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id):
         """Handles GET requests."""
-        assigned_topics = skill_services.get_all_topics_assigned_to_skill(
+        assigned_topics_dict = skill_services.get_all_topics_assigned_to_skill(
             skill_id)
         assigned_topic_dicts = {
-            topic_name: assigned_topics[topic_name].to_dict()
-            for topic_name in assigned_topics
+            topic_name: assigned_topics_dict[topic_name].to_dict()
+            for topic_name in assigned_topics_dict
         }
 
         self.render_json({
-            'assigned_topics': assigned_topic_dicts
+            'assigned_topics_dict': assigned_topic_dicts
         })
 
 

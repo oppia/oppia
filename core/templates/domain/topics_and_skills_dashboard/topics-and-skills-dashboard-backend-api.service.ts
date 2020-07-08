@@ -76,7 +76,7 @@ interface ISkillsDashboardDataBackendDict {
 }
 
 interface IAssignedSkillDataBackendDict {
-  'assigned_topics': {
+  'assigned_topics_dict': {
     [key: string]: {'id': string, 'subtopic_id'?: number}
   }
 }

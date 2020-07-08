@@ -52,7 +52,7 @@ describe('Unassign Skill from Topics Modal', function() {
       fetchAssignedSkillData: () => {
         var deferred = $q.defer();
         deferred.resolve({
-          assigned_topics: topicIdDict
+          assigned_topics_dict: topicIdDict
         });
         return deferred.promise;
       }

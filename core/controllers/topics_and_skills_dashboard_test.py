@@ -176,7 +176,7 @@ class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.get_json(
             '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
-        self.assertEqual(len(json_response['assigned_topics']), 0)
+        self.assertEqual(len(json_response['assigned_topics_dict']), 0)
 
         topic_id_1 = topic_services.get_new_topic_id()
         topic_id_2 = topic_services.get_new_topic_id()
@@ -202,20 +202,22 @@ class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.get_json(
             '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
-        self.assertEqual(len(json_response['assigned_topics']), 2)
-        self.assertTrue('Topic1' in json_response['assigned_topics'])
+        self.assertEqual(len(json_response['assigned_topics_dict']), 2)
+        self.assertTrue('Topic1' in json_response['assigned_topics_dict'])
         self.assertEqual(
-            json_response['assigned_topics']['Topic1']['topic_id'], topic_id_1)
+            json_response['assigned_topics_dict']['Topic1']['topic_id'],
+            topic_id_1)
         self.assertTrue('subtopic_id' in
-                        json_response['assigned_topics']['Topic1'])
+                        json_response['assigned_topics_dict']['Topic1'])
         self.assertIsNone(
-            json_response['assigned_topics']['Topic1']['subtopic_id'])
+            json_response['assigned_topics_dict']['Topic1']['subtopic_id'])
 
-        self.assertTrue('Topic2' in json_response['assigned_topics'])
+        self.assertTrue('Topic2' in json_response['assigned_topics_dict'])
         self.assertEqual(
-            json_response['assigned_topics']['Topic2']['topic_id'], topic_id_2)
+            json_response['assigned_topics_dict']['Topic2']['topic_id'],
+            topic_id_2)
         self.assertEqual(
-            json_response['assigned_topics']['Topic2']['subtopic_id'], 1)
+            json_response['assigned_topics_dict']['Topic2']['subtopic_id'], 1)
 
 
 class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
