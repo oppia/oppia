@@ -609,6 +609,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { TranslateService } from 'services/translate.service';
 
 @Component({
   selector: 'oppia-angular-root',
@@ -884,6 +885,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static topicsAndSkillsDashboardFilterObjectFactory: TopicsAndSkillsDashboardFilterObjectFactory;
   static topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService;
   static topicViewerBackendApiService: TopicViewerBackendApiService;
+  static translateService: TranslateService;
   static unitsObjectFactory: UnitsObjectFactory;
   static urlInterpolationService: UrlInterpolationService;
   static urlService: UrlService;
@@ -1168,6 +1170,7 @@ private topicSummaryObjectFactory: TopicSummaryObjectFactory,
 private topicsAndSkillsDashboardFilterObjectFactory: TopicsAndSkillsDashboardFilterObjectFactory,
 private topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService,
 private topicViewerBackendApiService: TopicViewerBackendApiService,
+private translateService: TranslateService,
 private unitsObjectFactory: UnitsObjectFactory,
 private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
@@ -1453,6 +1456,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.topicsAndSkillsDashboardFilterObjectFactory = this.topicsAndSkillsDashboardFilterObjectFactory;
     OppiaAngularRootComponent.topicsAndSkillsDashboardPageService = this.topicsAndSkillsDashboardPageService;
     OppiaAngularRootComponent.topicViewerBackendApiService = this.topicViewerBackendApiService;
+    OppiaAngularRootComponent.translateService = this.translateService;
     OppiaAngularRootComponent.unitsObjectFactory = this.unitsObjectFactory;
     OppiaAngularRootComponent.urlInterpolationService = this.urlInterpolationService;
     OppiaAngularRootComponent.urlService = this.urlService;
