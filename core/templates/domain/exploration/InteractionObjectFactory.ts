@@ -31,11 +31,12 @@ import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { IInteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { IInteractionAnswer } from 'interactions/answer-defs';
 
 export interface IInteractionBackendDict {
   'default_outcome': IOutcomeBackendDict;
   'answer_groups': IAnswerGroupBackendDict[];
-  'confirmed_unclassified_answers': any;
+  'confirmed_unclassified_answers': IInteractionAnswer;
   'customization_args': IInteractionCustomizationArgs;
   'hints': IHintBackendDict[];
   'id': string;
@@ -44,14 +45,14 @@ export interface IInteractionBackendDict {
 
 export class Interaction {
   answerGroups: AnswerGroup[];
-  confirmedUnclassifiedAnswers: any;
+  confirmedUnclassifiedAnswers: IInteractionAnswer;
   customizationArgs: IInteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
   id: string;
   solution: Solution;
   constructor(
-      answerGroups: AnswerGroup[], confirmedUnclassifiedAnswers: any,
+      answerGroups: AnswerGroup[], confirmedUnclassifiedAnswers: IInteractionAnswer,
       customizationArgs: IInteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;

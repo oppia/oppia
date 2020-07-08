@@ -32,6 +32,15 @@ import { NumberWithUnitsObjectFactory } from
 import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+import {
+  IInteractionAnswer,
+  IMathExpressionAnswer,
+  IPencilCodeEditorAnswer,
+  ILogicProofAnswer,
+  IFractionAnswer,
+  INumberWithUnitsAnswer
+} from 'interactions/answer-defs';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 export interface ExplanationBackendDict {
   'content_id': string;
@@ -40,7 +49,7 @@ export interface ExplanationBackendDict {
 
 export interface ISolutionBackendDict {
   'answer_is_exclusive': boolean;
-  'correct_answer': string;
+  'correct_answer': IInteractionAnswer;
   'explanation': ExplanationBackendDict;
 }
 
@@ -48,12 +57,12 @@ export class Solution {
   ehfs: ExplorationHtmlFormatterService;
   shof: SubtitledHtmlObjectFactory;
   answerIsExclusive: boolean;
-  correctAnswer: any;
+  correctAnswer: IInteractionAnswer;
   explanation: SubtitledHtml;
   constructor(
       ehfs: ExplorationHtmlFormatterService,
       shof: SubtitledHtmlObjectFactory,
-      answerisexclusive: boolean, correctanswer: any,
+      answerisexclusive: boolean, correctanswer: IInteractionAnswer,
       explanation: SubtitledHtml) {
     this.ehfs = ehfs;
     this.shof = shof;
@@ -77,21 +86,21 @@ export class Solution {
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
     } else if (interactionId === 'MathExpressionInput') {
-      correctAnswer = this.correctAnswer.latex;
+      correctAnswer = (<IMathExpressionAnswer> this.correctAnswer).latex;
     } else if (interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {
-      correctAnswer = this.correctAnswer.code;
+      correctAnswer = (<IPencilCodeEditorAnswer> this.correctAnswer).code;
     } else if (interactionId === 'MusicNotesInput') {
       correctAnswer = '[Music Notes]';
     } else if (interactionId === 'LogicProof') {
-      correctAnswer = this.correctAnswer.correct;
+      correctAnswer = (<ILogicProofAnswer> this.correctAnswer).correct;
     } else if (interactionId === 'FractionInput') {
       correctAnswer = (new FractionObjectFactory()).fromDict(
-        this.correctAnswer).toString();
+        <IFractionAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'NumberWithUnits') {
       correctAnswer = (new NumberWithUnitsObjectFactory(
         new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
-        this.correctAnswer).toString();
+        <INumberWithUnitsAnswer> this.correctAnswer).toString();
     } else {
       correctAnswer = (
         (new HtmlEscaperService(new LoggerService())).objToEscapedJson(
@@ -104,15 +113,15 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
-  setCorrectAnswer(correctAnswer: any): void {
+  setCorrectAnswer(correctAnswer: IInteractionAnswer): void {
     this.correctAnswer = correctAnswer;
   }
 
   setExplanation(explanation: SubtitledHtml): void {
     this.explanation = explanation;
   }
-  // TODO(#7165): Replace any with correct type.
-  getOppiaShortAnswerResponseHtml(interaction: any) {
+
+  getOppiaShortAnswerResponseHtml(interaction: Interaction) {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: this.ehfs.getShortAnswerHtml(
@@ -142,8 +151,8 @@ export class SolutionObjectFactory {
   }
 
   createNew(
-      answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
-      explanationId: string): Solution {
+      answerIsExclusive: boolean, correctAnswer: IInteractionAnswer,
+      explanationHtml: string, explanationId: string): Solution {
     return new Solution(
       this.ehfs,
       this.shof,
