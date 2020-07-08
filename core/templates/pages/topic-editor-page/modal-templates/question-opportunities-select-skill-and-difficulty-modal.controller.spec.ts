@@ -147,7 +147,7 @@ describe(
           });
       }));
 
-      it('should add a warn message', function() {
+      it('should add a warning message', function() {
         var addWarningSpy = spyOn(alertsService, 'addWarning');
         $scope.$apply();
 

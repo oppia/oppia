@@ -102,7 +102,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     expect($scope.showEditor).toBe(false);
   });
 
-  it('should show editor after 500 miliseconds', function() {
+  it('should show editor after 500 milliseconds', function() {
     expect($scope.showEditor).toBe(false);
     $timeout.flush(500);
     expect($scope.showEditor).toBe(true);
