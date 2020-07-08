@@ -47,3 +47,22 @@ angular.module('oppia').directive('topicSummaryTile', [
       ]
     };
   }]);
+
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+@Component({
+  selector: 'topic-summary-tile',
+  templateUrl: './topic-summary-tile.directive.html',
+  styleUrls: []
+})
+export class TopicSummaryTileComponent {
+  @Input() topicSummary: string;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+}
+angular.module('oppia').directive(
+  'topicSummaryTile', downgradeComponent(
+    {component: TopicSummaryTileComponent}));
