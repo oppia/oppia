@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import traceback
-
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
@@ -244,14 +242,11 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-            suggestions = suggestion_services.get_reviewable_suggestions(
-                self.user_id, suggestion_type)
-            self._render_suggestions(target_type, suggestions)
-        except Exception:
-            raise self.InvalidInputException(traceback.format_exc())
+        _require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
@@ -262,14 +257,11 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-            suggestions = suggestion_services.get_submitted_suggestions(
-                self.user_id, suggestion_type)
-            self._render_suggestions(target_type, suggestions)
-        except Exception:
-            raise self.InvalidInputException(traceback.format_exc())
+        _require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_submitted_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class SuggestionListHandler(base.BaseHandler):
