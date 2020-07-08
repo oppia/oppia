@@ -287,8 +287,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -764,7 +762,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageClickInputRulesService: ImageClickInputRulesService;
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
-  static improvementsBackendApiService: ImprovementsBackendApiService;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
@@ -1061,7 +1058,6 @@ private idGenerationService: IdGenerationService,
 private imageClickInputRulesService: ImageClickInputRulesService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
-private improvementsBackendApiService: ImprovementsBackendApiService,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
@@ -1359,7 +1355,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.imageClickInputRulesService = this.imageClickInputRulesService;
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
-    OppiaAngularRootComponent.improvementsBackendApiService = this.improvementsBackendApiService;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;

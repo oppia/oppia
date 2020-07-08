@@ -246,8 +246,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
