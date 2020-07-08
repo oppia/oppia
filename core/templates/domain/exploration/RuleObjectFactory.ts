@@ -20,26 +20,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { IFractionDict } from
-  'domain/objects/FractionObjectFactory.ts';
-/* eslint-disable max-len */
-import { INote } from 'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { IGraphBackendDict } from 'extensions/interactions/GraphInput/directives/graph-detail.service';
-/* eslint-enable max-len */
+import { IInteractionRuleInputs } from 'interactions/rule-input-defs';
 
 export interface IBackendRuleDict {
   'inputs': IRuleInputs;
   'rule_type': string;
 }
 
-export type IRuleInput = (string | number | IFractionDict |
-  INumberWithUnitsBackendDict | string[] | INote[] |
-  number[] | IGraphBackendDict| string[][]);
-
 export interface IRuleInputs {
-  [propName: string]: IRuleInput;
+  [propName: string]: IInteractionRuleInputs;
 }
 
 export class Rule {

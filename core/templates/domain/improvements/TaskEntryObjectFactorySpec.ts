@@ -78,11 +78,8 @@ describe('Task entry', function() {
     });
 
     expect(task.toPayloadDict()).toEqual({
-      entity_type: 'exploration',
-      entity_id: 'eid',
       entity_version: 1,
       task_type: 'high_bounce_rate',
-      target_type: 'state',
       target_id: 'Introduction',
       issue_description: '20% of learners dropped at this state',
       status: 'resolved',

@@ -71,6 +71,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
+
     EXP_0_ID = 'An_exploration_0_id'
     EXP_1_ID = 'An_exploration_1_id'
 
@@ -186,7 +187,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -195,25 +196,25 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'B']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA',
                 },
                 'B': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleB',
                 },
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'C']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -239,6 +240,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests exploration query methods which operate on ExplorationSummary
     objects.
     """
+
     EXP_ID_0 = '0_en_arch_bridges_in_england'
     EXP_ID_1 = '1_fi_arch_sillat_suomi'
     EXP_ID_2 = '2_en_welcome_introduce_oppia'
@@ -1047,6 +1049,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     """Tests for loading explorations using imported YAML."""
+
     EXP_ID = 'exp_id0'
     DEMO_EXP_ID = '0'
     TEST_ASSET_PATH = 'test_asset.file'
@@ -1950,6 +1953,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents.
     """
+
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
   content_id: content
@@ -2743,6 +2747,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
+
     SECOND_USERNAME = 'abc123'
     SECOND_EMAIL = 'abc123@gmail.com'
 
@@ -3042,6 +3047,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to the exploration commit log."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3051,7 +3057,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     EXP_ID_2 = 'eid2'
 
     COMMIT_ALBERT_CREATE_EXP_1 = {
-        'username': ALBERT_NAME,
         'version': 1,
         'exploration_id': EXP_ID_1,
         'commit_type': 'create',
@@ -3062,7 +3067,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_BOB_EDIT_EXP_1 = {
-        'username': BOB_NAME,
         'version': 2,
         'exploration_id': EXP_ID_1,
         'commit_type': 'edit',
@@ -3073,7 +3077,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_CREATE_EXP_2 = {
-        'username': ALBERT_NAME,
         'version': 1,
         'exploration_id': 'eid2',
         'commit_type': 'create',
@@ -3084,7 +3087,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_EDIT_EXP_1 = {
-        'username': 'albert',
         'version': 3,
         'exploration_id': 'eid1',
         'commit_type': 'edit',
@@ -3095,7 +3097,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_EDIT_EXP_2 = {
-        'username': 'albert',
         'version': 2,
         'exploration_id': 'eid2',
         'commit_type': 'edit',
@@ -3117,7 +3118,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_DELETE_EXP_1 = {
-        'username': 'albert',
         'version': 5,
         'exploration_id': 'eid1',
         'commit_type': 'delete',
@@ -3128,7 +3128,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_PUBLISH_EXP_2 = {
-        'username': 'albert',
         'version': None,
         'exploration_id': 'eid2',
         'commit_type': 'edit',
@@ -3220,6 +3219,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
+
     USER_ID_1 = 'user_1'
     USER_ID_2 = 'user_2'
 
@@ -3401,6 +3401,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3534,6 +3535,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3677,6 +3679,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
@@ -3807,7 +3810,7 @@ title: Old Title
         exploration = self.save_new_default_exploration('exp_id', 'user_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -3818,7 +3821,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -4172,6 +4175,7 @@ title: Old Title
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
+
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     EXP_ID3 = 'exp_id3'

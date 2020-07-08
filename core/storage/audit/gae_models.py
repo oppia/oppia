@@ -34,6 +34,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
     Instances of this class are keyed by a custom Id.
     [user_id].[timestamp_in_sec].[intent].[random_number]
     """
+
     # The user_id of the user making query.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The intent of making query (viewing (by role or username)
@@ -69,11 +70,6 @@ class RoleQueryAuditModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """RoleQueryAuditModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
 
 class UsernameChangeAuditModel(base_models.BaseModel):
@@ -114,13 +110,3 @@ class UsernameChangeAuditModel(base_models.BaseModel):
         """
         return cls.query(
             cls.committer_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UsernameChangeAuditModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.committer_id

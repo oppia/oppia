@@ -32,6 +32,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding exploration.
     """
+
     topic_id = ndb.StringProperty(required=True, indexed=True)
     topic_name = ndb.StringProperty(required=True, indexed=True)
     story_id = ndb.StringProperty(required=True, indexed=True)
@@ -71,13 +72,6 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationOpportunitySummaryModel doesn't have any field with user
-        ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_all_translation_opportunities(
@@ -182,6 +176,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     When a SkillModel's skill description changes, the corresponding instance
     of this model is also updated.
     """
+
     # The description of the opportunity's skill.
     skill_description = ndb.StringProperty(required=True, indexed=True)
     # The number of questions associated with this opportunity's skill.
@@ -211,11 +206,6 @@ class SkillOpportunityModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillOpportunityModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
