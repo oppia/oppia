@@ -66,7 +66,9 @@ def compress_image(image_content, scaling_factor):
     """
     if not constants.DEV_MODE:
         img = Image.open(io.BytesIO(image_content))
-        width, height = img.height, img.width
+
+        img_format = img.format
+        width, height = img.width, img.height
         new_width = int(width * scaling_factor)
         new_height = int(height * scaling_factor)
         if (new_width > MAX_RESIZE_DIMENSION_PX
@@ -78,10 +80,11 @@ def compress_image(image_content, scaling_factor):
                     MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
-        img = img.resize((min(new_width, MAX_RESIZE_DIMENSION_PX),
-                          min(new_height, MAX_RESIZE_DIMENSION_PX)))
+        maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
+                            min(new_height, MAX_RESIZE_DIMENSION_PX))
+        img.thumbnail(maxsize, Image.ANTIALIAS)
         with io.BytesIO() as output:
-            img.save(output, format='PNG')
+            img.save(output, format=img_format)
             contents = output.getvalue()
 
         return contents
