@@ -28,7 +28,6 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import user_id_migration
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -159,7 +158,7 @@ class BaseSuggestion(python_utils.OBJECT):
 
         if (
                 self.author_id is not None and
-                not user_id_migration.verify_user_id_correct(self.author_id)
+                not user_services.is_user_id_correct(self.author_id)
         ):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
@@ -171,7 +170,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
             if (
-                    not user_id_migration.verify_user_id_correct(
+                    not user_services.is_user_id_correct(
                         self.final_reviewer_id) and
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
