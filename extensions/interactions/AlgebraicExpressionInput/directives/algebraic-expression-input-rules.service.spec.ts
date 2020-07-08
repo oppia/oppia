@@ -44,7 +44,8 @@ describe('Algebraic expression input rules service', () => {
       {x: inputString})).toBeFalse();
     expect(algebraicRulesService.MatchesExactlyWith('((x)^(2))/(z)-(x)/(z)-4*y',
       {x: inputString})).toBeFalse();
-    expect(algebraicRulesService.MatchesExactlyWith('((x)^(2))/(z)-((x)/(z)+4*y)',
+    expect(algebraicRulesService.MatchesExactlyWith(
+      '((x)^(2))/(z)-((x)/(z)+4*y)',
       {x: inputString})).toBeFalse();
 
 

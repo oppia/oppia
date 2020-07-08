@@ -93,7 +93,7 @@ export class MathEquationInputRulesService {
     if (algebraicRulesService.IsEquivalentTo(
       expressionAnswer, {x: expressionInput1}) ||
       algebraicRulesService.IsEquivalentTo(
-      expressionAnswer, {x: expressionInput2})) {
+        expressionAnswer, {x: expressionInput2})) {
       return true;
     }
 
@@ -114,7 +114,7 @@ export class MathEquationInputRulesService {
       if (algebraicRulesService.IsEquivalentTo(
         expressionAnswer, {x: expressionInput1}) ||
         algebraicRulesService.IsEquivalentTo(
-        expressionAnswer, {x: expressionInput2})) {
+          expressionAnswer, {x: expressionInput2})) {
         return true;
       }
     }
