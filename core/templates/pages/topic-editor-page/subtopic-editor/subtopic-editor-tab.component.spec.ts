@@ -63,7 +63,7 @@ describe('Subtopic editor tab', function() {
     directive = $injector.get('subtopicEditorTabDirective')[0];
 
     var MockQuestionBackendApiService = {
-      fetchQuestionCountForSkillIds: () => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIds: () => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');

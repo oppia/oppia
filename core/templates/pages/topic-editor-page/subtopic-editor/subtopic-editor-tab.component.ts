@@ -66,7 +66,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
           var skillIds = ctrl.subtopic.getSkillIds();
-          QuestionBackendApiService.fetchQuestionCountForSkillIds(
+          QuestionBackendApiService.fetchTotalQuestionCountForSkillIds(
             skillIds).then((questionCount) => {
             ctrl.questionCount = questionCount;
           });

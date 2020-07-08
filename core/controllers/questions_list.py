@@ -111,8 +111,10 @@ class QuestionCountDataHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid skill id')
 
         total_question_count = (
-            question_services.get_question_count_for_skill_ids(skill_ids))
+            question_services.get_total_question_count_for_skill_ids(skill_ids))
 
-        return self.render_json({
+        self.values.update({
             'total_question_count': total_question_count
         })
+
+        self.render_json(self.values)

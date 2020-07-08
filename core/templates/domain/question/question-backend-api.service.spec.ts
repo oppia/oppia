@@ -153,7 +153,7 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/questions_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchQuestionCountForSkillIds(
+      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
@@ -176,13 +176,13 @@ describe('Question backend Api service', () => {
       let questionCountHandlerUrl = (
         '/questions_count_handler/' + encodeURIComponent(1));
 
-      questionBackendApiService.fetchQuestionCountForSkillIds(
+      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
         ['1']).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
       expect(req.request.method).toEqual('GET');
       req.flush('Error fetching question count.', {
-        status: 500, statusText: 'Invalid request'
+        status: 400, statusText: 'Invalid request'
       });
 
       flushMicrotasks();
@@ -207,7 +207,7 @@ describe('Question backend Api service', () => {
       let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading questions.', {
-        status: 500, statusText: 'Invalid request'
+        status: 400, statusText: 'Invalid request'
       });
 
       flushMicrotasks();

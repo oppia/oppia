@@ -111,7 +111,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
         self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())
 
-    def test_get_question_count_for_skill_ids(self):
+    def test_get_total_question_count_for_skill_ids(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -119,24 +119,29 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, 'skill_2', 0.5)
 
-        question_count = question_services.get_question_count_for_skill_ids(
-            ['skill_1'])
+        question_count = (
+            question_services.get_total_question_count_for_skill_ids(
+                ['skill_1']))
         self.assertEqual(question_count, 2)
 
-        question_count = question_services.get_question_count_for_skill_ids(
-            ['skill_2'])
+        question_count = (
+            question_services.get_total_question_count_for_skill_ids(
+                ['skill_2']))
         self.assertEqual(question_count, 1)
 
-        question_count = question_services.get_question_count_for_skill_ids(
-            ['skill_1', 'skill_2'])
+        question_count = (
+            question_services.get_total_question_count_for_skill_ids(
+                ['skill_1', 'skill_2']))
         self.assertEqual(question_count, 3)
 
-        question_count = question_services.get_question_count_for_skill_ids(
-            ['skill_1', 'skill_1'])
+        question_count = (
+            question_services.get_total_question_count_for_skill_ids(
+                ['skill_1', 'skill_1']))
         self.assertEqual(question_count, 2)
 
-        question_count = question_services.get_question_count_for_skill_ids(
-            ['skill_1', 'skill_1', 'skill_2'])
+        question_count = (
+            question_services.get_total_question_count_for_skill_ids(
+                ['skill_1', 'skill_1', 'skill_2']))
         self.assertEqual(question_count, 3)
 
     def test_update_question_skill_link_difficulty(self):

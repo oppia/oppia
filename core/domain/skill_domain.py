@@ -593,11 +593,7 @@ class Skill(python_utils.OBJECT):
             skill_ids: list(str). The skill ids to validate.
         """
         for skill_id in skill_ids:
-            if not isinstance(skill_id, python_utils.BASESTRING):
-                raise utils.ValidationError('Skill id should be a string.')
-
-            if len(skill_id) != 12:
-                raise utils.ValidationError('Invalid skill id.')
+            Skill.require_valid_skill_id(skill_id)
 
     @classmethod
     def require_valid_description(cls, description):
