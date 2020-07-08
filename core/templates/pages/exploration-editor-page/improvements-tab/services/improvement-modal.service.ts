@@ -17,35 +17,14 @@
  */
 
 require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-status-display.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'learner-answer-details-data.service.ts');
-require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require(
-  'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
-  'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/exploration-html-formatter.service.ts');
-/* eslint-disable max-len */
-require('pages/exploration-editor-page/improvements-tab/services/improvement-playthrough-modal.controller.ts');
-require('pages/exploration-editor-page/improvements-tab/services/improvement-learner-answer-details-modal.controller.ts');
-require('pages/exploration-editor-page/improvements-tab/services/improvement-feedback-thread-modal.controller.ts');
-require('pages/exploration-editor-page/improvements-tab/services/improvement-suggestion-thread-modal.controller.ts');
-require('pages/exploration-editor-page/improvements-tab/services/improvement-confirmation-modal.controller.ts');
-/* eslint-enable max-len */
 
 angular.module('oppia').factory('ImprovementModalService', [
-  '$uibModal', 'ThreadDataService', 'UrlInterpolationService',
-  'UserExplorationPermissionsService', 'UserService',
+  '$uibModal', 'UrlInterpolationService', 'UserExplorationPermissionsService',
   function(
-      $uibModal, ThreadDataService, UrlInterpolationService,
-      UserExplorationPermissionsService, UserService) {
+      $uibModal, UrlInterpolationService, UserExplorationPermissionsService) {
     return {
       /**
        * Opens the modal for displaying playthrough actions.
@@ -77,39 +56,6 @@ angular.module('oppia').factory('ImprovementModalService', [
             learnerAnswerDetails: () => learnerAnswerDetails
           },
           controller: 'ImprovementLearnerAnswerDetailsModalController'
-        });
-      },
-      openFeedbackThread: function(thread) {
-        return $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/improvements-tab/templates/' +
-            'feedback-thread-modal.template.html'),
-          resolve: {
-            messages: ThreadDataService.getMessagesAsync(thread),
-            isUserLoggedIn:
-              UserService.getUserInfoAsync().then(u => u.isLoggedIn()),
-            thread: () => thread
-          },
-          controller: 'ImprovementFeedbackThreadModalController',
-          backdrop: 'static',
-          size: 'lg',
-        });
-      },
-
-      openSuggestionThread: function(thread) {
-        return $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/improvements-tab/templates/' +
-            'suggestion-thread-modal.template.html'),
-          backdrop: 'static',
-          size: 'lg',
-          resolve: {
-            messages: ThreadDataService.getMessagesAsync(thread),
-            isUserLoggedIn:
-              UserService.getUserInfoAsync().then(u => u.isLoggedIn()),
-            thread: () => thread
-          },
-          controller: 'ImprovementSuggestionThreadModalController',
         });
       },
       /**
