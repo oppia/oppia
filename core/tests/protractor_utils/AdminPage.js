@@ -327,15 +327,14 @@ var AdminPage = function() {
       await waitFor.elementToBeClickable(similarityFileUploadButton,
         'Upload button taking too long to be clickable');
       await similarityFileUploadButton.click();
-      if(isValidFile) {
+      if (isValidFile) {
         await waitFor.visibilityOf(statusMessage,
           'Status message not visible');
         await waitFor.textToBePresentInElement(statusMessage,
           'Topic similarities uploaded successfully.');
         expect(await statusMessage.getText()).toEqual(
           'Topic similarities uploaded successfully.');
-      }
-      else {
+      } else {
         var text = await statusMessage.getText();
         await waitFor.visibilityOf(statusMessage,
           'Status message not visible');
@@ -421,7 +420,7 @@ var AdminPage = function() {
 
   this.expectConributionsToBeRegeneratedForTopic = async function() {
     var text = 'No. of opportunities model created: 0';
-    await waitFor.visibilityOf(regenerationMessage, 
+    await waitFor.visibilityOf(regenerationMessage,
       'Regeneration message not visible');
     expect(regenerationMessage.getText()).toEqual(text);
   };
