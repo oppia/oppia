@@ -694,7 +694,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(expected_command,)],
             expected_kwargs=[{'shell': True}])
         with popen_swap:
-            run_e2e_tests.start_google_app_engine_server(True)
+            run_e2e_tests.start_google_app_engine_server(True, 'critical')
 
     def test_start_google_app_engine_server_in_prod_mode(self):
 
@@ -709,7 +709,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(expected_command,)],
             expected_kwargs=[{'shell': True}])
         with popen_swap:
-            run_e2e_tests.start_google_app_engine_server(False)
+            run_e2e_tests.start_google_app_engine_server(False, 'critical')
 
     def test_start_tests_when_other_instances_not_stopped(self):
         def mock_exit(unused_exit_code):
@@ -745,7 +745,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_start_google_app_engine_server(unused_arg):
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
@@ -791,7 +791,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True,)])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             run_e2e_tests, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
@@ -929,7 +929,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_start_google_app_engine_server(unused_arg):
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
@@ -975,7 +975,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True,)])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             run_e2e_tests, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
@@ -1022,7 +1022,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_start_google_app_engine_server(unused_arg):
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
@@ -1075,7 +1075,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True,)])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             run_e2e_tests, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,

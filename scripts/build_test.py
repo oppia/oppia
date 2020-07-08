@@ -793,7 +793,7 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
         with constants_path_swap, feconf_path_swap:
-            build.modify_constants(True, maintenance_mode=False)
+            build.modify_constants(prod_env=True, maintenance_mode=False)
             with python_utils.open_file(
                 mock_constants_path, 'r') as constants_file:
                 self.assertEqual(
@@ -805,7 +805,7 @@ class BuildTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
 
-            build.modify_constants(False, maintenance_mode=True)
+            build.modify_constants(prod_env=False, maintenance_mode=True)
             with python_utils.open_file(
                 mock_constants_path, 'r') as constants_file:
                 self.assertEqual(

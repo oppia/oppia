@@ -13,16 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for ImprovementConfirmationModal.
+ * @fileoverview Controller for AnswerContentModal.
  */
 
-angular.module('oppia').controller('ImprovementConfirmationModalController', [
-  '$scope', '$uibModalInstance', 'buttonClass', 'buttonText', 'message',
-  function($scope, $uibModalInstance, buttonClass, buttonText, message ) {
-    $scope.confirmationMessage = message;
-    $scope.confirmationButtonText = buttonText;
-    $scope.confirmationButtonClass = buttonClass;
-    $scope.action = $uibModalInstance.close;
-    $scope.cancel = $uibModalInstance.dismiss;
+angular.module('oppia').controller('AnswerContentModalController', [
+  '$scope', '$uibModalInstance', 'answerHtml',
+  function($scope, $uibModalInstance, answerHtml) {
+    $scope.answerHtml = answerHtml;
+    $scope.close = $uibModalInstance.close;
   }
 ]);
