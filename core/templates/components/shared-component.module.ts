@@ -29,6 +29,7 @@ import { LazyLoadingComponent } from
   './common-layout-directives/common-elements/lazy-loading.component';
 import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
+import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
@@ -40,7 +41,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
-  imports: [CommonModule, NgbModalModule],
+  imports: [CommonModule, MaterialModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
@@ -52,7 +53,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent,
+    SharingLinksComponent, MaterialModule
   ],
 })
 
