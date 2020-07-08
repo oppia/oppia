@@ -580,31 +580,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
     def update_storage_models():
-        """Commits all the newly created models in an atomic transaction. If any
+        """Commits all the newly created models as an atomic transaction. If any
         operation fails, every other operation will fail as well.
         """
         exploration_model.commit(committer_id, commit_message, change_list_dict)
         exploration.version += 1
-
-        if feconf.ENABLE_ML_CLASSIFIERS:
-            trainable_states_dict = exploration.get_trainable_states_dict(
-                old_states, exp_versions_diff)
-            state_names_with_changed_answer_groups = trainable_states_dict[
-                'state_names_with_changed_answer_groups']
-            state_names_with_unchanged_answer_groups = trainable_states_dict[
-                'state_names_with_unchanged_answer_groups']
-            state_names_to_train_classifier = (
-                state_names_with_changed_answer_groups)
-            if state_names_with_unchanged_answer_groups:
-                state_names_without_classifier = (
-                    classifier_services.handle_non_retrainable_states(
-                        exploration, state_names_with_unchanged_answer_groups,
-                        exp_versions_diff))
-                state_names_to_train_classifier.extend(
-                    state_names_without_classifier)
-            if state_names_to_train_classifier:
-                classifier_services.handle_trainable_states(
-                    exploration, state_names_to_train_classifier)
 
         stats_services.create_stats_model(
             stats_services.get_stats_for_new_exp_version(
@@ -619,6 +599,28 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             exp_fetchers.get_exploration_memcache_key(exploration.id))
 
     transaction_services.run_in_transaction(update_storage_models)
+
+    if feconf.ENABLE_ML_CLASSIFIERS:
+        # Machine learning classifiers need to be run outside of the transaction
+        # because they read and modify files, which can not be done in a
+        # transactional context.
+        trainable_states_dict = exploration.get_trainable_states_dict(
+            old_states, exp_versions_diff)
+        state_names_with_changed_answer_groups = trainable_states_dict[
+            'state_names_with_changed_answer_groups']
+        state_names_with_unchanged_answer_groups = trainable_states_dict[
+            'state_names_with_unchanged_answer_groups']
+        state_names_to_train_classifier = state_names_with_changed_answer_groups
+        if state_names_with_unchanged_answer_groups:
+            state_names_without_classifier = (
+                classifier_services.handle_non_retrainable_states(
+                    exploration, state_names_with_unchanged_answer_groups,
+                    exp_versions_diff))
+            state_names_to_train_classifier.extend(
+                state_names_without_classifier)
+        if state_names_to_train_classifier:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_to_train_classifier)
 
 
 def _create_exploration(
