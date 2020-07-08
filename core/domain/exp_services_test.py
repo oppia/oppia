@@ -1885,7 +1885,8 @@ title: A title
         zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
 
-        self.assertEqual(zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
+        self.assertEqual(
+            zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
         self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image)
