@@ -648,9 +648,6 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
             .get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
-        for output in eval_output:
-            if output[0] == 'SUCCESS_INCORRECT':
-                output[1] = ast.literal_eval(output[1])
         return eval_output
 
     def test_one_commit_model_last_updated_before(self):
@@ -669,14 +666,15 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
                 created_on=datetime.datetime.strptime(
                     '2020-06-18T22:00:00Z', '%Y-%m-%dT%H:%M:%SZ'),
                 last_updated=datetime.datetime.strptime(
-                    '2020-06-20T22:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+                    '2020-06-18T22:01:00Z', '%Y-%m-%dT%H:%M:%SZ')
             )
         )
         original_commit_model.put(update_last_updated_time=False)
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['SUCCESS_CORRECT - CollectionCommitLogEntryModel', 1]], output)
+            [['SUCCESS_NEWLY_CREATED - CollectionCommitLogEntryModel', 1]],
+            output)
 
         migrated_commit_model = (
             collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
@@ -747,7 +745,8 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['SUCCESS_CORRECT - CollectionCommitLogEntryModel', 1]], output)
+            [['SUCCESS_NEWLY_CREATED - CollectionCommitLogEntryModel', 1]],
+            output)
 
         migrated_commit_model = (
             collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
@@ -757,6 +756,68 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_commit_model.last_updated,
             migrated_commit_model.last_updated)
+
+    def test_multiple_commit_models_admins(self):
+        original_commit_model_1 = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id1',
+                user_id=feconf.SYSTEM_COMMITTER_ID,
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-07-01T09:59:59Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-07-01T11:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model_1.put(update_last_updated_time=False)
+        original_commit_model_2 = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id2',
+                user_id=feconf.MIGRATION_BOT_USER_ID,
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-07-01T09:59:59Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-07-01T11:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model_2.put(update_last_updated_time=False)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ADMIN - CollectionCommitLogEntryModel', 2]], output)
+
+        migrated_commit_model_1 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id1'))
+        self.assertEqual(
+            original_commit_model_1.created_on,
+            migrated_commit_model_1.created_on)
+        self.assertEqual(
+            original_commit_model_1.last_updated,
+            migrated_commit_model_1.last_updated)
+
+        migrated_commit_model_2 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id2'))
+        self.assertEqual(
+            original_commit_model_2.created_on,
+            migrated_commit_model_2.created_on)
+        self.assertEqual(
+            original_commit_model_2.last_updated,
+            migrated_commit_model_2.last_updated)
 
     def test_multiple_commit_models_last_updated_wrong(self):
         original_commit_model_1 = (
@@ -800,7 +861,7 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['SUCCESS_INCORRECT - CollectionCommitLogEntryModel',
+            [['FAILURE_INCORRECT - CollectionCommitLogEntryModel',
               ['id1', 'id2']]],
             output)
 

@@ -26,8 +26,8 @@ from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import search_services
-
 from core.platform import models
+import feconf
 
 (
     collection_models, exp_models,
@@ -222,16 +222,18 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             commit_model.put(update_last_updated_time=False)
             yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
         elif (datetime.timedelta(0) < last_updated - created_on <
-              datetime.timedelta(7)):
-            yield ('SUCCESS_CORRECT - %s' % class_name, commit_model.id)
+              datetime.timedelta(hours=1)):
+            yield ('SUCCESS_NEWLY_CREATED - %s' % class_name, commit_model.id)
+        elif commit_model.user_id in feconf.SYSTEM_USERS.keys():
+            yield ('SUCCESS_ADMIN - %s' % class_name, commit_model.id)
         else:
-            yield ('SUCCESS_INCORRECT - %s' % class_name, commit_model.id)
+            yield ('FAILURE_INCORRECT - %s' % class_name, commit_model.id)
 
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        if key.startswith('SUCCESS_INCORRECT'):
+        if key.startswith('FAILURE_INCORRECT'):
             yield (key, values)
         else:
             yield (key, len(values))
