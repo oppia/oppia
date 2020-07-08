@@ -2558,9 +2558,8 @@ class Exploration(python_utils.OBJECT):
             interaction_id = state_dict['interaction']['id']
             if interaction_id:
                 customization_arg_specs = (
-                    interaction_registry.Registry
-                        .get_interaction_by_id(interaction_id)
-                            .customization_arg_specs)
+                    interaction_registry.Registry.get_interaction_by_id(
+                        interaction_id).customization_arg_specs)
                 customization_args = state_dict[
                     'interaction']['customization_args']
 
