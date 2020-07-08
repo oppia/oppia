@@ -23,6 +23,7 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
@@ -30,24 +31,29 @@ import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
+import { SocialButtonsComponent } from
+  'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TopicSummaryTileComponent } from
   './summary-tile/topic-summary-tile.component';
 
 
+
 @NgModule({
-  imports: [CommonModule, NgbModalModule],
+  imports: [CommonModule, MaterialModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
-    SkillMasteryViewerComponent, TopicSummaryTileComponent],
+    SkillMasteryViewerComponent, SocialButtonsComponent,
+    TopicSummaryTileComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+    SkillMasteryViewerComponent, SocialButtonsComponent,
+    TopicSummaryTileComponent,
     // These elements will remain here even after migration.
-    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent,
-    TopicSummaryTileComponent
+    ExplorationEmbedButtonModalComponent
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent,
+    SharingLinksComponent, MaterialModule
   ],
 })
 
