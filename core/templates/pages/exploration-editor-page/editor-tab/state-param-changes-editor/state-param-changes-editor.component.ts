@@ -25,19 +25,12 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 
-angular.module('oppia').directive('stateParamChangesEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/editor-tab/' +
-        'state-param-changes-editor/state-param-changes-editor.directive.html'),
-      controller: [
-        '$scope', 'StateParamChangesService',
-        function($scope, StateParamChangesService) {
-          $scope.StateParamChangesService = StateParamChangesService;
-        }
-      ]
-    };
-  }]);
+angular.module('oppia').component('stateParamChangesEditor', {
+  template: require('./state-param-changes-editor.component.html'),
+  controller: [
+    '$scope', 'StateParamChangesService',
+    function($scope, StateParamChangesService) {
+      $scope.StateParamChangesService = StateParamChangesService;
+    }
+  ]
+});

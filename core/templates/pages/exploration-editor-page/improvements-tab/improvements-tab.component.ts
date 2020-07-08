@@ -19,15 +19,6 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('improvementsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/improvements-tab/' +
-        'improvements-tab.directive.html'),
-      controller: ['$scope', $scope => {}],
-    };
-  }
-]);
+angular.module('oppia').component('improvementsTab', {
+  template: require('./improvements-tab.component.html')
+});

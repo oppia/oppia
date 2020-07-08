@@ -18,26 +18,18 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('answerDetailsImprovementTask', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        getData: '&data',
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/improvements-tab/' +
-        'answer-details-improvement-task/' +
-        'answer-details-improvement-task.directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.getStateName = function() {
-          return $scope.getData().stateName;
-        };
-
-        $scope.getLearnerAnswerInfoCount = function() {
-          return $scope.getData().learnerAnswerInfoData.length;
-        };
-      }]
+angular.module('oppia').component('answerDetailsImprovementTask', {
+  bindings: {
+    getData: '&data',
+  },
+  template: require('./answer-details-improvement-task.component.html'),
+  controller: ['$scope', function($scope) {
+    $scope.getStateName = function() {
+      return $scope.getData().stateName;
     };
-  }
-]);
+
+    $scope.getLearnerAnswerInfoCount = function() {
+      return $scope.getData().learnerAnswerInfoData.length;
+    };
+  }]
+});

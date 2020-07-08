@@ -19,25 +19,17 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/playthrough-issues.service.ts');
 
-angular.module('oppia').directive('playthroughImprovementTask', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        getData: '&data',
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/improvements-tab/' +
-        'playthrough-improvement-task/' +
-        'playthrough-improvement-task.directive.html'),
-      controller: [
-        '$scope', 'PlaythroughIssuesService',
-        function($scope, PlaythroughIssuesService) {
-          $scope.openPlaythroughModal = function(playthroughId, index) {
-            PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
-          };
-        }
-      ]
-    };
-  }
-]);
+angular.module('oppia').component('playthroughImprovementTask', {
+  bindings: {
+    getData: '&data',
+  },
+  template: require('./playthrough-improvement-task.component.html'),
+  controller: [
+    '$scope', 'PlaythroughIssuesService',
+    function($scope, PlaythroughIssuesService) {
+      $scope.openPlaythroughModal = function(playthroughId, index) {
+        PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
+      };
+    }
+  ]
+});

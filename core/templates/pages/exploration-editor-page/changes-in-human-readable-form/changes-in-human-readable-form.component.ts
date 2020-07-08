@@ -18,17 +18,10 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('changesInHumanReadableForm', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        lostChanges: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/' +
-        'changes-in-human-readable-form/templates/' +
-        'changes-in-human-readable-form.directive.html'),
-    };
-  }]);
+angular.module('oppia').component('changesInHumanReadableForm', {
+  bindings: {
+    lostChanges: '='
+  },
+  template: require(
+    './templates/changes-in-human-readable-form.component.html')
+});
