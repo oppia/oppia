@@ -70,6 +70,9 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # search query.
 MAX_ITERATIONS = 10
 
+# Asset directories that need to be included in exploration download.
+ASSET_DIRS_TO_INCLUDE_IN_DOWNLOADS = ('image',)
+
 
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user has permissions to edit the exploration.
@@ -267,7 +270,6 @@ def export_to_zip_file(exploration_id, version=None):
         str. The contents of the ZIP archive of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
-    ASSET_DIRS_TO_INCLUDE_IN_DOWNLOADS = ('image',)
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
