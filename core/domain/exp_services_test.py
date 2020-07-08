@@ -3879,10 +3879,10 @@ title: Old Title
     def test_update_exploration_does_nothing_if_create_stats_model_fails(self):
         swap_create_stats_model = (
             self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
-        assert_raises = self.assertRaises(Exception)
+        assert_raises_regexp = self.assertRaisesRegexp(Exception)
 
         self.save_new_valid_exploration('exp_id', 'user_id')
-        with swap_create_stats_model, assert_raises:
+        with swap_create_stats_model, assert_raises_regexp:
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -4195,7 +4195,7 @@ title: Old Title
     def test_revert_exploration_does_nothing_if_create_stats_model_fails(self):
         swap_create_stats_model = (
             self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
-        assert_raises = self.assertRaises(Exception)
+        assert_raises_regexp = self.assertRaises(Exception)
 
         self.save_new_valid_exploration('exp_id', 'user_id')
         exp_services.update_exploration(
@@ -4203,7 +4203,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'New title'})], 'Changed interaction_solutions.')
-        with swap_create_stats_model, assert_raises:
+        with swap_create_stats_model, assert_raises_regexp:
             exp_services.revert_exploration('user_id', 'exp_id', 2, 1)
 
         self.assertIsNone(
