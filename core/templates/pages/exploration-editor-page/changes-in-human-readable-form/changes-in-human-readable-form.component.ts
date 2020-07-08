@@ -23,5 +23,5 @@ angular.module('oppia').component('changesInHumanReadableForm', {
     lostChanges: '='
   },
   template: require(
-    './templates/changes-in-human-readable-form.component.html')
+    './changes-in-human-readable-form.component.html')
 });
