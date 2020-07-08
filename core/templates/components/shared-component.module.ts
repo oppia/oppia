@@ -31,7 +31,8 @@ import { SharingLinksComponent } from
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { TopicSummaryTileComponent } from './summary-tile/topic-summary-tile.component';
+import { TopicSummaryTileComponent } from
+  './summary-tile/topic-summary-tile.component';
 
 
 @NgModule({
