@@ -26,26 +26,29 @@ class TakeoutData(python_utils.OBJECT):
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(self, user_data, user_images):
-        """Constructs a TakeoutDomain domain object.
+        """Constructs a TakeoutData domain object.
 
         Args:
-            user_data: dict. User's Takeout data stored as a dictionary.
-            user_images: list. List of TakeoutImage objects representing user's
-                images.
+            user_data: dict. The user's Takeout data stored as a dictionary.
+            user_images: list(TakeoutImage). A list of TakeoutImage objects
+                representing the user's images.
         """
         self.user_data = user_data
         self.user_images = user_images
 
 
 class TakeoutImage(python_utils.OBJECT):
-    """Domain object for storing image data exported as part of Takeout."""
+    """Domain object for storing Base64 image data and the Takeout export path
+    for a single image.
+    """
 
     def __init__(self, b64_image_data, image_export_path):
         """Constructs a TakeoutImage domain object.
 
         Args:
-            b64_image_data: str. Base64 encoded string representing image.
-            image_export_path: str. Path to write image to in Takeout zip.
+            b64_image_data: str. A Base64-encoded string representing the image.
+            image_export_path: str. The path within the images/ folder to write
+                image to in the final Takeout zip.
         """
         self.b64_image_data = b64_image_data
         self.image_export_path = image_export_path
@@ -60,10 +63,11 @@ class TakeoutImageReplacementInstruction(python_utils.OBJECT):
         """Constructs a TakeoutImageReplacementInstruction object.
 
         Args:
-            dictionary_path: tuple. sequence of keys indicating position in
-                user data dictionary.
-            export_filename: str. the filename of the new file created.
-            new_key: str. the new key name after value replacement.
+            dictionary_path: tuple. A sequence of keys indicating the position
+                of the user image data within the user data dictionary.
+            export_filename: str. The filename of the new file created.
+            new_key: str. The new key name in the dictionary after the image
+                data is replaced with the filename within the final Takeout zip.
         """
         self.dictionary_path = dictionary_path
         self.export_filename = export_filename

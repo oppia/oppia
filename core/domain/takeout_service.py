@@ -80,24 +80,24 @@ def export_data_for_user(user_id):
     ]
     takeout_image_files = []
     for replacement_instruction in replacement_instructions:
-        dict_pos = replacement_instruction.dictionary_path
-        repl_filename = replacement_instruction.export_filename
-        repl_key = replacement_instruction.new_key
+        dictionary_position = replacement_instruction.dictionary_path
+        replacement_filename = replacement_instruction.export_filename
+        replacement_key = replacement_instruction.new_key
 
         # Move pointer to the position indicated by the tuple.
         pointer = exported_data
-        for key in dict_pos[:-1]:
+        for key in dictionary_position[:-1]:
             pointer = pointer[key]
 
         # Swap out data with replacement filename.
-        image_key = dict_pos[-1]
+        image_key = dictionary_position[-1]
         image_data = pointer[image_key]
         if image_data is not None:
             takeout_image_files.append(
-                takeout_domain.TakeoutImage(image_data, repl_filename))
-            pointer[image_key] = repl_filename
+                takeout_domain.TakeoutImage(image_data, replacement_filename))
+            pointer[image_key] = replacement_filename
 
         # Rename the key.
-        pointer[repl_key] = pointer.pop(image_key)
+        pointer[replacement_key] = pointer.pop(image_key)
 
     return takeout_domain.TakeoutData(exported_data, takeout_image_files)
