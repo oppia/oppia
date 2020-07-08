@@ -172,7 +172,7 @@ jobs:
       - run:
           name: Run e2e library test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env --sharding-instances=1
       - run:
           name: Run e2e classroomPage test
           command: |
