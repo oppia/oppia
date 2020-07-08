@@ -57,7 +57,7 @@ export class MathInteractionsService {
   }
 
   validateExpression(expressionString: string, algebraic = true): boolean {
-    expressionString = expressionString.split(' ').join('');
+    expressionString = expressionString.replace(/\s/g, '');
     let expressionObject;
     if (expressionString.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
@@ -92,7 +92,7 @@ export class MathInteractionsService {
   }
 
   validateEquation(equationString: string): boolean {
-    equationString = equationString.split(' ').join('');
+    equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
       return false;
@@ -188,9 +188,9 @@ export class MathInteractionsService {
     let listOfTerms: Array<string> = [];
     let currentTerm: string = '';
     let bracketBalance: number = 0;
-    let shouldModifyTerm: boolean = false;
+    let shouldModifyNextTerm: boolean = false;
     let modifyTerm = function(termString: string): string {
-      // If the shouldModifyTerm flag is set to true, we add the '-' sign,
+      // If the shouldModifyNextTerm flag is set to true, we add the '-' sign,
       // raise the term to a power of -1. This ensures that when the final
       // list is joined by the '+'/'*' sign, it matches with the original
       // expression. For eg.
@@ -202,9 +202,10 @@ export class MathInteractionsService {
         return '(' + termString + ')^(-1)';
       }
     };
-    const delimiters: Array<string> = splitByAddition ? ['+', '-'] : ['*', '/'];
+    const primaryDelimiter = splitByAddition ? '+' : '*';
+    const secondaryDelimiter = splitByAddition ? '-' : '/';
 
-    expressionString = expressionString.split(' ').join('');
+    expressionString = expressionString.replace(/\s/g, '');
 
     // Temporarily replacing all unary negation signs with '~' so as to avoid
     // splitting terms by them. We only need to split terms by binary
@@ -226,25 +227,26 @@ export class MathInteractionsService {
 
       // Split term only if we are not inside a set of parens and the current
       // value is a delimiter.
-      if (bracketBalance === 0 && delimiters.indexOf(currentVal) !== -1) {
+      if (bracketBalance === 0 && (
+        currentVal === primaryDelimiter || currentVal === secondaryDelimiter)) {
         if (currentTerm.length !== 0) {
-          if (shouldModifyTerm) {
+          if (shouldModifyNextTerm) {
             currentTerm = modifyTerm(currentTerm);
-            shouldModifyTerm = false;
+            shouldModifyNextTerm = false;
           }
           listOfTerms.push(currentTerm);
           currentTerm = '';
         }
-        if (currentVal === delimiters[1]) {
-          shouldModifyTerm = true;
+        if (currentVal === secondaryDelimiter) {
+          shouldModifyNextTerm = true;
         }
       } else {
         currentTerm += currentVal;
       }
     }
-    if (shouldModifyTerm) {
+    if (shouldModifyNextTerm) {
       currentTerm = modifyTerm(currentTerm);
-      shouldModifyTerm = false;
+      shouldModifyNextTerm = false;
     }
     listOfTerms.push(currentTerm);
 
@@ -256,26 +258,26 @@ export class MathInteractionsService {
   }
 
   termsMatch(term1: string, term2: string): boolean {
-    // We split both terms by multiplication and division and try to match terms
-    // from both inputs by checking equivalency.
-    let termsList1 = this.getTerms(term1, false);
-    let termsList2 = this.getTerms(term2, false);
+    // We split both terms by multiplication and division into separate parts
+    // and try to match these parts from both inputs by checking equivalency.
+    let partsList1 = this.getTerms(term1, false);
+    let partsList2 = this.getTerms(term2, false);
 
-    // NOTE: We only need to iterate from the top in the termsList1 list since
-    // in the termsList2 list, we will break the loop each time an element is
+    // NOTE: We only need to iterate from the top in the partsList1 list since
+    // in the partsList2 list, we will break the loop each time an element is
     // removed from it, thus, indexing errors would only arise in the outer
     // loop.
-    for (let i = termsList1.length - 1; i >= 0; i--) {
-      for (let j = 0; j < termsList2.length; j++) {
-        if (nerdamer(termsList1[i]).eq(nerdamer(termsList2[j]).toString())) {
-          termsList1.splice(i, 1);
-          termsList2.splice(j, 1);
+    for (let i = partsList1.length - 1; i >= 0; i--) {
+      for (let j = 0; j < partsList2.length; j++) {
+        if (nerdamer(partsList1[i]).eq(nerdamer(partsList2[j]).toString())) {
+          partsList1.splice(i, 1);
+          partsList2.splice(j, 1);
           break;
         }
       }
     }
 
-    return termsList1.length === 0 && termsList2.length === 0;
+    return partsList1.length === 0 && partsList2.length === 0;
   }
 }
 

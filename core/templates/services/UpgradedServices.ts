@@ -350,6 +350,9 @@ import { NumberWithUnitsRulesService } from
 import { NumberWithUnitsValidationService } from
   // eslint-disable-next-line max-len
   'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { NumericExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
@@ -752,6 +755,8 @@ export class UpgradedServices {
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['NumberAttemptsService'] = new NumberAttemptsService();
+    upgradedServices['NumericExpressionInputRulesService'] =
+      new NumericExpressionInputRulesService();
     upgradedServices['NumericInputRulesService'] =
       new NumericInputRulesService();
     upgradedServices['NewlyCreatedTopicObjectFactory'] =
@@ -924,9 +929,6 @@ export class UpgradedServices {
       upgradedServices['ExplorationDraftObjectFactory']);
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
-        upgradedServices['baseInteractionValidationService']);
-    upgradedServices['MathEquationInputValidationService'] =
-      new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
