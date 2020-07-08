@@ -75,7 +75,11 @@
           </button>
         </div>
         <div>
-          <div ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index">
+          <div ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index"
+               dnd-list="$ctrl.subtopic.getSkillSummaries()"
+               dnd-dragstart="$ctrl.onRearrangeMoveSkillStart($index)"
+               dnd-drop="$ctrl.onRearrangeMoveSkillFinish($index)"
+               dnd-draggable="skillSummary">
             <a class="protractor-test-assigned-skill-card-text"
                ng-if="!$ctrl.isSkillDeleted(skillSummary)"
                ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
