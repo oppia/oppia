@@ -18,12 +18,12 @@
       <td><[computation.humanReadableLastFinished]></td>
       <td><[computation.activeRealtimeLayerIndex]></td>
       <td>
-        <button ng-if="computation.is_startable"
-                ng-click="$ctrl.startComputation(computation.computation_type)">
+        <button ng-if="computation.isStartable"
+                ng-click="$ctrl.startComputation(computation.computationType)">
           Start
         </button>
-        <button ng-if="computation.is_stoppable"
-                ng-click="$ctrl.stopComputation(computation.computation_type)">
+        <button ng-if="computation.isStoppable"
+                ng-click="$ctrl.stopComputation(computation.computationType)">
           Stop
         </button>
       </td>

@@ -47,7 +47,7 @@ def memoize(func):
 
     Returns:
         callable. The same func, but calls to it using the same arguments are
-            made exactly once.
+        made exactly once.
     """
     key_locks = {}
     lock_for_key_locks = threading.Lock()

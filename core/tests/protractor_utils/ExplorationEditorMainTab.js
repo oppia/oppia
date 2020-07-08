@@ -280,6 +280,8 @@ var ExplorationEditorMainTab = function() {
     // Open the feedback entry form if it is not already open.
     var isVisible = await feedbackEditor.isPresent();
     if (isVisible) {
+      await waitFor.elementToBeClickable(
+        feedbackEditor, 'Feedback editor takes too long to be clickable.');
       await feedbackEditor.click();
     }
 
@@ -637,7 +639,7 @@ var ExplorationEditorMainTab = function() {
       NumericInput: 'Math',
       SetInput: 'Math',
       AlgebraicExpressionInput: 'Math',
-      MathExpressionInput: 'Math',
+      MathEquationInput: 'Math',
       NumberWithUnits: 'Math',
       CodeRepl: 'Programming',
       PencilCodeEditor: 'Programming',
@@ -717,6 +719,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   var _setOutcomeFeedback = async function(richTextInstructions) {
+    await waitFor.visibilityOf(
+      feedbackBubble, 'Feedback bubble takes too long to be visible.');
     var feedbackEditor = await forms.RichTextEditor(
       feedbackBubble);
     await feedbackEditor.clear();

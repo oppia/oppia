@@ -38,15 +38,14 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change, description, final_reviewer_id):
+        author_id, change, description):
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
-        suggestion_type: str. The type of the suggestion.
-        target_type: str. The target entity being edited.
-
-        (The above 2 parameters should be one of the constants defined in
-        storage/suggestion/gae_models.py.)
+        suggestion_type: str. The type of the suggestion. This parameter should
+            be one of the constants defined in storage/suggestion/gae_models.py.
+        target_type: str. The target entity being edited. This parameter should
+            be one of the constants defined in storage/suggestion/gae_models.py.
 
         target_id: str. The ID of the target entity being suggested to.
         target_version_at_submission: int. The version number of the target
@@ -54,8 +53,6 @@ def create_suggestion(
         author_id: str. The ID of the user who submitted the suggestion.
         change: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
-        final_reviewer_id: str|None. The ID of the reviewer who has
-            accepted/rejected the suggestion.
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
@@ -88,10 +85,18 @@ def create_suggestion(
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
+    suggestion_domain_class = (
+        suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
+            suggestion_type])
+    suggestion = suggestion_domain_class(
+        thread_id, target_id, target_version_at_submission, status, author_id,
+        None, change, score_category)
+    suggestion.validate()
+
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        final_reviewer_id, change, score_category, thread_id)
+        None, change, score_category, thread_id)
 
 
 def get_suggestion_from_model(suggestion_model):
@@ -122,7 +127,7 @@ def get_suggestion_by_id(suggestion_id):
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
-            is found.
+        is found.
     """
     model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
@@ -274,7 +279,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
 def reject_suggestion(suggestion, reviewer_id, review_message):
     """Rejects the suggestion.
 
-     Args:
+    Args:
         suggestion: Suggestion. The suggestion to be rejected.
         reviewer_id: str. The ID of the reviewer rejecting the suggestion.
         review_message: str. The message provided by the reviewer while
@@ -299,7 +304,7 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
 def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     """Resubmit a rejected suggestion.
 
-     Args:
+    Args:
         suggestion: Suggestion. The rejected suggestion.
         summary_message: str. The message provided by the author to
             summarize new suggestion.
@@ -337,7 +342,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed
-            to review.
+        to review.
     """
     score_categories = (
         user_models.UserContributionScoringModel
@@ -363,7 +368,7 @@ def get_reviewable_suggestions(user_id, suggestion_type):
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed
-            to review.
+        to review.
     """
     all_suggestions = ([
         get_suggestion_from_model(s) for s in (
@@ -410,7 +415,7 @@ def get_all_scores_of_user(user_id):
 
     Returns:
         dict. A dict containing all the scores of the user. The keys of the dict
-            are the score categories and the values are the scores.
+        are the score categories and the values are the scores.
     """
     scores = {}
     for model in (
@@ -432,7 +437,7 @@ def check_user_can_review_in_category(user_id, score_category):
 
     Returns:
         bool. Whether the user can review suggestions under category
-            score_category.
+        score_category.
     """
     score = (
         user_models.UserContributionScoringModel.get_score_of_user_for_category(
@@ -484,7 +489,7 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
 
     Returns:
         list(str). All user_ids of users who are allowed to review in the given
-            category.
+        category.
     """
     return [model.user_id for model in
             user_models.UserContributionScoringModel

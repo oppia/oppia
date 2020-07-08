@@ -182,7 +182,7 @@ class Question(python_utils.OBJECT):
         """Converts from version 27 to 28. Version 28 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 
-         Args:
+        Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
 
@@ -202,7 +202,7 @@ class Question(python_utils.OBJECT):
         allows the creator to ask for answer details from the learner
         about why they landed on a particular answer.
 
-         Args:
+        Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
 
@@ -512,6 +512,7 @@ class Question(python_utils.OBJECT):
 
 class QuestionSummary(python_utils.OBJECT):
     """Domain object for Question Summary."""
+
     def __init__(
             self, question_id, question_content,
             question_model_created_on=None, question_model_last_updated=None):

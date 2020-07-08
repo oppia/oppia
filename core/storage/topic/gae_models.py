@@ -31,11 +31,13 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
+
     pass
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
+
     pass
 
 
@@ -45,6 +47,7 @@ class TopicModel(base_models.VersionedModel):
     This class should only be imported by the topic services file
     and the topic model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
     ALLOW_REVERT = False
@@ -126,23 +129,15 @@ class TopicModel(base_models.VersionedModel):
         super(TopicModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
             status = constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            status, False
+            self.id, self.version, committer_id, commit_type,
+            commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
@@ -177,6 +172,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'topic-[topic_id]-[version]'.
     """
+
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -263,7 +259,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -283,11 +279,13 @@ class TopicSummaryModel(base_models.BaseModel):
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
+
     pass
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
+
     pass
 
 
@@ -296,6 +294,7 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     This stores the HTML data for a subtopic page.
     """
+
     SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
     ALLOW_REVERT = False
@@ -353,16 +352,10 @@ class SubtopicPageModel(base_models.VersionedModel):
         """
         super(SubtopicPageModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
 
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
@@ -382,6 +375,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     The id for this model is of the form
     'subtopicpage-[subtopic_page_id]-[version]'.
     """
+
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -417,11 +411,13 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
+
     pass
 
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
+
     pass
 
 
@@ -492,7 +488,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
         Returns:
             list(TopicRightsModel). The list of TopicRightsModel objects in
-                which the given user is a manager.
+            which the given user is a manager.
         """
         topic_rights_models = cls.query(
             cls.manager_ids == user_id
@@ -528,14 +524,7 @@ class TopicRightsModel(base_models.VersionedModel):
         super(TopicRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
@@ -544,7 +533,6 @@ class TopicRightsModel(base_models.VersionedModel):
         TopicCommitLogEntryModel(
             id=('rights-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
-            username=committer_username,
             topic_id=self.id,
             commit_type=commit_type,
             commit_message=commit_message,
@@ -589,6 +577,7 @@ class TopicRightsAllUsersModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding topic.
     """
+
     # The user_ids of users who are (or were in history) members of manager_ids
     # in corresponding rights model.
     all_user_ids = ndb.StringProperty(indexed=True, repeated=True)

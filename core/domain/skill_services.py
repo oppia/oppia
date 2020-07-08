@@ -50,8 +50,9 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
 
     Args:
         versioned_skill_contents: A dict with two keys:
-          - schema_version: int. The schema version for the skill_contents dict.
-          - skill_contents: dict. The dict comprising the skill contents.
+            - schema_version: int. The schema version for the skill_contents
+                dict.
+            - skill_contents: dict. The dict comprising the skill contents.
 
     Raises:
         Exception: The schema version of the skill_contents is outside of what
@@ -80,9 +81,10 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
 
     Args:
         versioned_misconceptions: dict. A dict with two keys:
-          - schema_version: int. The schema version for the misconceptions dict.
-          - misconceptions: list(dict). The list of dicts comprising the skill
-              misconceptions.
+            - schema_version: int. The schema version for the misconceptions
+                dict.
+            - misconceptions: list(dict). The list of dicts comprising the skill
+                misconceptions.
 
     Raises:
         Exception: The schema version of misconceptions is outside of what
@@ -111,13 +113,13 @@ def _migrate_rubrics_to_latest_schema(versioned_rubrics):
 
     Args:
         versioned_rubrics: dict. A dict with two keys:
-          - schema_version: int. The schema version for the rubrics dict.
-          - rubrics: list(dict). The list of dicts comprising the skill
-              rubrics.
+            - schema_version: int. The schema version for the rubrics dict.
+            - rubrics: list(dict). The list of dicts comprising the skill
+                rubrics.
 
     Raises:
-        Exception: The schema version of rubrics is outside of what
-            is supported at present.
+        Exception: The schema version of rubrics is outside of what is supported
+            at present.
     """
     rubric_schema_version = versioned_rubrics['schema_version']
     if not (1 <= rubric_schema_version
@@ -164,12 +166,10 @@ def get_skill_from_model(skill_model):
     from the datastore.
 
     Args:
-        skill_model: SkillModel. The skill model loaded from the
-            datastore.
+        skill_model: SkillModel. The skill model loaded from the datastore.
 
     Returns:
-        skill. A Skill domain object corresponding to the given
-        skill model.
+        skill. A Skill domain object corresponding to the given skill model.
     """
 
     # Ensure the original skill model does not get altered.
@@ -225,8 +225,8 @@ def get_all_skill_summaries():
     """Returns the summaries of all skills present in the datastore.
 
     Returns:
-        skill_summaries: list(SkillSummary). The list of summaries
-        of all skills present in the datastore.
+        list(SkillSummary). The list of summaries of all skills present in the
+        datastore.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_all()
     skill_summaries = [
@@ -288,7 +288,7 @@ def get_filtered_skill_summaries(
 
     Returns:
         3-tuple(augmented_skill_summaries, new_urlsafe_start_cursor, more).
-        where:
+        Where:
             augmented_skill_summaries: list(AugmentedSkillSummary). The list of
                 augmented skill summaries. The number of returned skills might
                 include more than the requested number. Hence, the cursor
@@ -326,7 +326,7 @@ def _get_augmented_skill_summaries_in_batches(
     topic and classroom.
 
     Returns:
-        3-tuple(augmented_skill_summaries, urlsafe_start_cursor, more). where:
+        3-tuple(augmented_skill_summaries, urlsafe_start_cursor, more). Where:
             augmented_skill_summaries: list(AugmentedSkillSummary). The list of
                 skill summaries.
             urlsafe_start_cursor: str or None. A query cursor pointing to the
@@ -430,7 +430,7 @@ def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
 
     Returns:
         list(AugmentedSkillSummary). The list of augmented skill summaries with
-         the given classroom name.
+        the given classroom name.
     """
 
     if classroom_name is None or classroom_name == 'All':
@@ -478,7 +478,7 @@ def get_multi_skill_summaries(skill_ids):
 
     Returns:
         list(SkillSummary). The list of summaries of skills matching the
-            provided IDs.
+        provided IDs.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
@@ -518,7 +518,7 @@ def get_rubrics_of_skills(skill_ids):
 
     Returns:
         dict, list(str). The skill rubrics of skills keyed by their
-            corresponding ids and the list of deleted skill ids, if any.
+        corresponding ids and the list of deleted skill ids, if any.
     """
     skills = get_multi_skills(skill_ids, strict=False)
     skill_id_to_rubrics_dict = {}
@@ -545,7 +545,7 @@ def get_descriptions_of_skills(skill_ids):
 
     Returns:
         dict, list(str). The skill descriptions of skills keyed by their
-            corresponding ids and the list of deleted skill ids, if any.
+        corresponding ids and the list of deleted skill ids, if any.
     """
     skill_summaries = get_multi_skill_summaries(skill_ids)
     skill_id_to_description_dict = {}
@@ -592,7 +592,7 @@ def get_image_filenames_from_skill(skill):
         skill: Skill. The skill itself.
 
     Returns:
-       list(str). List containing the name of the image files in skill.
+        list(str). List containing the name of the image files in skill.
     """
     html_list = skill.get_all_html_content_strings()
     return html_cleaner.get_image_filenames_from_html_strings(html_list)
@@ -639,8 +639,8 @@ def get_skill_summary_by_id(skill_id, strict=True):
             id exists in the datastore.
 
     Returns:
-        SkillSummary. The skill summary domain object corresponding to
-        a skill with the given skill_id.
+        SkillSummary. The skill summary domain object corresponding to a skill
+        with the given skill_id.
     """
     skill_summary_model = skill_models.SkillSummaryModel.get(
         skill_id, strict=strict)
@@ -831,8 +831,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         change_list: list(SkillChange). List of changes applied to a skill.
 
     Raises:
-        Exception: The skill model and the incoming skill domain
-            object have different version numbers.
+        Exception: The skill model and the incoming skill domain object have
+            different version numbers.
         Exception: Received invalid change list.
     """
     if not change_list:
@@ -1070,9 +1070,8 @@ def get_user_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        degree_of_mastery: float or None. Mastery degree of the user for the
-            requested skill, or None if UserSkillMasteryModel does not exist
-            for the skill.
+        float or None. Mastery degree of the user for the requested skill, or
+        None if UserSkillMasteryModel does not exist for the skill.
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
@@ -1093,10 +1092,9 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
             requested.
 
     Returns:
-        degrees_of_mastery: dict(str, float|None). The keys are the requested
-            skill IDs. The values are the corresponding mastery degree of
-            the user or None if UserSkillMasteryModel does not exist for the
-            skill.
+        dict(str, float|None). The keys are the requested skill IDs. The values
+        are the corresponding mastery degree of the user or None if
+        UserSkillMasteryModel does not exist for the skill.
     """
     degrees_of_mastery = {}
     model_ids = []

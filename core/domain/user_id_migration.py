@@ -126,11 +126,13 @@ def are_commit_cmds_role_change(commit_cmds):
 
 class MissingUserException(Exception):
     """Exception for cases when the user doesn't exist."""
+
     pass
 
 
 class AlreadyMigratedUserException(Exception):
     """Exception for cases when the user is already migrated."""
+
     pass
 
 
@@ -405,7 +407,7 @@ class SnapshotsContentUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             rights_snapshot_model: TopicRightsSnapshotContentModel. The model
-            that contains the old user IDs.
+                that contains the old user IDs.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **rights_snapshot_model.content)

@@ -95,7 +95,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         Raises:
             Exception: The id generator for ClassifierTrainingJobModel is
-            producing too many collisions.
+                producing too many collisions.
         """
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
@@ -275,7 +275,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
         Returns:
             list(ClassifierExplorationMappingModel|None). The model instances
-                for the classifier exploration mapping.
+            for the classifier exploration mapping.
         """
         mapping_ids = []
         for state_name in state_names:

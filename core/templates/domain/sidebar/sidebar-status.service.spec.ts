@@ -16,12 +16,9 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { TestBed } from '@angular/core/testing';
+
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('SidebarStatusService', () => {
@@ -29,8 +26,19 @@ describe('SidebarStatusService', () => {
 
   beforeEach(() => {
     $window = TestBed.get(WindowRef);
-    $window.nativeWindow.innerWidth = 600;
     sss = TestBed.get(SidebarStatusService);
+
+    // This approach was choosen because spyOn() doesn't work on properties
+    // that doesn't have a get access type.
+    // Without this approach the test will fail because it'll throw
+    // 'Property innerWidth does not have access type get' error.
+    // eslint-disable-next-line max-len
+    // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+    // ref: https://github.com/jasmine/jasmine/issues/1415
+    Object.defineProperty($window.nativeWindow, 'innerWidth', {
+      get: () => undefined
+    });
+    spyOnProperty($window.nativeWindow, 'innerWidth').and.returnValue(600);
   });
 
   it('should open the sidebar if its not open', () => {

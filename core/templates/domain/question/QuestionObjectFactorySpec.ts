@@ -267,7 +267,7 @@ describe('Question object factory', function() {
 
     interaction.hints = [];
     expect(sampleQuestion.getValidationErrorMessage()).toEqual(
-      'At least 1 hint should be specfied');
+      'At least 1 hint should be specified');
 
     interaction.id = null;
     expect(sampleQuestion.getValidationErrorMessage()).toEqual(

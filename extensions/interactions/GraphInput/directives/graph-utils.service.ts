@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IGraphAnswer } from 'interactions/answer-defs.ts';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -44,11 +46,8 @@ export class GraphUtilsService {
    *   or all edges in both directions, as though the graph were undirected
    *   (undirected)
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
-  // typed 'any'.
   constructAdjacencyLists(
-      graph: any, adjacencyListMode: string): Array<number[]> {
+      graph: IGraphAnswer, adjacencyListMode: string): number[][] {
     var adjacencyLists = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       adjacencyLists.push([]);
@@ -81,12 +80,9 @@ export class GraphUtilsService {
    * This function modifies the isVisited array and changes the values at
    * the indices of the vertices reachable from the starting vertex to true.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'isVisited' is an array with both string and boolean values;
-  // a thorough check needs to be done to assure its exact type.
   markAccessible(
-      startVertex: number, adjacencyLists: Array<number[]>,
-      isVisited: any[]): void {
+      startVertex: number, adjacencyLists: number[][],
+      isVisited: boolean[]): void {
     isVisited[startVertex] = true;
     for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
       var nextVertex = adjacencyLists[startVertex][i];
@@ -96,38 +92,32 @@ export class GraphUtilsService {
     }
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'isVisited' is an array with both string and boolean values;
-  // A thorough check needs to be done to assure of its exact type.
   findCycle(
       currentVertex: number, previousVertex: number,
-      adjacencyLists: Array<number[]>, isVisited: any[],
+      adjacencyLists: number[][], nodeStatus: string[],
       isDirected: boolean): boolean {
-    isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
+    nodeStatus[currentVertex] = this.DFS_STATUS.STILL_VISITING;
     for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
       var nextVertex = adjacencyLists[currentVertex][i];
       if (nextVertex === previousVertex && !isDirected) {
         continue;
       }
-      if (isVisited[nextVertex] === (
+      if (nodeStatus[nextVertex] === (
         this.DFS_STATUS.STILL_VISITING)) {
         return true;
       }
-      if (isVisited[nextVertex] === this.DFS_STATUS.UNVISITED &&
+      if (nodeStatus[nextVertex] === this.DFS_STATUS.UNVISITED &&
           this.findCycle(
-            nextVertex, currentVertex, adjacencyLists, isVisited,
+            nextVertex, currentVertex, adjacencyLists, nodeStatus,
             isDirected)) {
         return true;
       }
     }
-    isVisited[currentVertex] = this.DFS_STATUS.VISITED;
+    nodeStatus[currentVertex] = this.DFS_STATUS.VISITED;
     return false;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
-  // typed 'any'.
-  constructAdjacencyMatrix(graph: any): Array<number[]> {
+  constructAdjacencyMatrix(graph: IGraphAnswer): number[][] {
     var adjMatrix = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       var adjMatrixRow = [];
@@ -136,10 +126,8 @@ export class GraphUtilsService {
       }
       adjMatrix.push(adjMatrixRow);
     }
-    // TODO(#7165): Replace 'any' with the exact type. This has been typed
-    // as 'any' since 'edge' is a dict with various keys. A thorough research
-    // needs to be carried out to determine exact type.
-    graph.edges.map((edge: any) => {
+
+    graph.edges.map(edge => {
       var weight = graph.isWeighted ? edge.weight : 1;
       adjMatrix[edge.src][edge.dst] = weight;
       if (!graph.isDirected) {
@@ -180,7 +168,7 @@ export class GraphUtilsService {
   }
 
   areAdjacencyMatricesEqualWithPermutation(
-      adj1: Array<number[]>, adj2: Array<number[]>,
+      adj1: number[][], adj2: number[][],
       permutation: number[]): boolean {
     var numVertices = adj1.length;
     for (var i = 0; i < numVertices; i++) {

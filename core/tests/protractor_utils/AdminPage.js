@@ -140,10 +140,14 @@ var AdminPage = function() {
     await this.get();
     await configTab.click();
     await waitFor.elementToBeClickable(saveAllConfigs);
-    var results = await configProperties.map(async function(x) {
-      return await saveConfigProperty(
-        x, propertyName, objectType, editingInstructions);
-    });
+
+    const results = [];
+    for (let configProperty of (await configProperties)) {
+      results.push(
+        await saveConfigProperty(
+          configProperty, propertyName, objectType, editingInstructions)
+      );
+    }
     var success = null;
     for (var i = 0; i < results.length; i++) {
       success = success || results[i];
