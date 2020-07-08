@@ -77,11 +77,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ClassifierTrainingJobModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
@@ -235,13 +230,6 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TrainingJobExplorationMappingModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
