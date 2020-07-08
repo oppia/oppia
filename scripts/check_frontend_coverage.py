@@ -385,7 +385,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'SkillObjectFactory.ts',
     'skills-list.directive.ts',
     'skills-mastery-list.directive.ts',
-    'social-buttons.directive.ts',
+    'social-buttons.component.ts',
     'solution-editor.directive.ts',
     'solution-explanation-editor.directive.ts',
     'state-content-editor.directive.ts',
