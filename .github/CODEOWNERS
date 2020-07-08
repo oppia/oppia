@@ -19,6 +19,7 @@
 # Angular Migration team
 /core/templates/components/shared-component.module.ts @bansalnitish @srijanreddy98
 /core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
+/core/templates/components/material.module.ts @bansalnitish @srijanreddy98
 /core/templates/components/oppia-angular-root.component.ts @bansalnitish @srijanreddy98
 /core/templates/base-components/oppia-root.directive.ts @bansalnitish @srijanreddy98
 /core/templates/base-components/oppia-root.directive.html @bansalnitish @srijanreddy98

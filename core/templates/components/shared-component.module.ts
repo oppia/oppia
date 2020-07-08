@@ -23,6 +23,7 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
@@ -34,7 +35,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
-  imports: [CommonModule, NgbModalModule],
+  imports: [CommonModule, MaterialModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent],
@@ -44,7 +45,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent,
+    SharingLinksComponent, MaterialModule
   ],
 })
 
