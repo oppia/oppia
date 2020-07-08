@@ -1121,7 +1121,7 @@ tags: []
             Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title=title, category='A category')
+            exploration_id, title=title, category='Algebra')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
