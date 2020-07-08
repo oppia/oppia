@@ -347,9 +347,9 @@ angular.module('oppia').component('learnerDashboardPage', {
       };
 
       /**
-       * This was needed beacause javascript returns -1 using inBuilt indexOf
+       * This was needed because javascript returns -1 using inBuilt indexOf
        * even when there are identical objects.
-       * Refer -> https://rb.gy/kh5ry5
+       * Refer -> https://stackoverflow.com/q/11704971
        */
       var findIndex = (arr, element) => {
         for (var i = 0; i < arr.length; i++) {
