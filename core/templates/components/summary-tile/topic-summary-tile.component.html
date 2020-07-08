@@ -8,7 +8,7 @@
   </div>
   <div class="oppia-topic-details">
     <div class="oppia-topic-name">
-      {{ ::topicSummary.getName() }}
+      {{ topicSummary.getName() }}
     </div>
     <span [innerHTML]="'I18N_TOPIC_SUMMARY_TILE_LESSONS' | translate"
           translate-values="{lessonCount: topicSummary.getCanonicalStoryCount()}"
