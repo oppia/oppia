@@ -149,28 +149,6 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
-    def get_user_id_migration_policy():
-        """UserSettingsModel has ID that contains user ID and needs to be
-        replaced. The replacement is handled directly in the
-        user_id_migration.py, because it needs to be migrated before the other
-        models.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """UserSettingsModel is migrated in the user_id_migration.py, because it
-        needs to be migrated before the other models.
-        """
-        pass
-
-    def verify_model_user_ids_exist(self):
-        """We don't need to check the existence of UserSettingsModel for a
-        UserSettingsModel.
-        """
-        return True
-
-    @staticmethod
     def export_data(user_id):
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
@@ -352,13 +330,6 @@ class CompletedActivitiesModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
-    def get_user_id_migration_policy():
-        """CompletedActivitiesModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
-
-    @staticmethod
     def export_data(user_id):
         """(Takeout) Export CompletedActivitiesModel's user properties.
 
@@ -426,13 +397,6 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """IncompleteActivitiesModel has ID that contains user ID and needs to
-        be replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -508,13 +472,6 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExpUserLastPlaythroughModel has ID that contains user ID and
-        one other field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -636,13 +593,6 @@ class LearnerPlaylistModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
-    def get_user_id_migration_policy():
-        """LearnerPlaylistModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
-
-    @staticmethod
     def export_data(user_id):
         """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
 
@@ -714,13 +664,6 @@ class UserContributionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserContributionsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -799,13 +742,6 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserEmailPreferencesModel has ID that contains user ID and needs to
-        be replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
-
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -866,59 +802,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
             cls.query(
                 cls.creator_ids == user_id).get(keys_only=True) is not None or
             cls.get_by_id(user_id) is not None)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserSubscriptionsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the id and creator_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-
-        Returns:
-            (str, (str, str)). Status message when the model doesn't exist
-            for the user ID otherwise None.
-        """
-        migrated_models = []
-        for model in cls.query(cls.creator_ids == old_user_id).fetch():
-            model.creator_ids = [
-                new_user_id if creator_id == old_user_id else creator_id
-                for creator_id in model.creator_ids]
-            migrated_models.append(model)
-        cls.put_multi(migrated_models, update_last_updated_time=False)
-
-        old_model = cls.get_by_id(old_user_id)
-        if not old_model:
-            return ('SUCCESS_MISSING_OLD_MODEL', (old_user_id, new_user_id))
-        model_values = old_model.to_dict()
-        model_values['id'] = new_user_id
-        new_model = cls(**model_values)
-
-        def _replace_model():
-            """Replace old model with new one."""
-            new_model.put(update_last_updated_time=False)
-            old_model.delete()
-
-        transaction_services.run_in_transaction(_replace_model)
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in creator_ids and
-        for the id.
-        """
-        user_ids = list(self.creator_ids)
-        user_ids.append(self.id)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
 
     @staticmethod
     def export_data(user_id):
@@ -998,59 +881,6 @@ class UserSubscribersModel(base_models.BaseModel):
             cls.get_by_id(user_id) is not None)
 
     @staticmethod
-    def get_user_id_migration_policy():
-        """UserSubscribersModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the id and subscriber_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-
-        Returns:
-            (str, (str, str)). Status message when the model doesn't exist
-            for the user ID otherwise None.
-        """
-        migrated_models = []
-        for model in cls.query(cls.subscriber_ids == old_user_id).fetch():
-            model.subscriber_ids = [
-                new_user_id if subscriber_id == old_user_id else subscriber_id
-                for subscriber_id in model.subscriber_ids]
-            migrated_models.append(model)
-        cls.put_multi(migrated_models, update_last_updated_time=False)
-
-        old_model = cls.get_by_id(old_user_id)
-        if not old_model:
-            return ('SUCCESS_MISSING_OLD_MODEL', (old_user_id, new_user_id))
-        model_values = old_model.to_dict()
-        model_values['id'] = new_user_id
-        new_model = cls(**model_values)
-
-        def _replace_model():
-            """Replace old model with new one."""
-            new_model.put(update_last_updated_time=False)
-            old_model.delete()
-
-        transaction_services.run_in_transaction(_replace_model)
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in subscriber_ids
-        and for the id.
-        """
-        user_ids = list(self.subscriber_ids)
-        user_ids.append(self.id)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
-
-    @staticmethod
     def get_export_policy():
         """This model is not included because it contains data about other
         users.
@@ -1103,13 +933,6 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserRecentChangesBatchModel has ID that contains user ID and needs to
-        be replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -1195,13 +1018,6 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserStatsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @classmethod
     def get_or_create(cls, user_id):
@@ -1327,13 +1143,6 @@ class ExplorationUserDataModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationUserDataModel has ID that contains user id and one other
-        field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -1501,13 +1310,6 @@ class CollectionProgressModel(base_models.BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionProgressModel has ID that contains user id and one other
-        field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
     @classmethod
     def _generate_id(cls, user_id, collection_id):
         """Generates key for the instance of CollectionProgressModel class in
@@ -1672,13 +1474,6 @@ class StoryProgressModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StoryProgressModel has ID that contains user id and one other field
-        that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1874,16 +1669,6 @@ class UserQueryModel(base_models.BaseModel):
         return cls.query(cls.submitter_id == user_id).get(
             keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserQueryModel has two fields that contain user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.submitter_id
-
     @classmethod
     def fetch_page(cls, page_size, cursor):
         """Fetches a list of all query_models sorted by creation date.
@@ -1946,13 +1731,6 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserBulkEmailsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
-
 
 class UserSkillMasteryModel(base_models.BaseModel):
     """Model for storing a user's degree of mastery of a skill in Oppia.
@@ -2002,13 +1780,6 @@ class UserSkillMasteryModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserSkillMasteryModel has ID that contains user id and one other
-        field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -2115,13 +1886,6 @@ class UserContributionScoringModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserContributionScoringModel has ID that contains user id and one
-        other field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):
@@ -2272,13 +2036,6 @@ class UserCommunityRightsModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserCommunityRightsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
-
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instances of UserCommunityRightsModel for the user.
@@ -2410,10 +2167,3 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """PendingDeletionRequestModel is going to be used later and only as
-        a temporary model, so it doesn't need to be migrated.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
