@@ -9,6 +9,7 @@
   "plugins": [
     "angular",
     "html",
+    "unused-imports",
     "@typescript-eslint"
   ],
   "overrides": [{
@@ -171,9 +172,7 @@
       "off"
     ],
     "no-unused-vars": [
-      "error", {
-        "vars": "all"
-      }
+      "off"
     ],
     "one-var": [
       "off"
@@ -236,6 +235,7 @@
         "before": false
       }
     ],
+    "unused-imports/no-unused-imports-ts": "error",
     "@typescript-eslint/semi": ["error"],
     "wrap-iife": [
       "error",
