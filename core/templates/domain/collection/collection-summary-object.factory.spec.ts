@@ -26,7 +26,7 @@ describe('Collection summary object factory', () => {
     csof = new CollectionSummaryObjectFactory();
   });
 
-  it('should correctly convert backend dict to collection summary object', () => {
+  it('should correctly convert dict to collection summary object', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
