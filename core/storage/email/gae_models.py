@@ -107,32 +107,6 @@ class SentEmailModel(base_models.BaseModel):
             cls.sender_id == user_id,
         )).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SentEmailModel has two fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the recipient_id and
-        sender_id.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.recipient_id == old_user_id,
-                cls.sender_id == old_user_id)).fetch():
-            if model.recipient_id == old_user_id:
-                model.recipient_id = new_user_id
-            if model.sender_id == old_user_id:
-                model.sender_id = new_user_id
-            migrated_models.append(model)
-        SentEmailModel.put_multi(
-            migrated_models, update_last_updated_time=False)
-
     @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
@@ -292,15 +266,6 @@ class SentEmailModel(base_models.BaseModel):
 
         return False
 
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for recipient_id and sender_id."""
-        user_ids = [self.recipient_id, self.sender_id]
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
-
 
 class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
@@ -359,16 +324,6 @@ class BulkEmailModel(base_models.BaseModel):
         """
         return cls.query(cls.sender_id == user_id).get(
             keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BulkEmailModel has one field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.sender_id
 
     @classmethod
     def create(
@@ -432,13 +387,6 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """GeneralFeedbackEmailReplyToIdModel has ID that contains user id and
-        one other field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):

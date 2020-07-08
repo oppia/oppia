@@ -51,26 +51,6 @@ EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE',
 )
 
-# Types of user id migration policies. The pragma comment is needed because
-# Enums are evaluated as classes in Python and they should use PascalCase,
-# but using UPPER_CASE seems more appropriate here.
-# COPY - User ID is used as model ID thus the model needs to be recreated.
-# COPY_AND_UPDATE_ONE_FIELD - User ID is used as some part of the model ID and
-#                             also in user_id field thus the model needs to be
-#                             recreated and the field changed.
-# ONE_FIELD - One field in the model contains user ID thus the value in that
-#             field needs to be changed.
-# CUSTOM - Multiple fields in the model contain user ID, values in all these
-#          fields need to be changed.
-# NOT_APPLICABLE - The model doesn't contain any field with user ID.
-USER_ID_MIGRATION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'COPY',
-    'COPY_AND_UPDATE_ONE_FIELD',
-    'ONE_FIELD',
-    'CUSTOM',
-    'NOT_APPLICABLE'
-)
-
 # Constant used when retrieving big number of models.
 FETCH_BATCH_SIZE = 1000
 
@@ -122,27 +102,6 @@ class BaseModel(ndb.Model):
         Raises:
             NotImplementedError: The method is not overwritten in a derived
                 class.
-        """
-        raise NotImplementedError
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError: The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError: This method is needed when the migration
-                policy is ONE_FIELD, it is only overwritten in classes that have
-                that policy.
         """
         raise NotImplementedError
 
@@ -440,16 +399,6 @@ class BaseCommitLogEntryModel(BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BaseCommitLogEntryModel has one field that contains user ID."""
-        return USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
 
     @classmethod
     def create(
@@ -1128,16 +1077,6 @@ class BaseSnapshotMetadataModel(BaseModel):
         """Snapshot Metadata is relevant to the user for Takeout."""
         return EXPORT_POLICY.CONTAINS_USER_DATA
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BaseSnapshotMetadataModel has one field that contains user ID."""
-        return USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.committer_id
-
     @classmethod
     def exists_for_user_id(cls, user_id):
         """Check whether BaseSnapshotMetadataModel references the given user.
@@ -1227,11 +1166,6 @@ class BaseSnapshotContentModel(BaseModel):
         Takeout.
         """
         return EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BaseSnapshotContentModel doesn't have any field with user ID."""
-        return USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create(cls, snapshot_id, content):

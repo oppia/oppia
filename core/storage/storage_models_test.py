@@ -131,29 +131,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
                         msg='has_reference_to_user_id is not defined for %s' % (
                             clazz.__name__))
 
-    def test_all_model_classes_have_get_user_id_migration_policy(self):
-        for clazz in self._get_base_or_versioned_model_child_classes():
-            try:
-                self.assertIn(
-                    clazz.get_user_id_migration_policy(),
-                    base_models.USER_ID_MIGRATION_POLICY.__dict__)
-            except NotImplementedError:
-                self.fail(
-                    msg='get_user_id_migration_policy is not defined for %s'
-                    % clazz.__name__)
-
-    def test_model_classes_have_get_user_id_migration_field(self):
-        for clazz in self._get_base_or_versioned_model_child_classes():
-            if (clazz.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
-                self.assertTrue(hasattr(clazz, 'get_user_id_migration_field'))
-
-    def test_model_classes_have_migrate_model(self):
-        for clazz in self._get_base_or_versioned_model_child_classes():
-            if (clazz.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
-                self.assertTrue(hasattr(clazz, 'migrate_model'))
-
     def test_get_models_which_should_be_exported(self):
         """Ensure that the set of models to export is the set of models with
         export policy CONTAINS_USER_DATA, and that all other models have

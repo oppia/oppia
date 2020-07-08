@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.ext import ndb
 
@@ -102,11 +101,6 @@ class TopicModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -271,11 +265,6 @@ class TopicSummaryModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicSummaryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -326,11 +315,6 @@ class SubtopicPageModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SubtopicPageModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -457,28 +441,6 @@ class TopicRightsModel(base_models.VersionedModel):
             cls.manager_ids == user_id).get(keys_only=True) is not None
                 or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicRightsModel has one field that contains multiple user IDs."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the manager_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(cls.manager_ids == old_user_id).fetch():
-            model.manager_ids = [
-                new_user_id if manager_id == old_user_id else manager_id
-                for manager_id in model.manager_ids]
-            migrated_models.append(model)
-        cls.put_multi(
-            migrated_models, update_last_updated_time=False)
-
     @classmethod
     def get_by_user(cls, user_id):
         """Retrieves the rights object for all topics assigned to given user
@@ -494,14 +456,6 @@ class TopicRightsModel(base_models.VersionedModel):
             cls.manager_ids == user_id
         )
         return topic_rights_models
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in manager_ids."""
-        user_ids = [user_id for user_id in self.manager_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -566,73 +520,3 @@ class TopicRightsModel(base_models.VersionedModel):
         return {
             'managed_topic_ids': managed_topic_ids
         }
-
-
-class TopicRightsAllUsersModel(base_models.BaseModel):
-    """Temporary storage model for all user ids ever mentioned in the topic
-    rights.
-
-    TODO (#8529): This model should be deleted after the user ID migration is
-    completed.
-
-    The id of each instance is the id of the corresponding topic.
-    """
-
-    # The user_ids of users who are (or were in history) members of manager_ids
-    # in corresponding rights model.
-    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """TopicRightsAllUsersModel are temporary model that will be
-        deleted after user migration.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether TopicRightsAllUsersModel references the given user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(
-            cls.all_user_ids == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_export_policy():
-        """This model is only used for migration purposes. All the data
-        contained in this model are already exported through TopicRightsModel.
-        """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicRightsAllUsersModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
-        """This model is used to verify that the user ID migration of
-        TopicRightsSnapshotContentModel was successful. The content is filled by
-        the AddAllUserIdsVerificationJob and
-        AddAllUserIdsSnapshotsVerificationJob before the
-        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
-        this method.
-
-        Args:
-            unused_old_user_id: str. The old user ID.
-            unused_new_user_id: str. The new user ID.
-        """
-        pass
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
-        user_ids = [user_id for user_id in self.all_user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)

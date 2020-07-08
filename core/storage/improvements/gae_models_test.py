@@ -34,16 +34,6 @@ def _always_returns(value):
 class TaskEntryModelTests(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            improvements_models.TaskEntryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        self.assertEqual(
-            improvements_models.TaskEntryModel.get_user_id_migration_field(),
-            'resolver_id')
-
     def test_has_reference_to_user_id(self):
         improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,

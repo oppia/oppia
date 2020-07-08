@@ -23,7 +23,6 @@ import datetime
 
 from constants import constants
 import core.storage.base_model.gae_models as base_models
-import core.storage.user.gae_models as user_models
 import feconf
 import python_utils
 
@@ -100,11 +99,6 @@ class CollectionModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_collection_count(cls):
@@ -297,53 +291,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionRightsModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the owner_ids, editor_ids,
-        voice_artist_ids and viewer_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.owner_ids == old_user_id,
-                cls.editor_ids == old_user_id,
-                cls.voice_artist_ids == old_user_id,
-                cls.viewer_ids == old_user_id)).fetch():
-            model.owner_ids = [
-                new_user_id if owner_id == old_user_id else owner_id
-                for owner_id in model.owner_ids]
-            model.editor_ids = [
-                new_user_id if editor_id == old_user_id else editor_id
-                for editor_id in model.editor_ids]
-            model.voice_artist_ids = [
-                new_user_id if v_artist_id == old_user_id else v_artist_id
-                for v_artist_id in model.voice_artist_ids]
-            model.viewer_ids = [
-                new_user_id if viewer_id == old_user_id else viewer_id
-                for viewer_id in model.viewer_ids]
-            migrated_models.append(model)
-        cls.put_multi(migrated_models, update_last_updated_time=False)
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in owner_ids,
-        editor_ids, voice_artist_ids and viewer_ids.
-        """
-        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
-                    self.viewer_ids)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
-
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -432,78 +379,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             'voiced_collection_ids': voiced_collection_ids,
             'viewable_collection_ids': viewable_collection_ids
         }
-
-
-class CollectionRightsAllUsersModel(base_models.BaseModel):
-    """Temporary storage model for all user ids ever mentioned in the collection
-    rights.
-
-    TODO (#8529): This model should be deleted after the user ID migration is
-    completed.
-
-    The id of each instance is the id of the corresponding collection.
-    """
-
-    # The user_ids of users who are (or were in history) members of owner_ids,
-    # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
-    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """CollectionRightsAllUsersModel are temporary model that will be
-        deleted after user migration.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionRightsAllUsersModel references the given
-        user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(
-            cls.all_user_ids == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_export_policy():
-        """This model is only used for migration purposes. All the data
-        contained in this model are already exported through
-        CollectionRightsModel.
-        """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionRightsAllUsersModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
-        """This model is used to verify that the user ID migration of
-        CollectionRightsSnapshotContentModel was successful. The content is
-        filled by the AddAllUserIdsVerificationJob and
-        AddAllUserIdsSnapshotsVerificationJob before the
-        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
-        this method.
-
-        Args:
-            unused_old_user_id: str. The old user ID.
-            unused_new_user_id: str. The new user ID.
-        """
-        pass
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
-        user_ids = [user_id for user_id in self.all_user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
 
 
 class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -693,44 +568,6 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.viewer_ids == user_id,
             cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionSummaryModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the owner_ids, editor_ids,
-        viewer_ids and contributor_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
-                cls.viewer_ids == old_user_id,
-                cls.contributor_ids == old_user_id)).fetch():
-            model.owner_ids = [
-                new_user_id if owner_id == old_user_id else owner_id
-                for owner_id in model.owner_ids]
-            model.editor_ids = [
-                new_user_id if editor_id == old_user_id else editor_id
-                for editor_id in model.editor_ids]
-            model.viewer_ids = [
-                new_user_id if viewer_id == old_user_id else viewer_id
-                for viewer_id in model.viewer_ids]
-            model.contributor_ids = [
-                new_user_id if contributor_id == old_user_id else
-                contributor_id for contributor_id in model.contributor_ids]
-            if old_user_id in model.contributors_summary:
-                model.contributors_summary[new_user_id] = (
-                    model.contributors_summary[old_user_id])
-                del model.contributors_summary[old_user_id]
-            migrated_models.append(model)
-        cls.put_multi(migrated_models, update_last_updated_time=False)
-
     @classmethod
     def get_non_private(cls):
         """Returns an iterable with non-private collection summary models.
@@ -784,15 +621,3 @@ class CollectionSummaryModel(base_models.BaseModel):
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in owner_ids,
-        editor_ids, viewer_ids and contributor_ids.
-        """
-        user_ids = (self.owner_ids + self.editor_ids + self.viewer_ids +
-                    self.contributor_ids)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
