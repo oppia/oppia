@@ -189,6 +189,7 @@ def find_translatable(
                 conversion_fn,
                 content_id_prefix=content_id_prefix)
 
+
 def convert_translatable_in_cust_args(
         ca_values, ca_specs, conversion_fn):
     """Converts all html of SubtitledHtml or unicode of SubtitledUnicode in
@@ -212,6 +213,7 @@ def convert_translatable_in_cust_args(
                 ca_values[ca_spec_name],
                 ca_spec.to_dict(),
                 conversion_fn)
+
 
 def get_all_content_ids_in_cust_args(ca_values, ca_specs):
     """Extracts all content_id's from ca_values, using ca_specs to find
