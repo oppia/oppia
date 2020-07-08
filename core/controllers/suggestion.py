@@ -103,13 +103,15 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        suggestion_services.create_suggestion(
-            self.payload.get('suggestion_type'),
-            self.payload.get('target_type'), self.payload.get('target_id'),
-            self.payload.get('target_version_at_submission'),
-            self.user_id, self.payload.get('change'),
-            self.payload.get('description'),
-            self.payload.get('final_reviewer_id'))
+        try:
+            suggestion_services.create_suggestion(
+                self.payload.get('suggestion_type'),
+                self.payload.get('target_type'), self.payload.get('target_id'),
+                self.payload.get('target_version_at_submission'),
+                self.user_id, self.payload.get('change'),
+                self.payload.get('description'))
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
         self.render_json(self.values)
 
 

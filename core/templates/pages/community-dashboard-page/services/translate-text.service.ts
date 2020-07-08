@@ -99,8 +99,6 @@ angular.module('oppia').factory('TranslateTextService', [
           description: 'Adds translation',
           target_id: activeExpId,
           target_version_at_submission: activeExpVersion,
-          assigned_reviewer_id: null,
-          final_reviewer_id: null,
           change: {
             cmd: 'add_translation',
             content_id: activeContentId,
