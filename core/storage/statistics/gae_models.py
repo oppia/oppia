@@ -99,11 +99,6 @@ class StateCounterModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCounterModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
         """Gets or creates an entity by exploration_id and state_name.
@@ -151,13 +146,6 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """AnswerSubmittedEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -219,13 +207,6 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationActualStartEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
@@ -280,11 +261,6 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SolutionHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -368,13 +344,6 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StartExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -503,13 +472,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """MaybeLeaveExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates entity ID for a new event based on its
@@ -628,13 +590,6 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CompleteExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates entity ID for a new event based on its
@@ -724,13 +679,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """RateExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -826,11 +774,6 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates entity ID for a new event based on its
@@ -914,13 +857,6 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCompleteEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
@@ -980,13 +916,6 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LeaveForRefresherExplorationEventLogEntryModel doesn't have any field
-        with user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -1069,11 +998,6 @@ class ExplorationStatsModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationStatsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1239,11 +1163,6 @@ class ExplorationIssuesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationIssuesModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
         """Generates an ID for the instance of the form
@@ -1329,11 +1248,6 @@ class PlaythroughModel(base_models.BaseModel):
         individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """PlaythroughModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1451,11 +1365,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LearnerAnswerDetailsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_state_reference_for_exploration(cls, exp_id, state_name):
@@ -1600,11 +1509,6 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationAnnotationsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
         """Gets entity_id for a batch model based on given exploration state.
@@ -1729,11 +1633,6 @@ class StateAnswersModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
@@ -2051,11 +1950,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersCalcOutputModels doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create_or_update(
