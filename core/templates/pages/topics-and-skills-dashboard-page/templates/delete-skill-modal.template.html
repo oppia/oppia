@@ -5,8 +5,8 @@
 </div>
 <div class="modal-body" ng-if="showAssignedTopics()">
   <span>This skill is assigned to these following topics, If you delete the skill, it will be automatically removed from these topics.</span>
-  <div ng-repeat="(topic, id) in assignedTopics">
-    <span class="topic-name"><[topic]></span>
+  <div ng-repeat="topic in assignedTopics">
+    <span class="topic-name"><[topic.topic_name]></span>
   </div>
 </div>
 <div class="modal-footer">

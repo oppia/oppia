@@ -809,11 +809,12 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
     def setUp(self):
         super(TopicAssignmentTests, self).setUp()
         self.skill_assignments = skill_domain.TopicAssignment(
-            'topic_id1', 2, 1)
+            'topic_id1', 'Topic1', 2, 1)
 
     def test_skill_assignments_gets_created(self):
         skill_assignments_dict = {
             'topic_id': 'topic_id1',
+            'topic_name': 'Topic1',
             'topic_version': 2,
             'subtopic_id': 1,
         }

@@ -392,11 +392,12 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.unassignSkillWithIndex = async function(skillDescription, topicIndex) {
+  this.unassignSkillFromTopicWithIndex = async function(
+      skillDescription, topicIndex) {
     await waitFor.visibilityOf(skillsTable,
       'Skill table taking too long to appear.');
     var skillIndex = -1;
-    for (var i = 0; i < skillDescriptions.length; i++) {
+    for (var i = 0; i < await skillDescriptions.count(); i++) {
       var skillDescriptionText = (
         await (await skillDescriptions.get(i)).getText());
       if (skillDescriptionText === skillDescription) {
@@ -404,6 +405,7 @@ var TopicsAndSkillsDashboardPage = function() {
         break;
       }
     }
+    expect(skillIndex).not.toEqual(-1);
     var skillEditOptionBox = skillEditOptions.get(skillIndex);
     await skillEditOptionBox.click();
     await waitFor.elementToBeClickable(

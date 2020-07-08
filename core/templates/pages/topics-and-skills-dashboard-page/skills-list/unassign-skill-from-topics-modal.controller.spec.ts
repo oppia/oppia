@@ -30,8 +30,13 @@ describe('Unassign Skill from Topics Modal', function() {
   var $q = null;
   var $uibModalInstance = null;
   var topicIdDict = {
-    topic1: {id: 'tasd42'}
+    topic1: {topic_id: 'tasd42', subtopic_id: 1, topic_version: 1}
   };
+  var assignedTopicDicts = [{
+    topic_name: 'topic1',
+    topic_id: 'tasd42',
+    topic_version: 1,
+    subtopic_id: 1}];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -52,7 +57,7 @@ describe('Unassign Skill from Topics Modal', function() {
       fetchAssignedSkillData: () => {
         var deferred = $q.defer();
         deferred.resolve({
-          assigned_topics_dict: topicIdDict
+          assigned_topic_dicts: assignedTopicDicts
         });
         return deferred.promise;
       }

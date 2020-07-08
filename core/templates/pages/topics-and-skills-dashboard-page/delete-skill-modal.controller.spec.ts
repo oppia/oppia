@@ -54,7 +54,7 @@ describe('Delete Skill Modal Controller', function() {
         fetchAssignedSkillData: () => {
           var deferred = $q.defer();
           deferred.resolve({
-            assigned_topics_dict: {}
+            assigned_topic_dicts: []
           });
           return deferred.promise;
         }
@@ -72,14 +72,18 @@ describe('Delete Skill Modal Controller', function() {
     it('should initialize the correct value', function() {
       $scope.init();
       $rootScope.$apply();
-      expect($scope.assignedTopics).toEqual({});
+      expect($scope.assignedTopics).toEqual([]);
       expect($scope.assignedTopicsAreFetched).toEqual(true);
       expect($scope.showAssignedTopics()).toEqual(false);
     });
   });
 
   describe('when skill has assigned topics', function() {
-    var topicIdDict = {topic1: {id: 'topicId1'}};
+    var assignedTopicDicts = [{
+      topic_name: 'topic1',
+      topic_id: 'tasd42',
+      topic_version: 1,
+      subtopic_id: 1}];
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
@@ -90,7 +94,7 @@ describe('Delete Skill Modal Controller', function() {
         fetchAssignedSkillData: () => {
           var deferred = $q.defer();
           deferred.resolve({
-            assigned_topics_dict: topicIdDict
+            assigned_topic_dicts: assignedTopicDicts
           });
           return deferred.promise;
         }
@@ -108,7 +112,7 @@ describe('Delete Skill Modal Controller', function() {
     it('should initialize the correct value', function() {
       $scope.init();
       $rootScope.$apply();
-      expect($scope.assignedTopics).toEqual(topicIdDict);
+      expect($scope.assignedTopics).toEqual(assignedTopicDicts);
       expect($scope.assignedTopicsAreFetched).toEqual(true);
       expect($scope.showAssignedTopics()).toEqual(true);
     });
