@@ -50,10 +50,10 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
         self.topic_id = topic_services.get_new_topic_id()
-        self.linked_skill_id = skill_fetchers.get_new_skill_id()
+        self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3')
-        self.subtopic_skill_id = skill_fetchers.get_new_skill_id()
+        self.subtopic_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.subtopic_skill_id, self.admin_id, description='Subtopic Skill')
 

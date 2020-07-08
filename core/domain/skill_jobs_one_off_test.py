@@ -209,7 +209,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         skill_services.save_new_skill(self.albert_id, skill)
 
         get_skill_by_id_swap = self.swap(
-            skill_services, 'get_skill_by_id', _mock_get_skill_by_id)
+            skill_fetchers, 'get_skill_by_id', _mock_get_skill_by_id)
 
         with get_skill_by_id_swap:
             job_id = (
