@@ -68,6 +68,9 @@ angular.module('oppia').component('subtopicPreviewTab', {
           $scope.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           $scope.pageContents = $scope.subtopicPage.getPageContents();
+          if ($scope.pageContents) {
+            $scope.htmlData = $scope.pageContents.getHtml();
+          }
         }
       };
 
@@ -78,8 +81,8 @@ angular.module('oppia').component('subtopicPreviewTab', {
 
       $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
         $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
-        var pageContents = $scope.subtopicPage.getPageContents();
-        $scope.htmlData = pageContents.getHtml();
+        $scope.pageContents = $scope.subtopicPage.getPageContents();
+        $scope.htmlData = $scope.pageContents.getHtml();
       });
 
       $scope.changeContent = function(itemToDisplay) {
