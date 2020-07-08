@@ -156,11 +156,27 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
-            if self.final_reviewer_id:
+        if (
+                self.author_id is not None and
+                not user_services.is_user_id_correct(self.author_id)
+        ):
+            raise utils.ValidationError(
+                'Expected author_id to be in a valid user ID format, '
+                'received %s' % self.author_id)
+
+        if self.final_reviewer_id is not None:
+            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
+            if (
+                    not user_services.is_user_id_correct(
+                        self.final_reviewer_id) and
+                    self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
+            ):
+                raise utils.ValidationError(
+                    'Expected final_reviewer_id to be in a valid user ID '
+                    'format, received %s' % self.final_reviewer_id)
 
         if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -259,7 +275,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -296,11 +312,6 @@ class SuggestionEditStateContent(BaseSuggestion):
                 ', received %s' % (
                     suggestion_models.SCORE_TYPE_CONTENT,
                     self.get_score_type()))
-
-        if self.get_score_sub_type() not in constants.ALL_CATEGORIES:
-            raise utils.ValidationError(
-                'Expected the second part of score_category to be a valid'
-                ' category, received %s' % self.get_score_sub_type())
 
         if self.change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
             raise utils.ValidationError(
@@ -427,7 +438,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -457,18 +468,16 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to be an ExplorationChange, received %s'
                 % type(self.change))
-
+        # The score sub_type needs to match the validation for exploration
+        # category, i.e the second part of the score_category should match
+        # the target exploration's category and we have a prod validation
+        # for the same.
         if self.get_score_type() != suggestion_models.SCORE_TYPE_TRANSLATION:
             raise utils.ValidationError(
                 'Expected the first part of score_category to be %s '
                 ', received %s' % (
                     suggestion_models.SCORE_TYPE_TRANSLATION,
                     self.get_score_type()))
-
-        if self.get_score_sub_type() not in constants.ALL_CATEGORIES:
-            raise utils.ValidationError(
-                'Expected the second part of score_category to be a valid'
-                ' category, received %s' % self.get_score_sub_type())
 
         if self.change.cmd != exp_domain.CMD_ADD_TRANSLATION:
             raise utils.ValidationError(
@@ -552,7 +561,7 @@ class SuggestionAddQuestion(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """

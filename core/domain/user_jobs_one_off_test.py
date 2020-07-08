@@ -48,6 +48,7 @@ search_services = models.Registry.import_search_services()
 
 class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -197,6 +198,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'ab@example.com'
@@ -312,6 +314,7 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
 class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off long userbio length job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_A_BIO = 'I am less than 500'
@@ -408,6 +411,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     COLLECTION_ID_1 = 'col_id_1'
@@ -807,6 +811,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -1178,64 +1183,6 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
-
-
-class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
-
-    FETCHED_GRAVATAR = 'fetched_gravatar'
-
-    def setUp(self):
-        super(UserProfilePictureOneOffJobTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def _mock_fetch_gravatar(self, unused_email):
-        """Mocks user_services.fetch_gravatar()."""
-        return self.FETCHED_GRAVATAR
-
-    def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
-        user_services.update_profile_picture_data_url(self.owner_id, None)
-
-        # Before the job runs, the data URL is None.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertIsNone(user_settings.profile_picture_data_url)
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL has been updated.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url, self.FETCHED_GRAVATAR)
-
-    def test_profile_picture_is_not_regenerated_if_it_already_exists(self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, 'manually_added_data_url')
-
-        # Before the job runs, the data URL is the manually-added one.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url, 'manually_added_data_url')
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL is still the manually-added one.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url,
-            'manually_added_data_url')
 
 
 class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):

@@ -78,6 +78,7 @@ class StateCounterModel(base_models.BaseModel):
     The ID/key of instances of this class has the form
         [EXPLORATION_ID].[STATE_NAME].
     """
+
     # Number of times the state was entered for the first time in a reader
     # session.
     first_entry_count = ndb.IntegerProperty(default=0, indexed=False)
@@ -97,11 +98,6 @@ class StateCounterModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCounterModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
@@ -128,6 +124,7 @@ class StateCounterModel(base_models.BaseModel):
 
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student submitting an answer."""
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -149,13 +146,6 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """AnswerSubmittedEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -198,6 +188,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     'actually' entering an exploration means the student has completed the
     initial state of the exploration and traversed to the second state.
     """
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -215,13 +206,6 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationActualStartEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -257,6 +241,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student triggering the solution."""
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -276,11 +261,6 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SolutionHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -334,6 +314,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         params: Current parameter values, in the form of a map of parameter
             name to value.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -363,13 +344,6 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StartExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -464,6 +438,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: Time spent in this state before the event
             was triggered.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -496,13 +471,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """MaybeLeaveExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -588,6 +556,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     have the wrong 'last updated' timestamp. However, the 'created_on'
     timestamp is the same as that of the original model.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -620,13 +589,6 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CompleteExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -698,6 +660,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         exploration_id: ID of exploration which is being rated.
         rating: Value of rating assigned to exploration.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration which has been rated.
@@ -716,13 +679,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """RateExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -789,6 +745,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     amount of time between this event (i.e., the learner entering the
     state) and the other event.
     """
+
     # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
@@ -816,11 +773,6 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -884,6 +836,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing a state."""
+
     # Id of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -903,13 +856,6 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCompleteEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -948,6 +894,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student leaving for a refresher exploration."""
+
     # ID of exploration currently being played.
     exp_id = ndb.StringProperty(indexed=True)
     # ID of the refresher exploration.
@@ -969,13 +916,6 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LeaveForRefresherExplorationEventLogEntryModel doesn't have any field
-        with user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -1019,6 +959,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     The ID of instances of this class has the form [exp_id].[exp_version].
     """
+
     # ID of exploration.
     exp_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
@@ -1057,11 +998,6 @@ class ExplorationStatsModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationStatsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1210,6 +1146,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
     """
+
     # ID of exploration.
     exp_id = ndb.StringProperty(indexed=True, required=True)
     # Version of exploration.
@@ -1225,11 +1162,6 @@ class ExplorationIssuesModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationIssuesModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1295,6 +1227,7 @@ class PlaythroughModel(base_models.BaseModel):
     The ID of instances of this class are of the form
     '[exp_id].[random hash of 16 chars]'.
     """
+
     # ID of the exploration.
     exp_id = ndb.StringProperty(indexed=True, required=True)
     # Version of the exploration.
@@ -1315,11 +1248,6 @@ class PlaythroughModel(base_models.BaseModel):
         individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """PlaythroughModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1437,11 +1365,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LearnerAnswerDetailsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_state_reference_for_exploration(cls, exp_id, state_name):
@@ -1564,6 +1487,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     This model is keyed using a custom ID of the format
     {[EXPLORATION_ID]:[EXPLORATION_VERSION]}.
     """
+
     # ID of exploration.
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
@@ -1584,11 +1508,6 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationAnnotationsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
@@ -1663,6 +1582,7 @@ class StateAnswersModel(base_models.BaseModel):
     This model is keyed using a custom ID of the format
         {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID]}.
     """
+
     # This provides about 124k of padding for the other properties and entity
     # storage overhead (since the max entity size is 1MB). The meta data can
     # get close to 50k or exceed it, so plenty of padding is left to avoid
@@ -1713,11 +1633,6 @@ class StateAnswersModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
@@ -2035,11 +1950,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersCalcOutputModels doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create_or_update(

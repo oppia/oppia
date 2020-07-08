@@ -54,6 +54,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     The id of instances of this class has the form
         [entity_type].[entity_id].[generated_string]
     """
+
     # The type of entity the thread is linked to.
     entity_type = ndb.StringProperty(required=True, indexed=True)
     # The ID of the entity the thread is linked to.
@@ -110,50 +111,6 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             cls.original_author_id == user_id,
             cls.last_nonempty_message_author_id == user_id
         )).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """GeneralFeedbackThreadModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the original_author_id and
-        last_nonempty_message_author_id.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-
-        Returns:
-            (str, (str, str)). Status message when the model doesn't exist
-            for the user ID otherwise None.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.original_author_id == old_user_id,
-                cls.last_nonempty_message_author_id == old_user_id)).fetch():
-            if model.original_author_id == old_user_id:
-                model.original_author_id = new_user_id
-            if model.last_nonempty_message_author_id == old_user_id:
-                model.last_nonempty_message_author_id = new_user_id
-            migrated_models.append(model)
-        cls.put_multi(migrated_models, update_last_updated_time=False)
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the IDs in
-        original_author_id and last_nonempty_message_author_id.
-        """
-        user_ids = []
-        if self.original_author_id is not None:
-            user_ids.append(self.original_author_id)
-        if self.last_nonempty_message_author_id is not None:
-            user_ids.append(self.last_nonempty_message_author_id)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
 
     @classmethod
     def export_data(cls, user_id):
@@ -257,6 +214,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     The id of instances of this class has the form [thread_id].[message_id]
     """
+
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = ndb.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
@@ -300,16 +258,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
         return cls.query(cls.author_id == user_id).get(
             keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """GeneralFeedbackMessageModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.author_id
 
     @classmethod
     def export_data(cls, user_id):
@@ -534,13 +482,6 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """GeneralFeedbackThreadUserModel has ID that contains user ID and one
-        field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
         """Generates the full message id of the format:
@@ -634,6 +575,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
     The key of each instance is the exploration ID.
     """
+
     # The number of open feedback threads for this exploration.
     num_open_threads = ndb.IntegerProperty(default=None, indexed=True)
     # Total number of feedback threads for this exploration.
@@ -663,11 +605,6 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """FeedbackAnalyticsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create(cls, model_id, num_open_threads, num_total_threads):
@@ -730,10 +667,3 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UnsentFeedbackEmailModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY

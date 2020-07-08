@@ -49,6 +49,7 @@ class GcloudAdapterImportTests(test_utils.GenericTestBase):
 
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     """Tests import of install third party libs."""
+
     def setUp(self):
         super(InstallThirdPartyLibsImportTests, self).setUp()
         self.commands = []
@@ -57,6 +58,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
         def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):
             class Ret(test_utils.GenericTestBase):
                 """Return object that gives user-prefix error."""
+
                 def __init__(self):
                     self.returncode = 1
                 def communicate(self):
