@@ -447,11 +447,9 @@
 /core/templates/directives/mathjax-bind.directive.ts @aks681 @kevintab95
 /core/templates/mathjaxConfig.ts @aks681 @kevintab95
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681 @kevintab95
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts @shavavo
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts @shavavo
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @shavavo
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.spec.ts @shavavo
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.ts @shavavo
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @shavavo @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @shavavo @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @shavavo @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681 @kevintab95
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681 @kevintab95

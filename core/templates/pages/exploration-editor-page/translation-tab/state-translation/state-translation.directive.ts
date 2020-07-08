@@ -66,7 +66,7 @@ angular.module('oppia').directive('stateTranslation', [
         '/pages/exploration-editor-page/translation-tab/' +
         'state-translation/state-translation.directive.html'),
       controller: [
-        '$filter', '$rootScope', '$scope',
+        '$filter', '$rootScope', '$scope', 'CkEditorCopyContentService',
         'ExplorationCorrectnessFeedbackService',
         'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
         'ExplorationStatesService', 'RouterService', 'StateEditorService',
@@ -75,9 +75,9 @@ angular.module('oppia').directive('stateTranslation', [
         'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
-        'RULE_SUMMARY_WRAP_CHARACTER_COUNT', 'CkEditorCopyContentService',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
-            $filter, $rootScope, $scope,
+            $filter, $rootScope, $scope, CkEditorCopyContentService,
             ExplorationCorrectnessFeedbackService,
             ExplorationInitStateNameService, ExplorationLanguageCodeService,
             ExplorationStatesService, RouterService, StateEditorService,
@@ -86,7 +86,7 @@ angular.module('oppia').directive('stateTranslation', [
             TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
-            RULE_SUMMARY_WRAP_CHARACTER_COUNT, CkEditorCopyContentService
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT
         ) {
           var ctrl = this;
           $scope.isVoiceoverModeActive = (

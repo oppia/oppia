@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for the Ck editor copy content service.
+ */
+
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
@@ -28,9 +32,6 @@ const generateContent = (html: string): HTMLElement => {
   return <HTMLElement>(container.content.firstChild.firstChild);
 };
 
-/**
- * @fileoverview Unit tests for the Ck editor copy content service.
- */
 
 describe('Ck editor copy content service', () => {
   let loggerService = new LoggerService();

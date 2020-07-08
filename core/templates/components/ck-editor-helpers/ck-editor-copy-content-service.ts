@@ -33,7 +33,7 @@ interface CkEditorCopyEvent {
 })
 export class CkEditorCopyContentService {
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
-  private ckeditorToSubscription: {[id: string]: Subscription} = {};
+  private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
 
   copyModeActive = false;
 
@@ -53,13 +53,16 @@ export class CkEditorCopyContentService {
     let containedWidgetTagName;
     let currentElement = target;
 
-    while (
-      currentElement.parentElement.tagName !== 'ANGULAR-HTML-BIND'
-    ) {
+    while (true) {
       const currentTagName = currentElement.tagName.toLowerCase();
       if (currentTagName.includes('-noninteractive-')) {
         containedWidgetTagName = currentTagName;
       }
+
+      if (currentElement.parentElement.tagName === 'ANGULAR-HTML-BIND') {
+        break;
+      }
+
       currentElement = currentElement.parentElement;
     }
 
@@ -88,24 +91,29 @@ export class CkEditorCopyContentService {
    *  insert HTML.
    * @param {HTMLElement} element The element to be copied.
    * @param {string|undefined} containedWidgetTagName The name of the widget
-   *    in which element contains, if present.
+   *  in which element contains, if present.
    */
   private _handlePaste(
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
       element: HTMLElement,
       containedWidgetTagName?: string
   ) {
-    let tagName = (
+    let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
 
-    if (
-      !containedWidgetTagName && !tagName.includes('-noninteractive-')
-    ) {
+    if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
-      const widgetName = tagName.replace('-noninteractive-', '');
+      const widgetName = elementTagName.replace('-noninteractive-', '');
+
+      // Look for x-with-value="y" to extract and y.
+      //  (\w+): Any word containing [a-zA-Z0-9_] characters.
+      //  (-with-value="): Matches characters literally.
+      //  ([^"]+): Matches any characters excluding ".
+      //  ("): Matches " literally.
       const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
+
       let match;
       let startupData: {[id: string]: string} = {};
 
@@ -143,13 +151,13 @@ export class CkEditorCopyContentService {
    * @param {CKEDITOR.editor} editor The editor to add copied content to.
    */
   bindPasteHandler(
-      editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
+      editor: CKEDITOR.editor | Partial<CKEDITOR.editor>
   ) {
-    this.ckeditorToSubscription[editor.id] = this.copyEventEmitter.subscribe(
+    this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
       ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
         if (editor.status === 'destroyed') {
-          this.ckeditorToSubscription[editor.id].unsubscribe();
-          delete this.ckeditorToSubscription[editor.id];
+          this.ckEditorIdToSubscription[editor.id].unsubscribe();
+          delete this.ckEditorIdToSubscription[editor.id];
           return;
         }
         this._handlePaste(
