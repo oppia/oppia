@@ -37,7 +37,7 @@ export class SocialButtonsComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService) {
     this.translateService.use('en');
   }
-  ngOnInit() {
+  ngOnInit(): void {
     this.translateService.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
