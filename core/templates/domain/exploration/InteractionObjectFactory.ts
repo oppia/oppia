@@ -52,7 +52,8 @@ export class Interaction {
   id: string;
   solution: Solution;
   constructor(
-      answerGroups: AnswerGroup[], confirmedUnclassifiedAnswers: IInteractionAnswer,
+      answerGroups: AnswerGroup[],
+      confirmedUnclassifiedAnswers: IInteractionAnswer,
       customizationArgs: IInteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
