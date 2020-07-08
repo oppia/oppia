@@ -31,17 +31,21 @@ import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
+import { SocialButtonsComponent } from
+  'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+
 
 
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
-    SkillMasteryViewerComponent],
+    SkillMasteryViewerComponent, SocialButtonsComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     // These elements will remain here even after migration.
-    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent
+    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent,
+    SocialButtonsComponent
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
