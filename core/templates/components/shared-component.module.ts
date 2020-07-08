@@ -31,16 +31,18 @@ import { SharingLinksComponent } from
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { TopicSummaryTileComponent } from './summary-tile/topic-summary-tile.component';
 
 
 @NgModule({
   imports: [CommonModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
-    SkillMasteryViewerComponent],
+    SkillMasteryViewerComponent, TopicSummaryTileComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     // These elements will remain here even after migration.
-    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent
+    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent,
+    TopicSummaryTileComponent
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
