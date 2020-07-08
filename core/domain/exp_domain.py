@@ -568,6 +568,22 @@ class Exploration(python_utils.OBJECT):
                 state_domain.Solution.from_dict(idict['id'], idict['solution'])
                 if idict['solution'] else None)
 
+            if idict['id']:
+                # Populate missing customization arguments.
+                idict['customization_args'], new_content_ids = (
+                    customization_args_util.get_full_customization_args(
+                        idict['customization_args'],
+                        interaction_registry.Registry.get_interaction_by_id(
+                            idict['id']).customization_arg_specs
+                    )
+                )
+
+                for new_content_id in new_content_ids:
+                    sdict['recorded_voiceovers']['voiceovers_mapping'][
+                        new_content_id] = {}
+                    sdict['written_translations']['translations_mapping'][
+                        new_content_id] = {}
+
             state.interaction = state_domain.InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,

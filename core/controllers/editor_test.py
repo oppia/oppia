@@ -345,11 +345,13 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 """),
         'State B': ("""classifier_model_id: null
@@ -383,11 +385,13 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
@@ -421,11 +425,13 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -461,11 +467,13 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 """)
 

@@ -669,7 +669,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
 
+        # Make sure previous interaction is valid before calling
+        #   update_interaction_id.
         interaction.id = 'TextInput'
+        init_state.update_interaction_id('TextInput')
         exploration.validate()
 
         interaction.customization_args = []
@@ -693,18 +696,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected answer groups to be a list')
 
         interaction.answer_groups = answer_groups
-        interaction.id = 'EndExploration'
+        init_state.update_interaction_id('EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
-        interaction.id = 'TextInput'
+        init_state.update_interaction_id('TextInput')
         init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
-        interaction.id = 'EndExploration'
+        init_state.update_interaction_id('EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
@@ -715,7 +718,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Restore a valid exploration.
-        interaction.id = 'TextInput'
+        init_state.update_interaction_id('TextInput')
         answer_groups_list = [
             answer_group.to_dict() for answer_group in answer_groups]
         init_state.update_interaction_answer_groups(answer_groups_list)

@@ -2234,7 +2234,7 @@ class AppEngineTestBase(TestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        state.interaction.id = 'TextInput'
+        state.update_interaction_id('TextInput')
         solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -2252,10 +2252,15 @@ class AppEngineTestBase(TestBase):
             state.interaction.id, solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.interaction.customization_args = {
-            'placeholder': 'Enter text here',
-            'rows': 1
-        }
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'custarg_placeholder',
+                    'unicode_str': 'Enter text here'
+                }
+            },
+            'rows': {'value': 1}
+        })
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state

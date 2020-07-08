@@ -1431,47 +1431,55 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             }
         }
         customization_args_dict2 = {
-            'choices': {'value': [
-                (
+            'choices': {'value': [{
+                'content_id': 'custarg_choices_default',
+                'html': (
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
-                ),
-                (
+                )
+            }, {
+                'content_id': 'custarg_choices_0',
+                'html': (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
-            ]}
+            }]}
         }
         customization_args_dict3 = {
-            'choices': {'value': [
-                (
+            'choices': {'value': [{
+                'content_id': 'custarg_choices_default',
+                'html': (
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
+                    '</p>')
+            }, {
+                'content_id': 'custarg_choices_0',
+                'html': (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
+                    '</p>')
+            }, {
+                'content_id': 'custarg_choices_1',
+                'html': (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
-            ]}
+            }]}
         }
         state1.update_interaction_customization_args(customization_args_dict1)
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -1650,11 +1658,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
   New state:
     classifier_model_id: null
@@ -1688,11 +1698,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -1748,11 +1760,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
   Renamed state:
     classifier_model_id: null
@@ -1786,11 +1800,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -1993,11 +2009,13 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -2034,11 +2052,13 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 """)
     }
@@ -2076,11 +2096,13 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder: {}
     default_outcome: {}
 """)
     }
@@ -2394,13 +2416,31 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {'choices': {'value': ['Option A', 'Option B']}}),
+                {'choices': {'value': [
+                    {
+                        'content_id': 'custarg_choices_default',
+                        'html': '<p>Option A</p>'
+                    },
+                    {
+                        'content_id': 'custarg_choices_0',
+                        'html': '<p>Option B</p>'
+                    }
+                ]}}),
             '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.interaction.customization_args[
-                'choices']['value'], ['Option A', 'Option B'])
+                'choices']['value'],
+                [{
+                        'content_id': 'custarg_choices_default',
+                        'html': '<p>Option A</p>'
+                    },
+                    {
+                        'content_id': 'custarg_choices_0',
+                        'html': '<p>Option B</p>'
+                }]
+        )
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
@@ -2640,6 +2680,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'needs_update': True
                     }
                 },
+                'custarg_placeholder': {},
                 'default_outcome': {}
             }
         }
@@ -3769,11 +3810,13 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_buttonText: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_buttonText: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -4401,10 +4444,22 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         state_customization_args_dict = {
             'choices': {
                 'value': [
-                    '<p>state customization arg html 1</p>',
-                    '<p>state customization arg html 2</p>',
-                    '<p>state customization arg html 3</p>',
-                    '<p>state customization arg html 4</p>'
+                    {
+                        'content_id': 'custarg_choices_default',
+                        'html': '<p>state customization arg html 1</p>'
+                    },
+                    {
+                        'content_id': 'custarg_choices_0',
+                        'html': '<p>state customization arg html 2</p>'
+                    },
+                    {
+                        'content_id': 'custarg_choices_1',
+                        'html': '<p>state customization arg html 3</p>'
+                    },
+                    {
+                        'content_id': 'custarg_choices_2',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
                 ]
             },
             'maxAllowableSelectionCount': {
@@ -4425,12 +4480,25 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'new_value': {
                 'choices': {
                     'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>'),
-                        '<p>4</p>'
+                        {
+                            'content_id': 'custarg_choices_default',
+                            'html': '<p>1</p>'
+                        },
+                        {
+                            'content_id': 'custarg_choices_0',
+                            'html': '<p>2</p>'
+                        },
+                        {
+                            'content_id': 'custarg_choices_1',
+                            'html': ('<oppia-noninteractive-math raw_latex-with'
+                                '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
+                                '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
+                                'math>')
+                        },
+                        {
+                            'content_id': 'custarg_choices_2',
+                            'html': '<p>4</p>'
+                        }
                     ]
                 },
                 'maxAllowableSelectionCount': {

@@ -168,7 +168,7 @@ def find_translatable(
         content_id_prefix += '_' + ca_spec['name']
 
     if (schema_obj_type == 'SubtitledUnicode' or
-            schema_obj_type == 'SubtitledHtml'):c
+            schema_obj_type == 'SubtitledHtml'):
         customization_arg['value'] = conversion_fn(
             schema_obj_type,
             customization_arg['value'],
@@ -190,12 +190,12 @@ def find_translatable(
                 content_id_prefix=content_id_prefix)
 
 def convert_translatable_in_cust_args(
-        customization_args, ca_specs, conversion_fn):
+        ca_values, ca_specs, conversion_fn):
     """Converts all html of SubtitledHtml or unicode of SubtitledUnicode in
     customization arguments.
 
     Args:
-        customization_args: dict. The customization dict. The keys are names
+        ca_values: dict. The customization dict. The keys are names
             of customization_args and the values are dicts with a
             single key, 'value', whose corresponding value is the value of
             the customization arg.
@@ -207,15 +207,22 @@ def convert_translatable_in_cust_args(
     """
     for ca_spec in ca_specs:
         ca_spec_name = ca_spec.name
-        if ca_spec_name in customization_args:
+        if ca_spec_name in ca_values:
             find_translatable(
-                customization_args[ca_spec_name],
+                ca_values[ca_spec_name],
                 ca_spec.to_dict(),
                 conversion_fn)
 
-def get_all_content_ids_in_cust_args(
-        ca_values, ca_specs):
-    """
+def get_all_content_ids_in_cust_args(ca_values, ca_specs):
+    """Extracts all content_id's from ca_values, using ca_specs to find
+    SubtitledHtml or SubtitledUnicode locations.
+
+    Args:
+        ca_values: dict. The customization dict. The keys are names
+            of customization_args and the values are dicts with a
+            single key, 'value', whose corresponding value is the value of
+            the customization arg.
+        ca_specs: list(CustomizationArgSpec). List of spec dictionaries.
     """
     content_ids = []
     def dummy_conversion(
@@ -240,3 +247,42 @@ def get_all_content_ids_in_cust_args(
                 dummy_conversion)
     
     return content_ids
+
+
+def get_all_html_in_cust_args(ca_values, ca_specs):
+    """Extracts all html from ca_values, using ca_specs to find
+    SubtitledHtml locations.
+
+    Args:
+        ca_values: dict. The customization dict. The keys are names
+            of customization_args and the values are dicts with a
+            single key, 'value', whose corresponding value is the value of
+            the customization arg.
+        ca_specs: list(CustomizationArgSpec). List of spec dictionaries.
+    """
+    html = []
+    def dummy_conversion(
+            obj_type, ca_value, unused_content_id_prefix, ca_name):
+        if obj_type == 'SubtitledUnicode':
+            return ca_value
+
+        if isinstance(ca_value, list):
+            for content in ca_value:
+                html.append(content['html'])
+        elif isinstance(ca_value, dict):
+            if 'html' in ca_value:
+                html.append(ca_value['html'])
+            else:
+                html.append(ca_value[ca_name]['html'])
+
+        return ca_value
+
+    for ca_spec in ca_specs:
+        ca_spec_name = ca_spec.name
+        if ca_spec_name in ca_values:
+            find_translatable(
+                ca_values[ca_spec_name],
+                ca_spec.to_dict(),
+                dummy_conversion)
+    
+    return html
