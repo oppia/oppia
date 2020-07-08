@@ -25,7 +25,6 @@ from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 import utils
 
 (base_models, feedback_models, user_models) = models.Registry.import_models(
@@ -259,22 +258,6 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackMessageModel
             .has_reference_to_user_id('id_x'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.GeneralFeedbackMessageModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackMessageModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackMessageModel.author_id))
-
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
             Exception, 'Feedback message ID conflict on create.'):
@@ -445,12 +428,6 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadUserModel
             .has_reference_to_user_id('id_x'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.GeneralFeedbackThreadUserModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
-
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id',
@@ -580,12 +557,6 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
             feedback_models.FeedbackAnalyticsModel
             .has_reference_to_user_id('id_x'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.FeedbackAnalyticsModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class."""
@@ -603,12 +574,6 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('id_x'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.UnsentFeedbackEmailModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'
