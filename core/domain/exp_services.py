@@ -70,9 +70,6 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # search query.
 MAX_ITERATIONS = 10
 
-# Asset directories that need to be included in exploration download.
-ASSET_DIRS_TO_INCLUDE_IN_DOWNLOADS = ('image',)
-
 
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user has permissions to edit the exploration.
@@ -270,6 +267,8 @@ def export_to_zip_file(exploration_id, version=None):
         str. The contents of the ZIP archive of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
+    # Asset directories that need to be included in exploration download.
+    asset_dirs_to_include_in_downloads = ('image',)
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
@@ -287,7 +286,7 @@ def export_to_zip_file(exploration_id, version=None):
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
-            if not filepath.startswith(ASSET_DIRS_TO_INCLUDE_IN_DOWNLOADS):
+            if not filepath.startswith(asset_dirs_to_include_in_downloads):
                 continue
             file_contents = fs.get(filepath)
 
