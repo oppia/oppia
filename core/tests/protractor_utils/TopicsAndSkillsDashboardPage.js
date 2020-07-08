@@ -392,10 +392,19 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.unassignSkillWithIndex = async function(index, topicIndex) {
+  this.unassignSkillWithIndex = async function(skillDescription, topicIndex) {
     await waitFor.visibilityOf(skillsTable,
       'Skill table taking too long to appear.');
-    var skillEditOptionBox = skillEditOptions.get(index);
+    var skillIndex = -1;
+    for (var i = 0; i < skillDescriptions.length; i++) {
+      var skillDescriptionText = (
+        await (await skillDescriptions.get(i)).getText());
+      if (skillDescriptionText === skillDescription) {
+        skillIndex = i;
+        break;
+      }
+    }
+    var skillEditOptionBox = skillEditOptions.get(skillIndex);
     await skillEditOptionBox.click();
     await waitFor.elementToBeClickable(
       unassignSkillButon,
@@ -447,8 +456,11 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.expectNumberOfSkillsToBe = async function(number) {
     if (!number) {
+      await waitFor.visibilityOf(
+        noSkillsPresentMessage,
+        'No skill present message taking to long to appear.');
       expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
-      return ;
+      return;
     }
     expect(await skillsListItems.count()).toEqual(number);
   };

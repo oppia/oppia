@@ -167,7 +167,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
 
 class SkillAssignmentsHandler(base.BaseHandler):
-    """Retrieving information about which topics contain the given skill."""
+    """Provides information about which topics contain the given skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -176,12 +176,13 @@ class SkillAssignmentsHandler(base.BaseHandler):
         """Handles GET requests."""
         assigned_topics = skill_services.get_all_topics_assigned_to_skill(
             skill_id)
-
-        for topic_name in assigned_topics:
-            assigned_topics[topic_name] = assigned_topics[topic_name].to_dict()
+        assigned_topic_dicts = {
+            topic_name: assigned_topics[topic_name].to_dict()
+            for topic_name in assigned_topics
+        }
 
         self.render_json({
-            'assigned_topics': assigned_topics
+            'assigned_topics': assigned_topic_dicts
         })
 
 

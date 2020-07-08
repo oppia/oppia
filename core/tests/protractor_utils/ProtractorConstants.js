@@ -17,7 +17,7 @@
  * tests.
  */
 
-exports = {
+module.exports = {
   SKILL_STATUS_UNASSIGNED: 'Unassigned',
   SKILL_STATUS_ASSIGNED: 'Assigned'
 };

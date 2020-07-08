@@ -73,7 +73,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
 
-    await topicsAndSkillsDashboardPage.unassignSkillWithIndex(0, 0);
+    await topicsAndSkillsDashboardPage.unassignSkillWithIndex('Skill 2', 0);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(

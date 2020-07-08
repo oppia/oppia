@@ -641,7 +641,7 @@ def get_all_topics_assigned_to_skill(skill_id):
 
     Returns:
         dict. A dict where keys represent topic names and values represent
-        SkillAssignments domain object.
+        TopicAssignment domain object.
     """
     assigned_topics = {}
     topics = topic_fetchers.get_all_topics()
@@ -653,7 +653,7 @@ def get_all_topics_assigned_to_skill(skill_id):
                     subtopic_id = subtopic.id
                     break
 
-            assigned_topics[topic.name] = skill_domain.SkillAssignments(
+            assigned_topics[topic.name] = skill_domain.TopicAssignment(
                 topic.id, topic.version, subtopic_id)
 
     return assigned_topics

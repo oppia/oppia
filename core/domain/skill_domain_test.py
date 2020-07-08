@@ -804,11 +804,11 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
             augmented_skill_summary_dict)
 
 
-class SkillAssignmentsTests(test_utils.GenericTestBase):
+class TopicAssignmentTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(SkillAssignmentsTests, self).setUp()
-        self.skill_assignments = skill_domain.SkillAssignments(
+        super(TopicAssignmentTests, self).setUp()
+        self.skill_assignments = skill_domain.TopicAssignment(
             'topic_id1', 2, 1)
 
     def test_skill_assignments_gets_created(self):
