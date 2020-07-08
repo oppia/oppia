@@ -167,4 +167,8 @@ class SortedTiles(BaseVisualization):
         'name': 'header',
         'description': 'Header for the tiles.',
         'schema': {'type': 'unicode'}
+    }, {
+        'name': 'use_percentages',
+        'description': 'Summarize frequency through percentages',
+        'schema': {'type': 'bool'},
     }]

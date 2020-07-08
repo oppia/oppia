@@ -35,7 +35,7 @@ export class StoriesListComponent implements OnInit {
     private translateService: TranslateService) {
     this.translateService.use('en');
   }
-  ngOnInit() {
+  ngOnInit(): void {
     this.translateService.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
