@@ -109,18 +109,18 @@
 
 
 # Dev workflow team.
-/.circleci/ @BenHenning @vinitamurthi @U8NWXD
+/.circleci/ @kevinlee12 @U8NWXD
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
 /.coveragerc @bansalnitish @Hudda
-/.gitattributes @DubeySandeep
-/.gitignore @DubeySandeep
+/.gitattributes @kevinlee12
+/.gitignore @kevinlee12
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD
-/.yarnrc @DubeySandeep
+/.travis.yml @kevinlee12 @U8NWXD
+/.yarnrc @kevinlee12
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
 /tox.ini @bansalnitish @Hudda
@@ -132,7 +132,7 @@
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
 /scripts/linters/excluded_any_type_files.json @nishantwrp
-/ubuntu_dockerfile @DubeySandeep
+/ubuntu_dockerfile @ezl-13 @kevinlee12
 
 
 # Exploration project.
@@ -427,7 +427,7 @@
 /core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
 /utils*.py @aks681
-/python_utils*.py @DubeySandeep
+/python_utils*.py @kevinlee12
 
 
 # Restricted pages.
@@ -588,7 +588,6 @@
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @vojtechjelinek
-/.github/ @DubeySandeep
+/.github/ @kevinlee12
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-/.github/workflows/ @BenHenning @vinitamurthi
