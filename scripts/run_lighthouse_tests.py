@@ -30,7 +30,6 @@ from scripts import build
 from scripts import common
 
 _PARSER = argparse.ArgumentParser()
-
 _PARSER.add_argument(
     '--disable_compression',
     help='optional; if specified does not serve compressed assets',
@@ -39,9 +38,9 @@ _PARSER.add_argument(
     '--only_install_nginx',
     help='optional; if specified only instals nginx and does not run the check',
     action='store_true')
-
+FECONF_FILE_PATH = os.path.join('feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
 RUNNING_PROCESSES = []
-
 APP_ENGINE_PORT = 8181
 NGINX_PORT = 9999
 NGINX_DOWNLOAD_PATH = os.path.join(common.OPPIA_TOOLS_DIR, 'nginx-1.13.1')
@@ -62,7 +61,7 @@ def run_lighthouse_checks():
 
     if process.returncode != 0:
         python_utils.PRINT('Checks failed view details above')
-        sys.exit(1)
+        sys.exit(process.returncode)
 
 
 def start_google_app_engine_server(port=APP_ENGINE_PORT):
@@ -147,6 +146,14 @@ def run_lighthouse_checks_with_compression():
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
+    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
+    replace = 'COMMUNITY_DASHBOARD_ENABLED = False'
+    common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
+
+    pattern = '"ENABLE_ACCOUNT_DELETION": .*'
+    replace = '"ENABLE_ACCOUNT_DELETION": false,'
+    common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
+
     dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
     processes_to_kill = [
         '.*%s.*' % re.escape(dev_appserver_path),
@@ -160,6 +167,17 @@ def cleanup():
         common.kill_processes_based_on_regex(p)
 
 
+def enable_webpages():
+    """Enables deactivated webpages for testing."""
+    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
+    replace = 'COMMUNITY_DASHBOARD_ENABLED = True'
+    common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
+
+    pattern = '"ENABLE_ACCOUNT_DELETION": .*'
+    replace = '"ENABLE_ACCOUNT_DELETION": true,'
+    common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
+
+
 def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -171,14 +189,8 @@ def main(args=None):
 
     atexit.register(cleanup)
     build.main(args=['--prod_env'])
-
-    if parsed_args.disable_compression:
-        # Setting this so that it will be compatible with the config file.
-        start_google_app_engine_server(port=NGINX_PORT)
-        common.wait_for_port_to_be_open(APP_ENGINE_PORT)
-        run_lighthouse_checks()
-    else:
-        run_lighthouse_checks_with_compression()
+    enable_webpages()
+    run_lighthouse_checks_with_compression()
 
 
 if __name__ == '__main__':
