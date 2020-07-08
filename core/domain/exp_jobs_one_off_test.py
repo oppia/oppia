@@ -99,6 +99,10 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
     def setUp(self):
         super(DragAndDropSortInputInteractionOneOffJobTests, self).setUp()
 
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -108,6 +112,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         """Checks output pairs are produced only for
         desired interactions.
         """
+        owner = user_services.UserActionsInfo(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -217,6 +222,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
         # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
         job_id = (
@@ -235,6 +241,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_answer_groups(answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
         # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
         job_id = (
@@ -258,6 +265,20 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             '"]]'
         )]
         self.assertEqual(actual_output, expected_output)
+
+        rights_manager.unpublish_exploration(self.admin, self.VALID_EXP_ID)
+        # Start DragAndDropSortInputInteractionOneOffJob on private
+        # exploration.
+        job_id = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
+        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
+        self.assertEqual(actual_output, [])
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
