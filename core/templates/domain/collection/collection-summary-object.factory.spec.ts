@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Exploration Summary Object Factory.
+ * @fileoverview Unit tests for collectio  Summary Object Factory.
  */
 
 import { CollectionSummaryObjectFactory } from
   'domain/collection/collection-summary-object.factory';
 
-describe('Exploration summary object factory', () => {
+describe('Collection summary object factory', () => {
   let csof: CollectionSummaryObjectFactory;
 
   beforeEach(() => {
     csof = new CollectionSummaryObjectFactory();
   });
 
-  it('should correctly convert backend dict to exp summary object', () => {
+  it('should correctly convert backend dict to collection summary object', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
