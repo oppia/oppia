@@ -129,6 +129,7 @@ describe('State Diff Modal Controller', function() {
     });
 
     it('should evaluate yaml strings object', function() {
+      // Flush 400 milliseconds $timeout in order to set right and left panes.
       $timeout.flush(400);
       expect($scope.yamlStrs.leftPane).toBe('');
       expect($scope.yamlStrs.rightPane).toBe('');
