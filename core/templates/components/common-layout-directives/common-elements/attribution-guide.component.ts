@@ -36,7 +36,7 @@ export class AttributionGuideComponent implements OnInit {
     private urlService: UrlService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
     this.iframed = this.urlService.isIframed();
   }
