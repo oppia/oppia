@@ -23,6 +23,7 @@ import copy
 
 from core.platform import models
 import feconf
+import python_utils
 
 from core.domain import skill_domain
 
