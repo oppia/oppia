@@ -28,10 +28,6 @@ from core.platform import models
 app_identity_services = models.Registry.import_app_identity_services()
 
 
-# The maximum width or length an image can be resized to, inclusive.
-MAX_RESIZE_DIMENSION_PX = 4000.0
-
-
 def get_image_dimensions(file_content):
     """Gets the dimensions of the image with the given file_content.
 

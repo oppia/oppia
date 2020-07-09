@@ -46,7 +46,6 @@ import utils
 
 (exp_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
-gae_image_services = models.Registry.import_gae_image_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 

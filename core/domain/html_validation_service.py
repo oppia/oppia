@@ -27,13 +27,12 @@ import bs4
 from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import image_services
 from core.domain import rte_component_registry
 from core.platform import models
 from extensions.objects.models import objects
 import feconf
 import python_utils
-
-gae_image_services = models.Registry.import_gae_image_services()
 
 
 def escape_html(unescaped_html_data):
@@ -871,7 +870,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
     filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))
-        height, width = gae_image_services.get_image_dimensions(content)
+        height, width = image_services.get_image_dimensions(content)
     except IOError:
         height = 120
         width = 120
