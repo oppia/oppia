@@ -21,6 +21,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -61,7 +62,7 @@ class SkillEditorPage(base.BaseHandler):
         """Handles GET requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
             raise self.PageNotFoundException(
@@ -122,7 +123,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException(Exception('Invalid skill id.'))
 
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
             raise self.PageNotFoundException(
@@ -166,7 +167,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     def put(self, skill_id):
         """Updates properties of the given skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
@@ -186,7 +187,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        skill_dict = skill_services.get_skill_by_id(skill_id).to_dict()
+        skill_dict = skill_fetchers.get_skill_by_id(skill_id).to_dict()
 
         self.values.update({
             'skill': skill_dict
@@ -228,7 +229,7 @@ class SkillDataHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException('Invalid skill id.')
         try:
-            skills = skill_services.get_multi_skills(skill_ids)
+            skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -252,7 +253,7 @@ class FetchSkillsHandler(base.BaseHandler):
         skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
 
         try:
-            skills = skill_services.get_multi_skills(skill_ids)
+            skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
