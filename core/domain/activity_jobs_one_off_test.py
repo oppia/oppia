@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import datetime
 
 from constants import constants
 from core.domain import activity_jobs_one_off
@@ -627,3 +628,257 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_commit_model.last_updated,
             migrated_commit_model.last_updated)
+
+
+class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
+
+    USER_1_ID = 'user_1_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off.FixCommitLastUpdatedOneOffJob.create_new())
+        activity_jobs_one_off.FixCommitLastUpdatedOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            activity_jobs_one_off.FixCommitLastUpdatedOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_commit_model_last_updated_before(self):
+        original_commit_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id',
+                user_id='committer_id',
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-06-18T22:00:00Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-06-18T22:01:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model.put(update_last_updated_time=False)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_NEWLY_CREATED - CollectionCommitLogEntryModel', 1]],
+            output)
+
+        migrated_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
+        self.assertEqual(
+            original_commit_model.created_on,
+            migrated_commit_model.created_on)
+        self.assertEqual(
+            original_commit_model.last_updated,
+            migrated_commit_model.last_updated)
+
+    def test_one_commit_model_last_updated_during(self):
+        original_commit_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id',
+                user_id='committer_id',
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2019-06-29T01:00:00Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-06-29T11:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model.put(update_last_updated_time=False)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_FIXED - CollectionCommitLogEntryModel', 1]], output)
+
+        migrated_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
+        self.assertEqual(
+            original_commit_model.created_on,
+            migrated_commit_model.created_on)
+        self.assertNotEqual(
+            original_commit_model.last_updated,
+            migrated_commit_model.last_updated)
+        self.assertEqual(
+            original_commit_model.created_on,
+            migrated_commit_model.last_updated)
+
+    def test_one_commit_model_last_updated_after(self):
+        original_commit_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id',
+                user_id='committer_id',
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-07-01T08:59:59Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-07-01T09:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model.put(update_last_updated_time=False)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_NEWLY_CREATED - CollectionCommitLogEntryModel', 1]],
+            output)
+
+        migrated_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
+        self.assertEqual(
+            original_commit_model.created_on,
+            migrated_commit_model.created_on)
+        self.assertEqual(
+            original_commit_model.last_updated,
+            migrated_commit_model.last_updated)
+
+    def test_multiple_commit_models_admins(self):
+        original_commit_model_1 = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id1',
+                user_id=feconf.SYSTEM_COMMITTER_ID,
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-07-01T09:59:59Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-07-01T11:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model_1.put(update_last_updated_time=False)
+        original_commit_model_2 = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id2',
+                user_id=feconf.MIGRATION_BOT_USER_ID,
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-07-01T09:59:59Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-07-01T11:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model_2.put(update_last_updated_time=False)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ADMIN - CollectionCommitLogEntryModel', 2]], output)
+
+        migrated_commit_model_1 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id1'))
+        self.assertEqual(
+            original_commit_model_1.created_on,
+            migrated_commit_model_1.created_on)
+        self.assertEqual(
+            original_commit_model_1.last_updated,
+            migrated_commit_model_1.last_updated)
+
+        migrated_commit_model_2 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id2'))
+        self.assertEqual(
+            original_commit_model_2.created_on,
+            migrated_commit_model_2.created_on)
+        self.assertEqual(
+            original_commit_model_2.last_updated,
+            migrated_commit_model_2.last_updated)
+
+    def test_multiple_commit_models_last_updated_wrong(self):
+        original_commit_model_1 = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id1',
+                user_id='committer_id',
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-07-01T09:59:59Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-07-01T09:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model_1.put(update_last_updated_time=False)
+        original_commit_model_2 = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id2',
+                user_id='committer_id',
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2020-07-01T09:59:59Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-07-20T09:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model_2.put(update_last_updated_time=False)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['FAILURE_INCORRECT - CollectionCommitLogEntryModel',
+              ['id1', 'id2']]],
+            output)
+
+        migrated_commit_model_1 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id1'))
+        self.assertEqual(
+            original_commit_model_1.created_on,
+            migrated_commit_model_1.created_on)
+        self.assertEqual(
+            original_commit_model_1.last_updated,
+            migrated_commit_model_1.last_updated)
+
+        migrated_commit_model_2 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id2'))
+        self.assertEqual(
+            original_commit_model_2.created_on,
+            migrated_commit_model_2.created_on)
+        self.assertEqual(
+            original_commit_model_2.last_updated,
+            migrated_commit_model_2.last_updated)
