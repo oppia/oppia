@@ -71,6 +71,7 @@ def compress_image(image_content, scaling_factor):
         width, height = img.width, img.height
         new_width = int(width * scaling_factor)
         new_height = int(height * scaling_factor)
+        print(str(new_height)+" " +str(new_width))
         if (new_width > MAX_RESIZE_DIMENSION_PX
                 or new_height > MAX_RESIZE_DIMENSION_PX):
             # Recompute the scaling factor such that the larger dimension does
@@ -80,12 +81,23 @@ def compress_image(image_content, scaling_factor):
                     MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
-        maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
-                   min(new_height, MAX_RESIZE_DIMENSION_PX))
-        img.thumbnail(maxsize, Image.ANTIALIAS)
-        with io.BytesIO() as output:
-            img.save(output, format=img_format)
-            contents = output.getvalue()
+            
+            maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
+                    min(new_height, MAX_RESIZE_DIMENSION_PX))
+            
+            resized_img = img.resize(maxsize)
+            
+            with io.BytesIO() as output:
+                resized_img.save(output, format=img_format)
+                contents = output.getvalue()
+        else:
+            maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
+                    min(new_height, MAX_RESIZE_DIMENSION_PX))
+            img.thumbnail(maxsize, Image.ANTIALIAS)
+            print("Final image: " + str(img.width) + " " + str(img.height))
+            with io.BytesIO() as output:
+                img.save(output, format=img_format)
+                contents = output.getvalue()
 
         return contents
     else:
