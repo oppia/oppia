@@ -36,7 +36,7 @@ import { IInteractionAnswer } from 'interactions/answer-defs';
 export interface IInteractionBackendDict {
   'default_outcome': IOutcomeBackendDict;
   'answer_groups': IAnswerGroupBackendDict[];
-  'confirmed_unclassified_answers': IInteractionAnswer;
+  'confirmed_unclassified_answers': IInteractionAnswer[];
   'customization_args': IInteractionCustomizationArgs;
   'hints': IHintBackendDict[];
   'id': string;
@@ -45,7 +45,7 @@ export interface IInteractionBackendDict {
 
 export class Interaction {
   answerGroups: AnswerGroup[];
-  confirmedUnclassifiedAnswers: IInteractionAnswer;
+  confirmedUnclassifiedAnswers: IInteractionAnswer[];
   customizationArgs: IInteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
@@ -53,7 +53,7 @@ export class Interaction {
   solution: Solution;
   constructor(
       answerGroups: AnswerGroup[],
-      confirmedUnclassifiedAnswers: IInteractionAnswer,
+      confirmedUnclassifiedAnswers: IInteractionAnswer[],
       customizationArgs: IInteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
