@@ -23,7 +23,7 @@ import { AppConstants } from 'app.constants';
 import { ExpressionParserService } from
   'expressions/expression-parser.service.ts';
 
-interface ENV {
+interface Env {
   [param: string]: Object;
 }
 

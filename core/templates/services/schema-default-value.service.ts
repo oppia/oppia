@@ -76,7 +76,7 @@ type SchemaDefaultValue = (
   string |
   number |
   boolean |
-  Array<SchemaDefaultValue> |
+  SchemaDefaultValue[] |
   DictSchemaDefaultValue);
 
 @Injectable({
