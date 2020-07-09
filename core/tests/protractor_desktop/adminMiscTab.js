@@ -55,7 +55,7 @@ describe('Admin misc test tab', function() {
     await adminPage.getMiscTab();
     await adminPage.uploadTopicSimilarities(
       '../data/sample_topic_similarities.csv', true);
-    allowedErrors.push('encode', 'Object', 'resource');
+    await allowedErrors.push('encode', 'Object', 'resource');
     await adminPage.expectSimilaritiesToBeUploaded();
     await browser.refresh();
     await adminPage.uploadTopicSimilarities('../data/cafe.mp3', false);
@@ -81,7 +81,7 @@ describe('Admin misc test tab', function() {
 
   it('should try to send a test mail to admin', async function() {
     await adminPage.sendTestEmail();
-    allowedErrors.push('400', 'emails', 'Object');
+    await allowedErrors.push('400', 'emails', 'Object');
     await adminPage.expectEmailError();
   });
 
@@ -89,7 +89,7 @@ describe('Admin misc test tab', function() {
     async function() {
       await adminPage.regenerateContributionsForTopic('0');
       await adminPage.expectRegenerationError('0');
-      allowedErrors.push('500', 'Entity');
+      await allowedErrors.push('500', 'Entity');
       await adminPage.regenerateContributionsForTopic(topicId);
       await adminPage.expectConributionsToBeRegeneratedForTopic();
     });

@@ -21,7 +21,6 @@ var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var path = require('path');
-var fs = require('fs');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
@@ -328,14 +327,15 @@ var AdminPage = function() {
         'Upload button taking too long to be clickable');
       await similarityFileUploadButton.click();
       if (isValidFile) {
+        var text = 'Topic similarities uploaded successfully.';
         await waitFor.visibilityOf(statusMessage,
           'Status message not visible');
-        await waitFor.textToBePresentInElement(statusMessage,
-          'Topic similarities uploaded successfully.');
-        expect(await statusMessage.getText()).toEqual(
-          'Topic similarities uploaded successfully.');
+        await waitFor.textToBePresentInElement(statusMessage, text,
+          'Status message not visible');
+        expect(await statusMessage.getText()).toEqual(text);
       } else {
-        var text = await statusMessage.getText();
+        var text = 'Server error: \'ascii\' codec can\'t encode characters' +
+          ' in position 1024-1025: ordinal not in range(128)';
         await waitFor.visibilityOf(statusMessage,
           'Status message not visible');
         await waitFor.textToBePresentInElement(statusMessage,
@@ -396,10 +396,6 @@ var AdminPage = function() {
     var url = '/explorationdataextractionhandler?exp_id=0&exp_version' +
       '=0&state_name=0&num_answers=0';
     expect(protractor.ExpectedConditions.urlContains(url)).toBeTruthy();
-    var currTab = await browser.getWindowHandle();
-    await browser.driver.switchTo(currTab);
-    await browser.driver.close();
-    await browser.driver.switchTo(parentHandle);
   };
 
   this.regenerateContributionsForTopic = async function(topicId) {

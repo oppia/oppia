@@ -1,7 +1,8 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob')
 var path = require('path')
-var DPATH = path.resolve(__dirname, './downloads')
+var Constants = require('./protractor_utils/ProtractorConstants');
+var DOWNLOAD_PATH = path.resolve(__dirname, Constants.protractorConstants.DOWNLOAD_PATH);
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -253,7 +254,7 @@ exports.config = {
       prefs: {
         'download': {
             'prompt_for_download': false,
-            'default_directory': DPATH,
+            'default_directory': DOWNLOAD_PATH,
         }
       }
     },

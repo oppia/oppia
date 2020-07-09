@@ -17,6 +17,10 @@
  * tests.
  */
 
+var path = require('path');
+var DOWNLOAD_PATH = path.resolve(__dirname, '../downloads');
+
 exports.protractorConstants = {
-  SKILL_STATUS_UNASSIGNED: 'Unassigned'
+  SKILL_STATUS_UNASSIGNED: 'Unassigned',
+  DOWNLOAD_PATH: DOWNLOAD_PATH,
 };
