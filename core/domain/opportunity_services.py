@@ -452,7 +452,7 @@ def get_exploration_opportunity_summaries_by_ids(ids):
                     exp_opportunity_summary_model))
             opportunities.append(exp_opportunity_summary)
         else:
-            logging.info(
+            logging.warning(
                 'Backend warning: when getting the exploration opportunity '
                 'summary models for ids: %s, one of the models was None.' % ids)
     return opportunities
