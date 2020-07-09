@@ -26,6 +26,20 @@ import { ReviewTestDomainConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+interface ReviewTestBackendResponse {
+  'story_name': string;
+  'skill_descriptions': {
+    [skillId: string]: string;
+  }
+}
+
+interface ReviewTestData {
+  storyName: string;
+  skillDescriptions: {
+    [skillId: string]: string;
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,16 +49,21 @@ export class ReviewTestBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchReviewTestData(storyId: string): Promise<Object> {
-    return this.http.get(
+  _fetchReviewTestData(storyId: string): Promise<ReviewTestData> {
+    return this.http.get<ReviewTestBackendResponse>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
         {story_id: storyId}
       )
-    ).toPromise();
+    ).toPromise().then(backendResponse => {
+      return {
+        storyName: backendResponse.story_name,
+        skillDescriptions: backendResponse.skill_descriptions
+      };
+    });
   }
 
-  fetchReviewTestData(storyId: string): Promise<Object> {
+  fetchReviewTestData(storyId: string): Promise<ReviewTestData> {
     return this._fetchReviewTestData(storyId);
   }
 }

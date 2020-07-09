@@ -1315,6 +1315,7 @@ export class UpgradedServices {
     upgradedServices['SkillRightsBackendApiService'] =
       new SkillRightsBackendApiService(
         upgradedServices['HttpClient'],
+        upgradedServices['SkillRightsObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(
