@@ -439,6 +439,8 @@ import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryObjectFactory } from
+  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
@@ -779,6 +781,8 @@ export class UpgradedServices {
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['SkillDifficultyObjectFactory'] =
       new SkillDifficultyObjectFactory();
+    upgradedServices['SkillMasteryObjectFactory'] =
+      new SkillMasteryObjectFactory();
     upgradedServices['SkillOpportunityObjectFactory'] =
       new SkillOpportunityObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =
@@ -1299,7 +1303,8 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['SkillMasteryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],
