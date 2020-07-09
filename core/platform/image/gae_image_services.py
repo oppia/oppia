@@ -25,7 +25,6 @@ from PIL import Image
 from constants import constants
 from core.platform import models
 import python_utils
-from  google.appengine.api import images
 
 app_identity_services = models.Registry.import_app_identity_services()
 
