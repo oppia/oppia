@@ -128,7 +128,7 @@
                 ng-change="$ctrl.onFontChange()">
         </select>
       </div>
-      <div class="input-tag">
+      <div class="input-tag" ng-if="$ctrl.objectIsSelected">
         <select ng-model="$ctrl.fabricjsOptions.size" ng-options="size for size in $ctrl.sizes"
                 ng-change="$ctrl.onSizeChange()">
         </select>

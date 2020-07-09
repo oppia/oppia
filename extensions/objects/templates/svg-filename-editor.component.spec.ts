@@ -276,13 +276,13 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.canvas.backgroundColor).toBe(color);
     expect(rectShape.get('strokeWidth')).toBe(10);
     svgFilenameCtrl.createText();
+    svgFilenameCtrl.canvas.discardActiveObject();
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[1]);
     svgFilenameCtrl.fabricjsOptions.bold = true;
     svgFilenameCtrl.fabricjsOptions.italic = true;
     svgFilenameCtrl.fabricjsOptions.fontFamily = 'comic sans ms';
     svgFilenameCtrl.fabricjsOptions.size = '12px';
-    svgFilenameCtrl.canvas.discardActiveObject();
-    svgFilenameCtrl.canvas.setActiveObject(
-      svgFilenameCtrl.canvas.getObjects()[1]);
     svgFilenameCtrl.onItalicToggle();
     svgFilenameCtrl.onBoldToggle();
     svgFilenameCtrl.onFontChange();
