@@ -346,20 +346,6 @@ angular.module('oppia').component('learnerDashboardPage', {
         );
       };
 
-      /**
-       * This was needed because javascript returns -1 using inBuilt indexOf
-       * even when there are identical objects.
-       * Refer -> https://stackoverflow.com/q/11704971
-       */
-      var findIndex = (arr, element) => {
-        for (var i = 0; i < arr.length; i++) {
-          if (JSON.stringify(arr[i]) === JSON.stringify(element)) {
-            return i;
-          }
-        }
-        return -1;
-      };
-
       ctrl.openRemoveActivityModal = function(
           sectionNameI18nId, subsectionName, activity) {
         $uibModal.open({
@@ -384,13 +370,15 @@ angular.module('oppia').component('learnerDashboardPage', {
               LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
             if (subsectionName ===
                 LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-              var index = findIndex(ctrl.incompleteExplorationsList, activity);
+              var index = ctrl.incompleteExplorationsList.findIndex(
+                exp => exp.id === activity.id);
               if (index !== -1) {
                 ctrl.incompleteExplorationsList.splice(index, 1);
               }
             } else if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-              var index = findIndex(ctrl.incompleteCollectionsList, activity);
+              var index = ctrl.incompleteCollectionsList.findIndex(
+                collection => collection.id === activity.id);
               if (index !== -1) {
                 ctrl.incompleteCollectionsList.splice(index, 1);
               }
@@ -399,13 +387,15 @@ angular.module('oppia').component('learnerDashboardPage', {
                     LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
             if (subsectionName ===
                 LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-              var index = findIndex(ctrl.explorationPlaylist, activity);
+              var index = ctrl.explorationPlaylist.findIndex(
+                exp => exp.id === activity.id);
               if (index !== -1) {
                 ctrl.explorationPlaylist.splice(index, 1);
               }
             } else if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-              var index = findIndex(ctrl.collectionPlaylist, activity);
+              var index = ctrl.collectionPlaylist.findIndex(
+                collection => collection.id === activity.id);
               if (index !== -1) {
                 ctrl.collectionPlaylist.splice(index, 1);
               }
