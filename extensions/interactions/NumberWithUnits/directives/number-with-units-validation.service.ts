@@ -22,12 +22,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { unit } from 'mathjs';
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { INumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';

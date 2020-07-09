@@ -144,8 +144,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
             'outcome': {
                 'dest': None,
@@ -269,7 +268,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_with_math['change'],
-                'test description', self.reviewer_id)
+                'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -366,8 +365,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -508,7 +506,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_without_math['change'],
-                'test description', self.reviewer_id)
+                'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -625,8 +623,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
             'outcome': {
                 'dest': None,
@@ -745,8 +742,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
         job_id = (
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.create_new())
@@ -876,8 +872,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -890,6 +885,104 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_change_dict,
             observed_translation_suggestion.to_dict()['change'])
+
+    def test_skip_migration_for_suggestion_with_new_math_schema(self):
+        """Tests that a suggestion already having the new math_schema is not
+        migrated.
+        """
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+
+        state_dict = {
+            'classifier_model_id': None,
+            'content': {
+                'content_id': 'content',
+                'html': expected_html_content
+            },
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': expected_html_content
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'id': None,
+                'solution': None,
+            },
+            'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {}
+                }
+            },
+            'solicit_answer_details': False,
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {}
+                }
+            }
+        }
+        states = {
+            'Introduction': state_dict
+        }
+        exploration = (
+            exp_domain.Exploration(
+                'exp1', feconf.DEFAULT_EXPLORATION_TITLE, 'Algebra',
+                feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+                constants.DEFAULT_LANGUAGE_CODE, [], '', '',
+                feconf.CURRENT_STATE_SCHEMA_VERSION,
+                feconf.DEFAULT_INIT_STATE_NAME, states, {}, [], 0, False,
+                False))
+        exp_services.save_new_exploration(self.author_id, exploration)
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': expected_html_content
+            }
+        }
+
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_exploration_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id, self.target_version_at_submission,
+                self.author_id, change_dict, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionMathMigrationOneOffJob.create_new())
+        suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionMathMigrationOneOffJob.get_output(job_id))
+        self.assertEqual(len(actual_output), 0)
+
 
     def test_migration_skips_suggestions_failing_validation(self):
         html_content = (
@@ -1012,8 +1105,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
 
         def _mock_get_suggestion_by_id(unused_suggestion_id):
             """Mocks get_suggestion_by_id()."""
@@ -1160,8 +1252,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
 
         def _mock_convert_html_in_suggestion_change(
                 unused_self, unused_conversion_fn):
