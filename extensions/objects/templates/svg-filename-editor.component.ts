@@ -869,18 +869,21 @@ angular.module('oppia').component('svgFilenameEditor', {
             color: shape.get('stroke')
           });
           ctrl.objectIsSelected = true;
-          var strokeWidthShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
+          var strokeWidthShapes = [
+            'rect', 'circle', 'path', 'line', 'polyline'];
           if (strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
-            ctrl.fabricjsOptions.size = shape.get('strokeWidth').toString() + 'px';
+            ctrl.fabricjsOptions.size = (
+              shape.get('strokeWidth').toString() + 'px');
           } else if (shape.get('type') === 'textbox') {
             ctrl.displayFontStyles = true;
-            ctrl.fabricjsOptions.size = shape.get('fontSize').toString() + 'px'
+            ctrl.fabricjsOptions.size = (
+              shape.get('fontSize').toString() + 'px');
             ctrl.fabricjsOptions.fontFamily = shape.get('fontFamily');
             ctrl.fabricjsOptions.italic = shape.get('fontStyle') === 'italic';
             ctrl.fabricjsOptions.bold = shape.get('fontWeight') === 'bold';
           }
           $scope.$applyAsync();
-        }
+        };
 
         ctrl.canvas.on('selection:created', function() {
           onSelection();
