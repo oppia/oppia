@@ -16,31 +16,19 @@
  * @fileoverview Component for the topic viewer stories list.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 @Component({
   selector: 'stories-list',
   templateUrl: './topic-viewer-stories-list.component.html',
   styleUrls: []
 })
-export class StoriesListComponent implements OnInit {
-  @Input() canonicalStorySummaries: Array<StorySummary>;
-  constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private translateService: TranslateService) {
-    this.translateService.use('en');
-  }
-  ngOnInit(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code));
-  }
+export class StoriesListComponent {
+  @Input() canonicalStorySummaries: StorySummary[];
+  constructor() {}
 }
 angular.module('oppia').directive(
   'storiesList', downgradeComponent(

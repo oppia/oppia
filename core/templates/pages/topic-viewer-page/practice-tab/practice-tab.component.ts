@@ -24,8 +24,6 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants} from
   'pages/practice-session-page/practice-session-page.constants.ts';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 @Component({
   selector: 'practice-tab',
@@ -39,16 +37,9 @@ export class PracticeTabComponent implements OnInit {
   availableSubtopics: Array<Subtopic> = [];
   selectedSubtopicIndices: Array<Boolean> = [];
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService) {
-    translateService.use('en');
   }
   ngOnInit(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code));
     this.selectedSubtopics = [];
     this.availableSubtopics = this.subtopicsList.filter(
       (subtopic: Subtopic) => {
