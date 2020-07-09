@@ -47,7 +47,9 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
           var isAnswerValid = function() {
             return (
               ctrl.answer !== undefined &&
-              ctrl.answer !== null && ctrl.answer !== '');
+              ctrl.answer !== null && ctrl.answer !== '' &&
+              angular.isUndefined(
+                NumericInputValidationService.getErrorString(ctrl.answer)));
           };
 
           ctrl.submitAnswer = function(answer) {
