@@ -19,8 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import io
 import os
 
+from PIL import Image
 from constants import constants
 from core.platform.image import gae_image_services
 from core.tests import test_utils
@@ -39,67 +41,102 @@ class GaeImageServicesUnitTests(test_utils.GenericTestBase):
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'dummyLargeImage.jpg'),
             mode='rb', encoding=None) as f:
-            self.raw_image = f.read()
+            self.jpeg_raw_image = f.read()
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            mode='rb', encoding=None) as f:
+            self.png_raw_image = f.read()
 
-    def test_get_image_dimensions(self):
-        compressed_image = (
-            gae_image_services.compress_image(self.raw_image, 0.5))
+    def test_image_dimensions_outputs_correctly(self):
         height, width = (
-            gae_image_services.get_image_dimensions(compressed_image))
-        # The google app engine images api sometimes rounds off by 1 pixel
-        # compared to the pillow implementation.
-        self.assertTrue(abs(self.TEST_IMAGE_HEIGHT - height) <= 1)
-        self.assertTrue(abs(self.TEST_IMAGE_WIDTH - width) <= 1)
+            gae_image_services.get_image_dimensions(self.jpeg_raw_image))
+        self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
+        self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
-    def test_dev_mode(self):
-        height, width = gae_image_services.get_image_dimensions(self.raw_image)
-        # The google app engine images api sometimes rounds off by 1 pixel
-        # compared to the pillow implementation.
-        self.assertTrue(abs(self.TEST_IMAGE_HEIGHT - height) <= 1)
-        self.assertTrue(abs(self.TEST_IMAGE_WIDTH - width) <= 1)
+    def test_dev_mode_returns_regular_image(self):
+        height, width = (gae_image_services.get_image_dimensions(
+            self.jpeg_raw_image))
+        self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
+        self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
-    def test_compress_image(self):
+    def test_compress_image_returns_correct_dimensions(self):
         with self.swap(constants, 'DEV_MODE', False):
             compressed_image = (
-                gae_image_services.compress_image(self.raw_image, 0.5))
+                gae_image_services.compress_image(self.jpeg_raw_image, 0.5))
         height, width = (
             gae_image_services.get_image_dimensions(compressed_image))
-        # The google app engine images api sometimes rounds off by 1 pixel
-        # compared to the pillow implementation.
-        self.assertTrue(abs(int(self.TEST_IMAGE_HEIGHT * 0.5) - height) <= 1)
-        self.assertTrue(abs(int(self.TEST_IMAGE_WIDTH * 0.5) - width) <= 1)
+        image = Image.open(io.BytesIO(compressed_image))
+        image.save('compressed_image.jpg')
+        self.assertEqual(self.TEST_IMAGE_HEIGHT * 0.5, height)
+        self.assertEqual(self.TEST_IMAGE_WIDTH * 0.5, width)
 
-    def test_large_decompress_image(self):
-        # This test tests the use case where the method causes the dimensions to
-        # go above 4000 pixels on either dimension.
-
+    def test_enlarge_image_returns_correct_dimensions(self):
         with self.swap(constants, 'DEV_MODE', False):
             compressed_image = (
-                gae_image_services.compress_image(self.raw_image, 2))
+                gae_image_services.enlarge_image(self.jpeg_raw_image, 1.1))
         height, width = (
             gae_image_services.get_image_dimensions(compressed_image))
-        # When any of the dimensions goes above 4000, the largest dimension is
-        # scaled down to 4000 and the other one is scaled so the ratio is the
-        # same.
-        correct_scaled_height = int(
-            python_utils.divide(4000.0, self.TEST_IMAGE_WIDTH) *
-            self.TEST_IMAGE_HEIGHT)
-        correct_scaled_width = 4000
-        # The google app engine images api sometimes rounds off by 1 pixel
-        # compared to the pillow implementation.
-        self.assertTrue(abs(correct_scaled_height - height) <= 1)
-        self.assertTrue(abs(correct_scaled_width - width) <= 1)
+        self.assertEqual(int(self.TEST_IMAGE_HEIGHT * 1.1), height)
+        self.assertEqual(int(self.TEST_IMAGE_WIDTH * 1.1), width)
 
-    def test_decompress_image(self):
-        # This test tests the use case where the method causes the dimensions to
-        # go above 4000 pixels on either dimension.
+    def test_invalid_scaling_factor_triggers_value_error(self):
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Scaling factor should be less than 1.')
+        with self.swap(constants, 'DEV_MODE', False), email_exception:
+            gae_image_services.compress_image(self.jpeg_raw_image, 1.1)
 
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Scaling factor should be greater than 1.')
+        with self.swap(constants, 'DEV_MODE', False), email_exception:
+            gae_image_services.enlarge_image(self.jpeg_raw_image, 0.8)
+
+    def test_compression_results_in_correct_format(self):
         with self.swap(constants, 'DEV_MODE', False):
             compressed_image = (
-                gae_image_services.compress_image(self.raw_image, 1.1))
-        height, width = (
-            gae_image_services.get_image_dimensions(compressed_image))
-        # The google app engine images api sometimes rounds off by 1 pixel
-        # compared to the pillow implementation.
-        self.assertTrue(abs(int(self.TEST_IMAGE_HEIGHT * 1.1) - height) <= 1)
-        self.assertTrue(abs(int(self.TEST_IMAGE_WIDTH * 1.1) - width) <= 1)
+                gae_image_services.compress_image(self.jpeg_raw_image, 0.7))
+        pil_image = Image.open(io.BytesIO(compressed_image))
+        self.assertEqual(pil_image.format, 'JPEG')
+        with self.swap(constants, 'DEV_MODE', False):
+            compressed_image = (
+                gae_image_services.compress_image(self.png_raw_image, 0.7))
+        pil_image = Image.open(io.BytesIO(compressed_image))
+        self.assertEqual(pil_image.format, 'PNG')
+
+    def test_compression_results_in_identical_files(self):
+        def is_different(file1, file2):
+            """Checks the differences between the two images and returns if they
+            are different.
+
+            Args:
+                file1: str. Content of first image.
+                file2: str. Content of second image.
+
+            Returns:
+                bool. Returns whether the images are different.
+            """
+            from PIL import ImageChops
+            image1 = Image.open(io.BytesIO(file1)).convert('RGB')
+            image2 = Image.open(io.BytesIO(file2)).convert('RGB')
+            diff = ImageChops.difference(image1, image2)
+
+            if diff.getbbox():
+                return False
+            else:
+                return True
+
+        with python_utils.open_file(
+            os.path.join(
+                feconf.TESTS_DATA_DIR, 'compressed_image.jpg'),
+            mode='rb', encoding=None) as f:
+            correct_compressed_image = f.read()
+        correct_height, correct_width = (
+            gae_image_services.get_image_dimensions(correct_compressed_image))
+        with self.swap(constants, 'DEV_MODE', False):
+            compressed_image = (
+                gae_image_services.compress_image(self.jpeg_raw_image, 0.5))
+        height, width = gae_image_services.get_image_dimensions(
+            compressed_image)
+        self.assertEqual(correct_height, height)
+        self.assertEqual(correct_width, width)
+        self.assertFalse(is_different(compressed_image,
+                                      correct_compressed_image))
