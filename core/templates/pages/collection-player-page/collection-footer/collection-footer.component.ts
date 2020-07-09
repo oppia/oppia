@@ -17,13 +17,11 @@
  * in collection player.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { TranslateService } from 'services/translate.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'collection-footer',
@@ -33,20 +31,17 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 export class CollectionFooterComponent implements OnInit {
   collectionId: string = '';
   constructor(
-    private translateService: TranslateService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService) {
-    translateService.use('en');
   }
   ngOnInit() {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code));
     this.collectionId = this.urlService.getCollectionIdFromUrl();
   }
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
+
+angular.module('oppia').directive(
+  'collectionFooter', downgradeComponent(
+    {component: CollectionFooterComponent}));
