@@ -3,7 +3,7 @@
     <div class="col-sm-5">
       <ul>
         <li>
-          <img src="{{ getStaticImageUrl('/general/apple.svg') }}" class="collection-footer-img" alt="">
+          <img [src]="getStaticImageUrl('/general/apple.svg')" class="collection-footer-img" alt="">
         </li>
       </ul>
     </div>
@@ -16,9 +16,9 @@
           <li>
             <sharing-links (click)="$event.stopPropagation()"
                            [collectionId]="collectionId"
-                           layout-type="row"
-                           layout-align-type="center center"
-                           share-type="collection"
+                           layoutType="row"
+                           layoutAlignType="center center"
+                           shareType="collection"
                            class="oppia-collection-footer-sharing-links"
                            aria-label="Social media links">
             </sharing-links>
