@@ -93,7 +93,7 @@ def clean_math_expression(math_expression):
     Returns:
         str. The correctly formatted string representing the math expression.
     """
-    UNICODE_TO_TEXT = {
+    unicode_to_text = {
         u'\u221a': 'sqrt',
         u'\xb7': '*',
         u'\u03b1': 'alpha',
@@ -120,23 +120,23 @@ def clean_math_expression(math_expression):
         u'\u03c8': 'psi',
         u'\u03c9': 'omega',
     }
-    INVERSE_TRIG_FNS_MAPPING = {
+    inverse_trig_fns_mapping = {
         'asin': 'arcsin',
         'acos': 'arccos',
         'atan': 'arctan'
     }
-    TRIG_FNS = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
+    trig_fns = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
 
     # Shifting powers in trig functions to the end.
     # For eg. 'sin^2(x)' -> 'sin(x)^2'.
-    for trig_fn in TRIG_FNS:
+    for trig_fn in trig_fns:
         math_expression = re.sub(
             r'%s(\^\d)\((.)\)' % trig_fn,
             r'%s(\2)\1' % trig_fn, math_expression)
 
     # Adding parens to trig functions that don't have
     # any. For eg. 'cosA' -> 'cos(A)'.
-    for trig_fn in TRIG_FNS:
+    for trig_fn in trig_fns:
         math_expression = re.sub(
             r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
 
@@ -144,12 +144,12 @@ def clean_math_expression(math_expression):
     # special characters like sqrt and pi, which is why
     # they need to be replaced with their corresponding
     # text values before performing validation.
-    for unicode_char, text in UNICODE_TO_TEXT.items():
+    for unicode_char, text in unicode_to_text.items():
         math_expression = math_expression.replace(unicode_char, text)
 
     # Replacing trig functions that have format which is
     # incompatible with the validations.
-    for invalid_trig_fn, valid_trig_fn in INVERSE_TRIG_FNS_MAPPING.items():
+    for invalid_trig_fn, valid_trig_fn in inverse_trig_fns_mapping.items():
         math_expression = math_expression.replace(
             invalid_trig_fn, valid_trig_fn)
 
@@ -280,7 +280,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                             if validity != 'Invalid':
                                 types_of_inputs.add(validity)
-                            
+
                             if len(types_of_inputs) > 1:
                                 yield ('ERROR', (
                                     'The exploration with ID: %s and state '
@@ -343,7 +343,7 @@ class MathExpressionUpgradationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
-                                validity = 'Valid Algebraic Expression'    
+                                validity = 'Valid Algebraic Expression'
                                 new_interaction_id = 'AlgebraicExpressionInput'
                             elif is_valid_math_expression(
                                     rule_input, algebraic=False):
@@ -352,7 +352,7 @@ class MathExpressionUpgradationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             elif is_valid_math_equation(rule_input):
                                 validity = 'Valid Math Equation'
                                 new_interaction_id = 'MathEquationInput'
-                            
+
                             if validity != 'Invalid':
                                 rule_spec.inputs['x'] = rule_input
                                 if validity == 'Valid Math Equation':

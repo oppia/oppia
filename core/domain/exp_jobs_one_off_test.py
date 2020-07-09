@@ -1083,7 +1083,7 @@ class MathExpressionUpgradationOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
-        state2 = exploration.states['State3']
+        state3 = exploration.states['State3']
 
         state1.update_interaction_id('MathExpressionInput')
         state2.update_interaction_id('MathExpressionInput')
