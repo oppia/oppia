@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for copying ck editor content from an output view to an
+ * @fileoverview Service for copying html content from an output view to an
  *               ck editor
  */
 
@@ -24,7 +24,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { Subscription } from 'rxjs';
 
 interface CkEditorCopyEvent {
-  rootElement: HTMLElement;
+  rootElement?: HTMLElement;
   containedWidgetTagName?: string;
 }
 
@@ -32,6 +32,14 @@ interface CkEditorCopyEvent {
   providedIn: 'root'
 })
 export class CkEditorCopyContentService {
+  private readonly whitelistedWidgets = new Set([
+    'oppia-noninteractive-collapsible',
+    'oppia-noninteractive-image',
+    'oppia-noninteractive-link',
+    'oppia-noninteractive-math',
+    'oppia-noninteractive-tabs',
+    'oppia-noninteractive-video'
+  ]);
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
   private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
 
@@ -81,6 +89,11 @@ export class CkEditorCopyContentService {
       ];
     }
 
+    if (containedWidgetTagName &&
+        !this.whitelistedWidgets.has(containedWidgetTagName)) {
+      return {};
+    }
+
     return { rootElement: currentElement, containedWidgetTagName };
   }
 
@@ -96,7 +109,7 @@ export class CkEditorCopyContentService {
   private _handlePaste(
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
       element: HTMLElement,
-      containedWidgetTagName?: string
+      containedWidgetTagName: string | undefined
   ) {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
@@ -107,11 +120,13 @@ export class CkEditorCopyContentService {
     } else {
       const widgetName = elementTagName.replace('-noninteractive-', '');
 
-      // Look for x-with-value="y" to extract and y.
-      //  (\w+): Any word containing [a-zA-Z0-9_] characters.
-      //  (-with-value="): Matches characters literally.
-      //  ([^"]+): Matches any characters excluding ".
-      //  ("): Matches " literally.
+      // Look for x-with-value="y" to extract x and y.
+      //  Group 1 (\w+): Any word containing [a-zA-Z0-9_] characters. This is
+      //    the name of the property.
+      //  Group 2 (-with-value="): Matches characters literally.
+      //  Group 3 ([^"]+): Matches any characters excluding ". This is the
+      //    value of the property.
+      //  Group 4 ("): Matches " literally.
       const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
 
       let match;
@@ -155,6 +170,9 @@ export class CkEditorCopyContentService {
   ) {
     this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
       ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
+        if (!rootElement) {
+          return;
+        }
         if (editor.status === 'destroyed') {
           this.ckEditorIdToSubscription[editor.id].unsubscribe();
           delete this.ckEditorIdToSubscription[editor.id];

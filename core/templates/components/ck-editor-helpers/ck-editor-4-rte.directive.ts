@@ -16,10 +16,11 @@
  * @fileoverview Directive for CK Editor.
  */
 
+require('third-party-imports/ckeditor.import.ts');
+
 require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
-require('third-party-imports/ckeditor.import.ts');
 
 interface UiConfig {
   (): UiConfig;
