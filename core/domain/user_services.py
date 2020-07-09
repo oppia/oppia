@@ -293,6 +293,21 @@ class UserSettings(python_utils.OBJECT):
                         'This username is not available.')
 
 
+def is_user_id_correct(user_id):
+    """Verify that the user ID is in a correct format.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format, False otherwise.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('uid_'),
+        len(user_id) == user_models.USER_ID_LENGTH))
+
+
 def is_username_taken(username):
     """"Returns whether the given username has already been taken.
 
