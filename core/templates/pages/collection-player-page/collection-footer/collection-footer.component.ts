@@ -19,6 +19,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -34,7 +35,7 @@ export class CollectionFooterComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService) {
   }
-  ngOnInit() {
+  ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
   }
   getStaticImageUrl(imagePath: string): string {

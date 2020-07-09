@@ -52,7 +52,7 @@ import { ObjectsDomainConstants } from
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule,
+    SharedComponentsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
