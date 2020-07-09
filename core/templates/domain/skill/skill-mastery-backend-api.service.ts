@@ -21,15 +21,21 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { SkillMasteryObjectFactory, SkillMastery } from
+  './SkillMasteryObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SkillMasteryBackendApiService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private skillMasteryObjectFactory: SkillMasteryObjectFactory) {}
 
   _fetchSkillMasteryDegrees(skillIds: Array<string>,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (
+        value?: SkillMastery | PromiseLike<SkillMastery>
+      ) => void,
       errorCallback: (reason?: any) => void): void {
     this.httpClient.get(SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, {
       params: {
@@ -37,7 +43,10 @@ export class SkillMasteryBackendApiService {
       }
     }).toPromise().then((response: any) => {
       if (successCallback) {
-        successCallback(response.degrees_of_mastery);
+        let skillMastery = (
+          this.skillMasteryObjectFactory.createFromBackendDict(
+            response.degrees_of_mastery));
+        successCallback(skillMastery);
       }
     }, (errorResponse) =>{
       if (errorCallback) {
@@ -47,7 +56,9 @@ export class SkillMasteryBackendApiService {
   }
 
   _updateSkillMasteryDegrees(masteryPerSkillMapping: {[key: string]: number},
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (
+        value?: SkillMastery | PromiseLike<SkillMastery>
+      ) => void,
       errorCallback: (reason?: any) => void): void {
     let putData = {
       mastery_change_per_skill: masteryPerSkillMapping
@@ -65,14 +76,14 @@ export class SkillMasteryBackendApiService {
     });
   }
 
-  fetchSkillMasteryDegrees(skillIds: Array<string>): Promise<Object> {
+  fetchSkillMasteryDegrees(skillIds: Array<string>): Promise<SkillMastery> {
     return new Promise((resolve, reject) => {
       this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
     });
   }
 
   updateSkillMasteryDegrees(
-      masteryPerSkillMapping: {[key: string]: number}): Promise<Object> {
+      masteryPerSkillMapping: {[key: string]: number}): Promise<SkillMastery> {
     return new Promise((resolve, reject) => {
       this._updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);
     });

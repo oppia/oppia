@@ -478,6 +478,8 @@ import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryObjectFactory } from
+  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
@@ -860,6 +862,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static skillCreationBackendApiService: SkillCreationBackendApiService;
   static skillDifficultyObjectFactory: SkillDifficultyObjectFactory;
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
+  static skillMasteryObjectFactory: SkillMasteryObjectFactory;
   static skillObjectFactory: SkillObjectFactory;
   static skillOpportunityObjectFactory: SkillOpportunityObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
@@ -1157,6 +1160,7 @@ private siteAnalyticsService: SiteAnalyticsService,
 private skillCreationBackendApiService: SkillCreationBackendApiService,
 private skillDifficultyObjectFactory: SkillDifficultyObjectFactory,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
+private skillMasteryObjectFactory: SkillMasteryObjectFactory,
 private skillObjectFactory: SkillObjectFactory,
 private skillOpportunityObjectFactory: SkillOpportunityObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
@@ -1455,6 +1459,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.skillCreationBackendApiService = this.skillCreationBackendApiService;
     OppiaAngularRootComponent.skillDifficultyObjectFactory = this.skillDifficultyObjectFactory;
     OppiaAngularRootComponent.skillMasteryBackendApiService = this.skillMasteryBackendApiService;
+    OppiaAngularRootComponent.skillMasteryObjectFactory = this.skillMasteryObjectFactory;
     OppiaAngularRootComponent.skillObjectFactory = this.skillObjectFactory;
     OppiaAngularRootComponent.skillOpportunityObjectFactory = this.skillOpportunityObjectFactory;
     OppiaAngularRootComponent.skillRightsBackendApiService = this.skillRightsBackendApiService;
