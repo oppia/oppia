@@ -16,7 +16,7 @@
  * @fileoverview Component for topic-viewer subtopics list.
  */
 
-import { Component, Input} from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
