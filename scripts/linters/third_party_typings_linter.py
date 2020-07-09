@@ -58,12 +58,6 @@ THIRD_PARTY_LIBS = [
         'type_defs_filename_prefix': 'midi-defs-'
     },
     {
-        'name': 'Wavesurfer',
-        'dependency_key': 'wavesurfer.js',
-        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
-        'type_defs_filename_prefix': 'wavesurfer-defs-'
-    },
-    {
         'name': 'Nerdamer',
         'dependency_key': 'nerdamer',
         'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
