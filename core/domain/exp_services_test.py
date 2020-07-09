@@ -3879,7 +3879,8 @@ title: Old Title
     def test_update_exploration_does_nothing_if_create_stats_model_fails(self):
         swap_create_stats_model = (
             self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
-        assert_raises_regexp = self.assertRaisesRegexp(Exception)
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'DivisionError'))
 
         self.save_new_valid_exploration('exp_id', 'user_id')
         with swap_create_stats_model, assert_raises_regexp:
@@ -4195,7 +4196,8 @@ title: Old Title
     def test_revert_exploration_does_nothing_if_create_stats_model_fails(self):
         swap_create_stats_model = (
             self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
-        assert_raises_regexp = self.assertRaises(Exception)
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'DivisionError'))
 
         self.save_new_valid_exploration('exp_id', 'user_id')
         exp_services.update_exploration(
