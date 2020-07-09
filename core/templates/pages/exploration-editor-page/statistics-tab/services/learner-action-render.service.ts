@@ -29,7 +29,7 @@
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'answer-submit-action.directive.ts');
+  'answer-submit-action.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'multiple-incorrect-submissions-issue.directive.ts');
@@ -104,6 +104,11 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       var custArgs = learnerAction.actionCustomizationArgs;
       var interaction = ExplorationStatesService.getState(
         custArgs.state_name.value).interaction;
+
+      return renderAnswerSubmitActionHTML(
+        custArgs.submitted_answer.value, custArgs.dest_state_name.value,
+        custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
+        actionIndex, interaction);
       if (actionType === ACTION_TYPE_EXPLORATION_START) {
         return renderExplorationStartActionHTML(
           custArgs.state_name.value, actionIndex);
@@ -118,10 +123,10 @@ angular.module('oppia').factory('LearnerActionRenderService', [
             custArgs.dest_state_name.value,
             custArgs.time_spent_state_in_msecs.value, actionIndex);
         } else {
-          return renderAnswerSubmitActionHTML(
-            custArgs.submitted_answer.value, custArgs.dest_state_name.value,
-            custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
-            actionIndex, interaction);
+          // return renderAnswerSubmitActionHTML(
+          //   custArgs.submitted_answer.value, custArgs.dest_state_name.value,
+          //   custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
+          //   actionIndex, interaction);
         }
       }
     };
