@@ -20,24 +20,25 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ExplorationTask, ExplorationTaskObjectFactory } from
-  'domain/improvements/ExplorationTaskObjectFactory';
-import { ITaskEntryBackendDict } from
-  'domain/improvements/TaskEntryObjectFactory';
+import {
+  IExplorationTaskBackendDict,
+  ExplorationTask,
+  ExplorationTaskObjectFactory
+} from 'domain/improvements/ExplorationTaskObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 export interface IExplorationImprovementsResponseBackendDict {
-  'open_tasks': ITaskEntryBackendDict[];
+  'open_tasks': IExplorationTaskBackendDict[];
   'resolved_task_types_by_state_name': {
     [stateName: string]: string[];
   };
 }
 
 export interface IExplorationImprovementsHistoryResponseBackendDict {
-  'results': ITaskEntryBackendDict[];
+  'results': IExplorationTaskBackendDict[];
   'cursor': string;
   'more': boolean;
 }
@@ -56,7 +57,7 @@ export class ExplorationImprovementsHistoryResponse {
 }
 
 @Injectable({providedIn: 'root'})
-export class ImprovementsBackendApiService {
+export class ExplorationImprovementsBackendApiService {
   constructor(
       private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
       private http: HttpClient,
@@ -113,5 +114,5 @@ export class ImprovementsBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'ImprovementsBackendApiService',
-  downgradeInjectable(ImprovementsBackendApiService));
+  'ExplorationImprovementsBackendApiService',
+  downgradeInjectable(ExplorationImprovementsBackendApiService));

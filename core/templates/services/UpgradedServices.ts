@@ -171,6 +171,8 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
@@ -244,8 +246,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -1229,14 +1229,14 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ExplorationImprovementsBackendApiService'] =
+      new ExplorationImprovementsBackendApiService(
+        upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
       new ExplorationStatsBackendApiService(
         upgradedServices['ExplorationStatsObjectFactory'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
-    upgradedServices['ImprovementsBackendApiService'] =
-      new ImprovementsBackendApiService(
-        upgradedServices['ExplorationTaskObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
