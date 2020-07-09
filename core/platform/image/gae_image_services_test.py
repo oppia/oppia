@@ -46,13 +46,17 @@ class GaeImageServicesUnitTests(test_utils.GenericTestBase):
             gae_image_services.compress_image(self.raw_image, 0.5))
         height, width = (
             gae_image_services.get_image_dimensions(compressed_image))
-        self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
-        self.assertEqual(self.TEST_IMAGE_WIDTH, width)
+        # The google app engine images api sometimes rounds off by 1 pixel
+        # compared to the pillow implementation.
+        self.assertTrue(abs(self.TEST_IMAGE_HEIGHT - height) <= 1)
+        self.assertTrue(abs(self.TEST_IMAGE_WIDTH - width) <= 1)
 
     def test_dev_mode(self):
         height, width = gae_image_services.get_image_dimensions(self.raw_image)
-        self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
-        self.assertEqual(self.TEST_IMAGE_WIDTH, width)
+        # The google app engine images api sometimes rounds off by 1 pixel
+        # compared to the pillow implementation.
+        self.assertTrue(abs(self.TEST_IMAGE_HEIGHT - height) <= 1)
+        self.assertTrue(abs(self.TEST_IMAGE_WIDTH - width) <= 1)
 
     def test_compress_image(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -60,8 +64,10 @@ class GaeImageServicesUnitTests(test_utils.GenericTestBase):
                 gae_image_services.compress_image(self.raw_image, 0.5))
         height, width = (
             gae_image_services.get_image_dimensions(compressed_image))
-        self.assertEqual(self.TEST_IMAGE_HEIGHT * 0.5, height)
-        self.assertEqual(self.TEST_IMAGE_WIDTH * 0.5, width)
+        # The google app engine images api sometimes rounds off by 1 pixel
+        # compared to the pillow implementation.
+        self.assertTrue(abs(int(self.TEST_IMAGE_HEIGHT * 0.5) - height) <= 1)
+        self.assertTrue(abs(int(self.TEST_IMAGE_WIDTH * 0.5) - width) <= 1)
 
     def test_large_decompress_image(self):
         # This test tests the use case where the method causes the dimensions to
@@ -79,5 +85,21 @@ class GaeImageServicesUnitTests(test_utils.GenericTestBase):
             python_utils.divide(4000.0, self.TEST_IMAGE_WIDTH) *
             self.TEST_IMAGE_HEIGHT)
         correct_scaled_width = 4000
-        self.assertEqual(correct_scaled_height, height)
-        self.assertEqual(correct_scaled_width, width)
+        # The google app engine images api sometimes rounds off by 1 pixel
+        # compared to the pillow implementation.
+        self.assertTrue(abs(correct_scaled_height - height) <= 1)
+        self.assertTrue(abs(correct_scaled_width - width) <= 1)
+
+    def test_decompress_image(self):
+        # This test tests the use case where the method causes the dimensions to
+        # go above 4000 pixels on either dimension.
+
+        with self.swap(constants, 'DEV_MODE', False):
+            compressed_image = (
+                gae_image_services.compress_image(self.raw_image, 1.1))
+        height, width = (
+            gae_image_services.get_image_dimensions(compressed_image))
+        # The google app engine images api sometimes rounds off by 1 pixel
+        # compared to the pillow implementation.
+        self.assertTrue(abs(int(self.TEST_IMAGE_HEIGHT * 1.1) - height) <= 1)
+        self.assertTrue(abs(int(self.TEST_IMAGE_WIDTH * 1.1) - width) <= 1)

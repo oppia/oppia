@@ -25,6 +25,7 @@ from PIL import Image
 from constants import constants
 from core.platform import models
 import python_utils
+from  google.appengine.api import images
 
 app_identity_services = models.Registry.import_app_identity_services()
 
@@ -47,7 +48,7 @@ def get_image_dimensions(file_content):
     return height, width
 
 
-def compress_image(image_content, scaling_factor):
+def compress_image_for_PIL(image_content, scaling_factor):
     """Compresses the image by resizing the image with the scaling factor.
 
     Note that if the image's dimensions, after the scaling factor is applied,
@@ -89,7 +90,7 @@ def compress_image(image_content, scaling_factor):
 
             with io.BytesIO() as output:
                 resized_image.save(output, format=image_format)
-                contents = output.getvalue()
+                new_image_content = output.getvalue()
         elif scaling_factor > 1:
             new_image_dimensions = (
                 min(new_width, MAX_RESIZE_DIMENSION_PX),
@@ -100,7 +101,7 @@ def compress_image(image_content, scaling_factor):
 
             with io.BytesIO() as output:
                 resized_image.save(output, format=image_format)
-                contents = output.getvalue()
+                new_image_content = output.getvalue()
         else:
             new_image_dimensions = (
                 min(new_width, MAX_RESIZE_DIMENSION_PX),
@@ -108,8 +109,42 @@ def compress_image(image_content, scaling_factor):
             image.thumbnail(new_image_dimensions, Image.ANTIALIAS)
             with io.BytesIO() as output:
                 image.save(output, format=image_format)
-                contents = output.getvalue()
+                new_image_content = output.getvalue()
 
-        return contents
+        return new_image_content
+    else:
+        return image_content
+
+def compress_image(image_content, scaling_factor):
+    """Compresses the image by resizing the image with the scaling factor.
+    Note that if the image's dimensions, after the scaling factor is applied,
+    exceed 4000 then the scaling factor will be recomputed and applied such that
+    the larger dimension of the image does not exceed 4000 after resizing. This
+    is due to an implementation limitation. See https://goo.gl/TJCbmE for
+    context.
+    Args:
+        image_content: str. Content of the file to be compressed.
+        scaling_factor: float. The number by which the dimensions of the image
+            will be scaled. This is expected to be greater than zero.
+    Returns:
+        str. Returns the content of the compressed image.
+    """
+    if not constants.DEV_MODE:
+        height, width = get_image_dimensions(image_content)
+        new_width = int(width * scaling_factor)
+        new_height = int(height * scaling_factor)
+        if (new_width > MAX_RESIZE_DIMENSION_PX
+                or new_height > MAX_RESIZE_DIMENSION_PX):
+            # Recompute the scaling factor such that the larger dimension does
+            # not exceed 4000 when scaled.
+            new_scaling_factor = (
+                python_utils.divide(
+                    MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
+            new_width = int(width * new_scaling_factor)
+            new_height = int(height * new_scaling_factor)
+        return images.resize(
+            image_data=image_content,
+            width=min(new_width, MAX_RESIZE_DIMENSION_PX),
+            height=min(new_height, MAX_RESIZE_DIMENSION_PX))
     else:
         return image_content
