@@ -13,16 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for ImprovementConfirmationModal.
+ * @fileoverview Module for Angular Material.
  */
 
-angular.module('oppia').controller('ImprovementConfirmationModalController', [
-  '$scope', '$uibModalInstance', 'buttonClass', 'buttonText', 'message',
-  function($scope, $uibModalInstance, buttonClass, buttonText, message ) {
-    $scope.confirmationMessage = message;
-    $scope.confirmationButtonText = buttonText;
-    $scope.confirmationButtonClass = buttonClass;
-    $scope.action = $uibModalInstance.close;
-    $scope.cancel = $uibModalInstance.dismiss;
-  }
-]);
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+@NgModule({
+  imports: [CommonModule, BrowserAnimationsModule,
+    MatButtonModule, MatCardModule
+  ],
+  exports: [BrowserAnimationsModule, MatButtonModule, MatCardModule]
+})
+export class MaterialModule {}
