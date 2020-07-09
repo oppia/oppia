@@ -42,8 +42,8 @@ def get_image_dimensions(file_content):
     Returns:
         tuple(int). Returns height and width of the image.
     """
-    img = Image.open(io.BytesIO(file_content))
-    width, height = img.size
+    image = Image.open(io.BytesIO(file_content))
+    width, height = image.size
     return height, width
 
 
@@ -65,10 +65,10 @@ def compress_image(image_content, scaling_factor):
         str. Returns the content of the compressed image.
     """
     if not constants.DEV_MODE:
-        img = Image.open(io.BytesIO(image_content))
+        image = Image.open(io.BytesIO(image_content))
 
-        img_format = img.format
-        width, height = img.width, img.height
+        image_format = image.format
+        width, height = image.width, image.height
         new_width = int(width * scaling_factor)
         new_height = int(height * scaling_factor)
         if (new_width > MAX_RESIZE_DIMENSION_PX
@@ -80,31 +80,34 @@ def compress_image(image_content, scaling_factor):
                     MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
-            maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
-                       min(new_height, MAX_RESIZE_DIMENSION_PX))
+            new_image_dimensions = (
+                min(new_width, MAX_RESIZE_DIMENSION_PX),
+                min(new_height, MAX_RESIZE_DIMENSION_PX))
 
             # Thumbnail doesn't work for enlarging images.
-            resized_img = img.resize(maxsize)
+            resized_image = image.resize(new_image_dimensions)
 
             with io.BytesIO() as output:
-                resized_img.save(output, format=img_format)
+                resized_image.save(output, format=image_format)
                 contents = output.getvalue()
         elif scaling_factor > 1:
-            maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
-                       min(new_height, MAX_RESIZE_DIMENSION_PX))
+            new_image_dimensions = (
+                min(new_width, MAX_RESIZE_DIMENSION_PX),
+                min(new_height, MAX_RESIZE_DIMENSION_PX))
 
             # Thumbnail doesn't work for enlarging images.
-            resized_img = img.resize(maxsize)
+            resized_image = image.resize(new_image_dimensions)
 
             with io.BytesIO() as output:
-                resized_img.save(output, format=img_format)
+                resized_image.save(output, format=image_format)
                 contents = output.getvalue()
         else:
-            maxsize = (min(new_width, MAX_RESIZE_DIMENSION_PX),
-                       min(new_height, MAX_RESIZE_DIMENSION_PX))
-            img.thumbnail(maxsize, Image.ANTIALIAS)
+            new_image_dimensions = (
+                min(new_width, MAX_RESIZE_DIMENSION_PX),
+                min(new_height, MAX_RESIZE_DIMENSION_PX))
+            image.thumbnail(new_image_dimensions, Image.ANTIALIAS)
             with io.BytesIO() as output:
-                img.save(output, format=img_format)
+                image.save(output, format=image_format)
                 contents = output.getvalue()
 
         return contents
