@@ -49,7 +49,7 @@ export class MultipleChoiceInputValidationService {
     var areAnyChoicesDuplicated = false;
     var seenChoices = [];
     for (var i = 0; i < customizationArgs.choices.value.length; i++) {
-      var choice = customizationArgs.choices.value[i].html;
+      var choice = customizationArgs.choices.value[i].getHtml();
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }

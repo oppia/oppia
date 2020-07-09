@@ -20,6 +20,10 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicodeObjectFactory } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 const OBJECT_DEFAULTS = require('objects/object_defaults.json');
 
@@ -27,7 +31,12 @@ const OBJECT_DEFAULTS = require('objects/object_defaults.json');
   providedIn: 'root'
 })
 export class SchemaDefaultValueService {
-  constructor(private logger: LoggerService) {}
+  constructor(
+      private logger: LoggerService,
+      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+      private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
+  ) {}
+
   // TODO(sll): Rewrite this to take validators into account, so that
   // we always start with a valid value.
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
@@ -58,7 +67,17 @@ export class SchemaDefaultValueService {
     } else if (schema.type === 'int' || schema.type === 'float') {
       return 0;
     } else if (schema.type === 'custom') {
-      return angular.copy(OBJECT_DEFAULTS[schema.obj_type]);
+      let defaultValue = angular.copy(OBJECT_DEFAULTS[schema.obj_type]);
+
+      if (schema.obj_type === 'SubtitledHtml') {
+        return this.subtitledHtmlObjectFactory.createFromBackendDict(
+          defaultValue);
+      } else if (schema.obj_type === 'SubtitledUnicode') {
+        return this.subtitledUnicodeObjectFactory.createFromBackendDict(
+          defaultValue);
+      }
+
+      return defaultValue;
     } else {
       this.logger.error('Invalid schema type: ' + schema.type);
     }

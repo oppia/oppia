@@ -26,23 +26,34 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SubtitledUnicode {
-  constructor(
-    public unicode: string,
-    readonly contentId: string) {}
+  _unicode: string;
+  _contentId: string;
+  constructor(unicode: string, contentId: string) {
+    this._unicode = unicode;
+    this._contentId = contentId;
+  }
 
-  hasNoUnicode(): boolean {
-    return !this.unicode;
+  getUnicode(): string {
+    return this._unicode;
+  }
+
+  getContentId(): string {
+    return this._contentId;
+  }
+
+  setUnicode(newUnicode: string): void {
+    this._unicode = newUnicode;
+  }
+
+  setContentId(newContentId: string): void {
+    this._contentId = newContentId;
   }
 
   toBackendDict(): ISubtitledUnicodeBackendDict {
     return {
-      unicode_str: this.unicode,
-      content_id: this.contentId
+      unicode_str: this._unicode,
+      content_id: this._contentId
     };
-  }
-
-  isEmpty(): boolean {
-    return this.hasNoUnicode();
   }
 }
 

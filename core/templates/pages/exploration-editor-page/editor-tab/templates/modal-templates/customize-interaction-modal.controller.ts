@@ -16,6 +16,13 @@
  * @fileoverview Controller for customize interaction modal.
  */
 
+import { InteractionCustArgsConversionFn } from
+  'services/interaction-customization-args-util.service';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -39,6 +46,8 @@ require(
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',
   'EditorFirstTimeEventsService',
+  'InteractionCustomizationArgsObjectFactory',
+  'InteractionCustomizationArgsUtilService',
   'InteractionDetailsCacheService',
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'UrlInterpolationService',
@@ -48,6 +57,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   function(
       $controller, $injector, $scope, $uibModalInstance,
       EditorFirstTimeEventsService,
+      InteractionCustomizationArgsObjectFactory,
+      InteractionCustomizationArgsUtilService,
       InteractionDetailsCacheService,
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, UrlInterpolationService,
@@ -94,30 +105,50 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
       StateInteractionIdService.displayed = angular.copy(
         StateInteractionIdService.savedMemento);
-      StateCustomizationArgsService.displayed = {};
+      StateCustomizationArgsService.displayed.clear();
+
       // Ensure that StateCustomizationArgsService.displayed is
       // fully populated.
+      const customizationArgsBackendDict = {};
       for (
         var i = 0; i < $scope.customizationArgSpecs.length;
         i++) {
         var argName = $scope.customizationArgSpecs[i].name;
-        StateCustomizationArgsService.displayed[argName] = {
-          value: (
-            StateCustomizationArgsService.savedMemento
-              .hasOwnProperty(argName) ?
-              angular.copy(
-                StateCustomizationArgsService.savedMemento[
-                  argName].value) :
-              angular.copy(
-                $scope.customizationArgSpecs[i].default_value)
-          )
-        };
+        if (
+          StateCustomizationArgsService.savedMemento.values
+            .hasOwnProperty(argName)
+        ) {
+          StateCustomizationArgsService.displayed.values[argName] = (
+            angular.copy(
+              StateCustomizationArgsService.savedMemento.values[argName]
+            )
+          );
+        } else {
+          customizationArgsBackendDict[argName] = angular.copy(
+            $scope.customizationArgSpecs[i].default_value);
+        }
       }
+
+      const defaultCustomizationArgs = (
+        InteractionCustomizationArgsObjectFactory.createFromBackendDict(
+          StateInteractionIdService.displayed,
+          customizationArgsBackendDict
+        )
+      );
+      StateCustomizationArgsService.displayed.interactionId = (
+        StateInteractionIdService.displayed);
+      StateCustomizationArgsService.displayed.values = {
+        ...StateCustomizationArgsService.displayed.values,
+        ...defaultCustomizationArgs
+      };
+
 
       $scope.$broadcast('schemaBasedFormsShown');
       $scope.form = {};
-      $scope.hasCustomizationArgs = (Object.keys(
-        StateCustomizationArgsService.displayed).length > 0);
+      $scope.hasCustomizationArgs = (
+        StateCustomizationArgsService.displayed.values &&
+        Object.keys(StateCustomizationArgsService.displayed.values).length > 0
+      );
     }
 
     $scope.getCustomizationArgsWarningsList = function() {
@@ -129,7 +160,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         validationServiceName);
       var warningsList =
         validationService.getCustomizationArgsWarnings(
-          StateCustomizationArgsService.displayed);
+          StateCustomizationArgsService.displayed.values);
       return warningsList;
     };
 
@@ -152,7 +183,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         interactionSpec.customization_arg_specs);
 
       StateInteractionIdService.displayed = newInteractionId;
-      StateCustomizationArgsService.displayed = {};
+      StateCustomizationArgsService.displayed.clear();
       if (
         InteractionDetailsCacheService.contains(
           newInteractionId)) {
@@ -160,16 +191,26 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           InteractionDetailsCacheService.get(
             newInteractionId).customization);
       } else {
+        const customizationArgsBackendDict = {};
         $scope.customizationArgSpecs.forEach(function(caSpec) {
-          StateCustomizationArgsService.displayed[caSpec.name] =
-            {
-              value: angular.copy(caSpec.default_value)
-            };
+          customizationArgsBackendDict[caSpec.name] = {};
+          customizationArgsBackendDict[
+            caSpec.name].value = caSpec.default_value;
         });
+
+        StateCustomizationArgsService.displayed = (
+          InteractionCustomizationArgsObjectFactory.createFromBackendDict(
+            newInteractionId,
+            customizationArgsBackendDict
+          )
+        );
       }
 
-      if (Object.keys(
-        StateCustomizationArgsService.displayed).length === 0) {
+      if (
+        Object.keys(
+          StateCustomizationArgsService.displayed.values
+        ).length === 0
+      ) {
         $scope.save();
         $scope.hasCustomizationArgs = false;
       } else {
@@ -186,7 +227,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         StateCustomizationArgsService.displayed);
 
       StateInteractionIdService.displayed = null;
-      StateCustomizationArgsService.displayed = {};
+      StateCustomizationArgsService.displayed.clear();
     };
 
     $scope.isSaveInteractionButtonEnabled = function() {
@@ -221,50 +262,33 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
     };
 
-    $scope.populateEmptyContentIds = function() {
-      let ca = StateCustomizationArgsService.displayed;
-      let caSpecs = (INTERACTION_SPECS[StateInteractionIdService.displayed]
-        .customization_arg_specs);
-
-      let findEmptyContentIds = (
-          ca: {[id: string]: {value: any}},
-          caSpec: any,
-          contentIdPrefix: string = 'custarg'
+    $scope.populateBlankContentIds = function() {
+      const conversionFn: InteractionCustArgsConversionFn = (
+          caValue, unusedSchemaObjType, contentId, inList
       ) => {
-        const schema = 'schema' in caSpec ? caSpec.schema : caSpec;
-        const schemaType = schema.type;
-        let schemaObjType;
-        if (schemaType === 'custom') {
-          schemaObjType = schema.obj_type;
+        caValue = <SubtitledHtml | SubtitledUnicode> caValue;
+        if (caValue.getContentId() !== '') {
+          return caValue;
         }
 
-        if ('name' in caSpec) {
-          contentIdPrefix += '_' + caSpec.name;
+        if (inList) {
+          contentId += '_temp';
         }
+        caValue.setContentId(contentId);
 
-        if (schemaObjType === 'SubtitledUnicode' ||
-            schemaObjType === 'SubtitledHtml') {
-          console.log(ca, contentIdPrefix);
-        } else if (schemaType === 'list') {
-          findEmptyContentIds(ca, caSpec.schema.items, contentIdPrefix);
-        } else if (schemaType === 'dict') {
-          for (let i = 0; i < caSpec.properties.length; i++) {
-            findEmptyContentIds(
-              ca, caSpec.schema.properties[i], contentIdPrefix);
-          }
-        }
+        return caValue;
       };
-
-      for (const caSpec of caSpecs) {
-        findEmptyContentIds(ca[caSpec.name], caSpec);
-      }
+      InteractionCustomizationArgsUtilService.convertTranslatable(
+        StateCustomizationArgsService.displayed.values,
+        $scope.customizationArgSpecs,
+        conversionFn
+      );
     };
 
     $scope.save = function() {
-      $scope.populateEmptyContentIds();
-      // EditorFirstTimeEventsService
-      //   .registerFirstSaveInteractionEvent();
-      // $uibModalInstance.close();
+      $scope.populateBlankContentIds();
+      EditorFirstTimeEventsService.registerFirstSaveInteractionEvent();
+      $uibModalInstance.close();
     };
   }
 ]);

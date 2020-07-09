@@ -68,7 +68,7 @@ angular.module('oppia').directive('solutionEditor', [
             return ExplorationHtmlFormatterService.getAnswerHtml(
               StateSolutionService.savedMemento.correctAnswer,
               StateInteractionIdService.savedMemento,
-              StateCustomizationArgsService.savedMemento);
+              StateCustomizationArgsService.savedMemento.values);
           };
           ctrl.$onInit = function() {
             ctrl.StateSolutionService = StateSolutionService;

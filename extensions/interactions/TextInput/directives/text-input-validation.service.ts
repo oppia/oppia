@@ -45,7 +45,7 @@ export class TextInputValidationService {
       customizationArgs,
       ['placeholder', 'rows']);
 
-    var placeholder = customizationArgs.placeholder.value.unicode_str;
+    var placeholder = customizationArgs.placeholder.value.getUnicode();
     if (!angular.isString(placeholder)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,

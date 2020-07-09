@@ -130,7 +130,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =
-              StateCustomizationArgsService.savedMemento;
+              StateCustomizationArgsService.savedMemento.values;
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
           };
@@ -140,7 +140,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               'updateAnswerChoices',
               StateEditorService.getAnswerChoices(
                 $scope.interactionId,
-                StateCustomizationArgsService.savedMemento));
+                StateCustomizationArgsService.savedMemento.values));
           };
 
           // If a terminal interaction is selected for a state with no content,
@@ -196,7 +196,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               'handleCustomArgsUpdate',
               StateEditorService.getAnswerChoices(
                 $scope.interactionId,
-                StateCustomizationArgsService.savedMemento));
+                StateCustomizationArgsService.savedMemento.values));
           };
 
           $scope.openInteractionCustomizerModal = function() {
@@ -227,7 +227,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               StateInteractionIdService.displayed = null;
-              StateCustomizationArgsService.displayed = {};
+              StateCustomizationArgsService.displayed.clear();
               StateSolutionService.displayed = null;
               InteractionDetailsCacheService.removeDetails(
                 StateInteractionIdService.savedMemento);

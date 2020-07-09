@@ -19,24 +19,30 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import {
+  SubtitledHtml, ISubtitledHtmlBackendDict
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  SubtitledUnicode, ISubtitledUnicodeBackendDict
+} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 export type InteractionCustArgsConversionFn = (
-  caValue: SubtitledHtml | SubtitledUnicode,
+  caValue: SubtitledHtml |
+    SubtitledUnicode |
+    ISubtitledHtmlBackendDict |
+    ISubtitledUnicodeBackendDict,
   schemaObjType: 'SubtitledHtml' | 'SubtitledUnicode',
   contentId: string,
   inList: boolean
-) => SubtitledHtml | SubtitledUnicode;
+) => any;
 
 @Injectable({providedIn: 'root'})
 export class InteractionCustomizationArgsUtilService {
   private findSubtitled(
-      ca: {[id: string]: {value: any}},
+      ca: {value: any},
       caSpec: any,
       conversionFn: InteractionCustArgsConversionFn,
-      contentIdPrefix: string = 'custarg'
+      contentId: string = 'custarg'
   ) {
     const schema = 'schema' in caSpec ? caSpec.schema : caSpec;
     const schemaType = schema.type;
@@ -46,21 +52,48 @@ export class InteractionCustomizationArgsUtilService {
     }
 
     if ('name' in caSpec) {
-      contentIdPrefix += '_' + caSpec.name;
+      contentId += '_' + caSpec.name;
     }
 
     if (
       schemaObjType === 'SubtitledUnicode' ||
       schemaObjType === 'SubtitledHtml'
     ) {
-      const caValue = ca.value;
+      if (ca.value instanceof SubtitledUnicode ||
+          ca.value instanceof SubtitledHtml) {
+        ca.value = conversionFn(ca.value, schemaObjType, contentId, false);
+      } else if (Array.isArray(ca.value)) {
+        for (let i = 0; i < ca.value.length; i++) {
+          ca.value[i] = conversionFn(
+            ca.value[i], schemaObjType, contentId, true);
+        }
+      } else if (typeof ca.value === 'object') {
+        if ('content_id' in ca.value) {
+          ca.value = conversionFn(ca.value, schemaObjType, contentId, false);
+        } else {
+          ca.value[caSpec.name] = conversionFn(
+            ca.value[caSpec.name], schemaObjType, contentId, false);
+        }
+      }
     } else if (schemaType === 'list') {
       this.findSubtitled(
-        ca, caSpec.schema.items, conversionFn, contentIdPrefix);
+        ca, caSpec.schema.items, conversionFn, contentId);
     } else if (schemaType === 'dict') {
       for (let i = 0; i < caSpec.properties.length; i++) {
         this.findSubtitled(
-          ca, caSpec.schema.properties[i], conversionFn, contentIdPrefix);
+          ca, caSpec.schema.properties[i], conversionFn, contentId);
+      }
+    }
+  }
+
+  convertTranslatable(
+      caValues: {[caName: string]: any},
+      caSpecs: any[],
+      conversionFn: InteractionCustArgsConversionFn
+  ) {
+    for (let caSpec of caSpecs) {
+      if (caSpec.name in caValues) {
+        this.findSubtitled(caValues[caSpec.name], caSpec, conversionFn);
       }
     }
   }

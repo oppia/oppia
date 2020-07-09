@@ -61,10 +61,9 @@ export class ExplorationHtmlFormatterService {
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
-
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
-        element, interactionCustomizationArgSpecs));
+        interactionId, element, interactionCustomizationArgSpecs));
     element.attr('last-answer', parentHasLastAnswerProperty ?
       'lastAnswer' : 'null');
     if (labelForFocusTarget) {

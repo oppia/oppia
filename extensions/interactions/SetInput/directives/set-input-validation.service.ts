@@ -90,7 +90,7 @@ export class SetInputValidationService {
     let warningsList = [];
 
     let buttonText = customizationArgs.buttonText &&
-      customizationArgs.buttonText.value.unicode_str;
+      customizationArgs.buttonText.value.getUnicode();
     if (!angular.isString(buttonText)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,

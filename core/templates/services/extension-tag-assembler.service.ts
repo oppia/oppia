@@ -23,6 +23,16 @@ import { Injectable } from '@angular/core';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import {
+  InteractionCustomizationArgsUtilService,
+  InteractionCustArgsConversionFn
+} from './interaction-customization-args-util.service';
+import { InteractionCustomizationArgs } from 'domain/exploration/InteractionCustomizationArgsObjectFactory';
+
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 // Service for assembling extension tags (for interactions).
 @Injectable({
@@ -30,10 +40,38 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ExtensionTagAssemblerService {
   constructor(private htmlEscaperService: HtmlEscaperService,
-              private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
+              private camelCaseToHyphens: CamelCaseToHyphensPipe,
+              private interactionCustomizationArgsUtilService:
+                InteractionCustomizationArgsUtilService
+  ) {}
 
   formatCustomizationArgAttrs(
-      element: JQuery, customizationArgSpecs: Object): JQuery {
+      interactionId: string,
+      element: JQuery,
+      customizationArgSpecs: Object
+  ): JQuery {
+    customizationArgSpecs = angular.copy(customizationArgSpecs);
+    const conversionFn: InteractionCustArgsConversionFn = (
+        caValue,
+        schemaObjType,
+        unusedContentId,
+        unusedInList
+    ) => {
+      if (schemaObjType === 'SubtitledHtml') {
+        return (<SubtitledHtml>caValue).getHtml();
+      } else if (schemaObjType === 'SubtitledUnicode') {
+        return (<SubtitledUnicode>caValue).getUnicode();
+      }
+
+      return caValue;
+    };
+
+    this.interactionCustomizationArgsUtilService.convertTranslatable(
+      customizationArgSpecs,
+      INTERACTION_SPECS[interactionId].customization_arg_specs,
+      conversionFn
+    );
+
     for (let caSpecName in customizationArgSpecs) {
       let caSpecValue = customizationArgSpecs[caSpecName].value;
       element.attr(

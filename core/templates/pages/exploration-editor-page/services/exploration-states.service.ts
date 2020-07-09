@@ -46,12 +46,14 @@ angular.module('oppia').factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
+  'InteractionCustomizationArgsObjectFactory',
   'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
   'UrlInterpolationService', 'ValidatorsService',
   function(
       $filter, $injector, $location, $q, $rootScope, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
+      InteractionCustomizationArgsObjectFactory,
       SolutionValidityService, StateEditorService, StatesObjectFactory,
       UrlInterpolationService, ValidatorsService) {
     var _states = null;
@@ -104,6 +106,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       written_translations: function(writtenTranslations) {
         return writtenTranslations.toBackendDict();
+      },
+      widget_customization_args: function(customizationArgs) {
+        return InteractionCustomizationArgsObjectFactory.toBackendDict(
+          customizationArgs);
       }
     };
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for translatable HTML editor.
+ * @fileoverview Directive for subtitled HTML editor.
  */
 
 angular.module('oppia').directive('subtitledUnicodeEditor', [
@@ -25,7 +25,7 @@ angular.module('oppia').directive('subtitledUnicodeEditor', [
         value: '=',
         getInitArgs: '&'
       },
-      template: require('./translatable-unicode-string-editor.directive.html'),
+      template: require('./subtitled-unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

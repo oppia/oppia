@@ -17,13 +17,13 @@
  * domain objects.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 export interface ISubtitledHtmlBackendDict {
   'content_id': string;
   'html': string;
 }
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SubtitledHtml {
   _html: string;
@@ -43,6 +43,10 @@ export class SubtitledHtml {
 
   setHtml(newHtml: string): void {
     this._html = newHtml;
+  }
+
+  setContentId(newContentId: string): void {
+    this._contentId = newContentId;
   }
 
   hasNoHtml(): boolean {

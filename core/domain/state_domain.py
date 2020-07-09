@@ -2256,20 +2256,21 @@ class State(python_utils.OBJECT):
             )
             old_content_id_list.extend(old_ca_content_ids)
 
-        customization_args, new_ca_content_ids = (
-            customization_args_util.get_full_customization_args(
-                {},
-                (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        interaction_id
-                    ).customization_arg_specs
+        if interaction_id:
+            customization_args, new_ca_content_ids = (
+                customization_args_util.get_full_customization_args(
+                    {},
+                    (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            interaction_id
+                        ).customization_arg_specs
+                    )
                 )
             )
-        )
-        new_content_id_list.extend(new_ca_content_ids)
+            new_content_id_list.extend(new_ca_content_ids)
+            self.interaction.customization_args = customization_args
 
         self.interaction.id = interaction_id
-        self.interaction.customization_args = customization_args
 
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
@@ -2285,30 +2286,36 @@ class State(python_utils.OBJECT):
         Args:
             customization_args: dict. The new customization_args to set.
         """
-        old_content_id_list = []
-        new_content_id_list = []
 
-        ca_specs = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.interaction.id).customization_arg_specs)
+        if self.interaction.id:
+            # If interaction id is None, content_id's have already been removed
+            # in update_interaction_id.
 
-        old_content_id_list.extend(
-            customization_args_util.get_all_content_ids_in_cust_args(
-                self.interaction.customization_args,
-                ca_specs
+            old_content_id_list = []
+            new_content_id_list = []
+
+            ca_specs = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    self.interaction.id).customization_arg_specs)
+
+            old_content_id_list.extend(
+                customization_args_util.get_all_content_ids_in_cust_args(
+                    self.interaction.customization_args,
+                    ca_specs
+                )
             )
-        )
 
-        new_content_id_list.extend(
-            customization_args_util.get_all_content_ids_in_cust_args(
-                customization_args,
-                ca_specs
+            new_content_id_list.extend(
+                customization_args_util.get_all_content_ids_in_cust_args(
+                    customization_args,
+                    ca_specs
+                )
             )
-        )
 
+            self._update_content_ids_in_assets(
+                old_content_id_list, new_content_id_list)
+        
         self.interaction.customization_args = customization_args
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(self, answer_groups_list):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
