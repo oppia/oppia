@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+
 /**
  * @fileoverview Component for an exploration summary tile.
  */
@@ -227,3 +229,14 @@ angular.module('oppia').directive('explorationSummaryTile', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+@Directive({
+  selector: 'exploration-summary-tile'
+})
+export class ExplorationSummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('explorationSummaryTile', elementRef, injector);
+  }
+}
