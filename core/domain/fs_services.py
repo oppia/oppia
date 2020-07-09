@@ -23,9 +23,7 @@ import json
 
 from core.domain import fs_domain
 from core.domain import image_services
-from core.platform import models
 import feconf
-
 
 
 def save_original_and_compressed_versions_of_image(

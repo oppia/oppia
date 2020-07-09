@@ -54,8 +54,10 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
     def test_dev_mode_returns_regular_image(self):
-        height, width = (image_services.get_image_dimensions(
-            self.jpeg_raw_image))
+        compressed_image = (image_services.compress_image(
+            self.jpeg_raw_image, 0.8))
+        height, width = (
+            image_services.get_image_dimensions(compressed_image))
         self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
         self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
@@ -65,30 +67,14 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
                 image_services.compress_image(self.jpeg_raw_image, 0.5))
         height, width = (
             image_services.get_image_dimensions(compressed_image))
-        image = Image.open(io.BytesIO(compressed_image))
-        image.save('compressed_image.jpg')
         self.assertEqual(self.TEST_IMAGE_HEIGHT * 0.5, height)
         self.assertEqual(self.TEST_IMAGE_WIDTH * 0.5, width)
-
-    def test_enlarge_image_returns_correct_dimensions(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            compressed_image = (
-                image_services.enlarge_image(self.jpeg_raw_image, 1.1))
-        height, width = (
-            image_services.get_image_dimensions(compressed_image))
-        self.assertEqual(int(self.TEST_IMAGE_HEIGHT * 1.1), height)
-        self.assertEqual(int(self.TEST_IMAGE_WIDTH * 1.1), width)
 
     def test_invalid_scaling_factor_triggers_value_error(self):
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Scaling factor should be less than 1.')
         with self.swap(constants, 'DEV_MODE', False), email_exception:
             image_services.compress_image(self.jpeg_raw_image, 1.1)
-
-        email_exception = self.assertRaisesRegexp(
-            ValueError, 'Scaling factor should be greater than 1.')
-        with self.swap(constants, 'DEV_MODE', False), email_exception:
-            image_services.enlarge_image(self.jpeg_raw_image, 0.8)
 
     def test_compression_results_in_correct_format(self):
         with self.swap(constants, 'DEV_MODE', False):

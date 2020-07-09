@@ -24,12 +24,9 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import image_services
 from core.domain import user_services
-from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-
-
 
 class FileSystemServicesTests(test_utils.GenericTestBase):
     """Tests for File System services."""

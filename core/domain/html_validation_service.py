@@ -29,7 +29,6 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import image_services
 from core.domain import rte_component_registry
-from core.platform import models
 from extensions.objects.models import objects
 import feconf
 import python_utils

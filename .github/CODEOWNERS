@@ -414,6 +414,8 @@
 /core/templates/services/interaction-specs.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
+/core/domain/image_service*.py @seanlip
+
 
 
 # Miscellaneous.
