@@ -576,7 +576,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         assigned_topics = (
             skill_services.get_all_topics_assigned_to_skill(self.SKILL_ID))
-
+        assigned_topics = sorted(
+            assigned_topics, key=lambda i: i.topic_name)
         self.assertEqual(len(assigned_topics), 2)
         self.assertEqual(assigned_topics[0].topic_name, 'Topic1')
         self.assertEqual(assigned_topics[0].topic_id, topic_id)

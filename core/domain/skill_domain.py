@@ -1441,7 +1441,7 @@ class AugmentedSkillSummary(python_utils.OBJECT):
 
 class TopicAssignment(python_utils.OBJECT):
     """Domain object for Topic Assignment, which provides the details of a
-    single topic(and, if applicable, the subtopic within that topic) to which
+    single topic (and, if applicable, the subtopic within that topic) to which
     the skill is assigned.
     """
 

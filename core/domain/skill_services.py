@@ -27,8 +27,8 @@ from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
-from core.domain import topic_domain
 from core.domain import suggestion_services
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
@@ -409,38 +409,6 @@ def get_image_filenames_from_skill(skill):
     return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
-def get_skill_by_id(skill_id, strict=True, version=None):
-    """Returns a domain object representing a skill.
-
-    Args:
-        skill_id: str. ID of the skill.
-        strict: bool. Whether to fail noisily if no skill with the given
-            id exists in the datastore.
-        version: int or None. The version number of the skill to be
-            retrieved. If it is None, the latest version will be retrieved.
-
-    Returns:
-        Skill or None. The domain object representing a skill with the
-        given id, or None if it does not exist.
-    """
-    skill_memcache_key = _get_skill_memcache_key(
-        skill_id, version=version)
-    memcached_skill = memcache_services.get_multi(
-        [skill_memcache_key]).get(skill_memcache_key)
-
-    if memcached_skill is not None:
-        return memcached_skill
-    else:
-        skill_model = skill_models.SkillModel.get(
-            skill_id, strict=strict, version=version)
-        if skill_model:
-            skill = get_skill_from_model(skill_model)
-            memcache_services.set_multi({skill_memcache_key: skill})
-            return skill
-        else:
-            return None
-
-
 def get_all_topics_assigned_to_skill(skill_id):
     """Returns a list containing all the topics to which the given skill is
     assigned along with topic details.
@@ -491,7 +459,7 @@ def remove_skill_from_all_topics(user_id, skill_id):
                 'cmd': 'remove_uncategorized_skill_id',
                 'uncategorized_skill_id': skill_id
             }))
-            skill_name = get_skill_by_id(skill_id).description
+            skill_name = get_skill_summary_by_id(skill_id).description
             topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
                 'Removed skill with id %s and name %s from the topic' % (
