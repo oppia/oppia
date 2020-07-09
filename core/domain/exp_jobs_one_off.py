@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import copy
 import itertools
 import logging
 import re
@@ -77,6 +78,82 @@ SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 AUDIO_FILE_PREFIX = 'audio'
 AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
+# This threshold puts a cap on the number of valid inputs, i.e.,
+# expressions/equations that can be yielded by the math expression one-off jobs.
+VALID_MATH_INPUTS_YIELD_LIMIT = 200
+
+
+def clean_math_expression(math_expression):
+    """Cleans a given math expression and formats it so that it is compatible
+    with the new interactions' validators.
+
+    Args:
+        math_expression: str. The string representing the math expression.
+
+    Returns:
+        str. The correctly formatted string representing the math expression.
+    """
+    UNICODE_TO_TEXT = {
+        u'\u221a': 'sqrt',
+        u'\xb7': '*',
+        u'\u03b1': 'alpha',
+        u'\u03b2': 'beta',
+        u'\u03b3': 'gamma',
+        u'\u03b4': 'delta',
+        u'\u03b5': 'epsilon',
+        u'\u03b6': 'zeta',
+        u'\u03b7': 'eta',
+        u'\u03b8': 'theta',
+        u'\u03b9': 'iota',
+        u'\u03ba': 'kappa',
+        u'\u03bb': 'lambda',
+        u'\u03bc': 'mu',
+        u'\u03bd': 'nu',
+        u'\u03be': 'xi',
+        u'\u03c0': 'pi',
+        u'\u03c1': 'rho',
+        u'\u03c3': 'sigma',
+        u'\u03c4': 'tau',
+        u'\u03c5': 'upsilon',
+        u'\u03c6': 'phi',
+        u'\u03c7': 'chi',
+        u'\u03c8': 'psi',
+        u'\u03c9': 'omega',
+    }
+    INVERSE_TRIG_FNS_MAPPING = {
+        'asin': 'arcsin',
+        'acos': 'arccos',
+        'atan': 'arctan'
+    }
+    TRIG_FNS = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
+
+    # Shifting powers in trig functions to the end.
+    # For eg. 'sin^2(x)' -> 'sin(x)^2'.
+    for trig_fn in TRIG_FNS:
+        math_expression = re.sub(
+            r'%s(\^\d)\((.)\)' % trig_fn,
+            r'%s(\2)\1' % trig_fn, math_expression)
+
+    # Adding parens to trig functions that don't have
+    # any. For eg. 'cosA' -> 'cos(A)'.
+    for trig_fn in TRIG_FNS:
+        math_expression = re.sub(
+            r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
+
+    # The pylatexenc lib outputs the unicode values of
+    # special characters like sqrt and pi, which is why
+    # they need to be replaced with their corresponding
+    # text values before performing validation.
+    for unicode_char, text in UNICODE_TO_TEXT.items():
+        math_expression = math_expression.replace(unicode_char, text)
+
+    # Replacing trig functions that have format which is
+    # incompatible with the validations.
+    for invalid_trig_fn, valid_trig_fn in INVERSE_TRIG_FNS_MAPPING.items():
+        math_expression = math_expression.replace(
+            invalid_trig_fn, valid_trig_fn)
+
+    return math_expression
 
 
 class DragAndDropSortInputInteractionOneOffJob(
@@ -166,42 +243,75 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     'is_valid_math_equation' function present in schema_utils.py.
     """
 
-    # This threshold puts a cap on the number of valid inputs, i.e.,
-    # expressions/equations that can be yielded by this one-off job.
-    VALID_MATH_INPUTS_YIELD_LIMIT = 200
-    UNICODE_TO_TEXT = {
-        u'\u221a': 'sqrt',
-        u'\xb7': '*',
-        u'\u03b1': 'alpha',
-        u'\u03b2': 'beta',
-        u'\u03b3': 'gamma',
-        u'\u03b4': 'delta',
-        u'\u03b5': 'epsilon',
-        u'\u03b6': 'zeta',
-        u'\u03b7': 'eta',
-        u'\u03b8': 'theta',
-        u'\u03b9': 'iota',
-        u'\u03ba': 'kappa',
-        u'\u03bb': 'lambda',
-        u'\u03bc': 'mu',
-        u'\u03bd': 'nu',
-        u'\u03be': 'xi',
-        u'\u03c0': 'pi',
-        u'\u03c1': 'rho',
-        u'\u03c3': 'sigma',
-        u'\u03c4': 'tau',
-        u'\u03c5': 'upsilon',
-        u'\u03c6': 'phi',
-        u'\u03c7': 'chi',
-        u'\u03c8': 'psi',
-        u'\u03c9': 'omega',
-    }
-    INVERSE_TRIG_FNS_MAPPING = {
-        'asin': 'arcsin',
-        'acos': 'arccos',
-        'atan': 'arctan'
-    }
-    TRIG_FNS = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        is_valid_math_expression = schema_utils.get_validator(
+            'is_valid_math_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        if not item.deleted:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+            for state_name, state in exploration.states.items():
+                if state.interaction.id == 'MathExpressionInput':
+                    types_of_inputs = set()
+                    for group in state.interaction.answer_groups:
+                        for rule_spec in group.rule_specs:
+                            rule_input = ltt.latex_to_text(
+                                rule_spec.inputs['x'])
+
+                            rule_input = clean_math_expression(rule_input)
+
+                            validity = 'Invalid'
+                            if is_valid_math_expression(rule_input):
+                                validity = 'Valid Algebraic Expression'
+                            elif is_valid_math_expression(
+                                    rule_input, algebraic=False):
+                                validity = 'Valid Numeric Expression'
+                            elif is_valid_math_equation(rule_input):
+                                validity = 'Valid Math Equation'
+
+                            if validity != 'Invalid':
+                                types_of_inputs.add(validity)
+                            
+                            if len(types_of_inputs) > 1:
+                                yield ('ERROR', (
+                                    'The exploration with ID: %s and state '
+                                    'name: %s contains inputs that correspond '
+                                    'to two different types. Please resolve '
+                                    'this before running the upgradation '
+                                    'job.' % (item.id, state_name)))
+
+                            output_values = '%s %s: %s' % (
+                                item.id, state_name, rule_input)
+                            yield (validity, output_values.encode('utf-8'))
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('Valid'):
+            yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
+        else:
+            if key == 'Invalid' and len(values) != 0:
+                yield ('ERROR', (
+                    'There are some invalid inputs that need to be resolved '
+                    'before running the upgradation job. The invalid inputs '
+                    'are as follows:'))
+            yield (key, values)
+
+
+class MathExpressionUpgradationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of explorations that use the MathExpressionInput
+    along with the validity and type (expression/equation) of the inputs present
+    in the exploration.
+
+    This validation is done by the 'is_valid_math_expression' or the
+    'is_valid_math_equation' function present in schema_utils.py.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -214,68 +324,63 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         is_valid_math_equation = schema_utils.get_validator(
             'is_valid_math_equation')
         ltt = latex2text.LatexNodes2Text()
-        unicode_to_text_mapping = (
-            MathExpressionValidationOneOffJob.UNICODE_TO_TEXT)
-        inverse_trig_fns_mapping = (
-            MathExpressionValidationOneOffJob.INVERSE_TRIG_FNS_MAPPING)
-        trig_fns = MathExpressionValidationOneOffJob.TRIG_FNS
 
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
             for state_name, state in exploration.states.items():
                 if state.interaction.id == 'MathExpressionInput':
+                    new_answer_groups = []
+                    new_interaction_id = ''
                     for group in state.interaction.answer_groups:
-                        for rule_spec in group.rule_specs:
+                        new_answer_group = copy.deepcopy(group)
+                        for rule_spec in new_answer_group.rule_specs:
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
 
-                            # Shifting powers in trig functions to the end.
-                            # For eg. 'sin^2(x)' -> 'sin(x)^2'.
-                            for trig_fn in trig_fns:
-                                rule_input = re.sub(
-                                    r'%s(\^\d)\((.)\)' % trig_fn,
-                                    r'%s(\2)\1' % trig_fn, rule_input)
-
-                            # Adding parens to trig functions that don't have
-                            # any. For eg. 'cosA' -> 'cos(A)'.
-                            for trig_fn in trig_fns:
-                                rule_input = re.sub(
-                                    r'%s(?!\()(.)' % trig_fn,
-                                    r'%s(\1)' % trig_fn, rule_input)
-
-                            # The pylatexenc lib outputs the unicode values of
-                            # special characters like sqrt and pi, which is why
-                            # they need to be replaced with their corresponding
-                            # text values before performing validation.
-                            for unicode_char, text in (
-                                    unicode_to_text_mapping.items()):
-                                rule_input = rule_input.replace(
-                                    unicode_char, text)
-
-                            # Replacing trig functions that have format which is
-                            # incompatible with the validations.
-                            for invalid_trig_fn, valid_trig_fn in (
-                                    inverse_trig_fns_mapping.items()):
-                                rule_input = rule_input.replace(
-                                    invalid_trig_fn, valid_trig_fn)
+                            rule_input = clean_math_expression(rule_input)
 
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
-                                validity = 'Valid Expression'
+                                validity = 'Valid Algebraic Expression'    
+                                new_interaction_id = 'AlgebraicExpressionInput'
+                            elif is_valid_math_expression(
+                                    rule_input, algebraic=False):
+                                validity = 'Valid Numeric Expression'
+                                new_interaction_id = 'NumericExpressionInput'
                             elif is_valid_math_equation(rule_input):
-                                validity = 'Valid Equation'
+                                validity = 'Valid Math Equation'
+                                new_interaction_id = 'MathEquationInput'
+                            
+                            if validity != 'Invalid':
+                                rule_spec.inputs['x'] = rule_input
+                                if validity == 'Valid Math Equation':
+                                    rule_spec.inputs['y'] = 'both'
+                                rule_spec.rule_type = 'MatchesExactlyWith'
 
                             output_values = '%s %s: %s' % (
                                 item.id, state_name, rule_input)
 
                             yield (validity, output_values.encode('utf-8'))
 
+                        new_answer_groups.append(new_answer_group.to_dict())
+
+                    exp_services.update_exploration(
+                        'admin', item.id, [exp_domain.ExplorationChange({
+                            'cmd': 'edit_state_property',
+                            'state_name': state_name,
+                            'property_name': 'widget_id',
+                            'new_value': new_interaction_id
+                        }), exp_domain.ExplorationChange({
+                            'cmd': 'edit_state_property',
+                            'state_name': state_name,
+                            'property_name': 'answer_groups',
+                            'new_value': new_answer_groups
+                        })], 'Upgraded interaction to %s.' % new_interaction_id)
+
     @staticmethod
     def reduce(key, values):
-        valid_inputs_limit = (
-            MathExpressionValidationOneOffJob.VALID_MATH_INPUTS_YIELD_LIMIT)
         if key.startswith('Valid'):
-            yield (key, values[:valid_inputs_limit])
+            yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
 
