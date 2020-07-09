@@ -335,6 +335,7 @@ describe('SvgFilenameEditor', function() {
       svgFilenameCtrl.canvas.getObjects()[0]);
     svgFilenameCtrl.canvas.setActiveObject(
       svgFilenameCtrl.canvas.getObjects()[1]);
+    expect(svgFilenameCtrl.isSizeVisible()).toBe(true);
     expect(svgFilenameCtrl.displayFontStyles).toBe(true);
     svgFilenameCtrl.canvas.trigger('object:scaling');
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('scaleX')).toBe(1);

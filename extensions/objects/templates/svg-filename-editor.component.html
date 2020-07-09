@@ -1,7 +1,7 @@
 <div ng-model="$ctrl.data" ui-validate="'$ctrl.validate()'" class="fs-container">
   <div ng-if="!$ctrl.isDiagramSaved()" class="diagram-editor-size-toolbar">
-    Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()">
-    Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()">
+    <div class="input-box">Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()"></div>
+    <div class="input-box">Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()"></div>
     <i class="material-icons" title="<[$ctrl.getDiagramSizeInfo()]>">
       &#xE887;
     </i>
@@ -113,8 +113,6 @@
       <div class="info-tag" ng-if="$ctrl.isDrawModePolygon() && !$ctrl.isTouchDevice">
         Double click to complete the polygon.
       </div>
-    </div>
-    <div class="horizontal-toolbar bottom-toolbar">
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
         <span style="padding-left: 3px;">Italic</span>
@@ -128,10 +126,15 @@
                 ng-change="$ctrl.onFontChange()">
         </select>
       </div>
-      <div class="input-tag" ng-if="$ctrl.objectIsSelected">
+    </div>
+    <div class="horizontal-toolbar bottom-toolbar">
+      <div class="input-tag" ng-if="$ctrl.isSizeVisible()">
         <select ng-model="$ctrl.fabricjsOptions.size" ng-options="size for size in $ctrl.sizes"
                 ng-change="$ctrl.onSizeChange()">
         </select>
+      </div>
+      <div class="input-tag" ng-if="$ctrl.objectIsSelected">
+        Layer number:{{ $ctrl.layerNum }}
       </div>
     </div>
   </div>
@@ -151,6 +154,10 @@
   </div>
 </div>
 <style>
+  .diagram-editor-size-toolbar .input-box {
+    display: inline-block;
+  }
+
   .diagram-editor-saved-image-container {
     position: relative;
   }
