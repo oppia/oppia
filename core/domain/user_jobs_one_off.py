@@ -326,26 +326,6 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_id, first_contribution_msec)
 
 
-class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that updates profile pictures for users which do not
-    currently have them. Users who already have profile pictures are
-    unaffected.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-        if item.deleted or item.profile_picture_data_url is not None:
-            return
-
-        user_services.generate_initial_profile_picture(item.id)
-
-
 class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that adds fields to record last exploration created and last
     edited times.
