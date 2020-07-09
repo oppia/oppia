@@ -110,7 +110,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
 
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
-        with self.print_swap, esprima_swap, self.assertRaises(Exception):
+        with self.print_swap, esprima_swap, self.assertRaisesRegexp(
+            Exception, ''):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
@@ -457,7 +458,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
             ], self.linter_stdout)
 
     def test_third_party_linter_with_stderr(self):
-        with self.print_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, self.assertRaisesRegexp(
+            SystemExit, '1') as e:
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 INVALID_SORTED_DEPENDENCIES_FILEPATH,
                 True).perform_all_lint_checks()
@@ -469,7 +471,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with self.print_swap, exists_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, exists_swap, self.assertRaisesRegexp(
+            SystemExit, '1') as e:
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH],
                 True).perform_all_lint_checks()

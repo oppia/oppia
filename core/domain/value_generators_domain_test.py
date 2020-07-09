@@ -43,7 +43,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
     def test_generate_value_of_base_value_generator_raises_error(self):
         base_generator = value_generators_domain.BaseValueGenerator()
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(NotImplementedError, ''):
             base_generator.generate_value()
 
 

@@ -435,14 +435,14 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         for schema in valid_schemas:
             validate_schema(schema)
         for schema in invalid_schemas:
-            with self.assertRaises((AssertionError, KeyError)):
+            with self.assertRaisesRegexp((AssertionError, KeyError), ''):
                 validate_schema(schema)
 
     def test_normalize_against_schema_raises_exception(self):
         """Tests if normalize against schema raises exception
         for invalid key.
         """
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(Exception, 'Invalid schema type: invalid'):
             schema = {SCHEMA_KEY_TYPE: 'invalid'}
             schema_utils.normalize_against_schema('obj', schema)
 
@@ -478,7 +478,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Tests if class method 'get' in _Validator raises exception
         for invalid validator id.
         """
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid validator id: some invalid validator method name'):
             schema_utils.get_validator('some invalid validator method name')
 
     def test_is_valid_algebraic_expression_validator(self):
@@ -576,7 +578,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value in invalid_items:
-            with self.assertRaises(Exception):
+            with self.assertRaisesRegexp(Exception, ''):
                 schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self):
@@ -765,10 +767,13 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests if class method get of Normalizers raises exception when given
         an invalid normalizer id.
         """
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid normalizer id: some invalid normalizer method name'):
             schema_utils.Normalizers.get('some invalid normalizer method name')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid normalizer id: normalize_space'):
             # Test substring of an actual id.
             schema_utils.Normalizers.get('normalize_space')
 

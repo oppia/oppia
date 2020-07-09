@@ -773,7 +773,7 @@ class CommonTests(test_utils.GenericTestBase):
             raise ValueError
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaises(ValueError), compile_swap:
+        with self.assertRaisesRegexp(ValueError, ''), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))

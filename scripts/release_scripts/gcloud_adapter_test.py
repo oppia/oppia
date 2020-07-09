@@ -65,7 +65,7 @@ class GcloudAdapterTests(test_utils.GenericTestBase):
             return False
 
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with isfile_swap, self.assertRaises(AssertionError):
+        with isfile_swap, self.assertRaisesRegexp(AssertionError, ''):
             gcloud_adapter.update_indexes('yaml path', 'app name')
 
     def test_update_indexes_with_available_indexes_file(self):

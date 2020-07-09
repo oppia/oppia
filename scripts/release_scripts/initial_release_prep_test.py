@@ -189,7 +189,7 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
         input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
         with open_tab_swap, branch_cut_swap, input_swap:
-            with self.assertRaises(AssertionError):
+            with self.assertRaisesRegexp(AssertionError, ''):
                 initial_release_prep.cut_release_branch()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

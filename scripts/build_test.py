@@ -67,14 +67,25 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify(self):
         """Tests _minify with an invalid filepath."""
-        with self.assertRaises(subprocess.CalledProcessError) as called_process:
+        with self.assertRaisesRegexp(
+            subprocess.CalledProcessError,
+            'Command \'java -Xmx24m -jar ../oppia_tools/yuicompressor-2.4.8/'
+            'yuicompressor-2.4.8.jar -o core/tests/build/invalid/path/to/output'
+            '.js core/tests/build/invalid/path/to/input.js') as called_process:
             build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
     def test_minify_and_create_sourcemap(self):
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaises(subprocess.CalledProcessError) as called_process:
+        with self.assertRaisesRegexp(
+            subprocess.CalledProcessError,
+            'Command \'/home/jaat/opensource/oppia/../oppia_tools/node-12.16.2/'
+            'bin/node node_modules/uglify-js/bin/uglifyjs core/tests/build/'
+            'invalid/path/to/input.js -c -m --source-map includeSources,url='
+            '\'third_party.min.js.map\' -o core/tests/build/invalid/path/'
+            'to/output.js \' returned non-zero exit status '
+            '1') as called_process:
             build._minify_and_create_sourcemap(
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
         # `returncode` is the exit status of the child process.

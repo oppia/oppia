@@ -164,13 +164,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB',
             'xyzOppia', 'oppiaXyz', 'abcOppiaXyz']
         for username in bad_usernames:
-            with self.assertRaises(utils.ValidationError):
+            with self.assertRaisesRegexp(utils.ValidationError, ''):
                 user_services.set_username(user_id, username)
 
     def test_invalid_emails(self):
         bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
         for email in bad_email_addresses:
-            with self.assertRaises(utils.ValidationError):
+            with self.assertRaisesRegexp(utils.ValidationError, ''):
                 user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):
@@ -264,7 +264,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_user_settings_by_gae_id('id_x', strict=True)
 
     def test_fetch_gravatar_success(self):
@@ -609,9 +609,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'day': 5
             })
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError,
+            'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''):
             user_services.parse_date_from_string(test_datetime_strings[2])
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(ValueError, 'unconverted data remains: 2'):
             user_services.parse_date_from_string(test_datetime_strings[3])
 
     def test_record_user_started_state_translation_tutorial(self):

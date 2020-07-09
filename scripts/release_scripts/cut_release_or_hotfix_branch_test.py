@@ -220,7 +220,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.2.1', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaises(AssertionError):
+        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+            AssertionError, ''):
             (
                 cut_release_or_hotfix_branch
                 .verify_target_version_compatible_with_latest_release(
@@ -231,7 +232,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.0.9', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaises(AssertionError):
+        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+            AssertionError, ''):
             (
                 cut_release_or_hotfix_branch
                 .verify_target_version_compatible_with_latest_release(
@@ -243,7 +245,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.1.9', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaises(AssertionError):
+        with self.url_open_swap, load_swap, self.assertRaisesRegexp(
+            AssertionError, ''):
             (
                 cut_release_or_hotfix_branch
                 .verify_target_version_compatible_with_latest_release(
@@ -271,7 +274,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaises(AssertionError):
+        with check_output_swap, self.assertRaisesRegexp(AssertionError, ''):
             (
                 cut_release_or_hotfix_branch
                 .verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
@@ -287,7 +290,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaises(AssertionError):
+        with check_output_swap, self.assertRaisesRegexp(AssertionError, ''):
             (
                 cut_release_or_hotfix_branch
                 .verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(

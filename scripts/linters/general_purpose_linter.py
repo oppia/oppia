@@ -339,6 +339,14 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'self.assertRaises\('),
+        'message': 'Please do not use self.assertRaises method. ' +
+                   'This method has been deprecated. Instead use ' +
+                   'self.assertRaisesRegexp method.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'with open\(|= open\('),
         'message': 'Please use python_utils.open_file() instead of open().',
         'excluded_files': ('python_utils.py',),

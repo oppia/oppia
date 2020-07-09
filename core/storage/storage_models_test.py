@@ -112,7 +112,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
     def test_base_models_do_not_have_get_deletion_policy(self):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
-                with self.assertRaises(NotImplementedError):
+                with self.assertRaisesRegexp(NotImplementedError, ''):
                     clazz.get_deletion_policy()
 
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
@@ -120,7 +120,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for clazz in self._get_base_or_versioned_model_child_classes():
             if (clazz.get_deletion_policy() ==
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
-                with self.assertRaises(NotImplementedError):
+                with self.assertRaisesRegexp(NotImplementedError, ''):
                     clazz.has_reference_to_user_id('any_id')
             else:
                 try:

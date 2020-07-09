@@ -93,7 +93,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [INVALID_CSS_FILEPATH], False)
-        with self.print_swap, join_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, join_swap, self.assertRaisesRegexp(
+            SystemExit, '1') as e:
             third_party_linter.perform_all_lint_checks()
         self.assertEqual(e.exception.code, 1)
 
@@ -113,7 +114,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH], True)
-        with self.print_swap, popen_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, popen_swap, self.assertRaisesRegexp(
+            SystemExit, '1') as e:
             third_party_linter.perform_all_lint_checks()
         self.assertEqual(e.exception.code, 1)
 

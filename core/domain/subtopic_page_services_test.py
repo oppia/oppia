@@ -217,9 +217,13 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         subtopic_page_services.delete_subtopic_page(
             self.user_id, self.TOPIC_ID, 1)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            r'Entity for class SubtopicPageModel with id \w+-\w+ not found'):
             topic_models.SubtopicPageModel.get(subtopic_page_id)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            r'Entity for class SubtopicPageModel with id \w+-\w+ not found'):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
 

@@ -178,7 +178,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_models_invalid(self):
         """Tests import_models function with an invalid option."""
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(Exception, 'Invalid model name: '):
             self.registry_instance.import_models([''])
 
     def test_get_storage_model_classes(self):
@@ -302,5 +302,5 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_models_not_implemented_has_not_implemented_error(self):
         """Tests NotImplementedError of Platform."""
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(NotImplementedError, ''):
             models.Platform().import_models()

@@ -50,7 +50,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             )
 
         for item in invalid_items:
-            with self.assertRaises(Exception):
+            with self.assertRaisesRegexp(Exception, ''):
                 object_class.normalize(item)
 
     def test_boolean_validation(self):

@@ -244,11 +244,11 @@ class BaseValidatorTests(test_utils.GenericTestBase):
         self.item.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(NotImplementedError, ''):
             MockBaseModelValidator().validate(self.item)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(NotImplementedError, ''):
             MockSummaryModelValidator().validate(self.item)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
@@ -257,14 +257,14 @@ class BaseValidatorTests(test_utils.GenericTestBase):
             MockSnapshotContentModelValidator().validate(self.item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(NotImplementedError, ''):
             snapshot_model = MockSnapshotModel(id='mockmodel')
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
     def test_error_is_raised_if_entity_classes_to_map_over_is_undefined(self):
         job_class = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        with self.assertRaises(NotImplementedError), self.swap(
+        with self.assertRaisesRegexp(NotImplementedError, ''), self.swap(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
             job_id = job_class.create_new()
             job_class.enqueue(job_id)
