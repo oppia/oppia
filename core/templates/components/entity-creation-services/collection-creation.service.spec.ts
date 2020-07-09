@@ -20,9 +20,9 @@ import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks, tick }
   from '@angular/core/testing';
-import { Location } from '@angular/common';
 
-import { AlertsService } from 'services/alerts.service';
+
+
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 import { LoaderService } from 'services/loader.service.ts';

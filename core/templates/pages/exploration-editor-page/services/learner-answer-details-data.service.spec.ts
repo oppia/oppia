@@ -20,8 +20,7 @@
 // learner-answer-details-data.service.ts is upgraded to Angular 8.
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

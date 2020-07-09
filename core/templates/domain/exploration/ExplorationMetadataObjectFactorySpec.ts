@@ -16,7 +16,7 @@
  * @fileoverview Tests for ExplorationMetadataObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
+
 
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';

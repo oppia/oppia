@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks, async } from
+import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 
 import { ISkillRightBackend } from 'domain/skill/SkillRightsObjectFactory.ts';

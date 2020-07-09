@@ -21,7 +21,7 @@
 // thread-data.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+
 
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
