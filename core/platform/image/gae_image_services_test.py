@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for methods in the gae_memcache_services."""
+"""Tests for methods in the gae_image_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -29,7 +29,7 @@ import python_utils
 
 
 class GaeImageServicesUnitTests(test_utils.GenericTestBase):
-    """Tests for gae_memcache_services."""
+    """Tests for gae_image_services."""
 
     TEST_IMAGE_WIDTH = 3000
     TEST_IMAGE_HEIGHT = 2092
