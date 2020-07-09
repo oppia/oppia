@@ -27,7 +27,7 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_services
@@ -152,7 +152,7 @@ def can_view_skills(handler):
             raise self.InvalidInputException
 
         try:
-            skill_services.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 

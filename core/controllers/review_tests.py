@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import story_fetchers
 import feconf
 
@@ -61,7 +61,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            skills = skill_services.get_multi_skills(
+            skills = skill_fetchers.get_multi_skills(
                 story.get_acquired_skill_ids_for_node_ids(
                     latest_completed_node_ids
                 ))

@@ -43,6 +43,7 @@ from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import stats_services
 from core.domain import story_domain
@@ -1446,7 +1447,7 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
             # function.
             if skill_model is None or skill_model.deleted:
                 continue
-            skill = skill_services.get_skill_from_model(skill_model)
+            skill = skill_fetchers.get_skill_from_model(skill_model)
             question_skill_links = (
                 question_services.get_question_skill_links_of_skill(
                     skill.id, skill.description))
@@ -2678,7 +2679,7 @@ class SkillModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return skill_services.get_skill_from_model(item)
+        return skill_fetchers.get_skill_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

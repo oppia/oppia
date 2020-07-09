@@ -24,6 +24,7 @@ import logging
 
 from core import jobs
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.platform import models
 import feconf
@@ -55,7 +56,7 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the skill up to the newest version.
-        skill = skill_services.get_skill_by_id(item.id)
+        skill = skill_fetchers.get_skill_by_id(item.id)
         try:
             skill.validate()
         except Exception as e:

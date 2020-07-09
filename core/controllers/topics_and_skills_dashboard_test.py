@@ -22,6 +22,7 @@ import os
 from constants import constants
 from core.domain import config_services
 from core.domain import question_services
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
@@ -533,7 +534,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
-            skill_services.get_skill_by_id(skill_id, strict=False))
+            skill_fetchers.get_skill_by_id(skill_id, strict=False))
         self.logout()
 
     def test_skill_creation_in_invalid_topic(self):
@@ -651,7 +652,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         )
         skill_id = json_response['skillId']
         self.assertIsNotNone(
-            skill_services.get_skill_by_id(skill_id, strict=False))
+            skill_fetchers.get_skill_by_id(skill_id, strict=False))
         self.logout()
 
     def test_skill_creation_in_invalid_rubrics(self):
@@ -731,7 +732,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
-            skill_services.get_skill_by_id(skill_id, strict=False))
+            skill_fetchers.get_skill_by_id(skill_id, strict=False))
         topic = topic_fetchers.get_topic_by_id(self.topic_id)
         self.assertEqual(
             topic.uncategorized_skill_ids,
