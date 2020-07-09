@@ -171,6 +171,8 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
@@ -244,8 +246,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -439,6 +439,8 @@ import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryObjectFactory } from
+  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
@@ -779,6 +781,8 @@ export class UpgradedServices {
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['SkillDifficultyObjectFactory'] =
       new SkillDifficultyObjectFactory();
+    upgradedServices['SkillMasteryObjectFactory'] =
+      new SkillMasteryObjectFactory();
     upgradedServices['SkillOpportunityObjectFactory'] =
       new SkillOpportunityObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =
@@ -1229,14 +1233,14 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ExplorationImprovementsBackendApiService'] =
+      new ExplorationImprovementsBackendApiService(
+        upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
       new ExplorationStatsBackendApiService(
         upgradedServices['ExplorationStatsObjectFactory'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
-    upgradedServices['ImprovementsBackendApiService'] =
-      new ImprovementsBackendApiService(
-        upgradedServices['ExplorationTaskObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
@@ -1299,7 +1303,8 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['SkillMasteryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],
