@@ -83,10 +83,30 @@ describe('Exploration task object factory', () => {
     ).toBeInstanceOf(SuccessiveIncorrectAnswersTask);
   });
 
+  it('should build a new resolved exloration task', () => {
+    const task = expTaskObjectFactory.createNewResolvedTask(
+      'eid', 1, 'high_bounce_rate', 'Introduction');
+    expect(task.entityId).toEqual('eid');
+    expect(task.entityVersion).toEqual(1);
+    expect(task.taskType).toEqual('high_bounce_rate');
+    expect(task.targetId).toEqual('Introduction');
+    expect(task.isResolved()).toBeTrue();
+  });
+
+  it('should build a new obsolete exloration task', () => {
+    const task = expTaskObjectFactory.createNewObsoleteTask(
+      'eid', 1, 'high_bounce_rate', 'Introduction');
+    expect(task.entityId).toEqual('eid');
+    expect(task.entityVersion).toEqual(1);
+    expect(task.taskType).toEqual('high_bounce_rate');
+    expect(task.targetId).toEqual('Introduction');
+    expect(task.isObsolete()).toBeTrue();
+  });
+
   it('should throw an error if task type is unknown', () => {
     expect(
       () => expTaskObjectFactory.createFromBackendDict(
         this.newTaskEntryBackendDict('unknown_task_type'))
-    ).toThrowError(/Backend dict does not match any known task type/);
+    ).toThrowError('unsupported task type: unknown_task_type');
   });
 });
