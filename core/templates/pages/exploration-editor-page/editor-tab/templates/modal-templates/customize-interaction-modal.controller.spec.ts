@@ -216,29 +216,29 @@ describe('Customize Interaction Modal Controller', function() {
       interactionDetailsCacheService.removeDetails('LogicProof');
     });
 
-    it('should save interaction button tooltip and return warning message',
-      function() {
-        $scope.form.schemaForm = {
-          $valid: true
-        };
-        stateCustomizationArgsService.displayed = {
-          imageAndRegions: {
-            value: ''
-          }
-        };
-        stateCustomizationArgsService.saveDisplayedValue();
+    it('should save interaction button to be enabled and return warning' +
+      ' message', function() {
+      $scope.form.schemaForm = {
+        $valid: true
+      };
+      stateCustomizationArgsService.displayed = {
+        imageAndRegions: {
+          value: ''
+        }
+      };
+      stateCustomizationArgsService.saveDisplayedValue();
 
-        var injectorSpy = spyOn($injector, 'get');
-        injectorSpy.withArgs('ImageClickInputValidationService').and
-          .returnValue(imageClickInputValidationService);
+      var injectorSpy = spyOn($injector, 'get');
+      injectorSpy.withArgs('ImageClickInputValidationService').and
+        .returnValue(imageClickInputValidationService);
 
-        expect($scope.getSaveInteractionButtonTooltip()).toBe(
-          'Please add an image for the learner to click on.');
-        injectorSpy.and.callThrough();
-        expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
-      });
+      expect($scope.getSaveInteractionButtonTooltip()).toBe(
+        'Please add an image for the learner to click on.');
+      injectorSpy.and.callThrough();
+      expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
+    });
 
-    it('should not save interaction button tooltip when form entries' +
+    it('should save interaction button to be disabled when form entries' +
       ' are invalid', function() {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {
@@ -266,8 +266,8 @@ describe('Customize Interaction Modal Controller', function() {
       expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
     });
 
-    it('should not save interaction button tooltip when there is no warning' +
-      ' message', function() {
+    it('should save interaction button to be enabled when there is no' +
+      ' warning message', function() {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {
           value: {
@@ -314,14 +314,14 @@ describe('Customize Interaction Modal Controller', function() {
       });
     }));
 
-    it('should not save interaction button tooltip when there is no' +
-      ' customization  message', function() {
+    it('should save interaction button to be disabled when there is no' +
+      ' customization arg', function() {
       expect($scope.getSaveInteractionButtonTooltip()).toBe(
         'No customization arguments');
       expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
     });
 
-    it('should not save interaction button tooltip when there is no' +
+    it('should save interaction button to be disabled when there is no' +
       ' interaction being displayed', function() {
       // Change customization args.
       stateCustomizationArgsService.displayed = {
