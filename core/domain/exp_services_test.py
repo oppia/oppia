@@ -3877,10 +3877,11 @@ title: Old Title
                 })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     def test_update_exploration_does_nothing_if_create_stats_model_fails(self):
-        swap_create_stats_model = (
-            self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
         assert_raises_regexp = (
-            self.assertRaisesRegexp(Exception, 'DivisionError'))
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
 
         self.save_new_valid_exploration('exp_id', 'user_id')
         with swap_create_stats_model, assert_raises_regexp:
@@ -4194,10 +4195,11 @@ title: Old Title
             exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
 
     def test_revert_exploration_does_nothing_if_create_stats_model_fails(self):
-        swap_create_stats_model = (
-            self.swap(stats_services, 'create_stats_model', lambda: 1 / 0))
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
         assert_raises_regexp = (
-            self.assertRaisesRegexp(Exception, 'DivisionError'))
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
 
         self.save_new_valid_exploration('exp_id', 'user_id')
         exp_services.update_exploration(
