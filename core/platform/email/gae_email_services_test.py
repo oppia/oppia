@@ -34,7 +34,7 @@ class EmailTests(test_utils.GenericTestBase):
 
     def mock_send_emails(
             self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc_admin, reply_to_id, *_):
+            html_body, bcc_admin=False, reply_to_id=None, *_):
         bcc = []
         reply_to = ''
         if not feconf.CAN_SEND_EMAILS:
@@ -47,7 +47,6 @@ class EmailTests(test_utils.GenericTestBase):
         if not gae_email_services.is_sender_email_valid(sender_email):
             raise ValueError(
                 'Malformed sender email address: %s' % sender_email)
-
 
         if bcc_admin:
             bcc = [feconf.ADMIN_EMAIL_ADDRESS]
