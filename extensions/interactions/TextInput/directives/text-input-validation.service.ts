@@ -19,12 +19,16 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { ITextInputCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
 interface IWarning {
   type: string,
@@ -36,10 +40,8 @@ interface IWarning {
 })
 export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
-  // TODO(#7165): Replace 'any' with the exact type.
   getCustomizationArgsWarnings(
-      customizationArgs: ITextInputCustomizationArgs
-  ): Array<IWarning> {
+      customizationArgs: ITextInputCustomizationArgs): IWarning[] {
     var warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
@@ -82,10 +84,11 @@ export class TextInputValidationService {
     }
     return warningsList;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
+
   getAllWarnings(
-      stateName: any, customizationArgs: any, answerGroups: any,
-      defaultOutcome: any): Array<IWarning> {
+      stateName: string,
+      customizationArgs: ITextInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.bivs.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));

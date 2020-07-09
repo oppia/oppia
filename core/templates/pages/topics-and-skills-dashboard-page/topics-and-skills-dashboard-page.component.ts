@@ -87,6 +87,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
         TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
       var ctrl = this;
+      var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
 
       /**
            * Calls the TopicsAndSkillsDashboardBackendApiService and fetches
@@ -100,7 +101,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
             ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
             ctrl.currentCount = ctrl.totalEntityCountToDisplay;
-            ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
             ctrl.applyFilters();
             ctrl.editableTopicSummaries = (ctrl.topicSummaries.filter(
               function(summary) {
@@ -134,11 +134,21 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
               ctrl.initSkillDashboard();
             }
             ctrl.classrooms = response.all_classroom_names;
-            // Adding this since karma tests adds
-            // TOPIC_FILTER_CLASSROOM_ALL for every it block.
+            // Adding the if checks since karma tests adds
+            // the values in the array for every it block.
+            if (!ctrl.classrooms.includes(TOPIC_CLASSROOM_UNASSIGNED)) {
+              ctrl.classrooms.unshift(TOPIC_CLASSROOM_UNASSIGNED);
+            }
             if (!ctrl.classrooms.includes(TOPIC_FILTER_CLASSROOM_ALL)) {
               ctrl.classrooms.unshift(TOPIC_FILTER_CLASSROOM_ALL);
             }
+            ctrl.skillClassrooms = angular.copy(ctrl.classrooms);
+            var unassignedValueIndex = (
+              ctrl.skillClassrooms.indexOf(TOPIC_CLASSROOM_UNASSIGNED));
+            if (unassignedValueIndex !== -1) {
+              ctrl.skillClassrooms.splice(unassignedValueIndex, 1);
+            }
+
             $rootScope.$apply();
           },
           function(errorResponse) {
@@ -176,6 +186,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
            */
       ctrl.setActiveTab = function(tabName) {
         ctrl.activeTab = tabName;
+        ctrl.filterObject.reset();
         if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
           ctrl.goToPageNumber(ctrl.topicPageNumber);
         } else if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
@@ -306,6 +317,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       };
 
       ctrl.resetFilters = function() {
+        ctrl.getUpperLimitValueForPagination();
         ctrl.topicSummaries = ctrl.totalTopicSummaries;
         ctrl.currentCount = ctrl.totalEntityCountToDisplay;
         ctrl.filterObject.reset();
@@ -314,6 +326,19 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
 
       ctrl.toggleFilterBox = function() {
         ctrl.filterBoxIsShown = !ctrl.filterBoxIsShown;
+      };
+
+      ctrl.getUpperLimitValueForPagination = function() {
+        return (
+          Math.min(((ctrl.pageNumber * ctrl.itemsPerPage) +
+            ctrl.itemsPerPage), ctrl.currentCount));
+      };
+
+      ctrl.getTotalCountValueForSkills = function() {
+        if (ctrl.skillSummaries.length > ctrl.itemsPerPage) {
+          return 'many';
+        }
+        return ctrl.skillSummaries.length;
       };
 
       ctrl.refreshPagination = function() {
@@ -333,6 +358,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.skillPageNumber = 0;
         ctrl.lastSkillPage = 0;
         ctrl.selectedIndex = null;
+        ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
         ctrl.itemsPerPageChoice = [10, 15, 20];
         ctrl.filterBoxIsShown = !WindowDimensionsService.isWindowNarrow();
         ctrl.filterObject = (

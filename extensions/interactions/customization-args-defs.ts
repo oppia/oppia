@@ -16,26 +16,34 @@
  * @fileoverview Type definiitions for Customization Args.
  */
 
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
+import { IGraphAnswer } from 'interactions/answer-defs';
 import { IImageWithRegions } from
   // eslint-disable-next-line max-len
   'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.directive';
-import { IReadableNote } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive';
 import { ISubtitledHtmlBackendDict, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { ISubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-export interface IAlgebraicExpressionInputCustomizationArgsBackendDict {
-
+interface ILabeledRegion {
+  region: {
+    area: number[][];
+  };
+  label: string;
 }
+
+interface IImageWithRegions {
+  labeledRegions: ILabeledRegion[];
+  imagePath: string;
+}
+
+interface IReadableMusicNote {
+  readableNoteName: string;
+}
+
+export interface IAlgebraicExpressionInputCustomizationArgsBackendDict { }
 export interface IAlgebraicExpressionInputCustomizationArgs extends
-  IAlgebraicExpressionInputCustomizationArgsBackendDict {
-
-}
+  IAlgebraicExpressionInputCustomizationArgsBackendDict { }
 
 
 export interface ICodeReplCustomizationArgsBackendDict {
@@ -53,9 +61,7 @@ export interface ICodeReplCustomizationArgsBackendDict {
   };
 }
 export interface ICodeReplCustomizationArgs extends
-    ICodeReplCustomizationArgsBackendDict {
-
-}
+    ICodeReplCustomizationArgsBackendDict { }
 
 
 export interface IContinueCustomizationArgsBackendDict {
@@ -75,8 +81,8 @@ export interface IDragAndDropSortInputCustomizationArgsBackendDict {
   choices?: {
     value: ISubtitledHtmlBackendDict[];
   };
-  allowMultipleItemsInSamePosition?: {
-    value: string;
+  allowMultipleItemsInSamePosition: {
+    value: boolean;
   }
 }
 export interface IDragAndDropSortInputCustomizationArgs extends
@@ -93,9 +99,7 @@ export interface IEndExplorationCustomizationArgsBackendDict {
   };
 }
 export interface IEndExplorationCustomizationArgs extends
-  IEndExplorationCustomizationArgsBackendDict {
-
-}
+  IEndExplorationCustomizationArgsBackendDict { }
 
 
 export interface IFractionInputCustomizationArgsBackendDict {
@@ -122,7 +126,7 @@ export interface IFractionInputCustomizationArgs extends
 
 export interface IGraphInputCustomizationArgsBackendDict {
   graph?: {
-    value: IGraphBackendDict;
+    value: IGraphAnswer;
   };
   canAddVertex: {
     value: boolean;
@@ -147,9 +151,7 @@ export interface IGraphInputCustomizationArgsBackendDict {
   };
 }
 export interface IGraphInputCustomizationArgs extends
-  IGraphInputCustomizationArgsBackendDict {
-
-}
+  IGraphInputCustomizationArgsBackendDict { }
 
 
 export interface IImageClickInputCustomizationArgsBackendDict {
@@ -161,9 +163,7 @@ export interface IImageClickInputCustomizationArgsBackendDict {
   };
 }
 export interface IImageClickInputCustomizationArgs extends
-  IImageClickInputCustomizationArgsBackendDict {
-
-}
+  IImageClickInputCustomizationArgsBackendDict { }
 
 
 export interface IInteractiveMapCustomizationArgsBackendDict {
@@ -178,9 +178,7 @@ export interface IInteractiveMapCustomizationArgsBackendDict {
   };
 }
 export interface IInteractiveMapCustomizationArgs extends
-  IInteractiveMapCustomizationArgsBackendDict {
-
-}
+  IInteractiveMapCustomizationArgsBackendDict { }
 
 
 export interface IItemSelectionInputCustomizationArgsBackendDict {
@@ -208,18 +206,12 @@ export interface ILogicCustomizationArgsBackendDict {
   };
 }
 export interface ILogicCustomizationArgs extends
-  ILogicCustomizationArgsBackendDict {
-
-}
+  ILogicCustomizationArgsBackendDict { }
 
 
-export interface IMathEquationInputCustomizationArgsBackendDict {
-
-}
+export interface IMathEquationInputCustomizationArgsBackendDict { }
 export interface IMathEquationInputCustomizationArgs extends
-  IMathEquationInputCustomizationArgsBackendDict {
-
-}
+  IMathEquationInputCustomizationArgsBackendDict { }
 
 
 export interface IMultipleChoiceInputCustomizationArgsBackendDict {
@@ -240,16 +232,14 @@ export interface IMultipleChoiceInputCustomizationArgs extends
 
 export interface IMusicNotesInputCustomizationArgsBackendDict {
   sequenceToGuess?: {
-    value: IReadableNote[];
+    value: IReadableMusicNote[];
   };
   initialSequence?: {
-    value: IReadableNote[];
+    value: IReadableMusicNote[];
   };
 }
 export interface IMusicNotesInputCustomizationArgs extends
-  IMusicNotesInputCustomizationArgsBackendDict {
-
-}
+  IMusicNotesInputCustomizationArgsBackendDict { }
 
 
 export interface IPencilCodeCustomizationArgsBackendDict {
@@ -258,9 +248,7 @@ export interface IPencilCodeCustomizationArgsBackendDict {
   };
 }
 export interface IPencilCodeCustomizationArgs extends
-  IPencilCodeCustomizationArgsBackendDict {
-
-}
+  IPencilCodeCustomizationArgsBackendDict { }
 
 
 export interface ISetInputCustomizationArgsBackendDict {
@@ -292,22 +280,18 @@ export interface ITextInputCustomizationArgs extends
 }
 
 
-export interface IMathExpressionCustomizationArgsBackendDict {
-
-}
+export interface IMathExpressionCustomizationArgsBackendDict { }
 export interface IMathExpressionCustomizationArgs extends
-  IMathExpressionCustomizationArgsBackendDict {
+  IMathExpressionCustomizationArgsBackendDict { }
 
-}
-
-
-export interface INumericInputCustomizationArgsBackendDict {
-
-}
+export interface INumericInputCustomizationArgsBackendDict { }
 export interface INumericInputCustomizationArgs extends
-  INumericInputCustomizationArgsBackendDict {
+  INumericInputCustomizationArgsBackendDict { }
 
-}
+export interface INumberWithUnitsCustomizationArgsBackendDict { }
+export interface INumberWithUnitsCustomizationArgs extends
+  INumberWithUnitsCustomizationArgsBackendDict { }
+
 
 export type IInteractionCustomizationArgsValueBackendDict = (
   IAlgebraicExpressionInputCustomizationArgsBackendDict |
@@ -328,7 +312,8 @@ export type IInteractionCustomizationArgsValueBackendDict = (
   ISetInputCustomizationArgsBackendDict |
   ITextInputCustomizationArgsBackendDict |
   IMathExpressionCustomizationArgsBackendDict |
-  INumericInputCustomizationArgsBackendDict);
+  INumericInputCustomizationArgsBackendDict |
+  INumberWithUnitsCustomizationArgsBackendDict);
 
 export type IInteractionCustomizationArgsValue = (
   IAlgebraicExpressionInputCustomizationArgs |
@@ -343,10 +328,11 @@ export type IInteractionCustomizationArgsValue = (
   IItemSelectionInputCustomizationArgs |
   ILogicCustomizationArgs |
   IMathEquationInputCustomizationArgs |
+  IMathExpressionCustomizationArgs |
   IMultipleChoiceInputCustomizationArgs |
   IMusicNotesInputCustomizationArgs |
+  INumberWithUnitsCustomizationArgs |
+  INumericInputCustomizationArgs |
   IPencilCodeCustomizationArgs |
   ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs |
-  IMathExpressionCustomizationArgs |
-  INumericInputCustomizationArgs);
+  ITextInputCustomizationArgs);

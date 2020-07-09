@@ -1123,7 +1123,7 @@ tags: []
             Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title=title, category='A category')
+            exploration_id, title=title, category='Algebra')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -1875,6 +1875,7 @@ tags: []
 
         class PatchedDatetimeType(type):
             """Validates the datetime instances."""
+
             def __instancecheck__(cls, other):
                 """Validates whether the given instance is datetime
                 instance.
@@ -1887,6 +1888,7 @@ tags: []
             @classmethod
             def utcnow(cls):
                 """Returns the mocked datetime."""
+
                 return mocked_datetime
 
         setattr(datetime, 'datetime', MockDatetime)

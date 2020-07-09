@@ -70,6 +70,7 @@ class MockRecentUpdatesAggregator(
     """A modified DashboardRecentUpdatesAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
@@ -595,6 +596,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass

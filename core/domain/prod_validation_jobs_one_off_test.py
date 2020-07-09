@@ -30,6 +30,7 @@ from constants import constants
 from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -52,7 +53,6 @@ from core.domain import subtopic_page_domain
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import user_id_migration
 from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -78,7 +78,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
-    recommendations_models, skill_models,
+    recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
     user_models,) = (
         models.Registry.import_models([
@@ -88,14 +88,15 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-            models.NAMES.user]))
+            models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
 
 
 class PatchedDatetimeType(type):
     """Validates the datetime instances."""
+
     def __instancecheck__(cls, other):
         """Validates whether the given instance is a datatime instance.
 
@@ -844,8 +845,6 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             collection.add_node('%s' % (index * 2))
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
-            collection_models.CollectionRightsAllUsersModel(
-                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = collection_models.CollectionModel.get_by_id('0')
         self.model_instance_1 = collection_models.CollectionModel.get_by_id('1')
@@ -1000,19 +999,6 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model CollectionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_rights_all_users_failure(self):
-        collection_models.CollectionRightsAllUsersModel.get_by_id(
-            '0').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for all_users_model_ids '
-                'field check of CollectionModel\', '
-                '[u"Entity id 0: based on field all_users_model_ids having '
-                'value 0, expect model CollectionRightsAllUsersModel '
-                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -1806,124 +1792,6 @@ class CollectionRightsSnapshotContentModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(CollectionRightsAllUsersModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        editor_email = 'user@editor.com'
-        self.signup(editor_email, 'editor')
-        self.editor_id = self.get_user_id_from_email(editor_email)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(6)]
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        collections = [collection_domain.Collection.create_default_collection(
-            '%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-            objective='objective%d' % i,
-        ) for i in python_utils.RANGE(3)]
-        for index, collection in enumerate(collections):
-            collection.add_node('%s' % (index * 2))
-            collection.add_node('%s' % (index * 2 + 1))
-            collection_services.save_new_collection(self.owner_id, collection)
-
-        rights_manager.assign_role_for_collection(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
-
-        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
-            .create_new()
-        )
-        self.process_and_flush_pending_tasks()
-
-        self.model_instance_0 = (
-            collection_models.CollectionRightsAllUsersModel.get_by_id('0'))
-        self.model_instance_1 = (
-            collection_models.CollectionRightsAllUsersModel.get_by_id('1'))
-        self.model_instance_2 = (
-            collection_models.CollectionRightsAllUsersModel.get_by_id('2'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off.
-            CollectionRightsAllUsersModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated CollectionRightsAllUsersModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of CollectionRightsAllUsersModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'CollectionRightsAllUsersModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'CollectionRightsAllUsersModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_exploration_model_failure(self):
-        collection_models.CollectionRightsModel.get_by_id('0').delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for collection_rights_ids '
-                'field check of CollectionRightsAllUsersModel\', '
-                '[u"Entity id 0: based on field collection_rights_ids '
-                'having value 0, expect model CollectionRightsModel with '
-                'id 0 but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for all_user_ids '
-                'field check of CollectionRightsAllUsersModel\', '
-                '[u"Entity id 0: based on field all_user_ids '
-                'having value %s, expect model UserSettingsModel with '
-                'id %s but it doesn\'t exist"]]'
-            ) % (self.editor_id, self.editor_id),
-            u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
 class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -1956,9 +1824,12 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         self.rights_model_instance = (
             collection_models.CollectionCommitLogEntryModel(
-                id='rights-1-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, collection_id='1',
-                commit_type='edit', commit_message='', commit_cmds=[],
+                id='rights-1-1',
+                user_id=self.owner_id,
+                collection_id='1',
+                commit_type='edit',
+                commit_message='',
+                commit_cmds=[],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_community_owned=False,
                 post_commit_is_private=False))
@@ -2054,8 +1925,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             collection_models.CollectionCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.collection_id = '0'
         model_with_invalid_version_in_id.put()
@@ -2073,9 +1943,11 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             collection_models.CollectionCommitLogEntryModel(
-                id='invalid-0-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}],
+                id='invalid-0-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.collection_id = '0'
@@ -3522,10 +3394,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             language_code=language_codes[i]
         ) for i in python_utils.RANGE(3)]
 
-        for index, exp in enumerate(explorations):
+        for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
-            exp_models.ExplorationRightsAllUsersModel(
-                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = exp_models.ExplorationModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExplorationModel.get_by_id('1')
@@ -3664,18 +3534,6 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model ExplorationSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_rights_all_users_failure(self):
-        exp_models.ExplorationRightsAllUsersModel.get_by_id('0').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for all_users_model_ids '
-                'field check of ExplorationModel\', '
-                '[u"Entity id 0: based on field all_users_model_ids having '
-                'value 0, expect model ExplorationRightsAllUsersModel '
-                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -4413,113 +4271,6 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class ExplorationRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(ExplorationRightsAllUsersModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-
-        editor_email = 'user@editor.com'
-        self.signup(editor_email, 'editor')
-        self.editor_id = self.get_user_id_from_email(editor_email)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(3)]
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
-
-        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
-            .create_new()
-        )
-        self.process_and_flush_pending_tasks()
-
-        self.model_instance_0 = (
-            exp_models.ExplorationRightsAllUsersModel.get_by_id('0'))
-        self.model_instance_1 = (
-            exp_models.ExplorationRightsAllUsersModel.get_by_id('1'))
-        self.model_instance_2 = (
-            exp_models.ExplorationRightsAllUsersModel.get_by_id('2'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off.
-            ExplorationRightsAllUsersModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated ExplorationRightsAllUsersModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of ExplorationRightsAllUsersModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'ExplorationRightsAllUsersModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationRightsAllUsersModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationRightsModel.get_by_id('0').delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_rights_ids '
-                'field check of ExplorationRightsAllUsersModel\', '
-                '[u"Entity id 0: based on field exploration_rights_ids '
-                'having value 0, expect model ExplorationRightsModel with '
-                'id 0 but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for all_user_ids '
-                'field check of ExplorationRightsAllUsersModel\', '
-                '[u"Entity id 0: based on field all_user_ids '
-                'having value %s, expect model UserSettingsModel with '
-                'id %s but it doesn\'t exist"]]'
-            ) % (self.editor_id, self.editor_id),
-            u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
 class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -4540,9 +4291,12 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         self.rights_model_instance = (
             exp_models.ExplorationCommitLogEntryModel(
-                id='rights-1-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, exploration_id='1',
-                commit_type='edit', commit_message='', commit_cmds=[],
+                id='rights-1-1',
+                user_id=self.owner_id,
+                exploration_id='1',
+                commit_type='edit',
+                commit_message='',
+                commit_cmds=[],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_community_owned=False,
                 post_commit_is_private=False))
@@ -4638,8 +4392,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             exp_models.ExplorationCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.exploration_id = '0'
         model_with_invalid_version_in_id.put()
@@ -4657,9 +4410,11 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             exp_models.ExplorationCommitLogEntryModel(
-                id='invalid-0-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}],
+                id='invalid-0-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.exploration_id = '0'
@@ -6703,8 +6458,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_question_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             question_models.QuestionCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.question_id = '0'
         model_with_invalid_version_in_id.put()
@@ -6722,9 +6476,11 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             question_models.QuestionCommitLogEntryModel(
-                id='invalid-0-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}],
+                id='invalid-0-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.question_id = '0'
@@ -7943,8 +7699,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_skill_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             skill_models.SkillCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.skill_id = '0'
         model_with_invalid_version_in_id.put()
@@ -7962,9 +7717,11 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             skill_models.SkillCommitLogEntryModel(
-                id='invalid-0-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}],
+                id='invalid-0-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.skill_id = '0'
@@ -8815,8 +8572,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_story_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             story_models.StoryCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.story_id = '0'
         model_with_invalid_version_in_id.put()
@@ -8834,9 +8590,11 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             story_models.StoryCommitLogEntryModel(
-                id='invalid-0-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}],
+                id='invalid-0-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.story_id = '0'
@@ -9059,7 +8817,6 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
 
 
 class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
-
     def setUp(self):
         super(GeneralSuggestionModelValidatorTests, self).setUp()
 
@@ -9221,7 +8978,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_schema(self):
-        self.model_instance.score_category = 'invalid.invalid'
+        self.model_instance.score_category = 'invalid.Art'
         self.model_instance.put()
         expected_output = [
             (
@@ -9243,6 +9000,97 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             prod_validation_jobs_one_off, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
             run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_validate_score_category_for_content_suggestion(self):
+        self.model_instance.score_category = 'content.invalid'
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for score category subtype check of '
+            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
+            'valid does not match target exploration category Art\']]') % (
+                self.model_instance.id)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_validate_score_category_for_transalation_suggestion(self):
+        change = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        score_category = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'invalid')
+
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', self.owner_id, 'description',
+            'suggestion', has_suggestion=True)
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0',
+            1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
+            self.admin_id, change, score_category, thread_id)
+        model_instance = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
+        expected_output = [((
+            u'[u\'failed validation check for score category subtype check of '
+            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
+            'valid does not match target exploration category Art\']]') % (
+                model_instance.id)),
+                           u'[u\'fully-validated GeneralSuggestionModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_validate_score_category_for_question_suggestion(self):
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            '0', 'skill_description', rubrics)
+        skill_services.save_new_skill(self.owner_id, skill)
+
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['0']
+            },
+            'skill_id': '0',
+            'skill_difficulty': 0.3,
+        }
+
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'invalid_sub_category')
+
+        thread_id = feedback_services.create_thread(
+            'skill', '0', self.owner_id, 'description',
+            'suggestion', has_suggestion=True)
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, '0',
+            1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
+            self.admin_id, change, score_category, thread_id)
+        model_instance = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
+        expected_output = [(
+            u'[u\'failed validation check for score category check of '
+            'GeneralSuggestionModel\', [u\'Entity id %s: Score category'
+            ' question.invalid_sub_category is invalid\']]') % (
+                model_instance.id),
+                           u'[u\'fully-validated GeneralSuggestionModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class GeneralVoiceoverApplicationModelValidatorTests(
@@ -9435,8 +9283,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                     'new_subtopic_id': 1,
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
-            topic_models.TopicRightsAllUsersModel(
-                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = topic_models.TopicModel.get_by_id('0')
         self.model_instance_1 = topic_models.TopicModel.get_by_id('1')
@@ -9621,18 +9467,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model TopicSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_rights_all_users_failure(self):
-        topic_models.TopicRightsAllUsersModel.get_by_id('0').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for all_users_model_ids '
-                'field check of TopicModel\', '
-                '[u"Entity id 0: based on field all_users_model_ids having '
-                'value 0, expect model TopicRightsAllUsersModel '
-                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -10569,121 +10403,6 @@ class TopicRightsSnapshotContentModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(TopicRightsAllUsersModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-
-        manager1_email = 'user@manager1.com'
-        self.signup(manager1_email, 'manager1')
-        self.set_topic_managers(['manager1'])
-        self.manager1_id = self.get_user_id_from_email(manager1_email)
-        self.manager1 = user_services.UserActionsInfo(self.manager1_id)
-
-        topics = [topic_domain.Topic.create_default_topic(
-            '%s' % i,
-            'topic%s' % i,
-            'abbrev%s' % i,
-            'description%s' % i) for i in python_utils.RANGE(3)]
-
-        language_codes = ['ar', 'en', 'en']
-        for index, topic in enumerate(topics):
-            topic.language_code = language_codes[index]
-            topic_services.save_new_topic(self.owner_id, topic)
-
-        topic_services.assign_role(
-            self.admin, self.manager1, topic_domain.ROLE_MANAGER, '0')
-
-        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
-            .create_new()
-        )
-        self.process_and_flush_pending_tasks()
-
-        self.model_instance_0 = (
-            topic_models.TopicRightsAllUsersModel.get_by_id('0'))
-        self.model_instance_1 = (
-            topic_models.TopicRightsAllUsersModel.get_by_id('1'))
-        self.model_instance_2 = (
-            topic_models.TopicRightsAllUsersModel.get_by_id('2'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off.TopicRightsAllUsersModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated TopicRightsAllUsersModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of TopicRightsAllUsersModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'TopicRightsAllUsersModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicRightsAllUsersModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_topic_model_failure(self):
-        topic_models.TopicRightsModel.get_by_id('0').delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for topic_rights_ids '
-                'field check of TopicRightsAllUsersModel\', '
-                '[u"Entity id 0: based on field topic_rights_ids '
-                'having value 0, expect model TopicRightsModel with '
-                'id 0 but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for all_user_ids '
-                'field check of TopicRightsAllUsersModel\', '
-                '[u"Entity id 0: based on field all_user_ids '
-                'having value %s, expect model UserSettingsModel with '
-                'id %s but it doesn\'t exist"]]'
-            ) % (self.manager1_id, self.manager1_id),
-            u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
 class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -10847,8 +10566,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             topic_models.TopicCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.topic_id = '0'
         model_with_invalid_version_in_id.put()
@@ -10866,9 +10584,11 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             topic_models.TopicCommitLogEntryModel(
-                id='invalid-0-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}],
+                id='invalid-0-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.topic_id = '0'
@@ -11934,8 +11654,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             topic_models.SubtopicPageCommitLogEntryModel.create(
-                '0-1', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0-1', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.subtopic_page_id = '0-1'
         model_with_invalid_version_in_id.put()
@@ -11953,9 +11672,11 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             topic_models.SubtopicPageCommitLogEntryModel(
-                id='invalid-0-1-1', user_id=self.owner_id,
-                username=self.OWNER_USERNAME, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}],
+                id='invalid-0-1-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.subtopic_page_id = '0-1'
@@ -14558,18 +14279,6 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance.id, self.user_id, self.user_id)]
         run_job_and_check_output(self, expected_output)
 
-    def test_invalid_score_category(self):
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_id, 'invalid', 10)
-        expected_output = [
-            (
-                u'[u\'failed validation check for score category check '
-                'of UserContributionScoringModel\', [u\'Entity id invalid.%s: '
-                'Score category invalid is invalid\']]'
-            ) % self.user_id,
-            u'[u\'fully-validated UserContributionScoringModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
     def test_invalid_score(self):
         self.model_instance.score = -1
         self.model_instance.put()
@@ -15128,3 +14837,165 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
                 'have a state named "State 2" at version 2' % (
                     new_sia_task_id,)
             ])
+
+
+class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
+    def setUp(self):
+        super(PlaythroughModelValidatorTests, self).setUp()
+        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .PlaythroughModelAuditOneOffJob)
+
+    def create_playthrough(self):
+        """Helper method to create and return a simple playthrough model."""
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, issue_type='EarlyQuit',
+            issue_customization_args={
+                'state_name': {'value': 'state_name'},
+                'time_spent_in_exp_in_msecs': {'value': 200},
+            },
+            actions=[])
+        return stats_models.PlaythroughModel.get(playthrough_id)
+
+    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
+        """Helper method to create and return an ExplorationIssuesModel instance
+        with the given sets of playthrough ids as reference issues.
+        """
+        return stats_models.ExplorationIssuesModel.create(
+            self.exp.id, self.exp.version, unresolved_issues=[
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name'},
+                        'time_spent_in_exp_in_msecs': {'value': 200},
+                    },
+                    'playthrough_ids': list(playthrough_ids),
+                    'schema_version': 1,
+                    'is_valid': True,
+                }
+                for playthrough_ids in playthrough_ids_list
+            ])
+
+    def test_output_for_valid_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [u'[u\'fully-validated PlaythroughModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_pre_released_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        # Set created_on to a date which is definitely before GSoC 2018.
+        playthrough.created_on = datetime.datetime(2017, 12, 31)
+        playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for create datetime check of '
+                'PlaythroughModel\', [u\'Entity id %s: released on '
+                '2017-12-31, which is before the GSoC 2018 submission '
+                'deadline (2018-09-01) and should therefore not exist.\']]' % (
+                    playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_non_whitelisted_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id + 'differentiated'])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration id check of '
+                'PlaythroughModel\', [u\'Entity id %s: recorded in '
+                'exploration_id:EXP_ID which has not been curated for '
+                'recording.\']]' % (playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_bad_schema_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        playthrough.actions.append({'bad schema key': 'bad schema value'})
+        playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'PlaythroughModel\', [u"Entity id %s: '
+                'Entity fails domain validation with the error u\''
+                'schema_version\'"]]' % (playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_missing_reference(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([
+            [playthrough.id + '-different'],
+        ])
+        expected_output = [
+            (
+                u'[u\'failed validation check for reference check of '
+                'PlaythroughModel\', [u\'Entity id %s: not referenced'
+                ' by any issue of the corresponding exploration '
+                '(id=%s, version=%s).\']]' % (
+                    playthrough.id, playthrough.exp_id, playthrough.exp_version
+                )
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_multiple_references(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs(
+            [[playthrough.id], [playthrough.id]])
+        expected_output = [
+            (
+                u'[u\'failed validation check for reference check of '
+                'PlaythroughModel\', [u\'Entity id %s: referenced by '
+                'more than one issues of the corresponding exploration '
+                '(id=%s, version=%s), issue indices: [0, 1].\']]' % (
+                    playthrough.id, self.exp.id, self.exp.version)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_duplicate_references_in_one_issue(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs(
+            [[playthrough.id, playthrough.id]])
+        expected_output = [
+            (
+                u'[u\'failed validation check for reference check of '
+                'PlaythroughModel\', [u\'Entity id %s: referenced multiple '
+                'times in an issue (index=0) of the corresponding exploration '
+                '(id=%s, version=%s), duplicated id indices: [0, 1].\']]' % (
+                    playthrough.id, self.exp.id, self.exp.version)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
