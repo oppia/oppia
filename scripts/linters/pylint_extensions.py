@@ -568,9 +568,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not func_node.doc:
             # If this is a property setter,
             # the property should have the docstring instead.
-            _property = docstrings_checker.get_setters_property(func_node)
-            if _property:
-                func_node = _property
+            setters_property = docstrings_checker.get_setters_property(func_node)
+            if setters_property:
+                func_node = setters_property
 
         doc = docstrings_checker.docstringify(func_node.doc)
         if not doc.is_valid():
