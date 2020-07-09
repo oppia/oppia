@@ -2239,6 +2239,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-readonly-rule-tile img, .oppia-rule-tab img {
   max-height: 50px;
+  object-fit: contain;
 }
 
 .oppia-rule-dest-link {

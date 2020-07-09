@@ -13,19 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Disable parallelism on terser webpack plugin.
+ * @fileoverview Module for Angular Material.
  */
 
-const { merge } = require('webpack-merge');
-const prod = require('./webpack.prod.config.ts');
-const TerserPlugin = require('terser-webpack-plugin');
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-module.exports = merge(prod, {
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        parallel: false,
-      }),
-    ]
-  }
-});
+@NgModule({
+  imports: [CommonModule, BrowserAnimationsModule,
+    MatButtonModule, MatCardModule
+  ],
+  exports: [BrowserAnimationsModule, MatButtonModule, MatCardModule]
+})
+export class MaterialModule {}

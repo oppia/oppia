@@ -13,35 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ImprovementConfirmationModal.
+ * @fileoverview Unit tests for AnswerContentModalController.
  */
 
 describe('Improvement Confirmation Modal', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
+  let $scope = null;
+  let $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+    let $rootScope = $injector.get('$rootScope');
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+    $uibModalInstance = (
+      jasmine.createSpyObj('$uibModalInstance', ['close', 'dismiss']));
 
     $scope = $rootScope.$new();
-    $controller('ImprovementConfirmationModalController', {
+    $controller('AnswerContentModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      buttonClass: 'btn',
-      buttonText: 'Button Text',
-      message: 'Message Text'
+      answerHtml: '<div>Lorem ipsum dolor sit amet.</div>',
     });
   }));
 
-  it('should evalute scope variables values correctly', function() {
-    expect($scope.confirmationMessage).toBe('Message Text');
-    expect($scope.confirmationButtonText).toBe('Button Text');
-    expect($scope.confirmationButtonClass).toBe('btn');
-    expect($scope.action).toEqual($uibModalInstance.close);
-    expect($scope.cancel).toEqual($uibModalInstance.dismiss);
+  it('should evalute scope letiables values correctly', function() {
+    expect($scope.answerHtml).toEqual('<div>Lorem ipsum dolor sit amet.</div>');
+    expect($scope.close).toBe($uibModalInstance.close);
   });
 });
