@@ -168,7 +168,7 @@ export class NumericInputValidationService {
     value = value.toString().trim();
     const trailingDot = /\.\d/g;
     const twoDecimals = /.*\..*\./g;
-    const extraChars = /[^0-9.+-]/g;
+    const extraChars = /[^0-9\.-]/g;
     const trailingMinus = /^-/g;
     const extraMinus = /-.*-/g;
 
