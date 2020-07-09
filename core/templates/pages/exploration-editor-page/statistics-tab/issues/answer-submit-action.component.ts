@@ -24,7 +24,8 @@ angular.module('oppia').component('answerSubmitAction', {
   template: require('./answer-submit-action.component.html'),
   controller: ['$attrs', 'ExplorationHtmlFormatterService',
     'HtmlEscaperService',
-    function($attrs, ExplorationHtmlFormatterService, HtmlEscaperService) {
+    function($attrs, ExplorationHtmlFormatterService,
+        HtmlEscaperService) {
       var ctrl = this;
       var _customizationArgs = HtmlEscaperService.escapedJsonToObj(
         $attrs.interactionCustomizationArgs);
