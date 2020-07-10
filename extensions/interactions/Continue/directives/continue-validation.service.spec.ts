@@ -24,6 +24,8 @@ import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -64,7 +66,7 @@ describe('ContinueValidationService', () => {
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
     customizationArguments = {
       buttonText: {
-        value: 'Some Button Text'
+        value: new SubtitledUnicode('Some Button Text', 'custarg_buttonText')
       }
     };
   });
@@ -75,7 +77,8 @@ describe('ContinueValidationService', () => {
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([]);
 
-      customizationArguments.buttonText.value = '';
+      customizationArguments.buttonText.value = (
+        new SubtitledUnicode('', 'custarg_buttonText'));
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([{
