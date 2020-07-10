@@ -87,16 +87,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid skill id'):
             skill_domain.Skill.require_valid_skill_id('abc')
 
-    def test_skill_ids_validation_fails_with_invalid_skill_id_type(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Skill id should be a string'):
-            skill_domain.Skill.require_valid_skill_ids([10])
-
-    def test_skill_ids_validation_fails_with_invalid_skill_id_length(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid skill id'):
-            skill_domain.Skill.require_valid_skill_ids(['abc'])
-
     def test_valid_misconception_id(self):
         self.skill.next_misconception_id = 'invalid_id'
         self._assert_validation_error(

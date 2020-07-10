@@ -27,6 +27,19 @@ import feconf
 import utils
 
 
+def _require_valid_skill_ids(skill_ids):
+    """Checks whether the given skill ids are valid.
+
+    Args:
+        skill_ids: list(str). The skill ids to validate.
+    """
+    for skill_id in skill_ids:
+        try:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise utils.ValidationError('Invalid skill id')
+
+
 class QuestionsListHandler(base.BaseHandler):
     """Manages receiving of all question summaries for display in topic editor
     and skill editor page.
@@ -42,7 +55,7 @@ class QuestionsListHandler(base.BaseHandler):
         skill_ids = list(set(skill_ids))
 
         try:
-            skill_domain.Skill.require_valid_skill_ids(skill_ids)
+            _require_valid_skill_ids(skill_ids)
         except utils.ValidationError:
             raise self.InvalidInputException('Invalid skill id')
 
@@ -106,7 +119,7 @@ class QuestionCountDataHandler(base.BaseHandler):
         skill_ids = list(set(skill_ids))
 
         try:
-            skill_domain.Skill.require_valid_skill_ids(skill_ids)
+            _require_valid_skill_ids(skill_ids)
         except utils.ValidationError:
             raise self.InvalidInputException('Invalid skill id')
 

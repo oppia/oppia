@@ -586,16 +586,6 @@ class Skill(python_utils.OBJECT):
             raise utils.ValidationError('Invalid skill id.')
 
     @classmethod
-    def require_valid_skill_ids(cls, skill_ids):
-        """Checks whether the skill ids are valid.
-
-        Args:
-            skill_ids: list(str). The skill ids to validate.
-        """
-        for skill_id in skill_ids:
-            Skill.require_valid_skill_id(skill_id)
-
-    @classmethod
     def require_valid_description(cls, description):
         """Checks whether the description of the skill is a valid one.
 
