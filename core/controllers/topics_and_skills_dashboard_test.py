@@ -176,7 +176,7 @@ class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             skill_id, self.admin_id, description='Skill description')
 
         json_response = self.get_json(
-            '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
+            '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
         self.assertEqual(len(json_response['assigned_topic_dicts']), 0)
 
         topic_id_1 = topic_services.get_new_topic_id()
@@ -202,7 +202,7 @@ class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             subtopics=[subtopic], next_subtopic_id=2)
 
         json_response = self.get_json(
-            '%s%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
+            '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
         assigned_topic_dicts = sorted(
             json_response['assigned_topic_dicts'],
             key=lambda i: i['topic_name'])
