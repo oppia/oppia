@@ -92,7 +92,7 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
