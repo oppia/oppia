@@ -26,9 +26,8 @@ from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import state_domain
-from core.domain import user_id_migration
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -159,7 +158,7 @@ class BaseSuggestion(python_utils.OBJECT):
 
         if (
                 self.author_id is not None and
-                not user_id_migration.verify_user_id_correct(self.author_id)
+                not user_services.is_user_id_correct(self.author_id)
         ):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
@@ -171,7 +170,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
             if (
-                    not user_id_migration.verify_user_id_correct(
+                    not user_services.is_user_id_correct(
                         self.final_reviewer_id) and
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
@@ -659,7 +658,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Question state schema version is not up to date.')
 
         skill_domain.Skill.require_valid_skill_id(self.change.skill_id)
-        skill = skill_services.get_skill_by_id(
+        skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
@@ -684,7 +683,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)
-        skill = skill_services.get_skill_by_id(
+        skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(

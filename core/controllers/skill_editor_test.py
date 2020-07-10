@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import role_services
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -67,7 +68,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         """
         skill_model = skill_models.SkillModel.get(skill_id)
         skill_model.delete(user_id, 'Delete skill model.')
-        skill_memcache_key = skill_services._get_skill_memcache_key(skill_id) # pylint: disable=protected-access
+        skill_memcache_key = skill_fetchers.get_skill_memcache_key(skill_id) # pylint: disable=protected-access
         memcache_services.delete(skill_memcache_key)
 
     def _mock_update_skill_raise_exception(

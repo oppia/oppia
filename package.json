@@ -41,6 +41,7 @@
     "@types/q": "^1.5.1",
     "@types/select2": "^4.0.48",
     "@types/selenium-webdriver": "^4.0.0",
+    "@types/wavesurfer.js": "^3.3.1",
     "@typescript-eslint/eslint-plugin": "^3.0.0",
     "@typescript-eslint/parser": "^3.0.0",
     "ajv": "^6.10.0",
@@ -101,10 +102,13 @@
   },
   "keywords": [],
   "dependencies": {
+    "@angular/animations": "^8.0.0",
+    "@angular/cdk": "^8.0.0",
     "@angular/common": "^8.0.0",
     "@angular/compiler": "^8.0.0",
     "@angular/core": "^8.0.0",
     "@angular/forms": "^8.0.0",
+    "@angular/material": "^8.0.0",
     "@angular/platform-browser": "^8.0.0",
     "@angular/platform-browser-dynamic": "^8.0.0",
     "@angular/router": "^8.0.0",
@@ -124,11 +128,12 @@
     "fabric": "^3.6.3",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
+    "hammerjs": "^2.0.8",
     "lodash": "^4.17.14",
     "mathjs": "^7.0.0",
     "moment": "^2.24.0",
     "nerdamer": "^1.1.4",
     "vanilla-picker": "^2.10.1",
-    "wavesurfer.js": "^3.3.3"
+    "wavesurfer.js": "^4.0.1"
   }
 }

@@ -20,9 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import datetime
 
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -65,110 +63,6 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
         return self.ONE_OFF_JOB_CLASS.get_output(job_id)
-
-
-class PlaythroughAuditTests(OneOffJobTestBase):
-    ONE_OFF_JOB_CLASS = stats_jobs_one_off.PlaythroughAudit
-
-    def setUp(self):
-        super(PlaythroughAuditTests, self).setUp()
-        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
-
-    def create_playthrough(self):
-        """Helper method to create and return a simple playthrough model."""
-        playthrough_id = stats_models.PlaythroughModel.create(
-            self.exp.id, self.exp.version, issue_type='EarlyQuit',
-            issue_customization_args={
-                'state_name': {'value': 'state_name'},
-                'time_spent_in_exp_in_msecs': {'value': 200},
-            },
-            actions=[])
-        return stats_models.PlaythroughModel.get(playthrough_id)
-
-    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
-        """Helper method to create and return an ExplorationIssuesModel instance
-        with the given sets of playthrough ids as reference issues.
-        """
-        return stats_models.ExplorationIssuesModel.create(
-            self.exp.id, self.exp.version, unresolved_issues=[
-                {
-                    'issue_type': 'EarlyQuit',
-                    'issue_customization_args': {
-                        'state_name': {'value': 'state_name'},
-                        'time_spent_in_exp_in_msecs': {'value': 200},
-                    },
-                    'playthrough_ids': list(playthrough_ids),
-                    'schema_version': 1,
-                    'is_valid': True,
-                }
-                for playthrough_ids in playthrough_ids_list
-            ])
-
-    def test_empty_output_for_good_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(output, [])
-
-    def test_output_for_pre_release_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        # Set created_on to a date which is definitely before GSoC 2018.
-        playthrough.created_on = datetime.datetime(2017, 12, 31)
-        playthrough.put()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('before the GSoC 2018 submission deadline', output[0])
-
-    def test_output_for_non_whitelisted_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id + 'differentiated'])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('has not been curated for recording', output[0])
-
-    def test_output_for_bad_schema_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        playthrough.actions.append({'bad schema key': 'bad schema value'})
-        playthrough.put()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('could not be validated', output[0])
-
-    def test_output_for_missing_reference(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([
-            [playthrough.id + '-different'],
-        ])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('not found as a reference', output[0])
 
 
 class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
