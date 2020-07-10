@@ -770,8 +770,6 @@ export class UpgradedServices {
       new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
-    upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
-      new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
@@ -982,6 +980,9 @@ export class UpgradedServices {
     upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =
       new QuestionSummaryForOneSkillObjectFactory(
         upgradedServices['QuestionSummaryObjectFactory']);
+    upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
+        new ReadOnlyStoryNodeObjectFactory(
+          upgradedServices['ExplorationSummaryObjectFactory']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -1325,10 +1326,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['VisualizationInfoObjectFactory'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['StoryViewerBackendApiService'] =
-      new StoryViewerBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
     upgradedServices['StateParamChangesService'] =
       new StateParamChangesService(
         upgradedServices['AlertsService'],
@@ -1343,9 +1340,11 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StoryViewerBackendApiService'] =
-      new StoryViewerBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        new StoryViewerBackendApiService(
+          upgradedServices['ExplorationSummaryObjectFactory'],
+          upgradedServices['HttpClient'],
+          upgradedServices['StoryPlaythroughObjectFactory'],
+          upgradedServices['UrlInterpolationService']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
       new SubtopicPageContentsObjectFactory(
         upgradedServices['RecordedVoiceoversObjectFactory'],

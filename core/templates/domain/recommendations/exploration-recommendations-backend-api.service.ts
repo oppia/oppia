@@ -21,7 +21,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  IExplorationSummaryBackendDict,
+  ExplorationSummaryBackendDict,
   ExplorationSummary,
   ExplorationSummaryObjectFactory
 } from 'domain/summary/exploration-summary-object.factory';
@@ -35,7 +35,7 @@ type IRecommendationsUrlParams = {
 };
 
 export interface IExplorationSummariesBackendDict {
-  summaries: IExplorationSummaryBackendDict[];
+  summaries: ExplorationSummaryBackendDict[];
 }
 
 @Injectable({
@@ -73,7 +73,7 @@ export class ExplorationRecommendationsBackendApiService {
         params: recommendationsUrlParams
       }).toPromise().then(backendDict => {
       return backendDict.summaries.map((
-          summaryDict: IExplorationSummaryBackendDict) => {
+          summaryDict: ExplorationSummaryBackendDict) => {
         return this.explorationSummaryObjectFactory.createFromBackendDict(
           summaryDict);
       });

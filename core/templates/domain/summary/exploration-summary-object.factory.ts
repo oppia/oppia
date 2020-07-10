@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface IExpRatings {
+interface ExpRatings {
   '1': number;
   '2': number;
   '3': number;
@@ -27,12 +27,12 @@ interface IExpRatings {
   '5': number;
 }
 
-export interface IExplorationSummaryBackendDict {
+export interface ExplorationSummaryBackendDict {
   'category'?: string;
   'community_owned'?: boolean;
   'activity_type'?: string;
   'last_updated_msec'?: number;
-  'ratings'?: IExpRatings;
+  'ratings'?: ExpRatings;
   'id'?: string;
   'created_on_msec'?: number;
   'human_readable_contributors_summary'?: Object;
@@ -52,7 +52,7 @@ export class ExplorationSummary {
   activityType: string;
   lastUpdatedMsec: number;
   createdOnMsec: number;
-  ratings: IExpRatings;
+  ratings: ExpRatings;
   id: string;
   humanReadableContributorsSummary: Object;
   languageCode: string;
@@ -69,7 +69,7 @@ export class ExplorationSummary {
       languageCode: string, numViews: number, objective: string,
       status: string, tags: string[], thumbnailBgColor: string,
       thumbnailIconUrl: string, title: string, activityType: string,
-      lastUpdatedMsec: number, createdOnMsec: number, ratings: IExpRatings,
+      lastUpdatedMsec: number, createdOnMsec: number, ratings: ExpRatings,
       humanReadableContributorsSummary: Object) {
     this.category = category;
     this.communityOwned = communityOwned;
@@ -95,7 +95,7 @@ export class ExplorationSummary {
 })
 export class ExplorationSummaryObjectFactory {
   createFromBackendDict(
-      expSummaryBacknedDict: IExplorationSummaryBackendDict) {
+      expSummaryBacknedDict: ExplorationSummaryBackendDict) {
     return new ExplorationSummary(
       expSummaryBacknedDict.category, expSummaryBacknedDict.community_owned,
       expSummaryBacknedDict.id, expSummaryBacknedDict.language_code,
