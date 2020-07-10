@@ -50,7 +50,7 @@ def try_upgrading_draft_to_exp_version(
 
     Returns:
         list(ExplorationChange) or None. A list of ExplorationChange domain
-            objects after upgrade or None if upgrade fails.
+        objects after upgrade or None if upgrade fails.
 
     Raises:
         InvalidInputException. current_draft_version is greater than

@@ -28,8 +28,6 @@ from . import build
 from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
-from . import setup
-from . import setup_gae
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -59,9 +57,6 @@ def main(args=None):
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])
-    setup_gae.main(args=[])
-
     if not parsed_args.skip_install:
         install_third_party_libs.main()
 
@@ -89,14 +84,22 @@ def main(args=None):
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    out, _ = task.communicate()
-    task.wait()
+    output_lines = []
+    # Reads and prints realtime output from the subprocess until it terminates.
+    while True:
+        line = task.stdout.readline()
+        # No more output from the subprocess, and the subprocess has ended.
+        if len(line) == 0 and task.poll() is not None:
+            break
+        if line:
+            python_utils.PRINT(line, end='')
+            output_lines.append(line)
+    concatenated_output = ''.join(
+        line.decode('utf-8') for line in output_lines)
 
-    python_utils.PRINT(out)
     python_utils.PRINT('Done!')
 
-    if 'Trying to get the Angular injector' in python_utils.UNICODE(
-            out, 'utf-8'):
+    if 'Trying to get the Angular injector' in concatenated_output:
         python_utils.PRINT(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'

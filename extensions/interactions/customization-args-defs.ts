@@ -16,19 +16,25 @@
  * @fileoverview Type definiitions for Customization Args.
  */
 
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
-import { IImageWithRegions } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.directive';
-import { IReadableNote } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive';
+import { IGraphAnswer } from 'interactions/answer-defs';
 
-
-export interface IAlgebraicExpressionInputCustomizationArgs {
-
+interface ILabeledRegion {
+  region: {
+    area: number[][];
+  };
+  label: string;
 }
+
+interface IImageWithRegions {
+  labeledRegions: ILabeledRegion[];
+  imagePath: string;
+}
+
+interface IReadableMusicNote {
+  readableNoteName: string;
+}
+
+export interface IAlgebraicExpressionInputCustomizationArgs { }
 
 export interface ICodeReplCustomizationArgs {
   language?: {
@@ -55,8 +61,8 @@ export interface IDragAndDropSortInputCustomizationArgs {
   choices?: {
     value: string[];
   };
-  allowMultipleItemsInSamePosition?: {
-    value: string;
+  allowMultipleItemsInSamePosition: {
+    value: boolean;
   }
 }
 
@@ -83,28 +89,28 @@ export interface IFractionInputCustomizationArgs {
 
 export interface IGraphInputCustomizationArgs {
   graph?: {
-    value: IGraphBackendDict;
+    value: IGraphAnswer;
   };
-  canAddVertex?: {
-    value: string;
+  canAddVertex: {
+    value: boolean;
   };
-  canDeleteVertex?: {
-    value: string;
+  canDeleteVertex: {
+    value: boolean;
   };
-  canEditVertexLabel?: {
-    value: string;
+  canEditVertexLabel: {
+    value: boolean;
   };
-  canMoveVertex?: {
-    value: string;
+  canMoveVertex: {
+    value: boolean;
   };
-  canAddEdge?: {
-    value: string;
+  canAddEdge: {
+    value: boolean;
   };
-  canDeleteEdge?: {
-    value: string;
+  canDeleteEdge: {
+    value: boolean;
   };
-  canEditEdgeWeight?: {
-    value: string;
+  canEditEdgeWeight: {
+    value: boolean;
   };
 }
 
@@ -147,6 +153,8 @@ export interface ILogicCustomizationArgs {
   };
 }
 
+export interface IMathEquationInputCustomizationArgs { }
+
 export interface IMultipleChoiceInputCustomizationArgs {
   showChoicesInShuffledOrder?: {
     value: string;
@@ -158,10 +166,10 @@ export interface IMultipleChoiceInputCustomizationArgs {
 
 export interface IMusicNotesInputCustomizationArgs {
   sequenceToGuess?: {
-    value: IReadableNote[];
+    value: IReadableMusicNote[];
   };
   initialSequence?: {
-    value: IReadableNote[];
+    value: IReadableMusicNote[];
   };
 }
 
@@ -186,11 +194,13 @@ export interface ITextInputCustomizationArgs {
   };
 }
 
-export interface IMathExpressionCustomizationArgs {
+export interface IMathExpressionCustomizationArgs { }
 
-}
+export interface INumericInputCustomizationArgs { }
 
-export interface INumericInputCustomizationArgs {
+export interface INumberWithUnitsCustomizationArgs { }
+
+export interface INumberWithUnitsCustomizationArgs {
 
 }
 
@@ -206,10 +216,12 @@ export type IInteractionCustomizationArgs = (
   IInteractiveMapCustomizationArgs |
   IItemSelectionInputCustomizationArgs |
   ILogicCustomizationArgs |
+  IMathEquationInputCustomizationArgs |
+  IMathExpressionCustomizationArgs |
   IMultipleChoiceInputCustomizationArgs |
   IMusicNotesInputCustomizationArgs |
+  INumberWithUnitsCustomizationArgs |
+  INumericInputCustomizationArgs |
   IPencilCodeCustomizationArgs |
   ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs |
-  IMathExpressionCustomizationArgs |
-  INumericInputCustomizationArgs);
+  ITextInputCustomizationArgs);

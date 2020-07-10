@@ -19,7 +19,7 @@
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'sharing-links.directive.ts');
+  'sharing-links.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
@@ -377,7 +377,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           .getStaticImageUrl('/general/empty_dashboard.svg');
         ctrl.canReviewActiveThread = null;
         ctrl.updatesGivenScreenWidth();
-        angular.element($window).bind('resize', function() {
+        angular.element($window).on('resize', function() {
           ctrl.updatesGivenScreenWidth();
         });
       };

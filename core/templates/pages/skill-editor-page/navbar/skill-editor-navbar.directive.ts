@@ -21,7 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -47,41 +47,17 @@ angular.module('oppia').directive('skillEditorNavbar', [
           $scope.getActiveTabName = function() {
             return SkillEditorRoutingService.getActiveTabName();
           };
-          $scope.selectMainTab = function() {
-            SkillEditorRoutingService.navigateToMainTab();
-          };
+
           $scope.isLoadingSkill = function() {
             return SkillEditorStateService.isLoadingSkill();
           };
+
           $scope.isSaveInProgress = function() {
             return SkillEditorStateService.isSavingSkill();
           };
 
           $scope.getChangeListCount = function() {
             return UndoRedoService.getChangeCount();
-          };
-
-          $scope.selectQuestionsTab = function() {
-            // This check is needed because if a skill has unsaved changes to
-            // misconceptions, then these will be reflected in the questions
-            // created at that time, but if page is refreshed/changes are
-            // discarded, the misconceptions won't be saved, but there will be
-            // some questions with these now non-existent misconceptions.
-            if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill-editor-page/modal-templates/' +
-                  'save-pending-changes-modal.directive.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
-              }).result.then(null, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            } else {
-              SkillEditorRoutingService.navigateToQuestionsTab();
-            }
           };
 
           $scope.discardChanges = function() {

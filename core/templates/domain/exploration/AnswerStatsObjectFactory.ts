@@ -22,27 +22,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IFractionDict } from 'domain/objects/FractionObjectFactory';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
-import { INote } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-
-export type Answer = (
-  string | number | IFractionDict |
-  INumberWithUnitsBackendDict | string[] | INote[] |
-  number[] | IGraphBackendDict| string[][]);
+import { IInteractionAnswer } from
+  'interactions/answer-defs';
 
 export interface IAnswerStatsBackendDict {
-  answer: Answer;
+  answer: IInteractionAnswer;
   frequency: number;
 }
 
 export class AnswerStats {
-  answer: Answer;
+  answer: IInteractionAnswer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
@@ -56,7 +45,7 @@ export class AnswerStats {
    *    associated state's answer groups.
    */
   constructor(
-      answer: Answer, answerHtml: string, frequency: number,
+      answer: IInteractionAnswer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
     this.answer = cloneDeep(answer);

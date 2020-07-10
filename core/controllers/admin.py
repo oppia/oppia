@@ -60,6 +60,7 @@ current_user_services = models.Registry.import_current_user_services()
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
+
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
@@ -482,6 +483,11 @@ class AdminHandler(base.BaseHandler):
                 })]
             )
 
+            # Generates translation opportunities for the Contributor Dashboard.
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids_in_story)
+
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
@@ -772,6 +778,7 @@ class AddCommunityReviewerHandler(base.BaseHandler):
 
 class RemoveCommunityReviewerHandler(base.BaseHandler):
     """Handles removing reviewer for community dashboard."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
@@ -833,6 +840,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
 
 class CommunityReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
@@ -856,6 +864,7 @@ class CommunityReviewersListHandler(base.BaseHandler):
 
 class CommunityReviewerRightsDataHandler(base.BaseHandler):
     """Handler to show the review rights of a user."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page

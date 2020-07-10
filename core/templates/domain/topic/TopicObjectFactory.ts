@@ -346,6 +346,13 @@ export class Topic {
     this._canonicalStoryReferences.splice(index, 1);
   }
 
+  rearrangeCanonicalStory(fromIndex: number, toIndex: number): void {
+    const canonicalStoryToMove = cloneDeep(
+      this._canonicalStoryReferences[fromIndex]);
+    this._canonicalStoryReferences.splice(fromIndex, 1);
+    this._canonicalStoryReferences.splice(toIndex, 0, canonicalStoryToMove);
+  }
+
   clearCanonicalStoryReferences(): void {
     this._canonicalStoryReferences.length = 0;
   }

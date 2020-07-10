@@ -35,6 +35,9 @@ import { AdminRouterService } from
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AlertsService } from 'services/alerts.service';
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { AlgebraicExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
@@ -70,6 +73,8 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { BottomNavbarStatusService } from
+  'services/bottom-navbar-status.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
@@ -111,6 +116,8 @@ import { ConceptCardBackendApiService } from
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
+import { ContinueRulesService } from
+  'interactions/Continue/directives/continue-rules.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { ContributionOpportunitiesBackendApiService } from
@@ -148,6 +155,8 @@ import { EmailDashboardQueryObjectFactory } from
   'domain/email-dashboard/email-dashboard-query-object.factory';
 import { EmailDashboardQueryResultsObjectFactory } from
   'domain/email-dashboard/email-dashboard-query-results-object.factory';
+import { EndExplorationRulesService } from
+  'interactions/EndExploration/directives/end-exploration-rules.service';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
 import { EntityContextObjectFactory } from
@@ -162,6 +171,8 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
@@ -194,6 +205,8 @@ import { ExtensionTagAssemblerService } from
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { FeaturedTranslationLanguageObjectFactory } from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -202,12 +215,16 @@ import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
+import { FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service';
+import { GraphInputRulesService } from
+  'interactions/GraphInput/directives/graph-input-rules.service';
 import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
 import { GraphUtilsService } from
@@ -222,13 +239,13 @@ import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
+import { ImageClickInputRulesService } from
+  'interactions/ImageClickInput/directives/image-click-input-rules.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -242,10 +259,15 @@ import { InteractionRulesRegistryService } from
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
-import { JobStausSummaryObjectFactory } from
+import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
+import { InteractiveMapRulesService } from
+  'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { InteractiveMapValidationService } from
   'interactions/InteractiveMap/directives/interactive-map-validation.service';
+import { ItemSelectionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
@@ -269,10 +291,21 @@ import { LearnerParamsService } from
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { LogicProofRulesService } from
+  'interactions/LogicProof/directives/logic-proof-rules.service';
 import { LogicProofValidationService } from
   'interactions/LogicProof/directives/logic-proof-validation.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { MathEquationInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import { MathExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
@@ -281,9 +314,14 @@ import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+import { MultipleChoiceInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MultipleChoiceInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
+import { MusicNotesInputRulesService } from
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { MusicNotesInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
@@ -301,10 +339,14 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NumberAttemptsService } from
   'pages/exploration-player-page/services/number-attempts.service';
+import { NumericInputRulesService } from
+  'interactions/NumericInput/directives/numeric-input-rules.service';
 import { NumericInputValidationService } from
   'interactions/NumericInput/directives/numeric-input-validation.service';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
+import { NumberWithUnitsRulesService } from
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import { NumberWithUnitsValidationService } from
   // eslint-disable-next-line max-len
   'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
@@ -384,6 +426,8 @@ import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 import { SearchExplorationsBackendApiService } from
   'domain/collection/search-explorations-backend-api.service';
+import { SetInputRulesService } from
+  'interactions/SetInput/directives/set-input-rules.service';
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
@@ -395,6 +439,8 @@ import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryObjectFactory } from
+  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
@@ -428,9 +474,6 @@ import { StateGraphLayoutService } from
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
-import { StateImprovementSuggestionService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -577,8 +620,9 @@ export class UpgradedServices {
 
     // Topological level: 0.
     upgradedServices['AdminRouterService'] = new AdminRouterService();
-    upgradedServices['AdminTaskManagerService'] =
-      new AdminTaskManagerService();
+    upgradedServices['AdminTaskManagerService'] = new AdminTaskManagerService();
+    upgradedServices['AlgebraicExpressionInputRulesService'] =
+      new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
@@ -619,6 +663,7 @@ export class UpgradedServices {
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
+    upgradedServices['ContinueRulesService'] = new ContinueRulesService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
@@ -628,6 +673,8 @@ export class UpgradedServices {
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EmailDashboardQueryObjectFactory'] =
       new EmailDashboardQueryObjectFactory();
+    upgradedServices['EndExplorationRulesService'] =
+      new EndExplorationRulesService();
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -644,6 +691,8 @@ export class UpgradedServices {
     upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
       new ExplorationOpportunitySummaryObjectFactory();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
+    upgradedServices['FeaturedTranslationLanguageObjectFactory'] =
+      new FeaturedTranslationLanguageObjectFactory();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =
       new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FeedbackThreadSummaryObjectFactory'] =
@@ -661,18 +710,22 @@ export class UpgradedServices {
       new HighBounceRateTaskObjectFactory();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
     upgradedServices['IdGenerationService'] = new IdGenerationService();
+    upgradedServices['ImageClickInputRulesService'] =
+      new ImageClickInputRulesService();
     upgradedServices['ImageFileObjectFactory'] = new ImageFileObjectFactory();
-    upgradedServices['ImprovementActionButtonObjectFactory'] =
-      new ImprovementActionButtonObjectFactory();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['IneffectiveFeedbackLoopTaskObjectFactory'] =
       new IneffectiveFeedbackLoopTaskObjectFactory();
     upgradedServices['InteractionDetailsCacheService'] =
       new InteractionDetailsCacheService();
+    upgradedServices['InteractiveMapRulesService'] =
+      new InteractiveMapRulesService();
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
+    upgradedServices['ItemSelectionInputRulesService'] =
+      new ItemSelectionInputRulesService();
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
-    upgradedServices['JobStausSummaryObjectFactory'] =
-      new JobStausSummaryObjectFactory();
+    upgradedServices['JobStatusSummaryObjectFactory'] =
+      new JobStatusSummaryObjectFactory();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -684,10 +737,17 @@ export class UpgradedServices {
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
+    upgradedServices['LogicProofRulesService'] = new LogicProofRulesService();
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
+    upgradedServices['MathEquationInputRulesService'] =
+      new MathEquationInputRulesService();
+    upgradedServices['MathExpressionInputRulesService'] =
+      new MathExpressionInputRulesService();
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
+    upgradedServices['MultipleChoiceInputRulesService'] =
+      new MultipleChoiceInputRulesService();
     upgradedServices['MusicPhrasePlayerService'] =
       new MusicPhrasePlayerService();
     upgradedServices['NeedsGuidingResponsesTaskObjectFactory'] =
@@ -695,6 +755,8 @@ export class UpgradedServices {
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['NumberAttemptsService'] = new NumberAttemptsService();
+    upgradedServices['NumericInputRulesService'] =
+      new NumericInputRulesService();
     upgradedServices['NewlyCreatedTopicObjectFactory'] =
         new NewlyCreatedTopicObjectFactory();
     upgradedServices['ParamChangeObjectFactory'] =
@@ -720,8 +782,11 @@ export class UpgradedServices {
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SchemaUndefinedLastElementService'] =
       new SchemaUndefinedLastElementService();
+    upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['SkillDifficultyObjectFactory'] =
       new SkillDifficultyObjectFactory();
+    upgradedServices['SkillMasteryObjectFactory'] =
+      new SkillMasteryObjectFactory();
     upgradedServices['SkillOpportunityObjectFactory'] =
       new SkillOpportunityObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =
@@ -730,8 +795,6 @@ export class UpgradedServices {
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
-    upgradedServices['StateImprovementSuggestionService'] =
-      new StateImprovementSuggestionService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
@@ -830,10 +893,18 @@ export class UpgradedServices {
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
+    upgradedServices['FractionInputRulesService'] =
+      new FractionInputRulesService(
+        upgradedServices['FractionObjectFactory'],
+        upgradedServices['UtilsService']);
     upgradedServices['FractionInputValidationService'] =
       new FractionInputValidationService(
         upgradedServices['FractionObjectFactory'],
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['GraphInputRulesService'] =
+      new GraphInputRulesService(
+        upgradedServices['GraphUtilsService'],
+        upgradedServices['UtilsService']);
     upgradedServices['GraphInputValidationService'] =
       new GraphInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -861,7 +932,10 @@ export class UpgradedServices {
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['MathExpressionInputValidationService'] =
+    upgradedServices['MathEquationInputValidationService'] =
+      new MathEquationInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
+    upgradedServices['MathEquationInputValidationService'] =
       new MathExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MessengerService'] = new MessengerService(
@@ -872,6 +946,9 @@ export class UpgradedServices {
     upgradedServices['MultipleChoiceInputValidationService'] =
       new MultipleChoiceInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['MusicNotesInputRulesService'] =
+      new MusicNotesInputRulesService(
+        upgradedServices['UtilsService']);
     upgradedServices['MusicNotesInputValidationService'] =
       new MusicNotesInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -884,6 +961,10 @@ export class UpgradedServices {
       new NumberWithUnitsObjectFactory(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['FractionObjectFactory']);
+    upgradedServices['NumberWithUnitsRulesService'] =
+      new NumberWithUnitsRulesService(
+        upgradedServices['UnitsObjectFactory'],
+        upgradedServices['UtilsService']);
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['PageTitleService'] = new PageTitleService(
@@ -969,6 +1050,9 @@ export class UpgradedServices {
     upgradedServices['AutogeneratedAudioPlayerService'] =
       new AutogeneratedAudioPlayerService(
         upgradedServices['SpeechSynthesisChunkerService']);
+    upgradedServices['BottomNavbarStatusService'] = (
+      new BottomNavbarStatusService(
+        upgradedServices['WindowDimensionsService']));
     upgradedServices['CodeReplPredictionService'] =
       new CodeReplPredictionService(
         upgradedServices['CountVectorizerService'],
@@ -1070,7 +1154,7 @@ export class UpgradedServices {
       upgradedServices['HttpClient'],
       upgradedServices['ComputationDataObjectFactory'],
       upgradedServices['JobDataObjectFactory'],
-      upgradedServices['JobSpecObjectFactory'],
+      upgradedServices['JobStatusSummaryObjectFactory'],
       upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
@@ -1102,6 +1186,7 @@ export class UpgradedServices {
         upgradedServices['InteractiveMapRulesService'],
         upgradedServices['ItemSelectionInputRulesService'],
         upgradedServices['LogicProofRulesService'],
+        upgradedServices['MathEquationInputRulesService'],
         upgradedServices['MathExpressionInputRulesService'],
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
@@ -1134,7 +1219,8 @@ export class UpgradedServices {
     upgradedServices['ContributionOpportunitiesBackendApiService'] =
       new ContributionOpportunitiesBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['FeaturedTranslationLanguageObjectFactory']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['CurrentInteractionService'] =
@@ -1153,6 +1239,11 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ExplorationImprovementsBackendApiService'] =
+      new ExplorationImprovementsBackendApiService(
+        upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
       new ExplorationStatsBackendApiService(
         upgradedServices['ExplorationStatsObjectFactory'],
@@ -1177,7 +1268,7 @@ export class UpgradedServices {
     upgradedServices['PlaythroughIssuesBackendApiService'] =
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['PlaythroughIssuesBackendApiService'],
+        upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
@@ -1218,7 +1309,8 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['SkillMasteryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],
@@ -1316,7 +1408,6 @@ export class UpgradedServices {
         upgradedServices['UrlService'],
         upgradedServices['ExplorationRecommendationsBackendApiService']);
     upgradedServices['ExplorationStatsService'] = new ExplorationStatsService(
-      upgradedServices['ContextService'],
       upgradedServices['ExplorationStatsBackendApiService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
@@ -1380,7 +1471,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
         upgradedServices['AnswerClassificationService'],
-        upgradedServices['ContextService'],
         upgradedServices['FractionObjectFactory'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateInteractionStatsBackendApiService']);

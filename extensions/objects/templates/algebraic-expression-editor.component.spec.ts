@@ -16,11 +16,13 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
+import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 describe('AlgebraicExpressionEditor', function() {
   var ctrl = null, $window = null;
@@ -50,7 +52,8 @@ describe('AlgebraicExpressionEditor', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService();
+    guppyConfigurationService = new GuppyConfigurationService(
+      new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
     $provide.value('GuppyConfigurationService', guppyConfigurationService);

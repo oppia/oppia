@@ -57,16 +57,19 @@ install:
 - python -m scripts.install_third_party_libs
 
 script:
+- RUN_TESTS=true
+- if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_PULL_REQUEST_BRANCH" == update-changelog-for-release* ]]; then RUN_TESTS=false; fi
+
 # Run the e2e tests in the production environment (using --prod_env).
-- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_PLAYER_FEATURES" == 'true' ]; then python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_COMMUNITY_DASHBOARD" == 'true' ]; then python -m scripts.run_e2e_tests --suite="communityDashboard"  --community_dashboard_enabled --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ]; then python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_AND_HISTORY_TAB" == 'true' ]; then python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationHistoryTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_AND_TRANSLATION_TAB" == 'true' ]; then python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then python -m scripts.run_e2e_tests --suite="learner" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_COMMUNITY_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="communityDashboard"  --community_dashboard_enabled --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env --sharding-instances=1; fi
+- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_AND_HISTORY_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationHistoryTab" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_AND_TRANSLATION_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="learner" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
 
 cache:
   # Cache Oppia's dependencies.

@@ -27,6 +27,7 @@ require('interactions/ImageClickInput/ImageClickInput.ts');
 require('interactions/InteractiveMap/InteractiveMap.ts');
 require('interactions/ItemSelectionInput/ItemSelectionInput.ts');
 require('interactions/LogicProof/LogicProof.ts');
+require('interactions/MathEquationInput/MathEquationInput.ts');
 require('interactions/MathExpressionInput/MathExpressionInput.ts');
 require('interactions/MultipleChoiceInput/MultipleChoiceInput.ts');
 require('interactions/MusicNotesInput/MusicNotesInput.ts');

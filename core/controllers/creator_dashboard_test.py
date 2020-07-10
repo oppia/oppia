@@ -97,6 +97,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -843,7 +844,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.save_new_default_exploration('exploration_id', self.owner_id)
         suggestion_services.create_suggestion(
             'edit_exploration_state_content', 'exploration',
-            'exploration_id', 1, self.owner_id, change_dict, '', None)
+            'exploration_id', 1, self.owner_id, change_dict, '')
         suggestions = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list'][0]
         change_dict['old_value'] = {
