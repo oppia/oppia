@@ -2439,7 +2439,9 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
         """Converts from version 34 to 35. Version 35 adds translation support
-        for interaction customization arguments.
+        for interaction customization arguments. This migration converts
+        customization arguments whose schemas have been changed from unicode to
+        SubtitledUnicode or html to SubtitledHtml.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2455,7 +2457,8 @@ class Exploration(python_utils.OBJECT):
             subtitled unicode dict.
 
             Args:
-                ca_value: str. Customization argument value.
+                ca_value: str | None. Customization argument value. If None,
+                    populate with default.
                 ca_default: dict. The default value of the customization
                     argument.
 
@@ -2474,7 +2477,8 @@ class Exploration(python_utils.OBJECT):
             subtitled unicode dict.
 
             Args:
-                ca_value: str. Customization argument value.
+                ca_value: str | None. Customization argument value. If None,
+                    populate with default.
                 ca_default: dict. The default value of the customization
                     argument.
 
@@ -2494,7 +2498,8 @@ class Exploration(python_utils.OBJECT):
             subtitled unicode dict.
 
             Args:
-                ca_value: str. Customization argument value.
+                ca_value: str | None. Customization argument value. If None,
+                    populate with default.
                 ca_default: list(dict). The default value of the customization
                     argument.
                 next_content_id_index: int. The next content_id index.
@@ -2527,6 +2532,7 @@ class Exploration(python_utils.OBJECT):
 
 
         for state_dict in states_dict.values():
+            # Find maximum existing content_id index
             max_existing_content_id_index = -1
             translations_mapping = state_dict[
                 'written_translations']['translations_mapping']
@@ -2542,64 +2548,59 @@ class Exploration(python_utils.OBJECT):
                         content_id][lang_code]['type'] = 'html'
 
             next_content_id_index = max_existing_content_id_index + 1
-            all_new_content_ids = []
 
+            all_new_content_ids = []
             interaction_id = state_dict['interaction']['id']
             if interaction_id:
-                ca = state_dict[
-                    'interaction']['customization_args']
-                ca_specs = (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        interaction_id
-                    ).customization_arg_specs
-                )
+                ca = state_dict['interaction']['customization_args']
+                ca_specs = (interaction_registry.Registry.get_interaction_by_id(
+                    interaction_id
+                ).customization_arg_specs)
 
                 for ca_spec in ca_specs:
-                    schema = ca_spec.schema
-                    name = ca_spec.name
-                    schema_type = schema['type']
                     new_content_ids = []
 
-                    if schema_type == 'custom':
-                        obj_type = schema['obj_type']
-                        if obj_type == 'SubtitledUnicode':
-                            if name not in ca:
-                                ca[name] = {'value': None}
-                            ca[name]['value'], new_content_ids = (
-                                convert_ca_unicode_to_subtitled_unicode_dict(
-                                    ca[name]['value'],
-                                    ca_spec.default_value)
-                            )
-                        elif obj_type == 'SubtitledHtml':
-                            if name not in ca:
-                                ca[name] = {'value': None}
-                            ca[name]['value'], new_content_ids = (
-                                convert_ca_html_to_subtitled_html_dict(
-                                    ca[name]['value'],
-                                    ca_spec.default_value)
-                            )
-                    elif (schema_type == 'list' and
+                    schema = ca_spec.schema
+                    schema_obj_type = schema.get('obj_type')
+                    ca_name = ca_spec.name
+
+                    if obj_type == 'SubtitledUnicode':
+                        if ca_name not in ca:
+                            ca[ca_name] = {'value': None}
+                        ca[ca_name]['value'], new_content_ids = (
+                            convert_ca_unicode_to_subtitled_unicode_dict(
+                                ca[ca_name]['value'],
+                                ca_spec.default_value)
+                        )
+                    elif obj_type == 'SubtitledHtml':
+                        if ca_name not in ca:
+                            ca[ca_name] = {'value': None}
+                        ca[ca_name]['value'], new_content_ids = (
+                            convert_ca_html_to_subtitled_html_dict(
+                                ca[ca_name]['value'],
+                                ca_spec.default_value)
+                        )
+                    elif (schema['type'] == 'list' and
                         schema['items']['type'] == 'custom' and
                         schema['items']['obj_type'] == 'SubtitledHtml'
                     ):
-                        if name not in ca:
-                            ca[name] = {'value': None}
-                        ca[name]['value'], new_content_ids = (
+                        if ca_name not in ca:
+                            ca[ca_name] = {'value': None}
+                        ca[ca_name]['value'], new_content_ids = (
                             convert_ca_html_list_to_subtitled_html_dict_list(
-                                ca[name]['value'],
+                                ca[ca_name]['value'],
                                 ca_spec.default_value,
                                 next_content_id_index)
                         )
                         if len(new_content_ids) > 1:
                             next_content_id_index += len(new_content_ids) - 1
                     else:
-                        if name not in ca:
-                            ca[name] = {'value': ca_spec.default_value}
+                        if ca_name not in ca:
+                            ca[ca_name] = {'value': ca_spec.default_value}
 
                     all_new_content_ids.extend(new_content_ids)
 
             state_dict['next_content_id_index'] = next_content_id_index
-
             for new_content_id in all_new_content_ids:
                 state_dict[
                     'written_translations'][

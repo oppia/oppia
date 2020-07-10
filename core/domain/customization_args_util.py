@@ -162,9 +162,9 @@ def validate_customization_args_and_values(
 
 
 def apply_conversion_fn_on_content(
-        customization_arg, current_spec, conversion_fn):
+        conversion_fn, customization_arg, schema, ca_name=None):
     """Helper function that recursively traverses a customization argument
-    spec to locate any SubtitledHtml or SubtitledUnicode objects, and applying a
+    spec to locate any SubtitledHtml or SubtitledUnicode objects, and applies a
     conversion function to the customization argument value.
 
     Args:
@@ -178,10 +178,8 @@ def apply_conversion_fn_on_content(
             argument name, if availible.
 
     """
-    schema = current_spec.get('schema', current_spec)
     schema_type = schema['type']
-    schema_obj_type = (
-        schema['obj_type'] if schema_type == 'custom' else None)
+    schema_obj_type = schema.get('obj_type', None)
     
     if (schema_obj_type == 'SubtitledUnicode' or
             schema_obj_type == 'SubtitledHtml'):
@@ -196,21 +194,22 @@ def apply_conversion_fn_on_content(
                 ca_value,
                 schema_obj_type)
         elif isinstance(ca_value, dict):
-            customization_arg['value'][current_spec.name] = conversion_fn(
-                ca_value[current_spec.name],
+            customization_arg['value'][ca_name] = conversion_fn(
+                ca_value[ca_name],
                 schema_obj_type)
     elif schema_type == 'list':
         apply_conversion_fn_on_content(
             customization_arg,
-            current_spec['schema']['items'],
+            schema['items'],
             conversion_fn)
     elif schema_type == 'dict':
         for i in python_utils.RANGE(
                 len(current_spec['properties'])):
             apply_conversion_fn_on_content(
                 customization_arg,
-                current_spec['schema']['properties'][i],
-                conversion_fn)
+                schema['properties'][i],
+                conversion_fn,
+                ca_name=schema['name'])
 
 
 def convert_content_in_cust_args(
