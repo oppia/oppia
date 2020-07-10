@@ -620,7 +620,6 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         """Tests that a warning is logged if there is no
         ExplorationOpportunitySummaryModel associated with one of the ids.
         """
-
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
@@ -640,12 +639,10 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             observed_log_messages,
             [
-                'Backend warning: when getting the exploration opportunity '
-                'summary models for ids: [u\'badID\'], one of the models was'
-                ' None.'
+                'When getting the exploration opportunity summary models for '
+                'ids: [u\'badID\'], one of the models was None.'
             ]
         )
-
 
     def test_get_exploration_opportunity_summary_from_model_populates_new_lang(
             self):
