@@ -4,16 +4,13 @@ on:
   issues:
     types:
       - labeled
-      - assigned
 
 jobs:
   oppiabot:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Oppiabot
+      - name: Ensure that appropriate labels are added to issues
         uses: oppia/oppiabot@1.0.0
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
-          google-api-key: ${{secrets.GOOGLE_API_KEY}}
-          cla-sheet-id: ${{secrets.CLA_SHEET_ID}}

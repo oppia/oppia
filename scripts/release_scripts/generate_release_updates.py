@@ -101,7 +101,7 @@ def get_new_authors_and_contributors_mail_ids():
 
     Returns:
         list(str). List of mail ids of new authors and contributors
-            for the release.
+        for the release.
     """
     with python_utils.open_file(
         release_constants.RELEASE_SUMMARY_FILEPATH, 'r') as f:

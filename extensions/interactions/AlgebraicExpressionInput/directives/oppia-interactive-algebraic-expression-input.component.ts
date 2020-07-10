@@ -20,14 +20,14 @@
  * followed by the name of the arg.
  */
 
-require('services/guppy-configuration.service.ts');
-require('services/math-interactions.service.ts');
-require('services/guppy-initialization.service.ts');
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'algebraic-expression-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/guppy-configuration.service.ts');
+require('services/guppy-initialization.service.ts');
+require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
@@ -46,7 +46,11 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          let answerIsValid = MathInteractionsService.validateAnswer(
+          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
+          // is not compatible with nerdamer or with the backend validations.
+          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
+            ctrl.value);
+          let answerIsValid = MathInteractionsService.validateExpression(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;

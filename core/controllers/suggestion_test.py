@@ -126,7 +126,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 1',
-                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -150,7 +149,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 2',
-                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
 
         self.post_json(
@@ -170,7 +168,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 3',
-                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -192,7 +189,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': '<p>In Hindi</p>'
                 },
                 'description': 'change to state 3',
-                'final_reviewer_id': self.reviewer_id,
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -223,6 +219,39 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id_2))['suggestions']
         self.assertEqual(len(suggestions), 3)
+        self.logout()
+
+    def test_create_suggestion_invalid_target_version_input(self):
+        self.login(self.AUTHOR_EMAIL_2)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models
+                    .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'target_type': (
+                    suggestion_models.TARGET_TYPE_EXPLORATION),
+                'target_id': 'exp1',
+                'target_version_at_submission': 'invalid target version',
+                'change': {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'State 3',
+                    'new_value': self.new_content
+                },
+                'description': 'change again to state 3',
+            }, csrf_token=csrf_token, expected_status_int=400)
+        suggestions = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions']
+
+        self.assertEqual(
+            response['error'],
+            'Expected target_version_at_submission to be an int, received <type'
+            ' \'unicode\'>')
+        self.assertEqual(len(suggestions), 2)
         self.logout()
 
     def test_suggestion_to_exploration_handler_with_invalid_suggestion_id(self):
@@ -274,7 +303,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_id']
         }
 
         exp_id = 'new_exp_id'
@@ -290,7 +320,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'question_dict': question_dict,
                 'skill_id': None,
                 'skill_difficulty': 0.3
-            }, None, None)
+            }, None)
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -358,7 +388,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
-            self.editor_id, change_cmd, 'sample description', None)
+            self.editor_id, change_cmd, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.editor_id), (
@@ -862,7 +892,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
-            self.author_id, change_cmd, 'sample description', None)
+            self.author_id, change_cmd, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -1032,6 +1062,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
 class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the UserSubmittedSuggestionsHandler."""
+
     AUTHOR_EMAIL = 'author@example.com'
 
     def setUp(self):
@@ -1050,7 +1081,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            end_state_name='End State')
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -1090,9 +1121,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-            ['TextInput'], category='Algebra')
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
@@ -1127,7 +1155,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'translation_html': '<p>new content html in Hindi</p>'
                 },
                 'description': 'Adds translation',
-                'final_reviewer_id': None
             }, csrf_token=csrf_token)
 
         self.question_dict = {
@@ -1227,7 +1254,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            end_state_name='End State')
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -1268,11 +1295,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
-        # Login and create exploration and suggestions.
+        # Login and update exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-            ['TextInput'], category='Algebra')
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
@@ -1307,7 +1331,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'translation_html': '<p>new content html in Hindi</p>'
                 },
                 'description': 'Adds translation',
-                'final_reviewer_id': None
             }, csrf_token=csrf_token)
 
         self.question_dict = {

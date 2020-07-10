@@ -39,6 +39,7 @@ class FeedbackAnalyticsRealtimeModel(
     and the total number of threads to the default integer value of zero
     in the realtime layer.
     """
+
     num_open_threads = ndb.IntegerProperty(default=0)
     num_total_threads = ndb.IntegerProperty(default=0)
 
@@ -64,8 +65,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
         Returns:
             ndb.model.MetaModel. Datastore class used by the
-                realtime layer, which should be a subclass of
-                BaseRealtimeDatastoreClassForContinuousComputations.
+            realtime layer, which should be a subclass of
+            BaseRealtimeDatastoreClassForContinuousComputations.
         """
         return FeedbackAnalyticsRealtimeModel
 
@@ -201,11 +202,11 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             exploration_id: str. ID of the exploration to get analytics for.
 
         Returns:
-            dict with two keys:
-            - num_open_threads: int. The count of open feedback threads for
-              this exploration.
-            - num_total_threads: int. The count of all feedback
-              threads for this exploration.
+            dict. Contains two keys:
+                - num_open_threads: int. The count of open feedback threads for
+                    this exploration.
+                - num_total_threads: int. The count of all feedback
+                    threads for this exploration.
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
             [exploration_id])[0]
@@ -249,9 +250,10 @@ class FeedbackAnalyticsMRJobManager(
                 instance.
 
         Yields:
-            A tuple of two elements:
-              - str. The exploration id associated to the feedback thread.
-              - str. The feedback thread's status.
+            2-tuple of (entity_id, status). Where:
+                - entity_id: str. The exploration id associated to the feedback
+                    thread.
+                - status: str. The feedback thread's status.
         """
         yield (item.entity_id, item.status)
 

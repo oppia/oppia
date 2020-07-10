@@ -29,6 +29,7 @@ from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
@@ -368,11 +369,11 @@ class MergeSkillHandler(base.BaseHandler):
         """Handles the POST request."""
         old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')
-        new_skill = skill_services.get_skill_by_id(new_skill_id, strict=False)
+        new_skill = skill_fetchers.get_skill_by_id(new_skill_id, strict=False)
         if new_skill is None:
             raise self.PageNotFoundException(
                 Exception('The new skill with the given id doesn\'t exist.'))
-        old_skill = skill_services.get_skill_by_id(old_skill_id, strict=False)
+        old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=False)
         if old_skill is None:
             raise self.PageNotFoundException(
                 Exception('The old skill with the given id doesn\'t exist.'))

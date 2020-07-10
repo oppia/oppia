@@ -27,6 +27,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for running the user deletion."""
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -48,6 +49,7 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for verifying the user deletion."""
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""

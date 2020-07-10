@@ -187,8 +187,8 @@ def get_changelog_categories(pulls):
 
     Returns:
         dict(str, list(str)). A list where the keys are the various changelog
-            labels, and the values are the titles of the PRs that fall under
-            that category.
+        labels, and the values are the titles of the PRs that fall under
+        that category.
     """
     result = collections.defaultdict(list)
     for pull in pulls:
@@ -256,7 +256,7 @@ def check_setup_scripts(base_release_tag, changed_only=True):
 
     Returns:
         dict consisting of script --> boolean indicating whether or not it has
-            changed (filtered by default to those that are modified).
+        changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
                      ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',

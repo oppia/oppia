@@ -73,9 +73,7 @@ export class CollectionValidationService {
     });
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  _validateCollection(collection: Collection, isPublic: boolean): any {
+  _validateCollection(collection: Collection, isPublic: boolean): string[] {
     // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
     // same as that in core.domain.collection_domain.Collection.validate().
     var issues = [];
@@ -112,9 +110,7 @@ export class CollectionValidationService {
    * match the validations performed in the backend. This function is
    * expensive, so it should be called sparingly.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  findValidationIssuesForPrivateCollection(collection: Collection): any {
+  findValidationIssuesForPrivateCollection(collection: Collection): string[] {
     return this._validateCollection(collection, false);
   }
 
@@ -124,7 +120,7 @@ export class CollectionValidationService {
    * public collections. This function is expensive, so it should be called
    * sparingly.
    */
-  findValidationIssuesForPublicCollection(collection: Collection): any {
+  findValidationIssuesForPublicCollection(collection: Collection): string[] {
     return this._validateCollection(collection, true);
   }
 

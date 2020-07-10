@@ -168,7 +168,7 @@ export class NumericInputValidationService {
     value = value.toString().trim();
     const trailingDot = /\.\d/g;
     const twoDecimals = /.*\..*\./g;
-    const extraChars = /[^0-9.+-]/g;
+    const extraChars = /[^0-9\.-]/g;
     const trailingMinus = /^-/g;
     const extraMinus = /-.*-/g;
 
@@ -187,8 +187,8 @@ export class NumericInputValidationService {
 
   parseValue(viewValue: string): number {
     if (viewValue) {
-      viewValue = viewValue.trim();
-      return parseFloat(viewValue);
+      // Remove commas and leading/trailing spaces before parsing.
+      return parseFloat(viewValue.trim().replace(/\,/g, ''));
     }
   }
 }

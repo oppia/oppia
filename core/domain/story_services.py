@@ -107,8 +107,8 @@ def apply_change_list(story_id, change_list):
 
     Returns:
         Story, list(str), list(str). The resulting story domain object, the
-            exploration IDs removed from story and the exploration IDs added to
-            the story.
+        exploration IDs removed from story and the exploration IDs added to
+        the story.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -223,7 +223,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
 
     Returns:
         list(str). The various validation error messages (if raise_error is
-            False).
+        False).
 
     Raises:
         ValidationError. Expected story to only reference valid explorations.

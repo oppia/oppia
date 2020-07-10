@@ -26,6 +26,7 @@ import feconf
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
+
     RECIPIENT_EMAIL = 'user@example.com'
     RECIPIENT_USERNAME = 'user'
     SENDER_EMAIL = 'Sender <sender@example.com>'

@@ -23,6 +23,7 @@ import ast
 
 from constants import constants
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_jobs_one_off
 from core.domain import skill_services
 from core.platform import models
@@ -81,7 +82,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the skill is exactly the same after migration.
         updated_skill = (
-            skill_services.get_skill_by_id(self.SKILL_ID))
+            skill_fetchers.get_skill_by_id(self.SKILL_ID))
         self.assertEqual(
             updated_skill.skill_contents_schema_version,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
@@ -111,7 +112,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the skill is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            skill_services.get_skill_by_id(self.SKILL_ID)
+            skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
         # Start migration job on sample skill.
         job_id = (
@@ -124,7 +125,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the skill is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            skill_services.get_skill_by_id(self.SKILL_ID)
+            skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
         output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id)
         expected = [[u'skill_deleted',
@@ -180,7 +181,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify that the skill migrates correctly.
         updated_skill = (
-            skill_services.get_skill_by_id(self.SKILL_ID))
+            skill_fetchers.get_skill_by_id(self.SKILL_ID))
 
         self.assertEqual(
             updated_skill.skill_contents_schema_version,
@@ -208,7 +209,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         skill_services.save_new_skill(self.albert_id, skill)
 
         get_skill_by_id_swap = self.swap(
-            skill_services, 'get_skill_by_id', _mock_get_skill_by_id)
+            skill_fetchers, 'get_skill_by_id', _mock_get_skill_by_id)
 
         with get_skill_by_id_swap:
             job_id = (

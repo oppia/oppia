@@ -65,6 +65,7 @@ class TaskEntryModel(base_models.BaseModel):
     The ID of a task has the form: "[entity_type].[entity_id].[entity_version].
                                     [task_type].[target_type].[target_id]".
     """
+
     # Utility field which results in a 20% speedup compared to querying by each
     # of the invididual fields used to compose it.
     # Value has the form: "[entity_type].[entity_id].[entity_version]".
@@ -104,16 +105,6 @@ class TaskEntryModel(base_models.BaseModel):
     # The date and time at which a task was closed or deprecated.
     resolved_on = ndb.DateTimeProperty(
         default=None, required=False, indexed=True)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """Only the resolver_id field refers to a user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.resolver_id
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

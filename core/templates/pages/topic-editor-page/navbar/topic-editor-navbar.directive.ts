@@ -21,7 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'pages/topic-editor-page/modal-templates/' +
   'topic-editor-save-modal.controller.ts');
@@ -138,6 +138,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
+            $scope.discardChangesButtonIsShown = false;
             TopicEditorStateService.loadTopic($scope.topicId);
           };
 
@@ -164,6 +165,11 @@ angular.module('oppia').directive('topicEditorNavbar', [
             var prepublishValidationIssuesCount = (
               $scope.prepublishValidationIssues.length);
             return validationIssuesCount + prepublishValidationIssuesCount;
+          };
+
+          $scope.toggleDiscardChangeButton = function() {
+            $scope.discardChangesButtonIsShown = (
+              !$scope.discardChangesButtonIsShown);
           };
 
           $scope.saveChanges = function() {
@@ -201,6 +207,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $scope.topicId = UrlService.getTopicIdFromUrl();
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicSkillIds = $scope.topic.getSkillIds();
+            $scope.discardChangesButtonIsShown = false;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             $scope.topicRights = TopicEditorStateService.getTopicRights();

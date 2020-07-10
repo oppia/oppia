@@ -272,15 +272,16 @@ skip_files:
 # We exclude some of the scripts that are not directly imported in order to
 # reduce deployed file count.
 # TODO(sll): Find a more structured way of doing this.
+#
+# Please do not remove line below this, as it is used for testing purpose.
+# Third party files:
 - third_party/static/angular-audio-1.7.4/
-- third_party/static/angular-scroll-1.0.0/
 - third_party/static/angular-toastr-1.7.0/
 - third_party/static/bootstrap-4.3.1/
 - third_party/static/bower-angular-translate-2.18.1/
 - third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/
 - third_party/static/bower-angular-translate-loader-partial-2.18.1/
 - third_party/static/bower-angular-translate-loader-static-files-2.18.1/
-- third_party/static/bower-angular-cookies-1.7.9/
 - third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 - third_party/static/bower-material-1.1.19/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include

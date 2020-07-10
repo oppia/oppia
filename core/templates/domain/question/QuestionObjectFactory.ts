@@ -74,7 +74,7 @@ export class Question {
       return 'An interaction must be specified';
     }
     if (interaction.hints.length === 0) {
-      return 'At least 1 hint should be specfied';
+      return 'At least 1 hint should be specified';
     }
     if (
       !interaction.solution &&

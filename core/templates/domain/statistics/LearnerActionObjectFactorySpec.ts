@@ -123,61 +123,6 @@ describe('Learner Action Object Factory', () => {
       .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   });
 
-  it('should throw if the schema version is not a positive int', () => {
-    var LearnerActionObjectFactoryLocalReference =
-        learnerActionObjectFactory;
-
-    expect(() => {
-      return LearnerActionObjectFactoryLocalReference.
-        createNewAnswerSubmitAction({
-          state_name: {
-            value: 'state'
-          },
-          dest_state_name: {
-            value: 'dest_state'
-          },
-          interaction_id: {
-            value: 'interaction_id'
-          },
-          submitted_answer: {
-            value: 'answer'
-          },
-          feedback: {
-            value: 'feedback'
-          },
-          time_spent_state_in_msecs: {
-            value: 2
-          }
-        }, -1);
-    }).toThrowError('given invalid schema version');
-  });
-
-  it('should use a specific schema version if provided', () => {
-    var learnerActionObject =
-        learnerActionObjectFactory.createNewAnswerSubmitAction({
-          state_name: {
-            value: 'state'
-          },
-          dest_state_name: {
-            value: 'dest_state'
-          },
-          interaction_id: {
-            value: 'interaction_id'
-          },
-          submitted_answer: {
-            value: 'answer'
-          },
-          feedback: {
-            value: 'feedback'
-          },
-          time_spent_state_in_msecs: {
-            value: 2
-          }
-        }, 99);
-
-    expect(learnerActionObject.schemaVersion).toEqual(99);
-  });
-
   it('should create a new learner action from a backend dict', () => {
     var learnerActionObject =
         learnerActionObjectFactory.createFromBackendDict({
@@ -226,7 +171,7 @@ describe('Learner Action Object Factory', () => {
           time_spent_state_in_msecs: {
             value: 2
           }
-        }, 1);
+        });
 
     var learnerActionDict = learnerActionObject.toBackendDict();
     expect(learnerActionDict).toEqual({
