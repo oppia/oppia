@@ -28,6 +28,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -276,6 +277,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     skill_summaries[2].id], '')
         )
         self.assertEqual(len(questions), 3)
+        # Testing that there are 3 hindi translation opportunities
+        # available on the Contributor Dashboard. Hindi was picked arbitrarily,
+        # any language code other than english (what the dummy explorations
+        # were written in) can be tested here.
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 
     def test_generate_dummy_skill_and_questions_data(self):

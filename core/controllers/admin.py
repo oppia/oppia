@@ -483,6 +483,11 @@ class AdminHandler(base.BaseHandler):
                 })]
             )
 
+            # Generates translation opportunities for the Contributor Dashboard.
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids_in_story)
+
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
