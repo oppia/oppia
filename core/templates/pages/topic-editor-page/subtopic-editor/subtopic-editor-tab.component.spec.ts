@@ -67,6 +67,7 @@ describe('Subtopic editor tab', function() {
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
+    subtopic._skillIds = ['skill_1'];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
 
