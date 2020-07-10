@@ -44,7 +44,6 @@ import { ObjectsDomainConstants } from
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 
-
 import { PracticeTabComponent } from
   'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from

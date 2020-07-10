@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the navbar breadcrumb of the topic viewer.
+ * @fileoverview Component for the navbar breadcrumb of the topic viewer.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
