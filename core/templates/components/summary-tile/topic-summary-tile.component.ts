@@ -16,7 +16,7 @@
  * @fileoverview Component for a topic tile.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ClassroomDomainConstants } from
@@ -24,27 +24,16 @@ import { ClassroomDomainConstants } from
 import { TopicSummary } from 'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 @Component({
   selector: 'topic-summary-tile',
   templateUrl: './topic-summary-tile.component.html',
   styleUrls: []
 })
-export class TopicSummaryTileComponent implements OnInit {
+export class TopicSummaryTileComponent {
   @Input() topicSummary: TopicSummary;
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService) {
-    this.translateService.use('en');
-  }
-  ngOnInit(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code));
   }
   getTopicLink(): string {
     return this.urlInterpolationService.interpolateUrl(

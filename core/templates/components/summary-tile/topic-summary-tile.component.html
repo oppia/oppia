@@ -10,8 +10,7 @@
     <div class="oppia-topic-name">
       {{ topicSummary.getName() }}
     </div>
-    <span [innerHTML]="'I18N_TOPIC_SUMMARY_TILE_LESSONS' | translate"
-          translate-values="{lessonCount: topicSummary.getCanonicalStoryCount()}"
+    <span [innerHTML]="'I18N_TOPIC_SUMMARY_TILE_LESSONS' | translate:{lessonCount: topicSummary.getCanonicalStoryCount()}"
           translate-interpolation="messageformat">
     </span>
   </div>
