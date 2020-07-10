@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ImprovementConfirmationModal.
+ * @fileoverview Unit tests for NewStoryTitleEditorModalController.
  */
 
-describe('Improvement Confirmation Modal', function() {
+const CONSTANTS = require('constants.ts');
+
+describe('New Story Title Editor Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
 
@@ -28,20 +30,22 @@ describe('Improvement Confirmation Modal', function() {
       '$uibModalInstance', ['close', 'dismiss']);
 
     $scope = $rootScope.$new();
-    $controller('ImprovementConfirmationModalController', {
+    $controller('NewStoryTitleEditorModalController', {
       $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      buttonClass: 'btn',
-      buttonText: 'Button Text',
-      message: 'Message Text'
+      $uibModalInstance: $uibModalInstance
     });
   }));
 
-  it('should evalute scope variables values correctly', function() {
-    expect($scope.confirmationMessage).toBe('Message Text');
-    expect($scope.confirmationButtonText).toBe('Button Text');
-    expect($scope.confirmationButtonClass).toBe('btn');
-    expect($scope.action).toEqual($uibModalInstance.close);
-    expect($scope.cancel).toEqual($uibModalInstance.dismiss);
+  it('should check if properties was initialized correctly', function() {
+    expect($scope.storyTitle).toBe('');
+    expect($scope.MAX_CHARS_IN_STORY_TITLE).toBe(
+      CONSTANTS.MAX_CHARS_IN_STORY_TITLE);
+  });
+
+  it('should check if a provided story title is empty', function() {
+    expect($scope.isStoryTitleEmpty('')).toBe(true);
+    expect($scope.isStoryTitleEmpty('Story Title')).toBe(false);
+    expect($scope.isStoryTitleEmpty()).toBe(false);
+    expect($scope.isStoryTitleEmpty(null)).toBe(false);
   });
 });
