@@ -21,4 +21,4 @@
 require('pages/donate-page/donate-page.module.ts');
 require('App.ts');
 
-require('pages/oppia-footer.component.ts');
+require('pages/OppiaFooterDirective.ts');
