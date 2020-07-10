@@ -510,7 +510,7 @@ class AdminHandler(base.BaseHandler):
             skill = self._create_dummy_skill(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>')
             skill_services.save_new_skill(self.user_id, skill)
-            for i in python_utils.RANGE(15):
+            for i in python_utils.RANGE(1):
                 question_id = question_services.get_new_question_id()
                 question_name = 'Question number %s %s' % (
                     python_utils.UNICODE(i), skill_name)

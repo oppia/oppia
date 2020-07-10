@@ -75,7 +75,9 @@
     </md-card>
     <md-card class="item-list-card">
       <div class="item-list-card-header">
+        <div class="subtopic-reassign-header">
         <h3>Subtopics</h3>
+        <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">Reassign</span>
         <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
            class="fa fa-angle-down"
            ng-if="!subtopicsListIsShown"
@@ -86,57 +88,59 @@
            ng-if="subtopicsListIsShown"
            aria-hidden="true">
         </i>
+        </div>
       </div>
       <div ng-if="subtopicsListIsShown">
         <button class="btn add-subtopic-btn protractor-test-add-subtopic-button" ng-click="createSubtopic()">
           + ADD SUBTOPIC
+        </button>
+        <button class="btn add-skill-btn" ng-click="createSkill()">
+          + ADD SKILL
         </button>
         <div ng-if="subtopics.length && subtopicsListIsShown">
           <div class="list-header">
             <span>Name</span>
             <span># of Skills</span>
           </div>
-          <div ng-repeat="subtopic in subtopics">
-            <div class="subtopics-list-item">
-              <span class="protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
-              <span><[subtopic.getSkillSummaries().length]>
-                <button class="btn btn-secondary protractor-test-delete-subtopic-button" ng-click="deleteSubtopic(subtopic.getId())">Delete</button>
-              </span>
-            </div>
+          <div class="subtopic-name-header" ng-class="{'skills-valid': !uncategorizedSkillSummaries.length, 'skills-invalid': uncategorizedSkillSummaries.length}">
+            <span>Uncategorized Skills</span>
           </div>
-        </div>
-      </div>
-    </md-card>
-    <md-card class="item-list-card">
-      <div class="item-list-card-header">
-        <h3>Skills</h3>
-        <i ng-click="togglePreviewListCards(SKILL_LIST)"
-           class="fa fa-angle-down"
-           ng-if="!skillsListIsShown"
-           aria-hidden="true">
-        </i>
-        <i ng-click="togglePreviewListCards(SKILL_LIST)"
-           class="fa fa-angle-up"
-           ng-if="skillsListIsShown"
-           aria-hidden="true">
-        </i>
-      </div>
-      <div ng-if="skillsListIsShown">
-        <button class="btn add-skill-btn" ng-click="createSkill()">
-          + ADD SKILL
-        </button>
-        <div ng-if="uncategorizedSkillSummaries.length">
-          <div class="list-header">
-            <span>Name</span>
-          </div>
-          <div ng-repeat="skillSummary in uncategorizedSkillSummaries" class="skills-list-item protractor-test-skill-item">
+          <div ng-repeat="skillSummary in uncategorizedSkillSummaries" class="subtopic-skill skills-list-item protractor-test-skill-item">
             <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-              <span><[skillSummary.getDescription()]></span>
+              <span class="clickable-item"><[skillSummary.getDescription()]></span>
             </a>
-            <button class="btn btn-secondary"
-                    ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
-              Delete
-            </button>
+            <i class="fa fa-trash" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></i>
+          </div>
+          <div ng-repeat="subtopic in subtopics track by $index" ng-init="subtopicIndex = $index">
+            <div class="subtopics-list-item">
+              <div class="subtopic-name-header subtopic-name-card-header" ng-click="expandSubtopicCard(subtopicIndex)">
+                <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
+                  <div class="subtopic-edit-options-container">
+                    <span><[subtopic.getSkillSummaries().length]></span>
+                    <i class="fa fa-ellipsis-v" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
+                    <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
+                      <i class="fa fa-trash protractor-test-delete-subtopic-button"></i>
+                      <span>Delete</span>
+                    </div>
+                  </div>
+              </div>
+              <div ng-if="subtopicCardIsExpanded[subtopicIndex]">
+                <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skill-description-container">
+                  <span class="clickable-item"><[skillSummary.getDescription()]></span>
+                  <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
+                  <div class="skill-option-box" ng-if="skillEditOptionsAreShown[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)">
+                    <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                      <i class="fa fa-trash"></i>
+                      <span>Remove from subtopic</span>
+                    </div>
+                    <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                      <i class="fa fa-trash"></i>
+                      <span>Remove from topic</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -342,12 +346,91 @@
   }
 
   .topic-editor .subtopics-list-item {
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
     margin: 7px 0;
   }
 
+  .topic-editor .subtopic-name-header {
+    align-items: center;
+    background-color: #e3e3e3;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+    display: flex;
+    padding: 10px;
+    cursor: pointer;
+    justify-content: space-between;
+  }
+
+  .skill-option-box {
+    border: 1px solid black;
+    position: absolute;
+    background-color: #e1dcdc;
+    width: 210px;
+    right: -6px;
+    padding: 0;
+    z-index: 1;
+  }
+
+  .skill-edit-option {
+    border-bottom: 1px solid #000;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+  .remove-from-topic-option {
+    border-bottom: none;
+  }
+
+  .topic-editor .reassign-button {
+    color: #0b6c63;
+    cursor: pointer;
+  }
+
+  .topic-editor .subtopic-reassign-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+  .topic-editor .subtopic-edit-options-container {
+    position: relative;
+  }
+  .topic-editor .subtopic-edit-options {
+    position: absolute;
+    border: 1px solid #2e2626;
+    width: 120px;
+    background-color: #e1dcdc;
+    padding: 2px;
+    top: 0;
+    right: -7px;
+  }
+  .skill-description-container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .topic-editor  .skills-valid {
+    background-color: #009C8A33;
+    border: 2px solid #009C8A;
+  }
+
+  .topic-editor  .skills-invalid {
+    background-color: #C55F4533;
+    border: 2px solid #C55F45;
+  }
+
+  /*.subtopics-list-item div:last-child {*/
+  /*  border: none;*/
+  /*}*/
+
+  .clickable-item:hover {
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .subtopic-skill {
+    border-bottom: 1px solid #e3e3e3;
+    padding: 8px 10px;
+  }
   .topic-editor  .item-list-card-header i {
     display: none;
   }

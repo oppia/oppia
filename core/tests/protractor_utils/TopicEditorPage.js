@@ -258,12 +258,42 @@ var TopicEditorPage = function() {
       'Create subtopic modal taking too long to disappear.');
   };
 
-  this.dragSkillToSubtopic = async function(skillIndex) {
-    var target = element(by.css('.protractor-test-subtopic-column'));
-    await waitFor.visibilityOf(target,
-      "Subtopic's skills list taking too long to appear.");
-    var toMove = await skillCards.get(skillIndex);
+  this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
+    var uncategorizedSkills = element.all(by.css('.protractor-test-uncategorized-skill-card'));
+    await waitFor.visibilityOf(await uncategorizedSkills.first(), 'Uncategorized skills taking too long to appear.');
+    const target = (subtopicColumns.get(subtopicIndex));
+    var uncategorizedSkillIndex = -1;
+    for (var i = 0;i < await uncategorizedSkills.count();i++) {
+      if (skillDescription === await uncategorizedSkills.get(i).getText()) {
+        uncategorizedSkillIndex = i;
+        break;
+      }
+    }
+    var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
     await dragAndDrop(toMove, target);
+  };
+
+  this.navigateToReassignModal = async function() {
+    var reassignSkillButton = element(
+      by.css('.protractor-test-reassign-skill-button'));
+    await waitFor.elementToBeClickable(reassignSkillButton,
+      'Reassign skill button taking too long to be clickable');
+    await reassignSkillButton.click();
+  };
+
+  this.expectSubtopicWithIndexToHaveSkills = async function(
+      subtopicIndex, skillNames) {
+    const assignedSkillDescriptions = (
+      subtopicColumns.get(subtopicIndex).all(
+        by.css('.protractor-test-subtopic-skill-description')));
+    const assignedSkillsLength = await assignedSkillDescriptions.count();
+
+    expect(skillNames.length).toEqual(assignedSkillsLength);
+
+    for (let i = 0;i < assignedSkillsLength;i++) {
+      const skillDescription = await assignedSkillDescriptions.get(i).getText();
+      expect(skillDescription).toEqual(skillNames[i]);
+    }
   };
 
   this.dragSkillBetweenSubtopics = async function(

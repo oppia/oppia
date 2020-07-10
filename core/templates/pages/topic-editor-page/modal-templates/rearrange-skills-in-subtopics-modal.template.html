@@ -1,0 +1,139 @@
+<div>
+	<div class="modal-header">
+		<h3>
+			Drag and drop skills to assign them to subtopic
+		</h3>
+	</div>
+	<div class="modal-body subtopics">
+		<div class="subtopics-container">
+			<md-card class="item-container uncategorized-skill-ids"
+			         ng-class="{'skills-valid': !uncategorizedSkillSummaries.length, 'skills-invalid': uncategorizedSkillSummaries.length}"
+			         dnd-list="uncategorizedSkillSummaries"
+			         dnd-drop="onMoveSkillEnd(null)">
+				<strong> Uncategorized Skills </strong>
+				<div class="uncategorized-skills-container">
+					<md-card class="skill-id"
+					         ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
+					         dnd-draggable="skillSummary"
+					         dnd-effect-allowed="move"
+					         dnd-dragstart="onMoveSkillStart(null, skillSummary)">
+						<div class="skill-card">
+							<a ng-if="!isSkillDeleted(skillSummary)"
+							   class="protractor-test-uncategorized-skill-card"
+							   ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+								<[skillSummary.getDescription()]>
+							</a>
+						</div>
+					</md-card>
+					<p class="intro-card-message" ng-if="uncategorizedSkillSummaries.length === 0">
+						There are no unassigned skills left in the topic.
+					</p>
+				</div>
+			</md-card>
+			<md-card class="subtopic item-container protractor-test-subtopic-column"
+			         ng-repeat="(subtopicIndex, subtopic) in subtopics"
+			         dnd-list="subtopic.getSkillSummaries()"
+			         dnd-drop="onMoveSkillEnd(subtopic.getId())">
+				<div class="subtopic-header">
+					<strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
+					<strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
+				</div>
+				<div class="subtopic-container">
+					<md-card class="skill-id"
+					         ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
+					         dnd-draggable="skillSummary"
+					         dnd-dragstart="onMoveSkillStart(subtopic.getId(), skillSummary)"
+					         dnd-effect-allowed="move">
+						<div class="skill-card">
+							<a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" class="protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
+								<[skillSummary.getDescription()]>
+							</a>
+						</div>
+					</md-card>
+				</div>
+			</md-card>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
+		<button class="btn btn-success" ng-click="confirm()">Save</button>
+	</div>
+</div>
+<style>
+
+	.rearrange-skills-modal .modal-dialog {
+		max-width: inherit;
+		width: 80vw;
+	}
+	.rearrange-skills-modal .modal-body {
+		padding: 40px;
+	}
+	.rearrange-skills-modal a {
+		color: #666;
+	}
+	.rearrange-skills-modal .subtopic-container {
+		max-height: 60vh;
+		overflow-y: auto;
+	}
+	.rearrange-skills-modal .uncategorized-skills-container {
+		max-height: 60vh;
+		overflow-y: auto;
+	}
+	.rearrange-skills-modal .item-container {
+		background-color: #eee;
+		padding: 5px 10px;
+		min-height: 200px;
+		max-height: 200px;
+		width: 15vw;
+	}
+
+	.rearrange-skills-modal .rearrange-skills-modal {
+		display: flex;
+		height: auto;
+		margin: 6vh 10vh 0 10vh;
+	}
+	.rearrange-skills-modal .intro-card-message {
+		color: gray;
+		font-size: 0.8em;
+		line-height: 1.846;
+		padding: 10px;
+		text-align: center;
+	}
+	.rearrange-skills-modal .subtopics-container {
+		align-content: flex-start;
+		display: flex;
+		max-height: 350px;
+		display: flex;
+		flex-wrap: wrap;
+		max-width: 90%;
+		flex-direction: column;
+		overflow-x: auto;
+		margin: 0 auto;
+	}
+	.rearrange-skills-modal .subtopic-header {
+		text-align: left;
+	}
+	.rearrange-skills-modal .skill-id {
+		background-color: #FFF;
+		cursor: move;
+		margin: 8px 0;
+		border: 1px solid #cccccc;
+		box-shadow: none;
+		text-align: left;
+	}
+	.rearrange-skills-modal .skill-id:hover {
+		background-color: #e0e0e0;
+	}
+	.rearrange-skills-modal .dndPlaceholder {
+		display: none;
+	}
+
+	.rearrange-skills-modal .skills-valid {
+		background-color: #009C8A33;
+		border: 2px solid #009C8A;
+	}
+	.rearrange-skills-modal .skills-invalid {
+		background-color: #C55F4533;
+		border: 2px solid #C55F45;
+	}
+</style>

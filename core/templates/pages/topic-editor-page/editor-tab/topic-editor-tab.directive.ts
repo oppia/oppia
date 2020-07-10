@@ -29,6 +29,8 @@ require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require(
+  'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -42,6 +44,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('domain/question/question-backend-api.service.ts');
 
 
@@ -57,10 +60,10 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$timeout', '$scope', '$uibModal', 'AlertsService',
         'ContextService', 'CsrfTokenService', 'WindowDimensionsService',
         'ImageUploadHelperService',
-        'SkillCreationService', 'StoryCreationService',
+        'SkillCreationService', 'StoryCreationService', 'SkillBackendApiService',
         'EntityCreationService', 'TopicEditorRoutingService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
@@ -68,10 +71,10 @@ angular.module('oppia').directive('topicEditorTab', [
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, AlertsService,
+            $rootScope, $timeout, $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, WindowDimensionsService,
             ImageUploadHelperService,
-            SkillCreationService, StoryCreationService,
+            SkillCreationService, StoryCreationService, SkillBackendApiService,
             EntityCreationService, TopicEditorRoutingService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
@@ -119,6 +122,32 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
+          $scope.expandSubtopicCard = function(index) {
+            if ($scope.subtopicCardIsExpanded[index]) {
+              $scope.subtopicCardIsExpanded[index] = false;
+              return;
+            }
+            $scope.subtopicCardIsExpanded[index] = true;
+          };
+
+          $scope.reassignSkillsInSubtopics = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic-editor-page/modal-templates/' +
+                  'rearrange-skills-in-subtopics-modal.template.html'),
+              backdrop: true,
+              windowClass: 'rearrange-skills-modal',
+              controller: 'RearrangeSkillsInSubtopicsModalController',
+              size: 'xl'
+            }).result.then(function() {
+              _initEditor();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.createCanonicalStory = function() {
@@ -204,6 +233,18 @@ angular.module('oppia').directive('topicEditorTab', [
             _initEditor();
           };
 
+          $scope.removeSkillFromSubtopic = function(subtopicId, skillSummary) {
+            $scope.skillEditOptionsAreShown = {};
+            TopicUpdateService.removeSkillFromSubtopic($scope.topic, subtopicId, skillSummary);
+            _initEditor();
+          };
+
+          $scope.removeSkillFromTopic = function(subtopicId, skillSummary) {
+            $scope.skillEditOptionsAreShown = {};
+            TopicUpdateService.removeSkillFromSubtopic($scope.topic, subtopicId, skillSummary);
+            $scope.deleteUncategorizedSkillFromTopic(skillSummary);
+          };
+
           $scope.togglePreview = function() {
             $scope.topicPreviewCardIsShown = !($scope.topicPreviewCardIsShown);
           };
@@ -246,12 +287,22 @@ angular.module('oppia').directive('topicEditorTab', [
             if (listType === $scope.SUBTOPIC_LIST) {
               $scope.subtopicsListIsShown = !$scope.subtopicsListIsShown;
             }
-            if (listType === $scope.SKILL_LIST) {
-              $scope.skillsListIsShown = !$scope.skillsListIsShown;
-            }
             if (listType === $scope.STORY_LIST) {
               $scope.storiesListIsShown = !$scope.storiesListIsShown;
             }
+          };
+
+          $scope.showSubtopicEditOptions = function(index) {
+            $scope.subtopicEditOptionsAreShown = index;
+          };
+
+          $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
+            if (Object.keys($scope.skillEditOptionsAreShown).length) {
+              $scope.skillEditOptionsAreShown = {};
+              return;
+            }
+            $scope.skillEditOptionsAreShown[subtopicIndex] = {};
+            $scope.skillEditOptionsAreShown[subtopicIndex][skillIndex] = true;
           };
 
           ctrl.$onInit = function() {
@@ -259,9 +310,9 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';
             $scope.STORY_LIST = 'story';
+            $scope.subtopicCardIsExpanded = {};
+            $scope.skillEditOptionsAreShown = {};
             $scope.subtopicsListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.skillsListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());

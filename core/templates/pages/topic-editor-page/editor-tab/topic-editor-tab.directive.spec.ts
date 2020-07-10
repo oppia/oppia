@@ -36,8 +36,8 @@ describe('Topic editor tab directive', function() {
   var ctrl = null;
   var $rootScope = null;
   var topic = null;
-  var subtopic1 = null;
-  var subtopic2 = null;
+  var story1 = null;
+  var story2 = null;
   var ContextService = null;
   var ImageUploadHelperService = null;
   var directive = null;
@@ -95,9 +95,9 @@ describe('Topic editor tab directive', function() {
       EntityCreationService: EntityCreationService
     });
     topic = TopicObjectFactory.createInterstitialTopic();
-    subtopic1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
-    subtopic2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
-    topic._canonicalStoryReferences = [subtopic1, subtopic2];
+    story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
+    story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    topic._canonicalStoryReferences = [story1, story2];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl.$onInit();
   }));
@@ -276,7 +276,7 @@ describe('Topic editor tab directive', function() {
     expect($scope.getPreviewFooter()).toEqual('2 Stories');
     topic._canonicalStoryReferences = [];
     expect($scope.getPreviewFooter()).toEqual('0 Stories');
-    topic._canonicalStoryReferences = [subtopic1];
+    topic._canonicalStoryReferences = [story1];
     expect($scope.getPreviewFooter()).toEqual('1 Story');
   });
 
