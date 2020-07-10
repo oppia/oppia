@@ -2,25 +2,26 @@
   "ci": {
     "collect": {
       "numberOfRuns": 1,
+      "startServerCommand": "python -m scripts.start --no_browser --prod_env",
       "puppeteerScript": "puppeteer-login-script.js",
       "startServerReadyPattern": "default: \"GET /_ah/warmup HTTP/1.1\"",
       "startServerReadyTimeout": 250000,
       "url": [
-        "http://127.0.0.1:8181/",
-        "http://127.0.0.1:8181/admin",
-        "http://127.0.0.1:8181/about",
-        "http://127.0.0.1:8181/creator-dashboard",
-        "http://127.0.0.1:8181/contact",
-        "http://127.0.0.1:8181/community-dashboard",
-        "http://127.0.0.1:8181/delete-account",
-        "http://127.0.0.1:8181/donate",
-        "http://127.0.0.1:8181/emaildashboard",
-        "http://127.0.0.1:8181/get-started",
-        "http://127.0.0.1:8181/community-library",
-        "http://127.0.0.1:8181/privacy-policy",
-        "http://127.0.0.1:8181/teach",
-        "http://127.0.0.1:8181/terms",
-        "http://127.0.0.1:8181/thanks"
+        "http://127.0.0.1:9999/",
+        "http://127.0.0.1:9999/admin",
+        "http://127.0.0.1:9999/about",
+        "http://127.0.0.1:9999/creator-dashboard",
+        "http://127.0.0.1:9999/contact",
+        "http://127.0.0.1:9999/community-dashboard",
+        "http://127.0.0.1:9999/delete-account",
+        "http://127.0.0.1:9999/donate",
+        "http://127.0.0.1:9999/emaildashboard",
+        "http://127.0.0.1:9999/get-started",
+        "http://127.0.0.1:9999/community-library",
+        "http://127.0.0.1:9999/privacy-policy",
+        "http://127.0.0.1:9999/teach",
+        "http://127.0.0.1:9999/terms",
+        "http://127.0.0.1:9999/thanks"
       ]
     },
     "assert": {

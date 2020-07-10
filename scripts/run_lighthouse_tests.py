@@ -26,7 +26,6 @@ import subprocess
 import sys
 
 import python_utils
-from scripts import build
 from scripts import common
 
 _PARSER = argparse.ArgumentParser()
@@ -41,7 +40,6 @@ _PARSER.add_argument(
 FECONF_FILE_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
 RUNNING_PROCESSES = []
-APP_ENGINE_PORT = 8181
 NGINX_PORT = 9999
 NGINX_DOWNLOAD_PATH = os.path.join(common.OPPIA_TOOLS_DIR, 'nginx-1.13.1')
 NGINX_INSTALL_PATH = os.path.join(common.OPPIA_TOOLS_DIR, 'nginx')
@@ -62,21 +60,6 @@ def run_lighthouse_checks():
     if process.returncode != 0:
         python_utils.PRINT('Checks failed view details above')
         sys.exit(process.returncode)
-
-
-def start_google_app_engine_server(port=APP_ENGINE_PORT):
-    """Start the Google App Engine server."""
-    app_yaml_filepath = 'app.yaml'
-
-    python_utils.PRINT('Starting oppia server...')
-
-    server_process = subprocess.Popen(
-        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-            port, app_yaml_filepath), shell=True)
-    RUNNING_PROCESSES.append(server_process)
 
 
 def download_and_install_nginx():
@@ -128,17 +111,6 @@ def run_lighthouse_checks_with_compression():
     if not os.path.exists(NGINX_INSTALL_PATH):
         download_and_install_nginx()
 
-    constants_env_variable = '"DEV_MODE": false'
-    for line in fileinput.input(
-            files=[os.path.join('assets', 'constants.ts')], inplace=True):
-        # Inside this loop the STDOUT will be redirected to the file,
-        # constants.ts. The end='' is needed to avoid double line breaks.
-        python_utils.PRINT(
-            re.sub(
-                r'"DEV_MODE": .*', constants_env_variable, line), end='')
-
-    start_google_app_engine_server()
-    common.wait_for_port_to_be_open(APP_ENGINE_PORT)
     start_proxy_server()
     common.wait_for_port_to_be_open(NGINX_PORT)
     run_lighthouse_checks()
@@ -154,9 +126,7 @@ def cleanup():
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
-    dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
     processes_to_kill = [
-        '.*%s.*' % re.escape(dev_appserver_path),
         '.*%s.*' % re.escape(NGINX_INSTALL_PATH)
     ]
 
@@ -188,7 +158,6 @@ def main(args=None):
         return
 
     atexit.register(cleanup)
-    build.main(args=['--prod_env'])
     enable_webpages()
     run_lighthouse_checks_with_compression()
 
