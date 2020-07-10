@@ -39,6 +39,8 @@ import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
+import { SchemaBasedBoolEditorComponent } from
+  './forms/schema-based-editors/schema-based-bool-editor.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -48,10 +50,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent],
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    SchemaBasedBoolEditorComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    SchemaBasedBoolEditorComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
   ],

@@ -18,7 +18,7 @@
 
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
+  'schema-based-bool-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-choices-editor.directive.ts');

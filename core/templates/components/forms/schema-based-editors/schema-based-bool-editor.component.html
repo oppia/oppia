@@ -1,0 +1,11 @@
+<div class="input-group oppia-bool-editor-input-group">
+  <span *ngIf="!expressionMode">
+    <input type="checkbox" ng-model="localValue" ng-disabled="isDisabled"
+           focus-on="{{ labelForFocusTarget }}">
+  </span>
+</div>
+<style>
+  .oppia-bool-editor-input-group {
+    height: auto;
+  }
+</style>

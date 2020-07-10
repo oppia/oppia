@@ -4,8 +4,8 @@
 </schema-based-choices-editor>
 
 <schema-based-bool-editor ng-if="$ctrl.schema().type === 'bool' && !$ctrl.schema().choices"
-                          local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
-                          label-for-focus-target="$ctrl.labelForFocusTarget()">
+                          [local-value]="$ctrl.localValue" [is-disabled]="$ctrl.isDisabled()"
+                          [label-for-focus-target]="$ctrl.labelForFocusTarget()">
 </schema-based-bool-editor>
 
 <schema-based-int-editor ng-if="$ctrl.schema().type === 'int' && !$ctrl.schema().choices"
