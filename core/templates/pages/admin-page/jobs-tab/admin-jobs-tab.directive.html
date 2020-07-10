@@ -11,19 +11,19 @@
       <th>Controls</th>
     </tr>
     <tr ng-repeat="computation in $ctrl.CONTINUOUS_COMPUTATIONS_DATA">
-      <td><[computation.computation_type]></td>
-      <td><[computation.status_code]></td>
-      <td><[computation.human_readable_last_started]></td>
-      <td><[computation.human_readable_last_stopped]></td>
-      <td><[computation.human_readable_last_finished]></td>
-      <td><[computation.active_realtime_layer_index]></td>
+      <td><[computation.computationType]></td>
+      <td><[computation.statusCode]></td>
+      <td><[computation.humanReadableLastStarted]></td>
+      <td><[computation.humanReadableLastStopped]></td>
+      <td><[computation.humanReadableLastFinished]></td>
+      <td><[computation.activeRealtimeLayerIndex]></td>
       <td>
-        <button ng-if="computation.is_startable"
-                ng-click="$ctrl.startComputation(computation.computation_type)">
+        <button ng-if="computation.isStartable"
+                ng-click="$ctrl.startComputation(computation.computationType)">
           Start
         </button>
-        <button ng-if="computation.is_stoppable"
-                ng-click="$ctrl.stopComputation(computation.computation_type)">
+        <button ng-if="computation.isStoppable"
+                ng-click="$ctrl.stopComputation(computation.computationType)">
           Stop
         </button>
       </td>
@@ -35,14 +35,14 @@
   <h3>One-off jobs</h3>
   <h4>Current time: <[$ctrl.HUMAN_READABLE_CURRENT_TIME]></h4>
   <table class="table table-striped">
-    <tr ng-repeat="job_spec in $ctrl.ONE_OFF_JOB_SPECS" class="protractor-test-one-off-jobs-rows">
-      <td class="protractor-test-one-off-jobs-name"><[job_spec.job_type]></td>
+    <tr ng-repeat="jobSpec in $ctrl.ONE_OFF_JOB_SPECS" class="protractor-test-one-off-jobs-rows">
+      <td class="protractor-test-one-off-jobs-name"><[jobSpec.jobType]></td>
       <td>
-        <button ng-click="$ctrl.startNewJob(job_spec.job_type)"
+        <button ng-click="$ctrl.startNewJob(jobSpec.jobType)"
                 class="float-right protractor-test-one-off-jobs-start-btn">
           Start new job
         </button>
-        <span ng-if="job_spec.is_queued_or_running"
+        <span ng-if="jobSpec.isQueuedOrRunning"
               class="oppia-serious-warning-text">
           <strong>
             (warning: an instance of this job type is already running)
@@ -57,14 +57,14 @@
   <h3>Audit jobs</h3>
   <h4>Current time: <[$ctrl.HUMAN_READABLE_CURRENT_TIME]></h4>
   <table class="table table-striped">
-    <tr ng-repeat="job_spec in $ctrl.AUDIT_JOB_SPECS">
-      <td><[job_spec.job_type]></td>
+    <tr ng-repeat="jobSpec in $ctrl.AUDIT_JOB_SPECS">
+      <td><[jobSpec.jobType]></td>
       <td>
-        <button ng-click="$ctrl.startNewJob(job_spec.job_type)"
+        <button ng-click="$ctrl.startNewJob(jobSpec.jobType)"
                 class="float-right">
           Start new job
         </button>
-        <span ng-if="job_spec.is_queued_or_running"
+        <span ng-if="jobSpec.isQueuedOrRunning"
               class="oppia-serious-warning-text">
           <strong>
             (warning: an instance of this job type is already running)
@@ -89,12 +89,12 @@
     </tr>
     <tr ng-repeat="job in $ctrl.UNFINISHED_JOB_DATA track by $index" class="protractor-test-unfinished-one-off-jobs-rows">
       <td class="protractor-test-unfinished-one-off-jobs-id"><[job.id]></td>
-      <td><[job.status_code]></td>
-      <td><[job.human_readable_time_started]></td>
-      <td><[job.human_readable_time_finished]></td>
+      <td><[job.statusCode]></td>
+      <td><[job.humanReadableTimeStarted]></td>
+      <td><[job.humanReadableTimeFinished]></td>
       <td>
-        <button ng-if="job.can_be_canceled"
-                ng-click="$ctrl.cancelJob(job.id, job.job_type)"
+        <button ng-if="job.canBeCanceled"
+                ng-click="$ctrl.cancelJob(job.id, job.jobType)"
                 class="protractor-test-one-off-jobs-stop-btn">
           Cancel
         </button>
@@ -117,9 +117,9 @@
     </tr>
     <tr ng-repeat="job in $ctrl.RECENT_JOB_DATA track by $index">
       <td><[job.id]></td>
-      <td><[job.status_code]></td>
-      <td><[job.human_readable_time_started]></td>
-      <td><[job.human_readable_time_finished]></td>
+      <td><[job.statusCode]></td>
+      <td><[job.humanReadableTimeStarted]></td>
+      <td><[job.humanReadableTimeFinished]></td>
       <td>
         <button ng-click="$ctrl.showJobOutput(job.id)">
           View Output

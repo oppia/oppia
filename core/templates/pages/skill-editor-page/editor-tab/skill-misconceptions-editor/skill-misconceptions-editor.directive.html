@@ -1,50 +1,65 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <strong class="oppia-misconceptions-text">Misconceptions</strong>
-      <div class="oppia-misconceptions-text-container">
-        <span class="oppia-misconceptions-explanation-text">
-          <i>
-            These misconceptions represent common mistakes that are made by students when trying to apply this skill.
-          </i>
-        </span>
+      <div class="oppia-misconception-card-header">
+        <strong class="heading-text">Misconceptions</strong>
+        <i ng-click="toggleMisconceptionLists()"
+           class="fa fa-angle-down"
+           ng-if="!misconceptionsListIsShown"
+           aria-hidden="true">
+        </i>
+        <i ng-click="toggleMisconceptionLists()"
+           class="fa fa-angle-up"
+           ng-if="misconceptionsListIsShown"
+           aria-hidden="true">
+        </i>
       </div>
-      <div ng-if="misconceptions.length > 0" class="oppia-option-list-container">
-        <ul class="nav oppia-option-list nav-stacked nav-pills"
-            role="tablist"
-            ng-model="misconceptions">
-          <li ng-repeat="misconception in misconceptions"
-              ng-class="{'active': activeMisconceptionIndex === $index, 'last-element': $index === misconceptions.length - 1}"
-              class="oppia-rule-block oppia-prevent-selection oppia-prevent-selection-extra protractor-test-misconception-list-item">
-            <a ng-click="changeActiveMisconceptionIndex($index)"
-               class="oppia-rule-tab protractor-test-misconception-<[$index]>"
-               ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
-              <summary-list-header index="$index"
-                                   disable-sorting="true"
-                                   summary="getMisconceptionSummary(misconception)"
-                                   short-summary="getMisconceptionSummary(misconception)"
-                                   is-active="$index === activeMisconceptionIndex"
-                                   is-delete-available="isEditable"
-                                   on-delete-fn="openDeleteMisconceptionModal">
-              </summary-list-header>
-            </a>
+      <div ng-if="misconceptionsListIsShown">
+        <div class="helper-text">
+          <span>
+            <i>
+              These misconceptions represent common mistakes that are made by students when trying to apply this skill.
+            </i>
+          </span>
+        </div>
+        <div ng-if="misconceptions.length > 0" style="padding-bottom: 10px;">
+          <ul class="nav oppia-option-list nav-stacked nav-pills"
+              role="tablist"
+              ng-model="misconceptions">
+            <li ng-repeat="misconception in misconceptions"
+                ng-class="{'active': activeMisconceptionIndex === $index, 'last-element': $index === misconceptions.length - 1}"
+                class="oppia-rule-block oppia-prevent-selection protractor-test-misconception-list-item"
+                style="margin-top: 0;">
+              <a ng-click="changeActiveMisconceptionIndex($index)"
+                 class="oppia-rule-tab protractor-test-misconception-<[$index]>"
+                 ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
+                <summary-list-header index="$index"
+                                     disable-sorting="true"
+                                     summary="getMisconceptionSummary(misconception)"
+                                     short-summary="getMisconceptionSummary(misconception)"
+                                     is-active="$index === activeMisconceptionIndex"
+                                     is-delete-available="isEditable"
+                                     on-delete-fn="openDeleteMisconceptionModal">
+                </summary-list-header>
+              </a>
 
-            <div ng-if="activeMisconceptionIndex === $index">
-              <div class="oppia-editor-card-section">
-                <misconception-editor misconception="skill.findMisconceptionById(misconception.getId())"
-                                      index="$index"
-                                      is-editable="isEditable">
-                </misconception-editor>
+              <div ng-if="activeMisconceptionIndex === $index">
+                <div class="oppia-editor-card-section">
+                  <misconception-editor misconception="skill.findMisconceptionById(misconception.getId())"
+                                        index="$index"
+                                        is-editable="isEditable">
+                  </misconception-editor>
+                </div>
               </div>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
+        <button type="button"
+                class="btn add-skill-misconception-button protractor-test-add-misconception-modal-button"
+                ng-click="openAddMisconceptionModal()">
+          + ADD MISCONCEPTION
+        </button>
       </div>
-      <button type="button"
-              class="btn protractor-test-add-misconception-modal-button oppia-add-misconception-modal-button"
-              ng-click="openAddMisconceptionModal()">
-        + Add Misconception
-      </button>
     </div>
   </div>
 </md-card>
@@ -52,24 +67,37 @@
   skill-misconceptions-editor .last-element {
     border-bottom: 1px solid #ccc;
   }
-  .oppia-misconceptions-text {
-    font-size: 1.4em;
+
+  skill-misconceptions-editor .add-skill-misconception-button {
+    background-color: #058CA6;
+    color: #FFFFFF;
   }
-  .oppia-misconceptions-text-container {
+
+  skill-misconceptions-editor .helper-text {
     color: #595959;
     padding-bottom: 12px;
   }
-  .oppia-misconceptions-explanation-text {
-    font-size: .79em;
+
+  skill-misconceptions-editor .helper-text span {
+    font-size: 13px;
   }
-  .oppia-option-list-container {
-    padding-bottom: 10px;
+
+  skill-misconceptions-editor .heading-text {
+    font-size: 16px;
   }
-  .oppia-prevent-selection-extra {
-    margin-top: 0;
+
+  skill-misconceptions-editor .oppia-misconception-card-header {
+    display: flex;
+    justify-content: space-between;
   }
-  .oppia-add-misconception-modal-button {
-    background-color: rgba(5,140,166,0.9);
-    color: white;
+
+  skill-misconceptions-editor .oppia-misconception-card-header i {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-misconceptions-editor .oppia-misconception-card-header i {
+      display: block;
+    }
   }
 </style>

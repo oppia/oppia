@@ -122,9 +122,11 @@ export class AppConstants {
     EXPLANATION: 'worked_example_explanation'
   };
 
-  public static ACTION_TYPE_EXPLORATION_START = 'ExplorationStart';
-  public static ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit';
-  public static ACTION_TYPE_EXPLORATION_QUIT = 'ExplorationQuit';
+  public static ACTION_TYPE_EXPLORATION_START: 'ExplorationStart' =
+    'ExplorationStart';
+  public static ACTION_TYPE_ANSWER_SUBMIT: 'AnswerSubmit' = 'AnswerSubmit';
+  public static ACTION_TYPE_EXPLORATION_QUIT: 'ExplorationQuit'
+    = 'ExplorationQuit';
 
   public static ISSUE_TYPE_EARLY_QUIT = 'EarlyQuit';
   public static ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS =
@@ -165,7 +167,6 @@ export class AppConstants {
     TOPIC: 'topic',
     SKILL: 'skill',
     STORY: 'story',
-    SUBTOPIC: 'subtopic',
     QUESTION: 'question'
   };
 

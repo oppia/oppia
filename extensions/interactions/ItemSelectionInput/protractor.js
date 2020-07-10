@@ -65,7 +65,7 @@ var expectInteractionDetailsToMatch = async function(
   }
 };
 
-// type of object returned by interaction
+// Type of object returned by interaction.
 var answerObjectType = 'SetOfHtmlString';
 
 // 'elem' is the HTML element containing the form to submit the answer to.

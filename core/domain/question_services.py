@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -156,7 +156,7 @@ def _update_linked_skill_ids_of_question(
         question_id: str. ID of the question linked to the skill.
         new_linked_skill_ids: list(str). New linked skill IDs of the question.
         old_linked_skill_ids: list(str). Current linked skill IDs of the
-        question.
+            question.
     """
     change_dict = {
         'cmd': 'update_question_property',
@@ -214,15 +214,15 @@ def get_questions_by_skill_ids(
 
     Returns:
         list(Question). The list containing an expected number of
-            total_question_count questions linked to each given skill id.
-            question count per skill will be total_question_count divided by
-            length of skill_ids, and it will be rounded up if not evenly
-            divisible. If not enough questions for one skill, simply return
-            all questions linked to it. The order of questions will follow the
-            order of given skill ids, and the order of questions for the same
-            skill is random when require_medium_difficulty is false, otherwise
-            the order is sorted by absolute value of the difference between
-            skill difficulty and the medium difficulty.
+        total_question_count questions linked to each given skill id.
+        question count per skill will be total_question_count divided by
+        length of skill_ids, and it will be rounded up if not evenly
+        divisible. If not enough questions for one skill, simply return
+        all questions linked to it. The order of questions will follow the
+        order of given skill ids, and the order of questions for the same
+        skill is random when require_medium_difficulty is false, otherwise
+        the order is sorted by absolute value of the difference between
+        skill difficulty and the medium difficulty.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -300,7 +300,7 @@ def get_question_skill_link_from_model(
 
     Returns:
         QuestionSkillLink. The domain object representing the question skill
-            link model.
+        link model.
     """
 
     return question_domain.QuestionSkillLink(
@@ -362,7 +362,7 @@ def get_skills_linked_to_question(question_id):
         list(Skill). The list of skills that are linked to the question.
     """
     question = get_question_by_id(question_id)
-    skills = skill_services.get_multi_skills(question.linked_skill_ids)
+    skills = skill_fetchers.get_multi_skills(question.linked_skill_ids)
     return skills
 
 
@@ -423,10 +423,10 @@ def get_displayable_question_skill_link_details(
 
     Returns:
         list(QuestionSummary), list(MergedQuestionSkillLink), str|None.
-            The list of questions linked to the given skill ids, the list of
-            MergedQuestionSkillLink objects, keyed by question ID and the next
-            cursor value to be used for the next batch of questions (or None if
-            no more pages are left). The returned next cursor value is urlsafe.
+        The list of questions linked to the given skill ids, the list of
+        MergedQuestionSkillLink objects, keyed by question ID and the next
+        cursor value to be used for the next batch of questions (or None if
+        no more pages are left). The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], [], None
@@ -500,7 +500,7 @@ def apply_change_list(question_id, change_list):
             object.
 
     Returns:
-      Question. The resulting question domain object.
+        Question. The resulting question domain object.
     """
     question = get_question_by_id(question_id)
     try:

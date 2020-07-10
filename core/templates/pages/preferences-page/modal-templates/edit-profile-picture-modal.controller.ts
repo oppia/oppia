@@ -73,8 +73,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
     };
 
     $scope.onInvalidImageLoaded = function() {
-      $scope.uploadedImage = null;
-      $scope.croppedImageDataUrl = '';
+      $scope.reset();
       $scope.invalidImageWarningIsShown = true;
     };
 

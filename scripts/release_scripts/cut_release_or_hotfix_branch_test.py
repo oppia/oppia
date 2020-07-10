@@ -70,6 +70,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         class MockResponse(python_utils.OBJECT):
             def getcode(self):
                 """Mock getcode function for mock response object."""
+
                 return 200
         self.mock_response = MockResponse()
         def mock_url_open(unused_url):

@@ -22,22 +22,34 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UtilsService } from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+
+interface ILostChangeValues {
+  'outcome'?: Outcome;
+  'dest'?: string;
+  'feedback'?: SubtitledHtml;
+  'rules'?: Object;
+}
+
+type ILostChangeValue = string | ILostChangeValues;
+
 export class LostChange {
   cmd: string;
   stateName: string;
   newStateName: string;
   oldStateName: string;
-  // TODO(#7176): Replace 'any' with the exact type.
-  newValue: any;
-  oldValue: any;
+  newValue: ILostChangeValue;
+  oldValue: ILostChangeValue;
   propertyName: string;
   utilsService: UtilsService;
 
-  // TODO(#7176): Replace 'any' with the exact type.
   constructor(
       utilsService: UtilsService, cmd: string, newStateName: string,
-      oldStateName: string, stateName: string, newValue: any, oldValue: any,
-      propertyName: string) {
+      oldStateName: string, stateName: string, newValue: ILostChangeValue,
+      oldValue: ILostChangeValue, propertyName: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;
@@ -51,8 +63,8 @@ export class LostChange {
   // An edit is represented either as an object or an array. If it's an
   // object, then simply return that object. In case of an array, return
   // the last item.
-  // TODO(#7176): Replace 'any' with the exact type.
-  getStatePropertyValue(statePropertyValue: Array<string> | Object): any {
+  getStatePropertyValue(
+      statePropertyValue: Array<string> | Object): string | Object {
     return Array.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
@@ -74,38 +86,46 @@ export class LostChange {
   }
 
   isOutcomeFeedbackEqual() {
-    if (this.newValue.outcome && this.newValue.outcome.feedback &&
-      this.oldValue.outcome && this.oldValue.outcome.feedback) {
+    if ((<ILostChangeValues> this.newValue).outcome &&
+      (<ILostChangeValues> this.newValue).outcome.feedback &&
+      (<ILostChangeValues> this.oldValue).outcome &&
+      (<ILostChangeValues> this.oldValue).outcome.feedback) {
       return (
-        this.newValue.outcome.feedback.getHtml() ===
-        this.oldValue.outcome.feedback.getHtml());
+        (<ILostChangeValues> this.newValue).outcome.feedback.getHtml() ===
+        (<ILostChangeValues> this.oldValue).outcome.feedback.getHtml());
     }
     return false;
   }
 
   isOutcomeDestEqual() {
-    if (this.newValue.outcome && this.oldValue.outcome) {
+    if ((<ILostChangeValues> this.newValue).outcome &&
+      (<ILostChangeValues> this.oldValue).outcome) {
       return (
-        this.oldValue.outcome.dest === this.newValue.outcome.dest);
+        (<ILostChangeValues> this.oldValue).outcome.dest ===
+        (<ILostChangeValues> this.newValue).outcome.dest);
     }
     return false;
   }
 
   isDestEqual() {
-    return this.oldValue.dest === this.newValue.dest;
+    return (<ILostChangeValues> this.oldValue).dest ===
+      (<ILostChangeValues> this.newValue).dest;
   }
 
   isFeedbackEqual() {
-    if (this.newValue.feedback && this.oldValue.feedback) {
+    if ((<ILostChangeValues> this.newValue).feedback &&
+    (<ILostChangeValues> this.oldValue).feedback) {
       return (
-        this.newValue.feedback.getHtml() ===
-        this.oldValue.feedback.getHtml());
+        (<ILostChangeValues> this.newValue).feedback.getHtml() ===
+        (<ILostChangeValues> this.oldValue).feedback.getHtml());
     }
     return false;
   }
 
   isRulesEqual() {
-    return isEqual(this.newValue.rules, this.oldValue.rules);
+    return isEqual(
+      (<ILostChangeValues> this.newValue).rules,
+      (<ILostChangeValues> this.oldValue).rules);
   }
 
   // Detects whether an object of the type 'answer_group' or
@@ -142,7 +162,7 @@ export class LostChange {
 })
 export class LostChangeObjectFactory {
   constructor(private utilsService: UtilsService) {
-    // createNew function needs to be binded because it's used a lot in
+    // The createNew function needs to be binded because it's used a lot in
     // calbacks and then `this` would refer to window instead of the service
     // itself.
     this.createNew = this.createNew.bind(this);

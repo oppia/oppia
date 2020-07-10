@@ -1,0 +1,193 @@
+<div class="subtopic-content">
+  <div class="subtopic-content-box">
+    <div class="subtopic-left-box">
+      <md-card class="oppia-subtopics-list-card">
+        <div class="subtopic-title">
+          <p>
+            <strong style="font-size: 1.2em;">Subtopic Title</strong>
+          </p>
+          <form class="form-horizontal" role="form">
+            <input class="form-control protractor-test-subtopic-title-field"
+                   type="text"
+                   ng-blur="$ctrl.updateSubtopicTitle($ctrl.editableTitle)"
+                   ng-model="$ctrl.editableTitle"
+                   maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>"
+                   ng-change="$ctrl.resetErrorMsg()">
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+              </i>
+            </span>
+          </form>
+          <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
+            <em><[errorMsg]></em>
+          </span>
+          <span class="form-text error-message" ng-if="$ctrl.editableTitle.length === 80">
+            <em>The maximum length of subtopic title is 80 characters.</em>
+          </span>
+        </div>
+        <div class="subtopic-thumbnail">
+          <p>
+            <strong style="font-size: 1.2em;">Subtopic Thumbnail</strong>
+          </p>
+          <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
+                              update-filename="$ctrl.updateSubtopicThumbnailFilename"
+                              bg-color="$ctrl.editableThumbnailBgColor"
+                              update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
+                              allowed-bg-colors="$ctrl.allowedBgColors"
+                              aspect-ratio="'4:3'"
+                              preview-title="$ctrl.editableTitle"
+                              preview-description=""
+                              preview-description-bg-color="'#BE563C'"
+                              preview-footer="">
+          </thumbnail-uploader>
+        </div>
+        <div class="subtopic-html">
+          <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
+            <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
+                                 class="protractor-test-edit-subtopic-page-contents"
+                                 local-value="$ctrl.htmlData">
+            </schema-based-editor>
+            <button class="btn btn-success btn-sm protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()"> Save
+            </button>
+          </div>
+          <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
+            <span class="oppia-placeholder">
+              Give a description or explanation of the subtopic.
+              <i class="fa fa-pen"></i>
+            </span>
+            <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">
+            </angular-html-bind>
+          </div>
+        </div>
+      </md-card>
+    </div>
+
+    <div class="subtopic-right-box">
+      <md-card class="oppia-subtopics-list-card topic-skill-count">
+        <div class="skill-count">
+          <span class="skill-count-value"><[$ctrl.subtopic.getSkillSummaries().length]></span>
+          <span class="skill-count-text">Skills</span>
+        </div>
+        <div class="create-topic-skill">
+          <button class="btn add-skill-btn" ng-click="$ctrl.createSkill()">
+            + ADD SKILL
+          </button>
+        </div>
+      </md-card>
+
+      <md-card class="skills-card protractor-test-subtopic-column"
+               dnd-list="$ctrl.subtopic.getSkillSummaries()"
+               dnd-drop="$ctrl.onMoveSkillFinish($ctrl.subtopic.getId())">
+        <div class="subtopic-container">
+          <h3>Drop Uncategorized skill here to assign it to this subtopic.</h3>
+          <div class="skill-id protractor-test-subtopic-skillcard"
+               ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index"
+               dnd-draggable="skillSummary"
+               dnd-dragstart="$ctrl.onMoveSkillStart($ctrl.subtopic.getId(), skillSummary)"
+               dnd-effect-allowed="move"
+               dnd-disable-if="$ctrl.isSkillDeleted(skillSummary)">
+            <div class="skill-card">
+              <a class="protractor-test-assigned-skill-card-text"
+                 ng-if="!$ctrl.isSkillDeleted(skillSummary)"
+                 ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+                  <[skillSummary.getDescription()]>
+              </a>
+              <span ng-if="$ctrl.isSkillDeleted(skillSummary)" style="color: red;">
+                Skill Deleted
+              </span>
+            </div>
+          </div>
+        </div>
+      </md-card>
+
+      <md-card class="skills-card uncategorized-skill-ids protractor-test-uncategorized-skills-container"
+               dnd-list="$ctrl.uncategorizedSkillSummaries"
+               dnd-drop="$ctrl.onMoveSkillFinish(null)">
+        <h3 class="list-header"> Uncategorized Skills(Drag from here) </h3>
+        <div class="uncategorized-skills-container">
+          <div class="skill-id protractor-test-uncategorized-skill-item"
+               ng-repeat="skillSummary in $ctrl.uncategorizedSkillSummaries track by $index"
+               dnd-draggable="skillSummary"
+               dnd-effect-allowed="move"
+               dnd-dragstart="$ctrl.onMoveSkillStart(null, skillSummary)"
+               dnd-disable-if="$ctrl.isSkillDeleted(skillSummary)">
+            <div class="subtopics-list-item skill-card protractor-test-skill-card">
+              <a class="protractor-test-skill-card-text"
+                 ng-if="!$ctrl.isSkillDeleted(skillSummary)"
+                 ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+                  <[skillSummary.getDescription()]>
+              </a>
+              <span ng-if="$ctrl.isSkillDeleted(skillSummary)" style="color: red;">
+                Skill Deleted
+              </span>
+            </div>
+          </div>
+          <p class="intro-card-message" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
+             There are no pending skills in the topic. To add skills to the topic, go to the skills list in
+             the topics and skills dashboard and click 'Assign to Topic' for the required skill.
+          </p>
+        </div>
+      </md-card>
+    </div>
+  </div>
+</div>
+<style>
+  .subtopic-content .oppia-subtopics-list-card,
+  .subtopic-content .skills-card,
+  .subtopic-content .uncategorized-skill-ids {
+    font-family: Roboto, Arial, sans-serif;
+    padding: 30px 55px 30px 45px;
+  }
+
+  .subtopic-content .subtopic-content-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .subtopic-content .error-message {
+    color: #ff0000;
+    font-size: smaller;
+  }
+
+  .subtopic-content .list-header {
+    border-bottom: 2px solid #000000;
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+  }
+
+  .subtopic-content .subtopic-left-box {
+    width: 45%;
+  }
+
+  .subtopic-content .subtopic-thumbnail {
+    margin: 20px 0;
+  }
+
+  .subtopic-content .subtopic-html {
+    margin: 20px 0;
+  }
+
+  .subtopic-content .add-skill-btn {
+    background-color: #008098;
+    color: #FFFFFF;
+    margin: 15px 0;
+  }
+
+  .skill-count-value {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .subtopic-content .subtopic-right-box {
+    width: 30%;
+  }
+
+  .subtopic-content .subtopics-list-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 7px 0;
+  }
+</style>

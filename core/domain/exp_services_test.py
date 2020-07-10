@@ -62,7 +62,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
     Returns:
         int. The number of exploration summaries that are at least editable
-            by the given user.
+        by the given user.
     """
     return len(exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(
@@ -71,6 +71,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
+
     EXP_0_ID = 'An_exploration_0_id'
     EXP_1_ID = 'An_exploration_1_id'
 
@@ -186,7 +187,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -195,25 +196,25 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'B']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA',
                 },
                 'B': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleB',
                 },
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'C']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -239,6 +240,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests exploration query methods which operate on ExplorationSummary
     objects.
     """
+
     EXP_ID_0 = '0_en_arch_bridges_in_england'
     EXP_ID_1 = '1_fi_arch_sillat_suomi'
     EXP_ID_2 = '2_en_welcome_introduce_oppia'
@@ -1047,6 +1049,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     """Tests for loading explorations using imported YAML."""
+
     EXP_ID = 'exp_id0'
     DEMO_EXP_ID = '0'
     TEST_ASSET_PATH = 'test_asset.file'
@@ -1870,16 +1873,23 @@ title: A title
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
-        fs.commit('abc.png', raw_image)
+        fs.commit('image/abc.png', raw_image)
+        # Audio files should not be included in asset downloads.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+        fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
         zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
 
-        self.assertEqual(zf.namelist(), ['A title.yaml', 'assets/abc.png'])
+        self.assertEqual(
+            zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
-        self.assertEqual(zf.open('assets/abc.png').read(), raw_image)
+        self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image)
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
@@ -1950,6 +1960,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents.
     """
+
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
   content_id: content
@@ -2743,6 +2754,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
+
     SECOND_USERNAME = 'abc123'
     SECOND_EMAIL = 'abc123@gmail.com'
 
@@ -3042,6 +3054,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to the exploration commit log."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3051,7 +3064,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     EXP_ID_2 = 'eid2'
 
     COMMIT_ALBERT_CREATE_EXP_1 = {
-        'username': ALBERT_NAME,
         'version': 1,
         'exploration_id': EXP_ID_1,
         'commit_type': 'create',
@@ -3062,7 +3074,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_BOB_EDIT_EXP_1 = {
-        'username': BOB_NAME,
         'version': 2,
         'exploration_id': EXP_ID_1,
         'commit_type': 'edit',
@@ -3073,7 +3084,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_CREATE_EXP_2 = {
-        'username': ALBERT_NAME,
         'version': 1,
         'exploration_id': 'eid2',
         'commit_type': 'create',
@@ -3084,7 +3094,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_EDIT_EXP_1 = {
-        'username': 'albert',
         'version': 3,
         'exploration_id': 'eid1',
         'commit_type': 'edit',
@@ -3095,7 +3104,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_EDIT_EXP_2 = {
-        'username': 'albert',
         'version': 2,
         'exploration_id': 'eid2',
         'commit_type': 'edit',
@@ -3117,7 +3125,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_DELETE_EXP_1 = {
-        'username': 'albert',
         'version': 5,
         'exploration_id': 'eid1',
         'commit_type': 'delete',
@@ -3128,7 +3135,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_PUBLISH_EXP_2 = {
-        'username': 'albert',
         'version': None,
         'exploration_id': 'eid2',
         'commit_type': 'edit',
@@ -3220,6 +3226,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
+
     USER_ID_1 = 'user_1'
     USER_ID_2 = 'user_2'
 
@@ -3401,6 +3408,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3534,6 +3542,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3677,6 +3686,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
@@ -3807,7 +3817,7 @@ title: Old Title
         exploration = self.save_new_default_exploration('exp_id', 'user_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -3818,7 +3828,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -4172,6 +4182,7 @@ title: Old Title
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
+
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     EXP_ID3 = 'exp_id3'
@@ -4362,6 +4373,68 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
+
+    def test_get_exp_with_draft_applied_when_draft_has_invalid_math_tags(self):
+        """Test the method get_exp_with_draft_applied when the draft_changes
+        have invalid math-tags in them.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_customization_args_dict = {
+            'choices': {
+                'value': [
+                    '<p>state customization arg html 1</p>',
+                    '<p>state customization arg html 2</p>',
+                    '<p>state customization arg html 3</p>',
+                    '<p>state customization arg html 4</p>'
+                ]
+            },
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            }
+        }
+        state.update_interaction_id('ItemSelectionInput')
+        state.update_interaction_customization_args(
+            state_customization_args_dict)
+        exp_services.save_new_exploration(self.USER_ID, exploration)
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'State1',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'choices': {
+                    'value': [
+                        '<p>1</p>',
+                        '<p>2</p>',
+                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
+                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                         'uot;"></oppia-noninteractive-math>'),
+                        '<p>4</p>'
+                    ]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 1
+                },
+                'minAllowableSelectionCount': {
+                    'value': 1
+                }
+            }
+        }).to_dict()]
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, 'exp_id'), user_id=self.USER_ID,
+            exploration_id='exp_id',
+            draft_change_list=change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=2).put()
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            'exp_id', self.USER_ID)
+        self.assertIsNone(updated_exploration)
 
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):

@@ -22,7 +22,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 import feconf
 
 
@@ -30,6 +30,7 @@ class QuestionsListHandler(base.BaseHandler):
     """Manages receiving of all question summaries for display in topic editor
     and skill editor page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
@@ -45,7 +46,7 @@ class QuestionsListHandler(base.BaseHandler):
                 raise self.PageNotFoundException(Exception('Invalid skill id'))
 
         try:
-            skill_services.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 

@@ -34,11 +34,12 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Test that values are normalized correctly.
 
         Args:
-          object_class: the class whose normalize() method is to be tested.
-          mappings: a list of 2-element tuples. The first element of
-            each item is expected to be normalized to the second.
-          invalid_items: a list of values. Each of these is expected to raise
-            a TypeError when normalized.
+            object_class: child of BaseObject. The class whose normalize()
+                method is to be tested.
+            mappings: a list of 2-element tuples. The first element of
+                each item is expected to be normalized to the second.
+            invalid_items: a list of values. Each of these is expected to raise
+                a TypeError when normalized.
         """
         for item in mappings:
             assert object_class.normalize(item[0]) == item[1], (
@@ -211,14 +212,23 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.NormalizedString, mappings, invalid_values)
 
     def test_math_latex_string_validation(self):
-        """Tests objects of type MathLatexString."""
-        mappings = [
-            ('123456789', u'123456789'), (u'x \\times y', u'x \\times y'),
+        """Tests objects of type MathExpressionContent."""
+        mappings = [(
+            {'raw_latex': '123456789', 'svg_filename': ''},
+            {'raw_latex': u'123456789', 'svg_filename': u''}
+        ), (
+            {'raw_latex': u'x \\times y', 'svg_filename': u''},
+            {'raw_latex': u'x \\times y', 'svg_filename': u''}
+        )]
+        invalid_vals = [
+            3.0, {'a': 1}, [1, 2, 1], None,
+            {'raw_latex': 1, 'svg_filename': 2},
+            {'raw_latex': ['x^2'], 'svg_filename':{}},
+            {'raw_latex': ('x', 'y'), 'svg_filename': ''},
         ]
-        invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
 
         self.check_normalization(
-            objects.MathLatexString, mappings, invalid_vals)
+            objects.MathExpressionContent, mappings, invalid_vals)
 
     def test_skill_id_string_validation(self):
         """Tests objects of type SkillSelector."""

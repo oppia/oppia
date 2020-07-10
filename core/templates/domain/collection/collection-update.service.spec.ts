@@ -21,7 +21,7 @@
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';

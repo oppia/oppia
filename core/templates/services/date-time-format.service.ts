@@ -38,10 +38,10 @@ export class DateTimeFormatService {
         hour12: true
       });
     } else if (date.getFullYear() === new Date().getFullYear()) {
-      // moment will return Oct 10
+      // Moment will return Oct 10.
       return moment(date).format('MMM D');
     } else {
-      // moment will return 10/22/35(shortDate)
+      // Moment will return 10/22/35(shortDate).
       return moment(date).format('MM/DD/YY');
     }
   }

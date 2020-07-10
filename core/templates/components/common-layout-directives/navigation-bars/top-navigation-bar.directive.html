@@ -18,7 +18,7 @@
   </a>
 </div>
 
-<div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown" role="menu">
+<div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown">
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <li>
       <ul ng-if="$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
@@ -36,7 +36,6 @@
         </li>
         <li ng-class="{'open' : $ctrl.activeMenuName === 'aboutMenu'}" uib-dropdown ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="nav-item  oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" class="nav-link oppia-navbar-tab dropdown-toggle"
-             role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
@@ -148,7 +147,6 @@
     <li ng-class="{'open' : $ctrl.activeMenuName === 'profileMenu'}" uib-dropdown ng-if="$ctrl.userIsLoggedIn" class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
       <a ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})"
          class="nav-link oppia-navbar-dropdown-toggle"
-         role="menuitem"
          aria-haspopup="true"
          aria-expanded="false"
          aria-label="User Menu"

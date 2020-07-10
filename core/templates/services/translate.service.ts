@@ -10,15 +10,17 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License
+// limitations under the License.
 
 /**
  * @fileoverview Translate service for i18n translations
  */
 
 import { Injectable, EventEmitter } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { UtilsService } from './utils.service';
+
+import { ITranslationsDict, TranslationsBackendApiService } from
+  'services/translations-backend-api.service';
 
 /**
  * Commonly used terms in this file.
@@ -56,9 +58,7 @@ export interface LangChangeEvent {
 export class TranslateService {
   currentLang = 'en';
   fallbackLang = 'en';
-  prefix = '/assets/i18n/';
-  suffix = '.json';
-  translations: Array<Object> = [];
+  translations: Array<ITranslationsDict> = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
 
   private onLangChangeEventEmitter = new EventEmitter<LangChangeEvent>();
@@ -66,16 +66,18 @@ export class TranslateService {
     return this.onLangChangeEventEmitter;
   }
 
-  constructor(private http: HttpClient, private utilsService: UtilsService) {}
+  constructor(
+    private translationsBackendApiService: TranslationsBackendApiService,
+    private utilsService: UtilsService) {}
 
   /**
    * Function to fetch JSON file containing translations.
    * @param {string} languageCode - Code of the language
-   * @returns {Promise<Object>} - A promise that resolves to the translations
+   * @returns {Promise<ITranslationsDict>} - A promise that resolves to the
+   * translations
    */
-  fetchTranslations(languageCode:string): Promise<Object> {
-    return this.http.get(
-      `${this.prefix}${languageCode}${this.suffix}`).toPromise();
+  fetchTranslations(languageCode: string): Promise<ITranslationsDict> {
+    return this.translationsBackendApiService.fetchTranslations(languageCode);
   }
 
   /**

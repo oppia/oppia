@@ -18,25 +18,13 @@ workflows:
     # For an illustration of the stages, see https://github.com/oppia/oppia/wiki/images/circleCIWorkflow.png.
 
     jobs:
-      - setup
-      - lint_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - frontend_tests
-      - backend_tests:
-          requires:
-            - frontend_tests
+      - setup_and_typescript_tests
       - e2e_non_prod_tests:
           requires:
-            - typescript_tests
+            - setup_and_typescript_tests
       - e2e_navigation_and_misc:
           requires:
-            - typescript_tests
+            - setup_and_typescript_tests
       - e2e_library_and_collections:
           requires:
             - e2e_navigation_and_misc
@@ -52,6 +40,20 @@ anchor_for_job_defaults: &job_defaults
     - image: *docker_image
 
 commands:
+  install_chrome:
+    # Chrome version installed should be consistent with that installed on Travis CI.
+    description: "Install Chrome"
+    steps:
+      - run:
+          name:  Install chrome version 77.0.3865.75-1
+          command: |
+            sudo apt-get update
+            sudo apt-get install lsb-release
+            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
+            sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+            sudo dpkg -i google-chrome.deb
+            google-chrome --version
+
   merge_target_branch:
     description: "Merge to target branch"
     steps:
@@ -85,8 +87,19 @@ commands:
               fi
             fi
 
+  check_release_chaneglog_update_branch:
+    description: "Skip job for release changelog update PRs"
+    steps:
+      - run:
+          name: Skip build for release changelog update PRs
+          command: |
+            PR_BRANCH=$(curl -s https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER} | jq -r '.head.ref')
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ "$PR_BRANCH" == update-changelog-for-release* ]]; then
+              circleci-agent step halt
+            fi
+
 jobs:
-  setup:
+  setup_and_typescript_tests:
     <<: *job_defaults
     steps:
       - checkout
@@ -97,70 +110,16 @@ jobs:
       - run:
           name: Check that all e2e test files are captured in protractor.conf.js
           command: python -m scripts.check_e2e_tests_are_captured_in_ci
+      - run:
+          name: Run typescript tests
+          command: |
+            python -m scripts.typescript_checks
       - persist_to_workspace:
           root: /home/circleci/
           paths:
             - oppia/node_modules/
             - oppia/third_party/
             - oppia_tools/
-
-  lint_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run lint tests
-          # All the python scripts should behave as modules. Files like the
-          # pre_commit_linter and third_party_size_check need to import other
-          # Python files and that is only possible if we treat it as a module.
-          command: |
-            python -m scripts.third_party_size_check
-            python -m scripts.linters.pre_commit_linter --path=. --verbose
-
-  typescript_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run typescript tests
-          command: |
-            python -m scripts.typescript_checks
-
-  frontend_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run frontend tests
-          command: |
-            python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
-      - run:
-          name: Generate frontend coverage report
-          command: |
-            sudo pip install codecov
-            codecov --file ../karma_coverage_reports/lcov.info -F frontend
-          when: on_success
-
-  backend_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run backend tests
-          command: |
-            python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
@@ -170,12 +129,19 @@ jobs:
     steps:
       - checkout
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
+          # Provide a longer time period for this first test (which omits the
+          # --skip-build flag), since the webpack build process itself can take
+          # up to 10 minutes. If this is not done, then the test may stall due
+          # to lack of test output during this time.
+          no_output_timeout: 20m
+      - check_release_chaneglog_update_branch
       - run:
           name: Run e2e admin page test
           command: |
@@ -194,7 +160,9 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_chaneglog_update_branch
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -226,7 +194,9 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_chaneglog_update_branch
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -257,7 +227,9 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_chaneglog_update_branch
       - merge_target_branch
+      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -267,19 +239,27 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --server_log_level=info
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info
       - run:
           name: Run e2e topic and story editor test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
+      - run:
+          name: Run e2e play voiceovers test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+      - run:
+          name: Run e2e file upload extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
 
 notify:
   webhooks:

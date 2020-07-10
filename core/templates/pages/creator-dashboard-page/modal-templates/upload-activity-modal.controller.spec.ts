@@ -48,29 +48,43 @@ describe('Upload Activity Modal Controller', function() {
   }));
 
   it('should save activity', function() {
+    var documentCopy = angular.copy(document);
     var file = {
       size: 100,
       name: 'file.mp3'
     };
-    spyOn(document, 'getElementById').and.returnValue(<any>{
-      files: [file]
+    // The document has strict type rules which will fail typescript lint tests
+    // without the @ts-ignore.
+    // @ts-ignore
+    spyOn(document, 'getElementById').and.callFake(function() {
+      return {
+        files: [file]
+      };
     });
     $scope.save();
 
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       yamlFile: file
     });
+    document = documentCopy;
   });
 
   it('should not save activity if file is empty', function() {
+    var documentCopy = angular.copy(document);
     spyOn(AlertsService, 'addWarning').and.callThrough();
-    spyOn(document, 'getElementById').and.returnValue(<any>{
-      files: []
+    // The document has strict type rules which will fail typescript lint tests
+    // without the @ts-ignore.
+    // @ts-ignore
+    spyOn(document, 'getElementById').and.callFake(function() {
+      return {
+        files: []
+      };
     });
     $scope.save();
 
     expect(AlertsService.addWarning).toHaveBeenCalledWith(
       'Empty file detected.');
     expect($uibModalInstance.close).not.toHaveBeenCalled();
+    document = documentCopy;
   });
 });

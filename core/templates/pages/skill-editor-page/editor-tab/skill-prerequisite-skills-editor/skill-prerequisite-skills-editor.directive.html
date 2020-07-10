@@ -1,18 +1,32 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <strong class="oppia-prerequisite-skills-text">Prerequisite Skills</strong>
-      <div>
+      <div class="oppia-prerequisite-skills-header">
+        <strong class="heading-text">
+          Prerequisite Skills
+        </strong>
+        <i ng-click="togglePrerequisiteSkills()"
+           class="fa fa-angle-down"
+           ng-if="!prerequisiteSkillsAreShown"
+           aria-hidden="true">
+        </i>
+        <i ng-click="togglePrerequisiteSkills()"
+           class="fa fa-angle-up"
+           ng-if="prerequisiteSkillsAreShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div ng-if="prerequisiteSkillsAreShown">
         <md-card class="skill-id" ng-repeat="skillId in skill.getPrerequisiteSkillIds()">
           <div class="skill-description-card">
-            <span class="oppia-remove-skill-container" ng-click="removeSkillId(skillId)" aria-hidden="true">
-              <i class="material-icons md-18 oppia-remove-skill-icon">&#xE14C;</i>
+            <span ng-click="removeSkillId(skillId)" aria-hidden="true">
+              <i class="material-icons md-18">&#xE14C;</i>
             </span>
             <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
           </div>
         </md-card>
+        <button class="btn oppia-add-prerequisite-skill-button" ng-click="addSkill()">+ ADD PREREQUISITE SKILL</button>
       </div>
-      <button class="btn btn-success btn-sm" ng-click="addSkill()">Add Prerequisite Skill</button>
     </div>
   </div>
 </md-card>
@@ -20,6 +34,13 @@
   skill-prerequisite-skills-editor .skill-id {
     background-color: #efefef;
     margin-left: 0;
+  }
+  skill-prerequisite-skills-editor .oppia-add-prerequisite-skill-button {
+    background-color: #058CA6;
+    color: #FFFFFF;
+  }
+  skill-prerequisite-skills-editor .heading-text {
+    font-size: 16px;
   }
   skill-prerequisite-skills-editor .skill-id:hover {
     background-color: #e0e0e0;
@@ -29,13 +50,17 @@
     padding-left: 10px;
     padding-top: 10px;
   }
-  .oppia-prerequisite-skills-text {
-    font-size: 1.4em;
+  skill-prerequisite-skills-editor .oppia-prerequisite-skills-header {
+    display: flex;
+    justify-content: space-between;
   }
-  .oppia-remove-skill-container {
-    float: right;
+  skill-prerequisite-skills-editor .oppia-prerequisite-skills-header i {
+    display: none;
   }
-  .oppia-remove-skill-icon {
-    color: red;
+
+  @media screen and (max-width: 768px) {
+    skill-prerequisite-skills-editor .oppia-prerequisite-skills-header i {
+      display: block;
+    }
   }
 </style>

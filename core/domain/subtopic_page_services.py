@@ -98,7 +98,7 @@ def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
 
     Returns:
         SubtopicPage or None. The domain object representing a subtopic page
-            with the given id, or None if it does not exist.
+        with the given id, or None if it does not exist.
     """
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic_id)
@@ -120,8 +120,7 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
 
     Returns:
         list(SubtopicPage) or None. The list of domain objects representing the
-            subtopic pages corresponding to given ids list or None if none
-            exist.
+        subtopic pages corresponding to given ids list or None if none exist.
     """
     subtopic_page_ids = []
     for subtopic_id in subtopic_ids:
@@ -151,7 +150,7 @@ def get_subtopic_page_contents_by_id(topic_id, subtopic_id, strict=True):
 
     Returns:
         SubtopicPageContents or None: The page contents for a subtopic page,
-            or None if subtopic page does not exist.
+        or None if subtopic page does not exist.
     """
     subtopic_page = get_subtopic_page_by_id(
         topic_id, subtopic_id, strict=strict)

@@ -22,6 +22,11 @@ import { Injectable } from '@angular/core';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { UtilsService } from 'services/utils.service';
+import { IGraphAnswer } from 'interactions/answer-defs';
+import {
+  IGraphIsomorphicRuleInputs,
+  IGraphPropertyRuleInputs
+} from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -33,8 +38,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is strongly connected.
    */
-  // TODO(#7165): Replace 'any' with the exact type.
-  private isStronglyConnected(graph: any): boolean {
+  private isStronglyConnected(graph: IGraphAnswer): boolean {
     // Uses depth first search on each vertex to try and visit every other
     // vertex in both the normal and inverted adjacency lists.
     if (graph.vertices.length === 0) {
@@ -71,10 +75,9 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is weakly connected.
    */
-  // TODO(#7165): Replace 'any' with the exact type.
-  private isWeaklyConnected(graph: any): boolean {
+  private isWeaklyConnected(graph: IGraphAnswer): boolean {
     // Generates adjacency lists assuming graph is undirected, then uses depth
-    // first search on node 0 to try to reach every other vertex
+    // first search on node 0 to try to reach every other vertex.
     if (graph.vertices.length === 0) {
       return true;
     }
@@ -94,11 +97,10 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
-  // TODO(#7165): Replace 'any' with the exact type.
-  private isAcyclic(graph: any): boolean {
+  private isAcyclic(graph: IGraphAnswer): boolean {
     // Uses depth first search to ensure that we never have an edge to an
     // ancestor in the search tree.
-    var isVisited = graph.vertices.map(() => {
+    var nodeStatus = graph.vertices.map(() => {
       return this.gus.DFS_STATUS.UNVISITED;
     });
     var adjacencyLists = this.gus.constructAdjacencyLists(
@@ -106,9 +108,9 @@ export class GraphInputRulesService {
     for (var startVertex = 0;
       startVertex < graph.vertices.length;
       startVertex++) {
-      if (isVisited[startVertex] === this.gus.DFS_STATUS.UNVISITED) {
+      if (nodeStatus[startVertex] === this.gus.DFS_STATUS.UNVISITED) {
         if (this.gus.findCycle(
-          startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
+          startVertex, -1, adjacencyLists, nodeStatus, graph.isDirected)) {
           return false;
         }
       }
@@ -120,9 +122,8 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
-  // TODO(#7165): Replace 'any' with the exact type.
-  private isRegular(graph: any): boolean {
-    // Checks that every vertex has outdegree and indegree equal to the first
+  private isRegular(graph: IGraphAnswer): boolean {
+    // Checks that every vertex has outdegree and indegree equal to the first.
     if (graph.vertices.length === 0) {
       return true;
     }
@@ -149,8 +150,8 @@ export class GraphInputRulesService {
     });
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  private isIsomorphic(graph1: any, graph2: any): boolean {
+
+  private isIsomorphic(graph1: IGraphAnswer, graph2: IGraphAnswer): boolean {
     if (graph1.vertices.length !== graph2.vertices.length) {
       return false;
     }
@@ -159,7 +160,7 @@ export class GraphInputRulesService {
     var adj2 = this.gus.constructAdjacencyMatrix(graph2);
 
     // Check that for every vertex from the first graph there is a vertex in
-    // the second graph with the same sum of weights of outgoing edges
+    // the second graph with the same sum of weights of outgoing edges.
     var degrees1 = adj1.map(function(value) {
       return value.reduce(function(prev, cur) {
         return prev + cur;
@@ -196,8 +197,10 @@ export class GraphInputRulesService {
     }
     return false;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  HasGraphProperty(answer: any, inputs: {p: string}): boolean {
+
+  HasGraphProperty(
+      answer: IGraphAnswer,
+      inputs: IGraphPropertyRuleInputs): boolean {
     if (inputs.p === 'strongly_connected') {
       return this.isStronglyConnected(answer);
     } else if (inputs.p === 'weakly_connected') {
@@ -210,8 +213,10 @@ export class GraphInputRulesService {
       return false;
     }
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  IsIsomorphicTo(answer: any, inputs: {g: any}): boolean {
+
+  IsIsomorphicTo(
+      answer: IGraphAnswer,
+      inputs: IGraphIsomorphicRuleInputs): boolean {
     return this.isIsomorphic(answer, inputs.g);
   }
 }

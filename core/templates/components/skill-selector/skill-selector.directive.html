@@ -1,10 +1,10 @@
-<div class="skill-container oppia-skill-container-extra">
-  <div class="list-group oppia-list-group">
+<div class="skill-selector-parent skill-container" style="display:flex;  flex-direction: row;">
+  <div class="list-group" style="width:70%">
     <md-card layout="row" class="list-view-item protractor-test-skill-select-header">
       Search By Skill
       <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
     </md-card>
-    <div class="oppia-selected-skill-container">
+    <div class="skill-list-box">
       <md-radio-group ng-model="selectedSkill" ng-change="setSelectedSkillId()">
         <md-card ng-if="!hasUntriagedSkills(topicName)" ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
           <md-card layout="row" class="list-view-item">
@@ -58,42 +58,17 @@
       </md-card>
     </div>
     <br>
-    <button class="btn btn-secondary"  ng-click="clearAllFilters()">Clear All Filters</button>
+    <button class="btn btn-secondary" ng-click="clearAllFilters()">Clear All Filters</button>
   </div>
 </div>
-
 <style>
-  .oppia-skill-container-extra {
-    display: flex;
-    flex-direction: row;
-  }
-  .oppia-list-group {
-    width: 70%;
-  }
-  .oppia-selected-skill-container {
+  .skill-selector-parent .skill-list-box {
     max-height: 50vh;
     overflow-y: auto;
   }
-  .oppia-skill-selector-text {
-    padding-left: 10px;
-  }
-  .oppia-subtopic-name {
-    padding-bottom: 20px;
-    padding-left: 10px;
-    padding-top: 20px;
-  }
-  .oppia-skills-list-item-text {
-    margin-left: 10px;
-  }
-  .oppia-list-group-extra {
-    padding-left: 20px;
-    width: 30%;
-  }
-  .oppia-list-view-item {
-    padding-left: 10px;
-  }
-  .oppia-allow-skills {
-    max-height: 25vh;
-    overflow-y: auto;
+  @media screen and (max-width: 768px) {
+    .skill-selector-parent .skill-list-box {
+      max-height: initial;
+    }
   }
 </style>

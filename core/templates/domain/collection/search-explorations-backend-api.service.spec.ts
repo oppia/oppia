@@ -73,7 +73,7 @@ describe('Exploration search backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
       let query = escape(btoa('count'));
 
-      // Search result object returnable from the backend
+      // Search result object returnable from the backend.
       let searchResults = {
         collection_node_metadata_list: [{
           id: '12',

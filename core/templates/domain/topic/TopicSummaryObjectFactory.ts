@@ -46,7 +46,7 @@ export class TopicSummary {
     this._uncategorizedSkillCount = uncategorizedSkillCount;
     this._subtopicCount = subtopicCount;
   }
-  // Instance methods
+  // ---- Instance methods ----
 
   getId(): string {
     return this._id;

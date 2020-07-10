@@ -145,14 +145,44 @@ export class DragAndDropSortInputValidationService {
         areAnyItemsDuplicated = false;
 
         switch (rule.type) {
+          case 'HasElementXAtPositionY':
+            if (!customizationArgs.choices.value.includes(<string>inputs.x)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'contains a choice that does not match any of ' +
+                  'the choices in the customization arguments.')
+              });
+            }
+            if (inputs.y > customizationArgs.choices.value.length) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'refers to an invalid choice position.')
+              });
+            }
+            break;
           case 'HasElementXBeforeElementY':
             if (inputs.x === inputs.y) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because both the ' +
-                  'selected elements are same.')
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'will never be matched because both the selected ' +
+                  'elements are same.')
+              });
+            }
+            if (
+              !customizationArgs.choices.value.includes(<string>inputs.x) ||
+              !customizationArgs.choices.value.includes(<string>inputs.y)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'contains choices that do not match any of ' +
+                  'the choices in the customization arguments.')
               });
             }
             break;
@@ -176,10 +206,11 @@ export class DragAndDropSortInputValidationService {
               }
             }
 
-            if (areAnyItemsEmpty) {
+            if (areAnyItemsEmpty || xInputs.length === 0) {
+              var message = areAnyItemsEmpty ? 'the items are' : 'the list is';
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are nonempty.'
+                message: `Please ensure ${message} nonempty.`
               });
             }
 
@@ -202,6 +233,20 @@ export class DragAndDropSortInputValidationService {
                   'elements cannot occupy the same position.')
               });
             }
+            var sortedCustomArgsChoices = (
+              customizationArgs.choices.value.sort());
+            var flattenedAndSortedXInputs = (
+              xInputs.reduce((acc, val) => acc.concat(val), []).sort());
+            if (
+              !angular.equals(
+                sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'options do not match customization argument choices.')
+              });
+            }
             break;
           default:
         }
@@ -216,11 +261,10 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
-                  '.')
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'will never be matched because it is made redundant by ' +
+                  `rule ${ranges[k].ruleIndex} from answer group ` +
+                  `${ranges[k].answerGroupIndex}.`)
               });
             }
           }

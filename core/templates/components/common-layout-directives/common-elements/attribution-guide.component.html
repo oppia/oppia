@@ -1,0 +1,47 @@
+<div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
+  <div style="height: 3px; width: 3px;" class="protractor-test-neutral-element"></div>
+
+  <a class="oppia-attribution-image-link" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+    <img alt="Creative Commons License" class="oppia-attribution-image" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
+  </a><br>
+  <a class="oppia-attribution-link oppia-attribution-link-extra" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
+</div>
+<style>
+  .oppia-cc-icon a.oppia-attribution-image-link,
+  .oppia-cc-icon a.oppia-attribution-link {
+    text-decoration: none;
+  }
+  .oppia-cc-icon a.oppia-attribution-image-link:focus > img {
+    outline: 1px dotted #212121;
+    outline: auto 5px -webkit-focus-ring-color;
+  }
+  .oppia-cc-icon a.oppia-attribution-link:hover,
+  .oppia-cc-icon a.oppia-attribution-link:focus {
+    text-decoration: underline;
+  }
+  .oppia-cc-icon {
+    bottom: 50px;
+    opacity: 0.4;
+    position: fixed;
+    right: 25px;
+  }
+
+  .oppia-cc-icon:hover {
+    opacity: 0.7;
+    text-decoration: none;
+  }
+
+  .oppia-neutral-element {
+    height: 3px;
+    width: 3px;
+  }
+
+  .oppia-attribution-image {
+    border-width: 0;
+    height: 24px;
+  }
+
+  .oppia-attribution-link-extra {
+    font-size: 10px;
+  }
+</style>

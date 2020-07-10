@@ -132,7 +132,7 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
-      // ngHtml2JsPreprocessor adds the html inside $templateCache,
+      // Key ngHtml2JsPreprocessor adds the html inside $templateCache,
       // the key that we use for that cache needs to be exactly the same as
       // the templateUrl in directive JS. The stripPrefix and prependPrefix are
       // used for modifying the $templateCache keys.
@@ -169,7 +169,7 @@ module.exports = function(config) {
               {
                 loader: 'ts-loader',
                 options: {
-                  // this is needed for thread-loader to work correctly
+                  // This is needed for thread-loader to work correctly.
                   happyPackMode: true
                 }
               },

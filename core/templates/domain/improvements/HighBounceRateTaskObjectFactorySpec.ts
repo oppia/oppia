@@ -58,7 +58,7 @@ describe('High bounce rate task', function() {
 
   it('should return new task if any state has a high bounce rate', () => {
     const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction']);
+      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
 
     expect(task).not.toBeNull();
     expect(task.taskType).toEqual('high_bounce_rate');
@@ -72,14 +72,21 @@ describe('High bounce rate task', function() {
   it('should return null if state has a low bounce rate', () => {
     expect(
       highBounceRateTaskObjectFactory.createFromExplorationStats(
-        this.newExplorationStatsWithBounceRate(200, 0.15), ['Introduction']))
+        this.newExplorationStatsWithBounceRate(200, 0.15), ['Introduction'], 1))
+      .toEqual([null]);
+  });
+
+  it('should return null if state has no early quit playthroughs', () => {
+    expect(
+      highBounceRateTaskObjectFactory.createFromExplorationStats(
+        this.newExplorationStatsWithBounceRate(200, 0.15), ['Introduction'], 0))
       .toEqual([null]);
   });
 
   it('should return null if exploration starts are too low', () => {
     expect(
       highBounceRateTaskObjectFactory.createFromExplorationStats(
-        this.newExplorationStatsWithBounceRate(80, 0.50), ['Introduction']))
+        this.newExplorationStatsWithBounceRate(80, 0.50), ['Introduction'], 1))
       .toEqual([null]);
   });
 
@@ -167,17 +174,17 @@ describe('High bounce rate task', function() {
 
   it('should update status based on changes to exploration stats', () => {
     const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction']);
+      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isResolved()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.10));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.10), 1);
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.80));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.80), 1);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isResolved()).toBeFalse();
@@ -185,7 +192,7 @@ describe('High bounce rate task', function() {
 
   it('should throw when provided stats from a different exploration', () => {
     const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction']);
+      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
 
     const statsWithWrongId = (
       explorationStatsObjectFactory.createFromBackendDict({
@@ -205,7 +212,7 @@ describe('High bounce rate task', function() {
           },
         },
       }));
-    expect(() => task.refreshStatus(statsWithWrongId)).toThrowError(
+    expect(() => task.refreshStatus(statsWithWrongId, 1)).toThrowError(
       'Expected stats for exploration id="eid" v1 but given stats are for ' +
       'exploration id="eid2" v1');
 
@@ -227,25 +234,25 @@ describe('High bounce rate task', function() {
           },
         },
       }));
-    expect(() => task.refreshStatus(statsWithWrongVersion)).toThrowError(
+    expect(() => task.refreshStatus(statsWithWrongVersion, 1)).toThrowError(
       'Expected stats for exploration id="eid" v1 but given stats are for ' +
       'exploration id="eid" v2');
   });
 
   it('should not update status when number of starts is too low', () => {
     const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction']);
+      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(25, 0.05));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(25, 0.05), 1);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
   });
 
   it('should stay resolved regardless of changes in exploration stats', () => {
     const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction']);
+      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
     expect(task.isResolved()).toBeFalse();
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
@@ -255,12 +262,12 @@ describe('High bounce rate task', function() {
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.05));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.05), 1);
     expect(task.isResolved()).toBeTrue();
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.95));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.95), 1);
     expect(task.isResolved()).toBeTrue();
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();

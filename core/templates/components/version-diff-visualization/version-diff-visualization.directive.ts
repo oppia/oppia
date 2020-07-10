@@ -19,7 +19,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 require(
@@ -52,7 +52,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
         //     later version
         // - v1States: the states dict for the earlier version of the
         // exploration
-        // - v2States: the states dict for the later version of the exploration
+        // - v2States: the states dict for the later version of the exploration.
         getDiffData: '&diffData',
         // The header for the pane of the state comparison modal corresponding
         // to the earlier version of the exploration.
@@ -67,14 +67,14 @@ angular.module('oppia').directive('versionDiffVisualization', [
       controllerAs: '$ctrl',
       controller: ['$uibModal', function($uibModal) {
         var ctrl = this;
-        // Constants for color of nodes in diff graph
+        // Constants for color of nodes in diff graph.
         var COLOR_ADDED = '#4EA24E';
         var COLOR_DELETED = '#DC143C';
         var COLOR_CHANGED = '#1E90FF';
         var COLOR_UNCHANGED = 'beige';
         var COLOR_RENAMED_UNCHANGED = '#FFD700';
 
-        // Constants for names in legend
+        // Constants for names in legend.
         var NODE_TYPE_ADDED = 'Added';
         var NODE_TYPE_DELETED = 'Deleted';
         var NODE_TYPE_CHANGED = 'Changed';
@@ -89,7 +89,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
 
         // Object whose keys are legend node names and whose values are
         // 'true' or false depending on whether the state property is used in
-        // the diff graph. (Will be used to generate legend)
+        // the diff graph. (Will be used to generate legend).
         var _stateTypeUsed = {};
         var diffGraphNodes = {};
         var nodesData;
@@ -247,7 +247,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
             finalStateIds: ctrl.getDiffData().finalStateIds
           };
 
-          // Generate the legend graph
+          // Generate the legend graph.
           ctrl.legendGraph = {
             nodes: {},
             links: []

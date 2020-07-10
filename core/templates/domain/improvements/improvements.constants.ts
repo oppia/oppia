@@ -23,6 +23,10 @@ export namespace ImprovementsConstants {
     constants.TASK_TYPE_HIGH_BOUNCE_RATE);
   export const TASK_TYPE_NEEDS_GUIDING_RESPONSES: string = (
     constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+  export const TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP: string = (
+    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+  export const TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS: string = (
+    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
 
   export const TASK_ENTITY_TYPE_EXPLORATION: string = (
     constants.TASK_ENTITY_TYPE_EXPLORATION);
@@ -37,4 +41,9 @@ export namespace ImprovementsConstants {
   export const HIGH_BOUNCE_RATE_THRESHOLD_HIGH: number = 0.25;
   export const HIGH_BOUNCE_RATE_THRESHOLD_LOW: number = 0.20;
   export const HIGH_BOUNCE_RATE_MIN_EXP_STARTS: number = 100;
+
+  export const EXPLORATION_IMPROVEMENTS_URL: string = (
+    `/improvements/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
+  export const EXPLORATION_IMPROVEMENTS_HISTORY_URL: string = (
+    `/improvements/history/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
 }
