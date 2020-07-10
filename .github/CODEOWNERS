@@ -193,15 +193,15 @@
 # Global components and filters.
 /core/templates/components/button-directives/* @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
-/core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @ankita240796
