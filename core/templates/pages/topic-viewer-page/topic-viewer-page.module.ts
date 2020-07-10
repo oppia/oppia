@@ -44,6 +44,16 @@ import { ObjectsDomainConstants } from
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 
+import { PracticeTabComponent } from
+  'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import { StoriesListComponent } from
+  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
+import { SubtopicsListComponent } from
+  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
+import { TopicViewerNavbarBreadcrumbComponent } from
+  // eslint-disable-next-line max-len
+  'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -51,10 +61,14 @@ import { TopicViewerDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent, PracticeTabComponent,
+    TopicViewerNavbarBreadcrumbComponent, StoriesListComponent,
+    SubtopicsListComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent, PracticeTabComponent,
+    TopicViewerNavbarBreadcrumbComponent, StoriesListComponent,
+    SubtopicsListComponent
   ],
   providers: [
     AppConstants,
