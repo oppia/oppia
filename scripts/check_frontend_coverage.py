@@ -428,7 +428,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'teacher.ts',
     'teacher2.ts',
     'test-interaction-panel.directive.ts',
-    'thread-table.directive.ts',
     'thumbnail-uploader.directive.ts',
     'top-navigation-bar.directive.ts',
     'topic-creation.service.ts',

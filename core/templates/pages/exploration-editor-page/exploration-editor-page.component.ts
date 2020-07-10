@@ -54,7 +54,7 @@ require(
 require('pages/exploration-editor-page/feedback-tab/feedback-tab.directive.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.directive.ts');
+  'thread-table.component.ts');
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
