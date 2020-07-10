@@ -780,7 +780,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         expected_output = [
             u'[u\'ERROR\', u\'There are some invalid inputs that need to be '
-            u'resolved before running the upgradation job. The invalid inputs '
+            u'resolved before running the upgrade job. The invalid inputs '
             u'are as follows:\']',
             u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', '
             u'u\'exp_id0 State5: \\xe2\\xe9\\xee\\xf4\\xfc\']]',
@@ -789,7 +789,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             u'(cos(A)*arccos(B) - arcsin(A)*sin(B))\', '
             u'u\'exp_id0 State4: sqrt(x/y)\']]',
             u'[u\'Valid Math Equation\', [u\'exp_id0 State2: y=m*x+c\', '
-            u'u\'exp_id0 State6: sin(theta)^2 + cos(theta)^2 = 1\']]',
+            u'u\'exp_id0 State6: (sin(theta))^2 + (cos(theta))^2 = 1\']]',
             u'[u\'Valid Numeric Expression\', [u\'exp_id0 State9: '
             u'sqrt(4)-abs(3)\', u\'exp_id0 State8: (3.5+6)^2\']]']
 
@@ -799,9 +799,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         """Checks that the number of valid explorations yielded is less than
         the limit mentioned by the VALID_MATH_EXP_YIELD_LIMIT constant.
         """
-        one_off_job_cls = exp_jobs_one_off.MathExpressionValidationOneOffJob
         # Resetting the threshold only for testing purposes.
-        one_off_job_cls.VALID_MATH_INPUTS_YIELD_LIMIT = 3
+        exp_jobs_one_off.VALID_MATH_INPUTS_YIELD_LIMIT = 3
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -950,7 +949,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [
             u'[u\'Valid Algebraic Expression\', [u\'exp_id0 State3: '
             u'sqrt(x/y)\', u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: '
-            u'pi* r^2\', u\'exp_id0 State4: (a+b+c)^3\']]',
+            u'pi* r^2\']]',
             u'[u\'Valid Math Equation\', [u\'exp_id0 State2: y=m*x+c\']]']
 
         self.assertEqual(actual_output, expected_output)
@@ -1008,8 +1007,9 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [
             u'[u\'Valid Algebraic Expression\', [u\'exp_id0 State1: x+y-z\']]',
             u'[u\'ERROR\', [u\'The exploration with ID: exp_id0 and state '
-            u'name: State1 contains inputs that correspond to two different '
-            u'types. Please resolve this before running the upgradation '
+            u'name: State1 contains inputs that correspond to multiple '
+            u'different types: Valid Math Equation, Valid Algebraic '
+            u'Expression. Please resolve this before running the upgrade '
             u'job.\']]',
             u'[u\'Valid Math Equation\', [u\'exp_id0 State1: y=mx+c\']]']
 
@@ -1057,7 +1057,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             self, exp_jobs_one_off.MathExpressionValidationOneOffJob)
 
 
-class MathExpressionUpgradationOneOffJobTests(test_utils.GenericTestBase):
+class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -1067,7 +1067,7 @@ class MathExpressionUpgradationOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(MathExpressionUpgradationOneOffJobTests, self).setUp()
+        super(MathExpressionUpgradeOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -1075,7 +1075,7 @@ class MathExpressionUpgradationOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_explorations_are_properly_upgraded(self):
-        """Checks output is produced only for desired interactions."""
+        """Checks that valid explorations are appropriately upgraded."""
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1159,12 +1159,12 @@ class MathExpressionUpgradationOneOffJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         job_id = (
-            exp_jobs_one_off.MathExpressionUpgradationOneOffJob.create_new())
-        exp_jobs_one_off.MathExpressionUpgradationOneOffJob.enqueue(job_id)
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.create_new())
+        exp_jobs_one_off.MathExpressionUpgradeOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.MathExpressionUpgradationOneOffJob.get_output(
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
                 job_id))
         expected_output = [
             u'[u\'Valid Algebraic Expression\', [u\'exp_id0 State1: x+y-z\']]',
@@ -1184,6 +1184,66 @@ class MathExpressionUpgradationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.get_interaction_id_by_state_name('State3'),
             'NumericExpressionInput')
+
+    def test_explorations_with_invalid_inputs_are_not_upgraded(self):
+        """Checks that invalid explorations are not upgraded and an error is
+        yielded."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('MathExpressionInput')
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x<y>z'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        job_id = (
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.create_new())
+        exp_jobs_one_off.MathExpressionUpgradeOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
+                job_id))
+        expected_output = [
+            u'[u\'ERROR\', u\'There are some invalid inputs that need to be '
+            u'resolved before running the upgrade job. Please ensure that the '
+            u'audit job runs without any errors before running the upgrade '
+            u'job. The invalid inputs are as follows:\']',
+            u'[u\'Invalid\', [u\'exp_id0 State1: x<y>z\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
+        exploration = exp_fetchers.get_exploration_by_id('exp_id0')
+
+        # The exploration contains an invalid input and must therefore, not be
+        # upgraded to one of the new interactions.  
+        self.assertEqual(
+            exploration.get_interaction_id_by_state_name('State1'),
+            'MathExpressionInput')
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
@@ -1224,7 +1284,7 @@ class MathExpressionUpgradationOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(
-            self, exp_jobs_one_off.MathExpressionUpgradationOneOffJob)
+            self, exp_jobs_one_off.MathExpressionUpgradeOneOffJob)
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):

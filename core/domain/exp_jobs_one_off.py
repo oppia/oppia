@@ -81,9 +81,14 @@ AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 # This threshold puts a cap on the number of valid inputs, i.e.,
 # expressions/equations that can be yielded by the math expression one-off jobs.
 VALID_MATH_INPUTS_YIELD_LIMIT = 200
+_INVALID_EXPR = 'Invalid'
+_VALID_ALG_EXPR = 'Valid Algebraic Expression'
+_VALID_NUM_EXPR = 'Valid Numeric Expression'
+_VALID_MATH_EQN = 'Valid Math Equation'
 
 
-def clean_math_expression(math_expression):
+
+def _clean_math_expression(math_expression):
     """Cleans a given math expression and formats it so that it is compatible
     with the new interactions' validators.
 
@@ -128,11 +133,11 @@ def clean_math_expression(math_expression):
     trig_fns = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
 
     # Shifting powers in trig functions to the end.
-    # For eg. 'sin^2(x)' -> 'sin(x)^2'.
+    # For eg. 'sin^2(x)' -> '(sin(x))^2'.
     for trig_fn in trig_fns:
         math_expression = re.sub(
             r'%s(\^\d)\((.)\)' % trig_fn,
-            r'%s(\2)\1' % trig_fn, math_expression)
+            r'(%s(\2))\1' % trig_fn, math_expression)
 
     # Adding parens to trig functions that don't have
     # any. For eg. 'cosA' -> 'cos(A)'.
@@ -267,27 +272,29 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
 
-                            rule_input = clean_math_expression(rule_input)
+                            rule_input = _clean_math_expression(rule_input)
 
-                            validity = 'Invalid'
-                            if is_valid_math_expression(rule_input):
-                                validity = 'Valid Algebraic Expression'
+                            validity = _INVALID_EXPR
+                            if is_valid_math_expression(
+                                    rule_input, algebraic=True):
+                                validity = _VALID_ALG_EXPR
                             elif is_valid_math_expression(
                                     rule_input, algebraic=False):
-                                validity = 'Valid Numeric Expression'
+                                validity = _VALID_NUM_EXPR
                             elif is_valid_math_equation(rule_input):
-                                validity = 'Valid Math Equation'
+                                validity = _VALID_MATH_EQN
 
-                            if validity != 'Invalid':
+                            if validity != _INVALID_EXPR:
                                 types_of_inputs.add(validity)
 
                             if len(types_of_inputs) > 1:
                                 yield ('ERROR', (
                                     'The exploration with ID: %s and state '
                                     'name: %s contains inputs that correspond '
-                                    'to two different types. Please resolve '
-                                    'this before running the upgradation '
-                                    'job.' % (item.id, state_name)))
+                                    'to multiple different types: %s. Please '
+                                    'resolve this before running the upgrade '
+                                    'job.' % (item.id, state_name, 
+                                        ', '.join(list(types_of_inputs)))))
 
                             output_values = '%s %s: %s' % (
                                 item.id, state_name, rule_input)
@@ -298,15 +305,15 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if key.startswith('Valid'):
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
-            if key == 'Invalid' and len(values) != 0:
+            if key == _INVALID_EXPR and len(values) != 0:
                 yield ('ERROR', (
                     'There are some invalid inputs that need to be resolved '
-                    'before running the upgradation job. The invalid inputs '
+                    'before running the upgrade job. The invalid inputs '
                     'are as follows:'))
             yield (key, values)
 
 
-class MathExpressionUpgradationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of explorations that use the MathExpressionInput
     along with the validity and type (expression/equation) of the inputs present
     in the exploration.
@@ -326,6 +333,7 @@ class MathExpressionUpgradationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         is_valid_math_equation = schema_utils.get_validator(
             'is_valid_math_equation')
         ltt = latex2text.LatexNodes2Text()
+        committer_id = 'OppiaMigrationBot'
 
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
@@ -339,23 +347,24 @@ class MathExpressionUpgradationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
 
-                            rule_input = clean_math_expression(rule_input)
+                            rule_input = _clean_math_expression(rule_input)
 
-                            validity = 'Invalid'
-                            if is_valid_math_expression(rule_input):
-                                validity = 'Valid Algebraic Expression'
+                            validity = _INVALID_EXPR
+                            if is_valid_math_expression(
+                                    rule_input, algebraic=True):
+                                validity = _VALID_ALG_EXPR
                                 new_interaction_id = 'AlgebraicExpressionInput'
                             elif is_valid_math_expression(
                                     rule_input, algebraic=False):
-                                validity = 'Valid Numeric Expression'
+                                validity = _VALID_NUM_EXPR
                                 new_interaction_id = 'NumericExpressionInput'
                             elif is_valid_math_equation(rule_input):
-                                validity = 'Valid Math Equation'
+                                validity = _VALID_MATH_EQN
                                 new_interaction_id = 'MathEquationInput'
 
-                            if validity != 'Invalid':
+                            if validity != _INVALID_EXPR:
                                 rule_spec.inputs['x'] = rule_input
-                                if validity == 'Valid Math Equation':
+                                if validity == _VALID_MATH_EQN:
                                     rule_spec.inputs['y'] = 'both'
                                 rule_spec.rule_type = 'MatchesExactlyWith'
 
@@ -366,24 +375,33 @@ class MathExpressionUpgradationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                         new_answer_groups.append(new_answer_group.to_dict())
 
-                    exp_services.update_exploration(
-                        'admin', item.id, [exp_domain.ExplorationChange({
-                            'cmd': 'edit_state_property',
-                            'state_name': state_name,
-                            'property_name': 'widget_id',
-                            'new_value': new_interaction_id
-                        }), exp_domain.ExplorationChange({
-                            'cmd': 'edit_state_property',
-                            'state_name': state_name,
-                            'property_name': 'answer_groups',
-                            'new_value': new_answer_groups
-                        })], 'Upgraded interaction to %s.' % new_interaction_id)
+                    if new_interaction_id != '':
+                        exp_services.update_exploration(
+                            committer_id, item.id, [
+                                exp_domain.ExplorationChange({
+                                    'cmd': 'edit_state_property',
+                                    'state_name': state_name,
+                                    'property_name': 'widget_id',
+                                    'new_value': new_interaction_id
+                                }), exp_domain.ExplorationChange({
+                                    'cmd': 'edit_state_property',
+                                    'state_name': state_name,
+                                    'property_name': 'answer_groups',
+                                    'new_value': new_answer_groups
+                                })], 'Upgraded interaction to %s.' % (
+                                    new_interaction_id))
 
     @staticmethod
     def reduce(key, values):
         if key.startswith('Valid'):
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
+            if key == _INVALID_EXPR and len(values) != 0:
+                yield ('ERROR', (
+                    'There are some invalid inputs that need to be resolved '
+                    'before running the upgrade job. Please ensure that the '
+                    'audit job runs without any errors before running the '
+                    'upgrade job. The invalid inputs are as follows:'))
             yield (key, values)
 
 

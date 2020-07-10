@@ -392,7 +392,7 @@ class _Validators(python_utils.OBJECT):
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
 
     @staticmethod
-    def is_valid_math_expression(obj, algebraic=True):
+    def is_valid_math_expression(obj, algebraic):
         """Checks if the given obj (a string) represents a valid algebraic or
         numeric expression. Note that purely-numeric expressions are NOT
         considered valid algebraic expressions.
@@ -434,8 +434,10 @@ class _Validators(python_utils.OBJECT):
 
         # Both sides have to be valid expressions and at least one of them has
         # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_math_expression(lhs)
-        rhs_is_algebraically_valid = is_valid_math_expression(rhs)
+        lhs_is_algebraically_valid = is_valid_math_expression(
+            lhs, algebraic=True)
+        rhs_is_algebraically_valid = is_valid_math_expression(
+            rhs, algebraic=True)
 
         lhs_is_numerically_valid = is_valid_math_expression(
             lhs, algebraic=False)

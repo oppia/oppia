@@ -488,8 +488,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         is_valid_math_expression = schema_utils.get_validator(
             'is_valid_math_expression')
 
-        self.assertTrue(is_valid_math_expression('a+b*2'))
-        self.assertFalse(is_valid_math_expression('3+4/2'))
+        self.assertTrue(is_valid_math_expression('a+b*2', algebraic=True))
+        self.assertFalse(is_valid_math_expression('3+4/2', algebraic=True))
 
     def test_is_valid_numeric_expression_validator(self):
         """Tests for the is_valid_math_expression static method with
@@ -498,8 +498,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         is_valid_math_expression = schema_utils.get_validator(
             'is_valid_math_expression')
 
-        self.assertFalse(is_valid_math_expression('a+b*2', False))
-        self.assertTrue(is_valid_math_expression('3+4/2', False))
+        self.assertFalse(is_valid_math_expression('a+b*2', algebraic=False))
+        self.assertTrue(is_valid_math_expression('3+4/2', algebraic=False))
 
     def test_is_valid_math_equation_validator(self):
         """Tests for the is_valid_math_equation static method."""
