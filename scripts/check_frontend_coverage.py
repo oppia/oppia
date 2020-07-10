@@ -331,7 +331,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'rule-editor.directive.ts',
     'rule-type-selector.directive.ts',
     'sanitized-url-editor.directive.ts',
-    'schema-based-bool-editor.component.ts',
     'schema-based-choices-editor.directive.ts',
     'schema-based-custom-editor.directive.ts',
     'schema-based-custom-viewer.directive.ts',
