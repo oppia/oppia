@@ -310,7 +310,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'promo-bar.directive.ts',
     'promo-bar.service.ts',
     'python-program.tokenizer.ts',
-    'question-creation.service.ts',
     'question-difficulty-selector.directive.ts',
     'question-editor.directive.ts',
     'question-opportunities.directive.ts',
