@@ -566,22 +566,6 @@ class Exploration(python_utils.OBJECT):
                 state_domain.Solution.from_dict(idict['id'], idict['solution'])
                 if idict['solution'] else None)
 
-            if idict['id']:
-                # Populate missing customization arguments.
-                idict['customization_args'], new_content_ids = (
-                    customization_args_util.get_full_customization_args(
-                        idict['customization_args'],
-                        interaction_registry.Registry.get_interaction_by_id(
-                            idict['id']).customization_arg_specs
-                    )
-                )
-
-                for new_content_id in new_content_ids:
-                    sdict['recorded_voiceovers']['voiceovers_mapping'][
-                        new_content_id] = {}
-                    sdict['written_translations']['translations_mapping'][
-                        new_content_id] = {}
-
             state.interaction = state_domain.InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
@@ -2466,6 +2450,43 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
+
+        def convert_ca_unicode_to_subtitled_unicode(ca_value, ca_default):
+            ca_default = ca_default.copy()
+            if ca_value is not None:
+                ca_default['unicode_str'] = ca_value
+            return ca_default, [ca_default['content_id']]
+        
+        def convert_ca_html_to_subtitled_html(ca_value, ca_default):
+            ca_default = ca_default.copy()
+            if ca_value is not None:
+                ca_default['html'] = ca_value
+            return ca_default, [ca_default['content_id']]
+
+        def convert_ca_html_list_to_subtitled_html_list(
+                ca_value, ca_default, next_content_id_index):
+            ca_default = copy.deepcopy(ca_default)
+            content_id_prefix = (
+                ca_default[0]['content_id'].replace('_default', '_'))
+            new_content_ids = [ca_default[0]['content_id']]
+
+            if ca_value is not None:
+                for i, value in enumerate(ca_value):
+                    if i == 0:
+                        ca_default[0]['html'] = value
+                    else:
+                        content_id = (
+                            content_id_prefix + str(next_content_id_index))
+                        new_content_ids.append(content_id)
+                        ca_default.append({
+                            'content_id': content_id,
+                            'html': value
+                        })
+                        next_content_id_index += 1
+
+            return ca_default, new_content_ids
+
+
         for state_dict in states_dict.values():
             max_existing_content_id_index = -1
             translations_mapping = state_dict[
@@ -2481,70 +2502,67 @@ class Exploration(python_utils.OBJECT):
                     translations_mapping[
                         content_id][lang_code]['type'] = 'html'
 
-            # Since we cannot use nonlocal in python2, we use a dict to
-            # let inner function convert_to_subtitled modify the value.
-            next_content_id_index = {'value': max_existing_content_id_index + 1}
-            new_content_ids = []
-
-            def convert_to_subtitled(
-                    ca_value, obj_type, content_id, in_list):
-                """Conversion function that converts unsubtitled content to
-                SubtitledHtml or SubtitledUnicode.
-
-                Args:
-                    ca_value: dict. Dictionary of key 'value' to
-                        original value of customization argument.
-                    obj_type: str. Indicates the obj_type found in
-                        the customization arguments schema.    
-                    content_id: str. The content_id generated from
-                        traversing the customization argument spec.
-                    in_list: bool. Indicates if the content_id requires a
-                        content index.
-                Returns:
-                    str. The updated customization argument value.
-                """
-                # Let function access outer next_content_id_index and
-                # new_content_ids.
-                # pylint: disable=cell-var-from-loop
-                if obj_type == 'SubtitledUnicode':
-                    translation_value_key = 'unicode_str'
-                elif obj_type == 'SubtitledHtml':
-                    translation_value_key = 'html'
-
-                if in_list:
-                    content_id += ('_' + python_utils.UNICODE(
-                        next_content_id_index['value']))
-                    next_content_id_index['value'] += 1
-                new_content_ids.append(content_id)
-
-                if 'content_id' in ca_value:
-                    ca_value['content_id'] = content_id
-                    return ca_value
-
-                return {
-                    'content_id': content_id,
-                    translation_value_key: ca_value
-                }
+            next_content_id_index = max_existing_content_id_index + 1
+            all_new_content_ids = []
 
             interaction_id = state_dict['interaction']['id']
             if interaction_id:
-                interaction = (
+                ca = state_dict[
+                    'interaction']['customization_args']
+                ca_specs = (
                     interaction_registry.Registry.get_interaction_by_id(
                         interaction_id
-                    )
+                    ).customization_arg_specs
                 )
-                customization_args = state_dict[
-                    'interaction']['customization_args']
 
-                customization_args_util.convert_translatable_in_cust_args(
-                    customization_args,
-                    interaction.customization_arg_specs,
-                    convert_to_subtitled)
+                for ca_spec in ca_specs:
+                    schema = ca_spec.schema
+                    name = ca_spec.name
+                    schema_type = schema["type"]
+                    new_content_ids = []
 
-            state_dict[
-                'next_content_id_index'] = next_content_id_index['value']
+                    if schema_type == "custom":
+                        obj_type = schema["obj_type"]
+                        if obj_type == "SubtitledUnicode":
+                            if name not in ca:
+                                ca[name] = {'value': None}
+                            ca[name]['value'], new_content_ids = (
+                                convert_ca_unicode_to_subtitled_unicode(
+                                    ca[name]['value'],
+                                    ca_spec.default_value)
+                            )
+                        elif obj_type == "SubtitledHtml":
+                            if name not in ca:
+                                ca[name] = {'value': None}
+                            ca[name]['value'], new_content_ids = (
+                                convert_ca_html_to_subtitled_html(
+                                    ca[name]['value'],
+                                    ca_spec.default_value)
+                            )
+                    elif (
+                        schema_type == "list" and
+                        schema["items"]["type"] == "custom" and
+                        schema["items"]["obj_type"] == "SubtitledHtml"
+                    ):
+                        if name not in ca:
+                            ca[name] = {'value': None}
+                        ca[name]['value'], new_content_ids = (
+                            convert_ca_html_list_to_subtitled_html_list(
+                                ca[name]['value'],
+                                ca_spec.default_value,
+                                next_content_id_index)
+                        )
+                        if len(new_content_ids) > 1:
+                            next_content_id_index += len(new_content_ids) - 1
+                    else:
+                        if name not in ca:
+                            ca[name] = {'value': ca_spec.default_value}
 
-            for new_content_id in new_content_ids:
+                    all_new_content_ids.extend(new_content_ids)
+
+            state_dict['next_content_id_index'] = next_content_id_index
+
+            for new_content_id in all_new_content_ids:
                 state_dict[
                     'written_translations'][
                         'translations_mapping'][new_content_id] = {}

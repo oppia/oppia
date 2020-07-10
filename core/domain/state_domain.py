@@ -772,8 +772,7 @@ class InteractionInstance(python_utils.OBJECT):
         customization_arg_specs = interaction.customization_arg_specs
         customization_args = interaction_dict['customization_args']
 
-        def convert_cust_args(
-                ca_value, obj_type, unused_content_id, unused_in_list):
+        def convert_cust_args(ca_value, obj_type):
             """Conversion function that converts html content in
             customization arguments.
 
@@ -782,10 +781,6 @@ class InteractionInstance(python_utils.OBJECT):
                     original value of customization argument.
                 obj_type: str. Indicates the obj_type found in
                     the customization arguments schema.    
-                unused_content_id: str. The content_id generated from
-                    traversing the customization argument spec.
-                unused_in_list: bool. Indicates if the content_id requires a
-                    content index.
             Returns:
                 str. The updated customization argument value.
             """
@@ -800,7 +795,7 @@ class InteractionInstance(python_utils.OBJECT):
 
             return ca_value
 
-        customization_args_util.convert_translatable_in_cust_args(
+        customization_args_util.convert_content_in_cust_args(
             customization_args,
             customization_arg_specs,
             convert_cust_args)
@@ -1996,17 +1991,17 @@ class State(python_utils.OBJECT):
             content_id_list.append(solution_content_id)
 
         if self.interaction.id:
-            interaction = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    self.interaction.id
-                )
-            )
             interaction_content_ids = (
                 customization_args_util.get_all_content_ids_in_cust_args(
                     self.interaction.customization_args,
-                    interaction.customization_arg_specs
+                    (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).customization_arg_specs
+                    )
                 )
             )
+
             content_id_list.extend(interaction_content_ids)
 
         if not isinstance(self.solicit_answer_details, bool):
