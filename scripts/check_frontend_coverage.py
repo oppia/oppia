@@ -427,7 +427,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'teach-oppia-modal.controller.ts',
     'teacher.ts',
     'teacher2.ts',
-    'test-interaction-panel.directive.ts',
     'thumbnail-uploader.directive.ts',
     'top-navigation-bar.directive.ts',
     'topic-creation.service.ts',
