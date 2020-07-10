@@ -144,8 +144,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
             'outcome': {
                 'dest': None,
@@ -269,7 +268,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_with_math['change'],
-                'test description', self.reviewer_id)
+                'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -366,8 +365,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -508,7 +506,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_without_math['change'],
-                'test description', self.reviewer_id)
+                'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -625,8 +623,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
             'outcome': {
                 'dest': None,
@@ -745,8 +742,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
         job_id = (
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.create_new())
@@ -876,8 +872,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -975,8 +970,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -1111,8 +1105,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
 
         def _mock_get_suggestion_by_id(unused_suggestion_id):
             """Mocks get_suggestion_by_id()."""
@@ -1259,8 +1252,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
 
         def _mock_convert_html_in_suggestion_change(
                 unused_self, unused_conversion_fn):
