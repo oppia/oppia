@@ -199,7 +199,7 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         prod_yaml_file.write(content)
 
 
-def modify_constants(prod_env, maintenance_mode):
+def modify_constants(prod_env=False, maintenance_mode=False):
     """Modify constants.ts and feconf.py.
 
     Args:
@@ -218,6 +218,11 @@ def modify_constants(prod_env, maintenance_mode):
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = .*',
         enable_maintenance_mode_variable)
+
+
+def set_constants_to_default():
+    """Set variables in constants.ts and feconf.py to default values."""
+    modify_constants(prod_env=False, maintenance_mode=False)
 
 
 def _minify(source_path, target_path):
@@ -1318,7 +1323,8 @@ def main(args=None):
                 'minify_third_party_libs_only should not be '
                 'set in non-prod env.')
 
-    modify_constants(options.prod_env, options.maintenance_mode)
+    modify_constants(
+        prod_env=options.prod_env, maintenance_mode=options.maintenance_mode)
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
