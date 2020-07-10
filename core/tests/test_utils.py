@@ -47,6 +47,8 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+
+
 import feconf
 import main
 import main_mail
@@ -64,6 +66,7 @@ import webtest
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
+email_services = models.Registry.import_email_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -160,6 +163,80 @@ def check_image_png_or_webp(image_string):
         return True
     return False
 
+class EmailMessageMock():
+    """Mock for google.appengine.api.email message."""
+    
+    def __init__(self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc=[], reply_to=None):
+        self.sender = sender_email
+        self.to = recipient_email
+        self.subject = subject
+        self.body = plaintext_body
+        self.html = html_body
+        self.bcc = bcc
+        self.reply_to = reply_to
+
+class EmailServicesMock():
+    """Mock for google.appengine.api.email."""
+
+    def __init__(self):
+        self.emails_dict = {}
+
+    def wipe_emails_dict(self):
+        self.emails_dict = {}
+    
+    def mock_send_mail(
+            self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc_admin=False, reply_to_id=None, *_):
+        bcc = []
+        reply_to = ''
+        if not feconf.CAN_SEND_EMAILS:
+            raise Exception('This app cannot send emails.')
+
+        if not email_services.is_email_valid(recipient_email):
+            raise ValueError(
+                'Malformed recipient email address: %s' % recipient_email)
+
+        if not email_services.is_sender_email_valid(sender_email):
+            raise ValueError(
+                'Malformed sender email address: %s' % sender_email)
+
+        if bcc_admin:
+            bcc = [feconf.ADMIN_EMAIL_ADDRESS]
+        if reply_to_id:
+            reply_to = (
+                gae_email_services.get_incoming_email_address(reply_to_id))
+        if recipient_email not in self.emails_dict:
+            self.emails_dict[recipient_email] = []
+        new_email = EmailMessageMock(sender_email, recipient_email, 
+            subject, plaintext_body, html_body, bcc, reply_to)
+        self.emails_dict[recipient_email].append(new_email)
+
+    def mock_send_bulk_emails(
+            self, sender_email, recipient_emails, subject, plaintext_body,
+            html_body, *_):
+
+        if not feconf.CAN_SEND_EMAILS:
+            raise Exception('This app cannot send emails.')
+
+        for recipient_email in recipient_emails:
+            if not email_services.is_email_valid(recipient_email):
+                raise ValueError(
+                    'Malformed recipient email address: %s' % recipient_email)
+
+        if not email_services.is_sender_email_valid(sender_email):
+            raise ValueError(
+                'Malformed sender email address: %s' % sender_email)
+
+        for recipient_email in recipient_emails:
+            if recipient_email not in self.emails_dict:
+                self.emails_dict[recipient_email] = []
+            new_email = EmailMessageMock(sender_email, recipient_email, subject,
+                plaintext_body, html_body)
+            self.emails_dict[recipient_email].append(new_email)
+
+    def mock_get_sent_messages(self, to, *_):
+        return self.emails_dict[to] if to in self.emails_dict else []
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     """Mock for google.appengine.api.urlfetch."""
@@ -2281,6 +2358,12 @@ class AppEngineTestBase(TestBase):
 
 GenericTestBase = AppEngineTestBase
 
+class GenericEmailTestBase(GenericTestBase):
+    def setUp(self):
+        super(EmailTestBase, self).setUp()
+        self.email_services_mock = EmailServicesMock()
+
+EmailTestBase = GenericEmailTestBase
 
 class FunctionWrapper(python_utils.OBJECT):
     """A utility for making function wrappers. Create a subclass and override

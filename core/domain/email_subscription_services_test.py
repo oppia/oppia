@@ -76,7 +76,6 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             }
         )
 
-
     def mock_get_sent_messages(self, to, *_):
         return self.emails_dict[to] if to in self.emails_dict else []
 
