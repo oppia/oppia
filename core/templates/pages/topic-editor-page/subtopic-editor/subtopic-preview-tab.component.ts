@@ -30,7 +30,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 
 angular.module('oppia').component('subtopicPreviewTab', {
   template: require('./subtopic-preview-tab.component.html'),
@@ -68,6 +68,9 @@ angular.module('oppia').component('subtopicPreviewTab', {
           $scope.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           $scope.pageContents = $scope.subtopicPage.getPageContents();
+          if ($scope.pageContents) {
+            $scope.htmlData = $scope.pageContents.getHtml();
+          }
         }
       };
 
@@ -78,8 +81,8 @@ angular.module('oppia').component('subtopicPreviewTab', {
 
       $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
         $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
-        var pageContents = $scope.subtopicPage.getPageContents();
-        $scope.htmlData = pageContents.getHtml();
+        $scope.pageContents = $scope.subtopicPage.getPageContents();
+        $scope.htmlData = $scope.pageContents.getHtml();
       });
 
       $scope.changeContent = function(itemToDisplay) {

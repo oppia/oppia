@@ -23,25 +23,41 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { AttributionGuideComponent } from
+  './common-layout-directives/common-elements/attribution-guide.component';
+import { LazyLoadingComponent } from
+  './common-layout-directives/common-elements/lazy-loading.component';
+import { LoadingDotsComponent } from
+  './common-layout-directives/common-elements/loading-dots.component';
+import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SkillMasteryViewerComponent } from
+  './skill-mastery/skill-mastery.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
+import { SocialButtonsComponent } from
+  'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
+
 @NgModule({
-  imports: [CommonModule, NgbModalModule],
+  imports: [CommonModule, MaterialModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, ExplorationEmbedButtonModalComponent],
+    SharingLinksComponent, ExplorationEmbedButtonModalComponent,
+    SkillMasteryViewerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+    SkillMasteryViewerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     // These elements will remain here even after migration.
-    ExplorationEmbedButtonModalComponent
+    ExplorationEmbedButtonModalComponent,
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent,
+    SharingLinksComponent, MaterialModule
   ],
 })
 
