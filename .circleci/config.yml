@@ -256,6 +256,10 @@ jobs:
           name: Run e2e play voiceovers test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+      - run:
+          name: Run e2e file upload extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
 
 notify:
   webhooks:

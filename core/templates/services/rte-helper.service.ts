@@ -21,6 +21,11 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/rte-helper-modal.controller.ts');
 
+require('services/alerts.service.ts');
+require('services/assets-backend-api.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
+require('services/image-upload-helper.service.ts');
 require('app.constants.ajs.ts');
 require('services/services.constants.ajs.ts');
 
