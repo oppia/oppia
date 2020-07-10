@@ -86,7 +86,8 @@ export class StoryPlaythroughObjectFactory {
       storyPlaythroughBackendDict:
       StoryPlaythroughBackendDict): StoryPlaythrough {
     var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
-      this.readOnlyStoryNodeObjectFactory.createFromBackendDict);
+      storyNodeDict => this.readOnlyStoryNodeObjectFactory
+        .createFromBackendDict(storyNodeDict));
 
     return new StoryPlaythrough(
       nodeObjects,
