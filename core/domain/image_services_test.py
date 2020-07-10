@@ -57,12 +57,13 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
     def test_dev_mode_returns_original_uncompressed_image(self):
         # Test to test the behavior when we do not set constants.DEV_MODE
         # to False in test mode.
-        compressed_image = (image_services.compress_image(
-            self.jpeg_raw_image, 0.8))
-        height, width = (
-            image_services.get_image_dimensions(compressed_image))
-        self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
-        self.assertEqual(self.TEST_IMAGE_WIDTH, width)
+        with self.swap(constants, 'DEV_MODE', True):
+            compressed_image = (image_services.compress_image(
+                self.jpeg_raw_image, 0.8))
+            height, width = (
+                image_services.get_image_dimensions(compressed_image))
+            self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
+            self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
     def test_compress_image_returns_correct_dimensions(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -107,6 +108,10 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             image2 = Image.open(io.BytesIO(file2)).convert('RGB')
             diff = ImageChops.difference(image1, image2)
 
+            # diff.getbbox() returns a bounding box on all islands or regions of
+            # non-zero pixels. In other words, if we have a bounding box, there
+            # will be areas that are not 0 in the difference meaning that the 2
+            # images are not equal.
             return not diff.getbbox()
 
         with python_utils.open_file(
@@ -120,9 +125,10 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             compressed_image = (
                 image_services.compress_image(self.jpeg_raw_image, 0.5))
 
-        # I need to open and save it specifically using PIL since the "golden
+        # In order to make sure the images are the same, the function needs to
+        # open and save the image specifically using PIL since the "golden
         # image" (image that we compare the compressed image to) is saved using
-        # PIL which applies a slight quality change that won't appear unless we
+        # PIL. This applies a slight quality change that won't appear unless we
         # save it using PIL.
         temp_image = Image.open(io.BytesIO(compressed_image))
         image_format = temp_image.format
