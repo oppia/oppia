@@ -36,49 +36,12 @@ import python_utils
 taskqueue_services = models.Registry.import_taskqueue_services()
 email_services = models.Registry.import_email_services()
 
-class FeedbackServicesUnitTests(test_utils.GenericTestBase):
+class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     """Test functions in feedback_services."""
 
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
     emails_dict = {}
-
-    def mock_send_mail(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc_admin, reply_to_id, *_):
-        bcc = []
-        reply_to = ''
-        if not feconf.CAN_SEND_EMAILS:
-            raise Exception('This app cannot send emails.')
-
-        if not email_services.is_email_valid(recipient_email):
-            raise ValueError(
-                'Malformed recipient email address: %s' % recipient_email)
-
-        if not email_services.is_sender_email_valid(sender_email):
-            raise ValueError(
-                'Malformed sender email address: %s' % sender_email)
-
-        if bcc_admin:
-            bcc = [feconf.ADMIN_EMAIL_ADDRESS]
-        if reply_to_id:
-            reply_to = (
-                email_services.get_incoming_email_address(reply_to_id))
-        if recipient_email not in self.emails_dict:
-            self.emails_dict[recipient_email] = []
-        self.emails_dict[recipient_email].append(
-            {
-                'sender_email': sender_email,
-                'subject': subject,
-                'body': plaintext_body,
-                'html': html_body,
-                'bcc': bcc,
-                'reply_to': reply_to
-            }
-        )
-
-    def mock_get_sent_messages(self, to, *_):
-        return self.emails_dict[to] if to in self.emails_dict else []
 
     def setUp(self):
         super(FeedbackServicesUnitTests, self).setUp()
@@ -119,8 +82,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
     def test_create_message_fails_if_invalid_thread_id(self):
         with self.assertRaises(
-            feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError
-            ):
+            feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError):
             feedback_services.create_message(
                 'invalid_thread_id', self.user_id, None, None, 'Hello')
 

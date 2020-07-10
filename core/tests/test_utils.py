@@ -164,8 +164,8 @@ def check_image_png_or_webp(image_string):
     return False
 
 
-class EmailMessageMock(object):
-    """Mock for google.appengine.api.email message."""
+class EmailMessageMock(python_utils.OBJECT):
+    """Mock for mailgun API message."""
 
     def __init__(
             self, sender_email, recipient_email, subject, plaintext_body,
@@ -179,8 +179,8 @@ class EmailMessageMock(object):
         self.reply_to = reply_to
 
 
-class EmailServicesMock(object):
-    """Mock for google.appengine.api.email."""
+class EmailServicesMock(python_utils.OBJECT):
+    """Mock for mailgun API"""
 
     def __init__(self):
         self.emails_dict = {}
