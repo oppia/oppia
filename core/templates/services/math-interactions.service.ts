@@ -191,7 +191,7 @@ export class MathInteractionsService {
     let shouldModifyNextTerm: boolean = false;
     let modifyTerm = function(termString: string): string {
       // If the shouldModifyNextTerm flag is set to true, we add the '-' sign,
-      // raise the term to a power of -1. This ensures that when the final
+      // or raise the term to a power of -1. This ensures that when the final
       // list is joined by the '+'/'*' sign, it matches with the original
       // expression. For eg.
       // '3/10' would be split as [3, 10^(-1)] and
@@ -258,6 +258,8 @@ export class MathInteractionsService {
   }
 
   termsMatch(term1: string, term2: string): boolean {
+    // The input terms to this function should be the terms split by '+'/'-'
+    // from an expression.
     // We split both terms by multiplication and division into separate parts
     // and try to match these parts from both inputs by checking equivalency.
     let partsList1 = this.getTerms(term1, false);
