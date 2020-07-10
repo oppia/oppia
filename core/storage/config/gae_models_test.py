@@ -52,3 +52,65 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         retrieved_model2 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 2)
         self.assertEqual(retrieved_model2.value, 'd')
+
+
+class ConfigVariableModelUnitTests(test_utils.GenericTestBase):
+    """Test ConfigVariableModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            config_models.ConfigVariableModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_export_policy(self):
+        self.assertEqual(
+            config_models.ConfigVariableModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            config_models.ConfigVariableModel.has_reference_to_user_id(
+                'any_user_id')
+        )
+
+    def test_create_model(self):
+        var_model = config_models.ConfigVariableModel.create(
+            name='variable_name',
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+        )
+        self.assertEqual(var_model.id, 'variable_name')
+        self.assertEqual(
+            var_model.rules,
+            [{'filters': [], 'value_when_matched': False}])
+
+    def test_commit(self):
+        var_name = 'variable_name'
+        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+
+        var_model = config_models.ConfigVariableModel.create(
+            name=var_name,
+            rule_dicts=rule_dicts,
+        )
+
+        var_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+
+        retrieved_model1 = config_models.ConfigVariableModel.get_version(
+            var_name, 1)
+        self.assertEqual(retrieved_model1.rules, rule_dicts)
+
+        new_rules = [
+            {
+                'filters': [
+                    {'type': 'app_version', 'value': '>1.2.3'}
+                ],
+                'value_when_matched': True
+            },
+            {'filters': [], 'value_when_matched': False},
+        ]
+
+        retrieved_model1.rules = new_rules
+        retrieved_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        retrieved_model2 = config_models.ConfigVariableModel.get_version(
+            var_name, 2)
+
+        self.assertEqual(retrieved_model2.rules, new_rules)
