@@ -1,9 +1,9 @@
 <a href="{{ getTopicLink() }}">
   <div class="oppia-topic-image">
     <picture>
-      <source type="image/webp" srcset="{{ getStaticImageUrl('/landing/math/fractions/matthew_paper.webp') }}">
-      <source type="image/png" srcset="{{ getStaticImageUrl('/landing/math/fractions/matthew_paper.png') }}">
-      <img src="{{ getStaticImageUrl('/landing/math/fractions/matthew_paper.png') }}" alt="" class="topic-thumbnail">
+      <source type="image/webp" [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')">
+      <img [src]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')" alt="" class="topic-thumbnail">
     </picture>
   </div>
   <div class="oppia-topic-details">
