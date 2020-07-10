@@ -108,10 +108,10 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             image2 = Image.open(io.BytesIO(file2)).convert('RGB')
             diff = ImageChops.difference(image1, image2)
 
-            # diff.getbbox() returns a bounding box on all islands or regions of
-            # non-zero pixels. In other words, if we have a bounding box, there
-            # will be areas that are not 0 in the difference meaning that the 2
-            # images are not equal.
+            # Function diff.getbbox() returns a bounding box on all islands or
+            # regions of non-zero pixels. In other words, if we have a bounding
+            # box, there will be areas that are not 0 in the difference meaning
+            # that the 2 images are not equal.
             return not diff.getbbox()
 
         with python_utils.open_file(
