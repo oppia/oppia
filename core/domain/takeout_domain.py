@@ -65,8 +65,8 @@ class TakeoutImageReplacementInstruction(python_utils.OBJECT):
         """Constructs a TakeoutImageReplacementInstruction object.
 
         Args:
-            dictionary_path: tuple(str). A sequence of keys indicating the position
-                of the user image data within the user data dictionary.
+            dictionary_path: tuple(str). A sequence of keys indicating the
+                position of the user image data within the user data dictionary.
             export_filename: str. The filename of the new file created.
             new_key: str. The new key name in the user data dictionary after the
                 image data is replaced with the filename within the final
