@@ -29,7 +29,9 @@ class TakeoutData(python_utils.OBJECT):
         """Constructs a TakeoutData domain object.
 
         Args:
-            user_data: dict. The user's Takeout data stored as a dictionary.
+            user_data: dict. The user's Takeout data stored as a dictionary. The
+                dictionary is constructed via takeout_service.py, and the format
+                of the dictionary's contents can be found there.
             user_images: list(TakeoutImage). A list of TakeoutImage objects
                 representing the user's images.
         """
@@ -63,11 +65,12 @@ class TakeoutImageReplacementInstruction(python_utils.OBJECT):
         """Constructs a TakeoutImageReplacementInstruction object.
 
         Args:
-            dictionary_path: tuple. A sequence of keys indicating the position
+            dictionary_path: tuple(str). A sequence of keys indicating the position
                 of the user image data within the user data dictionary.
             export_filename: str. The filename of the new file created.
-            new_key: str. The new key name in the dictionary after the image
-                data is replaced with the filename within the final Takeout zip.
+            new_key: str. The new key name in the user data dictionary after the
+                image data is replaced with the filename within the final
+                Takeout zip.
         """
         self.dictionary_path = dictionary_path
         self.export_filename = export_filename

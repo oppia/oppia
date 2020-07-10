@@ -64,7 +64,7 @@ def export_data_for_user(user_id):
     for model in models_to_export:
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
-        final_name = ('_').join([x.lower() for x in split_name]) + '_data'
+        final_name = ('_').join([x.lower() for x in split_name])
         exported_data[final_name] = model.export_data(user_id)
 
     # Separate out images. We store the images that need to be separated here
@@ -73,24 +73,24 @@ def export_data_for_user(user_id):
     # indicates the filename that the exported image will be saved to.
     replacement_instructions = [
         takeout_domain.TakeoutImageReplacementInstruction(
-            ('user_settings_data', 'profile_picture_data_url'),
+            ('user_settings', 'profile_picture_data_url'),
             'user_settings_profile_picture.png',
             'profile_picture_filename'
         )
     ]
     takeout_image_files = []
     for replacement_instruction in replacement_instructions:
-        dictionary_position = replacement_instruction.dictionary_path
+        dictionary_path = replacement_instruction.dictionary_path
         replacement_filename = replacement_instruction.export_filename
         replacement_key = replacement_instruction.new_key
 
         # Move pointer to the position indicated by the tuple.
         pointer = exported_data
-        for key in dictionary_position[:-1]:
+        for key in dictionary_path[:-1]:
             pointer = pointer[key]
 
         # Swap out data with replacement filename.
-        image_key = dictionary_position[-1]
+        image_key = dictionary_path[-1]
         image_data = pointer[image_key]
         if image_data is not None:
             takeout_image_files.append(
