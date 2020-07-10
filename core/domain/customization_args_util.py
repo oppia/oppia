@@ -44,6 +44,34 @@ def get_full_customization_args(customization_args, ca_specs):
                     variable.
 
     Returns:
+        dict. The customization_args dict where missing keys are populated
+        with the default values.
+    """
+    for ca_spec in ca_specs:
+        if ca_spec.name not in customization_args:
+            customization_args[ca_spec.name] = {
+                'value': ca_spec.default_value
+            }
+    return customization_args
+
+def get_full_customization_args_with_content(customization_args, ca_specs):
+    """Populates the given customization_args dict with default values
+    if any of the expected customization_args are missing.
+
+    Args:
+        customization_args: dict. The customization dict. The keys are names
+            of customization_args and the values are dicts with a
+            single key, 'value', whose corresponding value is the value of
+            the customization arg.
+        ca_specs: list(dict). List of spec dictionaries. Is used to check if
+            some keys are missing in customization_args. Dicts have the
+            following structure:
+                - name: str. The customization variable name.
+                - description: str. The customization variable description.
+                - default_value: *. The default value of the customization
+                    variable.
+
+    Returns:
         tuple. A 2-tuple, the first being the customization_args dict where
         missing keys are populated with the default values, and the second an
         array of new content_id's from the default values.
@@ -103,7 +131,7 @@ def validate_customization_args_and_values(
 
     # Populate missing keys with the default values.
     customization_args = get_full_customization_args(
-        customization_args, ca_specs_to_validate_against)[0]
+        customization_args, ca_specs_to_validate_against)
 
     # Remove extra keys.
     extra_args = []

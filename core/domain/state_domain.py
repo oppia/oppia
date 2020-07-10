@@ -780,7 +780,8 @@ class InteractionInstance(python_utils.OBJECT):
                 ca_value: dict. Dictionary of key 'value' to
                     original value of customization argument.
                 obj_type: str. Indicates the obj_type found in
-                    the customization arguments schema.    
+                    the customization arguments schema.
+
             Returns:
                 str. The updated customization argument value.
             """
@@ -1958,6 +1959,17 @@ class State(python_utils.OBJECT):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
+            self.interaction.customization_args, new_content_ids = (
+                customization_args_util
+                    .get_full_customization_args_with_content(
+                        self.interaction.customization_args,
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).customization_arg_specs
+                    )
+            )
+            self._update_content_ids_in_assets(
+                [], new_content_ids)
             self.interaction.validate(exp_param_specs_dict)
 
         content_id_list = []
@@ -2253,7 +2265,8 @@ class State(python_utils.OBJECT):
 
         if interaction_id:
             customization_args, new_ca_content_ids = (
-                customization_args_util.get_full_customization_args(
+                customization_args_util
+                .get_full_customization_args_with_content(
                     {},
                     (
                         interaction_registry.Registry.get_interaction_by_id(
@@ -2285,7 +2298,6 @@ class State(python_utils.OBJECT):
         if self.interaction.id:
             # If interaction id is None, content_id's have already been removed
             # in update_interaction_id.
-
             old_content_id_list = []
             new_content_id_list = []
 
@@ -2638,9 +2650,6 @@ class State(python_utils.OBJECT):
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
-            states_schema_version: int. The current version of the states
-                schema. This is used to determine how to extract html from
-                interactions.
 
         Returns:
             dict. The converted state_dict.

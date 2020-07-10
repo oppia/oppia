@@ -153,14 +153,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_defa'
-                            'ult-hi</p>'),
+                             'ult-hi</p>'),
                         'needs_update': False
                     },
                     'en': {
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_defa'
-                            'ult-en</p>'),
+                             'ult-en</p>'),
                         'needs_update': False
                     }
                 },
@@ -169,14 +169,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_1-hi'
-                            '</p>'),
+                             '</p>'),
                         'needs_update': False
                     },
                     'en': {
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_1-en'
-                            '</p>'),
+                             '</p>'),
                         'needs_update': False
                     }
                 },
@@ -185,14 +185,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_2-hi'
-                            '</p>'),
+                             '</p>'),
                         'needs_update': False
                     },
                     'en': {
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_2-en'
-                            '</p>'),
+                             '</p>'),
                         'needs_update': False
                     }
                 },
@@ -201,14 +201,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_3-hi'
-                            '</p>'),
+                             '</p>'),
                         'needs_update': False
                     },
                     'en': {
                         'type': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_3-en'
-                            '</p>'),
+                             '</p>'),
                         'needs_update': False
                     }
                 },
