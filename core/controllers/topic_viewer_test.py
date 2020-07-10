@@ -25,9 +25,12 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
+email_services = models.Registry.import_email_services()
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
@@ -132,7 +135,8 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
                 expected_status_int=404)
 
 
-class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
+class TopicPageDataHandlerTests(
+    BaseTopicViewerControllerTests, test_utils.EmailTestBase):
 
     def test_get_with_no_user_logged_in(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
@@ -180,15 +184,17 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
 
     def test_get_with_user_logged_in(self):
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.login(self.NEW_USER_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-                messages = self.mail_stub.get_sent_messages(
+                messages = self.email_services_mock.mock_get_sent_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
                 json_response = self.get_json(
                     '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
-                messages = self.mail_stub.get_sent_messages(
+                messages = self.email_services_mock.mock_get_sent_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 expected_email_html_body = (
                     'The deleted skills: %s are still'

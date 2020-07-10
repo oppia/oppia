@@ -46,7 +46,7 @@ import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
-
+email_services = models.Registry.import_email_services()
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
@@ -616,7 +616,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RecommendationsHandlerTests(test_utils.GenericTestBase):
+class RecommendationsHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for recommended explorations for after an
     exploration is completed.
     """
@@ -1073,7 +1073,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         )
 
 
-class FlagExplorationHandlerTests(test_utils.GenericTestBase):
+class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
     EXP_ID = '0'
@@ -1153,10 +1153,14 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx:
+        with self.can_send_emails_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
