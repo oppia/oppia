@@ -163,11 +163,13 @@ def check_image_png_or_webp(image_string):
         return True
     return False
 
-class EmailMessageMock():
+
+class EmailMessageMock(object):
     """Mock for google.appengine.api.email message."""
-    
-    def __init__(self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc=[], reply_to=None):
+
+    def __init__(
+            self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None):
         self.sender = sender_email
         self.to = recipient_email
         self.subject = subject
@@ -176,18 +178,42 @@ class EmailMessageMock():
         self.bcc = bcc
         self.reply_to = reply_to
 
-class EmailServicesMock():
+
+class EmailServicesMock(object):
     """Mock for google.appengine.api.email."""
 
     def __init__(self):
         self.emails_dict = {}
 
     def wipe_emails_dict(self):
+        """Reset email dictionary for a new test."""
         self.emails_dict = {}
-    
+
     def mock_send_mail(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc_admin=False, reply_to_id=None, *_):
+            self, sender_email='', recipient_email='', subject='',
+            plaintext_body='', html_body='', bcc_admin=False, reply_to_id=None):
+        """Sends a mock email. Replaces gae_email_services.send_mail during
+        testing.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+            recipient_email: str. The email address of the recipient.
+            subject: str. The subject line of the email.
+            plaintext_body: str. The plaintext body of the email.
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity.
+            bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the
+                email.
+            reply_to_id: str or None. The unique reply-to id used in reply-to
+                email sent to recipient.
+
+        Raises:
+            ValueError: If 'sender_email' or 'recipient_email' is invalid,
+                according to App Engine.
+            Exception: If the configuration in feconf.py forbids emails from
+                being sent.
+        """
         bcc = []
         reply_to = ''
         if not feconf.CAN_SEND_EMAILS:
@@ -205,17 +231,36 @@ class EmailServicesMock():
             bcc = [feconf.ADMIN_EMAIL_ADDRESS]
         if reply_to_id:
             reply_to = (
-                gae_email_services.get_incoming_email_address(reply_to_id))
+                email_services.get_incoming_email_address(reply_to_id))
         if recipient_email not in self.emails_dict:
             self.emails_dict[recipient_email] = []
-        new_email = EmailMessageMock(sender_email, recipient_email, 
-            subject, plaintext_body, html_body, bcc, reply_to)
+        new_email = EmailMessageMock(
+            sender_email, recipient_email, subject, plaintext_body, html_body,
+            bcc, reply_to)
         self.emails_dict[recipient_email].append(new_email)
 
     def mock_send_bulk_emails(
             self, sender_email, recipient_emails, subject, plaintext_body,
-            html_body, *_):
+            html_body):
+        """Sends mock bulk emails. Replaces gae_email_services.send_mail during
+        testing.
 
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+            recipient_emails: list(str). The list of recipients' email
+                addresses.
+            subject: str. The subject line of the email.
+            plaintext_body: str. The plaintext body of the email.
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity.
+
+        Raises:
+            ValueError: If 'sender_email' or 'recipient_email' is invalid,
+                according to App Engine.
+            Exception: If the configuration in feconf.py forbids emails from
+                being sent.
+        """
         if not feconf.CAN_SEND_EMAILS:
             raise Exception('This app cannot send emails.')
 
@@ -231,12 +276,14 @@ class EmailServicesMock():
         for recipient_email in recipient_emails:
             if recipient_email not in self.emails_dict:
                 self.emails_dict[recipient_email] = []
-            new_email = EmailMessageMock(sender_email, recipient_email, subject,
-                plaintext_body, html_body)
+            new_email = EmailMessageMock(
+                sender_email, recipient_email, subject, plaintext_body,
+                html_body)
             self.emails_dict[recipient_email].append(new_email)
 
     def mock_get_sent_messages(self, to, *_):
         return self.emails_dict[to] if to in self.emails_dict else []
+
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     """Mock for google.appengine.api.urlfetch."""
@@ -2358,12 +2405,17 @@ class AppEngineTestBase(TestBase):
 
 GenericTestBase = AppEngineTestBase
 
+
 class GenericEmailTestBase(GenericTestBase):
+    """Base class for tests requiring email services."""
+
     def setUp(self):
         super(EmailTestBase, self).setUp()
         self.email_services_mock = EmailServicesMock()
 
+
 EmailTestBase = GenericEmailTestBase
+
 
 class FunctionWrapper(python_utils.OBJECT):
     """A utility for making function wrappers. Create a subclass and override
