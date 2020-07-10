@@ -1187,7 +1187,8 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
 
     def test_explorations_with_invalid_inputs_are_not_upgraded(self):
         """Checks that invalid explorations are not upgraded and an error is
-        yielded."""
+        yielded.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1240,7 +1241,7 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id('exp_id0')
 
         # The exploration contains an invalid input and must therefore, not be
-        # upgraded to one of the new interactions.  
+        # upgraded to one of the new interactions.
         self.assertEqual(
             exploration.get_interaction_id_by_state_name('State1'),
             'MathExpressionInput')

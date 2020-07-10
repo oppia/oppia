@@ -87,7 +87,6 @@ _VALID_NUM_EXPR = 'Valid Numeric Expression'
 _VALID_MATH_EQN = 'Valid Math Equation'
 
 
-
 def _clean_math_expression(math_expression):
     """Cleans a given math expression and formats it so that it is compatible
     with the new interactions' validators.
@@ -293,7 +292,8 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                     'name: %s contains inputs that correspond '
                                     'to multiple different types: %s. Please '
                                     'resolve this before running the upgrade '
-                                    'job.' % (item.id, state_name, 
+                                    'job.' % (
+                                        item.id, state_name,
                                         ', '.join(list(types_of_inputs)))))
 
                             output_values = '%s %s: %s' % (
