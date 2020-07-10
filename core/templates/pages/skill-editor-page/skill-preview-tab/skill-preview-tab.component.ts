@@ -43,11 +43,11 @@ angular.module('oppia').component('skillPreviewTab', {
   template: require('./skill-preview-tab.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$scope', 'ContextService', 'QuestionBackendApiService',
+    '$rootScope', '$scope', 'ContextService', 'QuestionBackendApiService',
     'QuestionObjectFactory', 'QuestionPlayerEngineService',
     'SkillEditorStateService', 'StateCardObjectFactory', 'UrlService',
     function(
-        $scope, ContextService, QuestionBackendApiService,
+        $rootScope, $scope, ContextService, QuestionBackendApiService,
         QuestionObjectFactory, QuestionPlayerEngineService,
         SkillEditorStateService, StateCardObjectFactory, UrlService) {
       var ctrl = this;
@@ -82,6 +82,7 @@ angular.module('oppia').component('skillPreviewTab', {
           if (ctrl.questionDicts.length) {
             ctrl.selectQuestionToPreview(0);
           }
+          $rootScope.$apply();
         });
       };
 

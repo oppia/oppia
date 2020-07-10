@@ -179,6 +179,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       ).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
+        $rootScope.$apply();
       });
     };
 
