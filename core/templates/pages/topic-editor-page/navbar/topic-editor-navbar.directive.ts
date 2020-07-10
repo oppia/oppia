@@ -21,7 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'pages/topic-editor-page/modal-templates/' +
   'topic-editor-save-modal.controller.ts');

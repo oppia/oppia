@@ -22,7 +22,7 @@ require(
   'background-banner.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'lazy-loading.directive.ts');
+  'lazy-loading.component.ts');
 require(
   'pages/community-dashboard-page/contributions-and-review/' +
   'contributions-and-review.directive.ts');

@@ -20,7 +20,7 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'pages/collection-editor-page/templates/' +
   'collection-editor-pre-publish-modal.controller.ts');
