@@ -135,11 +135,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.ensure_screenshots_dir_is_removed()
 
     def test_cleanup_when_no_subprocess(self):
+
+        def mock_kill_process_based_on_regex(unused_regex):
+            return
+
         def mock_is_windows_os():
             return False
 
-        subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
+        def mock_set_constants_to_default():
+            return
 
+        subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
         google_app_engine_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_HOME)
@@ -149,8 +155,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ('.*%s.*' % re.escape(google_app_engine_path),),
             ('.*%s.*' % re.escape(webdriver_download_path),)
         ]
-        def mock_kill_process_based_on_regex(unused_regex):
-            return
 
         swap_kill_process = self.swap_with_checks(
             common, 'kill_processes_based_on_regex',
@@ -158,8 +162,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=process_pattern)
         swap_is_windows = self.swap_with_checks(
             common, 'is_windows_os', mock_is_windows_os)
+        swap_set_constants_to_default = self.swap_with_checks(
+            build, 'set_constants_to_default', mock_set_constants_to_default)
         with swap_kill_process, subprocess_swap, swap_is_windows:
-            run_e2e_tests.cleanup()
+            with swap_set_constants_to_default:
+                run_e2e_tests.cleanup()
 
     def test_cleanup_when_subprocesses_exist(self):
 
@@ -168,20 +175,29 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return True
         mock_kill_process_based_on_regex.called_times = 0
 
+        def mock_set_constants_to_default():
+            return
+
         mock_processes = [MockProcessClass(), MockProcessClass()]
         subprocess_swap = self.swap(
             run_e2e_tests, 'SUBPROCESSES', mock_processes)
         swap_kill_process = self.swap_with_checks(
             common, 'kill_processes_based_on_regex',
             mock_kill_process_based_on_regex)
-        with subprocess_swap, swap_kill_process:
+        swap_set_constants_to_default = self.swap_with_checks(
+            build, 'set_constants_to_default', mock_set_constants_to_default)
+        with subprocess_swap, swap_kill_process, swap_set_constants_to_default:
             run_e2e_tests.cleanup()
         self.assertEqual(
             mock_kill_process_based_on_regex.called_times, len(mock_processes))
 
     def test_cleanup_on_windows(self):
+
         def mock_is_windows_os():
             return True
+
+        def mock_set_constants_to_default():
+            return
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
@@ -205,8 +221,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=expected_pattern)
         swap_is_windows = self.swap_with_checks(
             common, 'is_windows_os', mock_is_windows_os)
+        swap_set_constants_to_default = self.swap_with_checks(
+            build, 'set_constants_to_default', mock_set_constants_to_default)
         with swap_kill_process, subprocess_swap, swap_is_windows:
-            run_e2e_tests.cleanup()
+            with swap_set_constants_to_default:
+                run_e2e_tests.cleanup()
 
     def test_is_oppia_server_already_running_when_ports_closed(self):
         def mock_is_port_open(unused_port):
@@ -798,6 +817,97 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
                             run_e2e_tests.main(args=[])
+
+    def test_start_tests_skip_build(self):
+
+        def mock_is_oppia_server_already_running(*unused_args):
+            return False
+
+        def mock_setup_and_install_dependencies(unused_arg):
+            return
+
+        def mock_register(unused_func):
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_modify_constants(prod_env, maintenance_mode=False):  # pylint: disable=unused-argument
+            return
+
+        def mock_start_webdriver_manager(unused_arg):
+            return
+
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
+            return
+
+        def mock_wait_for_port_to_be_open(unused_port):
+            return
+
+        def mock_ensure_screenshots_dir_is_removed():
+            return
+
+        def mock_get_e2e_test_parameters(
+                unused_sharding_instances, unused_suite, unused_dev_mode):
+            return ['commands']
+
+        def mock_popen(unused_commands):
+            def mock_communicate():
+                return
+            result = MockProcessClass()
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            return result
+
+        def mock_exit(unused_code):
+            return
+
+        check_swap = self.swap_with_checks(
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
+        setup_and_install_swap = self.swap_with_checks(
+            run_e2e_tests, 'setup_and_install_dependencies',
+            mock_setup_and_install_dependencies, expected_args=[(True,)])
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[(mock_cleanup,)])
+        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        modify_constants_swap = self.swap_with_checks(
+            build, 'modify_constants', mock_modify_constants,
+            expected_kwargs=[{'prod_env': False}])
+        start_webdriver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_webdriver_manager',
+            mock_start_webdriver_manager,
+            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
+        start_google_app_engine_server_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_google_app_engine_server',
+            mock_start_google_app_engine_server,
+            expected_args=[(True, 'critical')])
+        wait_swap = self.swap_with_checks(
+            run_e2e_tests, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open,
+            expected_args=[
+                (run_e2e_tests.WEB_DRIVER_PORT,),
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+        ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
+            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
+            mock_ensure_screenshots_dir_is_removed)
+        get_parameters_swap = self.swap_with_checks(
+            run_e2e_tests, 'get_e2e_test_parameters',
+            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=[([
+                common.NODE_BIN_PATH, '--unhandled-rejections=strict',
+                run_e2e_tests.PROTRACTOR_BIN_PATH,
+                'commands'],)])
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
+        with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
+            with modify_constants_swap, start_webdriver_swap:
+                with start_google_app_engine_server_swap:
+                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                        with get_parameters_swap, popen_swap, exit_swap:
+                            run_e2e_tests.main(
+                                args=['--skip-install', '--skip-build'])
 
     def test_start_tests_in_debug_mode(self):
 
