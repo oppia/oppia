@@ -80,8 +80,7 @@
                dnd-dragstart="$ctrl.onRearrangeMoveSkillStart($index)"
                dnd-drop="$ctrl.onRearrangeMoveSkillFinish($index)"
                dnd-draggable="skillSummary">
-            <a class="protractor-test-assigned-skill-card-text"
-               ng-if="!$ctrl.isSkillDeleted(skillSummary)"
+            <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
                ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
               <[skillSummary.getDescription()]>
             </a>
