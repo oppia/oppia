@@ -213,6 +213,8 @@ import { ExplorationObjectFactory } from
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissionsObjectFactory } from
@@ -285,8 +287,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -478,6 +478,8 @@ import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryObjectFactory } from
+  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
@@ -720,6 +722,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService;
   static explorationFeaturesService: ExplorationFeaturesService;
   static explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  static explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService;
   static explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   static explorationObjectFactory: ExplorationObjectFactory;
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
@@ -762,7 +765,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageClickInputRulesService: ImageClickInputRulesService;
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
-  static improvementsBackendApiService: ImprovementsBackendApiService;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
@@ -860,6 +862,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static skillCreationBackendApiService: SkillCreationBackendApiService;
   static skillDifficultyObjectFactory: SkillDifficultyObjectFactory;
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
+  static skillMasteryObjectFactory: SkillMasteryObjectFactory;
   static skillObjectFactory: SkillObjectFactory;
   static skillOpportunityObjectFactory: SkillOpportunityObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
@@ -1017,6 +1020,7 @@ private explorationDraftObjectFactory: ExplorationDraftObjectFactory,
 private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
 private explorationFeaturesService: ExplorationFeaturesService,
 private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+private explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService,
 private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
@@ -1059,7 +1063,6 @@ private idGenerationService: IdGenerationService,
 private imageClickInputRulesService: ImageClickInputRulesService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
-private improvementsBackendApiService: ImprovementsBackendApiService,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
@@ -1157,6 +1160,7 @@ private siteAnalyticsService: SiteAnalyticsService,
 private skillCreationBackendApiService: SkillCreationBackendApiService,
 private skillDifficultyObjectFactory: SkillDifficultyObjectFactory,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
+private skillMasteryObjectFactory: SkillMasteryObjectFactory,
 private skillObjectFactory: SkillObjectFactory,
 private skillOpportunityObjectFactory: SkillOpportunityObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
@@ -1315,6 +1319,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationFeaturesBackendApiService = this.explorationFeaturesBackendApiService;
     OppiaAngularRootComponent.explorationFeaturesService = this.explorationFeaturesService;
     OppiaAngularRootComponent.explorationHtmlFormatterService = this.explorationHtmlFormatterService;
+    OppiaAngularRootComponent.explorationImprovementsBackendApiService = this.explorationImprovementsBackendApiService;
     OppiaAngularRootComponent.explorationMetadataObjectFactory = this.explorationMetadataObjectFactory;
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
@@ -1357,7 +1362,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.imageClickInputRulesService = this.imageClickInputRulesService;
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
-    OppiaAngularRootComponent.improvementsBackendApiService = this.improvementsBackendApiService;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
@@ -1455,6 +1459,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.skillCreationBackendApiService = this.skillCreationBackendApiService;
     OppiaAngularRootComponent.skillDifficultyObjectFactory = this.skillDifficultyObjectFactory;
     OppiaAngularRootComponent.skillMasteryBackendApiService = this.skillMasteryBackendApiService;
+    OppiaAngularRootComponent.skillMasteryObjectFactory = this.skillMasteryObjectFactory;
     OppiaAngularRootComponent.skillObjectFactory = this.skillObjectFactory;
     OppiaAngularRootComponent.skillOpportunityObjectFactory = this.skillOpportunityObjectFactory;
     OppiaAngularRootComponent.skillRightsBackendApiService = this.skillRightsBackendApiService;
