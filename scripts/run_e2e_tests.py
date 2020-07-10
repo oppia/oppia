@@ -163,7 +163,9 @@ def ensure_screenshots_dir_is_removed():
 
 
 def cleanup():
-    """Kill the running subprocesses and server fired in this program."""
+    """Kill the running subprocesses and server fired in this program, set
+    constants back to default values.
+    """
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
@@ -178,6 +180,7 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+    build.set_constants_to_default()
 
 
 def is_oppia_server_already_running():
@@ -473,7 +476,9 @@ def main(args=None):
     update_community_dashboard_status_in_feconf_file(
         FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
 
-    if not parsed_args.skip_build:
+    if parsed_args.skip_build:
+        build.modify_constants(prod_env=parsed_args.prod_env)
+    else:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
     version = (
