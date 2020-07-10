@@ -16,8 +16,6 @@
  * @fileoverview Directive containing the exploration material to be translated.
  */
 
-import { EventEmitter } from '@angular/core';
-
 require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
@@ -137,10 +135,13 @@ angular.module('oppia').directive('stateTranslation', [
           };
 
           $scope.onContentClick = function($event) {
+            if (CkEditorCopyContentService.copyModeActive) {
+              $event.stopPropagation();
+            }
             CkEditorCopyContentService.broadcastCopy($event.target);
           };
 
-          $scope.copyModeActive = function() {
+          $scope.isCopyModeActive = function() {
             return CkEditorCopyContentService.copyModeActive;
           };
 

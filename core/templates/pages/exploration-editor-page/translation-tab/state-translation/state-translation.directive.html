@@ -43,7 +43,7 @@
           <[getEmptyContentMessage()]>
         </span>
         <span>
-          <angular-html-bind ng-class="{'oppia-rte-editor-focused': copyModeActive()}"
+          <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
                              ng-click="onContentClick($event)"
                              html-data="getRequiredHtml(stateContent)"
                              class="oppia-rte-editor">
@@ -81,7 +81,7 @@
                     <[getEmptyContentMessage()]>
                   </span>
                   <span>
-                    <angular-html-bind ng-class="{'oppia-rte-editor-focused': copyModeActive()}"
+                    <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
                                        ng-click="onContentClick($event)"
                                        html-data="getRequiredHtml(answerGroup.outcome.feedback)"
                                        class="oppia-rte-editor">
@@ -117,7 +117,7 @@
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">
               <div class="oppia-editor-card-section protractor-test-feedback-<[stateAnswerGroups.length]>-text">
                 <div class="oppia-rule-body-container">
-                  <angular-html-bind ng-class="{'oppia-rte-editor-focused': copyModeActive()}"
+                  <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
                                      ng-click="onContentClick($event)"
                                      html-data="getRequiredHtml(stateDefaultOutcome.feedback)"
                                      class="oppia-rte-editor">
@@ -153,7 +153,7 @@
                 <[getEmptyContentMessage()]>
               </span>
               <span>
-                <angular-html-bind ng-class="{'oppia-rte-editor-focused': copyModeActive()}"
+                <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
                                    ng-click="onContentClick($event)"
                                    html-data="getRequiredHtml(hint.hintContent)"
                                    class="oppia-rte-editor">
@@ -170,7 +170,7 @@
         <[getEmptyContentMessage()]>
       </span>
       <span>
-        <angular-html-bind ng-class="{'oppia-rte-editor-focused': copyModeActive()}"
+        <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
                            ng-click="onContentClick($event)"
                            html-data="getRequiredHtml(stateSolution.explanation)"
                            class="oppia-rte-editor">
@@ -260,10 +260,31 @@
   .oppia-audio-translation-bar {
     height: 50px;
   }
-  .oppia-rte-editor-focused:focus > * {
+  .oppia-rte-editor-focused:focus > p {
     outline: solid 2px #009688;
   }
-  .oppia-rte-editor-focused:focus > * > * {
+  .oppia-rte-editor-focused:focus > ol {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > ul {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > pre {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > blockquote {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > uib-accordion > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-image > figure {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-tabs > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-video > center {
     outline: solid 2px #009688;
   }
   .oppia-rte-editor-focused *:hover {
