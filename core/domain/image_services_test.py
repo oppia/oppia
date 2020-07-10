@@ -24,7 +24,6 @@ import os
 
 from PIL import Image
 from PIL import ImageChops
-from constants import constants
 from core.domain import image_services
 from core.tests import test_utils
 import feconf
@@ -54,41 +53,28 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
         self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
-    def test_dev_mode_returns_original_uncompressed_image(self):
-        # Test to test the behavior when we do not set constants.DEV_MODE
-        # to False in test mode.
-        with self.swap(constants, 'DEV_MODE', True):
-            compressed_image = (image_services.compress_image(
-                self.jpeg_raw_image, 0.8))
-            height, width = (
-                image_services.get_image_dimensions(compressed_image))
-            self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
-            self.assertEqual(self.TEST_IMAGE_WIDTH, width)
-
     def test_compress_image_returns_correct_dimensions(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            compressed_image = (
-                image_services.compress_image(self.jpeg_raw_image, 0.5))
+        compressed_image = (
+            image_services.compress_image(self.jpeg_raw_image, 0.5))
         height, width = (
             image_services.get_image_dimensions(compressed_image))
         self.assertEqual(self.TEST_IMAGE_HEIGHT * 0.5, height)
         self.assertEqual(self.TEST_IMAGE_WIDTH * 0.5, width)
 
     def test_invalid_scaling_factor_triggers_value_error(self):
-        email_exception = self.assertRaisesRegexp(
+        value_exception = self.assertRaisesRegexp(
             ValueError, r'Scaling factor should be in the interval \(0, 1].')
-        with self.swap(constants, 'DEV_MODE', False), email_exception:
+        with value_exception:
             image_services.compress_image(self.jpeg_raw_image, 1.1)
 
     def test_compression_results_in_correct_format(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            compressed_image = (
-                image_services.compress_image(self.jpeg_raw_image, 0.7))
+        compressed_image = (
+            image_services.compress_image(self.jpeg_raw_image, 0.7))
         pil_image = Image.open(io.BytesIO(compressed_image))
         self.assertEqual(pil_image.format, 'JPEG')
-        with self.swap(constants, 'DEV_MODE', False):
-            compressed_image = (
-                image_services.compress_image(self.png_raw_image, 0.7))
+
+        compressed_image = (
+            image_services.compress_image(self.png_raw_image, 0.7))
         pil_image = Image.open(io.BytesIO(compressed_image))
         self.assertEqual(pil_image.format, 'PNG')
 
@@ -121,9 +107,8 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             correct_compressed_image = f.read()
         correct_height, correct_width = (
             image_services.get_image_dimensions(correct_compressed_image))
-        with self.swap(constants, 'DEV_MODE', False):
-            compressed_image = (
-                image_services.compress_image(self.jpeg_raw_image, 0.5))
+        compressed_image = (
+            image_services.compress_image(self.jpeg_raw_image, 0.5))
 
         # In order to make sure the images are the same, the function needs to
         # open and save the image specifically using PIL since the "golden

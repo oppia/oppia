@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import io
 
 from PIL import Image
-from constants import constants
 from core.platform import models
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -65,23 +64,20 @@ def compress_image(image_content, scaling_factor):
     Returns:
         str. Returns the content of the compressed image.
     """
-    if not constants.DEV_MODE:
-        if scaling_factor > 1 or scaling_factor <= 0:
-            raise ValueError('Scaling factor should be in the interval (0, 1].')
-        image = Image.open(io.BytesIO(image_content))
+    if scaling_factor > 1 or scaling_factor <= 0:
+        raise ValueError('Scaling factor should be in the interval (0, 1].')
+    image = Image.open(io.BytesIO(image_content))
 
-        image_format = image.format
-        height, width = _get_pil_image_dimensions(image)
-        new_width = int(width * scaling_factor)
-        new_height = int(height * scaling_factor)
-        new_image_dimensions = (new_width, new_height)
+    image_format = image.format
+    height, width = _get_pil_image_dimensions(image)
+    new_width = int(width * scaling_factor)
+    new_height = int(height * scaling_factor)
+    new_image_dimensions = (new_width, new_height)
 
-        # NOTE: image.thumbnail() function does not work when the scale factor
-        # is greater than 1.
-        image.thumbnail(new_image_dimensions, Image.ANTIALIAS)
-        with io.BytesIO() as output:
-            image.save(output, format=image_format)
-            new_image_content = output.getvalue()
-        return new_image_content
-    else:
-        return image_content
+    # NOTE: image.thumbnail() function does not work when the scale factor
+    # is greater than 1.
+    image.thumbnail(new_image_dimensions, Image.ANTIALIAS)
+    with io.BytesIO() as output:
+        image.save(output, format=image_format)
+        new_image_content = output.getvalue()
+    return new_image_content
