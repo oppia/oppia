@@ -30,6 +30,7 @@ import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
+
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
     """Returns a dict of target_id to exploration opportunity summary dict.
 
@@ -187,7 +188,7 @@ class SuggestionsProviderHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _require_valid_suggestion_and_target_types(
-        self, target_type, suggestion_type):
+            self, target_type, suggestion_type):
         """Checks whether the given target_type and suggestion_type are valid.
 
         Args:
