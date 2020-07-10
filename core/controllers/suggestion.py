@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -64,7 +64,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     opportunity_skill_ids = [opp.id for opp in opportunities]
     opportunity_id_to_skill = {
         skill.id: skill
-        for skill in skill_services.get_multi_skills(opportunity_skill_ids)
+        for skill in skill_fetchers.get_multi_skills(opportunity_skill_ids)
     }
     opportunity_id_to_opportunity = {}
     for opp in opportunities:
@@ -186,7 +186,8 @@ class SuggestionsProviderHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _require_valid_suggestion_and_target_types(self, target_type, suggestion_type):
+    def _require_valid_suggestion_and_target_types(
+        self, target_type, suggestion_type):
         """Checks whether the given target_type and suggestion_type are valid.
 
         Args:
@@ -194,8 +195,8 @@ class SuggestionsProviderHandler(base.BaseHandler):
             suggestion_type: str. The type of the suggestion.
 
         Raises:
-            InvalidInputException: If the given target_type of suggestion_type are
-                invalid.
+            InvalidInputException: If the given target_type of suggestion_type
+                are invalid.
         """
         if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
             raise self.InvalidInputException(
