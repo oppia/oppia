@@ -34,7 +34,7 @@ import python_utils
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
 taskqueue_services = models.Registry.import_taskqueue_services()
-
+email_services = models.Registry.import_email_services()
 
 class FeedbackServicesUnitTests(test_utils.GenericTestBase):
     """Test functions in feedback_services."""
@@ -42,7 +42,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
     emails_dict = {}
-    
+
     def mock_send_mail(
             self, sender_email, recipient_email, subject, plaintext_body,
             html_body, bcc_admin, reply_to_id, *_):
@@ -63,7 +63,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             bcc = [feconf.ADMIN_EMAIL_ADDRESS]
         if reply_to_id:
             reply_to = (
-                gae_email_services.get_incoming_email_address(reply_to_id))
+                email_services.get_incoming_email_address(reply_to_id))
         if recipient_email not in self.emails_dict:
             self.emails_dict[recipient_email] = []
         self.emails_dict[recipient_email].append(

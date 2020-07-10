@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import subscription_services
 from core.platform import models
@@ -29,6 +28,7 @@ import feconf
 (email_models, user_models) = models.Registry.import_models([
     models.NAMES.email, models.NAMES.user])
 email_services = models.Registry.import_email_services()
+
 
 class InformSubscribersTest(test_utils.GenericTestBase):
     """Test for informing subscribers when an exploration is published by the
@@ -41,7 +41,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
     USER_NAME_2 = 'user2'
     USER_EMAIL_2 = 'user2@test.com'
     emails_dict = {}
-    
+
     def mock_send_mail(
             self, sender_email, recipient_email, subject, plaintext_body,
             html_body, bcc_admin, reply_to_id, *_):
@@ -62,7 +62,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
             bcc = [feconf.ADMIN_EMAIL_ADDRESS]
         if reply_to_id:
             reply_to = (
-                gae_email_services.get_incoming_email_address(reply_to_id))
+                email_services.get_incoming_email_address(reply_to_id))
         if recipient_email not in self.emails_dict:
             self.emails_dict[recipient_email] = []
         self.emails_dict[recipient_email].append(
@@ -120,8 +120,9 @@ class InformSubscribersTest(test_utils.GenericTestBase):
                 email_subscription_services.inform_subscribers(
                     self.editor_id, 'A', 'Title')
 
-                # Make sure correct number of emails is sent and no email is sent
-                # to the person who has unsubscribed from subscription emails.
+                # Make sure correct number of emails is sent and no email is
+                # sent to the person who has unsubscribed from subscription
+                # emails.
                 messages = self.mock_get_sent_messages(to=self.NEW_USER_EMAIL)
                 self.assertEqual(len(messages), 1)
                 messages = self.mock_get_sent_messages(to=self.NEW_USER_EMAIL)
@@ -141,9 +142,9 @@ class InformSubscribersTest(test_utils.GenericTestBase):
                 self.assertEqual(True, any(
                     model.recipient_email == self.NEW_USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
 
-                # No email model is stored for the user who has unsubscribed from
-                # subscription emails.
+                # No email model is stored for the user who has unsubscribed
+                # from subscription emails.
                 self.assertEqual(False, any(
-                    model.recipient_id == self.user_id_2 for model in all_models))
+                    model.recipient_id == self.user_id_2 for model in all_models)) # pylint: disable=line-too-long
                 self.assertEqual(False, any(
                     model.recipient_email == self.USER_EMAIL_2 for model in all_models)) # pylint: disable=line-too-long

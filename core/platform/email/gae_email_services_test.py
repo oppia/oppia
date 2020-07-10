@@ -33,8 +33,8 @@ class EmailTests(test_utils.GenericTestBase):
     emails_dict = {}
 
     def mock_send_emails(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc_admin=False, reply_to_id=None, *_):
+            self, sender_email='', recipient_email='', subject='',
+            plaintext_body='', html_body='', bcc_admin=False, reply_to_id=None):
         bcc = []
         reply_to = ''
         if not feconf.CAN_SEND_EMAILS:
