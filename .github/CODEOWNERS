@@ -417,7 +417,6 @@
 /core/domain/image_service*.py @seanlip
 
 
-
 # Miscellaneous.
 /__init__.py @nithusha21
 /core/__init__.py @nithusha21

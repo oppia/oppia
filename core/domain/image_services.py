@@ -28,6 +28,19 @@ from core.platform import models
 app_identity_services = models.Registry.import_app_identity_services()
 
 
+def _get_pil_image_dimensions(pil_image):
+    """Gets the dimensions of the image with the given file_content.
+
+    Args:
+        pil_image: Image. A file in the Pillow Image format.
+
+    Returns:
+        tuple(int). Returns height and width of the image.
+    """
+    width, height = pil_image.size
+    return height, width
+
+
 def get_image_dimensions(file_content):
     """Gets the dimensions of the image with the given file_content.
 
@@ -38,8 +51,7 @@ def get_image_dimensions(file_content):
         tuple(int). Returns height and width of the image.
     """
     image = Image.open(io.BytesIO(file_content))
-    width, height = image.size
-    return height, width
+    return _get_pil_image_dimensions(image)
 
 
 def compress_image(image_content, scaling_factor):
@@ -48,22 +60,24 @@ def compress_image(image_content, scaling_factor):
     Args:
         image_content: str. Content of the file to be compressed.
         scaling_factor: float. The number by which the dimensions of the image
-            will be scaled. This is expected to be between 0 and 1
+            will be scaled. This is expected to be in the interval (0, 1].
 
     Returns:
         str. Returns the content of the compressed image.
     """
     if not constants.DEV_MODE:
-        if scaling_factor > 1:
-            raise ValueError('Scaling factor should be less than 1.')
+        if scaling_factor > 1 or scaling_factor <= 0:
+            raise ValueError('Scaling factor should be in the interval (0, 1].')
         image = Image.open(io.BytesIO(image_content))
 
         image_format = image.format
-        width, height = image.width, image.height
+        height, width = _get_pil_image_dimensions(image)
         new_width = int(width * scaling_factor)
         new_height = int(height * scaling_factor)
         new_image_dimensions = (new_width, new_height)
 
+        # NOTE: image.thumbnail() function does not work when the scale factor
+        # is greater than 1.
         image.thumbnail(new_image_dimensions, Image.ANTIALIAS)
         with io.BytesIO() as output:
             image.save(output, format=image_format)

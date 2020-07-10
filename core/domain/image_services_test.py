@@ -23,6 +23,7 @@ import io
 import os
 
 from PIL import Image
+from PIL import ImageChops
 from constants import constants
 from core.domain import image_services
 from core.tests import test_utils
@@ -47,13 +48,15 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             mode='rb', encoding=None) as f:
             self.png_raw_image = f.read()
 
-    def test_image_dimensions_outputs_correctly(self):
+    def test_image_dimensions_are_output_correctly(self):
         height, width = (
             image_services.get_image_dimensions(self.jpeg_raw_image))
         self.assertEqual(self.TEST_IMAGE_HEIGHT, height)
         self.assertEqual(self.TEST_IMAGE_WIDTH, width)
 
-    def test_dev_mode_returns_regular_image(self):
+    def test_dev_mode_returns_original_uncompressed_image(self):
+        # Test to test the behavior when we do not set constants.DEV_MODE
+        # to False in test mode.
         compressed_image = (image_services.compress_image(
             self.jpeg_raw_image, 0.8))
         height, width = (
@@ -72,7 +75,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_scaling_factor_triggers_value_error(self):
         email_exception = self.assertRaisesRegexp(
-            ValueError, 'Scaling factor should be less than 1.')
+            ValueError, r'Scaling factor should be in the interval \(0, 1].')
         with self.swap(constants, 'DEV_MODE', False), email_exception:
             image_services.compress_image(self.jpeg_raw_image, 1.1)
 
@@ -89,7 +92,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(pil_image.format, 'PNG')
 
     def test_compression_results_in_identical_files(self):
-        def is_different(file1, file2):
+        def is_identical(file1, file2):
             """Checks the differences between the two images and returns if they
             are different.
 
@@ -100,15 +103,11 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             Returns:
                 bool. Returns whether the images are different.
             """
-            from PIL import ImageChops
             image1 = Image.open(io.BytesIO(file1)).convert('RGB')
             image2 = Image.open(io.BytesIO(file2)).convert('RGB')
             diff = ImageChops.difference(image1, image2)
 
-            if diff.getbbox():
-                return False
-            else:
-                return True
+            return not diff.getbbox()
 
         with python_utils.open_file(
             os.path.join(
@@ -120,9 +119,19 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             compressed_image = (
                 image_services.compress_image(self.jpeg_raw_image, 0.5))
+
+        # I need to open and save it specifically using PIL since the "golden
+        # image" (image that we compare the compressed image to) is saved using
+        # PIL which applies a slight quality change that won't appear unless we
+        # save it using PIL.
+        temp_image = Image.open(io.BytesIO(compressed_image))
+        image_format = temp_image.format
+        with io.BytesIO() as output:
+            temp_image.save(output, format=image_format)
+            compressed_image_content = output.getvalue()
         height, width = image_services.get_image_dimensions(
-            compressed_image)
+            compressed_image_content)
         self.assertEqual(correct_height, height)
         self.assertEqual(correct_width, width)
-        self.assertFalse(is_different(compressed_image,
-                                      correct_compressed_image))
+        self.assertTrue(
+            is_identical(compressed_image_content, correct_compressed_image))
