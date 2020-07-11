@@ -32,7 +32,7 @@ good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
 dummy-variables-rgx=_|unused_*
 
 # Regular expression which should match good variable names
-variable-naming-style=snake_case
+variable-rgx=^(?:|_)[a-z][a-z0-9]*(_[a-z0-9]+)*$
 
 # Regular expression matching correct attribute names
 attr-rgx=[A-Za-z_][A-Za-z0-9_]*$
