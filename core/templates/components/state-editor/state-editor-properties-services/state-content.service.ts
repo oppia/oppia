@@ -23,12 +23,13 @@ import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
 import { UtilsService } from 'services/utils.service';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 // TODO(sll): Add validation.
-export class StateContentService extends StatePropertyService {
+export class StateContentService extends StatePropertyService<SubtitledHtml> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveStateContent';

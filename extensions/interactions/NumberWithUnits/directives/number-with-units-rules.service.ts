@@ -24,6 +24,8 @@ import { unit } from 'mathjs';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { UtilsService } from 'services/utils.service';
+import { INumberWithUnitsAnswer } from 'interactions/answer-defs';
+import { INumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
 
 // Rules service for number with units interaction.
 @Injectable({
@@ -36,14 +38,16 @@ export class NumberWithUnitsRulesService {
       this.unitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  IsEqualTo(answer: any, inputs: any): boolean {
-    // Returns true only if input is exactly equal to answer.
-    answer = this.unitsObjectFactory.fromDict(answer);
-    inputs = this.unitsObjectFactory.fromDict(inputs.f);
 
-    var answerString = answer.toMathjsCompatibleString();
-    var inputsString = inputs.toMathjsCompatibleString();
+  IsEqualTo(
+      answer: INumberWithUnitsAnswer,
+      inputs: INumberWithUnitsRuleInputs): boolean {
+    // Returns true only if input is exactly equal to answer.
+    var answerObject = this.unitsObjectFactory.fromDict(answer);
+    var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+
+    var answerString = answerObject.toMathjsCompatibleString();
+    var inputsString = inputsObject.toMathjsCompatibleString();
 
     var answerList = this.unitsObjectFactory.fromRawInputString(
       answerString).toDict();
@@ -51,20 +55,22 @@ export class NumberWithUnitsRulesService {
       inputsString).toDict();
     return this.utilsService.isEquivalent(answerList, inputsList);
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  IsEquivalentTo(answer: any, inputs: any): boolean {
-    answer = this.unitsObjectFactory.fromDict(answer);
-    inputs = this.unitsObjectFactory.fromDict(inputs.f);
-    if (answer.type === 'fraction') {
-      answer.type = 'real';
-      answer.real = answer.fraction.toFloat();
+
+  IsEquivalentTo(
+      answer: INumberWithUnitsAnswer,
+      inputs: INumberWithUnitsRuleInputs): boolean {
+    var answerObject = this.unitsObjectFactory.fromDict(answer);
+    var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+    if (answerObject.type === 'fraction') {
+      answerObject.type = 'real';
+      answerObject.real = answerObject.fraction.toFloat();
     }
-    if (inputs.type === 'fraction') {
-      inputs.type = 'real';
-      inputs.real = inputs.fraction.toFloat();
+    if (inputsObject.type === 'fraction') {
+      inputsObject.type = 'real';
+      inputsObject.real = inputsObject.fraction.toFloat();
     }
-    var answerString = answer.toMathjsCompatibleString();
-    var inputsString = inputs.toMathjsCompatibleString();
+    var answerString = answerObject.toMathjsCompatibleString();
+    var inputsString = inputsObject.toMathjsCompatibleString();
     return unit(answerString).equals(unit(inputsString));
   }
 }

@@ -267,13 +267,15 @@ def export_to_zip_file(exploration_id, version=None):
         str. The contents of the ZIP archive of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
+    # Asset directories that need to be included in exploration download.
+    asset_dirs_to_include_in_downloads = ('image',)
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = python_utils.string_io()
+    temp_file = python_utils.string_io()
     with zipfile.ZipFile(
-        memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
@@ -284,6 +286,8 @@ def export_to_zip_file(exploration_id, version=None):
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
+            if not filepath.startswith(asset_dirs_to_include_in_downloads):
+                continue
             file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
@@ -291,7 +295,7 @@ def export_to_zip_file(exploration_id, version=None):
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
-    return memfile.getvalue()
+    return temp_file.getvalue()
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):
@@ -1395,7 +1399,7 @@ def get_next_page_of_all_non_private_commits(
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.created_on, entry.last_updated, entry.user_id,
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private

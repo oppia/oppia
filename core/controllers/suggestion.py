@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -85,7 +85,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     opportunity_skill_ids = [opp.id for opp in opportunities]
     opportunity_id_to_skill = {
         skill.id: skill
-        for skill in skill_services.get_multi_skills(opportunity_skill_ids)
+        for skill in skill_fetchers.get_multi_skills(opportunity_skill_ids)
     }
     opportunity_id_to_opportunity = {}
     for opp in opportunities:
@@ -103,13 +103,15 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        suggestion_services.create_suggestion(
-            self.payload.get('suggestion_type'),
-            self.payload.get('target_type'), self.payload.get('target_id'),
-            self.payload.get('target_version_at_submission'),
-            self.user_id, self.payload.get('change'),
-            self.payload.get('description'),
-            self.payload.get('final_reviewer_id'))
+        try:
+            suggestion_services.create_suggestion(
+                self.payload.get('suggestion_type'),
+                self.payload.get('target_type'), self.payload.get('target_id'),
+                self.payload.get('target_version_at_submission'),
+                self.user_id, self.payload.get('change'),
+                self.payload.get('description'))
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
         self.render_json(self.values)
 
 

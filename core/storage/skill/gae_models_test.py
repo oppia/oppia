@@ -45,11 +45,6 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             skill_models.SkillModel.has_reference_to_user_id('x_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            skill_models.SkillModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
@@ -61,8 +56,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = skill_models.SkillCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False
         )
         commit.skill_id = 'b'
@@ -86,11 +80,6 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            skill_models.SkillSummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_fetch_page(self):
         skill_models.SkillSummaryModel(
