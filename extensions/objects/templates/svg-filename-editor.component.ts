@@ -681,6 +681,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.onClear = function() {
         ctrl.objectUndoStack = [];
         ctrl.objectRedoStack = [];
+        ctrl.canvasObjects = [];
         ctrl.canvas.clear();
       };
 
@@ -861,16 +862,18 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:added', function() {
-          var shape = ctrl.canvas._objects[ctrl.canvas._objects.length - 1];
-          ctrl.canvasObjects.push(shape);
-          if (!ctrl.isRedo) {
-            undoStackPush({
-              action: 'add',
-              object: shape
-            });
-            ctrl.objectRedoStack = [];
+          if (ctrl.drawMode !== DRAW_MODE_POLY) {
+            var shape = ctrl.canvas._objects[ctrl.canvas._objects.length - 1];
+            ctrl.canvasObjects.push(shape);
+            if (!ctrl.isRedo) {
+              undoStackPush({
+                action: 'add',
+                object: shape
+              });
+              ctrl.objectRedoStack = [];
+            }
+            ctrl.isRedo = false;
           }
-          ctrl.isRedo = false;
         });
 
         ctrl.canvas.on('object:scaling', function() {
