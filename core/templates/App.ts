@@ -16,10 +16,18 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
+/**
+ * Angular Material (v8) requires hammerjs for gesture recognition.
+ * You can look at point 2 here:
+ * https://v8.material.angular.io/guide/getting-started#install-angular-material
+ * It won't be required in Angular 9.
+ * TODO(#9172): Remove the import when upgraded to Angular 9.
+ */
+import 'hammerjs';
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.directive.ts');
-require('components/button-directives/social-buttons.directive.ts');
+require('components/button-directives/social-buttons.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');

@@ -18,6 +18,8 @@
 
 // In case of doubts over what is done here, please look at the description of
 // the PR #9479. https://github.com/oppia/oppia/pull/9479#issue-432536289
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -226,6 +228,16 @@ angular.module('oppia').directive('oppiaRoot', [
           $scope.initialized = false;
 
           $scope.onInit = function() {
+            const translateService = (
+              OppiaAngularRootComponent.translateService);
+            const i18nLanguageCodeService = (
+              OppiaAngularRootComponent.i18nLanguageCodeService);
+            translateService.use(
+              i18nLanguageCodeService.getCurrentI18nLanguageCode());
+            i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+              (code) => translateService.use(code)
+            );
+
             for (let service of ANGULAR_SERVICES) {
               (
                 angular.module(
