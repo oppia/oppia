@@ -1,16 +1,16 @@
 <div class="oppia-practice-tab-container">
   <md-card class="oppia-page-card oppia-long-text">
     <h2 class="tab-title">
-      <span translate="I18N_TOPIC_VIEWER_MASTER_SKILLS"></span>
+      <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate"></span>
     </h2>
     <span class="practice-content">
-      <span translate="I18N_TOPIC_VIEWER_SELECT_SKILLS"></span>
+      <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate"></span>
     </span>
-    <md-checkbox ng-repeat="subtopic in $ctrl.availableSubtopics" ng-model="$ctrl.selectedSubtopicIndices[$index]">
-      <[subtopic.getTitle()]>
+    <md-checkbox *ngFor="let subtopic of availableSubtopics" ng-model="selectedSubtopicIndices[$index]">
+      {{ subtopic.getTitle() }}
     </md-checkbox>
-    <md-button ng-disabled="$ctrl.isStartButtonDisabled()"
-               ng-click="$ctrl.openNewPracticeSession()"
+    <md-button ng-disabled="isStartButtonDisabled()"
+               (click)="openNewPracticeSession()"
                class="practice-session-button md-accent md-raised">
       <span translate="I18N_TOPIC_VIEWER_START_PRACTICE"></span>
     </md-button>
