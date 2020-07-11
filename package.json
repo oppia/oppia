@@ -133,6 +133,7 @@
     "mathjs": "^7.0.0",
     "moment": "^2.24.0",
     "nerdamer": "^1.1.4",
+    "protractor-retry": "^1.2.12",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^4.0.1"
   }

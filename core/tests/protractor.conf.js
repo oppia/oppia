@@ -1,6 +1,8 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
+var retry = require('protractor-retry').retry;
 var glob = require('glob')
-var path = require('path')
+var path = require('path');
+const { relativeTimeRounding } = require('moment');
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -314,9 +316,17 @@ exports.config = {
       displaySpecDuration: true
     }));
 
+    retry.onPrepare();
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
     browser.driver.manage().window().setSize(1285, 1000);
+  },
+  
+  afterLaunch: function() {
+      // Number of times to retry if a test fails.
+      // By setting it as 2, the tests will retry twice, making the total
+      // number of runs 3.
+      return retry.afterLaunch(2);
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -380,5 +390,7 @@ exports.config = {
   // A callback function called once the tests have finished running and
   // the webdriver instance has been shut down. It is passed the exit code
   // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {}
+  onCleanUp: function(results) {
+    retry.onCleanUp(results);
+  }
 };
