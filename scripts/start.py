@@ -53,6 +53,10 @@ _PARSER.add_argument(
     help='optional; if specified, enables console.',
     action='store_true')
 _PARSER.add_argument(
+    '--disable_host_checking',
+    help='optional; if specified, disables host checking.',
+    action='store_true')
+_PARSER.add_argument(
     '--prod_env',
     help='optional; if specified, runs Oppia in a production environment.',
     action='store_true')
@@ -105,6 +109,9 @@ def main(args=None):
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
         '--enable_console=true' if parsed_args.enable_console else '')
+    disable_host_checking_arg = (
+        '--enable_host_checking=False'
+        if parsed_args.disable_host_checking else '')
     no_auto_restart = (
         '--automatic_restart=no' if parsed_args.no_auto_restart else '')
 
@@ -134,9 +141,9 @@ def main(args=None):
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port %s --skip_sdk_update_check true %s' % (
+        '8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check true %s' % (
             common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg, no_auto_restart,
+            enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True))
 
