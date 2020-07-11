@@ -963,11 +963,13 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exp_model_class_model_id_model_tuples = (
+        exp_model_references = (
             field_name_to_external_model_references['exploration_ids'])
 
-        for (model_class, model_id, exp_model) in (
-                exp_model_class_model_id_model_tuples):
+        for exp_model_reference in exp_model_references:
+            model_class = exp_model_reference.class_name
+            model_id = exp_model_reference.model_id
+            exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -996,11 +998,13 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exp_model_class_model_id_model_tuples = (
+        exp_model_references = (
             field_name_to_external_model_references['exploration_ids'])
 
-        for (model_class, model_id, exp_model) in (
-                exp_model_class_model_id_model_tuples):
+        for exp_model_reference in exp_model_references:
+            model_class = exp_model_reference.class_name
+            model_id = exp_model_reference.model_id
+            exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -1056,11 +1060,13 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exp_model_class_model_id_model_tuples = (
+        exp_model_references = (
             field_name_to_external_model_references['exploration_ids'])
 
-        for (model_class, model_id, exp_model) in (
-                exp_model_class_model_id_model_tuples):
+        for exp_model_reference in exp_model_references:
+            model_class = exp_model_reference.class_name
+            model_id = exp_model_reference.model_id
+            exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -1089,11 +1095,13 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exp_model_class_model_id_model_tuples = (
+        exp_model_references = (
             field_name_to_external_model_references['exploration_ids'])
 
-        for (model_class, model_id, exp_model) in (
-                exp_model_class_model_id_model_tuples):
+        for exp_model_reference in exp_model_references:
+            model_class = exp_model_reference.class_name
+            model_id = exp_model_reference.model_id
+            exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -1301,8 +1309,9 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         elif item.id.startswith('collection'):
             return collection_domain.CollectionChange
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -1380,11 +1389,13 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        collection_model_class_model_id_model_tuples = (
+        collection_model_references = (
             field_name_to_external_model_references['collection_ids'])
 
-        for (model_class, model_id, collection_model) in (
-                collection_model_class_model_id_model_tuples):
+        for collection_model_reference in collection_model_references:
+            model_class = collection_model_reference.class_name
+            model_id = collection_model_reference.model_id
+            collection_model = collection_model_reference.model_instance
             if collection_model is None or collection_model.deleted:
                 cls.errors['collection_ids field check'].append((
                     'Entity id %s: based on field collection_ids having'
@@ -1488,11 +1499,13 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exploration_model_class_model_id_model_tuples = (
+        exploration_model_references = (
             field_name_to_external_model_references['exploration_ids'])
 
-        for (model_class, model_id, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
+        for exploration_model_reference in exploration_model_references:
+            model_class = exploration_model_reference.class_name
+            model_id = exploration_model_reference.model_id
+            exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -1524,11 +1537,13 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exploration_model_class_model_id_model_tuples = (
+        exploration_model_references = (
             field_name_to_external_model_references['exploration_ids'])
 
-        for (model_class, model_id, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
+        for exploration_model_reference in exploration_model_references:
+            model_class = exploration_model_reference.class_name
+            model_id = exploration_model_reference.model_id
+            exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -1558,11 +1573,13 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        story_model_class_model_id_model_tuples = (
+        story_model_references = (
             field_name_to_external_model_references['story_ids'])
 
-        for (model_class, model_id, story_model) in (
-                story_model_class_model_id_model_tuples):
+        for story_model_reference in story_model_references:
+            model_class = story_model_reference.class_name
+            model_id = story_model_reference.model_id
+            story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
                 cls.errors['story_ids field check'].append((
                     'Entity id %s: based on field story_ids having'
@@ -1638,11 +1655,13 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        skill_model_class_model_id_model_tuples = (
+        skill_model_references = (
             field_name_to_external_model_references['skill_ids'])
 
-        for (model_class, model_id, skill_model) in (
-                skill_model_class_model_id_model_tuples):
+        for skill_model_reference in skill_model_references:
+            model_class = skill_model_reference.class_name
+            model_id = skill_model_reference.model_id
+            skill_model = skill_model_reference.model_instance
             if skill_model is None or skill_model.deleted:
                 cls.errors['skill_ids field check'].append((
                     'Entity id %s: based on field skill_ids having'
@@ -1794,11 +1813,13 @@ class SentEmailModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        sender_model_class_model_id_model_tuples = (
+        sender_model_references = (
             field_name_to_external_model_references['sender_id'])
 
-        for (model_class, model_id, sender_model) in (
-                sender_model_class_model_id_model_tuples):
+        for sender_model_reference in sender_model_references:
+            model_class = sender_model_reference.class_name
+            model_id = sender_model_reference.model_id
+            sender_model = sender_model_reference.model_instance
             if sender_model is None or sender_model.deleted:
                 cls.errors['sender_id field check'].append((
                     'Entity id %s: based on field sender_id having'
@@ -1827,11 +1848,13 @@ class SentEmailModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        recipient_model_class_model_id_model_tuples = (
+        recipient_model_references = (
             field_name_to_external_model_references['recipient_id'])
 
-        for (model_class, model_id, recipient_model) in (
-                recipient_model_class_model_id_model_tuples):
+        for recipient_model_reference in recipient_model_references:
+            model_class = recipient_model_reference.class_name
+            model_id = recipient_model_reference.model_id
+            recipient_model = recipient_model_reference.model_instance
             if recipient_model is None or recipient_model.deleted:
                 cls.errors['recipient_id field check'].append((
                     'Entity id %s: based on field recipient_id having'
@@ -1897,11 +1920,13 @@ class BulkEmailModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        sender_model_class_model_id_model_tuples = (
+        sender_model_references = (
             field_name_to_external_model_references['sender_id'])
 
-        for (model_class, model_id, sender_model) in (
-                sender_model_class_model_id_model_tuples):
+        for sender_model_reference in sender_model_references:
+            model_class = sender_model_reference.class_name
+            model_id = sender_model_reference.model_id
+            sender_model = sender_model_reference.model_instance
             if sender_model is None or sender_model.deleted:
                 cls.errors['sender_id field check'].append((
                     'Entity id %s: based on field sender_id having'
@@ -2163,8 +2188,9 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         elif item.id.startswith('exploration'):
             return exp_domain.ExplorationChange
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -2259,10 +2285,13 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exploration_model_class_model_id_model_tuples = (
+        exploration_model_references = (
             field_name_to_external_model_references['exploration_ids'])
-        for (model_class, model_id, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
+
+        for exploration_model_reference in exploration_model_references:
+            model_class = exploration_model_reference.class_name
+            model_id = exploration_model_reference.model_id
+            exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -2430,11 +2459,14 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        feedback_thread_model_class_model_id_model_tuples = (
+        feedback_thread_model_references = (
             field_name_to_external_model_references['feedback_thread_ids'])
 
-        for (model_class, model_id, feedback_thread_model) in (
-                feedback_thread_model_class_model_id_model_tuples):
+        for feedback_thread_model_reference in feedback_thread_model_references:
+            model_class = feedback_thread_model_reference.class_name
+            model_id = feedback_thread_model_reference.model_id
+            feedback_thread_model = (
+                feedback_thread_model_reference.model_instance)
             if feedback_thread_model is None or feedback_thread_model.deleted:
                 cls.errors['feedback_thread_ids field check'].append((
                     'Entity id %s: based on field feedback_thread_ids having'
@@ -2800,8 +2832,9 @@ class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         if item.id.startswith('question'):
             return question_domain.QuestionChange
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -2838,11 +2871,13 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        question_model_class_model_id_model_tuples = (
+        question_model_references = (
             field_name_to_external_model_references['question_ids'])
 
-        for (model_class, model_id, question_model) in (
-                question_model_class_model_id_model_tuples):
+        for question_model_reference in question_model_references:
+            model_class = question_model_reference.class_name
+            model_id = question_model_reference.model_id
+            question_model = question_model_reference.model_instance
             if question_model is None or question_model.deleted:
                 cls.errors['question_ids field check'].append((
                     'Entity id %s: based on field question_ids having'
@@ -3061,8 +3096,9 @@ class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         if item.id.startswith('skill'):
             return skill_domain.SkillChange
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -3098,12 +3134,19 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        skill_model_class_model_id_model_tuples = (
+        skill_model_references = (
             field_name_to_external_model_references['skill_ids'])
 
-        for (_, _, skill_model) in (
-                skill_model_class_model_id_model_tuples):
+        for skill_model_reference in skill_model_references:
+            model_class = skill_model_reference.class_name
+            model_id = skill_model_reference.model_id
+            skill_model = skill_model_reference.model_instance
             if not skill_model or skill_model.deleted:
+                cls.errors['skill_ids field check'].append((
+                    'Entity id %s: based on field skill_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.misconception_count != len(skill_model.misconceptions):
                 cls.errors['misconception count check'].append((
@@ -3125,11 +3168,13 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        skill_model_class_model_id_model_tuples = (
+        skill_model_references = (
             field_name_to_external_model_references['skill_ids'])
 
-        for (model_class, model_id, skill_model) in (
-                skill_model_class_model_id_model_tuples):
+        for skill_model_reference in skill_model_references:
+            model_class = skill_model_reference.class_name
+            model_id = skill_model_reference.model_id
+            skill_model = skill_model_reference.model_instance
             if not skill_model or skill_model.deleted:
                 cls.errors['skill_ids field check'].append((
                     'Entity id %s: based on field skill_ids having'
@@ -3256,8 +3301,9 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         if item.id.startswith('story'):
             return story_domain.StoryChange
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -3294,11 +3340,13 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        story_model_class_model_id_model_tuples = (
+        story_model_references = (
             field_name_to_external_model_references['story_ids'])
 
-        for (model_class, model_id, story_model) in (
-                story_model_class_model_id_model_tuples):
+        for story_model_reference in story_model_references:
+            model_class = story_model_reference.class_name
+            model_id = story_model_reference.model_id
+            story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
                 cls.errors['story_ids field check'].append((
                     'Entity id %s: based on field story_ids having'
@@ -3351,8 +3399,9 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             return suggestion_services.get_suggestion_from_model(item)
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -3402,13 +3451,19 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                 of ExternalModelReference objects.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
+            cls.errors['target type check'].append(
+                'Entity id %s: Target type %s is not allowed' % (
+                    item.id, item.target_type))
             return
-        target_model_class_model_id_model_tuples = (
+
+        target_model_references = (
             field_name_to_external_model_references[
                 '%s_ids' % item.target_type])
 
-        for (model_class, model_id, target_model) in (
-                target_model_class_model_id_model_tuples):
+        for target_model_reference in target_model_references:
+            model_class = target_model_reference.class_name
+            model_id = target_model_reference.model_id
+            target_model = target_model_reference.model_instance
             if target_model is None or target_model.deleted:
                 cls.errors['%s_ids field check' % item.target_type].append((
                     'Entity id %s: based on field %s_ids having'
@@ -3459,6 +3514,9 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                 of ExternalModelReference objects.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
+            cls.errors['target type check'].append(
+                'Entity id %s: Target type %s is not allowed' % (
+                    item.id, item.target_type))
             return
         score_category_type = (
             item.score_category.split(
@@ -3467,12 +3525,14 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
             item.score_category.split(
                 suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
         if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-            target_model_class_model_id_model_tuples = (
+            target_model_references = (
                 field_name_to_external_model_references[
                     '%s_ids' % item.target_type])
 
-            for (model_class, model_id, target_model) in (
-                    target_model_class_model_id_model_tuples):
+            for target_model_reference in target_model_references:
+                model_class = target_model_reference.class_name
+                model_id = target_model_reference.model_id
+                target_model = target_model_reference.model_instance
                 if target_model is None or target_model.deleted:
                     cls.errors['%s_ids field check' % item.target_type].append((
                         'Entity id %s: based on field %s_ids having'
@@ -3761,8 +3821,9 @@ class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         elif item.id.startswith('topic'):
             return topic_domain.TopicChange
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -3806,11 +3867,13 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        topic_model_class_model_id_model_tuples = (
+        topic_model_references = (
             field_name_to_external_model_references['topic_ids'])
 
-        for (model_class, model_id, topic_model) in (
-                topic_model_class_model_id_model_tuples):
+        for topic_model_reference in topic_model_references:
+            model_class = topic_model_reference.class_name
+            model_id = topic_model_reference.model_id
+            topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
                 cls.errors['topic_ids field check'].append((
                     'Entity id %s: based on field topic_ids having'
@@ -3843,11 +3906,13 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        topic_model_class_model_id_model_tuples = (
+        topic_model_references = (
             field_name_to_external_model_references['topic_ids'])
 
-        for (model_class, model_id, topic_model) in (
-                topic_model_class_model_id_model_tuples):
+        for topic_model_reference in topic_model_references:
+            model_class = topic_model_reference.class_name
+            model_id = topic_model_reference.model_id
+            topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
                 cls.errors['topic_ids field check'].append((
                     'Entity id %s: based on field topic_ids having'
@@ -3882,11 +3947,13 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        topic_model_class_model_id_model_tuples = (
+        topic_model_references = (
             field_name_to_external_model_references['topic_ids'])
 
-        for (model_class, model_id, topic_model) in (
-                topic_model_class_model_id_model_tuples):
+        for topic_model_reference in topic_model_references:
+            model_class = topic_model_reference.class_name
+            model_id = topic_model_reference.model_id
+            topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
                 cls.errors['topic_ids field check'].append((
                     'Entity id %s: based on field topic_ids having'
@@ -3917,11 +3984,13 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        topic_model_class_model_id_model_tuples = (
+        topic_model_references = (
             field_name_to_external_model_references['topic_ids'])
 
-        for (model_class, model_id, topic_model) in (
-                topic_model_class_model_id_model_tuples):
+        for topic_model_reference in topic_model_references:
+            model_class = topic_model_reference.class_name
+            model_id = topic_model_reference.model_id
+            topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
                 cls.errors['topic_ids field check'].append((
                     'Entity id %s: based on field topic_ids having'
@@ -3956,11 +4025,13 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        topic_model_class_model_id_model_tuples = (
+        topic_model_references = (
             field_name_to_external_model_references['topic_ids'])
 
-        for (model_class, model_id, topic_model) in (
-                topic_model_class_model_id_model_tuples):
+        for topic_model_reference in topic_model_references:
+            model_class = topic_model_reference.class_name
+            model_id = topic_model_reference.model_id
+            topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
                 cls.errors['topic_ids field check'].append((
                     'Entity id %s: based on field topic_ids having'
@@ -4102,8 +4173,9 @@ class SubtopicPageCommitLogEntryModelValidator(
         if item.id.startswith('subtopicpage'):
             return subtopic_page_domain.SubtopicPageChange
         else:
-            # The case of invalid id is being ignored here since this
-            # case will already be checked by the id regex test.
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
             return None
 
     @classmethod
@@ -4300,10 +4372,13 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exploration_model_class_model_id_model_tuples = (
+        exploration_model_references = (
             field_name_to_external_model_references['exploration_ids'])
-        for (model_class, model_id, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
+
+        for exploration_model_reference in exploration_model_references:
+            model_class = exploration_model_reference.class_name
+            model_id = exploration_model_reference.model_id
+            exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -4331,10 +4406,13 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exploration_model_class_model_id_model_tuples = (
+        exploration_model_references = (
             field_name_to_external_model_references['exploration_ids'])
-        for (model_class, model_id, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
+
+        for exploration_model_reference in exploration_model_references:
+            model_class = exploration_model_reference.class_name
+            model_id = exploration_model_reference.model_id
+            exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -4501,10 +4579,13 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        subscriber_model_class_model_id_model_tuples = (
+        subscriber_model_references = (
             field_name_to_external_model_references['subscriber_ids'])
-        for (model_class, model_id, subscriber_model) in (
-                subscriber_model_class_model_id_model_tuples):
+
+        for subscriber_model_reference in subscriber_model_references:
+            model_class = subscriber_model_reference.class_name
+            model_id = subscriber_model_reference.model_id
+            subscriber_model = subscriber_model_reference.model_instance
             if subscriber_model is None or subscriber_model.deleted:
                 cls.errors['subscriber_ids field check'].append((
                     'Entity id %s: based on field subscriber_ids having'
@@ -4569,10 +4650,13 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        subscription_model_class_model_id_model_tuples = (
+        subscription_model_references = (
             field_name_to_external_model_references['subscription_ids'])
-        for (model_class, model_id, subscription_model) in (
-                subscription_model_class_model_id_model_tuples):
+
+        for subscription_model_reference in subscription_model_references:
+            model_class = subscription_model_reference.class_name
+            model_id = subscription_model_reference.model_id
+            subscription_model = subscription_model_reference.model_instance
             if subscription_model is None or subscription_model.deleted:
                 cls.errors['subscription_ids field check'].append((
                     'Entity id %s: based on field subscription_ids having'
@@ -4782,10 +4866,13 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        exploration_model_class_model_id_model_tuples = (
+        exploration_model_references = (
             field_name_to_external_model_references['exploration_ids'])
-        for (model_class, model_id, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
+
+        for exploration_model_reference in exploration_model_references:
+            model_class = exploration_model_reference.class_name
+            model_id = exploration_model_reference.model_id
+            exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -4852,10 +4939,15 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                 of ExternalModelReference objects.
         """
         completed_exp_ids = item.completed_explorations
-        completed_activities_model_class_model_id_model_tuples = (
+        completed_activities_model_references = (
             field_name_to_external_model_references['completed_activities_ids'])
-        for (model_class, model_id, completed_activities_model) in (
-                completed_activities_model_class_model_id_model_tuples):
+
+        for completed_activities_model_reference in (
+                completed_activities_model_references):
+            model_class = completed_activities_model_reference.class_name
+            model_id = completed_activities_model_reference.model_id
+            completed_activities_model = (
+                completed_activities_model_reference.model_instance)
             if completed_activities_model is None or (
                     completed_activities_model.deleted):
                 cls.errors['completed_activities_ids field check'].append((
@@ -4874,10 +4966,13 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                     'are not present in CompletedActivitiesModel for the '
                     'user' % (item.id, missing_exp_ids))
 
-        collection_model_class_model_id_model_tuples = (
+        collection_model_references = (
             field_name_to_external_model_references['collection_ids'])
-        for (model_class, model_id, collection_model) in (
-                collection_model_class_model_id_model_tuples):
+
+        for collection_model_reference in collection_model_references:
+            model_class = collection_model_reference.class_name
+            model_id = collection_model_reference.model_id
+            collection_model = collection_model_reference.model_instance
             if collection_model is None or collection_model.deleted:
                 cls.errors['collection_ids field check'].append((
                     'Entity id %s: based on field collection_ids having'
@@ -4936,10 +5031,13 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        story_model_class_model_id_model_tuples = (
+        story_model_references = (
             field_name_to_external_model_references['story_ids'])
-        for (model_class, model_id, story_model) in (
-                story_model_class_model_id_model_tuples):
+
+        for story_model_reference in story_model_references:
+            model_class = story_model_reference.class_name
+            model_id = story_model_reference.model_id
+            story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
                 cls.errors['story_ids field check'].append((
                     'Entity id %s: based on field story_ids having'
@@ -4976,10 +5074,13 @@ class StoryProgressModelValidator(BaseUserModelValidator):
         """
         completed_activity_model = user_models.CompletedActivitiesModel.get(
             item.user_id)
-        story_model_class_model_id_model_tuples = (
+        story_model_references = (
             field_name_to_external_model_references['story_ids'])
-        for (model_class, model_id, story_model) in (
-                story_model_class_model_id_model_tuples):
+
+        for story_model_reference in story_model_references:
+            model_class = story_model_reference.class_name
+            model_id = story_model_reference.model_id
+            story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
                 cls.errors['story_ids field check'].append((
                     'Entity id %s: based on field story_ids having'
@@ -5083,10 +5184,13 @@ class UserQueryModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        email_model_class_model_id_model_tuples = (
+        email_model_references = (
             field_name_to_external_model_references['sent_email_model_ids'])
-        for (model_class, model_id, email_model) in (
-                email_model_class_model_id_model_tuples):
+
+        for email_model_reference in email_model_references:
+            model_class = email_model_reference.class_name
+            model_id = email_model_reference.model_id
+            email_model = email_model_reference.model_instance
             if email_model is None or email_model.deleted:
                 cls.errors['sent_email_model_ids field check'].append((
                     'Entity id %s: based on field sent_email_model_ids having'
@@ -5157,10 +5261,13 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
                 A dict is keyed by field name. Each value consists of a list
                 of ExternalModelReference objects.
         """
-        email_model_class_model_id_model_tuples = (
+        email_model_references = (
             field_name_to_external_model_references['sent_email_model_ids'])
-        for (model_class, model_id, email_model) in (
-                email_model_class_model_id_model_tuples):
+
+        for email_model_reference in email_model_references:
+            model_class = email_model_reference.class_name
+            model_id = email_model_reference.model_id
+            email_model = email_model_reference.model_instance
             if email_model is None or email_model.deleted:
                 cls.errors['sent_email_model_ids field check'].append((
                     'Entity id %s: based on field sent_email_model_ids having'
@@ -5443,7 +5550,7 @@ class PlaythroughModelValidator(BaseModelValidator):
             ExternalModelFetchingDetails(
                 'exp_ids', exp_models.ExplorationModel, [item.exp_id]),
             ExternalModelFetchingDetails(
-                'exp_issues', stats_models.ExplorationIssuesModel,
+                'exp_issues_ids', stats_models.ExplorationIssuesModel,
                 [exp_issues_id])]
 
     @classmethod
@@ -5474,24 +5581,37 @@ class PlaythroughModelValidator(BaseModelValidator):
             )
 
     @classmethod
-    def _validate_reference(cls, item):
+    def _validate_reference(cls, item, field_name_to_external_model_references):
         """Validate the playthrough reference relations.
 
         Args:
             item: ndb.Model. PlaythroughModel to validate.
+            field_name_to_external_model_references:
+                dict(str, (list(ExternalModelReference))).
+                A dict is keyed by field name. Each value consists of a list
+                of ExternalModelReference objects.
         """
-        exp_issues_tuples = cls.field_name_to_external_model_references[
-            'exp_issues']
-        for _, _, exp_issues in exp_issues_tuples:
-            # The case for missing ExplorationIssues external model is
-            # ignored here since errors for missing email external model
-            # are already checked and stored in
-            # _validate_external_id_relationships function.
+        exp_issues_model_references = (
+            field_name_to_external_model_references['exp_issues_ids'])
+
+        for exp_issues_model_reference in exp_issues_model_references:
+            model_class = exp_issues_model_reference.class_name
+            model_id = exp_issues_model_reference.model_id
+            exp_issues_model = exp_issues_model_reference.model_instance
+
+            if exp_issues_model is None or exp_issues_model.deleted:
+                cls.errors['exp_issues_ids field check'].append((
+                    'Entity id %s: based on field exp_issues_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
             exp_id = item.exp_id
             exp_version = item.exp_version
 
             issues = []
-            for issue_index, issue in enumerate(exp_issues.unresolved_issues):
+            for issue_index, issue in enumerate(
+                    exp_issues_model.unresolved_issues):
                 issue_type = issue['issue_type']
                 if (
                         item.id in issue['playthrough_ids']
@@ -5556,9 +5676,12 @@ class PlaythroughModelValidator(BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_exploration_id_in_whitelist,
-            cls._validate_reference,
             cls._validate_created_datetime,
         ]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_reference]
 
 
 MODEL_TO_VALIDATOR_MAPPING = {
