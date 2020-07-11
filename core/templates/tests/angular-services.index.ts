@@ -206,8 +206,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
@@ -561,7 +559,7 @@ export const ANGULAR_SERVICES = [
   GuestCollectionProgressObjectFactory, GuestCollectionProgressService,
   HighBounceRateTaskObjectFactory, HintObjectFactory, HtmlEscaperService,
   I18nLanguageCodeService, IdGenerationService, ImageClickInputValidationService,
-  ImageFileObjectFactory, ImprovementActionButtonObjectFactory,
+  ImageFileObjectFactory,
   ImprovementsService, InteractionDetailsCacheService, InteractionObjectFactory,
   InteractionRulesRegistryService, InteractionSpecsService,
   InteractiveMapValidationService, ItemSelectionInputValidationService,
@@ -678,7 +676,7 @@ export const ANGULAR_SERVICES_NAMES = [
   'HighBounceRateTaskObjectFactory', 'HintObjectFactory', 'HtmlEscaperService',
   'I18nLanguageCodeService', 'IdGenerationService',
   'ImageClickInputValidationService', 'ImageFileObjectFactory',
-  'ImprovementActionButtonObjectFactory', 'ImprovementsService',
+  'ImprovementsService',
   'InteractionDetailsCacheService', 'InteractionObjectFactory',
   'InteractionRulesRegistryService', 'InteractionSpecsService',
   'InteractiveMapValidationService', 'ItemSelectionInputValidationService',
