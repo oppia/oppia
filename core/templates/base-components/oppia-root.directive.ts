@@ -178,6 +178,7 @@ export const ANGULAR_SERVICES = [
   'VoiceoverObjectFactory', 'WindowDimensionsService', 'WindowRef',
   'WinnowingPreprocessingService', 'WorkedExampleObjectFactory',
   'WrittenTranslationObjectFactory', 'WrittenTranslationsObjectFactory',
+  'baseInteractionValidationService'
 ];
 
 angular.module('oppia').directive('oppiaRoot', [

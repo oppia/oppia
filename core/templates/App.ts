@@ -125,9 +125,8 @@ angular.module('oppia').config([
      *   3. After Angular has initialized we provide the Angular services
      *      to AngularJS in oppia-root.directive.ts by using this function.
      */
-    (
-      angular.module(
-        'oppia') as CustomOppiaModule).provideValueAfterBootstrap = (
+    (angular.module(
+      'oppia') as CustomOppiaModule).provideValueAfterBootstrap = (
       function(
           name, value) {
         $provide.value( name, value );
