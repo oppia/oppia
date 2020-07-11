@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { IClassroomDataBackendDict, ClassroomDataObjectFactory } from
+import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
 import { ITopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
@@ -53,14 +53,12 @@ describe('Classroom backend API service', function() {
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#C6DCDA'
   };
-  let classroomDataDict: IClassroomDataBackendDict = {
+
+  let responseDictionaries = {
     name: 'Math',
     topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
     course_details: 'Course Details',
-    topics_covered: 'Topics Covered'
-  };
-  let responseDictionaries = {
-    classroom_data: classroomDataDict
+    topic_list_intro: 'Topics Covered'
   };
 
   let sampleClassroomDataObject = null;
@@ -75,8 +73,10 @@ describe('Classroom backend API service', function() {
 
     // Sample topic object returnable from the backend.
     sampleClassroomDataObject = (
-      classroomDataObjectFactory.createFromBackendDict(
-        responseDictionaries.classroom_data));
+      classroomDataObjectFactory.createFromBackendData(
+        responseDictionaries.name, responseDictionaries.topic_summary_dicts,
+        responseDictionaries.course_details,
+        responseDictionaries.topic_list_intro));
   });
 
   afterEach(() => {

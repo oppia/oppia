@@ -17,13 +17,6 @@
  * classroom objects.
  */
 
-export interface IClassroomDataBackendDict {
-  name: string,
-  topic_summary_dicts: ITopicSummaryBackendDict[],
-  course_details: string,
-  topics_covered: string
-}
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import {
@@ -34,15 +27,15 @@ export class ClassroomData {
   _name: string;
   _topicSummaries: TopicSummary[];
   _courseDetails: string;
-  _topicsCovered: string;
+  _topicListIntro: string;
 
   constructor(
       name: string, topicSummaries: TopicSummary[], courseDetails: string,
-      topicsCovered: string) {
+      topicListIntro: string) {
     this._name = name;
     this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
-    this._topicsCovered = topicsCovered;
+    this._topicListIntro = topicListIntro;
   }
 
   getName(): string {
@@ -57,8 +50,8 @@ export class ClassroomData {
     return this._courseDetails;
   }
 
-  getTopicsCovered(): string {
-    return this._topicsCovered;
+  getTopicListIntro(): string {
+    return this._topicListIntro;
   }
 }
 
@@ -69,17 +62,17 @@ export class ClassroomDataObjectFactory {
   constructor(
       private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
-  createFromBackendDict(
-      classroomDict: IClassroomDataBackendDict): ClassroomData {
-    let topicSummaries = classroomDict.topic_summary_dicts.map(
+  createFromBackendData(
+      name: string, topicSummaryDicts: ITopicSummaryBackendDict[],
+      courseDetails: string, topicListIntro: string): ClassroomData {
+    let topicSummaries = topicSummaryDicts.map(
       (summaryDict) => {
         return this.topicSummaryObjectFactory.createFromBackendDict(
           summaryDict);
       }
     );
     return new ClassroomData(
-      classroomDict.name, topicSummaries, classroomDict.course_details,
-      classroomDict.topics_covered
+      name, topicSummaries, courseDetails, topicListIntro
     );
   }
 }

@@ -23,10 +23,11 @@ import { Injectable } from '@angular/core';
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
 import {
-  IClassroomDataBackendDict,
   ClassroomData,
   ClassroomDataObjectFactory
 } from 'domain/classroom/ClassroomDataObjectFactory';
+import { ITopicSummaryBackendDict } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -34,8 +35,11 @@ interface IClassroomStatusBackendDict {
   'classroom_page_is_shown': boolean;
 }
 
-interface IClassroomDataReturnedBackendDict {
-  'classroom_data': IClassroomDataBackendDict
+interface IClassroomDataBackendDict {
+  name: string,
+  'topic_summary_dicts': ITopicSummaryBackendDict[],
+  'course_details': string,
+  'topic_list_intro': string
 }
 
 @Injectable({
@@ -57,11 +61,12 @@ export class ClassroomBackendApiService {
         classroom_name: classroomName
       });
 
-    this.http.get<IClassroomDataReturnedBackendDict>(
-      classroomDataUrl).toPromise().then(data => {
+    this.http.get<IClassroomDataBackendDict>(
+      classroomDataUrl).toPromise().then(response => {
       this.classroomData = (
-        this.classroomDataObjectFactory.createFromBackendDict(
-          data.classroom_data));
+        this.classroomDataObjectFactory.createFromBackendData(
+          response.name, response.topic_summary_dicts, response.course_details,
+          response.topic_list_intro));
       if (successCallback) {
         successCallback(this.classroomData);
       }

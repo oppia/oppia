@@ -88,7 +88,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             self.admin_id, 'classroom_pages_data', [{
                 'name': 'math',
                 'topic_ids': [self.topic_id],
-                'topics_covered': 'Topics covered',
+                'topic_list_intro': 'Topics covered',
                 'course_details': 'Course details'
             }]
         )

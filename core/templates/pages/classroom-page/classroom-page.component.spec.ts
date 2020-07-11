@@ -93,12 +93,9 @@ describe('Classroom page', () => {
     beforeEach(function() {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
-      classroomData = ClassroomDataObjectFactory.createFromBackendDict({
-        name: 'Math',
-        topic_summary_dicts: [],
-        course_details: 'Course details',
-        topics_covered: 'Topics covered'
-      });
+      classroomData = ClassroomDataObjectFactory.createFromBackendData(
+        'Math', [], 'Course details', 'Topics covered'
+      );
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
         $q.resolve(classroomData));
       spyOn($rootScope, '$broadcast').and.callThrough();

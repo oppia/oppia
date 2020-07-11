@@ -466,7 +466,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
                 'topic_ids': [topic_id],
-                'topics_covered': 'Topics Covered',
+                'topic_list_intro': 'Topics Covered',
                 'course_details': 'Course Details'
             }]
         )

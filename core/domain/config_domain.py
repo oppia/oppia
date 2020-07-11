@@ -79,7 +79,7 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
                 }
             }
         }, {
-            'name': 'topics_covered',
+            'name': 'topic_list_intro',
             'schema': {
                 'type': 'unicode',
                 'ui_config': {
@@ -363,7 +363,7 @@ CLASSROOM_PAGES_DATA = ConfigProperty(
         'name': 'math',
         'topic_ids': [],
         'course_details': '',
-        'topics_covered': ''
+        'topic_list_intro': ''
     }]
 )
 

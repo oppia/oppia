@@ -71,10 +71,12 @@ class ClassroomDataHandler(base.BaseHandler):
             summary.to_dict() for ind, summary in enumerate(topic_summaries)
             if summary is not None and topic_rights[ind].topic_is_published
         ]
-        classroom_data['topic_summary_dicts'] = topic_summary_dicts
 
         self.values.update({
-            'classroom_data': classroom_data
+            'topic_summary_dicts': topic_summary_dicts,
+            'topic_list_intro': classroom_data['topic_list_intro'],
+            'course_details': classroom_data['course_details'],
+            'name': classroom_data['name']
         })
         self.render_json(self.values)
 

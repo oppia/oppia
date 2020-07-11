@@ -469,6 +469,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
         output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
             job_id)
 
-        for x in output:
+        for message in output:
             self.assertRegexpMatches(
-                x, 'object has no attribute \'canonical_story_references\'')
+                message,
+                'object has no attribute \'canonical_story_references\'')
