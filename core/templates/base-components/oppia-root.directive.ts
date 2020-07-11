@@ -20,9 +20,6 @@
 // the PR #9479. https://github.com/oppia/oppia/pull/9479#issue-432536289
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { IModule } from 'angular';
 
 // Creating an interface that extends IModule and has an extra field called

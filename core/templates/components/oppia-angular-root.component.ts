@@ -945,7 +945,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static conceptCardBackendApiService: ConceptCardBackendApiService;
   static taskEntryObjectFactory: TaskEntryObjectFactory;
   static translationsBackendApiService: TranslationsBackendApiService;
-  static translateService: TranslateService;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
