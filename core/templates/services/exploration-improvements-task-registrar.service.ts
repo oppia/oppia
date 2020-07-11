@@ -189,11 +189,12 @@ export class ExplorationImprovementsTaskRegistrarService {
   }
 
   onStateRename(oldStateName: string, newStateName: string): void {
-    const taskRegistry = this.taskRegistry.get(oldStateName);
+    const oldTaskRegistry = this.taskRegistry.get(oldStateName);
+    oldTaskRegistry.forEach(t => t.markAsObsolete());
 
     const newTaskRegistry = (
-      taskRegistry.map(t => t.cloneWithNewTarget(newStateName)));
-    taskRegistry.forEach(t => t.markAsObsolete());
+      oldTaskRegistry.map(t => t.cloneWithNewTarget(newStateName)));
+    newTaskRegistry.forEach(t => this.tasksByType.get(t.taskType).push(t));
 
     // eslint-disable-next-line dot-notation
     this.taskRegistry.delete(oldStateName);
