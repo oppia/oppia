@@ -92,12 +92,12 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/concept-card/concept-card.directive.ts');
-require('components/skill-mastery/skill-mastery.directive.ts');
+require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -369,14 +369,14 @@ angular.module('oppia').directive('questionPlayer', [
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {
-                // If questionScore goes negative, set it to 0
+                // If questionScore goes negative, set it to 0.
                 questionScore = Math.max(
                   0, questionScore - totalHintsPenalty - wrongAnswerPenalty);
               }
-              // Calculate total score
+              // Calculate total score.
               ctrl.totalScore += questionScore;
 
-              // Calculate scores per skill
+              // Calculate scores per skill.
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }

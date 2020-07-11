@@ -31,7 +31,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       this._linkedSkillIds = linkedSkillIds;
     };
 
-    // Instance methods
+    // ---- Instance methods ----
 
     Question.prototype.getId = function() {
       return this._id;
@@ -80,7 +80,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         return 'An interaction must be specified';
       }
       if (interaction.hints.length === 0) {
-        return 'At least 1 hint should be specfied';
+        return 'At least 1 hint should be specified';
       }
       if (
         !interaction.solution &&

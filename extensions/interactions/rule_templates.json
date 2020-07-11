@@ -121,6 +121,14 @@
       "description": "is not correct due to {{c|LogicErrorCategory}}"
     }
   },
+  "MathEquationInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|MathEquation}}"
+    }
+  },
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
       "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"

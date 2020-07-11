@@ -18,9 +18,9 @@
  */
 
 export interface IConceptCardBackendDict {
-  explanation: ISubtitledHtmlBackendDict,
-  'worked_examples': Array<IWorkedExampleBackendDict>,
-  'recorded_voiceovers': IRecordedVoiceOverBackendDict
+  'explanation': ISubtitledHtmlBackendDict;
+  'worked_examples': IWorkedExampleBackendDict[];
+  'recorded_voiceovers': IRecordedVoiceOverBackendDict;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';

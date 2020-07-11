@@ -158,9 +158,10 @@ describe('Router Service', () => {
     // To $watch the first $location.path call.
     $rootScope.$apply();
 
-    // setTimeout is being used here to not conflict with $timeout.flush
-    // for fadeIn Jquery method. This first setTimeout is to wait the default
-    // time for fadeOut Jquery method to complete, which is 400 miliseconds.
+    // Function setTimeout is being used here to not conflict with
+    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
+    // the default time for fadeOut Jquery method to complete, which is 400
+    // miliseconds.
     // Ref: https://api.jquery.com/fadeout/
     setTimeout(() => {
       // Waiting for $applyAsync be called, which can take ~10 miliseconds
@@ -198,9 +199,10 @@ describe('Router Service', () => {
     // To $watch the first $location.path call.
     $rootScope.$apply();
 
-    // setTimeout is being used here to not conflict with $timeout.flush
-    // for fadeIn Jquery method. This first setTimeout is to wait the default
-    // time for fadeOut Jquery method to complete, which is 400 miliseconds.
+    // Function setTimeout is being used here to not conflict with
+    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
+    // the default time for fadeOut Jquery method to complete, which is 400
+    // miliseconds.
     // Ref: https://api.jquery.com/fadeout/
     setTimeout(() => {
       // Waiting for $applyAsync be called, which can take ~10 miliseconds
@@ -469,7 +471,7 @@ describe('Router Service', () => {
     RouterService.navigateToFeedbackTab();
     $rootScope.$apply();
 
-    // $watch is called
+    // $watch is called.
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
     expect(RouterService.getActiveTabName()).toBe('feedback');
 

@@ -37,6 +37,7 @@ export class ContextService {
   pageContext = null;
   explorationIsLinkedToStory = false;
   explorationId = null;
+  questionPlayerIsManuallySet = false;
   questionId = null;
   editorContext = null;
   customEntityContext = null;
@@ -69,7 +70,7 @@ export class ContextService {
   // This is PAGE_CONTEXT.EXPLORATION_EDITOR or
   // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
   // If the current page is not one in either EXPLORATION_EDITOR or
-  // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER
+  // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER.
   getPageContext(): string {
     if (this.pageContext) {
       return this.pageContext;
@@ -104,7 +105,7 @@ export class ContextService {
         } else if (pathnameArray[i] === 'collection_editor') {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
-        } else if (pathnameArray[i] === 'topics_and_skills_dashboard') {
+        } else if (pathnameArray[i] === 'topics-and-skills-dashboard') {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
@@ -113,6 +114,19 @@ export class ContextService {
 
       return ServicesConstants.PAGE_CONTEXT.OTHER;
     }
+  }
+  // This is required in cases like when we need to access question player
+  // from the skill editor preview tab.
+  setQuestionPlayerIsOpen(): void {
+    this.questionPlayerIsManuallySet = true;
+  }
+
+  clearQuestionPlayerIsOpen(): void {
+    this.questionPlayerIsManuallySet = false;
+  }
+
+  getQuestionPlayerIsManuallySet(): boolean {
+    return this.questionPlayerIsManuallySet;
   }
 
   canEntityReferToSkills(): boolean {
@@ -167,7 +181,7 @@ export class ContextService {
     return decodeURI(pathnameArray[2]);
   }
 
-  // add constants for entity type
+  // Add constants for entity type.
   getEntityType(): string {
     if (this.customEntityContext !== null) {
       return this.customEntityContext.getType();
@@ -236,7 +250,9 @@ export class ContextService {
 
   isInQuestionPlayerMode(): boolean {
     return (
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER);
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER ||
+        this.questionPlayerIsManuallySet);
   }
 
   isInExplorationEditorPage(): boolean {

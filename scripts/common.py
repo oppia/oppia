@@ -338,7 +338,7 @@ def is_port_open(port):
     Args:
         port: int. The port number.
 
-    Return:
+    Returns:
         bool. True if port is open else False.
     """
     with contextlib.closing(
@@ -476,7 +476,7 @@ def check_prs_for_current_release_are_released(repo):
 
     Raises:
         Exception: Some pull requests for current release do not have a
-            PR: released label.
+            "PR: released" label.
     """
     current_release_label = repo.get_label(
         release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)

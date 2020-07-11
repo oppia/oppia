@@ -228,7 +228,7 @@ def search_collections(query, limit, sort=None, cursor=None):
             function will return a cursor to get the next page.
 
     Returns:
-        A 2-tuple with the following elements:
+        2-tuple of (collection_ids, cursor). Where:
             - A list of collection ids that match the query.
             - A cursor if there are more matching collections to fetch, None
               otherwise. If a cursor is returned, it will be a web-safe string

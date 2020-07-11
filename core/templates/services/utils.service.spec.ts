@@ -41,7 +41,7 @@ describe('Utils Service', () => {
     expect(uts.isString('xyz')).toEqual(true);
     expect(uts.isString(new String())).toEqual(true);
 
-    // Test against invalid inputs
+    // Test against invalid inputs.
     expect(uts.isString(NaN)).toEqual(false);
     expect(uts.isString(undefined)).toEqual(false);
     expect(uts.isString(null)).toEqual(false);
@@ -106,5 +106,27 @@ describe('Utils Service', () => {
     expect(uts.isDefined(objB)).toBe(true);
     expect(uts.isDefined(objC)).toBe(false);
     expect(uts.isDefined(objD)).toBe(false);
+  });
+
+  it('should determine when an element is overflowing', () => {
+    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', null, {
+      offsetWidth: 200, offsetHeight: 300,
+      scrollWidth: 500, scrollHeight: 300,
+    });
+    expect(uts.isOverflowing(elWithHorizontalOverflow)).toBeTrue();
+
+    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', null, {
+      offsetWidth: 200, offsetHeight: 300,
+      scrollWidth: 200, scrollHeight: 600,
+    });
+    expect(uts.isOverflowing(elWithVerticalOverflow)).toBeTrue();
+
+    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', null, {
+      offsetWidth: 200, offsetHeight: 300,
+      scrollWidth: 200, scrollHeight: 300,
+    });
+    expect(uts.isOverflowing(elWithoutOverflow)).toBeFalse();
+
+    expect(uts.isOverflowing(null)).toBeFalse();
   });
 });

@@ -124,7 +124,8 @@ FILEPATHS_NOT_TO_RENAME = (
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
-    'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.directive.html',
+    'images/*', 'videos/*', 'i18n/*', '*.component.html',
+    '*_directive.html', '*.directive.html',
     '*.template.html', '*.png', '*.json', '*.webp')
 
 HASH_BLOCK_SIZE = 2**20
@@ -198,7 +199,7 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         prod_yaml_file.write(content)
 
 
-def modify_constants(prod_env, maintenance_mode):
+def modify_constants(prod_env=False, maintenance_mode=False):
     """Modify constants.ts and feconf.py.
 
     Args:
@@ -217,6 +218,11 @@ def modify_constants(prod_env, maintenance_mode):
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = .*',
         enable_maintenance_mode_variable)
+
+
+def set_constants_to_default():
+    """Set variables in constants.ts and feconf.py to default values."""
+    modify_constants(prod_env=False, maintenance_mode=False)
 
 
 def _minify(source_path, target_path):
@@ -291,8 +297,8 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
         target_path: str. Path where the fonts should be copied.
 
     Returns:
-        deque(Thread). A deque that contains all copy tasks queued
-            to be processed.
+        deque(Thread). A deque that contains all copy tasks queued to be
+        processed.
     """
     copy_tasks = collections.deque()
     for font_path in source_paths:
@@ -321,8 +327,8 @@ def ensure_directory_exists(filepath):
     """Ensures if directory tree exists, if not creates the directories.
 
     Args:
-        filepath: str. Path to file located in directory that we want to
-            ensure exists.
+        filepath: str. Path to file located in directory that we want to ensure
+            exists.
     """
     directory = os.path.dirname(filepath)
     if not os.path.exists(directory):
@@ -405,8 +411,8 @@ def _compare_file_count(
     list matches the count of files in all the directories in the second list.
 
     Args:
-       first_dir_list: list(str). List of directories to compare.
-       second_dir_list: list(str). List of directories to compare.
+        first_dir_list: list(str). List of directories to compare.
+        second_dir_list: list(str). List of directories to compare.
 
     Raises:
         ValueError: The source directory list does not have the same file
@@ -532,9 +538,9 @@ def get_dependencies_filepaths():
 
     Returns:
         dict(str, list(str)). A dict mapping file types to lists of filepaths.
-            The dict has three keys: 'js', 'css' and 'fonts'. Each of the
-            corresponding values is a full list of dependency file paths of the
-            given type.
+        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
+        corresponding values is a full list of dependency file paths of the
+        given type.
     """
     filepaths = {
         'js': [],
@@ -691,7 +697,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
 
     Returns:
         deque(Thread). A deque that contains all copy tasks queued
-            to be processed.
+        to be processed.
     """
     python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
     python_utils.PRINT('Copying into %s' % os.path.join(os.getcwd(), target))
@@ -786,7 +792,7 @@ def get_file_hashes(directory_path):
 
     Returns:
         dict(str, str). Dictionary with keys specifying file paths and values
-            specifying file hashes.
+        specifying file hashes.
     """
     file_hashes = dict()
 
@@ -822,7 +828,7 @@ def filter_hashes(file_hashes):
 
     Returns:
         dict(str, str). Filtered dictionary of only filepaths that should be
-            provided to the frontend.
+        provided to the frontend.
     """
     filtered_hashes = dict()
     for filepath, file_hash in file_hashes.items():
@@ -911,7 +917,7 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
     python_utils.PRINT('Generating into %s' % os.path.join(os.getcwd(), target))
@@ -947,7 +953,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     build_tasks = collections.deque()
     for filepath in filepaths:
@@ -978,7 +984,7 @@ def generate_delete_tasks_to_remove_deleted_files(
 
     Returns:
         deque(Thread). A deque that contains all delete tasks
-            queued to be processed.
+        queued to be processed.
     """
     python_utils.PRINT(
         'Scanning directory %s to remove deleted file' % staging_directory)
@@ -1060,7 +1066,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
     staging_dir = dirnames_dict['staging_dir']
@@ -1317,7 +1323,8 @@ def main(args=None):
                 'minify_third_party_libs_only should not be '
                 'set in non-prod env.')
 
-    modify_constants(options.prod_env, options.maintenance_mode)
+    modify_constants(
+        prod_env=options.prod_env, maintenance_mode=options.maintenance_mode)
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()

@@ -77,7 +77,7 @@ class AssetDevHandler(base.BaseHandler):
                 subtopic: topic_name of the topic that it is part of.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
-              string is encoded in the frontend using encodeURIComponent().
+                string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException

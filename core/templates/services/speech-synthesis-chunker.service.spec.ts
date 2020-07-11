@@ -205,7 +205,7 @@ describe('Speech Synthesis Chunker Service', () => {
       speechSynthesisChunkerService.speak(
         speechSynthesisUtterance, callbackSpy);
 
-      // wait for 2 setTimeout calls to finished because there are
+      // Wait for 2 setTimeout calls to finished because there are
       // two chuncks in speechSynthesisUtterance.
       flush(2);
 
@@ -227,7 +227,7 @@ describe('Speech Synthesis Chunker Service', () => {
           speechSynthesisUtterance, callbackSpy);
         speechSynthesisChunkerService.cancel();
 
-        // wait for 1 setTimeout call to finished.
+        // Wait for 1 setTimeout call to finished.
         flush(1);
 
         expect(callbackSpy).not.toHaveBeenCalled();

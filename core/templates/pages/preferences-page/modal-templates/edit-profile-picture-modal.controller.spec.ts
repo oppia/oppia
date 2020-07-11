@@ -58,7 +58,7 @@ describe('EditProfilePictureModalController', function() {
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
     var file = new File([arrayBuffer], 'filename.mp3');
 
-    // window has strict type rules which will fail typescript lint tests
+    // The window has strict type rules which will fail typescript lint tests
     // without the @ts-ignore.
     // @ts-ignore
     spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
@@ -73,11 +73,11 @@ describe('EditProfilePictureModalController', function() {
 
     $scope.onFileChanged(file);
 
-    // setTimeout is being used here to not conflict with $timeout.flush
-    // for fadeIn Jquery method. This first setTimeout is to wait the default
-    // time for fadeOut Jquery method to complete, which is 400 miliseconds.
-    // 800ms is being used instead of 400ms just to be sure that fadeOut callbak
-    // is already executed.
+    // Function setTimeout is being used here to not conflict with
+    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
+    // the default time for fadeOut Jquery method to complete, which is 400
+    // miliseconds. 800ms is being used instead of 400ms just to be sure that
+    // fadeOut callbak is already executed.
     // Ref: https://api.jquery.com/fadeout/
     setTimeout(function() {
       $timeout.flush();
@@ -88,7 +88,9 @@ describe('EditProfilePictureModalController', function() {
         'data:application/octet-stream;base64,' + dataBase64Mock);
 
       var mockUrl = 'mock-url';
-      spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue(<any>{
+      // @ts-ignore Cropper getCroppedCanvas method should return more
+      // properties than toDataURL according with lint settings.
+      spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({
         toDataURL: () => mockUrl
       });
       $scope.confirm();

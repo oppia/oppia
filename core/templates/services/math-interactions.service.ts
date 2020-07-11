@@ -19,7 +19,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const nerdamer = require('nerdamer');
+import nerdamer from 'nerdamer';
+
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -54,35 +56,132 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
-  validateAnswer(answer: string): boolean {
-    let expression;
-    if (answer.length === 0) {
+  validateExpression(expressionString: string, algebraic = true): boolean {
+    expressionString = expressionString.split(' ').join('');
+    let expressionObject;
+    if (expressionString.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
       return false;
-    } else if (answer.indexOf('=') !== -1 || answer.indexOf(
-      '<') !== -1 || answer.indexOf('>') !== -1) {
+    } else if (expressionString.indexOf('=') !== -1 || expressionString.indexOf(
+      '<') !== -1 || expressionString.indexOf('>') !== -1) {
       this.warningText = 'It looks like you have entered an ' +
-        'equation/inequality. Please enter an algebraic ' +
-        'expression instead.';
+        'equation/inequality. Please enter an expression instead.';
+      return false;
+    } else if (expressionString.indexOf('_') !== -1) {
+      this.warningText = 'Invalid character \'_\' present in the expression.';
       return false;
     }
     try {
-      expression = nerdamer(answer);
+      expressionObject = nerdamer(expressionString);
     } catch (err) {
       this.warningText = this.cleanErrorMessage(err.message);
       return false;
     }
-    if (expression.variables().length === 0) {
+    if (algebraic && expressionObject.variables().length === 0) {
       this.warningText = 'It looks like you have entered only ' +
         'numbers. Make sure to include the necessary variables' +
         ' mentioned in the question.';
       return false;
     }
+    if (!algebraic && expressionObject.variables().length !== 0) {
+      this.warningText = 'It looks like you have entered some non-numeric' +
+        ' values. Please enter numbers only.';
+      return false;
+    }
     return true;
+  }
+
+  validateEquation(equationString: string): boolean {
+    equationString = equationString.split(' ').join('');
+    if (equationString.length === 0) {
+      this.warningText = 'Please enter a non-empty answer.';
+      return false;
+    } else if (equationString.indexOf(
+      '<') !== -1 || equationString.indexOf('>') !== -1) {
+      this.warningText = 'It looks like you have entered an ' +
+        'inequality. Please enter an equation instead.';
+      return false;
+    } else if (equationString.indexOf('=') === -1) {
+      this.warningText = 'It looks like you have entered an ' +
+        'expression. Please enter an equation instead.';
+      return false;
+    } else if (equationString.indexOf('=') === 0) {
+      this.warningText = 'The LHS of your equation is empty.';
+      return false;
+    } else if (equationString.indexOf('=') === equationString.length - 1) {
+      this.warningText = 'The RHS of your equation is empty.';
+      return false;
+    }
+    let splitString = equationString.split('=');
+    let lhsString = splitString[0], rhsString = splitString[1];
+    let lhsIsAlgebraicallyValid = this.validateExpression(lhsString);
+    let rhsIsAlgebraicallyValid = this.validateExpression(rhsString);
+    let lhsIsNumericallyValid = this.validateExpression(lhsString, false);
+    let rhsIsNumericallyValid = this.validateExpression(rhsString, false);
+
+    // At least one side must be algebraic. Purely numeric equations are
+    // considered as invalid.
+    if (lhsIsNumericallyValid && rhsIsNumericallyValid) {
+      this.warningText = 'The equation must contain at least one variable.';
+      return false;
+    }
+    if (lhsIsAlgebraicallyValid && rhsIsAlgebraicallyValid ||
+      lhsIsAlgebraicallyValid && rhsIsNumericallyValid ||
+      lhsIsNumericallyValid && rhsIsAlgebraicallyValid) {
+      this.warningText = '';
+      return true;
+    }
+    // Neither side is algebraically valid. Calling validation functions again
+    // to appropriately update the warningText.
+    this.validateExpression(lhsString);
+    return false;
   }
 
   getWarningText(): string {
     return this.warningText;
+  }
+
+  insertMultiplicationSigns(expressionString: string): string {
+    // Assumes that given expressionString is valid.
+    // Nerdamer allows multi-character variables so, 'ax+b' will be considered
+    // to have variables: [ax, b], but we want a and x to be considered as
+    // separate variables which is why we would assume that any such instance of
+    // consecutive characters means they are single characters multiplied with
+    // each other. So, 'ax+b' would be transformed to 'a*x+b' via this function.
+    let variables = nerdamer(expressionString).variables();
+    for (let variable of variables) {
+      // We wouldn't want to interpolate '*' signs between valid greek letters.
+      // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+      // rid of the TS2339 error on AppConstants.
+      if (AppConstants.GREEK_LETTERS.indexOf(variable) === -1) {
+        let separatedVariables = variable.split('').join('*');
+        expressionString = expressionString.replace(
+          variable, separatedVariables);
+      }
+    }
+    return expressionString;
+  }
+
+  replaceAbsSymbolWithText(expressionString: string): string {
+    // The guppy editor outputs abs as a symbol '|x|' but that is incompatible
+    // with nerdamer and the backend validations. Both of them need 'abs(x)',
+    // hence the replacement.
+    let opening = true;
+    let modifiedExpressionList = [];
+    for (let i = 0; i < expressionString.length; i++) {
+      if (expressionString[i] === '|') {
+        if (opening) {
+          modifiedExpressionList.push('abs(');
+          opening = false;
+        } else {
+          modifiedExpressionList.push(')');
+          opening = true;
+        }
+      } else {
+        modifiedExpressionList.push(expressionString[i]);
+      }
+    }
+    return modifiedExpressionList.join('');
   }
 }
 
