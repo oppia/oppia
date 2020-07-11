@@ -1086,7 +1086,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         oppia_root_directive_path = (
             './core/templates/base-components/oppia-root.directive.ts')
         injectables_to_ignore = [
+            'ExplorationStats',
             'NormalizeWhitespacePunctuationAndCasePipe\n',
+            'MockCsrfTokenService',
             'StatePropertyService'
         ]
         if self.verbose_mode_enabled:
