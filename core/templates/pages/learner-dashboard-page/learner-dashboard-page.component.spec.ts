@@ -34,10 +34,15 @@ describe('Learner dashboard page', function() {
   var $window = null;
   var AlertsService = null;
   var CollectionObjectFactory = null;
+  var collectionSummaryObjectFactory = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
   var ExplorationObjectFactory = null;
+  var feedbackThreadSummaryObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
+  var learnerExplorationSummaryObjectFactory = null;
+  var nonExistentActivitiesObjectFactory = null;
+  var profileSummaryObjectFactory = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
 
@@ -62,11 +67,21 @@ describe('Learner dashboard page', function() {
       $uibModal = $injector.get('$uibModal');
       $window = $injector.get('$window');
       CollectionObjectFactory = $injector.get('CollectionObjectFactory');
+      collectionSummaryObjectFactory = $injector.get(
+        'CollectionSummaryObjectFactory');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
+      feedbackThreadSummaryObjectFactory = $injector.get(
+        'FeedbackThreadSummaryObjectFactory');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
+      learnerExplorationSummaryObjectFactory = $injector.get(
+        'LearnerExplorationSummaryObjectFactory');
+      nonExistentActivitiesObjectFactory = $injector.get(
+        'NonExistentActivitiesObjectFactory');
+      profileSummaryObjectFactory = $injector.get(
+        'ProfileSummaryObjectFactory');
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
       UserService = $injector.get('UserService');
@@ -116,7 +131,11 @@ describe('Learner dashboard page', function() {
         objective: '',
         category: '',
         version: '0',
-        nodes: []
+        nodes: [],
+        playthrough_dict: {
+          next_exploration_id: 'expId',
+          completed_exploration_ids: ['expId2']
+        }
       };
       learnerDashboardData = {
         completed_explorations_list: [],
@@ -124,15 +143,13 @@ describe('Learner dashboard page', function() {
         incomplete_explorations_list: [],
         incomplete_collections_list: [],
         subscription_list: [{
-          subscriber_impact: null,
+          creator_impact: null,
           creator_picture_data_url: 'creator1-url',
-          creator_username: 'creator1',
-          subscriber_username: 'username1'
+          creator_username: 'username1',
         }, {
-          subscriber_impact: null,
+          creator_impact: null,
           creator_picture_data_url: 'creator1-url',
-          creator_username: 'creator1',
-          subscriber_username: 'username1'
+          creator_username: 'username1',
         }],
         number_of_nonexistent_activities: {
           incomplete_explorations: 0,
@@ -223,7 +240,46 @@ describe('Learner dashboard page', function() {
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
-        .and.returnValue($q.resolve(learnerDashboardData));
+        .and.returnValue($q.resolve({
+          completedExplorationsList: (
+            learnerDashboardData.completed_explorations_list.map(
+              expSummary => learnerExplorationSummaryObjectFactory
+                .createFromBackendDict(expSummary))),
+          incompleteExplorationsList: (
+            learnerDashboardData.incomplete_explorations_list.map(
+              expSummary => learnerExplorationSummaryObjectFactory
+                .createFromBackendDict(expSummary))),
+          explorationPlaylist: (
+            learnerDashboardData.exploration_playlist.map(
+              expSummary => learnerExplorationSummaryObjectFactory
+                .createFromBackendDict(expSummary))),
+          completedCollectionsList: (
+            learnerDashboardData.completed_collections_list.map(
+              collectionSummary => collectionSummaryObjectFactory
+                .createFromBackendDict(collectionSummary))),
+          incompleteCollectionsList: (
+            learnerDashboardData.incomplete_collections_list.map(
+              collectionSummary => collectionSummaryObjectFactory
+                .createFromBackendDict(collectionSummary))),
+          collectionPlaylist: (
+            learnerDashboardData.collection_playlist.map(
+              collectionSummary => collectionSummaryObjectFactory
+                .createFromBackendDict(collectionSummary))),
+          numberOfUnreadThreads: learnerDashboardData.number_of_unread_threads,
+          threadSummaries: (
+            learnerDashboardData.thread_summaries.map(
+              threadSummary => feedbackThreadSummaryObjectFactory
+                .createFromBackendDict(threadSummary))),
+          completedToIncompleteCollections: (
+            learnerDashboardData.completed_to_incomplete_collections),
+          numberOfNonexistentActivities: (
+            nonExistentActivitiesObjectFactory.createFromBackendDict(
+              learnerDashboardData.number_of_nonexistent_activities)),
+          subscriptionList: (
+            learnerDashboardData.subscription_list.map(
+              profileSummary => profileSummaryObjectFactory
+                .createFromCreatorBackendDict(profileSummary)))
+        }));
 
       $scope = $rootScope.$new();
       ctrl = $componentController('learnerDashboardPage', {
@@ -436,19 +492,24 @@ describe('Learner dashboard page', function() {
       var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
       var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
 
+      var completedExplorations = learnerDashboardData
+        .completed_explorations_list.map(
+          expSummary => learnerExplorationSummaryObjectFactory
+            .createFromBackendDict(expSummary));
+
       expect(ctrl.startCompletedExpIndex).toBe(0);
       expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(learnerDashboardData.completed_explorations_list.slice(0, 8));
+        .toEqual(completedExplorations.slice(0, 8));
 
       ctrl.goToNextPage(section, subsection);
       expect(ctrl.startCompletedExpIndex).toBe(8);
       expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(learnerDashboardData.completed_explorations_list.slice(8));
+        .toEqual(completedExplorations.slice(8));
 
       ctrl.goToPreviousPage(section, subsection);
       expect(ctrl.startCompletedExpIndex).toBe(0);
       expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(learnerDashboardData.completed_explorations_list.slice(0, 8));
+        .toEqual(completedExplorations.slice(0, 8));
     });
 
     it('should go to through page of completed collections', function() {
@@ -476,18 +537,18 @@ describe('Learner dashboard page', function() {
 
     it('should set subscription sorting options', function() {
       expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
-      expect(ctrl.currentSubscribersSortType).toBe('subscriber_username');
-      ctrl.setSubscriptionSortingOptions('subscriber_username');
+      expect(ctrl.currentSubscribersSortType).toBe('username');
+      ctrl.setSubscriptionSortingOptions('username');
       expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
 
-      ctrl.setSubscriptionSortingOptions('subscriber_impact');
-      expect(ctrl.currentSubscribersSortType).toBe('subscriber_impact');
+      ctrl.setSubscriptionSortingOptions('impact');
+      expect(ctrl.currentSubscribersSortType).toBe('impact');
     });
 
     it('should set feedback sorting options', function() {
       expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
-      expect(ctrl.currentFeedbackThreadsSortType).toBe('last_updated_msecs');
-      ctrl.setFeedbackSortingOptions('last_updated_msecs');
+      expect(ctrl.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
+      ctrl.setFeedbackSortingOptions('lastUpdatedMsecs');
       expect(ctrl.isCurrentFeedbackSortDescending).toBe(false);
 
       ctrl.setFeedbackSortingOptions('exploration');
@@ -514,7 +575,7 @@ describe('Learner dashboard page', function() {
 
     it('should get value of subscription sort key property', function() {
       // The default sort option is exploration last played.
-      expect(ctrl.currentSubscribersSortType).toBe('subscriber_username');
+      expect(ctrl.currentSubscribersSortType).toBe('username');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a ng-repeat directive.
@@ -523,8 +584,8 @@ describe('Learner dashboard page', function() {
           'username1');
       });
 
-      ctrl.setSubscriptionSortingOptions('subscriber_impact');
-      expect(ctrl.currentSubscribersSortType).toBe('subscriber_impact');
+      ctrl.setSubscriptionSortingOptions('impact');
+      expect(ctrl.currentSubscribersSortType).toBe('impact');
       ctrl.subscriptionsList.forEach(function(subscription) {
         expect(ctrl.getValueOfSubscriptionSortKey(subscription)).toBe(0);
       });
@@ -669,11 +730,33 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
       // Get exploration with id 13.
-      var activity = learnerDashboardData.incomplete_explorations_list[2];
+      var activity = learnerExplorationSummaryObjectFactory
+        .createFromBackendDict(
+          learnerDashboardData.incomplete_explorations_list[2]);
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
       expect(ctrl.incompleteExplorationsList.length).toBe(11);
+    });
+
+    it('should not remove an activity if its not present', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+
+      expect(ctrl.incompleteExplorationsList.length).toBe(12);
+
+      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      // Get exploration with id 13.
+      var activity = learnerExplorationSummaryObjectFactory
+        .createFromBackendDict({
+          id: 100
+        });
+      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
+      $scope.$apply();
+
+      expect(ctrl.incompleteExplorationsList.length).toBe(12);
     });
 
     it('should remove an incomplete collection activity', function() {
@@ -686,7 +769,10 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 11.
-      var activity = learnerDashboardData.incomplete_collections_list[2];
+
+      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+        learnerDashboardData.incomplete_collections_list[2]);
+
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
@@ -702,8 +788,12 @@ describe('Learner dashboard page', function() {
 
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      // Get exploration with id 2.
-      var activity = learnerDashboardData.exploration_playlist[1];
+
+      // Exploration with id 2.
+      var activity = learnerExplorationSummaryObjectFactory
+        .createFromBackendDict(
+          learnerDashboardData.exploration_playlist[1]);
+
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
@@ -720,7 +810,9 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 2.
-      var activity = learnerDashboardData.collection_playlist[1];
+      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+        learnerDashboardData.collection_playlist[1]);
+
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 

@@ -22,23 +22,31 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 
 describe('Read only collection backend API service', () => {
   let readOnlyCollectionBackendApiService:
     ReadOnlyCollectionBackendApiService = null;
   let httpTestingController: HttpTestingController;
+  let collectionObjectFactory: CollectionObjectFactory = null;
   let sampleDataResults = {
     collection: {
       id: '0',
       title: 'Collection Under Test',
       category: 'Test',
       objective: 'To pass',
-      schema_version: '1',
+      schema_version: 1,
       nodes: [{
         exploration_id: '0'
       }],
-      next_exploration_ids: [],
-      completed_exploration_ids: []
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      },
+      language_code: null,
+      tags: [],
+      version: null
     }
   };
   beforeEach(() => {
@@ -48,6 +56,7 @@ describe('Read only collection backend API service', () => {
 
     readOnlyCollectionBackendApiService = TestBed.get(
       ReadOnlyCollectionBackendApiService);
+    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -68,7 +77,10 @@ describe('Read only collection backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      var collectionObject = collectionObjectFactory.create(
+        sampleDataResults.collection);
+
+      expect(successHandler).toHaveBeenCalledWith(collectionObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -86,7 +98,10 @@ describe('Read only collection backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      var collectionObject = collectionObjectFactory.create(
+        sampleDataResults.collection);
+
+      expect(successHandler).toHaveBeenCalledWith(collectionObject);
       expect(failHandler).not.toHaveBeenCalled();
 
       // Loading a collection the second time should not fetch it.
@@ -134,7 +149,10 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+    var collectionObject = collectionObjectFactory.create(
+      sampleDataResults.collection);
+
+    expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();
 
     // The collection should now be cached.
@@ -156,7 +174,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+    expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -167,13 +185,26 @@ describe('Read only collection backend API service', () => {
     // The collection should not currently be cached.
     expect(readOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
 
-    // Cache a collection.
-    readOnlyCollectionBackendApiService.cacheCollection('0', {
+    var collection = collectionObjectFactory.create({
       id: '0',
-      nodes: []
+      nodes: [],
+      title: null,
+      objective: null,
+      tags: null,
+      language_code: null,
+      schema_version: null,
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      },
+      category: null,
+      version: null
     });
 
-    // It should now be cached.
+    // Cache a collection.
+    readOnlyCollectionBackendApiService.cacheCollection('0', collection);
+
+    // It should now be cached.CollectionPlaythroughObjectFactory.
     expect(readOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
 
     // A new collection should not have been fetched from the backend. Also,
@@ -183,10 +214,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      id: '0',
-      nodes: []
-    });
+    expect(successHandler).toHaveBeenCalledWith(collection);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 });

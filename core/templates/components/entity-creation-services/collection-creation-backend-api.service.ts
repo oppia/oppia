@@ -20,6 +20,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+interface CollectionCreationResponse {
+  collectionId: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -28,10 +32,14 @@ export class CollectionCreationBackendService {
 
   private _createCollection(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
-    this.http.post('/collection_editor_handler/create_new', {}).toPromise()
-      .then((response) => {
+      errorCallback: (reason?: string) => void): void {
+    this.http.post<CollectionCreationResponse>(
+      '/collection_editor_handler/create_new', {}).toPromise()
+      .then(response => {
         if (successCallback) {
+          // NOTE: The response doesn't need to return a domain object
+          // because the response just returns collectionId and the the case
+          // of the keys of the backend dict is already in camelCase.
           successCallback(response);
         }
       }, () => {
@@ -42,15 +50,11 @@ export class CollectionCreationBackendService {
   }
 
 
-  createCollection(): Promise<object> {
+  createCollection(): Promise<CollectionCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createCollection(resolve, reject);
     });
   }
-}
-
-export interface ICollectionCreationResponse {
-  collectionId: string
 }
 
 angular.module('oppia').factory(

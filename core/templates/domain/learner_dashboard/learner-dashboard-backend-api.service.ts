@@ -21,19 +21,122 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import {
+  CollectionSummary,
+  CollectionSummaryBackendDict,
+  CollectionSummaryObjectFactory
+} from 'domain/collection/collection-summary-object.factory';
+import {
+  FeedbackThreadSummary,
+  FeedbackThreadSummaryObjectFactory,
+  FeedbackThreadSummaryBackendDict
+} from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
+import {
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummaryObjectFactory
+} from 'domain/summary/learner-exploration-summary-object.factory';
+import {
+  NonExistentActivities,
+  NonExistentActivitiesBackendDict,
+  NonExistentActivitiesObjectFactory
+} from 'domain/learner_dashboard/non-existent-activities-object.factory';
+import {
+  CreatorSummaryBackendDict,
+  ProfileSummary,
+  ProfileSummaryObjectFactory
+} from 'domain/user/profile-summary-object.factory';
+
+interface LearnerDashboardDataBackendDict {
+  'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
+  'incomplete_explorations_list': LearnerExplorationSummaryBackendDict[];
+  'exploration_playlist': LearnerExplorationSummaryBackendDict[];
+  'completed_collections_list': CollectionSummaryBackendDict[];
+  'incomplete_collections_list': CollectionSummaryBackendDict[];
+  'collection_playlist': CollectionSummaryBackendDict[];
+  'number_of_unread_threads': number;
+  'thread_summaries': FeedbackThreadSummaryBackendDict[];
+  'completed_to_incomplete_collections': string[];
+  'number_of_nonexistent_activities': NonExistentActivitiesBackendDict;
+  'subscription_list': CreatorSummaryBackendDict[];
+}
+
+interface LearnerDashboardData {
+  completedExplorationsList: LearnerExplorationSummary[];
+  incompleteExplorationsList: LearnerExplorationSummary[];
+  explorationPlaylist: LearnerExplorationSummary[];
+  completedCollectionsList: CollectionSummary[];
+  incompleteCollectionsList: CollectionSummary[];
+  collectionPlaylist: CollectionSummary[];
+  numberOfUnreadThreads: number;
+  threadSummaries: FeedbackThreadSummary[];
+  completedToIncompleteCollections: string[];
+  numberOfNonexistentActivities: NonExistentActivities;
+  subscriptionList: ProfileSummary[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerDashboardBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private collectionSummaryObjectFactory: CollectionSummaryObjectFactory,
+    private feedbackThreadSummaryObjectFactory:
+    FeedbackThreadSummaryObjectFactory,
+    private learnerExplorationSummaryObjectFactory:
+    LearnerExplorationSummaryObjectFactory,
+    private nonExistentActivitiesObjectFactory:
+    NonExistentActivitiesObjectFactory,
+    private profileSummaryObjectFactory: ProfileSummaryObjectFactory) {}
 
-  _fetchLearnerDashboardData(): Promise<Object> {
-    // HttpClient returns an Observable, the toPromise converts it into a
-    // Promise.
-    return this.http.get('/learnerdashboardhandler/data').toPromise();
+  _fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
+    return this.http.get<LearnerDashboardDataBackendDict>(
+      '/learnerdashboardhandler/data').toPromise().then(dashboardData => {
+      return {
+        completedExplorationsList: (
+          dashboardData.completed_explorations_list.map(
+            expSummary => this.learnerExplorationSummaryObjectFactory
+              .createFromBackendDict(expSummary))),
+        incompleteExplorationsList: (
+          dashboardData.incomplete_explorations_list.map(
+            expSummary => this.learnerExplorationSummaryObjectFactory
+              .createFromBackendDict(expSummary))),
+        explorationPlaylist: (
+          dashboardData.exploration_playlist.map(
+            expSummary => this.learnerExplorationSummaryObjectFactory
+              .createFromBackendDict(expSummary))),
+        completedCollectionsList: (
+          dashboardData.completed_collections_list.map(
+            collectionSummary => this.collectionSummaryObjectFactory
+              .createFromBackendDict(collectionSummary))),
+        incompleteCollectionsList: (
+          dashboardData.incomplete_collections_list.map(
+            collectionSummary => this.collectionSummaryObjectFactory
+              .createFromBackendDict(collectionSummary))),
+        collectionPlaylist: (
+          dashboardData.collection_playlist.map(
+            collectionSummary => this.collectionSummaryObjectFactory
+              .createFromBackendDict(collectionSummary))),
+        numberOfUnreadThreads: dashboardData.number_of_unread_threads,
+        threadSummaries: (
+          dashboardData.thread_summaries.map(
+            threadSummary => this.feedbackThreadSummaryObjectFactory
+              .createFromBackendDict(threadSummary))),
+        completedToIncompleteCollections: (
+          dashboardData.completed_to_incomplete_collections),
+        numberOfNonexistentActivities: (
+          this.nonExistentActivitiesObjectFactory.createFromBackendDict(
+            dashboardData.number_of_nonexistent_activities)),
+        subscriptionList: (
+          dashboardData.subscription_list.map(
+            profileSummary => this.profileSummaryObjectFactory
+              .createFromCreatorBackendDict(profileSummary)))
+      };
+    });
   }
 
-  fetchLearnerDashboardData(): Promise<Object> {
+  fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
     return this._fetchLearnerDashboardData();
   }
 }

@@ -25,7 +25,7 @@ import { ThreadMessage } from
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
-export interface IFeedbackThreadBackendDict {
+export interface FeedbackThreadBackendDict {
   'status': string;
   'subject': string;
   'summary': string;
@@ -94,7 +94,7 @@ export class FeedbackThreadObjectFactory {
       ThreadMessageSummaryObjectFactory) {}
 
   createFromBackendDict(
-      feedbackThreadBackendDict: IFeedbackThreadBackendDict): FeedbackThread {
+      feedbackThreadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,

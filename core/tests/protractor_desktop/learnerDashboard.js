@@ -97,12 +97,12 @@ describe('Learner dashboard functionality', function() {
     // dashboard.
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToSubscriptionsSection();
-    // The last user (collectionAdm) that learner subsribes to is placed first
+    // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
-    await learnerDashboardPage.expectSubscriptionFirstNameToMatch('collect...');
-    // The first user (creatorName) that learner subscribes to is placed
+    await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
+    // The first user (collectionAdm) that learner subscribes to is placed
     // last in the list.
-    await learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
+    await learnerDashboardPage.expectSubscriptionLastNameToMatch('collect...');
     await users.logout();
   });
 

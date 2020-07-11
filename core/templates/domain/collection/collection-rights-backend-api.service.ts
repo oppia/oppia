@@ -50,12 +50,12 @@ export class CollectionRightsBackendApiService {
           collection_id: collectionId
         });
 
-    this.http.get(collectionRightsUrl, { observe: 'response' }).toPromise()
-      .then((response) => {
+    this.http.get<ICollectionRightsBackendDict>(collectionRightsUrl).toPromise()
+      .then(response => {
         if (successCallback) {
           successCallback(
             this.collectionRightsObjectFactory
-              .create(response.body as ICollectionRightsBackendDict)
+              .create(response)
           );
         }
       },
@@ -104,14 +104,14 @@ export class CollectionRightsBackendApiService {
     });
   }
 
-  private _isCached(collectionId: string): Boolean {
+  private _isCached(collectionId: string): boolean {
     return this.collectionRightsCache.hasOwnProperty(collectionId);
   }
 
   /**
    * Gets a collection's rights, given its ID.
    */
-  fetchCollectionRights(collectionId: string): Promise<Object> {
+  fetchCollectionRights(collectionId: string): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._fetchCollectionRights(collectionId, resolve, reject);
     });
@@ -126,7 +126,7 @@ export class CollectionRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  loadCollectionRights(collectionId: string): Promise<object> {
+  loadCollectionRights(collectionId: string): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
         if (resolve) {
@@ -150,7 +150,7 @@ export class CollectionRightsBackendApiService {
    * local data cache or if it needs to be retrieved from the backend
    * upon a laod.
    */
-  isCached(collectionId: string): Boolean {
+  isCached(collectionId: string): boolean {
     return this._isCached(collectionId);
   }
 
@@ -167,7 +167,7 @@ export class CollectionRightsBackendApiService {
    * its ID and version.
    */
   setCollectionPublic(collectionId: string,
-      collectionVersion: number): Promise<Object> {
+      collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._setCollectionStatus(
         collectionId, collectionVersion, true, resolve, reject);
@@ -179,7 +179,7 @@ export class CollectionRightsBackendApiService {
    * given its ID and version.
    */
   setCollectionPrivate(collectionId: string,
-      collectionVersion: number): Promise<Object> {
+      collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._setCollectionStatus(
         collectionId, collectionVersion, false, resolve, reject);

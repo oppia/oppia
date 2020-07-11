@@ -27,47 +27,158 @@ describe('Creator Dashboard backend API service', () => {
   let creatorDashboardBackendApiService:
     CreatorDashboardBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  var SAMPLE_EXP_ID = 'hyuy4GUlvTqJ';
 
   var sampleDataResults = {
-    explorations_list: [{
-      id: SAMPLE_EXP_ID,
-      title: 'Sample Title',
-      activity_type: 'exploration',
-      category: 'Computing',
-      objective: 'Sample objective',
-      language_code: 'en',
-      created_on_msec: 1466178691847.67,
-      last_updated_msec: 1466178759209.839,
-      status: 'public',
-      rating: {
-        5: 0,
-        4: 1,
-        3: 0,
-        2: 0,
-        1: 0
+    suggestions_to_review_list: [{
+      suggestion_type: 'edit_exploration_state_content',
+      suggestion_id: 'exp1',
+      target_type: '',
+      target_id: '',
+      status: '',
+      author_name: '',
+      change: {
+        state_name: '',
+        new_value: '',
+        old_value: '',
       },
-      community_owned: false,
-      tags: '',
-      thumbnail_icon_url: '/subjects/Computing.svg',
-      thumbnail_bg_color: '#bb8b2f',
-      num_views: 2,
-      num_open_threads: 0,
-      num_total_threads: 0
+      last_updated_msecs: 0
+    }, {
+      suggestion_type: 'edit_exploration_state_content',
+      suggestion_id: 'exp2',
+      target_type: '',
+      target_id: '',
+      status: '',
+      author_name: '',
+      change: {
+        state_name: '',
+        new_value: '',
+        old_value: '',
+      },
+      last_updated_msecs: 0
     }],
-    collections_list: [],
+    explorations_list: [
+      {
+        human_readable_contributors_summary: {
+          username: {
+            num_commits: 3
+          }
+        },
+        category: 'Algebra',
+        community_owned: false,
+        tags: [],
+        title: 'Testing Exploration',
+        created_on_msec: 1593786508029.501,
+        num_total_threads: 0,
+        num_views: 1,
+        last_updated_msec: 1593786607552.753,
+        status: 'public',
+        num_open_threads: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        language_code: 'en',
+        objective: 'To test exploration recommendations',
+        id: 'hi27Jix1QGbT',
+        thumbnail_bg_color: '#cd672b',
+        activity_type: 'exploration',
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        }
+      }
+    ],
+    is_topic_manager: false,
     dashboard_stats: {
-      total_plays: 10,
-      num_ratings: 1,
-      average_ratings: 4.0,
-      total_open_feedback: 5
+      average_ratings: null,
+      num_ratings: 0,
+      total_open_feedback: 0,
+      total_plays: 1
     },
-    last_week_stats: {
-      total_plays: 2,
-      average_ratings: 3.5,
-      num_ratings: 3,
-      total_open_feedback: 1
-    }
+    subscribers_list: [{
+      subscriber_picture_data_url: 'path/to/img',
+      subscriber_username: 'username',
+      subscriber_impact: 0
+    }],
+    collections_list: [{
+      last_updated: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      language_code: 'en',
+      thumbnail_bg_color: '#cd672b',
+      created_on: 1591296635736.666,
+      status: 'public',
+      category: 'Algebra',
+      title: 'Test Title',
+      node_count: 0
+    }],
+    created_suggestions_list: [{
+      suggestion_type: 'edit_exploration_state_content',
+      suggestion_id: 'exp1',
+      target_type: '',
+      target_id: '',
+      status: '',
+      author_name: '',
+      change: {
+        state_name: '',
+        new_value: '',
+        old_value: '',
+      },
+      last_updated_msecs: 0
+    }, {
+      suggestion_type: 'edit_exploration_state_content',
+      suggestion_id: 'exp2',
+      target_type: '',
+      target_id: '',
+      status: '',
+      author_name: '',
+      change: {
+        state_name: '',
+        new_value: '',
+        old_value: '',
+      },
+      last_updated_msecs: 0
+    }],
+    display_preference: 'card',
+    last_week_stats: null,
+    threads_for_suggestions_to_review_list: [{
+      status: '',
+      subject: '',
+      summary: '',
+      original_author_username: '',
+      last_updated_msecs: 0,
+      message_count: '',
+      thread_id: 'exp1',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: '',
+    }],
+    threads_for_created_suggestions_list: [{
+      status: '',
+      subject: '',
+      summary: '',
+      original_author_username: '',
+      last_updated_msecs: 0,
+      message_count: '',
+      thread_id: 'exp1',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: '',
+    }],
+    topic_summary_dicts: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      subtopic_count: 5,
+      canonical_story_count: 4,
+      total_skill_count: 10,
+      uncategorized_skill_count: 3,
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      additional_story_count: 0,
+      topic_model_created_on: 231241343,
+      topic_model_last_updated: 3454354354
+    }]
   };
 
   var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';

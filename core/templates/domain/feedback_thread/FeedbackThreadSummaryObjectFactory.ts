@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface IFeedbackThreadSummaryBackendDict {
+export interface FeedbackThreadSummaryBackendDict {
   'status': string;
   'original_author_id': string;
   'last_updated_msecs': number;
@@ -105,7 +105,7 @@ export class FeedbackThreadSummaryObjectFactory {
   }
 
   createFromBackendDict(
-      feedbackThreadSummaryBackendDict: IFeedbackThreadSummaryBackendDict):
+      feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict):
       FeedbackThreadSummary {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
