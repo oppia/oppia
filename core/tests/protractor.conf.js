@@ -1,8 +1,7 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var retry = require('protractor-retry').retry;
-var glob = require('glob')
+var glob = require('glob');
 var path = require('path');
-const { relativeTimeRounding } = require('moment');
 
 var suites = {
     // The tests on Travis are run individually to parallelize
