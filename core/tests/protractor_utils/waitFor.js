@@ -116,7 +116,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
     await browser.switchTo().window(await handles.pop());
     var url = await browser.getCurrentUrl();
     await browser.waitForAngularEnabled(true);
-    if(url === null) {
+    if (url === null) {
       url = await browser.getCurrentUrl();
     }
     return await url.match(urlToMatch);
