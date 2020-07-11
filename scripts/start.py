@@ -110,7 +110,7 @@ def main(args=None):
     enable_console_arg = (
         '--enable_console=true' if parsed_args.enable_console else '')
     disable_host_checking_arg = (
-        '--enable_host_checking=False'
+        '--enable_host_checking=false'
         if parsed_args.disable_host_checking else '')
     no_auto_restart = (
         '--automatic_restart=no' if parsed_args.no_auto_restart else '')
