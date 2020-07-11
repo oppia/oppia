@@ -199,7 +199,7 @@ class MockSummaryModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
 
 class MockSnapshotContentModelValidator(
@@ -207,7 +207,7 @@ class MockSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
 
 class MockSnapshotMetadataModelValidator(
@@ -216,9 +216,9 @@ class MockSnapshotMetadataModelValidator(
     EXTERNAL_MODEL_NAME = 'external model'
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'external_model_ids': (MockModel, [])
-        }
+        return [
+            prod_validation_jobs_one_off.ExternalModelFetchingDetails(
+                'external_model_ids', MockModel, [])]
 
 
 class MockBaseUserModelValidator(
@@ -226,7 +226,7 @@ class MockBaseUserModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
     @classmethod
     def _get_custom_validation_functions(cls):

@@ -1175,13 +1175,13 @@ class CollectionSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'collection_ids': (
-                collection_models.CollectionModel,
+        return [
+            ExternalModelFetchingDetails(
+                'collection_ids', collection_models.CollectionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class CollectionSnapshotContentModelValidator(
@@ -3559,13 +3559,13 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_target_type,
-            cls._validate_score_category]
+            cls._validate_final_reveiwer_id]
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_target_version_at_submission,
-            cls._validate_final_reveiwer_id]
+            cls._validate_score_category]
 
 
 class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
@@ -5366,7 +5366,7 @@ class UserCommunityRightsModelValidator(BaseUserModelValidator):
         return [
             ExternalModelFetchingDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id])]
+                [item.id])]
 
 
 class PendingDeletionRequestModelValidator(BaseUserModelValidator):
