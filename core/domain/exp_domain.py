@@ -2564,7 +2564,7 @@ class Exploration(python_utils.OBJECT):
                     schema_obj_type = schema.get('obj_type')
                     ca_name = ca_spec.name
 
-                    if obj_type == 'SubtitledUnicode':
+                    if schema_obj_type == 'SubtitledUnicode':
                         if ca_name not in ca:
                             ca[ca_name] = {'value': None}
                         ca[ca_name]['value'], new_content_ids = (
@@ -2572,7 +2572,7 @@ class Exploration(python_utils.OBJECT):
                                 ca[ca_name]['value'],
                                 ca_spec.default_value)
                         )
-                    elif obj_type == 'SubtitledHtml':
+                    elif schema_obj_type == 'SubtitledHtml':
                         if ca_name not in ca:
                             ca[ca_name] = {'value': None}
                         ca[ca_name]['value'], new_content_ids = (

@@ -741,19 +741,12 @@ class InteractionInstance(python_utils.OBJECT):
                                 'The solution does not have a valid '
                                 'correct_answer type.')
 
-
-        customization_args_html_list = (
-            customization_args_util.get_all_html_in_cust_args(
-                self.customization_args,
-                interaction.customization_arg_specs)
-        )
-        html_list += customization_args_html_list
+        html_list += self.get_all_html_in_cust_args()
 
         return html_list
 
     @staticmethod
-    def convert_html_in_interaction(
-            interaction_dict, conversion_fn):
+    def convert_html_in_interaction(interaction_dict, conversion_fn):
         """Checks for HTML fields in the outcome and converts it
         according to the conversion function.
 
@@ -766,12 +759,6 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             dict. The converted interaction dict.
         """
-        interaction_id = interaction_dict['id']
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(interaction_id))
-        customization_arg_specs = interaction.customization_arg_specs
-        customization_args = interaction_dict['customization_args']
-
         def convert_cust_args(ca_value, obj_type):
             """Conversion function that converts html content in
             customization arguments.
@@ -785,23 +772,147 @@ class InteractionInstance(python_utils.OBJECT):
             Returns:
                 str. The updated customization argument value.
             """
-            if obj_type == 'SubtitledUnicode':
-                return ca_value
-
-            if isinstance(ca_value, dict) and 'content_id' in ca_value:
+            if obj_type == 'SubtitledHtml':
                 ca_value['html'] = conversion_fn(ca_value['html'])
-                return ca_value
-            elif isinstance(ca_value, str):
-                return conversion_fn(ca_value)
+            return ca_value
+
+        InteractionInstance.convert_content_in_cust_args(
+            interaction_dict['id'],
+            interaction_dict['customization_args'],
+            convert_cust_args)
+        return interaction_dict
+
+    @staticmethod
+    def convert_content_in_cust_args(
+            interaction_id, customization_args, conversion_fn):
+        """Converts all html of SubtitledHtml or unicode of SubtitledUnicode in
+        customization arguments.
+
+        Args:
+            interaction_id: string. The interaction id.
+            ca_values: dict. The customization dict. The keys are names
+                of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+            conversion_fn: function. The function to be used for converting the
+                HTML. It is passed the obj_type, customization argument value,
+                content_id prefix generated from schema, and the customization
+                argument name, if availible.
+        """
+        ca_specs = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).customization_arg_specs
+
+        for ca_spec in ca_specs:
+            ca_spec_name = ca_spec.name
+            if ca_spec_name in customization_args:
+                customization_args[ca_spec_name]['value'] = (
+                    InteractionInstance.apply_conversion_fn_on_content(
+                        customization_args[ca_spec_name]['value'],
+                        ca_spec.to_dict()['schema'],
+                        conversion_fn))
+
+    @staticmethod
+    def apply_conversion_fn_on_content(value, schema, conversion_fn):
+        """Helper function that recursively traverses an interaction
+        customization argument spec to locate any SubtitledHtml or
+        SubtitledUnicode objects, and applies a conversion function to the
+        customization argument value.
+
+        Args:
+            schema: dict. The customization dict to be modified: dict
+                with a single key, 'value', whose corresponding value is the
+                value of the customization arg.
+            value: dict. The current nested customization argument value to be
+                modifed.
+            conversion_fn: function. The function to be used for converting the
+                content. It is passed the customization argument value and obj_type.
+        """
+        if 'type' not in schema:
+            raise Exception(schema)
+        schema_type = schema['type']
+        schema_obj_type = schema.get('obj_type', None)
+        
+        if (schema_obj_type == 'SubtitledUnicode' or
+                schema_obj_type == 'SubtitledHtml'):
+            value = conversion_fn(value, schema_obj_type)
+        elif schema_type == 'list':
+            for i in range(len(value)):
+                value[i] = InteractionInstance.apply_conversion_fn_on_content(
+                    value[i],
+                    schema['items'],
+                    conversion_fn)
+        elif schema_type == 'dict':
+            for property_spec in schema['properties']:
+                name = property_spec['name']
+                value[name] = (
+                    InteractionInstance.apply_conversion_fn_on_content(
+                        value[name],
+                        property_spec['schema'],
+                        conversion_fn)
+                )
+        
+        return value
+
+    def get_all_content_ids_in_cust_args(self):
+        """Extracts all content_id's from interaction customization arguments.
+
+        Returns:
+            list(str). List of all content_id's in customization arguments.
+        """
+        content_ids = []
+        def extract_content_ids(ca_value, unused_obj_type):
+            """Conversion function used to extract all content_ids. Customization
+            argument is returned unmodified.
+
+            Args:
+                ca_value: dict. Dictionary of key 'value' to
+                    original value of customization argument.
+                unused_obj_type: str. Indicates the obj_type found in
+                    the customization arguments schema.
+
+            Returns:
+                str. The unmodified customization argument value.
+            """
+            if 'content_id' in ca_value:
+                content_ids.append(ca_value['content_id'])
 
             return ca_value
 
-        customization_args_util.convert_content_in_cust_args(
-            customization_args,
-            customization_arg_specs,
-            convert_cust_args)
+        self.convert_content_in_cust_args(
+            self.id, self.customization_args, extract_content_ids)
+        return content_ids
 
-        return interaction_dict
+    def get_all_html_in_cust_args(self):
+        """Extracts all html from interaction customization arguments.
+
+        Returns:
+            list(str). List of all html in customization arguments.
+        """
+        html = []
+        def extract_html(ca_value, obj_type):
+            """Conversion function used to extract all html. Customization
+            argument is returned unmodified.
+
+            Args:
+                obj_type: str. Indicates the obj_type found in
+                    the customization arguments schema.
+                ca_value: dict. Dictionary of key 'value' to
+                    original value of customization argument.
+
+            Returns:
+                str. The unmodified customization argument value.
+            """
+            if obj_type == 'SubtitledUnicode':
+                return ca_value
+
+            if 'html' in ca_value:
+                html.append(ca_value['html'])
+
+            return ca_value
+
+        self.convert_content_in_cust_args(
+            self.id, self.customization_args, extract_html)
+        return html
 
 
 class Outcome(python_utils.OBJECT):
@@ -1959,17 +2070,6 @@ class State(python_utils.OBJECT):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
-            self.interaction.customization_args, new_content_ids = (
-                customization_args_util
-                    .get_full_customization_args_with_content(
-                        self.interaction.customization_args,
-                        interaction_registry.Registry.get_interaction_by_id(
-                            self.interaction.id
-                        ).customization_arg_specs
-                    )
-            )
-            self._update_content_ids_in_assets(
-                [], new_content_ids)
             self.interaction.validate(exp_param_specs_dict)
 
         content_id_list = []
@@ -2003,18 +2103,8 @@ class State(python_utils.OBJECT):
             content_id_list.append(solution_content_id)
 
         if self.interaction.id:
-            interaction_content_ids = (
-                customization_args_util.get_all_content_ids_in_cust_args(
-                    self.interaction.customization_args,
-                    (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            self.interaction.id
-                        ).customization_arg_specs
-                    )
-                )
-            )
-
-            content_id_list.extend(interaction_content_ids)
+            content_id_list.extend(
+                self.interaction.get_all_content_ids_in_cust_args())
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
@@ -2251,34 +2341,20 @@ class State(python_utils.OBJECT):
         new_content_id_list = []
 
         if self.interaction.id:
-            old_ca_content_ids = (
-                customization_args_util.get_all_content_ids_in_cust_args(
-                    self.interaction.customization_args,
-                    (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            self.interaction.id
-                        ).customization_arg_specs
-                    )
-                )
-            )
-            old_content_id_list.extend(old_ca_content_ids)
+            old_content_id_list.extend(
+                self.interaction.get_all_content_ids_in_cust_args())
+        self.interaction.id = interaction_id
 
         if interaction_id:
-            customization_args, new_ca_content_ids = (
-                customization_args_util
-                .get_full_customization_args_with_content(
-                    {},
-                    (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            interaction_id
-                        ).customization_arg_specs
-                    )
-                )
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            self.interaction.customization_args = (
+                customization_args_util.get_full_customization_args(
+                    {}, interaction.customization_arg_specs)
             )
-            new_content_id_list.extend(new_ca_content_ids)
-            self.interaction.customization_args = customization_args
+            new_content_id_list.extend(
+                self.interaction.get_all_content_ids_in_cust_args())
 
-        self.interaction.id = interaction_id
 
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
@@ -2306,23 +2382,16 @@ class State(python_utils.OBJECT):
                     self.interaction.id).customization_arg_specs)
 
             old_content_id_list.extend(
-                customization_args_util.get_all_content_ids_in_cust_args(
-                    self.interaction.customization_args,
-                    ca_specs
-                )
-            )
+                self.interaction.get_all_content_ids_in_cust_args())
 
+            self.interaction.customization_args = customization_args
             new_content_id_list.extend(
-                customization_args_util.get_all_content_ids_in_cust_args(
-                    customization_args,
-                    ca_specs
-                )
-            )
+                self.interaction.get_all_content_ids_in_cust_args())
 
             self._update_content_ids_in_assets(
                 old_content_id_list, new_content_id_list)
-        
-        self.interaction.customization_args = customization_args
+        else:
+            self.interaction.customization_args = customization_args
 
     def update_interaction_answer_groups(self, answer_groups_list):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
