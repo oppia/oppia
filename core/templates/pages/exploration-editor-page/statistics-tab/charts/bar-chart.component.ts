@@ -26,45 +26,54 @@ angular.module('oppia').component('barChart', {
     options: '&'
   },
   controller: ['$scope', '$element', function($scope, $element) {
-    if (!$.isArray($scope.data())) {
-      return;
-    }
-    var options = $scope.options();
-    var chart = null;
+    var ctrl = this;
 
-    var redrawChart = function() {
-      if (!chart) {
-        try {
-          // Occasionally, we run into the following error:
-          // "TypeError: google.visualization.BarChart is not a constructor".
-          // This ignores the above error since the bar chart directive is to
-          // be deprecated soon.
-          chart = new google.visualization.BarChart($element[0]);
-        } catch (e) {
-          return;
-        }
+    ctrl.$onInit = function() {
+      if (!$.isArray($scope.data())) {
+        return;
       }
-      chart.draw(google.visualization.arrayToDataTable($scope.data()), {
-        chartArea: {
-          left: 0,
-          width: options.chartAreaWidth
-        },
-        colors: options.colors,
-        hAxis: {
-          gridlines: {
-            color: 'transparent'
+      var options = $scope.options();
+      var chart = null;
+
+      var redrawChart = function() {
+        if (!chart) {
+          try {
+            // Occasionally, we run into the following error:
+            // "TypeError: google.visualization.BarChart is not a
+            // constructor".
+            // This ignores the above error since the bar chart directive is
+            // to be deprecated soon.
+            chart = new google.visualization.BarChart($element[0]);
+          } catch (e) {
+            return;
           }
-        },
-        height: options.height,
-        isStacked: true,
-        legend: {
-          position: options.legendPosition || 'none'
-        },
-        width: options.width
-      });
+        }
+        chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+          chartArea: {
+            left: 0,
+            width: options.chartAreaWidth
+          },
+          colors: options.colors,
+          hAxis: {
+            gridlines: {
+              color: 'transparent'
+            }
+          },
+          height: options.height,
+          isStacked: true,
+          legend: {
+            position: options.legendPosition || 'none'
+          },
+          width: options.width
+        });
+      };
+
+      $scope.$watch('data()', redrawChart);
+      $(window).resize(redrawChart);
     };
 
-    $scope.$watch('data()', redrawChart);
-    $(window).resize(redrawChart);
+    ctrl.$onDestroy = function() {
+      $(window).off('resize');
+    };
   }]
 });

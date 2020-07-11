@@ -17,71 +17,136 @@
  */
 
 describe('Bar Chart directive', function() {
+  var ctrl = null;
   var $scope = null;
 
-  var mockedChart = {
-    draw: () => {}
-  };
+  var mockedChart = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  afterAll(function() {
+    // Resetting google global property.
+    window.google = undefined;
+    Object.defineProperty(window, 'google', {
+      get: () => undefined
+    });
+    ctrl.$onDestroy();
+  });
 
   describe('when $scope data is not an array', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       var $rootScope = $injector.get('$rootScope');
 
+      mockedChart = {
+        draw: () => {}
+      };
+
+      // @ts-ignore window.google should have properties from google
+      // third-party library according to the lint.
+      window.google = {};
+      // This approach was choosen because spyOnProperty() doesn't work on
+      // properties that doesn't have a get access type.
+      // Without this approach the test will fail because it'll throw
+      // 'Property google does not have access type get' error.
+      // eslint-disable-next-line max-len
+      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+      // ref: https://github.com/jasmine/jasmine/issues/1415
+      Object.defineProperty(window, 'google', {
+        get: () => ({})
+      });
+      spyOnProperty(window, 'google').and.callFake(() => ({
+        visualization: {
+          arrayToDataTable: () => {}
+        }
+      }));
+
       $scope = $rootScope.$new();
       $scope.data = () => ({});
-      $componentController('barChart', {
+      ctrl = $componentController('barChart', {
         $scope: $scope,
         $element: [{}]
       });
+      ctrl.$onInit();
     }));
 
     it('should not redraw chart', function() {
       const drawSpy = spyOn(mockedChart, 'draw');
-      window.dispatchEvent(new Event('resize'));
+      angular.element(window).triggerHandler('resize');
       expect(drawSpy).not.toHaveBeenCalled();
     });
   });
 
-  describe('when google.visualization is not defined', function() {
+  describe('when google is not defined', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       var $rootScope = $injector.get('$rootScope');
 
+      mockedChart = {
+        draw: () => {}
+      };
+
+      // @ts-ignore window.google should have properties from google
+      // third-party library according to the lint.
+      window.google = {};
+      // This approach was choosen because spyOnProperty() doesn't work on
+      // properties that doesn't have a get access type.
+      // Without this approach the test will fail because it'll throw
+      // 'Property google does not have access type get' error.
+      // eslint-disable-next-line max-len
+      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+      // ref: https://github.com/jasmine/jasmine/issues/1415
       Object.defineProperty(window, 'google', {
-        get: () => undefined
+        get: () => ({})
       });
-      spyOnProperty(window, 'google').and.returnValue(undefined);
+      spyOnProperty(window, 'google').and.callFake(() => ({
+        visualization: {
+          arrayToDataTable: () => {}
+        }
+      }));
 
       $scope = $rootScope.$new();
       $scope.data = () => [];
       $scope.options = () => ({});
-      $componentController('barChart', {
+      ctrl = $componentController('barChart', {
         $scope: $scope,
         $element: [{}]
       });
+      ctrl.$onInit();
     }));
 
     it('should not redraw chart', function() {
-      window.dispatchEvent(new Event('resize'));
-      expect(window.google).not.toBeDefined();
+      angular.element(window).triggerHandler('resize');
+      expect(window.google.visualization.BarChart).not.toBeDefined();
     });
   });
 
-  describe('when google.visualization is defined and $scope data is an array',
+  describe('when google is defined and $scope data is an array',
     function() {
       beforeEach(angular.mock.inject(function($injector, $componentController) {
         var $rootScope = $injector.get('$rootScope');
 
+        mockedChart = {
+          draw: () => {}
+        };
+
+        // @ts-ignore window.google should have properties from google
+        // third-party library according to the lint.
+        window.google = {};
+        // This approach was choosen because spyOnProperty() doesn't work on
+        // properties that doesn't have a get access type.
+        // Without this approach the test will fail because it'll throw
+        // 'Property google does not have access type get' error.
+        // eslint-disable-next-line max-len
+        // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+        // ref: https://github.com/jasmine/jasmine/issues/1415
         Object.defineProperty(window, 'google', {
-          get: () => undefined
+          get: () => ({})
         });
-        spyOnProperty(window, 'google').and.returnValue({
+        spyOnProperty(window, 'google').and.callFake(() => ({
           visualization: {
             BarChart: () => mockedChart,
             arrayToDataTable: () => {}
           }
-        });
+        }));
 
         $scope = $rootScope.$new();
         $scope.data = () => [];
@@ -91,33 +156,17 @@ describe('Bar Chart directive', function() {
           height: 0,
           width: 0
         });
-        $componentController('barChart', {
+        ctrl = $componentController('barChart', {
           $scope: $scope,
           $element: [{}]
         });
+        ctrl.$onInit();
       }));
 
       it('should redraw chart', function() {
         const drawSpy = spyOn(mockedChart, 'draw');
-        window.dispatchEvent(new Event('resize'));
-        expect(drawSpy).toHaveBeenCalledWith(undefined, {
-          chartArea: {
-            left: 0,
-            width: 0
-          },
-          colors: [],
-          hAxis: {
-            gridlines: {
-              color: 'transparent'
-            }
-          },
-          height: 0,
-          isStacked: true,
-          legend: {
-            position: 'none'
-          },
-          width: 0
-        });
+        angular.element(window).triggerHandler('resize');
+        expect(drawSpy).toHaveBeenCalled();
       });
     });
 });

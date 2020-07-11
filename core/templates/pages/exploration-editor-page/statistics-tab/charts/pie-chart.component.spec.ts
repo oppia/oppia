@@ -17,21 +17,56 @@
  */
 
 describe('Pie Chart directive', function() {
+  var ctrl = null;
   var $scope = null;
 
-  var mockedChart = {
-    draw: () => {}
-  };
+  var mockedChart = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  afterAll(function() {
+    // Resetting google global property.
+    window.google = undefined;
+    Object.defineProperty(window, 'google', {
+      get: () => undefined
+    });
+    ctrl.$onDestroy();
+  });
 
   describe('when $scope data is not an array', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       var $rootScope = $injector.get('$rootScope');
 
+      mockedChart = {
+        draw: () => {}
+      };
+
+      // @ts-ignore window.google should have properties from google
+      // third-party library according to the lint.
+      window.google = {};
+      // This approach was choosen because spyOnProperty() doesn't work on
+      // properties that doesn't have a get access type.
+      // Without this approach the test will fail because it'll throw
+      // 'Property google does not have access type get' error.
+      // eslint-disable-next-line max-len
+      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+      // ref: https://github.com/jasmine/jasmine/issues/1415
+      Object.defineProperty(window, 'google', {
+        get: () => ({})
+      });
+      spyOnProperty(window, 'google').and.returnValue({
+        visualization: {
+          arrayToDataTable: () => {},
+          PieChart: () => mockedChart
+        },
+        charts: {
+          setOnLoadCallback: callback => {}
+        }
+      });
+
       $scope = $rootScope.$new();
       $scope.data = () => ({});
-      var ctrl = $componentController('pieChart', {
+      ctrl = $componentController('pieChart', {
         $scope: $scope,
         $element: []
       });
@@ -40,7 +75,7 @@ describe('Pie Chart directive', function() {
 
     it('should not redraw chart', function() {
       const drawSpy = spyOn(mockedChart, 'draw');
-      window.dispatchEvent(new Event('resize'));
+      angular.element(window).triggerHandler('resize');
       expect(drawSpy).not.toHaveBeenCalled();
     });
   });
@@ -49,10 +84,28 @@ describe('Pie Chart directive', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       var $rootScope = $injector.get('$rootScope');
 
+      mockedChart = {
+        draw: () => {}
+      };
+
+      // @ts-ignore window.google should have properties from google
+      // third-party library according to the lint.
+      window.google = {};
+      // This approach was choosen because spyOnProperty() doesn't work on
+      // properties that doesn't have a get access type.
+      // Without this approach the test will fail because it'll throw
+      // 'Property google does not have access type get' error.
+      // eslint-disable-next-line max-len
+      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+      // ref: https://github.com/jasmine/jasmine/issues/1415
       Object.defineProperty(window, 'google', {
-        get: () => undefined
+        get: () => ({})
       });
       spyOnProperty(window, 'google').and.returnValue({
+        visualization: {
+          arrayToDataTable: () => {},
+          PieChart: () => jasmine.createSpy('chart')
+        },
         charts: {
           setOnLoadCallback: callback => {}
         }
@@ -69,9 +122,9 @@ describe('Pie Chart directive', function() {
     }));
 
     it('should not redraw chart', function() {
-      const drawSpy = spyOn(mockedChart, 'draw');
-      window.dispatchEvent(new Event('resize'));
-      expect(drawSpy).not.toHaveBeenCalled();
+      const pieChartSpy = spyOn(window.google.visualization, 'PieChart');
+      angular.element(window).triggerHandler('resize');
+      expect(pieChartSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -79,8 +132,22 @@ describe('Pie Chart directive', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       var $rootScope = $injector.get('$rootScope');
 
+      mockedChart = {
+        draw: () => {}
+      };
+
+      // @ts-ignore window.google should have properties from google
+      // third-party library according to the lint.
+      window.google = {};
+      // This approach was choosen because spyOnProperty() doesn't work on
+      // properties that doesn't have a get access type.
+      // Without this approach the test will fail because it'll throw
+      // 'Property google does not have access type get' error.
+      // eslint-disable-next-line max-len
+      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+      // ref: https://github.com/jasmine/jasmine/issues/1415
       Object.defineProperty(window, 'google', {
-        get: () => undefined
+        get: () => ({})
       });
       spyOnProperty(window, 'google').and.returnValue({
         visualization: {
@@ -114,26 +181,8 @@ describe('Pie Chart directive', function() {
 
     it('should redraw chart', function() {
       const drawSpy = spyOn(mockedChart, 'draw');
-      window.dispatchEvent(new Event('resize'));
-      expect(drawSpy).toHaveBeenCalledWith(undefined, {
-        title: 'Pie title',
-        pieHole: null,
-        pieSliceTextStyle: {
-          color: '#fff',
-        },
-        pieSliceBorderColor: '#fff',
-        pieSliceText: 'none',
-        chartArea: {
-          left: 0,
-          width: 0,
-        },
-        colors: [],
-        height: 0,
-        legend: {
-          position: 'none',
-        },
-        width: 0,
-      });
+      angular.element(window).triggerHandler('resize');
+      expect(drawSpy).toHaveBeenCalled();
     });
   });
 });

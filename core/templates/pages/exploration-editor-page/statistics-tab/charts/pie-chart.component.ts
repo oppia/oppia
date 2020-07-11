@@ -27,6 +27,7 @@ angular.module('oppia').component('pieChart', {
   },
   controller: ['$scope', '$element', function($scope, $element) {
     var ctrl = this;
+
     ctrl.$onInit = function() {
       if (!$.isArray($scope.data())) {
         return;
@@ -67,6 +68,10 @@ angular.module('oppia').component('pieChart', {
 
       $scope.$watch('data()', redrawChart);
       $(window).resize(redrawChart);
+    };
+
+    ctrl.$onDestroy = function() {
+      $(window).off('resize');
     };
   }]
 });
