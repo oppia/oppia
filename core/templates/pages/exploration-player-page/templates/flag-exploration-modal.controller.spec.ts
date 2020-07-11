@@ -17,14 +17,13 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { PlayerPositionService } from '../services/player-position.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { IdGenerationService } from 'services/id-generation.service';
-import { TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
   'tests/angular-services.index';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { PlayerPositionService } from '../services/player-position.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { IdGenerationService } from 'services/id-generation.service';
 
 describe('Flag Exploration Modal Controller', function() {
   var $scope = null;
