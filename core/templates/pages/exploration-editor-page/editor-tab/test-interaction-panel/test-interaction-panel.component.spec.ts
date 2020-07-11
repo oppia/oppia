@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for testInteractionPanel.
  */
 
-fdescribe('Test Interaction Panel directive', function() {
+describe('Test Interaction Panel directive', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var CurrentInteractionService = null;
