@@ -21,8 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 
+from constants import constants
 from core.platform.email import gae_email_services
 import feconf
+import logging
 import python_utils
 
 
@@ -98,7 +100,30 @@ def send_mail(
         reply_to = gae_email_services.get_incoming_email_address(reply_to_id)
         data['h:Reply-To'] = reply_to
 
-    post_to_mailgun(data)
+    if not constants.DEV_MODE:
+        post_to_mailgun(data)
+    else:
+        msg_title = 'MailgunService.Send'
+        msg_body = (
+            '''
+            From: %s
+            To: %s
+            Subject: %s
+            Body:
+                Content-type: text/plain
+                Data length: %d
+            Body
+                Conten-type: text/html
+                Data length: %d
+            ''' % (
+                sender_email, recipient_email, subject, len(plaintext_body),
+                len(html_body)))
+        msg = msg_title + dedent(msg_body)
+        logging.info(msg)
+        logging.info(
+            'You are not currently sending out real email since this is a' +
+            ' dev environment. Emails are sent out in the production' +
+            ' environment.')
 
 
 def send_bulk_mail(
@@ -136,6 +161,8 @@ def send_bulk_mail(
         recipient_emails[i:i + 1000]
         for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
 
+    if not constants.DEV_MODE:
+        logging.info('MailgunService.SendBulkMail')
     for email_set in recipient_email_sets:
         # 'recipient-variable' in post data forces mailgun to send individual
         # email to each recipient (This is intended to be a workaround for
@@ -147,5 +174,28 @@ def send_bulk_mail(
             'text': plaintext_body.encode(encoding='utf-8'),
             'html': html_body.encode(encoding='utf-8'),
             'recipient-variables': '{}'}
+        if not constants.DEV_MODE:
+            post_to_mailgun(data)
+        else:
+            msg = (
+                '''
+                From: %s
+                To: %s
+                Subject: %s
+                Body:
+                    Content-type: text/plain
+                    Data length: %d
+                Body
+                    Conten-type: text/html
+                    Data length: %d
+                ''' % (
+                    sender_email, recipient_email, subject, len(plaintext_body),
+                    len(html_body)))
+            logging.info(msg)
+    if not constants.DEV_MODE:
+        logging.info(
+            'You are not currently sending out real email since this is a' +
+            ' dev environment. Emails are sent out in the production' +
+            ' environment.')
 
-        post_to_mailgun(data)
+
