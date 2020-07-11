@@ -116,6 +116,9 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
     await browser.switchTo().window(await handles.pop());
     var url = await browser.getCurrentUrl();
     await browser.waitForAngularEnabled(true);
+    if(url === null) {
+      url = await browser.getCurrentUrl();
+    }
     return await url.match(urlToMatch);
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
@@ -126,7 +129,6 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
 
 var fileToBeDownloaded = async function(filename) {
   var name = Constants.protractorConstants.DOWNLOAD_PATH + '/' + filename;
-  name = path.resolve(__dirname, name);
   browser.driver.wait(function() {
     return fs.existsSync(name);
   }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');

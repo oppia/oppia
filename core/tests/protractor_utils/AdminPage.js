@@ -395,7 +395,9 @@ var AdminPage = function() {
     await extractDataFormSubmitButton.click();
     var url = '/explorationdataextractionhandler?exp_id=0&exp_version' +
       '=0&state_name=0&num_answers=0';
-    expect(protractor.ExpectedConditions.urlContains(url)).toBeTruthy();
+    waitFor.newTabToBeCreated('Tab showing data not opened',
+      'explorationdataextractionhandler');
+    await browser.driver.close();
   };
 
   this.regenerateContributionsForTopic = async function(topicId) {

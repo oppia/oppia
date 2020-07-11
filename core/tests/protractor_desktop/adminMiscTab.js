@@ -40,14 +40,15 @@ describe('Admin misc test tab', function() {
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
 
+    var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic('adminPageMiscTabTestTopic',
       'A topic to test the admin page\'s misc tab', false);
-    await browser.getCurrentUrl().then((url) => {
-      topicId = url.split('/')[4];
-      topicId = topicId.substring(0, topicId.length - 1);
-    });
+    var url = await browser.getCurrentUrl();
+    topicId = url.split('/')[4];
+    topicId = topicId.substring(2, topicId.length - 1)
     await topicEditorPage.publishTopic();
+    await general.closeCurrentTabAndSwitchTo(handle);
   });
 
   it('should upload and download similarity files', async function() {
@@ -55,7 +56,7 @@ describe('Admin misc test tab', function() {
     await adminPage.getMiscTab();
     await adminPage.uploadTopicSimilarities(
       '../data/sample_topic_similarities.csv', true);
-    await allowedErrors.push('encode', 'Object', 'resource');
+    allowedErrors.push('encode', 'Object', 'resource');
     await adminPage.expectSimilaritiesToBeUploaded();
     await browser.refresh();
     await adminPage.uploadTopicSimilarities('../data/cafe.mp3', false);
@@ -81,7 +82,7 @@ describe('Admin misc test tab', function() {
 
   it('should try to send a test mail to admin', async function() {
     await adminPage.sendTestEmail();
-    await allowedErrors.push('400', 'emails', 'Object');
+    allowedErrors.push('400', 'emails', 'Object');
     await adminPage.expectEmailError();
   });
 
@@ -89,7 +90,7 @@ describe('Admin misc test tab', function() {
     async function() {
       await adminPage.regenerateContributionsForTopic('0');
       await adminPage.expectRegenerationError('0');
-      await allowedErrors.push('500', 'Entity');
+      allowedErrors.push('500', 'Entity');
       await adminPage.regenerateContributionsForTopic(topicId);
       await adminPage.expectConributionsToBeRegeneratedForTopic();
     });
