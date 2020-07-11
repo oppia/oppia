@@ -295,7 +295,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_parent_branch_name_for_diff(), 'release-1.2.3')
+                pre_push_hook.get_parent_branch_name_for_diff(),
+                'release-1.2.3')
 
     def test_get_parent_branch_name_for_diff_with_release_branch(self):
         def mock_get_branch():
