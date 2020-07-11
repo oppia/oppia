@@ -142,7 +142,6 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
-    // console.log('expression before: ' + expressionString);
     // Assumes that given expressionString is valid.
     // Nerdamer allows multi-character variables so, 'ax+b' will be considered
     // to have variables: [ax, b], but we want a and x to be considered as
@@ -170,7 +169,6 @@ export class MathInteractionsService {
     }
     // Inserting multiplication signs after closing parens.
     expressionString = expressionString.replace(/\)([^\*\+\/\-\^\)])/g, ')*$1');
-    // console.log('expression after: ' + expressionString);
     return expressionString;
   }
 
