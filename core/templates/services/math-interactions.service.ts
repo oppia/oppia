@@ -162,7 +162,7 @@ export class MathInteractionsService {
     // Inserting multiplication signs before functions. For eg. 5sqrt(x) should
     // be treated as 5*sqrt(x).
     // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
-      // rid of the TS2339 error on AppConstants.
+    // rid of the TS2339 error on AppConstants.
     for (let functionName of AppConstants.MATH_FUNCTION_NAMES) {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
