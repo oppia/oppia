@@ -397,6 +397,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             if pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
                 summary_messages.append(summary_message)
+                are_there_errors = True
 
             if pylinter.msg_status != 0:
                 for message in pylint_report.read():
