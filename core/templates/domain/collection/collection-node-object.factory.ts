@@ -23,17 +23,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { ExplorationSummaryBackendDict } from
-  'domain/summary/exploration-summary-object.factory';
+import { LearnerExplorationSummaryBackendDict } from
+  'domain/summary/learner-exploration-summary-object.factory';
 
 export interface ICollectionNodeBackendDict {
   'exploration_id'?: string;
-  'exploration_summary'?: ExplorationSummaryBackendDict;
+  'exploration_summary'?: LearnerExplorationSummaryBackendDict;
 }
 
 export class CollectionNode {
   _explorationId: string;
-  _explorationSummaryObject: ExplorationSummaryBackendDict;
+  _explorationSummaryObject: LearnerExplorationSummaryBackendDict;
 
   constructor(collectionNodeBackendObject: ICollectionNodeBackendDict) {
     this._explorationId = collectionNodeBackendObject.exploration_id;
@@ -80,7 +80,7 @@ export class CollectionNode {
   // frontend exploration summary tile displaying. Changes to the returned
   // object are not reflected in this domain object. The value returned by
   // this function is null if doesExplorationExist() returns false.
-  getExplorationSummaryObject(): ExplorationSummaryBackendDict {
+  getExplorationSummaryObject(): LearnerExplorationSummaryBackendDict {
     // TODO(bhenning): This should be represented by a
     // frontend summary domain object that is also shared with
     // the search result and profile pages.
@@ -89,7 +89,8 @@ export class CollectionNode {
 
   // Sets the raw exploration summary object stored within this node.
   setExplorationSummaryObject(
-      explorationSummaryBackendObject: ExplorationSummaryBackendDict): void {
+      explorationSummaryBackendObject:
+      LearnerExplorationSummaryBackendDict): void {
     this._explorationSummaryObject = cloneDeep(
       explorationSummaryBackendObject);
   }
