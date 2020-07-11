@@ -19,6 +19,7 @@
 # Angular Migration team
 /core/templates/components/shared-component.module.ts @bansalnitish @srijanreddy98
 /core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
+/core/templates/components/material.module.ts @bansalnitish @srijanreddy98
 /core/templates/components/oppia-angular-root.component.ts @bansalnitish @srijanreddy98
 /core/templates/base-components/oppia-root.directive.ts @bansalnitish @srijanreddy98
 /core/templates/base-components/oppia-root.directive.html @bansalnitish @srijanreddy98
@@ -109,18 +110,18 @@
 
 
 # Dev workflow team.
-/.circleci/ @kevinlee12 @U8NWXD
+/.circleci/ @BenHenning @vinitamurthi @U8NWXD
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
 /.coveragerc @bansalnitish @Hudda
-/.gitattributes @kevinlee12
-/.gitignore @kevinlee12
+/.gitattributes @DubeySandeep
+/.gitignore @DubeySandeep
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @kevinlee12 @U8NWXD
-/.yarnrc @kevinlee12
+/.travis.yml @BenHenning @vinitamurthi @U8NWXD
+/.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
 /tox.ini @bansalnitish @Hudda
@@ -132,7 +133,7 @@
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
 /scripts/linters/excluded_any_type_files.json @nishantwrp
-/ubuntu_dockerfile @ezl-13 @kevinlee12
+/ubuntu_dockerfile @DubeySandeep
 
 
 # Exploration project.
@@ -190,25 +191,21 @@
 
 
 # Global components and filters.
-/core/templates/components/button-directives/exploration-embed-button.service.ts @ankita240796
-/core/templates/components/button-directives/exploration-embed-button.directive.html @ankita240796
-/core/templates/components/button-directives/exploration-embed-button-modal.controller*.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.directive.ts @ankita240796
-/core/templates/components/button-directives/social-buttons.directive.html @ankita240796
+/core/templates/components/button-directives/* @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
-/core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
-/core/templates/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @ankita240796
 /core/templates/components/profile-link-directives/ @ankita240796
 /core/templates/components/summary-tile/ @ankita240796
 /core/templates/directives/angular-html-bind.directive*.ts @ankita240796
@@ -273,15 +270,17 @@
 /core/domain/visualization_registry*.py @brianrodri
 /core/storage/improvements/ @brianrodri
 /core/storage/statistics/ @brianrodri
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
 /core/templates/domain/statistics/ @brianrodri
 /core/templates/domain/improvements/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
+/core/templates/services/exploration-improvements-backend-api.service*.ts @brianrodri
 /core/templates/services/exploration-stats.service*.ts @brianrodri
 /core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
-/core/templates/services/improvements-backend-api*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
 /core/templates/services/state-interaction-stats.service*.ts @brianrodri
@@ -429,7 +428,7 @@
 /core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
 /utils*.py @aks681
-/python_utils*.py @kevinlee12
+/python_utils*.py @DubeySandeep
 
 
 # Restricted pages.
@@ -515,6 +514,7 @@
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
+/puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @jimbyo @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
@@ -528,6 +528,7 @@
 
 
 # User Data Takeout.
+/core/domain/takeout_domain.py @vojtechjelinek @seanlip
 /core/domain/takeout_service*.py @vojtechjelinek @seanlip
 /core/domain/wipeout_jobs_one_off*.py @vojtechjelinek @seanlip
 /core/domain/wipeout_service*.py @vojtechjelinek @seanlip
@@ -589,6 +590,7 @@
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @vojtechjelinek
-/.github/ @kevinlee12
+/.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
+/.github/workflows/ @BenHenning @vinitamurthi

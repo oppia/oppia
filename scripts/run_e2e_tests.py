@@ -135,6 +135,13 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
+    '--server_log_level',
+    help='Sets the log level for the appengine server. The default value is '
+         'set to critical.',
+    default='critical',
+    choices=['critical', 'error', 'warning', 'info'])
+
+_PARSER.add_argument(
     '--community_dashboard_enabled', action='store_true',
     help='Run the test after enabling the community dashboard page.')
 
@@ -156,7 +163,9 @@ def ensure_screenshots_dir_is_removed():
 
 
 def cleanup():
-    """Kill the running subprocesses and server fired in this program."""
+    """Kill the running subprocesses and server fired in this program, set
+    constants back to default values.
+    """
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
@@ -171,6 +180,7 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+    build.set_constants_to_default()
 
 
 def is_oppia_server_already_running():
@@ -414,21 +424,23 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_app_engine_server(dev_mode_setting):
+def start_google_app_engine_server(dev_mode_setting, log_level):
     """Start the Google App Engine server.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
             in dev mode.
+        log_level: str. The log level for the google app engine server.
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
 
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true %s' % (
+        '--clear_datastore=yes --dev_appserver_log_level=%s '
+        '--log_level=%s --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath), shell=True)
+            GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
+        shell=True)
     SUBPROCESSES.append(p)
 
 
@@ -464,7 +476,9 @@ def main(args=None):
     update_community_dashboard_status_in_feconf_file(
         FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
 
-    if not parsed_args.skip_build:
+    if parsed_args.skip_build:
+        build.modify_constants(prod_env=parsed_args.prod_env)
+    else:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
     version = (
@@ -472,7 +486,7 @@ def main(args=None):
         else CHROME_DRIVER_VERSION)
     start_webdriver_manager(version)
 
-    start_google_app_engine_server(dev_mode)
+    start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
