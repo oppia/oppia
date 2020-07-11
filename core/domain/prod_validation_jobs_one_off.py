@@ -402,9 +402,9 @@ class BaseSummaryModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. BaseSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
 
         for (
@@ -490,9 +490,9 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. BaseSnapshotContentModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
 
         if cls.EXTERNAL_MODEL_NAME == '':
@@ -713,9 +713,9 @@ class BaseUserModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. BaseUserModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         if 'exploration_ids' not in field_name_to_external_model_references:
             return
@@ -754,9 +754,9 @@ class BaseUserModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. BaseUserModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         if 'collection_ids' not in field_name_to_external_model_references:
             return
@@ -907,7 +907,9 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
+        return [
+            ExternalModelFetchingDetails(
+                'user_ids', user_models.UserSettingsModel, [item.user_id])]
 
 
 class UsernameChangeAuditModelValidator(BaseModelValidator):
@@ -922,8 +924,10 @@ class UsernameChangeAuditModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {'committer_ids': (
-            user_models.UserSettingsModel, [item.committer_id])}
+        return [
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class ClassifierTrainingJobModelValidator(BaseModelValidator):
@@ -942,7 +946,9 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {'exploration_ids': (exp_models.ExplorationModel, [item.exp_id])}
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel, [item.exp_id])]
 
     @classmethod
     def _validate_exp_version(
@@ -953,9 +959,9 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exp_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -986,9 +992,9 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exp_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -1033,7 +1039,9 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {'exploration_ids': (exp_models.ExplorationModel, [item.exp_id])}
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel, [item.exp_id])]
 
     @classmethod
     def _validate_exp_version(
@@ -1044,9 +1052,9 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. TrainingJobExplorationMappingModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exp_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -1077,9 +1085,9 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exp_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -1119,27 +1127,32 @@ class CollectionModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
-        return {
-            'exploration_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids',
                 exp_models.ExplorationModel,
                 [node['exploration_id'] for node in item.collection_contents[
                     'nodes']]),
-            'collection_commit_log_entry_ids': (
+            ExternalModelFetchingDetails(
+                'collection_commit_log_entry_ids',
                 collection_models.CollectionCommitLogEntryModel,
                 ['collection-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            'collection_summary_ids': (
+            ExternalModelFetchingDetails(
+                'collection_summary_ids',
                 collection_models.CollectionSummaryModel, [item.id]),
-            'collection_rights_ids': (
+            ExternalModelFetchingDetails(
+                'collection_rights_ids',
                 collection_models.CollectionRightsModel, [item.id]),
-            'snapshot_metadata_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 collection_models.CollectionSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 collection_models.CollectionSnapshotContentModel,
-                snapshot_model_ids)
-        }
+                snapshot_model_ids)]
 
 
 class CollectionSnapshotMetadataModelValidator(
@@ -1171,11 +1184,11 @@ class CollectionSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'collection_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'collection_ids',
                 collection_models.CollectionModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class CollectionRightsModelValidator(BaseModelValidator):
@@ -1186,22 +1199,27 @@ class CollectionRightsModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
-        return {
-            'collection_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'collection_ids',
                 collection_models.CollectionModel, [item.id]),
-            'owner_user_ids': (
+            ExternalModelFetchingDetails(
+                'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_ids': (
+            ExternalModelFetchingDetails(
+                'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_ids': (
+            ExternalModelFetchingDetails(
+                'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            'snapshot_metadata_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 collection_models.CollectionRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 collection_models.CollectionRightsSnapshotContentModel,
-                snapshot_model_ids),
-        }
+                snapshot_model_ids)]
 
     @classmethod
     def _validate_first_published_msec(cls, item):
@@ -1238,13 +1256,14 @@ class CollectionRightsSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'collection_rights_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'collection_rights_ids',
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids',
+                user_models.UserSettingsModel, [item.committer_id])]
 
 
 class CollectionRightsSnapshotContentModelValidator(
@@ -1255,11 +1274,11 @@ class CollectionRightsSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'collection_rights_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'collection_rights_ids',
                 collection_models.CollectionRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
@@ -1288,13 +1307,16 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        external_id_relationships = {
-            'collection_ids': (
-                collection_models.CollectionModel, [item.collection_id]),
-        }
+        external_id_relationships = [
+            ExternalModelFetchingDetails(
+                'collection_ids',
+                collection_models.CollectionModel, [item.collection_id])]
         if item.id.startswith('rights'):
-            external_id_relationships['collection_rights_ids'] = (
-                collection_models.CollectionRightsModel, [item.collection_id])
+            external_id_relationships.append(
+                ExternalModelFetchingDetails(
+                    'collection_rights_ids',
+                    collection_models.CollectionRightsModel,
+                    [item.collection_id]))
         return external_id_relationships
 
 
@@ -1307,20 +1329,25 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'collection_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'collection_ids',
                 collection_models.CollectionModel, [item.id]),
-            'collection_rights_ids': (
+            ExternalModelFetchingDetails(
+                'collection_rights_ids',
                 collection_models.CollectionRightsModel, [item.id]),
-            'owner_user_ids': (
+            ExternalModelFetchingDetails(
+                'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_ids': (
+            ExternalModelFetchingDetails(
+                'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_ids': (
+            ExternalModelFetchingDetails(
+                'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            'contributor_user_ids': (
-                user_models.UserSettingsModel, item.contributor_ids)
-        }
+            ExternalModelFetchingDetails(
+                'contributor_user_ids',
+                user_models.UserSettingsModel, item.contributor_ids)]
 
     @classmethod
     def _validate_contributors_summary(cls, item):
@@ -1349,9 +1376,9 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. CollectionSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         collection_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['collection_ids'])
@@ -1437,14 +1464,16 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
-            'topic_ids': (
+            ExternalModelFetchingDetails(
+                'topic_ids',
                 topic_models.TopicModel, [item.topic_id]),
-            'story_ids': (
-                story_models.StoryModel, [item.story_id])
-        }
+            ExternalModelFetchingDetails(
+                'story_ids',
+                story_models.StoryModel, [item.story_id])]
 
     @classmethod
     def _validate_translation_counts(
@@ -1455,9 +1484,9 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exploration_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -1491,9 +1520,9 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exploration_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -1525,9 +1554,9 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         story_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['story_ids'])
@@ -1592,10 +1621,9 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'skill_ids': (
-                skill_models.SkillModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel, [item.id])]
 
     @classmethod
     def _validate_question_count(
@@ -1606,9 +1634,9 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. SkillOpportunityModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         skill_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['skill_ids'])
@@ -1664,14 +1692,15 @@ class ConfigPropertyModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
-        return {
-            'snapshot_metadata_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 config_models.ConfigPropertySnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 config_models.ConfigPropertySnapshotContentModel,
-                snapshot_model_ids),
-        }
+                snapshot_model_ids)]
 
 
 class ConfigPropertySnapshotMetadataModelValidator(
@@ -1690,13 +1719,14 @@ class ConfigPropertySnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'config_property_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'config_property_ids',
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids',
+                user_models.UserSettingsModel, [item.committer_id])]
 
 
 class ConfigPropertySnapshotContentModelValidator(
@@ -1711,11 +1741,11 @@ class ConfigPropertySnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'config_property_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'config_property_ids',
                 config_models.ConfigPropertyModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class SentEmailModelValidator(BaseModelValidator):
@@ -1730,11 +1760,12 @@ class SentEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'recipient_id': (
+        return [
+            ExternalModelFetchingDetails(
+                'recipient_id',
                 user_models.UserSettingsModel, [item.recipient_id]),
-            'sender_id': (user_models.UserSettingsModel, [item.sender_id]),
-        }
+            ExternalModelFetchingDetails(
+                'sender_id', user_models.UserSettingsModel, [item.sender_id])]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -1759,9 +1790,9 @@ class SentEmailModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. SentEmailModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         sender_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['sender_id'])
@@ -1792,9 +1823,9 @@ class SentEmailModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. SentEmailModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         recipient_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['recipient_id'])
@@ -1832,11 +1863,12 @@ class BulkEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'recipient_id': (
+        return [
+            ExternalModelFetchingDetails(
+                'recipient_id',
                 user_models.UserSettingsModel, item.recipient_ids),
-            'sender_id': (user_models.UserSettingsModel, [item.sender_id]),
-        }
+            ExternalModelFetchingDetails(
+                'sender_id', user_models.UserSettingsModel, [item.sender_id])]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -1861,9 +1893,9 @@ class BulkEmailModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. BulkEmailModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         sender_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['sender_id'])
@@ -1908,14 +1940,15 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'item.id.user_id': (
+        return [
+            ExternalModelFetchingDetails(
+                'item.id.user_id',
                 user_models.UserSettingsModel, [
                     item.id[:item.id.find('.')]]),
-            'item.id.thread_id': (
+            ExternalModelFetchingDetails(
+                'item.id.thread_id',
                 feedback_models.GeneralFeedbackThreadModel, [
-                    item.id[item.id.find('.') + 1:]]),
-        }
+                    item.id[item.id.find('.') + 1:]])]
 
     @classmethod
     def _validate_reply_to_id_length(cls, item):
@@ -1953,23 +1986,27 @@ class ExplorationModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
-        return {
-            'exploration_commit_log_entry_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_commit_log_entry_ids',
                 exp_models.ExplorationCommitLogEntryModel,
                 ['exploration-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            'exp_summary_ids': (
+            ExternalModelFetchingDetails(
+                'exp_summary_ids',
                 exp_models.ExpSummaryModel, [item.id]),
-            'exploration_rights_ids': (
+            ExternalModelFetchingDetails(
+                'exploration_rights_ids',
                 exp_models.ExplorationRightsModel, [item.id]),
-            'snapshot_metadata_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 exp_models.ExplorationSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 exp_models.ExplorationSnapshotContentModel,
-                snapshot_model_ids)
-        }
+                snapshot_model_ids)]
 
 
 class ExplorationSnapshotMetadataModelValidator(
@@ -1984,13 +2021,14 @@ class ExplorationSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids',
                 exp_models.ExplorationModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids',
+                user_models.UserSettingsModel, [item.committer_id])]
 
 
 class ExplorationSnapshotContentModelValidator(
@@ -2001,11 +2039,11 @@ class ExplorationSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids',
                 exp_models.ExplorationModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class ExplorationRightsModelValidator(BaseModelValidator):
@@ -2019,25 +2057,31 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
-        return {
-            'exploration_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
-            'cloned_from_exploration_ids': (
+            ExternalModelFetchingDetails(
+                'cloned_from_exploration_ids',
                 exp_models.ExplorationModel,
                 cloned_from_exploration_id),
-            'owner_user_ids': (
+            ExternalModelFetchingDetails(
+                'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_ids': (
+            ExternalModelFetchingDetails(
+                'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_ids': (
+            ExternalModelFetchingDetails(
+                'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            'snapshot_metadata_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 exp_models.ExplorationRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 exp_models.ExplorationRightsSnapshotContentModel,
-                snapshot_model_ids),
-        }
+                snapshot_model_ids)]
 
     @classmethod
     def _validate_first_published_msec(cls, item):
@@ -2074,13 +2118,14 @@ class ExplorationRightsSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_rights_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_rights_ids',
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids',
+                user_models.UserSettingsModel, [item.committer_id])]
 
 
 class ExplorationRightsSnapshotContentModelValidator(
@@ -2091,11 +2136,11 @@ class ExplorationRightsSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_rights_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_rights_ids',
                 exp_models.ExplorationRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
@@ -2124,13 +2169,15 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        external_id_relationships = {
-            'exploration_ids': (
-                exp_models.ExplorationModel, [item.exploration_id]),
-        }
+        external_id_relationships = [
+            ExternalModelFetchingDetails(
+                'exploration_ids',
+                exp_models.ExplorationModel, [item.exploration_id])]
         if item.id.startswith('rights'):
-            external_id_relationships['exploration_rights_ids'] = (
-                exp_models.ExplorationRightsModel, [item.exploration_id])
+            external_id_relationships.append(
+                ExternalModelFetchingDetails(
+                    'exploration_rights_ids', exp_models.ExplorationRightsModel,
+                    [item.exploration_id]))
         return external_id_relationships
 
 
@@ -2143,20 +2190,25 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
-            'exploration_rights_ids': (
+            ExternalModelFetchingDetails(
+                'exploration_rights_ids',
                 exp_models.ExplorationRightsModel, [item.id]),
-            'owner_user_ids': (
+            ExternalModelFetchingDetails(
+                'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_ids': (
+            ExternalModelFetchingDetails(
+                'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_ids': (
+            ExternalModelFetchingDetails(
+                'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            'contributor_user_ids': (
-                user_models.UserSettingsModel, item.contributor_ids)
-        }
+            ExternalModelFetchingDetails(
+                'contributor_user_ids',
+                user_models.UserSettingsModel, item.contributor_ids)]
 
     @classmethod
     def _validate_contributors_summary(cls, item):
@@ -2203,9 +2255,9 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. ExpSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exploration_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -2283,23 +2335,29 @@ class GeneralFeedbackThreadModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        field_name_to_external_model_references = {
-            'message_ids': (
+        field_name_to_external_model_references = [
+            ExternalModelFetchingDetails(
+                'message_ids',
                 feedback_models.GeneralFeedbackMessageModel,
                 ['%s.%s' % (item.id, i) for i in python_utils.RANGE(
                     item.message_count)])
-        }
+        ]
         if item.original_author_id:
-            field_name_to_external_model_references['author_ids'] = (
-                user_models.UserSettingsModel, [item.original_author_id])
+            field_name_to_external_model_references.append(
+                ExternalModelFetchingDetails(
+                    'author_ids', user_models.UserSettingsModel,
+                    [item.original_author_id]))
         if item.has_suggestion:
-            field_name_to_external_model_references['suggestion_ids'] = (
-                suggestion_models.GeneralSuggestionModel, [item.id])
+            field_name_to_external_model_references.append(
+                ExternalModelFetchingDetails(
+                    'suggestion_ids', suggestion_models.GeneralSuggestionModel,
+                    [item.id]))
         if item.entity_type in TARGET_TYPE_TO_TARGET_MODEL:
-            field_name_to_external_model_references[
-                '%s_ids' % item.entity_type] = (
+            field_name_to_external_model_references.append(
+                ExternalModelFetchingDetails(
+                    '%s_ids' % item.entity_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.entity_type],
-                    [item.entity_id])
+                    [item.entity_id]))
         return field_name_to_external_model_references
 
     @classmethod
@@ -2352,11 +2410,12 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
         author_ids = []
         if item.author_id:
             author_ids = [item.author_id]
-        return {
-            'author_ids': (user_models.UserSettingsModel, author_ids),
-            'feedback_thread_ids': (
-                feedback_models.GeneralFeedbackThreadModel, [item.thread_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'author_ids', user_models.UserSettingsModel, author_ids),
+            ExternalModelFetchingDetails(
+                'feedback_thread_ids',
+                feedback_models.GeneralFeedbackThreadModel, [item.thread_id])]
 
     @classmethod
     def _validate_message_id(
@@ -2367,9 +2426,9 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. GeneralFeedbackMessageModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         feedback_thread_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['feedback_thread_ids'])
@@ -2419,11 +2478,12 @@ class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
             message_ids = ['%s.%s' % (
                 item.id[index + 1:], message_id) for message_id in (
                     item.message_ids_read_by_user)]
-        return {
-            'message_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'message_ids',
                 feedback_models.GeneralFeedbackMessageModel, message_ids),
-            'user_ids': (user_models.UserSettingsModel, user_ids)
-        }
+            ExternalModelFetchingDetails(
+                'user_ids', user_models.UserSettingsModel, user_ids)]
 
 
 class FeedbackAnalyticsModelValidator(BaseModelValidator):
@@ -2431,9 +2491,9 @@ class FeedbackAnalyticsModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_ids': (exp_models.ExplorationModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel, [item.id])]
 
 
 class UnsentFeedbackEmailModelValidator(BaseModelValidator):
@@ -2454,11 +2514,12 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
                 cls.errors['feedback message reference check'].append(
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
-        return {
-            'user_ids': (user_models.UserSettingsModel, [item.id]),
-            'message_ids': (
-                feedback_models.GeneralFeedbackMessageModel, message_ids)
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_ids', user_models.UserSettingsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'message_ids', feedback_models.GeneralFeedbackMessageModel,
+                message_ids)]
 
     @classmethod
     def _validate_entity_type_and_entity_id_feedback_reference(cls, item):
@@ -2497,7 +2558,7 @@ class JobModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
     @classmethod
     def _validate_time_fields(cls, item):
@@ -2587,7 +2648,7 @@ class ContinuousComputationModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
     @classmethod
     def _validate_time_fields(cls, item):
@@ -2634,23 +2695,27 @@ class QuestionModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
-        return {
-            'question_commit_log_entry_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'question_commit_log_entry_ids',
                 question_models.QuestionCommitLogEntryModel,
                 ['question-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            'question_summary_ids': (
+            ExternalModelFetchingDetails(
+                'question_summary_ids',
                 question_models.QuestionSummaryModel, [item.id]),
-            'snapshot_metadata_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 question_models.QuestionSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 question_models.QuestionSnapshotContentModel,
                 snapshot_model_ids),
-            'linked_skill_ids': (
-                skill_models.SkillModel, item.linked_skill_ids)
-        }
+            ExternalModelFetchingDetails(
+                'linked_skill_ids',
+                skill_models.SkillModel, item.linked_skill_ids)]
 
 
 class ExplorationContextModelValidator(BaseModelValidator):
@@ -2658,12 +2723,11 @@ class ExplorationContextModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'story_ids': (
-                story_models.StoryModel, [item.story_id]),
-            'exp_ids': (
-                exp_models.ExplorationModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'story_ids', story_models.StoryModel, [item.story_id]),
+            ExternalModelFetchingDetails(
+                'exp_ids', exp_models.ExplorationModel, [item.id])]
 
 
 class QuestionSkillLinkModelValidator(BaseModelValidator):
@@ -2675,12 +2739,12 @@ class QuestionSkillLinkModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'question_ids': (
-                question_models.QuestionModel, [item.question_id]),
-            'skill_ids': (
-                skill_models.SkillModel, [item.skill_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'question_ids', question_models.QuestionModel,
+                [item.question_id]),
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel, [item.skill_id])]
 
 
 class QuestionSnapshotMetadataModelValidator(
@@ -2695,13 +2759,13 @@ class QuestionSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'question_ids': (
-                question_models.QuestionModel,
+        return [
+            ExternalModelFetchingDetails(
+                'question_ids', question_models.QuestionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class QuestionSnapshotContentModelValidator(
@@ -2712,11 +2776,10 @@ class QuestionSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'question_ids': (
-                question_models.QuestionModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'question_ids', question_models.QuestionModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
@@ -2743,10 +2806,10 @@ class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'question_ids': (
-                question_models.QuestionModel, [item.question_id]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'question_ids', question_models.QuestionModel,
+                [item.question_id])]
 
 
 class QuestionSummaryModelValidator(BaseSummaryModelValidator):
@@ -2758,10 +2821,9 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'question_ids': (
-                question_models.QuestionModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'question_ids', question_models.QuestionModel, [item.id])]
 
     @classmethod
     def _validate_question_content(
@@ -2772,9 +2834,9 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. QuestionSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         question_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['question_ids'])
@@ -2820,11 +2882,10 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exploration_ids': (
-                exp_models.ExplorationModel,
-                [item.id] + item.recommended_exploration_ids),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel,
+                [item.id] + item.recommended_exploration_ids)]
 
     @classmethod
     def _validate_item_id_not_in_recommended_exploration_ids(cls, item):
@@ -2854,7 +2915,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
     @classmethod
     def _validate_topic_similarities(cls, item):
@@ -2903,23 +2964,24 @@ class SkillModelValidator(BaseModelValidator):
         superseding_skill_ids = []
         if item.superseding_skill_id:
             superseding_skill_ids = [item.superseding_skill_id]
-        return {
-            'skill_commit_log_entry_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'skill_commit_log_entry_ids',
                 skill_models.SkillCommitLogEntryModel,
                 ['skill-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            'skill_summary_ids': (
-                skill_models.SkillSummaryModel, [item.id]),
-            'superseding_skill_ids': (
-                skill_models.SkillModel, superseding_skill_ids),
-            'snapshot_metadata_ids': (
-                skill_models.SkillSnapshotMetadataModel,
-                snapshot_model_ids),
-            'snapshot_content_ids': (
-                skill_models.SkillSnapshotContentModel,
-                snapshot_model_ids),
-        }
+            ExternalModelFetchingDetails(
+                'skill_summary_ids', skill_models.SkillSummaryModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'superseding_skill_ids', skill_models.SkillModel,
+                superseding_skill_ids),
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
+                skill_models.SkillSnapshotMetadataModel, snapshot_model_ids),
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids', skill_models.SkillSnapshotContentModel,
+                snapshot_model_ids)]
 
     @classmethod
     def _validate_all_questions_merged(cls, item):
@@ -2958,13 +3020,13 @@ class SkillSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'skill_ids': (
-                skill_models.SkillModel,
+        return [
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class SkillSnapshotContentModelValidator(
@@ -2975,11 +3037,10 @@ class SkillSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'skill_ids': (
-                skill_models.SkillModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
@@ -3006,11 +3067,9 @@ class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        external_id_relationships = {
-            'skill_ids': (
-                skill_models.SkillModel, [item.skill_id]),
-        }
-        return external_id_relationships
+        return [
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel, [item.skill_id])]
 
 
 class SkillSummaryModelValidator(BaseSummaryModelValidator):
@@ -3022,10 +3081,9 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'skill_ids': (
-                skill_models.SkillModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel, [item.id])]
 
     @classmethod
     def _validate_misconception_count(
@@ -3036,9 +3094,9 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         skill_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['skill_ids'])
@@ -3063,9 +3121,9 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         skill_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['skill_ids'])
@@ -3122,25 +3180,29 @@ class StoryModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
-        return {
-            'story_commit_log_entry_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'story_commit_log_entry_ids',
                 story_models.StoryCommitLogEntryModel,
                 ['story-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            'story_summary_ids': (
+            ExternalModelFetchingDetails(
+                'story_summary_ids',
                 story_models.StorySummaryModel, [item.id]),
-            'snapshot_metadata_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 story_models.StorySnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 story_models.StorySnapshotContentModel,
                 snapshot_model_ids),
-            'exploration_ids': (
+            ExternalModelFetchingDetails(
+                'exploration_ids',
                 exp_models.ExplorationModel,
                 [node['exploration_id'] for node in (
-                    item.story_contents['nodes'])])
-        }
+                    item.story_contents['nodes'])])]
 
 
 class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
@@ -3154,13 +3216,13 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'story_ids': (
-                story_models.StoryModel,
+        return [
+            ExternalModelFetchingDetails(
+                'story_ids', story_models.StoryModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
@@ -3170,11 +3232,10 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'story_ids': (
-                story_models.StoryModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'story_ids', story_models.StoryModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
@@ -3201,10 +3262,10 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'story_ids': (
-                story_models.StoryModel, [item.story_id]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'story_ids', story_models.StoryModel, [item.story_id]),
+        ]
 
 
 class StorySummaryModelValidator(BaseSummaryModelValidator):
@@ -3216,10 +3277,9 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'story_ids': (
-                story_models.StoryModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'story_ids', story_models.StoryModel, [item.id])]
 
     @classmethod
     def _validate_node_titles(
@@ -3230,9 +3290,9 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. StorySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         story_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['story_ids'])
@@ -3297,19 +3357,23 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        field_name_to_external_model_references = {
-            'feedback_thread_ids': (
+        field_name_to_external_model_references = [
+            ExternalModelFetchingDetails(
+                'feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel, [item.id]),
-            'author_ids': (user_models.UserSettingsModel, [item.author_id]),
-        }
+            ExternalModelFetchingDetails(
+                'author_ids', user_models.UserSettingsModel, [item.author_id])]
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
-            field_name_to_external_model_references[
-                '%s_ids' % item.target_type] = (
+            field_name_to_external_model_references.append(
+                ExternalModelFetchingDetails(
+                    '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
-                    [item.target_id])
+                    [item.target_id]))
         if item.final_reviewer_id:
-            field_name_to_external_model_references['reviewer_ids'] = (
-                user_models.UserSettingsModel, [item.final_reviewer_id])
+            field_name_to_external_model_references.append(
+                ExternalModelFetchingDetails(
+                    'reviewer_ids', user_models.UserSettingsModel,
+                    [item.final_reviewer_id]))
         return field_name_to_external_model_references
 
     @classmethod
@@ -3333,9 +3397,9 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             return
@@ -3390,9 +3454,9 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             return
@@ -3461,17 +3525,20 @@ class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        field_name_to_external_model_references = {
-            'author_ids': (user_models.UserSettingsModel, [item.author_id]),
-        }
+        field_name_to_external_model_references = [
+            ExternalModelFetchingDetails(
+                'author_ids', user_models.UserSettingsModel, [item.author_id])]
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
-            field_name_to_external_model_references[
-                '%s_ids' % item.target_type] = (
+            field_name_to_external_model_references.append(
+                ExternalModelFetchingDetails(
+                    '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
-                    [item.target_id])
+                    [item.target_id]))
         if item.final_reviewer_id is not None:
-            field_name_to_external_model_references['final_reviewer_ids'] = (
-                user_models.UserSettingsModel, [item.final_reviewer_id])
+            field_name_to_external_model_references.append(
+                ExternalModelFetchingDetails(
+                    'final_reviewer_ids', user_models.UserSettingsModel,
+                    [item.final_reviewer_id]))
         return field_name_to_external_model_references
 
 
@@ -3497,31 +3564,32 @@ class TopicModelValidator(BaseModelValidator):
         additional_story_ids = [
             reference['story_id']
             for reference in item.additional_story_references]
-        return {
-            'topic_commit_log_entry_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'topic_commit_log_entry_ids',
                 topic_models.TopicCommitLogEntryModel,
                 ['topic-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            'topic_summary_ids': (
-                topic_models.TopicSummaryModel, [item.id]),
-            'topic_rights_ids': (
-                topic_models.TopicRightsModel, [item.id]),
-            'snapshot_metadata_ids': (
-                topic_models.TopicSnapshotMetadataModel,
+            ExternalModelFetchingDetails(
+                'topic_summary_ids', topic_models.TopicSummaryModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'topic_rights_ids', topic_models.TopicRightsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
+                topic_models.TopicSnapshotMetadataModel, snapshot_model_ids),
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids', topic_models.TopicSnapshotContentModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
-                topic_models.TopicSnapshotContentModel,
-                snapshot_model_ids),
-            'story_ids': (
-                story_models.StoryModel,
+            ExternalModelFetchingDetails(
+                'story_ids', story_models.StoryModel,
                 canonical_story_ids + additional_story_ids),
-            'skill_ids': (skill_models.SkillModel, skill_ids),
-            'subtopic_page_ids': (
-                topic_models.SubtopicPageModel,
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel, skill_ids),
+            ExternalModelFetchingDetails(
+                'subtopic_page_ids', topic_models.SubtopicPageModel,
                 ['%s-%s' % (
-                    item.id, subtopic['id']) for subtopic in item.subtopics])
-        }
+                    item.id, subtopic['id']) for subtopic in item.subtopics])]
 
     @classmethod
     def _validate_canonical_name_is_unique(cls, item):
@@ -3592,13 +3660,13 @@ class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'topic_ids': (
-                topic_models.TopicModel,
+        return [
+            ExternalModelFetchingDetails(
+                'topic_ids', topic_models.TopicModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class TopicSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
@@ -3608,11 +3676,10 @@ class TopicSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'topic_ids': (
-                topic_models.TopicModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'topic_ids', topic_models.TopicModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class TopicRightsModelValidator(BaseModelValidator):
@@ -3623,18 +3690,20 @@ class TopicRightsModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
-        return {
-            'topic_ids': (
-                topic_models.TopicModel, [item.id]),
-            'manager_user_ids': (
-                user_models.UserSettingsModel, item.manager_ids),
-            'snapshot_metadata_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'topic_ids', topic_models.TopicModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'manager_user_ids', user_models.UserSettingsModel,
+                item.manager_ids),
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 topic_models.TopicRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 topic_models.TopicRightsSnapshotContentModel,
-                snapshot_model_ids),
-        }
+                snapshot_model_ids)]
 
 
 class TopicRightsSnapshotMetadataModelValidator(
@@ -3649,13 +3718,13 @@ class TopicRightsSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'topic_rights_ids': (
-                topic_models.TopicRightsModel,
+        return [
+            ExternalModelFetchingDetails(
+                'topic_rights_ids', topic_models.TopicRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class TopicRightsSnapshotContentModelValidator(
@@ -3666,11 +3735,10 @@ class TopicRightsSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'topic_rights_ids': (
-                topic_models.TopicRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'topic_rights_ids', topic_models.TopicRightsModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
@@ -3699,13 +3767,14 @@ class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        external_id_relationships = {
-            'topic_ids': (
-                topic_models.TopicModel, [item.topic_id]),
-        }
+        external_id_relationships = [
+            ExternalModelFetchingDetails(
+                'topic_ids', topic_models.TopicModel, [item.topic_id])]
         if item.id.startswith('rights'):
-            external_id_relationships['topic_rights_ids'] = (
-                topic_models.TopicRightsModel, [item.topic_id])
+            external_id_relationships.append(
+                ExternalModelFetchingDetails(
+                    'topic_rights_ids', topic_models.TopicRightsModel,
+                    [item.topic_id]))
         return external_id_relationships
 
 
@@ -3718,12 +3787,11 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'topic_ids': (
-                topic_models.TopicModel, [item.id]),
-            'topic_rights_ids': (
-                topic_models.TopicRightsModel, [item.id]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'topic_ids', topic_models.TopicModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'topic_rights_ids', topic_models.TopicRightsModel, [item.id])]
 
     @classmethod
     def _validate_canonical_story_count(
@@ -3734,9 +3802,9 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         topic_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['topic_ids'])
@@ -3771,9 +3839,9 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         topic_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['topic_ids'])
@@ -3810,9 +3878,9 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         topic_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['topic_ids'])
@@ -3845,9 +3913,9 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         topic_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['topic_ids'])
@@ -3884,9 +3952,9 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         topic_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['topic_ids'])
@@ -3949,21 +4017,23 @@ class SubtopicPageModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
-        return {
-            'subtopic_page_commit_log_entry_ids': (
+        return [
+            ExternalModelFetchingDetails(
+                'subtopic_page_commit_log_entry_ids',
                 topic_models.SubtopicPageCommitLogEntryModel,
                 ['subtopicpage-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            'snapshot_metadata_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_metadata_ids',
                 topic_models.SubtopicPageSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_ids': (
+            ExternalModelFetchingDetails(
+                'snapshot_content_ids',
                 topic_models.SubtopicPageSnapshotContentModel,
                 snapshot_model_ids),
-            'topic_ids': (
-                topic_models.TopicModel, [item.topic_id])
-        }
+            ExternalModelFetchingDetails(
+                'topic_ids', topic_models.TopicModel, [item.topic_id])]
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -3986,13 +4056,13 @@ class SubtopicPageSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'subtopic_page_ids': (
-                topic_models.SubtopicPageModel,
+        return [
+            ExternalModelFetchingDetails(
+                'subtopic_page_ids', topic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+            ExternalModelFetchingDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [item.committer_id])]
 
 
 class SubtopicPageSnapshotContentModelValidator(
@@ -4007,11 +4077,10 @@ class SubtopicPageSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'subtopic_page_ids': (
-                topic_models.SubtopicPageModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'subtopic_page_ids', topic_models.SubtopicPageModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class SubtopicPageCommitLogEntryModelValidator(
@@ -4039,10 +4108,10 @@ class SubtopicPageCommitLogEntryModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'subtopic_page_ids': (
-                topic_models.SubtopicPageModel, [item.subtopic_page_id]),
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'subtopic_page_ids', topic_models.SubtopicPageModel,
+                [item.subtopic_page_id])]
 
 
 class UserSettingsModelValidator(BaseUserModelValidator):
@@ -4054,10 +4123,10 @@ class UserSettingsModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_contributions_ids': (
-                user_models.UserContributionsModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_contributions_ids', user_models.UserContributionsModel,
+                [item.id])]
 
     @classmethod
     def _validate_time_fields_of_user_actions(cls, item):
@@ -4103,14 +4172,15 @@ class CompletedActivitiesModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id]),
-            'exploration_ids': (
-                exp_models.ExplorationModel, item.exploration_ids),
-            'collection_ids': (
-                collection_models.CollectionModel, item.collection_ids)
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel,
+                item.exploration_ids),
+            ExternalModelFetchingDetails(
+                'collection_ids', collection_models.CollectionModel,
+                item.collection_ids)]
 
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
@@ -4146,14 +4216,15 @@ class IncompleteActivitiesModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id]),
-            'exploration_ids': (
-                exp_models.ExplorationModel, item.exploration_ids),
-            'collection_ids': (
-                collection_models.CollectionModel, item.collection_ids)
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel,
+                item.exploration_ids),
+            ExternalModelFetchingDetails(
+                'collection_ids', collection_models.CollectionModel,
+                item.collection_ids)]
 
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
@@ -4193,12 +4264,13 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.user_id]),
-            'exploration_ids': (
-                exp_models.ExplorationModel, [item.exploration_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel,
+                [item.user_id]),
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel,
+                [item.exploration_id])]
 
     @classmethod
     def _validate_exp_id_is_marked_as_incomplete(cls, item):
@@ -4224,9 +4296,9 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exploration_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -4255,9 +4327,9 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exploration_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -4297,14 +4369,15 @@ class LearnerPlaylistModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id]),
-            'exploration_ids': (
-                exp_models.ExplorationModel, item.exploration_ids),
-            'collection_ids': (
-                collection_models.CollectionModel, item.collection_ids)
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel,
+                item.exploration_ids),
+            ExternalModelFetchingDetails(
+                'collection_ids', collection_models.CollectionModel,
+                item.collection_ids)]
 
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
@@ -4356,14 +4429,15 @@ class UserContributionsModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id]),
-            'created_exploration_ids': (
-                exp_models.ExplorationModel, item.created_exploration_ids),
-            'edited_exploration_ids': (
-                exp_models.ExplorationModel, item.edited_exploration_ids)
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'created_exploration_ids', exp_models.ExplorationModel,
+                item.created_exploration_ids),
+            ExternalModelFetchingDetails(
+                'edited_exploration_ids', exp_models.ExplorationModel,
+                item.edited_exploration_ids)]
 
 
 class UserEmailPreferencesModelValidator(BaseUserModelValidator):
@@ -4371,10 +4445,9 @@ class UserEmailPreferencesModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
 
 class UserSubscriptionsModelValidator(BaseUserModelValidator):
@@ -4382,19 +4455,23 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'activity_ids': (exp_models.ExplorationModel, item.activity_ids),
-            'collection_ids': (
-                collection_models.CollectionModel,
+        return [
+            ExternalModelFetchingDetails(
+                'activity_ids', exp_models.ExplorationModel, item.activity_ids),
+            ExternalModelFetchingDetails(
+                'collection_ids', collection_models.CollectionModel,
                 item.collection_ids),
-            'general_feedback_thread_ids': (
+            ExternalModelFetchingDetails(
+                'general_feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel,
                 item.general_feedback_thread_ids),
-            'creator_ids': (user_models.UserSettingsModel, item.creator_ids),
-            'subscriber_ids': (
-                user_models.UserSubscribersModel, item.creator_ids),
-            'id': (user_models.UserSettingsModel, [item.id]),
-        }
+            ExternalModelFetchingDetails(
+                'creator_ids', user_models.UserSettingsModel, item.creator_ids),
+            ExternalModelFetchingDetails(
+                'subscriber_ids', user_models.UserSubscribersModel,
+                item.creator_ids),
+            ExternalModelFetchingDetails(
+                'id', user_models.UserSettingsModel, [item.id])]
 
     @classmethod
     def _validate_last_checked(cls, item):
@@ -4420,9 +4497,9 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. UserSubscriptionsModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         subscriber_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['subscriber_ids'])
@@ -4455,13 +4532,15 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'subscriber_ids': (
-                user_models.UserSettingsModel, item.subscriber_ids),
-            'user_settings_ids': (user_models.UserSettingsModel, [item.id]),
-            'subscription_ids': (
-                user_models.UserSubscriptionsModel, item.subscriber_ids)
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'subscriber_ids', user_models.UserSettingsModel,
+                item.subscriber_ids),
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'subscription_ids', user_models.UserSubscriptionsModel,
+                item.subscriber_ids)]
 
     @classmethod
     def _validate_user_id_not_in_subscriber_ids(cls, item):
@@ -4486,9 +4565,9 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. UserSubscribersModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         subscription_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['subscription_ids'])
@@ -4521,10 +4600,9 @@ class UserRecentChangesBatchModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
     @classmethod
     def _validate_job_queued_msec(cls, item):
@@ -4551,10 +4629,9 @@ class UserStatsModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
     @classmethod
     def _validate_schema_version(cls, item):
@@ -4615,12 +4692,13 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.user_id]),
-            'exploration_ids': (
-                exp_models.ExplorationModel, [item.exploration_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel,
+                [item.user_id]),
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel,
+                [item.exploration_id])]
 
     @classmethod
     def _validate_draft_change_list(cls, item):
@@ -4700,9 +4778,9 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. ExplorationUserDataModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         exploration_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['exploration_ids'])
@@ -4745,16 +4823,19 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.user_id]),
-            'collection_ids': (
-                collection_models.CollectionModel, [item.collection_id]),
-            'exploration_ids': (
-                exp_models.ExplorationModel, item.completed_explorations),
-            'completed_activities_ids': (
-                user_models.CompletedActivitiesModel, [item.user_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel,
+                [item.user_id]),
+            ExternalModelFetchingDetails(
+                'collection_ids', collection_models.CollectionModel,
+                [item.collection_id]),
+            ExternalModelFetchingDetails(
+                'exploration_ids', exp_models.ExplorationModel,
+                item.completed_explorations),
+            ExternalModelFetchingDetails(
+                'completed_activities_ids',
+                user_models.CompletedActivitiesModel, [item.user_id])]
 
     @classmethod
     def _validate_completed_exploration(
@@ -4766,9 +4847,9 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. CollectionProgressModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         completed_exp_ids = item.completed_explorations
         completed_activities_model_class_model_id_model_tuples = (
@@ -4836,12 +4917,12 @@ class StoryProgressModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.user_id]),
-            'story_ids': (
-                story_models.StoryModel, [item.story_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel,
+                [item.user_id]),
+            ExternalModelFetchingDetails(
+                'story_ids', story_models.StoryModel, [item.story_id])]
 
     @classmethod
     def _validate_story_is_public(
@@ -4851,9 +4932,9 @@ class StoryProgressModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         story_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['story_ids'])
@@ -4889,9 +4970,9 @@ class StoryProgressModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         completed_activity_model = user_models.CompletedActivitiesModel.get(
             item.user_id)
@@ -4976,13 +5057,13 @@ class UserQueryModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, (
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, (
                     item.user_ids + [item.submitter_id])),
-            'sent_email_model_ids': (
-                email_models.BulkEmailModel, [item.sent_email_model_id])
-        }
+            ExternalModelFetchingDetails(
+                'sent_email_model_ids', email_models.BulkEmailModel,
+                [item.sent_email_model_id])]
 
     @classmethod
     def _validate_sender_and_recipient_ids(
@@ -4998,9 +5079,9 @@ class UserQueryModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. UserQueryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         email_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['sent_email_model_ids'])
@@ -5056,12 +5137,12 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id]),
-            'sent_email_model_ids': (
-                email_models.BulkEmailModel, item.sent_email_model_ids)
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            ExternalModelFetchingDetails(
+                'sent_email_model_ids', email_models.BulkEmailModel,
+                item.sent_email_model_ids)]
 
     @classmethod
     def _validate_user_id_in_recipient_id_for_emails(
@@ -5072,9 +5153,9 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. UserBulkEmailsModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(str, str, ndb.Model))).
+                dict(str, (list(ExternalModelReference))).
                 A dict is keyed by field name. Each value consists of a list
-                of (model class, external_key, external_model_instance) tuples.
+                of ExternalModelReference objects.
         """
         email_model_class_model_id_model_tuples = (
             field_name_to_external_model_references['sent_email_model_ids'])
@@ -5106,12 +5187,12 @@ class UserSkillMasteryModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.user_id]),
-            'skill_ids': (
-                skill_models.SkillModel, [item.skill_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel,
+                [item.user_id]),
+            ExternalModelFetchingDetails(
+                'skill_ids', skill_models.SkillModel, [item.skill_id])]
 
     @classmethod
     def _validate_skill_mastery(cls, item):
@@ -5141,10 +5222,10 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.user_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel,
+                [item.user_id])]
 
     @classmethod
     def _validate_score(cls, item):
@@ -5175,10 +5256,10 @@ class UserCommunityRightsModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (
-                user_models.UserSettingsModel, [item.id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'user_settings_ids', user_models.UserSettingsModel,
+                [item.user_id])]
 
 
 class PendingDeletionRequestModelValidator(BaseUserModelValidator):
@@ -5186,7 +5267,7 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
     @classmethod
     def _validate_user_settings_are_marked_deleted(cls, item):
@@ -5261,12 +5342,12 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'resolver_ids': (
-                user_models.UserSettingsModel,
+        return [
+            ExternalModelFetchingDetails(
+                'resolver_ids', user_models.UserSettingsModel,
                 [item.resolver_id] if item.resolver_id is not None else []),
-            'entity_ids': (exp_models.ExplorationModel, [item.entity_id])
-        }
+            ExternalModelFetchingDetails(
+                'entity_ids', exp_models.ExplorationModel, [item.entity_id])]
 
     @classmethod
     def _validate_composite_entity_id(cls, item):
@@ -5358,12 +5439,12 @@ class PlaythroughModelValidator(BaseModelValidator):
                 exp_id, exp_version)
         )
 
-        return {
-            'exp_ids': (
-                exp_models.ExplorationModel, [item.exp_id]),
-            'exp_issues': (
-                stats_models.ExplorationIssuesModel, [exp_issues_id])
-        }
+        return [
+            ExternalModelFetchingDetails(
+                'exp_ids', exp_models.ExplorationModel, [item.exp_id]),
+            ExternalModelFetchingDetails(
+                'exp_issues', stats_models.ExplorationIssuesModel,
+                [exp_issues_id])]
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
