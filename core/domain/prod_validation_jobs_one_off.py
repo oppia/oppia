@@ -232,8 +232,8 @@ class BaseModelValidator(python_utils.OBJECT):
 
         Returns:
             list(ExternalModelFetcher). A list whose values are
-                ExternalModelFetcher instances each representing
-                the details for a single type of external model to fetch.
+            ExternalModelFetcher instances each representing
+            the details for a single type of external model to fetch.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -376,11 +376,11 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
         Returns:
             tuple(str, str, dict). A tuple with first element as
-                external model name, second element as a key to fetch
-                external model details from cls.external_instance_details
-                and the third element as a properties dict with key as
-                property name in summary model and value as property name
-                in external model.
+            external model name, second element as a key to fetch
+            external model details from cls.external_instance_details
+            and the third element as a properties dict with key as
+            property name in summary model and value as property name
+            in external model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -3332,6 +3332,9 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
 
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             return
@@ -3343,7 +3346,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                 suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
         if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
             target_model_class_model_id_model_tuples = (
-                 external_instance_details['%s_ids' % item.target_type])
+                external_instance_details['%s_ids' % item.target_type])
 
             for (model_class, model_id, target_model) in (
                     target_model_class_model_id_model_tuples):
