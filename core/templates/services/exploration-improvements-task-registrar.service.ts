@@ -301,13 +301,8 @@ export class ExplorationImprovementsTaskRegistrarService {
       }
     }
 
-    const stateNameReferencesByTaskType = (
-      new Map<ExplorationTaskType, Set<string>>([
-        ['high_bounce_rate', new Set()],
-        ['ineffective_feedback_loop', new Set()],
-        ['needs_guiding_responses', new Set()],
-        ['successive_incorrect_answers', new Set()],
-      ]));
+    const stateNameReferencesByTaskType = new Map(
+      ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, new Set()]));
 
     for (const task of openTasks) {
       if (task.entityId !== expId) {
