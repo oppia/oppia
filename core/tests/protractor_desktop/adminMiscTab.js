@@ -46,7 +46,7 @@ describe('Admin misc test tab', function() {
       'A topic to test the admin page\'s misc tab', false);
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4];
-    topicId = topicId.substring(2, topicId.length - 1)
+    topicId = topicId.substring(2, topicId.length - 1);
     await topicEditorPage.publishTopic();
     await general.closeCurrentTabAndSwitchTo(handle);
   });
