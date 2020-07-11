@@ -191,9 +191,9 @@ angular.module('oppia').directive('questionPlayer', [
             if (actionButtonType === 'BOOST_SCORE') {
               iconHtml = `<picture>
               <source type="image/webp" 
-              src="${getStaticImageUrl('/icons/rocket@2x.webp')}">
+              srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
               <source type="image/png" 
-              src="${getStaticImageUrl('/icons/rocket@2x.png')}">
+              srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
               <img class="action-button-icon" src="
               ${getStaticImageUrl('/icons/rocket@2x.png')}"/>
               </picture>`;

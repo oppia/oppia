@@ -893,7 +893,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [
             u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
             u'[u\'Valid Expression\', [u\'exp_id0 State3: sqrt(x/y)\', '
-            u'u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: pi* r^2\']]']
+            u'u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: pi*r^2\']]']
 
         self.assertEqual(actual_output, expected_output)
 

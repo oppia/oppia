@@ -123,17 +123,17 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join('third_party', 'backports.functools_lru_cache-1.6.1'),
-    os.path.join('third_party', 'beautifulsoup4-4.9.0'),
+    os.path.join('third_party', 'beautifulsoup4-4.9.1'),
     os.path.join('third_party', 'bleach-3.1.5'),
     os.path.join('third_party', 'callbacks-0.3.0'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.22.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
     os.path.join('third_party', 'mutagen-1.43.0'),
-    os.path.join('third_party', 'packaging-20.3'),
-    os.path.join('third_party', 'pylatexenc-2.5'),
+    os.path.join('third_party', 'packaging-20.4'),
+    os.path.join('third_party', 'pylatexenc-2.6'),
     os.path.join('third_party', 'soupsieve-1.9.5'),
-    os.path.join('third_party', 'six-1.12.0'),
+    os.path.join('third_party', 'six-1.15.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),
 ]
 for path in _PATHS_TO_INSERT:
