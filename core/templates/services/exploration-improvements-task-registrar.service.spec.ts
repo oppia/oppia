@@ -277,7 +277,7 @@ describe('Exploration improvements task registrar service', () => {
       () => taskRegistrarService.initialize(
         expId, expVersion, makeStates(), makeExpStats(), [],
         new Map(), new Map(), new Map(), new Map(), new Map()))
-      .not.toThrow();
+      .not.toThrowError();
   });
 
   describe('Validating initialize arguments', () => {

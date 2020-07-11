@@ -278,6 +278,7 @@
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
 /core/templates/services/exploration-improvements-backend-api.service*.ts @brianrodri
+/core/templates/services/exploration-improvements-task-registrar.service*.ts @brianrodri
 /core/templates/services/exploration-stats.service*.ts @brianrodri
 /core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
