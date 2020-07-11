@@ -38,7 +38,7 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change, description, final_reviewer_id):
+        author_id, change, description):
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
@@ -53,8 +53,6 @@ def create_suggestion(
         author_id: str. The ID of the user who submitted the suggestion.
         change: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
-        final_reviewer_id: str|None. The ID of the reviewer who has
-            accepted/rejected the suggestion.
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
@@ -87,10 +85,18 @@ def create_suggestion(
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
+    suggestion_domain_class = (
+        suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
+            suggestion_type])
+    suggestion = suggestion_domain_class(
+        thread_id, target_id, target_version_at_submission, status, author_id,
+        None, change, score_category)
+    suggestion.validate()
+
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        final_reviewer_id, change, score_category, thread_id)
+        None, change, score_category, thread_id)
 
 
 def get_suggestion_from_model(suggestion_model):
@@ -293,6 +299,28 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message)
+
+
+def reject_question_suggestions_with_skill_target_id(skill_id):
+    """Rejects all SuggestionAddQuestions with target ID matching the supplied
+    skill ID. Reviewer ID is set to Oppia Bot.
+
+    Args:
+        skill_id: The skill ID corresponding to the target ID of the
+            SuggestionAddQuestion.
+    """
+    suggestions = query_suggestions(
+        [
+            (
+                'suggestion_type',
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+            ('target_id', skill_id)
+        ]
+    )
+    for suggestion in suggestions:
+        reject_suggestion(
+            suggestion, feconf.SUGGESTION_BOT_USER_ID,
+            suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
 def resubmit_rejected_suggestion(suggestion, summary_message, author_id):

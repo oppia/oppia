@@ -21,10 +21,10 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'sharing-links.directive.ts');
+  'sharing-links.component.ts');
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'editor-reloading-modal.controller.ts');

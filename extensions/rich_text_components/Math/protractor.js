@@ -21,7 +21,7 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeComponent = async function(modal, rawLatex) {
   await (objects.MathExpressionContentEditor(
-    await modal.element(by.tagName('math-expression-content-editor'))
+    modal.element(by.tagName('math-expression-content-editor'))
   ).setValue(rawLatex));
 };
 

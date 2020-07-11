@@ -17,7 +17,7 @@
  */
 require(
   'components/common-layout-directives/common-elements/' +
-  'lazy-loading.directive.ts');
+  'lazy-loading.component.ts');
 
 require(
   'filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');

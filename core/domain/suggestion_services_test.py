@@ -21,7 +21,9 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_domain
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -119,7 +121,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'target_version_at_submission': self.target_version_at_submission,
             'status': suggestion_models.STATUS_IN_REVIEW,
             'author_name': 'author',
-            'final_reviewer_id': self.reviewer_id,
             'change': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -142,8 +143,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
             observed_suggestion = suggestion_services.get_suggestion_by_id(
                 self.suggestion_id)
@@ -156,8 +156,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'invalid_suggestion_type',
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, self.change, 'test description',
-                self.reviewer_id)
+                self.author_id, self.change, 'test description')
+
+    def test_cannot_create_suggestion_with_invalid_author_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_id to be in a valid user ID format'):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id, self.target_version_at_submission,
+                'invalid author ID', self.change, 'test description')
 
     def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
         add_translation_change_dict = {
@@ -176,16 +184,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
 
     def test_get_all_stale_suggestions(self):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
@@ -203,8 +209,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -228,8 +233,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -245,8 +249,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -262,8 +265,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -300,8 +302,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, change_dict, 'test description',
-            self.reviewer_id)
+            self.author_id, change_dict, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -342,8 +343,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -400,8 +400,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, change_dict, 'test description',
-                    self.reviewer_id)
+                    self.author_id, change_dict, 'test description')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -438,8 +437,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -480,8 +478,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -507,8 +504,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -528,8 +524,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -557,8 +552,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -599,8 +593,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         suggestion_services.reject_suggestion(
@@ -623,8 +616,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         with self.assertRaisesRegexp(
@@ -647,8 +639,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
                 suggestion = suggestion_services.get_suggestion_by_id(
                     self.suggestion_id)
                 with self.swap(
@@ -677,8 +668,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         can_resubmit = suggestion_services.check_can_resubmit_suggestion(
             self.suggestion_id, self.author_id)
         self.assertEqual(can_resubmit, True)
@@ -749,45 +739,36 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description',
-                self.reviewer_id_1)
+                self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description', None)
+                self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description', None)
+                self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description',
-                self.reviewer_id_2)
+                self.author_id_2, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_2, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description',
-                self.reviewer_id_2)
+                self.author_id_2, self.change, 'test description')
 
     def test_get_by_author(self):
         queries = [('author_id', self.author_id_1)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 3)
         queries = [('author_id', self.author_id_2)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
-
-    def test_get_by_reviewer(self):
-        queries = [('final_reviewer_id', self.reviewer_id_1)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
-        queries = [('final_reviewer_id', self.reviewer_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
     def test_get_by_target_id(self):
@@ -966,7 +947,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description', None)
+                self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -990,7 +971,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description', None)
+                self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -1017,7 +998,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description', None)
+                self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -1037,6 +1018,42 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             '<p>new content</p>')
 
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_delete_skill_rejects_question_suggestion(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', skill_id)])
+        self.assertEqual(len(suggestions), 1)
+
+        skill_services.delete_skill(self.author_id, skill_id)
+
+        # Suggestion should be rejected after corresponding skill is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', skill_id)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
 
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):
