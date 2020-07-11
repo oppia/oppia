@@ -78,8 +78,17 @@ class TaskRegistry {
     this.siaTask = <SuccessiveIncorrectAnswersTask> siaTask;
   }
 
-  public toArray(): ExplorationTask[] {
-    return [this.hbrTask, this.iflTask, this.ngrTask, this.siaTask];
+  public forEach(fn: (t: ExplorationTask) => void): void {
+    fn(this.hbrTask);
+    fn(this.iflTask);
+    fn(this.ngrTask);
+    fn(this.siaTask);
+  }
+
+  public map(fn: (t: ExplorationTask) => ExplorationTask): TaskRegistry {
+    return new TaskRegistry([
+      fn(this.hbrTask), fn(this.iflTask), fn(this.ngrTask), fn(this.siaTask),
+    ]);
   }
 
   public didHbrTaskStatusChange(): boolean {
@@ -141,7 +150,7 @@ export class ExplorationImprovementsTaskRegistrarService {
 
     for (const [stateName, taskRegistry] of this.taskRegistry.entries()) {
       const statsRegistry = this.statsRegistry.get(stateName);
-      taskRegistry.toArray().forEach(t => this.refreshTask(t, statsRegistry));
+      taskRegistry.forEach(t => this.refreshTask(t, statsRegistry));
     }
   }
 
@@ -171,8 +180,7 @@ export class ExplorationImprovementsTaskRegistrarService {
 
   onStateDelete(stateName: string): void {
     const taskRegistry = this.taskRegistry.get(stateName);
-    const {hbrTask, iflTask, ngrTask, siaTask} = taskRegistry;
-    [hbrTask, iflTask, ngrTask, siaTask].forEach(t => t.markAsObsolete());
+    taskRegistry.forEach(t => t.markAsObsolete());
 
     // eslint-disable-next-line dot-notation
     this.taskRegistry.delete(stateName);
@@ -182,20 +190,17 @@ export class ExplorationImprovementsTaskRegistrarService {
 
   onStateRename(oldStateName: string, newStateName: string): void {
     const taskRegistry = this.taskRegistry.get(oldStateName);
-    const {hbrTask, iflTask, ngrTask, siaTask} = taskRegistry;
 
-    const oldTasks = [hbrTask, iflTask, ngrTask, siaTask];
-    const newTasks = oldTasks.map(t => t.cloneWithNewTarget(newStateName));
-
-    oldTasks.forEach(t => t.markAsObsolete());
-    newTasks.forEach(t => this.tasksByType.get(t.taskType).push(t));
+    const newTaskRegistry = (
+      taskRegistry.map(t => t.cloneWithNewTarget(newStateName)));
+    taskRegistry.forEach(t => t.markAsObsolete());
 
     // eslint-disable-next-line dot-notation
     this.taskRegistry.delete(oldStateName);
     // eslint-disable-next-line dot-notation
     this.statsRegistry.delete(oldStateName);
 
-    this.taskRegistry.set(newStateName, new TaskRegistry(newTasks));
+    this.taskRegistry.set(newStateName, newTaskRegistry);
     this.statsRegistry.set(newStateName, new StatsRegistry());
   }
 
