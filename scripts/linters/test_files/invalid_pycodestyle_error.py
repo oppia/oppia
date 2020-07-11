@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Python file with invalid syntax, used by scripts/linters/
-python_linter_test.py. This file contain just one newline between imports and
+python_linter_test.py. This file contains just one newline between imports and
 class defintion but two newlines are required on line 26.
 """
 
