@@ -20,6 +20,11 @@ import { TestBed } from '@angular/core/testing';
 import { PlayerPositionService } from '../services/player-position.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { IdGenerationService } from 'services/id-generation.service';
+import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
+  'tests/angular-services.index';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Flag Exploration Modal Controller', function() {
   var $scope = null;
@@ -30,15 +35,17 @@ describe('Flag Exploration Modal Controller', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        DeviceInfoService,
-        IdGenerationService,
-        PlayerPositionService
-      ]
+      imports: [HttpClientTestingModule]
     });
   });
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
