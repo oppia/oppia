@@ -17,7 +17,7 @@
  */
 
 import { ProfileSummaryObjectFactory } from
-  'domain/profile/profile-summary-object.factory';
+  'domain/user/profile-summary-object.factory';
 
 describe('Subscriber Summary object factory', () => {
   let psof: ProfileSummaryObjectFactory;

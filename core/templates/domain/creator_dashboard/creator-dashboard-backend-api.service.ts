@@ -50,7 +50,7 @@ import {
   ProfileSummary,
   SubscriberSummaryBackendDict,
   ProfileSummaryObjectFactory
-} from 'domain/profile/profile-summary-object.factory';
+} from 'domain/user/profile-summary-object.factory';
 import {
   SuggestionThread,
   SuggestionThreadObjectFactory

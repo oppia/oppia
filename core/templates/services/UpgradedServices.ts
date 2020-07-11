@@ -403,7 +403,7 @@ import { PretestQuestionBackendApiService } from
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
-  'domain/profile/profile-summary-object.factory';
+  'domain/user/profile-summary-object.factory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';

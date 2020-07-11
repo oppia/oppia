@@ -45,7 +45,7 @@ import {
   CreatorSummaryBackendDict,
   ProfileSummary,
   ProfileSummaryObjectFactory
-} from 'domain/profile/profile-summary-object.factory';
+} from 'domain/user/profile-summary-object.factory';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
