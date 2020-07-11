@@ -175,7 +175,7 @@ class SkillAssignmentsHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id):
         """Handles GET requests."""
-        topic_assignments = skill_services.get_all_topics_assigned_to_skill(
+        topic_assignments = skill_services.get_all_topic_assignments_for_skill(
             skill_id)
         assigned_topic_dicts = [
             topic_assignment.to_dict()

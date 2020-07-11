@@ -409,7 +409,7 @@ def get_image_filenames_from_skill(skill):
     return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
-def get_all_topics_assigned_to_skill(skill_id):
+def get_all_topic_assignments_for_skill(skill_id):
     """Returns a list containing all the topics to which the given skill is
     assigned along with topic details.
 

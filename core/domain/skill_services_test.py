@@ -549,7 +549,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-    def test_get_all_topics_assigned_to_skill(self):
+    def test_get_all_topic_assignments_for_skill(self):
         topic_id = topic_services.get_new_topic_id()
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
@@ -575,7 +575,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             subtopics=[subtopic], next_subtopic_id=2)
 
         assigned_topics = (
-            skill_services.get_all_topics_assigned_to_skill(self.SKILL_ID))
+            skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         assigned_topics = sorted(
             assigned_topics, key=lambda i: i.topic_name)
         self.assertEqual(len(assigned_topics), 2)
@@ -616,7 +616,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         skill_services.remove_skill_from_all_topics(self.USER_ID, self.SKILL_ID)
         assigned_topics_dict = (
-            skill_services.get_all_topics_assigned_to_skill(self.SKILL_ID))
+            skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         self.assertEqual(len(assigned_topics_dict), 0)
 
     def test_update_skill(self):
