@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.directive.ts');
