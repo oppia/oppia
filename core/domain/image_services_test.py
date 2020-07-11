@@ -79,19 +79,6 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(pil_image.format, 'PNG')
 
     def test_compression_results_in_identical_files(self):
-        def is_identical(file1, file2):
-            """Checks the differences between the two images and returns if they
-            are different.
-
-            Args:
-                file1: str. Content of first image.
-                file2: str. Content of second image.
-
-            Returns:
-                bool. Whether the images are different.
-            """
-            
-
         with python_utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, 'compressed_image.jpg'),
@@ -117,8 +104,8 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(correct_height, height)
         self.assertEqual(correct_width, width)
 
-        image1 = Image.open(io.BytesIO(file1)).convert('RGB')
-        image2 = Image.open(io.BytesIO(file2)).convert('RGB')
+        image1 = Image.open(io.BytesIO(correct_compressed_image)).convert('RGB')
+        image2 = Image.open(io.BytesIO(compressed_image_content)).convert('RGB')
         diff = ImageChops.difference(image1, image2)
 
         # Function diff.getbbox() returns a bounding box on all islands or
