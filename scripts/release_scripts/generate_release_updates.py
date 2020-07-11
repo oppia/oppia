@@ -212,7 +212,7 @@ def draft_new_release():
     common.open_new_tab_in_browser_if_possible(
         release_constants.NEW_RELEASE_URL)
     common.open_new_tab_in_browser_if_possible(
-        release_constants.EXAMPLE_RELEASE_URL)
+        release_constants.GITHUB_RELEASE_TAB_URL)
     common.ask_user_to_confirm(
         'Please draft a new release on GitHub pointing to the '
         'new tag and including relevant changelog information.\n'

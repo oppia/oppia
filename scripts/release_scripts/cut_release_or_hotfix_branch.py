@@ -299,12 +299,10 @@ def execute_branch_cut(target_version, hotfix_number):
     if new_branch_type == release_constants.BRANCH_TYPE_RELEASE:
         python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
         subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
-
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'New %s branch successfully cut. You are now on branch %s' % (
-            new_branch_type, new_branch_name))
-    python_utils.PRINT('Done!')
+    else:
+        python_utils.PRINT(
+            'Please cherrypick the required PRs and push the branch '
+            'to Github once this script is done.')
 
     common.ask_user_to_confirm(
         'Ask Sean (or Ben, if Sean isn\'t available) to create '
@@ -315,6 +313,12 @@ def execute_branch_cut(target_version, hotfix_number):
         '3. Checking the box: Restrict who can push to matching '
         'branches (then add the oppia/release-coordinators team)\n' % (
             new_branch_name))
+
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'New %s branch successfully cut. You are now on branch %s' % (
+            new_branch_type, new_branch_name))
+    python_utils.PRINT('Done!')
 
 
 def main(args=None):

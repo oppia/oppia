@@ -288,32 +288,32 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 pre_push_hook.FileDiff(status='W', name='file3')]),
             ['file1', 'file2'])
 
-    def test_get_remote_branch_name_with_hotfix_branch(self):
+    def test_get_parent_branch_name_for_diff_with_hotfix_branch(self):
         def mock_get_branch():
             return 'release-1.2.3-hotfix-1'
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_remote_branch_name(), 'release-1.2.3')
+                pre_push_hook.get_parent_branch_name_for_diff(), 'release-1.2.3')
 
-    def test_get_remote_branch_name_with_release_branch(self):
+    def test_get_parent_branch_name_for_diff_with_release_branch(self):
         def mock_get_branch():
             return 'release-1.2.3'
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_remote_branch_name(), 'develop')
+                pre_push_hook.get_parent_branch_name_for_diff(), 'develop')
 
-    def test_get_remote_branch_name_with_non_release_branch(self):
+    def test_get_parent_branch_name_for_diff_with_non_release_branch(self):
         def mock_get_branch():
             return 'branch-1'
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_remote_branch_name(), 'develop')
+                pre_push_hook.get_parent_branch_name_for_diff(), 'develop')
 
     def test_collect_files_being_pushed_with_empty_ref_list(self):
         def mock_get_branch():

@@ -228,7 +228,7 @@ def extract_files_to_lint(file_diffs):
     return lint_files
 
 
-def get_remote_branch_name():
+def get_parent_branch_name_for_diff():
     """Returns remote branch name against which the diff has to be checked.
 
     Returns:
@@ -265,7 +265,7 @@ def collect_files_being_pushed(ref_list, remote):
     for branch, _ in python_utils.ZIP(branches, hashes):
         # Get the difference to remote/develop.
         modified_files = compare_to_remote(
-            remote, branch, remote_branch=get_remote_branch_name())
+            remote, branch, remote_branch=get_parent_branch_name_for_diff())
         files_to_lint = extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 

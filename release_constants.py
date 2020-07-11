@@ -70,7 +70,7 @@ JOBS_FORM_URL = 'https://goo.gl/forms/XIj00RJ2h5L55XzU2'
 OPPIA_DEV_GROUP_URL = 'https://groups.google.com/forum/#!forum/oppia-dev'
 
 NEW_RELEASE_URL = 'https://github.com/oppia/oppia/releases/new'
-EXAMPLE_RELEASE_URL = 'https://github.com/oppia/oppia/releases'
+GITHUB_RELEASE_TAB_URL = 'https://github.com/oppia/oppia/releases'
 
 INVALID_EMAIL_SUFFIX = 'users.noreply.github.com'
 

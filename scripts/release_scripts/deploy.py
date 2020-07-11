@@ -288,21 +288,22 @@ def switch_version(app_name, current_release_version):
             current_release_version, app_name))
     library_page_loads_correctly = check_errors_in_a_page(
         release_version_library_url, 'Library page is loading correctly?')
-    if library_page_loads_correctly:
-        if common.is_current_branch_a_hotfix_branch():
-            python_utils.PRINT('Do you want to switch version?')
-            version_switch = python_utils.INPUT()
-        else:
-            version_switch = 'yes'
-        if version_switch in release_constants.AFFIRMATIVE_CONFIRMATIONS:
-            gcloud_adapter.switch_version(
-                app_name, current_release_version)
-            python_utils.PRINT(
-                'Successfully migrated traffic to release version!')
-    else:
+
+    if not library_page_loads_correctly:
         raise Exception(
             'Aborting version switch due to issues in library page '
             'loading.')
+
+    version_switch = release_constants.AFFIRMATIVE_CONFIRMATIONS[0]
+    if common.is_current_branch_a_hotfix_branch():
+        python_utils.PRINT('Do you want to switch version?')
+        version_switch = python_utils.INPUT()
+
+    if version_switch in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        gcloud_adapter.switch_version(
+            app_name, current_release_version)
+        python_utils.PRINT(
+            'Successfully migrated traffic to release version!')
 
 
 def check_breakage(app_name, current_release_version):
@@ -409,18 +410,17 @@ def check_release_doc():
     """Asks the co-ordinator to create a doc for the current release.
     or update the doc for the hotfix.
     """
+    message = (
+        'Please create a dedicated section for this release in the '
+        'release tracking document created by the QA Lead.\n'
+        'The three tabs in your browser point to: '
+        'Release drive url, template for the release notes, example of '
+        'release notes from previous release.')
     if common.is_current_branch_a_hotfix_branch():
         message = (
             'Please ensure you note down the notes for the hotfix in the '
             'release tracking document created by the QA Lead for the release '
             'corresponding to the hotfix.\n'
-            'The three tabs in your browser point to: '
-            'Release drive url, template for the release notes, example of '
-            'release notes from previous release.')
-    else:
-        message = (
-            'Please create a dedicated section for this release in the '
-            'release tracking document created by the QA Lead.\n'
             'The three tabs in your browser point to: '
             'Release drive url, template for the release notes, example of '
             'release notes from previous release.')
