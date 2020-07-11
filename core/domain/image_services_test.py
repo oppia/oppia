@@ -88,17 +88,9 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
                 file2: str. Content of second image.
 
             Returns:
-                bool. Returns whether the images are different.
+                bool. Whether the images are different.
             """
-            image1 = Image.open(io.BytesIO(file1)).convert('RGB')
-            image2 = Image.open(io.BytesIO(file2)).convert('RGB')
-            diff = ImageChops.difference(image1, image2)
-
-            # Function diff.getbbox() returns a bounding box on all islands or
-            # regions of non-zero pixels. In other words, if we have a bounding
-            # box, there will be areas that are not 0 in the difference meaning
-            # that the 2 images are not equal.
-            return not diff.getbbox()
+            
 
         with python_utils.open_file(
             os.path.join(
@@ -124,5 +116,13 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
             compressed_image_content)
         self.assertEqual(correct_height, height)
         self.assertEqual(correct_width, width)
-        self.assertTrue(
-            is_identical(compressed_image_content, correct_compressed_image))
+
+        image1 = Image.open(io.BytesIO(file1)).convert('RGB')
+        image2 = Image.open(io.BytesIO(file2)).convert('RGB')
+        diff = ImageChops.difference(image1, image2)
+
+        # Function diff.getbbox() returns a bounding box on all islands or
+        # regions of non-zero pixels. In other words, if we have a bounding
+        # box, there will be areas that are not 0 in the difference meaning
+        # that the 2 images are not equal.
+        self.assertFalse(diff.getbbox())
