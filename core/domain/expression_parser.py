@@ -39,9 +39,6 @@ import string
 from constants import constants
 import python_utils
 
-_MATH_FUNCTION_NAMES = [
-    'log', 'ln', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
-    'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
 _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']
 _VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
@@ -131,7 +128,7 @@ def tokenize(expression):
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
-            constants.GREEK_LETTERS + _MATH_FUNCTION_NAMES,
+            constants.GREEK_LETTERS + constants.MATH_FUNCTION_NAMES,
             reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))
 
@@ -217,7 +214,7 @@ class Token(python_utils.OBJECT):
         Returns:
             bool. Whether the given string represents a valid math function.
         """
-        return text in _MATH_FUNCTION_NAMES
+        return text in constants.MATH_FUNCTION_NAMES
 
     def is_identifier(self, text):
         """Checks if the given token represents a valid identifier. A valid

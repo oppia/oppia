@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-describe('MathInteractionsService', () => {
+fdescribe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
@@ -265,6 +265,14 @@ describe('MathInteractionsService', () => {
       'log(alpha/pi)')).toBe('log(alpha/pi)');
     expect(mathInteractionsService.insertMultiplicationSigns(
       'Al^2')).toBe('A*l^2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '5sqrt(4)')).toBe('5*sqrt(4)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'cos(theta)sin(theta)')).toBe('cos(theta)*sin(theta)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'sqrt(4)abs(5)')).toBe('sqrt(4)*abs(5)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '(3+alpha)(3-alpha)4')).toBe('(3+alpha)*(3-alpha)*4');
   });
 
   it('should replace abs symbol with text', function() {
@@ -336,6 +344,8 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.termsMatch('(x^2)/2', '(x*x)/2')).toBeTrue();
     expect(mathInteractionsService.termsMatch('2*pi*r', 'r*pi*2')).toBeTrue();
     expect(mathInteractionsService.termsMatch('x*(y+z)', '(y+z)*x')).toBeTrue();
+    expect(mathInteractionsService.termsMatch(
+      'x*(y+z)*(3-alpha)/2', '(3-alpha)/2*(z+y)*x')).toBeTrue();
     expect(mathInteractionsService.termsMatch('2*4.5', '(9/2)*2')).toBeTrue();
 
     expect(mathInteractionsService.termsMatch('4*5', '20')).toBeFalse();

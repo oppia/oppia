@@ -5301,6 +5301,12 @@ export = {
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
   ],
 
+  // Functions allowed in math interactions.
+  "MATH_FUNCTION_NAMES": [
+    "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
+    "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
+  ],
+
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 

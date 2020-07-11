@@ -159,6 +159,16 @@ export class MathInteractionsService {
           variable, separatedVariables);
       }
     }
+    // Inserting multiplication signs before functions. For eg. 5sqrt(x) should
+    // be treated as 5*sqrt(x).
+    // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+      // rid of the TS2339 error on AppConstants.
+    for (let functionName of AppConstants.MATH_FUNCTION_NAMES) {
+      expressionString = expressionString.replace(new RegExp(
+        '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
+    }
+    // Inserting multiplication signs after closing parens.
+    expressionString = expressionString.replace(/\)([^*+\/-])/g, ')*$1');
     return expressionString;
   }
 
@@ -257,9 +267,9 @@ export class MathInteractionsService {
     return listOfTerms;
   }
 
+  // The input terms to this function should be the terms split by '+'/'-'
+  // from an expression.
   termsMatch(term1: string, term2: string): boolean {
-    // The input terms to this function should be the terms split by '+'/'-'
-    // from an expression.
     // We split both terms by multiplication and division into separate parts
     // and try to match these parts from both inputs by checking equivalency.
     let partsList1 = this.getTerms(term1, false);
