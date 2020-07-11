@@ -272,4 +272,34 @@ describe('High bounce rate task', function() {
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();
   });
+
+  it('should be clonable', () => {
+    const task = highBounceRateTaskObjectFactory.createFromBackendDict({
+      entity_type: 'exploration',
+      entity_id: 'eid',
+      entity_version: 1,
+      task_type: 'high_bounce_rate',
+      target_type: 'state',
+      target_id: 'Introduction',
+      issue_description: '28% of learners had dropped off at this card.',
+      status: 'open',
+      resolver_username: null,
+      resolver_profile_picture_data_url: null,
+      resolved_on_msecs: null,
+    });
+
+    const clonedTask = task.cloneWithNewTarget('End');
+    expect(clonedTask.entityType).toEqual('exploration');
+    expect(clonedTask.entityId).toEqual('eid');
+    expect(clonedTask.entityVersion).toEqual(1);
+    expect(clonedTask.taskType).toEqual('high_bounce_rate');
+    expect(clonedTask.targetType).toEqual('state');
+    expect(clonedTask.targetId).toEqual('End');
+    expect(clonedTask.getIssueDescription())
+      .toEqual('28% of learners had dropped off at this card.');
+    expect(clonedTask.getStatus()).toEqual('open');
+    expect(clonedTask.resolverUsername).toBeNull();
+    expect(clonedTask.resolverProfilePictureDataUrl).toBeNull();
+    expect(clonedTask.resolvedOnMsecs).toBeNull();
+  });
 });

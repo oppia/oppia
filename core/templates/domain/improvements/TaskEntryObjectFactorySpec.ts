@@ -85,4 +85,57 @@ describe('Task entry', function() {
       status: 'resolved',
     });
   });
+
+  it('should be able to become obsolete', () => {
+    const task = taskEntryObjectFactory.createFromBackendDict({
+      entity_type: 'exploration',
+      entity_id: 'eid',
+      entity_version: 1,
+      task_type: 'high_bounce_rate',
+      target_type: 'state',
+      target_id: 'Introduction',
+      issue_description: '20% of learners dropped at this state',
+      status: 'open',
+      resolver_username: 'test_user',
+      resolver_profile_picture_data_url: './image.png',
+      resolved_on_msecs: 123456789,
+    });
+    expect(task.isOpen()).toBeTrue();
+    expect(task.isObsolete()).toBeFalse();
+
+    task.markAsObsolete();
+    expect(task.isOpen()).toBeFalse();
+    expect(task.isObsolete()).toBeTrue();
+  });
+
+  it('should be clonable with a new target id', () => {
+    const task = taskEntryObjectFactory.createFromBackendDict({
+      entity_type: 'exploration',
+      entity_id: 'eid',
+      entity_version: 1,
+      task_type: 'high_bounce_rate',
+      target_type: 'state',
+      target_id: 'Introduction',
+      issue_description: '20% of learners dropped at this state',
+      status: 'open',
+      resolver_username: 'test_user',
+      resolver_profile_picture_data_url: './image.png',
+      resolved_on_msecs: 123456789,
+    });
+    const clonedTask = task.cloneWithNewTarget('End');
+
+    expect(clonedTask.entityType).toEqual(task.entityType);
+    expect(clonedTask.entityId).toEqual(task.entityId);
+    expect(clonedTask.entityVersion).toEqual(task.entityVersion);
+    expect(clonedTask.taskType).toEqual(task.taskType);
+    expect(clonedTask.targetType).toEqual(task.targetType);
+    expect(clonedTask.targetId).toEqual('End');
+    expect(clonedTask.getIssueDescription())
+      .toEqual(task.getIssueDescription());
+    expect(clonedTask.getStatus()).toEqual(task.getStatus());
+    expect(clonedTask.resolverUsername).toEqual(task.resolverUsername);
+    expect(clonedTask.resolverProfilePictureDataUrl)
+      .toEqual(task.resolverProfilePictureDataUrl);
+    expect(clonedTask.resolvedOnMsecs).toEqual(task.resolvedOnMsecs);
+  });
 });

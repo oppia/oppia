@@ -62,10 +62,8 @@ export class ExplorationStats {
   }
 
   getStateStats(stateName: string): StateStats {
-    if (!this.stateStatsMapping.has(stateName)) {
-      throw new Error('no stats exist for state: ' + stateName);
-    }
-    return this.stateStatsMapping.get(stateName);
+    return this.stateStatsMapping.has(stateName) ?
+      this.stateStatsMapping.get(stateName) : new StateStats(0, 0, 0, 0, 0, 0);
   }
 }
 
@@ -77,13 +75,12 @@ export class ExplorationStatsObjectFactory {
 
   createFromBackendDict(
       backendDict: IExplorationStatsBackendDict): ExplorationStats {
-    const stateStatsMapping = new Map(
-      Object.entries(backendDict.state_stats_mapping).map(
-        ([stateName, stateStatsBackendDict]) => [
+    const stateStatsMapping = (
+      new Map(Object.entries(backendDict.state_stats_mapping).map(
+        ([stateName, stateStatsDict]) => [
           stateName,
-          this.stateStatsObjectFactory.createFromBackendDict(
-            stateStatsBackendDict)
-        ]));
+          this.stateStatsObjectFactory.createFromBackendDict(stateStatsDict)
+        ])));
     return new ExplorationStats(
       backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,
       backendDict.num_actual_starts, backendDict.num_completions,

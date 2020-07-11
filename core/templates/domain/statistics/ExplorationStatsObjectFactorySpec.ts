@@ -108,9 +108,9 @@ describe('Exploration stats', function() {
         jasmine.arrayWithExactContents(['Introduction', 'Middle', 'End']));
     });
 
-    it('should throw an error if state stats do not exist', () => {
-      expect(() => explorationStats.getStateStats('Prelude'))
-        .toThrowError('no stats exist for state: Prelude');
+    it('should return zero-value stats if state do not exist', () => {
+      expect(explorationStats.getStateStats('Prelude'))
+        .toEqual(new StateStats(0, 0, 0, 0, 0, 0));
     });
 
     it('should calculate bounce rate of state compared to exploration', () => {

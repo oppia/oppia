@@ -17,6 +17,8 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Constructor } from
+  '@angular/material/core/typings/common-behaviors/constructor';
 import { Injectable } from '@angular/core';
 
 import { ImprovementsConstants } from
@@ -72,6 +74,22 @@ export class TaskEntry {
     this.taskStatus = backendDict.status;
   }
 
+  cloneWithNewTarget<T extends TaskEntry>(this: T, newTargetId: string): T {
+    return new (<Constructor<T>> this.constructor)({
+      entity_type: this.entityType,
+      entity_id: this.entityId,
+      entity_version: this.entityVersion,
+      task_type: this.taskType,
+      target_type: this.targetType,
+      target_id: newTargetId,
+      resolver_username: this.resolverUsername,
+      resolver_profile_picture_data_url: this.resolverProfilePictureDataUrl,
+      issue_description: this.issueDescription,
+      status: this.taskStatus,
+      resolved_on_msecs: this.resolvedOnMsecs,
+    });
+  }
+
   public toPayloadDict(): ITaskEntryPayloadDict {
     return {
       entity_version: this.entityVersion,
@@ -80,6 +98,10 @@ export class TaskEntry {
       issue_description: this.issueDescription,
       status: this.taskStatus,
     };
+  }
+
+  public getStatus(): string {
+    return this.taskStatus;
   }
 
   public getIssueDescription(): string {
@@ -98,12 +120,12 @@ export class TaskEntry {
     return this.taskStatus === ImprovementsConstants.TASK_STATUS_RESOLVED;
   }
 
-  protected markAsOpen(): void {
-    this.taskStatus = ImprovementsConstants.TASK_STATUS_OPEN;
+  public markAsObsolete(): void {
+    this.taskStatus = ImprovementsConstants.TASK_STATUS_OBSOLETE;
   }
 
-  protected markAsObsolete(): void {
-    this.taskStatus = ImprovementsConstants.TASK_STATUS_OBSOLETE;
+  protected markAsOpen(): void {
+    this.taskStatus = ImprovementsConstants.TASK_STATUS_OPEN;
   }
 
   protected markAsResolved(): void {
