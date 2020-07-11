@@ -28,21 +28,21 @@ angular.module('oppia').controller('DeleteSkillModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.fetchAssignedSkillData = function() {
-      TopicsAndSkillsDashboardBackendApiService.fetchAssignedSkillData(
+    $scope.fetchTopicAssignmentsForSkill = function() {
+      TopicsAndSkillsDashboardBackendApiService.fetchTopicAssignmentsForSkill(
         skillId).then((response) => {
-        $scope.assignedTopics = response.assigned_topic_dicts;
-        $scope.assignedTopicsAreFetched = true;
+        $scope.topicsAssignments = response.topic_assignment_dicts;
+        $scope.topicsAssignmentsAreFetched = true;
       });
     };
     $scope.init = function() {
-      $scope.assignedTopicsAreFetched = false;
-      $scope.fetchAssignedSkillData();
+      $scope.topicsAssignmentsAreFetched = false;
+      $scope.fetchTopicAssignmentsForSkill();
     };
-    $scope.showAssignedTopics = function() {
+    $scope.showTopicsAssignments = function() {
       return Boolean(
-        $scope.assignedTopicsAreFetched &&
-          $scope.assignedTopics.length);
+        $scope.topicsAssignmentsAreFetched &&
+          $scope.topicsAssignments.length);
     };
     $scope.init();
   }

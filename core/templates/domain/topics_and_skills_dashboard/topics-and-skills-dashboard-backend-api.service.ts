@@ -76,7 +76,7 @@ interface ISkillsDashboardDataBackendDict {
 }
 
 interface IAssignedSkillDataBackendDict {
-  'assigned_topics_dict': {
+  'topic_assignments_dict': {
     [key: string]: {
       'topic_id': string,
       'topic_name': string,
@@ -99,7 +99,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
       '/topics_and_skills_dashboard/data').toPromise();
   }
 
-  fetchAssignedSkillData(skillId): Promise<IAssignedSkillDataBackendDict> {
+  fetchTopicAssignmentsForSkill(
+      skillId): Promise<IAssignedSkillDataBackendDict> {
     const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
       '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
         skill_id: skillId

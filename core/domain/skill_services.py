@@ -419,7 +419,7 @@ def get_all_topic_assignments_for_skill(skill_id):
     Returns:
         list(TopicAssignment). A list of TopicAssignment domain objects.
     """
-    assigned_topics = []
+    topic_assignments = []
     topics = topic_fetchers.get_all_topics()
     for topic in topics:
         if skill_id in topic.get_all_skill_ids():
@@ -429,10 +429,10 @@ def get_all_topic_assignments_for_skill(skill_id):
                     subtopic_id = subtopic.id
                     break
 
-            assigned_topics.append(skill_domain.TopicAssignment(
+            topic_assignments.append(skill_domain.TopicAssignment(
                 topic.id, topic.name, topic.version, subtopic_id))
 
-    return assigned_topics
+    return topic_assignments
 
 
 def remove_skill_from_all_topics(user_id, skill_id):

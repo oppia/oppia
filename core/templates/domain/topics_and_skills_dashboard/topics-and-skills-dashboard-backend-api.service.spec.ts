@@ -95,7 +95,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
-        topicsAndSkillsDashboardBackendApiService.fetchAssignedSkillData(
+        topicsAndSkillsDashboardBackendApiService.fetchTopicAssignmentsForSkill(
           'skillId1').then(
           successHandler, failHandler);
         let req = httpTestingController.expectOne(ASSIGNED_SKILL_DATA_URL);

@@ -574,20 +574,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
 
-        assigned_topics = (
+        topic_assignments = (
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
-        assigned_topics = sorted(
-            assigned_topics, key=lambda i: i.topic_name)
-        self.assertEqual(len(assigned_topics), 2)
-        self.assertEqual(assigned_topics[0].topic_name, 'Topic1')
-        self.assertEqual(assigned_topics[0].topic_id, topic_id)
-        self.assertEqual(assigned_topics[0].topic_version, 1)
-        self.assertIsNone(assigned_topics[0].subtopic_id)
+        topic_assignments = sorted(
+            topic_assignments, key=lambda i: i.topic_name)
+        self.assertEqual(len(topic_assignments), 2)
+        self.assertEqual(topic_assignments[0].topic_name, 'Topic1')
+        self.assertEqual(topic_assignments[0].topic_id, topic_id)
+        self.assertEqual(topic_assignments[0].topic_version, 1)
+        self.assertIsNone(topic_assignments[0].subtopic_id)
 
-        self.assertEqual(assigned_topics[1].topic_name, 'Topic2')
-        self.assertEqual(assigned_topics[1].topic_id, topic_id_1)
-        self.assertEqual(assigned_topics[1].topic_version, 1)
-        self.assertEqual(assigned_topics[1].subtopic_id, 1)
+        self.assertEqual(topic_assignments[1].topic_name, 'Topic2')
+        self.assertEqual(topic_assignments[1].topic_id, topic_id_1)
+        self.assertEqual(topic_assignments[1].topic_version, 1)
+        self.assertEqual(topic_assignments[1].subtopic_id, 1)
 
     def test_remove_skill_from_all_topics(self):
         topic_id = topic_services.get_new_topic_id()
@@ -615,9 +615,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             subtopics=[subtopic], next_subtopic_id=2)
 
         skill_services.remove_skill_from_all_topics(self.USER_ID, self.SKILL_ID)
-        assigned_topics_dict = (
+        topic_assignments_dict = (
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
-        self.assertEqual(len(assigned_topics_dict), 0)
+        self.assertEqual(len(topic_assignments_dict), 0)
 
     def test_update_skill(self):
         changelist = [

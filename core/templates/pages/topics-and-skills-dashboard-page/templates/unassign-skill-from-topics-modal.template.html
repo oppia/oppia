@@ -5,13 +5,13 @@
 </div>
 <div class="modal-body">
   <span>This skill is assigned to these following topics, Tick the topics that you want this skill to be unassigned from.</span>
-  <div ng-repeat="(topic, id) in assignedTopics track by $index">
+  <div ng-repeat="(topic, id) in topicsAssignments track by $index">
     <input type="checkbox" class="topic-name protractor-test-unassign-topic" ng-click="selectedTopicToUnassign(topic)"><[topic]>
   </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-danger protractor-test-confirm-unassign-skill-button" ng-click="close()"  ng-disabled="!assignedTopicsAreFetched">
+  <button class="btn btn-danger protractor-test-confirm-unassign-skill-button" ng-click="close()"  ng-disabled="!topicsAssignmentsAreFetched">
     <span>Unassign Skill</span>
   </button>
 </div>

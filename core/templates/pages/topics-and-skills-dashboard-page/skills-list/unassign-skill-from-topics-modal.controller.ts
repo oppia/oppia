@@ -33,24 +33,24 @@ angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.fetchAssignedSkillData = function() {
-      TopicsAndSkillsDashboardBackendApiService.fetchAssignedSkillData(
+    $scope.fetchTopicAssignmentsForSkill = function() {
+      TopicsAndSkillsDashboardBackendApiService.fetchTopicAssignmentsForSkill(
         skillId).then((response) => {
-        $scope.assignedTopics = {};
-        response.assigned_topic_dicts.map((topic) => {
-          $scope.assignedTopics[topic.topic_name] = {
+        $scope.topicsAssignments = {};
+        response.topic_assignment_dicts.map((topic) => {
+          $scope.topicsAssignments[topic.topic_name] = {
             subtopic_id: topic.subtopic_id,
             topic_version: topic.topic_version,
             topic_id: topic.topic_id,
           };
         });
-        $scope.assignedTopicsAreFetched = true;
+        $scope.topicsAssignmentsAreFetched = true;
       });
     };
     $scope.init = function() {
       $scope.selectedTopicNames = [];
-      $scope.assignedTopicsAreFetched = false;
-      $scope.fetchAssignedSkillData();
+      $scope.topicsAssignmentsAreFetched = false;
+      $scope.fetchTopicAssignmentsForSkill();
     };
     $scope.selectedTopicToUnassign = function(topicId) {
       var index = $scope.selectedTopicNames.indexOf(topicId);
@@ -64,7 +64,7 @@ angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
       $scope.selectedTopics = [];
       for (let index in $scope.selectedTopicNames) {
         $scope.selectedTopics.push(
-          $scope.assignedTopics[$scope.selectedTopicNames[index]]);
+          $scope.topicsAssignments[$scope.selectedTopicNames[index]]);
       }
       $uibModalInstance.close($scope.selectedTopics);
     };

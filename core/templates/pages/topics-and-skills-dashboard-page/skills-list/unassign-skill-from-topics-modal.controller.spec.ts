@@ -54,10 +54,10 @@ describe('Unassign Skill from Topics Modal', function() {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
     var MockTopicsAndSkillsDashboardBackendApiService = {
-      fetchAssignedSkillData: () => {
+      fetchTopicAssignmentsForSkill: () => {
         var deferred = $q.defer();
         deferred.resolve({
-          assigned_topic_dicts: assignedTopicDicts
+          topic_assignment_dicts: assignedTopicDicts
         });
         return deferred.promise;
       }
@@ -78,13 +78,13 @@ describe('Unassign Skill from Topics Modal', function() {
 
   it('should initialize the variables', function() {
     expect($scope.selectedTopicNames).toEqual([]);
-    expect($scope.assignedTopicsAreFetched).toEqual(false);
+    expect($scope.topicsAssignmentsAreFetched).toEqual(false);
   });
 
   it('should fetch the assigned topics', function() {
     $rootScope.$apply();
     expect($scope.selectedTopicNames).toEqual([]);
-    expect($scope.assignedTopicsAreFetched).toEqual(true);
+    expect($scope.topicsAssignmentsAreFetched).toEqual(true);
   });
 
   it('should select topic to unassign', function() {

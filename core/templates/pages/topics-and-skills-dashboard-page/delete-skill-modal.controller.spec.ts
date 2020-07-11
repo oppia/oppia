@@ -51,10 +51,10 @@ describe('Delete Skill Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchAssignedSkillData: () => {
+        fetchTopicAssignmentsForSkill: () => {
           var deferred = $q.defer();
           deferred.resolve({
-            assigned_topic_dicts: []
+            topic_assignment_dicts: []
           });
           return deferred.promise;
         }
@@ -72,9 +72,9 @@ describe('Delete Skill Modal Controller', function() {
     it('should initialize the correct value', function() {
       $scope.init();
       $rootScope.$apply();
-      expect($scope.assignedTopics).toEqual([]);
-      expect($scope.assignedTopicsAreFetched).toEqual(true);
-      expect($scope.showAssignedTopics()).toEqual(false);
+      expect($scope.topicsAssignments).toEqual([]);
+      expect($scope.topicsAssignmentsAreFetched).toEqual(true);
+      expect($scope.showTopicsAssignments()).toEqual(false);
     });
   });
 
@@ -91,10 +91,10 @@ describe('Delete Skill Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchAssignedSkillData: () => {
+        fetchTopicAssignmentsForSkill: () => {
           var deferred = $q.defer();
           deferred.resolve({
-            assigned_topic_dicts: assignedTopicDicts
+            topic_assignment_dicts: assignedTopicDicts
           });
           return deferred.promise;
         }
@@ -112,9 +112,9 @@ describe('Delete Skill Modal Controller', function() {
     it('should initialize the correct value', function() {
       $scope.init();
       $rootScope.$apply();
-      expect($scope.assignedTopics).toEqual(assignedTopicDicts);
-      expect($scope.assignedTopicsAreFetched).toEqual(true);
-      expect($scope.showAssignedTopics()).toEqual(true);
+      expect($scope.topicsAssignments).toEqual(assignedTopicDicts);
+      expect($scope.topicsAssignmentsAreFetched).toEqual(true);
+      expect($scope.showTopicsAssignments()).toEqual(true);
     });
   });
 });

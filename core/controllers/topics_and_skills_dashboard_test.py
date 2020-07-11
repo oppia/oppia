@@ -177,7 +177,7 @@ class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
-        self.assertEqual(len(json_response['assigned_topic_dicts']), 0)
+        self.assertEqual(len(json_response['topic_assignment_dicts']), 0)
 
         topic_id_1 = topic_services.get_new_topic_id()
         topic_id_2 = topic_services.get_new_topic_id()
@@ -203,18 +203,18 @@ class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
-        assigned_topic_dicts = sorted(
-            json_response['assigned_topic_dicts'],
+        topic_assignment_dicts = sorted(
+            json_response['topic_assignment_dicts'],
             key=lambda i: i['topic_name'])
 
-        self.assertEqual(len(assigned_topic_dicts), 2)
-        self.assertEqual(assigned_topic_dicts[0]['topic_name'], 'Topic1')
-        self.assertEqual(assigned_topic_dicts[0]['topic_id'], topic_id_1)
-        self.assertIsNone(assigned_topic_dicts[0]['subtopic_id'])
+        self.assertEqual(len(topic_assignment_dicts), 2)
+        self.assertEqual(topic_assignment_dicts[0]['topic_name'], 'Topic1')
+        self.assertEqual(topic_assignment_dicts[0]['topic_id'], topic_id_1)
+        self.assertIsNone(topic_assignment_dicts[0]['subtopic_id'])
 
-        self.assertEqual(assigned_topic_dicts[1]['topic_name'], 'Topic2')
-        self.assertEqual(assigned_topic_dicts[1]['topic_id'], topic_id_2)
-        self.assertEqual(assigned_topic_dicts[1]['subtopic_id'], 1)
+        self.assertEqual(topic_assignment_dicts[1]['topic_name'], 'Topic2')
+        self.assertEqual(topic_assignment_dicts[1]['topic_id'], topic_id_2)
+        self.assertEqual(topic_assignment_dicts[1]['subtopic_id'], 1)
 
 
 class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):

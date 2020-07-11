@@ -177,12 +177,12 @@ class SkillAssignmentsHandler(base.BaseHandler):
         """Handles GET requests."""
         topic_assignments = skill_services.get_all_topic_assignments_for_skill(
             skill_id)
-        assigned_topic_dicts = [
+        topic_assignment_dicts = [
             topic_assignment.to_dict()
             for topic_assignment in topic_assignments]
 
         self.render_json({
-            'assigned_topic_dicts': assigned_topic_dicts
+            'topic_assignment_dicts': topic_assignment_dicts
         })
 
 
