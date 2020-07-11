@@ -37,9 +37,10 @@ import feconf
 import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+email_services = models.Registry.import_email_services()
 
 
-class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
+class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
@@ -152,8 +153,14 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         config_property.set_value(
             'committer_id', ['moderator@example.com'])
 
-        with can_send_emails_ctx, can_send_feedback_email_ctx:
-            with fail_training_job:
+        with can_send_emails_ctx, can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_bulk_mail',
+                self.email_services_mock.mock_send_bulk_emails)):
+            with fail_training_job, (
+                self.swap(
+                    email_services, 'send_mail',
+                    self.email_services_mock.mock_send_mail)):
                 # Adding moderator email to admin config page
                 # for sending emails for failed training jobs.
                 self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -168,10 +175,10 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
                 # Check that there are no sent emails to either
                 # email address before posting json.
-                messages = self.mail_stub.get_sent_messages(
+                messages = self.email_services_mock.mock_get_sent_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
-                messages = self.mail_stub.get_sent_messages(
+                messages = self.email_services_mock.mock_get_sent_messages(
                     to='moderator@example.com')
                 self.assertEqual(len(messages), 0)
 
@@ -181,12 +188,12 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
                     expected_status_int=500)
 
                 # Check that there are now emails sent.
-                messages = self.mail_stub.get_sent_messages(
+                messages = self.email_services_mock.mock_get_sent_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
-                messages = self.mail_stub.get_sent_messages(
+                messages = self.email_services_mock.mock_get_sent_messages(
                     to='moderator@example.com')
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
