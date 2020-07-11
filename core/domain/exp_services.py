@@ -273,9 +273,9 @@ def export_to_zip_file(exploration_id, version=None):
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = python_utils.string_io()
+    temp_file = python_utils.string_io()
     with zipfile.ZipFile(
-        memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
@@ -295,7 +295,7 @@ def export_to_zip_file(exploration_id, version=None):
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
-    return memfile.getvalue()
+    return temp_file.getvalue()
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):

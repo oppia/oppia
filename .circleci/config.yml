@@ -176,7 +176,7 @@ jobs:
       - run:
           name: Run e2e library test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env --sharding-instances=1
       - run:
           name: Run e2e classroomPage test
           command: |
@@ -184,15 +184,15 @@ jobs:
       - run:
           name: Run e2e collections test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env --sharding-instances=1
       - run:
           name: Run e2e accessibility page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env --sharding-instances=1
       - run:
           name: Run e2e embedding page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env --sharding-instances=1
 
   e2e_users:
     <<: *job_defaults
@@ -206,15 +206,15 @@ jobs:
       - run:
           name: Run e2e users test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env --sharding-instances=1
       - run:
           name: Run e2e subscriptions test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env --sharding-instances=1
       - run:
           name: Run e2e profileMenu test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env --sharding-instances=1
       - run:
           name: Run e2e preferences test
           command: |
@@ -243,7 +243,7 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --sharding-instances=1 --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
@@ -251,7 +251,7 @@ jobs:
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --sharding-instances=1 --server_log_level=info
       - run:
           name: Run e2e topic and story editor test
           command: |
@@ -260,6 +260,10 @@ jobs:
           name: Run e2e play voiceovers test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+      - run:
+          name: Run e2e file upload extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
 
 notify:
   webhooks:
