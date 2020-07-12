@@ -20,18 +20,18 @@ import { TestBed } from '@angular/core/testing';
 
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
-import { ExplorationSummaryObjectFactory } from
-  'domain/summary/exploration-summary-object.factory';
+import { LearnerExplorationSummaryObjectFactory } from
+  'domain/summary/learner-exploration-summary-object.factory';
 
 describe('Read only story node object factory', () => {
   let readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory = null;
-  let esof: ExplorationSummaryObjectFactory = null;
+  let esof: LearnerExplorationSummaryObjectFactory = null;
   var _sampleStoryNode = null;
 
   beforeEach(() => {
     readOnlyStoryNodeObjectFactory = TestBed.get(
       ReadOnlyStoryNodeObjectFactory);
-    esof = TestBed.get(ExplorationSummaryObjectFactory);
+    esof = TestBed.get(LearnerExplorationSummaryObjectFactory);
 
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',

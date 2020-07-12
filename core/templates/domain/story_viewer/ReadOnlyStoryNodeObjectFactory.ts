@@ -21,10 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ExplorationSummaryBackendDict,
-  ExplorationSummaryObjectFactory,
-  ExplorationSummary
-} from 'domain/summary/exploration-summary-object.factory';
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummaryObjectFactory,
+  LearnerExplorationSummary
+} from 'domain/summary/learner-exploration-summary-object.factory';
 
 export interface StoryNodeBackendDict {
   'id': string;
@@ -36,7 +36,7 @@ export interface StoryNodeBackendDict {
   'outline': string;
   'outline_is_finalized': boolean;
   'exploration_id': string;
-  'exp_summary_dict': ExplorationSummaryBackendDict;
+  'exp_summary_dict': LearnerExplorationSummaryBackendDict;
   'completed': boolean;
   'thumbnail_bg_color': string;
   'thumbnail_filename': string;
@@ -52,7 +52,7 @@ export class ReadOnlyStoryNode {
   outline: string;
   outlineIsFinalized: boolean;
   explorationId: string;
-  explorationSummary: ExplorationSummary;
+  explorationSummary: LearnerExplorationSummary;
   completed: boolean;
   thumbnailBgColor: string;
   thumbnailFilename: string;
@@ -61,7 +61,7 @@ export class ReadOnlyStoryNode {
       destinationNodeIds: string[], prerequisiteSkillIds: string[],
       acquiredSkillIds: string[], outline: string,
       outlineIsFinalized: boolean, explorationId: string,
-      explorationSummary: ExplorationSummary, completed: boolean,
+      explorationSummary: LearnerExplorationSummary, completed: boolean,
       thumbnailBgColor: string, thumbnailFilename: string) {
     this.id = id;
     this.title = title;
@@ -98,7 +98,7 @@ export class ReadOnlyStoryNode {
     return this.completed;
   }
 
-  getExplorationSummaryObject(): ExplorationSummary {
+  getExplorationSummaryObject(): LearnerExplorationSummary {
     return this.explorationSummary;
   }
 
@@ -124,11 +124,12 @@ export class ReadOnlyStoryNode {
 })
 export class ReadOnlyStoryNodeObjectFactory {
   constructor(
-    private explorationSummaryObjectFactory: ExplorationSummaryObjectFactory) {}
+    private learnerExplorationSummaryObjectFactory:
+    LearnerExplorationSummaryObjectFactory) {}
 
   createFromBackendDict(
       storyNodeBackendDict: StoryNodeBackendDict): ReadOnlyStoryNode {
-    let explorationSummary = this.explorationSummaryObjectFactory
+    let explorationSummary = this.learnerExplorationSummaryObjectFactory
       .createFromBackendDict(storyNodeBackendDict.exp_summary_dict);
 
     return new ReadOnlyStoryNode(storyNodeBackendDict.id,

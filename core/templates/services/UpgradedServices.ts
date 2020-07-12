@@ -1003,7 +1003,7 @@ export class UpgradedServices {
         upgradedServices['QuestionSummaryObjectFactory']);
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
         new ReadOnlyStoryNodeObjectFactory(
-          upgradedServices['ExplorationSummaryObjectFactory']);
+          upgradedServices['LearnerExplorationSummaryObjectFactory']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -1378,7 +1378,7 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StoryViewerBackendApiService'] =
         new StoryViewerBackendApiService(
-          upgradedServices['ExplorationSummaryObjectFactory'],
+          upgradedServices['LearnerExplorationSummaryObjectFactory'],
           upgradedServices['HttpClient'],
           upgradedServices['StoryPlaythroughObjectFactory'],
           upgradedServices['UrlInterpolationService']);

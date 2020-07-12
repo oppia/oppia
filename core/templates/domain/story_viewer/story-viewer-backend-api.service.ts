@@ -21,10 +21,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  ExplorationSummaryBackendDict,
-  ExplorationSummary,
-  ExplorationSummaryObjectFactory
-} from 'domain/summary/exploration-summary-object.factory';
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryObjectFactory
+} from 'domain/summary/learner-exploration-summary-object.factory';
 import {
   StoryPlaythroughBackendDict,
   StoryPlaythrough,
@@ -38,13 +38,13 @@ import { UrlInterpolationService } from
 interface StoryChapterCompletionBackendResponse {
   'next_node_id': string;
   'ready_for_review_test': boolean;
-  'summaries': ExplorationSummaryBackendDict[];
+  'summaries': LearnerExplorationSummaryBackendDict[];
 }
 
 interface StoryChapterCompletionResponse {
   nextNodeId: string;
   readyForReviewTest: boolean;
-  summaries: ExplorationSummary[];
+  summaries: LearnerExplorationSummary[];
 }
 
 @Injectable({
@@ -52,7 +52,8 @@ interface StoryChapterCompletionResponse {
 })
 export class StoryViewerBackendApiService {
   constructor(
-    private explorationSummaryObjectFactory: ExplorationSummaryObjectFactory,
+    private learnerExplorationSummaryObjectFactory:
+    LearnerExplorationSummaryObjectFactory,
     private http: HttpClient,
     private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
     private urlInterpolationService: UrlInterpolationService
@@ -92,7 +93,7 @@ export class StoryViewerBackendApiService {
       chapterCompletionUrl, {}).toPromise().then(data => {
       successCallback({
         summaries: data.summaries.map(
-          expSummary => this.explorationSummaryObjectFactory
+          expSummary => this.learnerExplorationSummaryObjectFactory
             .createFromBackendDict(expSummary)),
         nextNodeId: data.next_node_id,
         readyForReviewTest: data.ready_for_review_test});
