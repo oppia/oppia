@@ -16,12 +16,12 @@
  * @fileoverview Tests for TopicSummaryObjectFactory.
  */
 
-import { TopicSummaryObjectFactory } from
+import { TopicSummary, TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 
 describe('Topic summary object factory', () => {
   let topicSummaryObjectFactory: TopicSummaryObjectFactory = null;
-  let _sampleTopicSummary = null;
+  let _sampleTopicSummary: TopicSummary = null;
 
   beforeEach(() => {
     topicSummaryObjectFactory = new TopicSummaryObjectFactory();
@@ -33,6 +33,12 @@ describe('Topic summary object factory', () => {
       canonical_story_count: 4,
       total_skill_count: 10,
       uncategorized_skill_count: 3,
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      additional_story_count: 0,
+      topic_model_created_on: 231241343,
+      topic_model_last_updated: 3454354354,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     };
@@ -47,6 +53,12 @@ describe('Topic summary object factory', () => {
     expect(_sampleTopicSummary.getCanonicalStoryCount()).toEqual(4);
     expect(_sampleTopicSummary.getTotalSkillCount()).toEqual(10);
     expect(_sampleTopicSummary.getUncategorizedSkillCount()).toEqual(3);
+    expect(_sampleTopicSummary.getLanguageCode()).toEqual('en');
+    expect(_sampleTopicSummary.getDescription()).toEqual('description');
+    expect(_sampleTopicSummary.getVersion()).toEqual(1);
+    expect(_sampleTopicSummary.getAdditionalStoryCount()).toEqual(0);
+    expect(_sampleTopicSummary.getTopicModelCreatedOn()).toEqual(231241343);
+    expect(_sampleTopicSummary.getTopicModelLastUpdated()).toEqual(3454354354);
     expect(_sampleTopicSummary.getThumbnailFilename()).toEqual('image.svg');
     expect(_sampleTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
   });

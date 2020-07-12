@@ -20,70 +20,94 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ITopicSummaryBackendDict {
+export interface TopicSummaryBackendDict {
   'id': string;
   'name': string;
+  'language_code': string;
+  'description': string;
+  'version': number;
   'canonical_story_count': number;
+  'additional_story_count': number;
   'subtopic_count': number;
   'total_skill_count': number;
   'uncategorized_skill_count': number;
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
+  'topic_model_created_on': number;
+  'topic_model_last_updated': number;
 }
 
 export class TopicSummary {
-  _id: string;
-  _name: string;
-  _canonicalStoryCount: number;
-  _subtopicCount: number;
-  _totalSkillCount: number;
-  _uncategorizedSkillCount: number;
-  _thumbnailFilename: string;
-  _thumbnailBgColor: string;
-
-  constructor(id, name, canonicalStoryCount, subtopicCount, totalSkillCount,
-      uncategorizedSkillCount, thumbnailFilename, thumbnailBgColor) {
-    this._id = id;
-    this._name = name;
-    this._canonicalStoryCount = canonicalStoryCount;
-    this._totalSkillCount = totalSkillCount;
-    this._uncategorizedSkillCount = uncategorizedSkillCount;
-    this._subtopicCount = subtopicCount;
-    this._thumbnailFilename = thumbnailFilename;
-    this._thumbnailBgColor = thumbnailBgColor;
-  }
-  // ---- Instance methods ----
+  constructor(
+      public id: string,
+      public name: string,
+      public canonicalStoryCount: number,
+      public subtopicCount: number,
+      public totalSkillCount: number,
+      public uncategorizedSkillCount: number,
+      public languageCode: string,
+      public description: string,
+      public version: number,
+      public additionalStoryCount: number,
+      public topicModelCreatedOn: number,
+      public topicModelLastUpdated: number
+      public thumbnailFilename: string,
+      public thumbnailBgColor: string) { }
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getName(): string {
-    return this._name;
+    return this.name;
   }
 
   getCanonicalStoryCount(): number {
-    return this._canonicalStoryCount;
+    return this.canonicalStoryCount;
   }
 
   getSubtopicCount(): number {
-    return this._subtopicCount;
+    return this.subtopicCount;
   }
 
   getTotalSkillCount(): number {
-    return this._totalSkillCount;
+    return this.totalSkillCount;
   }
 
   getUncategorizedSkillCount(): number {
-    return this._uncategorizedSkillCount;
+    return this.uncategorizedSkillCount;
+  }
+
+  getLanguageCode(): string {
+    return this.languageCode;
+  }
+
+  getDescription(): string {
+    return this.description;
+  }
+
+  getVersion(): number {
+    return this.version;
+  }
+
+  getAdditionalStoryCount(): number {
+    return this.additionalStoryCount;
+  }
+
+  getTopicModelCreatedOn(): number {
+    return this.topicModelCreatedOn;
+  }
+
+  getTopicModelLastUpdated(): number {
+    return this.topicModelLastUpdated;
   }
 
   getThumbnailFilename(): string {
-    return this._thumbnailFilename;
+    return this.thumbnailFilename;
   }
 
   getThumbnailBgColor(): string {
-    return this._thumbnailBgColor;
+    return this.thumbnailBgColor;
   }
 }
 
@@ -92,7 +116,7 @@ export class TopicSummary {
 })
 export class TopicSummaryObjectFactory {
   createFromBackendDict(
-      topicSummaryBackendDict: ITopicSummaryBackendDict): TopicSummary {
+      topicSummaryBackendDict: TopicSummaryBackendDict): TopicSummary {
     return new TopicSummary(
       topicSummaryBackendDict.id,
       topicSummaryBackendDict.name,
@@ -100,9 +124,14 @@ export class TopicSummaryObjectFactory {
       topicSummaryBackendDict.subtopic_count,
       topicSummaryBackendDict.total_skill_count,
       topicSummaryBackendDict.uncategorized_skill_count,
+      topicSummaryBackendDict.language_code,
+      topicSummaryBackendDict.description,
+      topicSummaryBackendDict.version,
+      topicSummaryBackendDict.additional_story_count,
+      topicSummaryBackendDict.topic_model_created_on,
+      topicSummaryBackendDict.topic_model_last_updated,
       topicSummaryBackendDict.thumbnail_filename,
-      topicSummaryBackendDict.thumbnail_bg_color
-    );
+      topicSummaryBackendDict.thumbnail_bg_color);
   }
 }
 
