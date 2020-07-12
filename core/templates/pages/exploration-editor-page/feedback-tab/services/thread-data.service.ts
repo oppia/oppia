@@ -28,13 +28,13 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestions.service.ts');
 
-import { FeedbackThread, IFeedbackThreadBackendDict } from
+import { FeedbackThread, FeedbackThreadBackendDict } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionThread } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
-import { ISuggestionBackendDict } from
+import { SuggestionBackendDict } from
   'domain/suggestion/SuggestionObjectFactory';
 
 type AnyThread = FeedbackThread | SuggestionThread;
@@ -101,7 +101,7 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     let setFeedbackThreadFromBackendDict = function(
-        threadBackendDict: IFeedbackThreadBackendDict): FeedbackThread {
+        threadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
       if (!threadBackendDict) {
         throw new Error('Missing input backend dict');
       }
@@ -112,8 +112,8 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     let setSuggestionThreadFromBackendDicts = function(
-        threadBackendDict: IFeedbackThreadBackendDict,
-        suggestionBackendDict: ISuggestionBackendDict): SuggestionThread {
+        threadBackendDict: FeedbackThreadBackendDict,
+        suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
       if (!threadBackendDict || !suggestionBackendDict) {
         throw new Error('Missing input backend dicts');
       }
@@ -143,7 +143,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
         return $q.all([suggestionsPromise, threadsPromise]).then(response => {
           let [suggestionData, threadData] = response.map(r => r.data);
-          let suggestionBackendDicts: ISuggestionBackendDict[] = (
+          let suggestionBackendDicts: SuggestionBackendDict[] = (
             suggestionData.suggestions);
           let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
           let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
