@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-describe('MathInteractionsService', () => {
+fdescribe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
@@ -157,7 +157,7 @@ describe('MathInteractionsService', () => {
       'Please enter numbers only.');
   });
 
-  it('should validate equations correctly', function() {
+  fit('should validate equations correctly', function() {
     // Success cases.
     expect(mathInteractionsService.validateEquation(
       'x=y')).toBeTrue();
@@ -236,7 +236,7 @@ describe('MathInteractionsService', () => {
       'Division by zero not allowed.');
 
     expect(mathInteractionsService.validateEquation(
-      '3*x^2 = (x+y)/(y-y)')).toBeFalse();
+      '(x+y)/(y-y) = 3*x^2')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Division by zero not allowed.');
 
