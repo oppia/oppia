@@ -30,16 +30,17 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
     'create-new-topic-modal.controller.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
-  '$rootScope', '$uibModal', '$window', 'AlertsService',
+  '$rootScope', '$uibModal', '$window', 'AlertsService', 'ContextService',
   'ImageLocalStorageService', 'TopicCreationBackendApiService',
   'UrlInterpolationService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   function(
-      $rootScope, $uibModal, $window, AlertsService,
+      $rootScope, $uibModal, $window, AlertsService, ContextService,
       ImageLocalStorageService, TopicCreationBackendApiService,
       UrlInterpolationService,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
@@ -51,12 +52,13 @@ angular.module('oppia').factory('TopicCreationService', [
         if (topicCreationInProgress) {
           return;
         }
-
+        ContextService.setImageSaveDestinationToLocalStorage();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
             'create-new-topic-modal.template.html'),
           backdrop: true,
+          windowClass: 'create-new-topic',
           controller: 'CreateNewTopicModalController'
         }).result.then(function(newlyCreatedTopic) {
           if (!newlyCreatedTopic.isValid()) {
@@ -72,7 +74,7 @@ angular.module('oppia').factory('TopicCreationService', [
           // and filled with URL once the details are fetched from the backend.
           var newTab = $window.open();
           var imagesData = ImageLocalStorageService.getStoredImagesData();
-          var bgColor = ImageLocalStorageService.getImageBgColor();
+          var bgColor = ImageLocalStorageService.getThumbnailBgColor();
           TopicCreationBackendApiService.createTopic(
             newlyCreatedTopic, imagesData, bgColor).then(
             function(response) {
@@ -80,6 +82,7 @@ angular.module('oppia').factory('TopicCreationService', [
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
               topicCreationInProgress = false;
               ImageLocalStorageService.flushStoredImagesData();
+              ContextService.resetImageSaveDestination();
               newTab.location.href = UrlInterpolationService.interpolateUrl(
                 TOPIC_EDITOR_URL_TEMPLATE, {
                   topic_id: response.topicId

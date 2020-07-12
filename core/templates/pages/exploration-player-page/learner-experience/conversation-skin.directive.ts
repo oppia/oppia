@@ -354,8 +354,9 @@ angular.module('oppia').directive('conversationSkin', [
         'ExplorationRecommendationsService',
         'FatigueDetectionService', 'FocusManagerService',
         'GuestCollectionProgressService', 'HintsAndSolutionManagerService',
-        'ImagePreloaderService', 'LearnerAnswerInfoService', 'LoaderService',
-        'LearnerParamsService', 'LearnerViewRatingService', 'MessengerService',
+        'ImagePreloaderService', 'I18nLanguageCodeService',
+        'LearnerAnswerInfoService', 'LoaderService', 'LearnerParamsService',
+        'LearnerViewRatingService', 'MessengerService',
         'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
         'PlayerPositionService', 'PlayerTranscriptService',
         'QuestionPlayerEngineService', 'QuestionPlayerStateService',
@@ -385,8 +386,9 @@ angular.module('oppia').directive('conversationSkin', [
             ExplorationRecommendationsService,
             FatigueDetectionService, FocusManagerService,
             GuestCollectionProgressService, HintsAndSolutionManagerService,
-            ImagePreloaderService, LearnerAnswerInfoService, LoaderService,
-            LearnerParamsService, LearnerViewRatingService, MessengerService,
+            ImagePreloaderService, I18nLanguageCodeService,
+            LearnerAnswerInfoService, LoaderService, LearnerParamsService,
+            LearnerViewRatingService, MessengerService,
             NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
             PlayerPositionService, PlayerTranscriptService,
             QuestionPlayerEngineService, QuestionPlayerStateService,
@@ -748,7 +750,7 @@ angular.module('oppia').directive('conversationSkin', [
                     }
                     $scope.recommendedExplorationSummaries = nextStoryNode;
                     // TODO(#8521): Remove the use of $rootScope.$apply()
-                    // once the directive is migrated to angular
+                    // once the directive is migrated to angular.
                     $rootScope.$apply();
                   });
                 StoryViewerBackendApiService.recordChapterCompletion(
@@ -763,7 +765,7 @@ angular.module('oppia').directive('conversationSkin', [
                         });
                   }
                   // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the directive is migrated to angular
+                  // once the directive is migrated to angular.
                   $rootScope.$apply();
                 });
               } else {
@@ -773,7 +775,7 @@ angular.module('oppia').directive('conversationSkin', [
                   function(summaries) {
                     $scope.recommendedExplorationSummaries = summaries;
                     // TODO(#8521): Remove the use of $rootScope.$apply()
-                    // once the directive is migrated to angular
+                    // once the directive is migrated to angular.
                     $rootScope.$apply();
                   });
               }
@@ -802,8 +804,11 @@ angular.module('oppia').directive('conversationSkin', [
                 ExplorationPlayerStateService.getLanguageCode());
               if (langCodes.indexOf(explorationLanguageCode) !== -1) {
                 $translate.use(explorationLanguageCode);
+                I18nLanguageCodeService.setI18nLanguageCode(
+                  explorationLanguageCode);
               } else {
                 $translate.use('en');
+                I18nLanguageCodeService.setI18nLanguageCode('en');
               }
             }
             $scope.adjustPageHeight(false, null);
@@ -1013,7 +1018,7 @@ angular.module('oppia').directive('conversationSkin', [
                     if (isFinalQuestion) {
                       if (ExplorationPlayerStateService.
                         isInQuestionPlayerMode()) {
-                        // We will redirect to the results page here
+                        // We will redirect to the results page here.
                         $scope.questionSessionCompleted = true;
                       }
                       $scope.moveToExploration = true;
@@ -1244,7 +1249,7 @@ angular.module('oppia').directive('conversationSkin', [
               ReadOnlyCollectionBackendApiService
                 .loadCollection($scope.collectionId)
                 .then(function(collection) {
-                  $scope.collectionTitle = collection.title;
+                  $scope.collectionTitle = collection.getTitle();
                 });
             } else {
               $scope.collectionTitle = null;

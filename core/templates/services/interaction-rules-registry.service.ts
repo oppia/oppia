@@ -19,6 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ContinueRulesService } from
@@ -34,8 +37,6 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { ImageClickInputRulesService } from
   'interactions/ImageClickInput/directives/image-click-input-rules.service';
-import { InteractionSpecsConstants } from
-  'pages/interaction-specs.constants';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { ItemSelectionInputRulesService } from
@@ -43,6 +44,9 @@ import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
@@ -67,6 +71,8 @@ export class InteractionRulesRegistryService {
   private rulesServiceRegistry: Map<string, object>;
 
   constructor(
+      private algebraicExpressionInputRulesService:
+        AlgebraicExpressionInputRulesService,
       private codeReplRulesService: CodeReplRulesService,
       private continueRulesService: ContinueRulesService,
       private dragAndDropSortInputRulesService:
@@ -78,6 +84,7 @@ export class InteractionRulesRegistryService {
       private interactiveMapRulesService: InteractiveMapRulesService,
       private itemSelectionInputRulesService: ItemSelectionInputRulesService,
       private logicProofRulesService: LogicProofRulesService,
+      private mathEquationInputRulesService: MathEquationInputRulesService,
       private mathExpressionInputRulesService: MathExpressionInputRulesService,
       private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
       private musicNotesInputRulesService: MusicNotesInputRulesService,
@@ -87,6 +94,8 @@ export class InteractionRulesRegistryService {
       private setInputRulesService: SetInputRulesService,
       private textInputRulesService: TextInputRulesService) {
     this.rulesServiceRegistry = new Map(Object.entries({
+      AlgebraicExpressionInputRulesService:
+        this.algebraicExpressionInputRulesService,
       CodeReplRulesService: this.codeReplRulesService,
       ContinueRulesService: this.continueRulesService,
       DragAndDropSortInputRulesService: this.dragAndDropSortInputRulesService,
@@ -97,6 +106,7 @@ export class InteractionRulesRegistryService {
       InteractiveMapRulesService: this.interactiveMapRulesService,
       ItemSelectionInputRulesService: this.itemSelectionInputRulesService,
       LogicProofRulesService: this.logicProofRulesService,
+      MathEquationInputRulesService: this.mathEquationInputRulesService,
       MathExpressionInputRulesService: this.mathExpressionInputRulesService,
       MultipleChoiceInputRulesService: this.multipleChoiceInputRulesService,
       MusicNotesInputRulesService: this.musicNotesInputRulesService,

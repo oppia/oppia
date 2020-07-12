@@ -49,3 +49,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_FILTER_CLASSROOM_ALL',
   TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL);
+angular.module('oppia').constant(
+  'SKILL_STATUS_OPTIONS',
+  TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS);

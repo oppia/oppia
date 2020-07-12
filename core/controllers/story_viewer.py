@@ -21,7 +21,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
@@ -44,6 +44,7 @@ class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page
@@ -87,6 +88,7 @@ class StoryProgressHandler(base.BaseHandler):
     """Marks a story node as completed after completing and returns exp ID of
     next chapter (if applicable).
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page
@@ -134,7 +136,7 @@ class StoryProgressHandler(base.BaseHandler):
 
         # If there are no questions for any of the acquired skills that the
         # learner has completed, do not show review tests.
-        acquired_skills = skill_services.get_multi_skills(
+        acquired_skills = skill_fetchers.get_multi_skills(
             story.get_acquired_skill_ids_for_node_ids(
                 completed_node_ids
             ))

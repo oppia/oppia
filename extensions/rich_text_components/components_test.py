@@ -35,12 +35,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         """Test that values are validated correctly.
 
         Args:
-          rte_component_class: the class whose validate() method
-            is to be tested.
-          valid_items: a list of values. Each of these items is expected to
-            be validated without any Exception.
-          invalid_items: a list of values. Each of these is expected to raise
-            a TypeError when validated.
+            rte_component_class: child of BaseRTEComponent. The class whose
+                validate() method is to be tested.
+            valid_items: a list of values. Each of these items is expected to
+                be validated without any Exception.
+            invalid_items: a list of values. Each of these is expected to raise
+                a TypeError when validated.
         """
         for item in valid_items:
             rte_component_class.validate(item)
@@ -117,17 +117,35 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Link, valid_items, invalid_items)
 
+    # TODO(#9379): Add validations for svg_filename field and add proper
+    # values in the tests.
     def test_math_validation(self):
         """Tests collapsible component validation."""
         valid_items = [{
-            'raw_latex-with-value': '123456789'
+            'math_content-with-value': {
+                u'raw_latex': u'123456',
+                u'svg_filename': u''
+            }
         }, {
-            'raw_latex-with-value': '\\frac{x}{y}'
+            'math_content-with-value': {
+                u'raw_latex': u'\\frac{x}{y}',
+                u'svg_filename': u''
+            }
         }]
         invalid_items = [{
-            'raw_latex-with-value': False
+            'math_content-with-value': False
         }, {
             'url-with-value': 'http://link.com'
+        }, {
+            'math_content-with-value': {
+                u'raw_latex': True,
+                u'svg_filename': False
+            }
+        }, {
+            'math_content-with-value': {
+                u'raw_latex': 123,
+                u'svg_filename': 11
+            }
         }]
 
         self.check_validation(

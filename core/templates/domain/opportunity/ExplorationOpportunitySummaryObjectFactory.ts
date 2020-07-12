@@ -24,6 +24,15 @@ export interface ITranslationCountsDict {
   [languageCode: string]: number
 }
 
+export interface IExplorationOpportunitySummaryBackendDict {
+  'id': string;
+  'topic_name': string;
+  'story_title': string;
+  'chapter_title': string;
+  'content_count': number;
+  'translation_counts': ITranslationCountsDict;
+}
+
 export class ExplorationOpportunitySummary {
   id: string;
   topicName: string;
@@ -75,7 +84,9 @@ export class ExplorationOpportunitySummary {
   providedIn: 'root'
 })
 export class ExplorationOpportunitySummaryObjectFactory {
-  createFromBackendDict(backendDict: any): ExplorationOpportunitySummary {
+  createFromBackendDict(
+      backendDict: IExplorationOpportunitySummaryBackendDict):
+      ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
       backendDict.id, backendDict.topic_name, backendDict.story_title,
       backendDict.chapter_title, backendDict.content_count,

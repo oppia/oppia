@@ -159,7 +159,7 @@ angular.module('oppia').directive('filepathEditor', [
             img.src = imageDataURI;
             img.addEventListener('load', () => {
               // If the image loads,
-              // fulfill the promise with the cropped dataURL
+              // fulfill the promise with the cropped dataURL.
               var canvas = document.createElement('canvas');
               canvas.width = x + width;
               canvas.height = y + height;
@@ -521,9 +521,9 @@ angular.module('oppia').directive('filepathEditor', [
           let newImageFile;
 
           if (mimeType === 'data:image/gif') {
-            // looping through individual gif frames can take a while
+            // Looping through individual gif frames can take a while
             // especially if there are a lot. Changing the cursor will let the
-            // user know that something is happening
+            // user know that something is happening.
             document.body.style.cursor = 'wait';
             gifFrames({
               url: imageDataURI,
@@ -716,15 +716,15 @@ angular.module('oppia').directive('filepathEditor', [
           var dimensions = ctrl.calculateTargetImageDimensions();
 
 
-          // Check mime type from imageDataURI
+          // Check mime type from imageDataURI.
           const imageDataURI = ctrl.data.metadata.uploadedImageData;
           const mimeType = imageDataURI.split(';')[0];
           let resampledFile;
 
           if (mimeType === 'data:image/gif') {
-            // looping through individual gif frames can take a while
+            // Looping through individual gif frames can take a while
             // especially if there are a lot. Changing the cursor will let the
-            // user know that something is happening
+            // user know that something is happening.
             document.body.style.cursor = 'wait';
             gifFrames({
               url: imageDataURI,
@@ -916,7 +916,7 @@ angular.module('oppia').directive('filepathEditor', [
           //     {
           //       savedImageFilename: <File name of the resource for the image>
           //       savedImageUrl: <Trusted resource Url for the image>
-          //     }
+          //     }.
           ctrl.data = { mode: MODE_EMPTY, metadata: {}, crop: true };
 
           // Resizing properties.

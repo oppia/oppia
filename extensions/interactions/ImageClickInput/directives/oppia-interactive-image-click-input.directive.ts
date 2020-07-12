@@ -29,18 +29,6 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
-export interface ILabeledRegion {
-  region?: {
-    area: number[][];
-  };
-  label: string;
-}
-
-export interface IImageWithRegions {
-  labeledRegions?: ILabeledRegion[];
-  imagePath?: string;
-}
-
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
   'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageClickInputRulesService', 'ImagePreloaderService',
@@ -165,7 +153,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             };
             if (ImagePreloaderService.inExplorationPlayer()) {
               ctrl.isLoadingIndicatorShown = true;
-              // For aligning the gif to the center of it's container
+              // For aligning the gif to the center of it's container.
               var loadingIndicatorSize = (
                 (ctrl.dimensions.height < 124) ? 24 : 120);
               ctrl.imageContainerStyle = {

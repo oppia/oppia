@@ -31,6 +31,8 @@ require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
   'worked-example-editor.directive.ts');
 require(
+  'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
+require(
   'pages/skill-editor-page/modal-templates/' +
   'add-worked-example-modal.controller.ts');
 
@@ -41,6 +43,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/format-rte-preview.filter.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 require('services/generate-content-id.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
@@ -50,11 +53,13 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  'WorkedExampleObjectFactory', 'COMPONENT_NAME_WORKED_EXAMPLE',
+  'WindowDimensionsService', 'WorkedExampleObjectFactory',
+  'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
       GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
       SubtitledHtmlObjectFactory, UrlInterpolationService,
-      WorkedExampleObjectFactory, COMPONENT_NAME_WORKED_EXAMPLE) {
+      WindowDimensionsService, WorkedExampleObjectFactory,
+      COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -158,9 +163,37 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             });
           };
 
+          $scope.showSkillPreview = function() {
+            var skillDescription = (
+              SkillEditorStateService.getSkill().getDescription());
+            var skillExplanation = (
+              $scope.bindableFieldsDict.displayedConceptCardExplanation);
+            var skillWorkedExamples = (
+              $scope.bindableFieldsDict.displayedWorkedExamples);
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill-editor-page/editor-tab/' +
+                'skill-preview-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                skillDescription: () => skillDescription,
+                skillExplanation: () => skillExplanation,
+                skillWorkedExamples: () => skillWorkedExamples
+              },
+              controller: 'SkillPreviewModalController'
+            });
+          };
+
+          $scope.toggleWorkedExampleList = function() {
+            $scope.workedExamplesListIsShown = (
+              !$scope.workedExamplesListIsShown);
+          };
+
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             initBindableFieldsDict();
+            $scope.workedExamplesListIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.onSkillChange.subscribe(
                 () => initBindableFieldsDict())

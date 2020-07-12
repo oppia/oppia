@@ -29,7 +29,7 @@
 </div>
 
 <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <div class="conversation-skin-cards-container conversation-skin-animate-cards"
+  <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
@@ -39,6 +39,7 @@
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card displayed-card="displayedCard"
                   is-learn-again-button="isLearnAgainButton()"
+                  avatar-image-is-shown="true"
                   start-card-change-animation="startCardChangeAnimation">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">

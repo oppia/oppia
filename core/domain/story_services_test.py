@@ -1797,11 +1797,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         )
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
-        self.assertEqual(story.story_contents_schema_version, 3)
+        self.assertEqual(story.story_contents_schema_version, 4)
         self.assertEqual(
-            story.story_contents.to_dict(), self.VERSION_3_STORY_CONTENTS_DICT)
+            story.story_contents.to_dict(), self.VERSION_4_STORY_CONTENTS_DICT)

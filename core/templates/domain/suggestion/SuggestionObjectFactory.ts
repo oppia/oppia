@@ -22,24 +22,24 @@ import { Injectable } from '@angular/core';
 
 import { SuggestionsService } from 'services/suggestions.service';
 
-interface ISuggestionChangeValue {
+interface SuggestionChangeValue {
   html: string;
 }
 
-interface ISuggestionChangeBackendDict {
+interface SuggestionChangeBackendDict {
   'state_name': string;
-  'new_value': ISuggestionChangeValue;
-  'old_value': ISuggestionChangeValue;
+  'new_value': SuggestionChangeValue;
+  'old_value': SuggestionChangeValue;
 }
 
-interface ISuggestionBackendDict {
+export interface SuggestionBackendDict {
   'suggestion_type': string;
   'suggestion_id': string;
   'target_type': string;
   'target_id': string;
   'status': string;
   'author_name': string;
-  'change': ISuggestionChangeBackendDict;
+  'change': SuggestionChangeBackendDict;
   'last_updated_msecs': number;
 }
 
@@ -52,15 +52,15 @@ export class Suggestion {
   status: string;
   authorName: string;
   stateName: string;
-  newValue: ISuggestionChangeValue;
-  oldValue: ISuggestionChangeValue;
+  newValue: SuggestionChangeValue;
+  oldValue: SuggestionChangeValue;
   lastUpdatedMsecs: number;
 
   constructor(
       suggestionType: string, suggestionId: string, threadId: string,
       targetType: string, targetId: string, status: string, authorName: string,
-      stateName: string, newValue: ISuggestionChangeValue,
-      oldValue: ISuggestionChangeValue, lastUpdatedMsecs: number) {
+      stateName: string, newValue: SuggestionChangeValue,
+      oldValue: SuggestionChangeValue, lastUpdatedMsecs: number) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
     this.threadId = threadId;
@@ -83,7 +83,7 @@ export class Suggestion {
 export class SuggestionObjectFactory {
   constructor(private suggestionsService: SuggestionsService) {}
   createFromBackendDict(
-      suggestionBackendDict: ISuggestionBackendDict): Suggestion {
+      suggestionBackendDict: SuggestionBackendDict): Suggestion {
     let threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
       suggestionBackendDict);
     return new Suggestion(

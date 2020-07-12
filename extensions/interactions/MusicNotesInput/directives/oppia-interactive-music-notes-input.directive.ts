@@ -33,10 +33,6 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/html-escaper.service.ts');
 
-export interface IReadableNote {
-  readableNoteName: string;
-}
-
 interface MusicNote {
   baseNoteMidiNumber: number;
   offset: number;
@@ -566,7 +562,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // If a note position is taken, return true,
-        // otherwise the position is available
+        // otherwise the position is available.
         var checkIfNotePositionTaken = function(leftPos) {
           if (getNoteStartFromLeftPos(leftPos)) {
             var newNoteToCheck = getNoteStartFromLeftPos(leftPos);

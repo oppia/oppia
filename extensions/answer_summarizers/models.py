@@ -117,7 +117,7 @@ def _get_top_unresolved_answers_by_frequency(
 
     Returns:
         stats_domain.AnswerFrequencyList. A list of the top "limit"
-            unresolved answers.
+        unresolved answers.
     """
     classification_results_dict = {}
 
@@ -330,8 +330,8 @@ class TopNUnresolvedAnswersByFrequency(BaseCalculation):
 
         Returns:
             stats_domain.StateAnswersCalcOutput. A calculation output object
-                containing the list of top unresolved answers, in descending
-                order of frequency (up to at most limit answers).
+            containing the list of top unresolved answers, in descending
+            order of frequency (up to at most limit answers).
         """
         answers_with_classification = [{
             'answer': ans['answer'],

@@ -18,6 +18,9 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ContinueRulesService } from
@@ -44,6 +47,9 @@ import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
@@ -79,6 +85,8 @@ describe('Interaction Rules Registry Service', () => {
 
     this.registry = TestBed.get(InteractionRulesRegistryService);
 
+    this.algebraicExpressionInputRulesService = (
+      TestBed.get(AlgebraicExpressionInputRulesService));
     this.codeReplRulesService = TestBed.get(CodeReplRulesService);
     this.continueRulesService = TestBed.get(ContinueRulesService);
     this.dragAndDropSortInputRulesService = (
@@ -91,6 +99,8 @@ describe('Interaction Rules Registry Service', () => {
     this.itemSelectionInputRulesService = (
       TestBed.get(ItemSelectionInputRulesService));
     this.logicProofRulesService = TestBed.get(LogicProofRulesService);
+    this.mathEquationInputRulesService = (
+      TestBed.get(MathEquationInputRulesService));
     this.mathExpressionInputRulesService = (
       TestBed.get(MathExpressionInputRulesService));
     this.multipleChoiceInputRulesService = (
@@ -126,6 +136,14 @@ describe('Interaction Rules Registry Service', () => {
         .not.toThrowError();
     }
   });
+
+  it('should return the correct rules service for AlgebraicExpressionInput',
+    () => {
+      expect(this.registry.getRulesServiceByInteractionId(
+        'AlgebraicExpressionInput')).toBe(
+        this.algebraicExpressionInputRulesService);
+    }
+  );
 
   it('should return the correct rules service for CodeRepl', () => {
     expect(this.registry.getRulesServiceByInteractionId('CodeRepl'))
@@ -175,6 +193,11 @@ describe('Interaction Rules Registry Service', () => {
   it('should return the correct rules service for LogicProof', () => {
     expect(this.registry.getRulesServiceByInteractionId('LogicProof'))
       .toBe(this.logicProofRulesService);
+  });
+
+  it('should return the correct rules service for MathEquationInput', () => {
+    expect(this.registry.getRulesServiceByInteractionId('MathEquationInput'))
+      .toBe(this.mathEquationInputRulesService);
   });
 
   it('should return the correct rules service for MathExpressionInput', () => {

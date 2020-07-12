@@ -167,7 +167,6 @@ export class AppConstants {
     TOPIC: 'topic',
     SKILL: 'skill',
     STORY: 'story',
-    SUBTOPIC: 'subtopic',
     QUESTION: 'question'
   };
 

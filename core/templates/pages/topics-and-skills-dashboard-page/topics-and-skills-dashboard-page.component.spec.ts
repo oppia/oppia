@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the topics and skills dashboard page.
+ * @fileoverview Unit tests for the topics and skills dashboard controller.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -42,6 +42,7 @@ describe('Topics and Skills Dashboard Page', function() {
   var $q = null;
   var $timeout = null;
   var TopicsAndSkillsDashboardBackendApiService = null;
+  var WindowDimensionsService = null;
   var TopicsAndSkillsDashboardFilterObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
   var AlertsService = null;
@@ -81,6 +82,7 @@ describe('Topics and Skills Dashboard Page', function() {
       $timeout = $injector.get('$timeout');
       $uibModal = $injector.get('$uibModal');
       AlertsService = $injector.get('AlertsService');
+      WindowDimensionsService = $injector.get('WindowDimensionsService');
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
         'TopicsAndSkillsDashboardFilterObjectFactory');
@@ -91,12 +93,21 @@ describe('Topics and Skills Dashboard Page', function() {
           var deferred = $q.defer();
           deferred.resolve(sampleDataResults);
           return deferred.promise;
+        },
+        fetchSkillsDashboardData: () => {
+          var deferred = $q.defer();
+          deferred.resolve(sampleDataResults);
+          return deferred.promise;
         }
+      };
+      var MockWindowDimensionsService = {
+        isWindowNarrow: () => false
       };
       SkillCreationService = $injector.get('SkillCreationService');
 
       ctrl = $componentController('topicsAndSkillsDashboardPage', {
         $scope: $scope,
+        WindowDimensionsService: MockWindowDimensionsService,
         TopicsAndSkillsDashboardBackendApiService:
         MockTopicsAndSkillsDashboardBackendApiService
       });
@@ -114,7 +125,7 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.skillPageNumber).toEqual(0);
       expect(ctrl.selectedIndex).toEqual(null);
       expect(ctrl.itemsPerPageChoice).toEqual([10, 15, 20]);
-      expect(ctrl.classrooms).toEqual(['All', 'math']);
+      expect(ctrl.classrooms).toEqual(['All', 'Unassigned', 'math']);
       expect(ctrl.filterObject).toEqual(filterObject);
 
       expect(ctrl.sortOptions).toEqual([
@@ -135,12 +146,21 @@ describe('Topics and Skills Dashboard Page', function() {
 
     it('should set the active tab', function() {
       expect(ctrl.activeTab).toEqual('topics');
-      ctrl.setActiveTab(ctrl.TAB_NAME_UNTRIAGED_SKILLS);
-      expect(ctrl.activeTab).toEqual('untriagedSkills');
+      ctrl.setActiveTab(ctrl.TAB_NAME_SKILLS);
+      expect(ctrl.activeTab).toEqual('skills');
       ctrl.setActiveTab(ctrl.TAB_NAME_TOPICS);
       expect(ctrl.activeTab).toEqual('topics');
     });
 
+    it('should toggle the filter box visibility', function() {
+      expect(ctrl.filterBoxIsShown).toEqual(true);
+      ctrl.toggleFilterBox();
+      expect(ctrl.filterBoxIsShown).toEqual(false);
+      ctrl.toggleFilterBox();
+      expect(ctrl.filterBoxIsShown).toEqual(true);
+      ctrl.toggleFilterBox();
+      expect(ctrl.filterBoxIsShown).toEqual(false);
+    });
     it('should go to Page Number', function() {
       expect(ctrl.topicPageNumber).toEqual(0);
       expect(ctrl.pageNumber).toEqual(0);
@@ -176,26 +196,13 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(skillSpy).toHaveBeenCalled();
     });
 
-    it('should reset skill when create skill modal is dismissed',
-      function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-
-        var skillSpy = spyOn(
-          SkillCreationService, 'resetSkillDescriptionStatusMarker');
-        ctrl.createSkill();
-        $rootScope.$apply();
-        expect(skillSpy).toHaveBeenCalled();
-      });
-
     it('should navigate the page', function() {
-      var totalEntityCountToDisplay = 50;
+      var currentCount = 50;
       var itemsPerPage = 10;
 
       expect(ctrl.activeTab).toEqual('topics');
 
-      ctrl.totalEntityCountToDisplay = totalEntityCountToDisplay;
+      ctrl.currentCount = currentCount;
       ctrl.itemsPerPage = itemsPerPage;
 
       expect(ctrl.topicPageNumber).toEqual(0);
@@ -204,18 +211,22 @@ describe('Topics and Skills Dashboard Page', function() {
       ctrl.changePageByOne('next_page');
       expect(ctrl.topicPageNumber).toEqual(1);
       expect(ctrl.pageNumber).toEqual(1);
+      ctrl.currentCount = currentCount;
 
       ctrl.changePageByOne('next_page');
       expect(ctrl.topicPageNumber).toEqual(2);
       expect(ctrl.pageNumber).toEqual(2);
+      ctrl.currentCount = currentCount;
 
       ctrl.changePageByOne('prev_page');
       expect(ctrl.topicPageNumber).toEqual(1);
       expect(ctrl.pageNumber).toEqual(1);
+      ctrl.currentCount = currentCount;
 
       ctrl.changePageByOne('prev_page');
       expect(ctrl.topicPageNumber).toEqual(0);
       expect(ctrl.pageNumber).toEqual(0);
+      ctrl.currentCount = currentCount;
 
       ctrl.changePageByOne('prev_page');
       expect(ctrl.topicPageNumber).toEqual(0);
@@ -241,6 +252,21 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.select2DropdownIsShown).toBe(true);
     });
 
+    it('should return the upper count value for pagination', function() {
+      // This basically signifies that there is no second page,
+      // since there's just 1 topic, so the pagination header should say
+      // 1-1 of 1.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(1);
+      ctrl.currentCount = 15;
+      // This basically signifies that there's a second page since current
+      // count is 15 so the pagination header should show 1-10 of 15.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(10);
+      ctrl.currentCount = 15;
+      ctrl.pageNumber = 1;
+      // This basically signifies that there's a second page since current
+      // count is 15 so the pagination header should show 10-15 of 15.
+      expect(ctrl.getUpperLimitValueForPagination()).toEqual(15);
+    });
 
     it('should return number from 1 to the range specified', function() {
       var array = ctrl.generateNumbersTillRange(5);
@@ -329,6 +355,19 @@ describe('Topics and Skills Dashboard Page', function() {
           var deferred = $q.defer();
           deferred.resolve(sampleDataResults2);
           return deferred.promise;
+        },
+        fetchSkillsDashboardData: () => {
+          var deferred = $q.defer();
+          deferred.resolve({
+            skill_summary_dicts: [
+              {id: 'id1', description: 'description1'},
+              {id: 'id2', description: 'description2'},
+              {id: 'id3', description: 'description3'},
+              {id: 'id4', description: 'description4'}],
+            more: true,
+            next_cursor: 'kasfmk424'
+          });
+          return deferred.promise;
         }
       };
 
@@ -340,13 +379,80 @@ describe('Topics and Skills Dashboard Page', function() {
       });
 
       ctrl.$onInit();
+      ctrl.displayedSkillSummaries = [];
       $rootScope.$apply();
     }));
 
     it('should change active tab to skills if topic summaries are null',
       function() {
-        expect(ctrl.activeTab).toEqual('untriagedSkills');
+        expect(ctrl.activeTab).toEqual('skills');
       });
+
+    it('should return the total count value for skills', function() {
+      expect(ctrl.getTotalCountValueForSkills()).toEqual(4);
+      ctrl.itemsPerPage = 2;
+      expect(ctrl.getTotalCountValueForSkills()).toEqual('many');
+    });
+
+    it('should fetch skills when filters are applied', function() {
+      expect(ctrl.activeTab).toEqual('skills');
+      var fetchSkillSpy = spyOn(ctrl, 'fetchSkills').and.callThrough();
+      ctrl.applyFilters();
+      expect(fetchSkillSpy).toHaveBeenCalled();
+    });
+
+    it('should paginate if skills are present in memory instead of fetching',
+      function() {
+        expect(ctrl.activeTab).toEqual('skills');
+        ctrl.moreSkillsPresent = true;
+        ctrl.fetchSkills();
+        ctrl.itemsPerPage = 1;
+        ctrl.skillPageNumber = 1;
+        var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber');
+        ctrl.moreSkillsPresent = false;
+        ctrl.fetchSkills();
+        expect(paginateSkillSpy).toHaveBeenCalled();
+      });
+
+    it('should paginate forward without fetching if skills are present',
+      function() {
+        expect(ctrl.activeTab).toEqual('skills');
+        ctrl.moreSkillsPresent = false;
+        ctrl.pageNumber = 2;
+        spyOn(ctrl, 'isNextSkillPagePresent').and.returnValue(true);
+        var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber').and.callThrough();
+        ctrl.navigateSkillPage('next_page');
+        expect(paginateSkillSpy).toHaveBeenCalled();
+        expect(ctrl.pageNumber).toEqual(3);
+      });
+
+    it('should change page number after fetching skills', function() {
+      ctrl.pageNumber = 1;
+      ctrl.firstTimeFetchingSkills = false;
+      ctrl.moreSkillsPresent = true;
+      ctrl.fetchSkills();
+      $rootScope.$apply();
+      expect(ctrl.pageNumber).toEqual(2);
+    });
+
+    it('should fetch skills when filters are applied', function() {
+      expect(ctrl.activeTab).toEqual('skills');
+      var fetchSkillSpy = spyOn(ctrl, 'fetchSkills').and.callThrough();
+      ctrl.applyFilters();
+      expect(fetchSkillSpy).toHaveBeenCalled();
+    });
+
+    it('should navigate skill page forward', function() {
+      var skillSpy = spyOn(ctrl, 'fetchSkills');
+      ctrl.navigateSkillPage('next_page');
+      expect(skillSpy).toHaveBeenCalled();
+    });
+
+    it('should navigate skill page backward', function() {
+      ctrl.pageNumber = 3;
+      ctrl.navigateSkillPage('prev_page');
+      expect(ctrl.pageNumber).toEqual(2);
+    });
   });
 
   describe('when fetching the backend data fails with fatal error', function() {

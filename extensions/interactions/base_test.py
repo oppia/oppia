@@ -45,6 +45,8 @@ IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store', '.swp']
 INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
+INTERACTIONS_THAT_USE_COMPONENTS = [
+    'AlgebraicExpressionInput', 'MathEquationInput']
 
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', python_utils.BASESTRING),
@@ -438,38 +440,68 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             hyphenated_interaction_id = (
                 utils.camelcase_to_hyphenated(interaction_id))
-            interaction_directive_ts_file = os.path.join(
-                directives_dir, 'oppia-interactive-%s.directive.ts' % (
-                    hyphenated_interaction_id))
-            response_directive_ts_file = os.path.join(
-                directives_dir, 'oppia-response-%s.directive.ts'
-                % hyphenated_interaction_id)
-            short_response_directive_ts_file = os.path.join(
-                directives_dir, 'oppia-short-response-%s.directive.ts' % (
-                    hyphenated_interaction_id))
-            rules_service_ts_file = os.path.join(
-                directives_dir, '%s-rules.service.ts'
-                % hyphenated_interaction_id)
-            validation_service_ts_file = os.path.join(
-                directives_dir, '%s-validation.service.ts'
-                % hyphenated_interaction_id)
-            interaction_directive_html = os.path.join(
-                directives_dir,
-                '%s-interaction.directive.html' % hyphenated_interaction_id)
-            response_directive_html = os.path.join(
-                directives_dir,
-                '%s-response.directive.html' % hyphenated_interaction_id)
-            short_response_directive_html = os.path.join(
-                directives_dir,
-                '%s-short-response.directive.html' % hyphenated_interaction_id)
-            self.assertTrue(os.path.isfile(interaction_directive_ts_file))
-            self.assertTrue(os.path.isfile(response_directive_ts_file))
-            self.assertTrue(os.path.isfile(short_response_directive_ts_file))
+            if interaction_id in INTERACTIONS_THAT_USE_COMPONENTS:
+                interaction_ts_file = os.path.join(
+                    directives_dir, 'oppia-interactive-%s.component.ts' % (
+                        hyphenated_interaction_id))
+                response_ts_file = os.path.join(
+                    directives_dir, 'oppia-response-%s.component.ts'
+                    % hyphenated_interaction_id)
+                short_response_ts_file = os.path.join(
+                    directives_dir, 'oppia-short-response-%s.component.ts' % (
+                        hyphenated_interaction_id))
+                rules_service_ts_file = os.path.join(
+                    directives_dir, '%s-rules.service.ts'
+                    % hyphenated_interaction_id)
+                validation_service_ts_file = os.path.join(
+                    directives_dir, '%s-validation.service.ts'
+                    % hyphenated_interaction_id)
+                interaction_html = os.path.join(
+                    directives_dir,
+                    '%s-interaction.component.html' % hyphenated_interaction_id)
+                response_html = os.path.join(
+                    directives_dir,
+                    '%s-response.component.html' % hyphenated_interaction_id)
+                short_response_html = os.path.join(
+                    directives_dir,
+                    '%s-short-response.component.html' %
+                    hyphenated_interaction_id)
+            else:
+                interaction_ts_file = os.path.join(
+                    directives_dir, 'oppia-interactive-%s.directive.ts' % (
+                        hyphenated_interaction_id))
+                response_ts_file = os.path.join(
+                    directives_dir, 'oppia-response-%s.directive.ts'
+                    % hyphenated_interaction_id)
+                short_response_ts_file = os.path.join(
+                    directives_dir, 'oppia-short-response-%s.directive.ts' % (
+                        hyphenated_interaction_id))
+                rules_service_ts_file = os.path.join(
+                    directives_dir, '%s-rules.service.ts'
+                    % hyphenated_interaction_id)
+                validation_service_ts_file = os.path.join(
+                    directives_dir, '%s-validation.service.ts'
+                    % hyphenated_interaction_id)
+                interaction_html = os.path.join(
+                    directives_dir,
+                    '%s-interaction.directive.html' % hyphenated_interaction_id)
+                response_html = os.path.join(
+                    directives_dir,
+                    '%s-response.directive.html' % hyphenated_interaction_id)
+                short_response_html = os.path.join(
+                    directives_dir,
+                    '%s-short-response.directive.html' %
+                    hyphenated_interaction_id)
+
+            self.assertTrue(os.path.isfile(interaction_ts_file))
+            self.assertTrue(os.path.isfile(response_ts_file))
+            self.assertTrue(os.path.isfile(
+                short_response_ts_file))
             self.assertTrue(os.path.isfile(rules_service_ts_file))
             self.assertTrue(os.path.isfile(validation_service_ts_file))
-            self.assertTrue(os.path.isfile(interaction_directive_html))
-            self.assertTrue(os.path.isfile(response_directive_html))
-            self.assertTrue(os.path.isfile(short_response_directive_html))
+            self.assertTrue(os.path.isfile(interaction_html))
+            self.assertTrue(os.path.isfile(response_html))
+            self.assertTrue(os.path.isfile(short_response_html))
 
             # Check that the PNG thumbnail image has the correct dimensions.
             static_dir = os.path.join(interaction_dir, 'static')
@@ -481,28 +513,30 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
-                self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
+                self.assertEqual(
+                    int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
-            interaction_directive_ts_file_content = utils.get_file_contents(
-                interaction_directive_ts_file)
-            response_directive_ts_file_content = utils.get_file_contents(
-                response_directive_ts_file)
-            short_response_directive_ts_file_content = utils.get_file_contents(
-                short_response_directive_ts_file)
+            interaction_ts_file_content = utils.get_file_contents(
+                interaction_ts_file)
+            response_ts_file_content = utils.get_file_contents(
+                response_ts_file)
+            short_response_ts_file_content = (
+                utils.get_file_contents(short_response_ts_file))
             ts_file_content = utils.get_file_contents(ts_file)
             rules_service_ts_file_content = utils.get_file_contents(
                 rules_service_ts_file)
             validation_service_ts_file_content = utils.get_file_contents(
                 validation_service_ts_file)
 
-            self.assertIn('oppiaInteractive%s' % interaction_id,
-                          interaction_directive_ts_file_content)
+            self.assertIn(
+                'oppiaInteractive%s' % interaction_id,
+                interaction_ts_file_content)
             self.assertIn(
                 'oppiaResponse%s' % interaction_id,
-                response_directive_ts_file_content)
+                response_ts_file_content)
             self.assertIn(
                 'oppiaShortResponse%s' % interaction_id,
-                short_response_directive_ts_file_content)
+                short_response_ts_file_content)
             self.assertIn(
                 '%sRulesService' % (
                     interaction_id[0] + interaction_id[1:]),
@@ -513,15 +547,21 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the html template includes js script for the
             # interaction.
-            self.assertIn(
-                'oppia-interactive-%s.directive.ts' % hyphenated_interaction_id,
-                ts_file_content)
-            self.assertIn(
-                'oppia-response-%s.directive.ts' % hyphenated_interaction_id,
-                ts_file_content)
-            self.assertIn(
-                'oppia-short-response-%s.directive.ts'
-                % hyphenated_interaction_id, ts_file_content)
+            self.assertTrue(
+                'oppia-interactive-%s.component.ts' %
+                hyphenated_interaction_id in ts_file_content or (
+                    'oppia-interactive-%s.directive.ts' %
+                    hyphenated_interaction_id in ts_file_content))
+            self.assertTrue(
+                'oppia-response-%s.component.ts' %
+                hyphenated_interaction_id in ts_file_content or (
+                    'oppia-response-%s.directive.ts' %
+                    hyphenated_interaction_id in ts_file_content))
+            self.assertTrue(
+                'oppia-short-response-%s.component.ts' %
+                hyphenated_interaction_id in ts_file_content or (
+                    'oppia-short-response-%s.directive.ts' %
+                    hyphenated_interaction_id in ts_file_content))
             self.assertIn(
                 '%s-rules.service.ts' % hyphenated_interaction_id,
                 ts_file_content)
@@ -529,18 +569,22 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 '%s-validation.service.ts' % hyphenated_interaction_id,
                 ts_file_content)
 
-            self.assertNotIn('<script>', interaction_directive_ts_file_content)
-            self.assertNotIn('</script>', interaction_directive_ts_file_content)
-            self.assertNotIn('<script>', response_directive_ts_file_content)
-            self.assertNotIn('</script>', response_directive_ts_file_content)
             self.assertNotIn(
-                '<script>', short_response_directive_ts_file_content)
+                '<script>', interaction_ts_file_content)
             self.assertNotIn(
-                '</script>', short_response_directive_ts_file_content)
+                '</script>', interaction_ts_file_content)
+            self.assertNotIn('<script>', response_ts_file_content)
+            self.assertNotIn(
+                '</script>', response_ts_file_content)
+            self.assertNotIn(
+                '<script>', short_response_ts_file_content)
+            self.assertNotIn(
+                '</script>', short_response_ts_file_content)
             self.assertNotIn('<script>', rules_service_ts_file_content)
             self.assertNotIn('</script>', rules_service_ts_file_content)
             self.assertNotIn('<script>', validation_service_ts_file_content)
-            self.assertNotIn('</script>', validation_service_ts_file_content)
+            self.assertNotIn(
+                '</script>', validation_service_ts_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)

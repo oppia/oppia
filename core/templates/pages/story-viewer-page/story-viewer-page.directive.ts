@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
@@ -132,7 +132,7 @@ angular.module('oppia').directive('storyViewerPage', [
                 LoaderService.hideLoadingScreen();
                 ctrl.pathIconParameters = ctrl.generatePathIconParameters();
                 // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular
+                // once the directive is migrated to angular.
                 $rootScope.$apply();
               },
               function(errorResponse) {

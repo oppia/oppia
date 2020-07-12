@@ -18,4 +18,5 @@
 
 export class TopicsAndSkillsDashboardDomainConstants {
   public static MERGE_SKILLS_URL = '/merge_skills_handler';
+  public static SKILL_DASHBOARD_DATA_URL = '/skills_dashboard/data';
 }

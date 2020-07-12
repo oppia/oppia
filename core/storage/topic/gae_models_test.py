@@ -33,6 +33,7 @@ import feconf
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicModel class."""
+
     TOPIC_NAME = 'tOpic_NaMe'
     TOPIC_CANONICAL_NAME = 'topic_name'
     TOPIC_ID = 'topic_id'
@@ -51,11 +52,6 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(
             topic_models.TopicModel.has_reference_to_user_id('x_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            topic_models.TopicModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
@@ -122,7 +118,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = topic_models.TopicCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.topic_id = 'b'
         commit.put()
@@ -141,7 +137,6 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 entity_id='entity_id',
                 version=1,
                 committer_id='committer_id',
-                committer_username='committer_username',
                 commit_type='create',
                 commit_message='Created new TopicCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
@@ -167,14 +162,10 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            topic_models.TopicSummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
+
     SUBTOPIC_PAGE_ID = 'subtopic_page_id'
 
     def test_get_deletion_policy(self):
@@ -246,7 +237,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = topic_models.SubtopicPageCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.subtopic_page_id = 'b'
         commit.put()
@@ -265,7 +256,6 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 entity_id='entity_id',
                 version=1,
                 committer_id='committer_id',
-                committer_username='committer_username',
                 commit_type='create',
                 commit_message='Created new SubtopicPageCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
@@ -337,85 +327,6 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            topic_models.TopicRightsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        original_model_1 = topic_models.TopicRightsModel(
-            id=self.TOPIC_1_ID, manager_ids=[self.MANAGER_1_ID_OLD])
-        original_model_1.commit(
-            'committer_id',
-            'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
-        original_model_2 = topic_models.TopicRightsModel(
-            id=self.TOPIC_2_ID,
-            manager_ids=[self.MANAGER_1_ID_OLD, self.MANAGER_2_ID_OLD])
-        original_model_2.commit(
-            'committer_id',
-            'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
-        original_model_3 = topic_models.TopicRightsModel(
-            id=self.TOPIC_3_ID,
-            manager_ids=[self.MANAGER_2_ID_OLD, self.MANAGER_3_ID_OLD])
-        original_model_3.commit(
-            'committer_id',
-            'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
-
-        topic_models.TopicRightsModel.migrate_model(
-            self.MANAGER_1_ID_OLD, self.MANAGER_1_ID_NEW)
-        topic_models.TopicRightsModel.migrate_model(
-            self.MANAGER_2_ID_OLD, self.MANAGER_2_ID_NEW)
-        topic_models.TopicRightsModel.migrate_model(
-            self.MANAGER_3_ID_OLD, self.MANAGER_3_ID_NEW)
-
-        migrated_model_1 = topic_models.TopicRightsModel.get_by_id(
-            self.TOPIC_1_ID)
-        self.assertEqual([self.MANAGER_1_ID_NEW], migrated_model_1.manager_ids)
-        migrated_model_2 = topic_models.TopicRightsModel.get_by_id(
-            self.TOPIC_2_ID)
-        self.assertEqual(
-            [self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW],
-            migrated_model_2.manager_ids)
-        migrated_model_3 = topic_models.TopicRightsModel.get_by_id(
-            self.TOPIC_3_ID)
-        self.assertEqual(
-            [self.MANAGER_2_ID_NEW, self.MANAGER_3_ID_NEW],
-            migrated_model_3.manager_ids)
-
-    def test_verify_model_user_ids_exist(self):
-        user_models.UserSettingsModel(
-            id=self.MANAGER_1_ID_NEW,
-            gae_id='gae_1_id',
-            email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        user_models.UserSettingsModel(
-            id=self.MANAGER_2_ID_NEW,
-            gae_id='gae_2_id',
-            email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        model = topic_models.TopicRightsModel(
-            id=self.TOPIC_1_ID,
-            manager_ids=[self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW])
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.manager_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.manager_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.manager_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.manager_ids = [self.MANAGER_1_ID_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.manager_ids = ['user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
     def test_export_data_nontrivial(self):
         """Tests nontrivial export data on user with some managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_2)
@@ -431,70 +342,3 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
         self.assertEqual(user_data, expected_data)
-
-
-class TopicRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
-    """Test the TopicRightsModel class."""
-    TOPIC_ID_1 = '1'
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_3 = 'id_3'
-
-    def setUp(self):
-        super(TopicRightsAllUsersModelUnitTest, self).setUp()
-        user_models.UserSettingsModel(
-            id=self.USER_ID_1,
-            gae_id='gae_1_id',
-            email='some@email.com',
-            role=feconf.ROLE_ID_TOPIC_MANAGER
-        ).put()
-        user_models.UserSettingsModel(
-            id=self.USER_ID_2,
-            gae_id='gae_2_id',
-            email='some_other@email.com',
-            role=feconf.ROLE_ID_TOPIC_MANAGER
-        ).put()
-        topic_models.TopicRightsAllUsersModel(
-            id=self.TOPIC_ID_1,
-            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
-        ).put()
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            topic_models.TopicRightsAllUsersModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertTrue(
-            topic_models.TopicRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_1))
-        self.assertTrue(
-            topic_models.TopicRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_2))
-        self.assertFalse(
-            topic_models.TopicRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_3))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            topic_models.TopicRightsAllUsersModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_verify_model_user_ids_exist(self):
-        model = topic_models.TopicRightsAllUsersModel(
-            id=self.TOPIC_ID_1,
-            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
-        )
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.all_user_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.all_user_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.all_user_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.all_user_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())

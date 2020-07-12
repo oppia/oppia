@@ -22,10 +22,13 @@ require(
   'background-banner.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'lazy-loading.directive.ts');
+  'lazy-loading.component.ts');
 require(
   'pages/community-dashboard-page/contributions-and-review/' +
   'contributions-and-review.directive.ts');
+require(
+  'pages/community-dashboard-page/translation-language-selector/' +
+  'translation-language-selector.component.ts');
 require(
   'pages/community-dashboard-page/question-opportunities/' +
   'question-opportunities.directive.ts');
@@ -73,7 +76,8 @@ angular.module('oppia').component('communityDashboardPage', {
         return languageDescriptions;
       };
 
-      ctrl.onChangeLanguage = function() {
+      ctrl.onChangeLanguage = function(languageCode: string) {
+        ctrl.languageCode = languageCode;
         TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
         LocalStorageService.updateLastSelectedTranslationLanguageCode(
           ctrl.languageCode);
@@ -135,15 +139,6 @@ angular.module('oppia').component('communityDashboardPage', {
           }
         });
 
-        ctrl.languageCodesAndDescriptions = (
-          allAudioLanguageCodes.map(function(languageCode) {
-            return {
-              id: languageCode,
-              description: (
-                LanguageUtilService.getAudioLanguageDescription(
-                  languageCode))
-            };
-          }));
         ctrl.languageCode = (
           allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
           prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);

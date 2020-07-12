@@ -14,7 +14,7 @@ module.exports = function(config) {
       // Constants must be loaded before everything else.
       // Since jquery, jquery-ui, angular, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-3.4.1/jquery.min.js',
+      'third_party/static/jquery-3.5.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
       'third_party/static/angularjs-1.7.9/angular.js',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
@@ -132,7 +132,7 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
-      // ngHtml2JsPreprocessor adds the html inside $templateCache,
+      // Key ngHtml2JsPreprocessor adds the html inside $templateCache,
       // the key that we use for that cache needs to be exactly the same as
       // the templateUrl in directive JS. The stripPrefix and prependPrefix are
       // used for modifying the $templateCache keys.
@@ -169,7 +169,7 @@ module.exports = function(config) {
               {
                 loader: 'ts-loader',
                 options: {
-                  // this is needed for thread-loader to work correctly
+                  // This is needed for thread-loader to work correctly.
                   happyPackMode: true
                 }
               },

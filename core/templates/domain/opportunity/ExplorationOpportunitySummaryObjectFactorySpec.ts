@@ -16,14 +16,16 @@
  * @fileoverview Unit tests for ExplorationOpportunitySummaryObjectFactory.
  */
 
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import {
+  IExplorationOpportunitySummaryBackendDict,
+  ExplorationOpportunitySummaryObjectFactory
+} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 
 describe('Exploration opportunity summary object factory', () => {
   describe('ExplorationOpportunitySummaryObjectFactory', () => {
     let explorationOpportunitySummaryObjectFactory: (
       ExplorationOpportunitySummaryObjectFactory);
-    let backendDict: any;
+    let backendDict: IExplorationOpportunitySummaryBackendDict;
 
     beforeEach(() => {
       explorationOpportunitySummaryObjectFactory = (

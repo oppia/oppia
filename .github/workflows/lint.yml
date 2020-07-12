@@ -1,5 +1,13 @@
 name: Lint Checks
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   lint:
@@ -8,14 +16,17 @@ jobs:
       matrix:
         os: [ubuntu-18.04]
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: '2.x'
           architecture: 'x64'
       - name: Install Third Party Dependencies
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
       - name: Third Party Size Check
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.third_party_size_check
       - name: Run Lint Checks
-        run: python -m scripts.linters.pre_commit_linter --path=. --verbose
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: PYTHONIOENCODING=utf-8 python -m scripts.linters.pre_commit_linter --path=. --verbose

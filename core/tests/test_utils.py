@@ -103,7 +103,7 @@ def get_filepath_from_filename(filename, rootdir):
 
     Returns:
         str | None. The path of the file if file is found otherwise
-            None.
+        None.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled
@@ -389,7 +389,10 @@ class TestBase(unittest.TestCase):
 
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -403,7 +406,10 @@ class TestBase(unittest.TestCase):
 
     VERSION_2_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -419,7 +425,30 @@ class TestBase(unittest.TestCase):
 
     VERSION_3_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+    VERSION_4_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
+                ': &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -595,7 +624,7 @@ tags: []
 
         Returns:
             str. A string that contains unicode characters and ends with the
-                given suffix.
+            given suffix.
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
@@ -1092,7 +1121,7 @@ tags: []
             Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title=title, category='A category')
+            exploration_id, title=title, category='Algebra')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -1361,7 +1390,7 @@ tags: []
 
         Returns:
             Collection. A newly-created collection containing the corresponding
-                exploration details.
+            exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id,
@@ -1844,6 +1873,7 @@ tags: []
 
         class PatchedDatetimeType(type):
             """Validates the datetime instances."""
+
             def __instancecheck__(cls, other):
                 """Validates whether the given instance is datetime
                 instance.
@@ -1856,6 +1886,7 @@ tags: []
             @classmethod
             def utcnow(cls):
                 """Returns the mocked datetime."""
+
                 return mocked_datetime
 
         setattr(datetime, 'datetime', MockDatetime)
@@ -1955,8 +1986,8 @@ tags: []
             invoked.
 
             Args:
-                args: tuple. The args passed into `attr` function.
-                kwargs: dict. The key word args passed into `attr` function.
+                *args: tuple. The args passed into `attr` function.
+                **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
                 Result of `new_value`.
@@ -2228,6 +2259,24 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
+
+    def assert_same_list_elements(self, phrases, stdout):
+        """Checks to see if all of the phrases appear in at least one of the
+        stdout outputs.
+
+        Args:
+            phrases: list(str). A list of phrases we are trying to find in
+                one of the stdout outputs. For example, python linting
+                outputs a success string that includes data we don't have easy
+                access to, like how long the test took, so we may want to search
+                for a substring of that success string in stdout.
+
+            stdout: list(str). A list of the output results from the
+                method's execution.
+        """
+        self.assertTrue(
+            any(all(phrase in output for phrase in phrases) for
+                output in stdout))
 
 
 GenericTestBase = AppEngineTestBase
