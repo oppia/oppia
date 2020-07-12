@@ -63,7 +63,7 @@ describe('Classroom backend API service', function() {
     version: 2,
     additional_story_count: 0,
     topic_model_created_on: 231241343,
-    topic_model_last_updated: 3454354354 
+    topic_model_last_updated: 3454354354
   };
 
   let responseDictionaries = {
