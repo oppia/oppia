@@ -196,6 +196,10 @@ angular.module('oppia').component('subtopicEditorTab', {
         EntityCreationService.createSkill();
       };
 
+      ctrl.togglePreview = function() {
+        ctrl.subtopicPreviewCardIsShown = !(ctrl.subtopicPreviewCardIsShown);
+      };
+
       ctrl.$onInit = function() {
         ctrl.SUBTOPIC_PAGE_SCHEMA = {
           type: 'html',

@@ -1,48 +1,49 @@
 <div class="subtopic-content">
   <div class="subtopic-content-box">
     <div class="subtopic-left-box">
-      <md-card class="oppia-subtopics-list-card">
-        <div class="subtopic-title">
-          <p>
-            <strong style="font-size: 1.2em;">Subtopic Title</strong>
-          </p>
-          <form class="form-horizontal" role="form">
-            <input class="form-control protractor-test-subtopic-title-field"
-                   type="text"
-                   ng-blur="$ctrl.updateSubtopicTitle($ctrl.editableTitle)"
-                   ng-model="$ctrl.editableTitle"
-                   maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>"
-                   ng-change="$ctrl.resetErrorMsg()">
-            <span class="oppia-input-box-subtitle">
-              <i>
-                Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
-              </i>
+      <md-card class="subtopic-item-container">
+        <div class="oppia-subtopics-list-card">
+          <div class="subtopic-title">
+            <p>
+              <strong style="font-size: 1.2em;">Subtopic Title</strong>
+            </p>
+            <form class="form-horizontal" role="form">
+              <input class="form-control protractor-test-subtopic-title-field"
+                     type="text"
+                     ng-blur="$ctrl.updateSubtopicTitle($ctrl.editableTitle)"
+                     ng-model="$ctrl.editableTitle"
+                     maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>"
+                     ng-change="$ctrl.resetErrorMsg()">
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+                </i>
+              </span>
+            </form>
+            <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
+              <em><[errorMsg]></em>
             </span>
-          </form>
-          <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
-            <em><[errorMsg]></em>
-          </span>
-          <span class="form-text error-message" ng-if="$ctrl.editableTitle.length === 80">
-            <em>The maximum length of subtopic title is 80 characters.</em>
-          </span>
-        </div>
-        <div class="subtopic-thumbnail">
-          <p>
-            <strong style="font-size: 1.2em;">Subtopic Thumbnail</strong>
-          </p>
-          <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
-                              update-filename="$ctrl.updateSubtopicThumbnailFilename"
-                              bg-color="$ctrl.editableThumbnailBgColor"
-                              update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
-                              allowed-bg-colors="$ctrl.allowedBgColors"
-                              aspect-ratio="'4:3'"
-                              preview-title="$ctrl.editableTitle"
-                              preview-description=""
-                              preview-description-bg-color="'#BE563C'"
-                              preview-footer="">
-          </thumbnail-uploader>
-        </div>
-        <div class="subtopic-html">
+            <span class="form-text error-message" ng-if="$ctrl.editableTitle.length === 80">
+              <em>The maximum length of subtopic title is 80 characters.</em>
+            </span>
+          </div>
+          <div class="subtopic-thumbnail">
+            <p>
+              <strong style="font-size: 1.2em;">Subtopic Thumbnail</strong>
+            </p>
+            <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
+                                update-filename="$ctrl.updateSubtopicThumbnailFilename"
+                                bg-color="$ctrl.editableThumbnailBgColor"
+                                update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
+                                allowed-bg-colors="$ctrl.allowedBgColors"
+                                aspect-ratio="'4:3'"
+                                preview-title="$ctrl.editableTitle"
+                                preview-description=""
+                                preview-description-bg-color="'#BE563C'"
+                                preview-footer="">
+            </thumbnail-uploader>
+          </div>
+          <div class="subtopic-html">
           <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
             <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
                                  class="protractor-test-edit-subtopic-page-contents"
@@ -60,11 +61,31 @@
             </angular-html-bind>
           </div>
         </div>
+        </div>
+        <div ng-if="!$ctrl.subtopicPreviewCardIsShown" >
+          <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.togglePreview()">
+            Preview Topic Card
+            <i class="fa fa-angle-down"></i>
+          </button>
+        </div>
+        <div ng-if="$ctrl.subtopicPreviewCardIsShown">
+          <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.togglePreview()">
+            Collapse Topic Card
+            <i class="fa fa-angle-up"></i>
+          </button>
+        </div>
+        <div ng-if="$ctrl.subtopicPreviewCardIsShown">
+          <preview-thumbnail name="$ctrl.editableTitle"
+                             filename = "$ctrl.editableThumbnailFilename"
+                             thumbnail-bg-color="$ctrl.editableThumbnailBgColor"
+                             bg-color="'#2F6687'">
+          </preview-thumbnail>
+        </div>
       </md-card>
     </div>
 
     <div class="subtopic-right-box">
-      <md-card class="oppia-subtopics-list-card topic-skill-count">
+      <md-card class="oppia-subtopics-list-card topic-skill-count subtopic-item-container">
         <div class="skill-count">
           <span class="skill-count-value"><[$ctrl.subtopic.getSkillSummaries().length]></span>
           <span class="skill-count-text">Skills</span>
@@ -146,6 +167,14 @@
     justify-content: center;
   }
 
+  .subtopic-content .show-subtopic-preview-button {
+    border-top: 1px solid #c1c1c1;
+    color: #419889;
+    font-size: 15px;
+    padding: 10px 0;
+    width: 100%;
+  }
+
   .subtopic-content .error-message {
     color: #ff0000;
     font-size: smaller;
@@ -189,5 +218,30 @@
     display: flex;
     justify-content: space-between;
     margin: 7px 0;
+  }
+  @media screen and (max-width: 1100px) {
+    .subtopic-content .subtopic-left-box {
+      width: 55%;
+    }
+
+    .subtopic-content .subtopic-right-box {
+      width: 40%;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .subtopic-content .subtopic-left-box {
+      width: 60%;
+    }
+    .subtopic-item-container {
+      margin: 1px;
+    }
+  }
+  @media screen and (max-width: 700px) {
+    .subtopic-content .subtopic-left-box {
+      width: 100%;
+    }
+    .subtopic-content .subtopic-right-box {
+      width: 100%;
+    }
   }
 </style>
