@@ -75,8 +75,13 @@ describe('Guest collection progress service', () => {
       category: 'a category',
       version: 1,
       nodes: [],
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      },
+      tags: null,
       language_code: null,
-      tags: null
+      schema_version: null
     };
     return collectionObjectFactory.create(collectionBackendObject);
   };
@@ -85,9 +90,28 @@ describe('Guest collection progress service', () => {
     var collectionNodeBackendObject = {
       exploration_id: expId,
       exploration_summary: {
-        title: expTitle,
-        category: 'exp category',
-        objective: 'exp objective'
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: expTitle
       }
     };
     return collectionNodeObjectFactory.create(collectionNodeBackendObject);
