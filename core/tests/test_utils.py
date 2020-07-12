@@ -2045,6 +2045,11 @@ tags: []
             self.logout()
             os.environ.update(initial_user_env)
 
+    def assertRaises(self, exc, fun, *args, **kwds):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
