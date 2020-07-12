@@ -15028,3 +15028,27 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             )
         ]
         run_job_and_check_output(self, expected_output)
+
+    def test_missing_exp_issues_model_failure(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        exp_issues_id = (
+            stats_models.ExplorationIssuesModel.get_entity_id(
+                self.exp.id, self.exp.version)
+        )
+        exp_issues = stats_models.ExplorationIssuesModel.get_by_id(
+            exp_issues_id)
+
+        exp_issues.delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for exp_issues_ids '
+                'field check of PlaythroughModel\', '
+                '[u"Entity id %s: based on '
+                'field exp_issues_ids having value '
+                '%s, expect model ExplorationIssuesModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    playthrough.id, exp_issues_id, exp_issues_id)]
+        run_job_and_check_output(self, expected_output)
