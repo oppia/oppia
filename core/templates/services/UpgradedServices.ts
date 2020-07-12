@@ -108,6 +108,8 @@ import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
+import { CollectionSummaryObjectFactory } from
+  'domain/collection/collection-summary-object.factory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
@@ -128,6 +130,10 @@ import { ConstructTranslationIdsService } from
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import { CreatorDashboardStatsObjectFactory } from
+  'domain/creator_dashboard/creator-dashboard-stats-object.factory';
+import { CreatorExplorationSummaryObjectFactory } from
+  'domain/summary/creator-exploration-summary-object.factory';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
@@ -171,6 +177,8 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
@@ -181,8 +189,6 @@ import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissionsObjectFactory } from
   'domain/exploration/exploration-permissions-object.factory';
-import { ExplorationSummaryObjectFactory } from
-  'domain/summary/exploration-summary-object.factory';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ExplorationStatsBackendApiService } from
@@ -244,8 +250,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImprovementsBackendApiService } from
-  'services/improvements-backend-api.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -286,6 +290,8 @@ import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import { LearnerExplorationSummaryObjectFactory } from
+  'domain/summary/learner-exploration-summary-object.factory';
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -332,6 +338,8 @@ import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+import { NonExistentActivitiesObjectFactory } from
+  'domain/learner_dashboard/non-existent-activities-object.factory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
@@ -394,6 +402,8 @@ import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
+import { ProfileSummaryObjectFactory } from
+  'domain/user/profile-summary-object.factory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
@@ -439,6 +449,8 @@ import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryObjectFactory } from
+  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
@@ -650,6 +662,8 @@ export class UpgradedServices {
       new CollectionPlaythroughObjectFactory();
     upgradedServices['CollectionRightsObjectFactory'] =
       new CollectionRightsObjectFactory();
+    upgradedServices['CollectionSummaryObjectFactory'] =
+      new CollectionSummaryObjectFactory();
     upgradedServices['CollectionValidationService'] =
       new CollectionValidationService();
     upgradedServices['ComputationDataObjectFactory'] =
@@ -659,6 +673,10 @@ export class UpgradedServices {
       new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
+    upgradedServices['CreatorExplorationSummaryObjectFactory'] =
+      new CreatorExplorationSummaryObjectFactory();
+    upgradedServices['CreatorDashboardStatsObjectFactory'] =
+      new CreatorDashboardStatsObjectFactory();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
@@ -678,8 +696,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExplorationPermissionsObjectFactory'] =
       new ExplorationPermissionsObjectFactory();
-    upgradedServices['ExplorationSummaryObjectFactory'] =
-      new ExplorationSummaryObjectFactory();
     upgradedServices['ExplorationMetadataObjectFactory'] =
       new ExplorationMetadataObjectFactory();
     upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
@@ -728,6 +744,8 @@ export class UpgradedServices {
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
+    upgradedServices['LearnerExplorationSummaryObjectFactory'] =
+      new LearnerExplorationSummaryObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
@@ -753,6 +771,8 @@ export class UpgradedServices {
       new NumericInputRulesService();
     upgradedServices['NewlyCreatedTopicObjectFactory'] =
         new NewlyCreatedTopicObjectFactory();
+    upgradedServices['NonExistentActivitiesObjectFactory'] =
+      new NonExistentActivitiesObjectFactory();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
     upgradedServices['ParamMetadataObjectFactory'] =
@@ -764,6 +784,8 @@ export class UpgradedServices {
       new PlaythroughIssueObjectFactory();
     upgradedServices['PredictionResultObjectFactory'] =
       new PredictionResultObjectFactory();
+    upgradedServices['ProfileSummaryObjectFactory'] =
+      new ProfileSummaryObjectFactory();
     upgradedServices['QuestionSummaryObjectFactory'] =
       new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
@@ -779,6 +801,8 @@ export class UpgradedServices {
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['SkillDifficultyObjectFactory'] =
       new SkillDifficultyObjectFactory();
+    upgradedServices['SkillMasteryObjectFactory'] =
+      new SkillMasteryObjectFactory();
     upgradedServices['SkillOpportunityObjectFactory'] =
       new SkillOpportunityObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =
@@ -851,7 +875,8 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['CollectionObjectFactory'] =
       new CollectionObjectFactory(
-        upgradedServices['CollectionNodeObjectFactory']);
+        upgradedServices['CollectionNodeObjectFactory'],
+        upgradedServices['CollectionPlaythroughObjectFactory']);
     upgradedServices['ContinueValidationService'] =
       new ContinueValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1075,8 +1100,6 @@ export class UpgradedServices {
       upgradedServices['AudioLanguageObjectFactory'],
       upgradedServices['AutogeneratedAudioLanguageObjectFactory'],
       upgradedServices['BrowserCheckerService']);
-    upgradedServices['LearnerDashboardBackendApiService'] =
-      new LearnerDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['NumberWithUnitsValidationService'] =
       new NumberWithUnitsValidationService(
         upgradedServices['NumberWithUnitsObjectFactory'],
@@ -1162,7 +1185,7 @@ export class UpgradedServices {
     upgradedServices['ExplorationRecommendationsBackendApiService'] =
       new ExplorationRecommendationsBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['ExplorationSummaryObjectFactory']);
+        upgradedServices['LearnerExplorationSummaryObjectFactory']);
     upgradedServices['InteractionRulesRegistryService'] =
       new InteractionRulesRegistryService(
         upgradedServices['AlgebraicExpressionInputRulesService'],
@@ -1212,7 +1235,18 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['FeaturedTranslationLanguageObjectFactory']);
     upgradedServices['CreatorDashboardBackendApiService'] =
-      new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+      new CreatorDashboardBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['CollectionSummaryObjectFactory'],
+        upgradedServices['CreatorDashboardStatsObjectFactory'],
+        upgradedServices['CreatorExplorationSummaryObjectFactory'],
+        upgradedServices['ProfileSummaryObjectFactory'],
+        upgradedServices['FeedbackThreadObjectFactory'],
+        upgradedServices['SuggestionObjectFactory'],
+        upgradedServices['SuggestionThreadObjectFactory'],
+        upgradedServices['SuggestionsService'],
+        upgradedServices['TopicSummaryObjectFactory'],
+        upgradedServices['LoggerService']);
     upgradedServices['CurrentInteractionService'] =
       new CurrentInteractionService(
         upgradedServices['ContextService'],
@@ -1229,14 +1263,14 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ExplorationImprovementsBackendApiService'] =
+      new ExplorationImprovementsBackendApiService(
+        upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
       new ExplorationStatsBackendApiService(
         upgradedServices['ExplorationStatsObjectFactory'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
-    upgradedServices['ImprovementsBackendApiService'] =
-      new ImprovementsBackendApiService(
-        upgradedServices['ExplorationTaskObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
@@ -1244,7 +1278,13 @@ export class UpgradedServices {
           upgradedServices['HttpClient'],
           upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerDashboardBackendApiService'] =
-      new LearnerDashboardBackendApiService(upgradedServices['HttpClient']);
+      new LearnerDashboardBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['CollectionSummaryObjectFactory'],
+        upgradedServices['FeedbackThreadSummaryObjectFactory'],
+        upgradedServices['LearnerExplorationSummaryObjectFactory'],
+        upgradedServices['NonExistentActivitiesObjectFactory'],
+        upgradedServices['ProfileSummaryObjectFactory']);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient']);
@@ -1277,6 +1317,7 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
       new ReadOnlyCollectionBackendApiService(
         upgradedServices['HttpClient'],
+        upgradedServices['CollectionObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
@@ -1299,7 +1340,8 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['SkillMasteryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],
@@ -1379,6 +1421,7 @@ export class UpgradedServices {
       new EditableCollectionBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['ReadOnlyCollectionBackendApiService'],
+        upgradedServices['CollectionObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardDataService'] =
         new EmailDashboardDataService(

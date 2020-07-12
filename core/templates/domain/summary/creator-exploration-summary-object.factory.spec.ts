@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for Exploration Summary Object Factory.
  */
 
-import { ExplorationSummaryObjectFactory } from
-  'domain/summary/exploration-summary-object.factory';
+import { CreatorExplorationSummaryObjectFactory } from
+  'domain/summary/creator-exploration-summary-object.factory';
 
-describe('Exploration summary object factory', () => {
-  let esof: ExplorationSummaryObjectFactory;
+describe('Creator Exploration summary object factory', () => {
+  let cesof: CreatorExplorationSummaryObjectFactory;
 
   beforeEach(() => {
-    esof = new ExplorationSummaryObjectFactory();
+    cesof = new CreatorExplorationSummaryObjectFactory();
   });
 
   it('should correctly convert backend dict to exp summary object', () => {
@@ -49,10 +49,12 @@ describe('Exploration summary object factory', () => {
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
+      num_total_threads: 0,
+      num_open_threads: 0
     };
 
-    let expSummaryObject = esof.createFromBackendDict(backendDict);
+    let expSummaryObject = cesof.createFromBackendDict(backendDict);
 
     expect(expSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
     expect(expSummaryObject.communityOwned).toEqual(false);
@@ -76,5 +78,7 @@ describe('Exploration summary object factory', () => {
     expect(expSummaryObject.activityType).toEqual('exploration');
     expect(expSummaryObject.category).toEqual('Algebra');
     expect(expSummaryObject.title).toEqual('Test Title');
+    expect(expSummaryObject.numTotalThreads).toEqual(0);
+    expect(expSummaryObject.numOpenThreads).toEqual(0);
   });
 });
