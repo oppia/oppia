@@ -2748,3 +2748,206 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
             exp_jobs_one_off
             .ExplorationMockMathMigrationOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
+
+
+class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            MathExplorationsImageGenerationAuditJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_explorations_with_math_images(self):
+        """Test the audit job output when there are several explorations with
+        math rich text components.
+        """
+        exploration_with_no_math = (
+            exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title=self.EXP_TITLE, category='category'))
+        exp_services.save_new_exploration(
+            self.albert_id, exploration_with_no_math)
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            'exp_id2', title='title2', category='category2')
+        exploration3 = exp_domain.Exploration.create_default_exploration(
+            'exp_id3', title='title3', category='category3')
+
+        exploration1.add_states(['FirstState'])
+        exploration2.add_states(['FirstState'])
+        exploration3.add_states(['FirstState'])
+
+        exploration1_state = exploration1.states['FirstState']
+        exploration2_state = exploration2.states['FirstState']
+        exploration3_state = exploration3.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content1,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    valid_html_content2
+                ]
+            }
+        }
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[valid_html_content1]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': valid_html_content1,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[valid_html_content1]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': valid_html_content2,
+                    'y': valid_html_content1
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[valid_html_content2]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+        exploration1_state.update_interaction_answer_groups([answer_group_dict])
+        exploration2_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration2_state.update_interaction_id('ItemSelectionInput')
+        exploration2_state.update_interaction_customization_args(
+            customization_args_dict)
+        exploration3_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration3_state.update_interaction_id('DragAndDropSortInput')
+        exploration3_state.update_interaction_customization_args(
+            customization_args_dict)
+        exploration3_state.update_interaction_answer_groups([answer_group_dict])
+
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+        exp_services.save_new_exploration(self.albert_id, exploration2)
+        exp_services.save_new_exploration(self.albert_id, exploration3)
+
+        mock_max_size_of_math_svg_batch = 0.5 * 1024 * 1024
+        self.assertEqual(
+            exp_models.MathExplorationImagesModel.get_math_exploration_count(),
+            0)
+        with self.swap(
+            feconf, 'MAX_SIZE_OF_MATH_SVG_BATCH_BYTES',
+            mock_max_size_of_math_svg_batch):
+            job_id = (
+                exp_jobs_one_off
+                .MathExplorationsImageGenerationAuditJob.create_new())
+            exp_jobs_one_off.MathExplorationsImageGenerationAuditJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = (
+                exp_jobs_one_off
+                .MathExplorationsImageGenerationAuditJob.get_output(job_id))
+
+        actual_output_list = ast.literal_eval(actual_output[0])
+        self.assertEqual(
+            actual_output_list[1]['largest_math_expression'],
+            '(x-a_1)(x-a_2)(x-a_3)...(x-a_n-1)(x-a_n)')
+        self.assertEqual(
+            actual_output_list[1]['number_of_explorations_having_math'], 3)
+        self.assertEqual(
+            actual_output_list[1]['estimated_no_of_batches'], 2)
+        exp1_math_image_model = (
+            exp_models.MathExplorationImagesModel.get_by_id('exp_id1'))
+        exp2_math_image_model = (
+            exp_models.MathExplorationImagesModel.get_by_id('exp_id2'))
+        exp3_math_image_model = (
+            exp_models.MathExplorationImagesModel.get_by_id('exp_id3'))
+        self.assertEqual(
+            exp1_math_image_model.estimated_size_of_images_in_bytes, 261000.0)
+        self.assertEqual(
+            exp2_math_image_model.estimated_size_of_images_in_bytes, 87000.0)
+        self.assertEqual(
+            exp3_math_image_model.estimated_size_of_images_in_bytes, 261000.0)
+        self.assertEqual(
+            exp_models.MathExplorationImagesModel.get_math_exploration_count(),
+            3)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+        exp_services.delete_exploration(self.albert_id, 'exp_id1')
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.MathExplorationsImageGenerationAuditJob)

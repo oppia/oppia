@@ -529,6 +529,86 @@ class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class MathExplorationsImageGenerationAuditJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that finds all the explorations with math rich text components and
+    creates a temporary storage model with all the information required for
+    generating math rich text component SVG images.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        num_of_math = 0
+        size_of_math_svg = 0
+        largest_math_expression = ''
+        for state in exploration.states.values():
+            html_string = ''.join(state.get_all_html_content_strings())
+            size_of_math_svg_in_state = (
+                (html_validation_service.
+                 estimate_size_of_svg_for_math_expressions_in_html(
+                     html_string))[0])
+            largest_math_expression_in_state = (
+                (html_validation_service.
+                 estimate_size_of_svg_for_math_expressions_in_html(
+                     html_string))[1])
+            if (len(largest_math_expression_in_state) >
+                    len(largest_math_expression)):
+                largest_math_expression = largest_math_expression_in_state
+            size_of_math_svg = size_of_math_svg + size_of_math_svg_in_state
+            if size_of_math_svg > 0:
+                num_of_math = num_of_math + 1
+            value_dict = {
+                'exploration_id': item.id,
+                'size_of_math_svgs': size_of_math_svg,
+                'no_of_states_having_math': num_of_math,
+                'largest_math_expression': largest_math_expression
+            }
+        yield ('Information about math-expressions in explorations', value_dict)
+
+    @staticmethod
+    def reduce(key, values):
+        final_list = []
+        final_values = [ast.literal_eval(value) for value in values]
+        number_of_explorations_having_math = 0
+        largest_math_expression = ''
+        estimated_no_of_batches = 1
+        size_of_math_svgs_in_a_batch = 0
+        for value in final_values:
+            if int(value['size_of_math_svgs']) > 0:
+                final_list.append(value['exploration_id'])
+                exp_models.MathExplorationImagesModel(
+                    id=value['exploration_id'],
+                    estimated_size_of_images_in_bytes=int(
+                        value['size_of_math_svgs'])).put()
+                number_of_explorations_having_math = (
+                    number_of_explorations_having_math + 1)
+                if (len(value['largest_math_expression']) >
+                        len(largest_math_expression)):
+                    largest_math_expression = value['largest_math_expression']
+                size_of_math_svgs_in_a_batch = (
+                    size_of_math_svgs_in_a_batch +
+                    int(value['size_of_math_svgs']))
+                if (size_of_math_svgs_in_a_batch >
+                        feconf.MAX_SIZE_OF_MATH_SVG_BATCH_BYTES):
+                    size_of_math_svgs_in_a_batch = 0
+                    estimated_no_of_batches = estimated_no_of_batches + 1
+        final_value_dict = {
+            'estimated_no_of_batches': estimated_no_of_batches,
+            'largest_math_expression': largest_math_expression,
+            'number_of_explorations_having_math': (
+                number_of_explorations_having_math)
+        }
+        yield (key, final_value_dict)
+
+
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that outputs a list of private explorations which are viewable."""
 

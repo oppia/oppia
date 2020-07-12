@@ -54,6 +54,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
     exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
+    exp_jobs_one_off.MathExplorationsImageGenerationAuditJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,

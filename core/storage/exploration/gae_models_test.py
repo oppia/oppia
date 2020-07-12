@@ -87,6 +87,34 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
 
+class MathExplorationImagesModelUnitTests(test_utils.GenericTestBase):
+    """Tests the MathExplorationImagesModel class."""
+
+    def setUp(self):
+        super(MathExplorationImagesModelUnitTests, self).setUp()
+        exp_models.MathExplorationImagesModel(id='exp_id').put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exp_models.MathExplorationImagesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            exp_models.MathExplorationImagesModel
+            .has_reference_to_user_id('any_id'))
+
+    def test_get_export_policy(self):
+        self.assertEqual(
+            exp_models.MathExplorationImagesModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_math_exploration_count(self):
+        self.assertEqual(
+            exp_models.MathExplorationImagesModel.get_math_exploration_count(),
+            1)
+
+
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
 

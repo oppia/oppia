@@ -530,6 +530,10 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
+# We Generate Images for existing math rich text components in batches. This
+# gives the maximum size for a batch of Math SVGs in bytes.
+MAX_SIZE_OF_MATH_SVG_BATCH_BYTES = 31 * 1024 * 1024
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 

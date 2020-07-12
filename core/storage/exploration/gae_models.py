@@ -239,6 +239,56 @@ class ExplorationContextModel(base_models.BaseModel):
         return False
 
 
+class MathExplorationImagesModel(base_models.BaseModel):
+    """Storage model for rights related to an exploration.
+
+    The id of each instance is the id of the corresponding exploration.
+    """
+
+    # A boolean which indicates if there are images saved in datastore for all
+    # the math rich-text components in an exploration.
+    math_images_exist = ndb.BooleanProperty(indexed=True, default=False)
+    # Approximate size of Math rich-text components SVG images that would be
+    # generated for the exploration according to the length of raw_latex
+    # value.
+    estimated_size_of_images_in_bytes = (
+        ndb.FloatProperty(indexed=True, default=0))
+    # A field to store the intermediate exploration data while in the process
+    # of generation of Math images. This field will be non-empty only during
+    # the process of the generation and saving of images for math-expressions.
+    intermediate_exploration_data = ndb.JsonProperty(default={}, indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """MathExplorationImagesModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether MathExplorationImagesModel references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_math_exploration_count(cls):
+        """Returns the total number of math explorations."""
+        return cls.get_all().count()
+
+
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
