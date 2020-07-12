@@ -240,7 +240,8 @@ class ExplorationContextModel(base_models.BaseModel):
 
 
 class MathExplorationImagesModel(base_models.BaseModel):
-    """Storage model for rights related to an exploration.
+    """Temporary Storage model for storing information useful while generating
+    images for math rich-text components in explorations.
 
     The id of each instance is the id of the corresponding exploration.
     """
