@@ -19,7 +19,7 @@
 
 import {UpgradedServices} from 'services/UpgradedServices';
 
-fdescribe('Delete Topic Modal Controller', function() {
+describe('Delete Topic Modal Controller', function() {
   var $scope = null;
   var topic = null;
   var $uibModalInstance = null;

@@ -174,6 +174,7 @@ angular.module('oppia').directive('skillsList', [
               controller: 'MergeSkillModalController',
               windowClass: 'skill-select-modal',
               size: 'xl'
+
             }).result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;

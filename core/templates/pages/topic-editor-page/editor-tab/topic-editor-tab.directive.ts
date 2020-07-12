@@ -124,7 +124,7 @@ angular.module('oppia').directive('topicEditorTab', [
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
 
-          $scope.expandSubtopicCard = function(index) {
+          $scope.toggleSubtopicCard = function(index) {
             if ($scope.subtopicCardIsExpanded[index]) {
               $scope.subtopicCardIsExpanded[index] = false;
               return;
@@ -235,13 +235,15 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.removeSkillFromSubtopic = function(subtopicId, skillSummary) {
             $scope.skillEditOptionsAreShown = {};
-            TopicUpdateService.removeSkillFromSubtopic($scope.topic, subtopicId, skillSummary);
+            TopicUpdateService.removeSkillFromSubtopic(
+              $scope.topic, subtopicId, skillSummary);
             _initEditor();
           };
 
           $scope.removeSkillFromTopic = function(subtopicId, skillSummary) {
             $scope.skillEditOptionsAreShown = {};
-            TopicUpdateService.removeSkillFromSubtopic($scope.topic, subtopicId, skillSummary);
+            TopicUpdateService.removeSkillFromSubtopic(
+              $scope.topic, subtopicId, skillSummary);
             $scope.deleteUncategorizedSkillFromTopic(skillSummary);
           };
 

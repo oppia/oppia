@@ -136,45 +136,6 @@ angular.module('oppia').component('subtopicEditorTab', {
         );
       };
 
-      /**
-       * @param {string|null} oldSubtopicId - The id of the subtopic from
-       *    which the skill is to be moved, or null if the origin is the
-       *    uncategorized section.
-       * @param {SkillSummary} skillSummary - The summary of the skill
-       * that is to be moved.
-      */
-      ctrl.onMoveSkillStart = function(oldSubtopicId, skillSummary) {
-        ctrl.skillSummaryToMove = skillSummary;
-        ctrl.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
-      };
-
-      /**
-       * @param {string|null} newSubtopicId - The subtopic to which the
-       *    skill is to be moved, or null if the destination is the
-       *    uncategorized section.
-      */
-      ctrl.onMoveSkillFinish = function(newSubtopicId) {
-        if (newSubtopicId === ctrl.oldSubtopicId) {
-          return;
-        }
-
-        if (newSubtopicId === null) {
-          TopicUpdateService.removeSkillFromSubtopic(
-            ctrl.topic, ctrl.oldSubtopicId, ctrl.skillSummaryToMove);
-        } else {
-          TopicUpdateService.moveSkillToSubtopic(
-            ctrl.topic, ctrl.oldSubtopicId, newSubtopicId,
-            ctrl.skillSummaryToMove);
-        }
-        _initEditor();
-      };
-
-      ctrl.deleteUncategorizedSkillFromTopic = function(skillSummary) {
-        TopicUpdateService.removeUncategorizedSkill(
-          ctrl.topic, skillSummary);
-        _initEditor();
-      };
-
       ctrl.updateHtmlData = function() {
         if (ctrl.htmlData !==
                 ctrl.subtopicPage.getPageContents().getHtml()) {

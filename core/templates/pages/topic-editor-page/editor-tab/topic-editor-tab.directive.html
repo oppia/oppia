@@ -113,7 +113,7 @@
           </div>
           <div ng-repeat="subtopic in subtopics track by $index" ng-init="subtopicIndex = $index">
             <div class="subtopics-list-item">
-              <div class="subtopic-name-header subtopic-name-card-header" ng-click="expandSubtopicCard(subtopicIndex)">
+              <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
                   <div class="subtopic-edit-options-container">
                     <span><[subtopic.getSkillSummaries().length]></span>
