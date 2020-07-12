@@ -592,6 +592,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         performed as an atomic transaction.
         """
         exploration_model.commit(committer_id, commit_message, change_list_dict)
+        # Note: the memcache will not be reinstated if the transaction fails.
+        # However, it must be deleted before creating the exploration summary
+        # because otherwise the wrong version will be used.
         memcache_services.delete(exp_memcache_key)
 
         stats_services.create_stats_model(new_exp_stats)
@@ -1205,8 +1208,9 @@ def revert_exploration(
             'Reverted exploration to version %s' % revert_to_version,
             revert_to_version)
 
-        # Memcache needs to be wiped before updating the summary to guarantee it
-        # uses the most up-to-date version.
+        # Note: the memcache will not be reinstated if the transaction fails.
+        # However, it must be deleted before creating the exploration summary
+        # because otherwise the wrong version will be used.
         memcache_services.delete(exp_memcache_key)
 
         # Update the exploration summary, but since this is just a revert so
