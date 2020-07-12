@@ -6,34 +6,34 @@
     <md-card layout="row">
       <div class="average-ratings stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_AVERAGE_RATING"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-average-rating" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.average_ratings || 'N/A']></h1>
-        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.average_ratings || 'N/A']></h1>
-        <p ng-hide="!$ctrl.dashboardStats.num_ratings">
-          <p ng-if="$ctrl.dashboardStats.num_ratings === 1">
-            (by <[$ctrl.dashboardStats.num_ratings]> user)
+        <h1 class="stat-value-with-rating protractor-test-oppia-average-rating" ng-show="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.averageRatings || 'N/A']></h1>
+        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.averageRatings || 'N/A']></h1>
+        <p ng-hide="!$ctrl.dashboardStats.numRatings">
+          <p ng-if="$ctrl.dashboardStats.numRatings === 1">
+            (by <[$ctrl.dashboardStats.numRatings]> user)
           </p>
-          <p ng-if="$ctrl.dashboardStats.num_ratings > 1">
-            (by <[$ctrl.dashboardStats.num_ratings]> users)
+          <p ng-if="$ctrl.dashboardStats.numRatings > 1">
+            (by <[$ctrl.dashboardStats.numRatings]> users)
           </p>
         </p>
       </div>
       <div class="total-plays stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_PLAYS"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-total-plays" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_plays]></h1>
-        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_plays]></h1>
+        <h1 class="stat-value-with-rating protractor-test-oppia-total-plays" ng-show="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.totalPlays]></h1>
+        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.totalPlays]></h1>
         <p ng-hide="!$ctrl.relativeChangeInTotalPlays">
           (+<[$ctrl.relativeChangeInTotalPlays]> from last week)
         </p>
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_OPEN_FEEDBACK"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-open-feedback" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_open_feedback]></h1>
-        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.total_open_feedback]></h1>
+        <h1 class="stat-value-with-rating protractor-test-oppia-open-feedback" ng-show="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.totalOpenFeedback]></h1>
+        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.dashboardStats.totalOpenFeedback]></h1>
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-total-subscribers" ng-show="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
-        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.num_ratings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
+        <h1 class="stat-value-with-rating protractor-test-oppia-total-subscribers" ng-show="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
+        <h1 class="stat-value-without-rating" ng-hide="$ctrl.dashboardStats.numRatings || $ctrl.relativeChangeInTotalPlays"><[$ctrl.subscribersList.length]></h1>
       </div>
     </md-card>
   </div>
@@ -190,18 +190,18 @@
             </td>
             <td ng-if="exploration.status !== 'private'">
               <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-num-views">
-                <[exploration.num_views]>
+                <[exploration.numViews]>
               </a>
             </td>
             <td ng-if="exploration.status !== 'private'">
               <a ng-href="/create/<[exploration.id]>#/feedback"
                  class="oppia-dashboard-list-summary protractor-test-exp-summary-row-open-feedback">
-                <[exploration.num_open_threads]>
+                <[exploration.numOpenThreads]>
               </a>
             </td>
             <td>
               <a ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-last-updated">
-                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)]>
               </a>
             </td>
           </tr>
@@ -216,9 +216,9 @@
                is-private="exploration.status === 'private'">
         <a ng-href="/create/<[exploration.id]>">
           <div class="title-section"
-               style="background-color: <[exploration.thumbnail_bg_color]>;">
+               style="background-color: <[exploration.thumbnailBgColor]>;">
             <img class="thumbnail-image"
-                 ng-src="<[$ctrl.getCompleteThumbnailIconUrl(exploration.thumbnail_icon_url)]>">
+                 ng-src="<[$ctrl.getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)]>">
             <h2 class="activity-title protractor-test-exp-summary-tile-title">
               <span><[(exploration.title || $ctrl.DEFAULT_EMPTY_TITLE) | truncate:40]></span>
             </h2>
@@ -256,13 +256,13 @@
                     uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                     tooltip-placement="top">
               </span>
-              <a ng-if="exploration.num_open_threads != 0" ng-href="/create/<[exploration.id]>#/feedback"
+              <a ng-if="exploration.numOpenThreads != 0" ng-href="/create/<[exploration.id]>#/feedback"
                  class="oppia-dashboard-card-statistic-value">
-                <[exploration.num_open_threads]>
+                <[exploration.numOpenThreads]>
               </a>
-              <span ng-if="exploration.num_open_threads === 0"
+              <span ng-if="exploration.numOpenThreads === 0"
                     class="oppia-dashboard-card-statistic-value">
-                <[exploration.num_open_threads]>
+                <[exploration.numOpenThreads]>
               </span>
             </li>
 
@@ -272,7 +272,7 @@
                     tooltip-placement="top">
               </span>
               <span class="oppia-dashboard-card-statistic-value">
-                <[exploration.num_views]>
+                <[exploration.numViews]>
               </span>
             </li>
 
@@ -282,7 +282,7 @@
                     tooltip-placement="top">
               </span>
               <span class="oppia-dashboard-card-statistic-value">
-                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                <[$ctrl.getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)]>
               </span>
             </li>
             <li flex="100">
@@ -333,20 +333,20 @@
     </div>
     <md-card class="oppia-subscription-card protractor-test-subscription-card"
              ng-repeat="subscriber in $ctrl.subscribersList | orderBy:sortSubscriptionFunction:$ctrl.isCurrentSubscriptionSortDescending">
-      <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank" rel="noopener">
-        <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture rounded-circle">
+      <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.username]>" target="_blank" rel="noopener">
+        <img ng-src="<[subscriber.pictureDataUrl]>" class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary">
           <div class="oppia-subscription-container">
             <strong class="protractor-test-subscription-name"
                     popover-append-to-body
-                    popover-trigger="<[$ctrl.showUsernamePopover(subscriber.subscriber_username)]>"
-                    ng-attr-uib-popover="<[subscriber.subscriber_username]>">
-              <[subscriber.subscriber_username| truncate:10]>
+                    popover-trigger="<[$ctrl.showUsernamePopover(subscriber.username)]>"
+                    ng-attr-uib-popover="<[subscriber.username]>">
+              <[subscriber.username| truncate:10]>
             </strong>
           </div>
           <div class="oppia-impact-text">
             <span>Impact</span>
-            <span><[subscriber.subscriber_impact || 0]></span>
+            <span><[subscriber.impact || 0]></span>
           </div>
         </span>
       </a>
@@ -364,11 +364,11 @@
         <collection-summary-tile class="protractor-test-collection-card"
                                  collection-id="collection.id"
                                  collection-title="collection.title"
-                                 last-updated-msec="collection.last_updated"
-                                 node-count="collection.node_count"
+                                 last-updated-msec="collection.lastUpdatedMsec"
+                                 node-count="collection.nodeCount"
                                  objective="collection.objective"
-                                 thumbnail-icon-url="collection.thumbnail_icon_url"
-                                 thumbnail-bg-color="collection.thumbnail_bg_color"
+                                 thumbnail-icon-url="collection.thumbnailIconUrl"
+                                 thumbnail-bg-color="collection.thumbnailBgColor"
                                  is-linked-to-editor-page="true">
         </collection-summary-tile>
       </span>
