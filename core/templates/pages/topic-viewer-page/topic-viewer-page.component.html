@@ -48,17 +48,17 @@
       </topic-info-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"></stories-list>
+      <stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
-      <practice-tab [subtopics-list]="$ctrl.subtopics"
-                    [topic-name]="$ctrl.topicName">
+      <practice-tab subtopics-list="$ctrl.subtopics"
+                    topic-name="$ctrl.topicName">
       </practice-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
-      <subtopics-list [subtopics-list]="$ctrl.subtopics"
-                      [topic-name]="$ctrl.topicName"
-                      [topic-id]="$ctrl.topicId">
+      <subtopics-list subtopics-list="$ctrl.subtopics"
+                      topic-name="$ctrl.topicName"
+                      topic-id="$ctrl.topicId">
       </subtopics-list>
     </div>
   </div>
