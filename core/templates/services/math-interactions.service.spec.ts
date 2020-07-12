@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-fdescribe('MathInteractionsService', () => {
+describe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
@@ -157,7 +157,7 @@ fdescribe('MathInteractionsService', () => {
       'Please enter numbers only.');
   });
 
-  fit('should validate equations correctly', function() {
+  it('should validate equations correctly', function() {
     // Success cases.
     expect(mathInteractionsService.validateEquation(
       'x=y')).toBeTrue();
