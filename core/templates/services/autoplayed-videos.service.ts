@@ -40,7 +40,7 @@ export class AutoplayedVideosService {
 
   /**
    * Adds video to the autoplayed videos dictionary.
-   * @param {string} videoId - id of the video
+   * @param {string} videoId - id of the video.
    */
   addAutoplayedVideo(videoId: string): void {
     this.autoplayedVideosDict[videoId] = true;
@@ -49,7 +49,7 @@ export class AutoplayedVideosService {
   /**
    * Returns whether the video with the corresponding key
    * has been autoplayed or not.
-   * @param {string} videoId - id of the video
+   * @param {string} videoId - id of the video.
    * @return {boolean} - Returns true if the video has been autoplayed and
    * false otherwise.
    */
