@@ -118,12 +118,12 @@ class ExternalModelFetchingDetails(python_utils.OBJECT):
 
     def __init__(
             self, field_name, class_name, model_ids):
-        """Initializes a ExternalModelReference domain object.
+        """Initializes an ExternalModelFetchingDetails domain object.
 
         Args:
             field_name: str. A specific name used as an identifier by the
                 storgae model to which is used to identify the external model
-                reference. For example: 'exp_ids': ExplorationModel, exp_id
+                reference. For example: 'exp_ids': ExplorationModel, exp_ids
                 is the field name to identify the external model
                 ExplorationModel.
             class_name: str. The name of the external model class.
@@ -140,7 +140,7 @@ class ExternalModelReference(python_utils.OBJECT):
 
     def __init__(
             self, class_name, model_id, model_instance):
-        """Initializes a ExternalModelReference domain object.
+        """Initializes an ExternalModelReference domain object.
 
         Args:
             class_name: str. The name of model class.
