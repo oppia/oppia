@@ -17,7 +17,6 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
 

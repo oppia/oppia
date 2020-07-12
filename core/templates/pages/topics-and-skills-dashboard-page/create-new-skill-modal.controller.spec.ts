@@ -18,7 +18,6 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-
 describe('Create new skill modal', function() {
   beforeEach(angular.mock.module('oppia'));
 

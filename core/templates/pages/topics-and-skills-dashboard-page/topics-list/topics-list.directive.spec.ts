@@ -17,8 +17,6 @@
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
-
-
 describe('Topics List Directive', function() {
   var $uibModal = null;
   var $scope = null;

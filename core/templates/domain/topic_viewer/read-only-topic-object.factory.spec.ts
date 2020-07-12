@@ -16,8 +16,6 @@
  * @fileoverview Tests for ReadOnlyTopicObjectFactory.
  */
 
-
-
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { SkillSummaryObjectFactory } from

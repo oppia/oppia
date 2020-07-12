@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants.ts';
 import { UrlInterpolationService } from

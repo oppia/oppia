@@ -25,8 +25,6 @@ import { UrlInterpolationService } from
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
 
-
-
 interface CreditNames {
   letter: String;
   names: Array<String>;
