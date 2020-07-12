@@ -16,7 +16,7 @@
  * @fileoverview Component for the navbar breadcrumb of the topic viewer.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ReadOnlyTopic } from
