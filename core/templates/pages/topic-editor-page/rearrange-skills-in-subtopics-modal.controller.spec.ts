@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for DeleteTopicModalController.
+ * @fileoverview Unit tests for RearrangeSkillsInSubtopicsModalController.
  */
 
 
-import {UpgradedServices} from 'services/UpgradedServices';
+import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Delete Topic Modal Controller', function() {
+describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var $scope = null;
   var topic = null;
   var $uibModalInstance = null;

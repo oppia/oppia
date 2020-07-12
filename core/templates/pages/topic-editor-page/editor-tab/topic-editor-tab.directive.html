@@ -76,18 +76,18 @@
     <md-card class="item-list-card">
       <div class="item-list-card-header">
         <div class="subtopic-reassign-header">
-        <h3>Subtopics</h3>
-        <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">Reassign</span>
-        <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
-           class="fa fa-angle-down"
-           ng-if="!subtopicsListIsShown"
-           aria-hidden="true">
-        </i>
-        <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
-           class="fa fa-angle-up"
-           ng-if="subtopicsListIsShown"
-           aria-hidden="true">
-        </i>
+          <h3>Subtopics</h3>
+          <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">Reassign</span>
+          <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
+             class="fa fa-angle-down"
+             ng-if="!subtopicsListIsShown"
+             aria-hidden="true">
+          </i>
+          <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
+             class="fa fa-angle-up"
+             ng-if="subtopicsListIsShown"
+             aria-hidden="true">
+          </i>
         </div>
       </div>
       <div ng-if="subtopicsListIsShown">
@@ -115,20 +115,20 @@
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
-                  <div class="subtopic-edit-options-container">
-                    <span><[subtopic.getSkillSummaries().length]></span>
-                    <i class="fa fa-ellipsis-v" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
-                    <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
-                      <i class="fa fa-trash protractor-test-delete-subtopic-button"></i>
-                      <span>Delete</span>
-                    </div>
+                <div class="subtopic-edit-options-container">
+                  <span><[subtopic.getSkillSummaries().length]></span>
+                  <i class="fa fa-ellipsis-v" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
+                  <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
+                    <i class="fa fa-trash protractor-test-delete-subtopic-button"></i>
+                    <span>Delete</span>
                   </div>
+                </div>
               </div>
-              <div ng-if="subtopicCardIsExpanded[subtopicIndex]">
+              <div ng-if="subtopicCardSelectedIndexes[subtopicIndex]">
                 <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skill-description-container">
                   <span class="clickable-item"><[skillSummary.getDescription()]></span>
                   <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
-                  <div class="skill-option-box" ng-if="skillEditOptionsAreShown[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)">
+                  <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)">
                     <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
                       <i class="fa fa-trash"></i>
                       <span>Remove from subtopic</span>
@@ -335,7 +335,7 @@
   }
 
   .topic-editor .list-header {
-    border-bottom: 2px solid #000000;
+    border-bottom: 2px solid #000;
     display: flex;
     justify-content: space-between;
     margin: 25px 0;
@@ -352,31 +352,31 @@
   .topic-editor .subtopic-name-header {
     align-items: center;
     background-color: #e3e3e3;
-    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
-    display: flex;
-    padding: 10px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
     cursor: pointer;
+    display: flex;
     justify-content: space-between;
+    padding: 10px;
   }
 
-  .skill-option-box {
-    border: 1px solid black;
-    position: absolute;
+  .topic-editor .skill-option-box {
     background-color: #e1dcdc;
-    width: 210px;
-    right: -6px;
+    border: 1px solid #000;
     padding: 0;
+    position: absolute;
+    right: -6px;
+    width: 210px;
     z-index: 1;
   }
 
-  .skill-edit-option {
+  .topic-editor .skill-edit-option {
     border-bottom: 1px solid #000;
-    padding: 5px;
     cursor: pointer;
     font-size: 15px;
+    padding: 5px;
   }
 
-  .remove-from-topic-option {
+  .topic-editor .remove-from-topic-option {
     border-bottom: none;
   }
 
@@ -390,22 +390,25 @@
     display: flex;
     justify-content: space-between;
   }
+
   .topic-editor .subtopic-edit-options-container {
     position: relative;
   }
+
   .topic-editor .subtopic-edit-options {
-    position: absolute;
-    border: 1px solid #2e2626;
-    width: 120px;
     background-color: #e1dcdc;
+    border: 1px solid #2e2626;
     padding: 2px;
-    top: 0;
+    position: absolute;
     right: -7px;
+    top: 0;
+    width: 120px;
   }
-  .skill-description-container {
-    position: relative;
+
+  .topic-editor .skill-description-container {
     display: flex;
     justify-content: space-between;
+    position: relative;
   }
 
   .topic-editor  .skills-valid {
@@ -418,10 +421,6 @@
     border: 2px solid #C55F45;
   }
 
-  /*.subtopics-list-item div:last-child {*/
-  /*  border: none;*/
-  /*}*/
-
   .clickable-item:hover {
     cursor: pointer;
     font-weight: bold;
@@ -431,6 +430,7 @@
     border-bottom: 1px solid #e3e3e3;
     padding: 8px 10px;
   }
+
   .topic-editor  .item-list-card-header i {
     display: none;
   }

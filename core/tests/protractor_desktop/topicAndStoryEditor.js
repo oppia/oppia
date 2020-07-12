@@ -207,6 +207,8 @@ describe('Topic editor functionality', function() {
 
       await topicEditorPage.navigateToTopicEditorTab();
       await topicEditorPage.navigateToReassignModal();
+      await topicEditorPage.expectUncategorizedSkillsToBe(
+        ['Skill 3', 'Skill 2']);
       await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
       await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, []);
 
@@ -214,6 +216,12 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, ['Skill 2']);
       await topicEditorPage.dragSkillToSubtopic('Skill 3', 1);
       await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, ['Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToSubtopic(1, 0, 'Skill 3');
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(
+        0, ['Skill 2', 'Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToUncategorized(0, 'Skill 2');
+      await topicEditorPage.expectUncategorizedSkillsToBe(
+        ['Skill 2']);
     });
 
   afterEach(async function() {

@@ -127,13 +127,13 @@ describe('Topic editor tab directive', function() {
 
   it('should toggle the subtopic card', function() {
     var index = 1;
-    expect($scope.subtopicCardIsExpanded[index]).toEqual(undefined);
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(undefined);
     $scope.toggleSubtopicCard(index);
-    expect($scope.subtopicCardIsExpanded[index]).toEqual(true);
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(true);
     $scope.toggleSubtopicCard(index);
-    expect($scope.subtopicCardIsExpanded[index]).toEqual(false);
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(false);
     $scope.toggleSubtopicCard(index);
-    expect($scope.subtopicCardIsExpanded[index]).toEqual(true);
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(true);
   });
 
   it('should open the reassign modal', function() {
@@ -171,9 +171,9 @@ describe('Topic editor tab directive', function() {
 
   it('should show skill edit options', function() {
     $scope.showSkillEditOptions(0, 1);
-    expect($scope.skillEditOptionsAreShown[0][1]).toEqual(true);
+    expect($scope.selectedSkillEditOptionsIndex[0][1]).toEqual(true);
     $scope.showSkillEditOptions(0, 1);
-    expect($scope.skillEditOptionsAreShown).toEqual({});
+    expect($scope.selectedSkillEditOptionsIndex).toEqual({});
   });
 
   it('should open save changes warning modal before creating skill',

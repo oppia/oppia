@@ -44,7 +44,6 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
-require('domain/skill/skill-backend-api.service.ts');
 require('domain/question/question-backend-api.service.ts');
 
 
@@ -60,10 +59,10 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$rootScope', '$timeout', '$scope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', 'AlertsService',
         'ContextService', 'CsrfTokenService', 'WindowDimensionsService',
         'ImageUploadHelperService',
-        'SkillCreationService', 'StoryCreationService', 'SkillBackendApiService',
+        'SkillCreationService', 'StoryCreationService',
         'EntityCreationService', 'TopicEditorRoutingService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
@@ -71,10 +70,10 @@ angular.module('oppia').directive('topicEditorTab', [
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $rootScope, $timeout, $scope, $uibModal, AlertsService,
+            $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, WindowDimensionsService,
             ImageUploadHelperService,
-            SkillCreationService, StoryCreationService, SkillBackendApiService,
+            SkillCreationService, StoryCreationService,
             EntityCreationService, TopicEditorRoutingService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
@@ -125,11 +124,11 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.toggleSubtopicCard = function(index) {
-            if ($scope.subtopicCardIsExpanded[index]) {
-              $scope.subtopicCardIsExpanded[index] = false;
+            if ($scope.subtopicCardSelectedIndexes[index]) {
+              $scope.subtopicCardSelectedIndexes[index] = false;
               return;
             }
-            $scope.subtopicCardIsExpanded[index] = true;
+            $scope.subtopicCardSelectedIndexes[index] = true;
           };
 
           $scope.reassignSkillsInSubtopics = function() {
@@ -234,14 +233,14 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.removeSkillFromSubtopic = function(subtopicId, skillSummary) {
-            $scope.skillEditOptionsAreShown = {};
+            $scope.selectedSkillEditOptionsIndex = {};
             TopicUpdateService.removeSkillFromSubtopic(
               $scope.topic, subtopicId, skillSummary);
             _initEditor();
           };
 
           $scope.removeSkillFromTopic = function(subtopicId, skillSummary) {
-            $scope.skillEditOptionsAreShown = {};
+            $scope.selectedSkillEditOptionsIndex = {};
             TopicUpdateService.removeSkillFromSubtopic(
               $scope.topic, subtopicId, skillSummary);
             $scope.deleteUncategorizedSkillFromTopic(skillSummary);
@@ -299,12 +298,13 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
-            if (Object.keys($scope.skillEditOptionsAreShown).length) {
-              $scope.skillEditOptionsAreShown = {};
+            if (Object.keys($scope.selectedSkillEditOptionsIndex).length) {
+              $scope.selectedSkillEditOptionsIndex = {};
               return;
             }
-            $scope.skillEditOptionsAreShown[subtopicIndex] = {};
-            $scope.skillEditOptionsAreShown[subtopicIndex][skillIndex] = true;
+            $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {};
+            $scope.selectedSkillEditOptionsIndex[subtopicIndex][skillIndex] = (
+              true);
           };
 
           ctrl.$onInit = function() {
@@ -312,8 +312,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';
             $scope.STORY_LIST = 'story';
-            $scope.subtopicCardIsExpanded = {};
-            $scope.skillEditOptionsAreShown = {};
+            $scope.subtopicCardSelectedIndexes = {};
+            $scope.selectedSkillEditOptionsIndex = {};
             $scope.subtopicsListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (

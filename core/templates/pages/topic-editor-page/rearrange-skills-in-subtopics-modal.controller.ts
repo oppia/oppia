@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal for the subtopics list editor.
+ * @fileoverview Controller for RearrangeSkillsInSubtopicsModal.
  */
+
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 
@@ -27,22 +28,16 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-const subtopicConstants = require('constants.ts');
 
 angular.module('oppia').controller(
   'RearrangeSkillsInSubtopicsModalController', [
-    '$controller',
-    '$scope', '$uibModalInstance', 'TopicEditorStateService',
-    'TopicUpdateService',
-    'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
-    'EVENT_TOPIC_INITIALIZED',
+    '$controller', '$scope', '$uibModalInstance', 'TopicEditorStateService',
+    'TopicUpdateService', 'UrlInterpolationService',
+    'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
     function(
         $controller, $scope, $uibModalInstance, TopicEditorStateService,
-        TopicUpdateService,
-        UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
-        EVENT_TOPIC_INITIALIZED) {
+        TopicUpdateService, UrlInterpolationService,
+        EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance
@@ -103,4 +98,5 @@ angular.module('oppia').controller(
       };
       $scope.init();
     }
-  ]);
+  ]
+);
