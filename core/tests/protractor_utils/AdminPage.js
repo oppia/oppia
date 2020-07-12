@@ -313,6 +313,8 @@ var AdminPage = function() {
   };
 
   this.getMiscTab = async function() {
+    await waitFor.elementToBeClickable(miscTabButton,
+      'Misc tab button not clickable');
     await miscTabButton.click();
     await waitFor.pageToFullyLoad();
   };
@@ -401,11 +403,16 @@ var AdminPage = function() {
   };
 
   this.regenerateContributionsForTopic = async function(topicId) {
+    await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
+      'Regenerate contributions topic ID input not showing up.');
     await regenerateContributionsTopicIdInput.sendKeys(topicId);
     await waitFor.elementToBeClickable(regenerateContributionsSubmitButton,
       'Regenerate conributions form submit button not clickable');
     await regenerateContributionsSubmitButton.click();
     await general.acceptAlert();
+    await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
+      'Regenerate contributions topic ID input not showing up.');
+    await regenerateContributionsTopicIdInput.clear();
   };
 
   this.expectRegenerationError = async function(topic) {

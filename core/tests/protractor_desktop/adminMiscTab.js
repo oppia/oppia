@@ -24,7 +24,7 @@ var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
-describe('Admin misc test tab', function() {
+describe('Admin misc tab', function() {
   var adminPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
@@ -36,23 +36,22 @@ describe('Admin misc test tab', function() {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
-
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
-
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic('adminPageMiscTabTestTopic',
       'A topic to test the admin page\'s misc tab', false);
     var url = await browser.getCurrentUrl();
-    topicId = url.split('/')[4];
-    topicId = topicId.substring(2, topicId.length - 1);
+    var temp = url.split('/')[4];
+    topicId = temp.substring(0, temp.length - 1);
     await topicEditorPage.publishTopic();
     await general.closeCurrentTabAndSwitchTo(handle);
   });
 
   it('should upload and download similarity files', async function() {
     await adminPage.get();
+    await browser.waitForAngularEnabled(true);
     await adminPage.getMiscTab();
     await adminPage.uploadTopicSimilarities(
       '../data/sample_topic_similarities.csv', true);
