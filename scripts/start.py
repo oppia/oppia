@@ -57,7 +57,7 @@ _PARSER.add_argument(
     help=(
         'optional; if specified, disables host checking so that the dev '
         'server can be accessed by any device on the same network using the '
-        'device\'s IP address.'),
+        'host device\'s IP address.'),
     action='store_true')
 _PARSER.add_argument(
     '--prod_env',
