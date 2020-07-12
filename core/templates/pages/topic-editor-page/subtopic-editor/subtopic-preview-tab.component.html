@@ -1,19 +1,23 @@
-<h3>
-  Back to <a ng-click="navigateToSubtopic()"><[editableTitle]></a>
-</h3>
 <div>
+  <div class="back-to-subtopic-container">
+    <span class="back-to-subtopic-text">
+      Back to <a ng-click="navigateToSubtopic()" href="#"><[editableTitle]></a>
+    </span>
+  </div>
   <div class="content-box">
     <div class="left-menu">
-      <div class="left-menu-item" ng-click="changeContent(THUMBNAIL)"><span>Card</span></div>
-      <div class="left-menu-item" ng-click="changeContent(CONTENT)"><span>Content</span></div>
+      <div class="left-menu-header"><span>Preview</span></div>
+      <div class="left-menu-item" ng-click="changeContent(THUMBNAIL)" ng-class="{'left-menu-item-active': thumbnailIsShown}"><span>Card</span></div>
+      <div class="left-menu-item" ng-click="changeContent(CONTENT)" ng-class="{'left-menu-item-active': !thumbnailIsShown}"><span>Content</span></div>
     </div>
-    <div class="content">
-      <preview-thumbnail ng-if="thumbnailIsShown" name="editableName"
+    <div class="content" ng-class="{'content-active': !thumbnailIsShown}">
+      <preview-thumbnail ng-if="thumbnailIsShown"
+                         name="editableTitle"
                          description="editableDescription"
                          preview-footer="topic.getCanonicalStoryIds().length"
                          filename = "editableThumbnailFilename"
-                         thumbnail-bg-color="editableThumbnailBgColor"
-                         bg-color="'#2F6687'">
+                         preview-description-bg-color="'#BE563C'"
+                         thumbnail-bg-color="editableThumbnailBgColor">
       </preview-thumbnail>
 
       <angular-html-bind ng-if="!thumbnailIsShown" html-data="pageContents.getHtml()">
@@ -23,35 +27,54 @@
 </div>
 
 <style>
-  .content-box {
-    background-color: #FFFFFF;
-    border: 2px solid #000000;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  subtopic-preview-tab .back-to-subtopic-container {
+    margin: 5px auto;
+    width: 70%;
+  }
+  subtopic-preview-tab .back-to-subtopic-text {
+    font-size: 18px;
+  }
+  subtopic-preview-tab .back-to-subtopic-text a {
+    font-weight: bold;
+    text-decoration: none;
+  }
+  subtopic-preview-tab .content-box {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
     margin: 0 auto;
     top: 20vh;
-    width: 60%;
+    width: 70%;
   }
-
-  .left-menu {
-    border-right: 2px solid #000000;
+  subtopic-preview-tab .left-menu-header span {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  subtopic-preview-tab .left-menu-header {
+    border-bottom: 2px solid #000;
+  }
+  subtopic-preview-tab .left-menu-item {
+    border-bottom: 1px solid #d5d0d0;
+    padding: 10px 0 10px 5px;
+  }
+  subtopic-preview-tab .left-menu-item-active {
+    background-color: #E0F2F1;
+  }
+  subtopic-preview-tab .left-menu-item span {
+    font-size: 18px;
+  }
+  subtopic-preview-tab .left-menu {
+    background-color: #FFF;
+    height: 60vh;
+    padding: 20px 20px;
     width: 30%;
   }
-
-  .content {
+  subtopic-preview-tab .content {
     padding: 30px;
     width: 65%;
   }
-
-  .left-menu-item {
-    border-bottom: 2px solid #000000;
-    margin: 10px 0;
-    padding: 10px 0 10px 5px;
-  }
-
-  .left-menu-item span {
-    font-size: 18px;
-    font-weight: bold;
+  subtopic-preview-tab .content-active {
+    background-color: #F0FFFF;
+    border: 1px solid #707070;
   }
 </style>
