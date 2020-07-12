@@ -90,5 +90,9 @@ describe('NumericExpressionEditor', function() {
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
     expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+
+    ctrl.value = '45/2';
+    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    expect(ctrl.warningText).toBe('');
   });
 });
