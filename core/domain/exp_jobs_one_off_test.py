@@ -779,18 +779,19 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'ERROR\', u\'There are some invalid inputs that need to be '
-            u'resolved before running the upgrade job. The invalid inputs '
-            u'are as follows:\']',
-            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', '
-            u'u\'exp_id0 State5: \\xe2\\xe9\\xee\\xf4\\xfc\']]',
-            u'[u\'Valid Algebraic Expression\', [u\'exp_id0 State1: x+y-z\', '
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State1: x+y-z\', '
             u'u\'exp_id0 State7: (arcsin(A)*cos(B) + cos(A)*arcsin(B))/'
-            u'(cos(A)*arccos(B) - arcsin(A)*sin(B))\', '
-            u'u\'exp_id0 State4: sqrt(x/y)\']]',
-            u'[u\'Valid Math Equation\', [u\'exp_id0 State2: y=m*x+c\', '
+            u'(cos(A)*arccos(B) - arcsin(A)*sin(B))\', u\'exp_id0 '
+            u'State4: sqrt(x/y)\']]',
+            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', u\'exp_id0 State5: '
+            u'\\xe2\\xe9\\xee\\xf4\\xfc\']]',
+            u'[u\'ERROR\', [u\'There are some invalid inputs that need to be '
+            u'resolved before running the upgrade job.\', u\'There are some '
+            u'invalid inputs that need to be resolved before running the '
+            u'upgrade job.\']]',
+            u'[u\'MathEquationInput\', [u\'exp_id0 State2: y=m*x+c\', '
             u'u\'exp_id0 State6: (sin(theta))^2 + (cos(theta))^2 = 1\']]',
-            u'[u\'Valid Numeric Expression\', [u\'exp_id0 State9: '
+            u'[u\'NumericExpressionInput\', [u\'exp_id0 State9: '
             u'sqrt(4)-abs(3)\', u\'exp_id0 State8: (3.5+6)^2\']]']
 
         self.assertEqual(actual_output, expected_output)
@@ -947,10 +948,10 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         # Only 3 exploration details should be yielded since the threshold is 3.
         expected_output = [
-            u'[u\'Valid Algebraic Expression\', [u\'exp_id0 State3: '
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State3: '
             u'sqrt(x/y)\', u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: '
             u'pi*r^2\']]',
-            u'[u\'Valid Math Equation\', [u\'exp_id0 State2: y=m*x+c\']]']
+            u'[u\'MathEquationInput\', [u\'exp_id0 State2: y=m*x+c\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -1005,13 +1006,13 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
 
         expected_output = [
-            u'[u\'Valid Algebraic Expression\', [u\'exp_id0 State1: x+y-z\']]',
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State1: x+y-z\']]',
             u'[u\'ERROR\', [u\'The exploration with ID: exp_id0 and state '
             u'name: State1 contains inputs that correspond to multiple '
-            u'different types: Valid Math Equation, Valid Algebraic '
-            u'Expression. Please resolve this before running the upgrade '
+            u'different types: MathEquationInput, AlgebraicExpressionInput. '
+            u'Please resolve this before running the upgrade '
             u'job.\']]',
-            u'[u\'Valid Math Equation\', [u\'exp_id0 State1: y=mx+c\']]']
+            u'[u\'MathEquationInput\', [u\'exp_id0 State1: y=mx+c\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -1167,9 +1168,9 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'Valid Algebraic Expression\', [u\'exp_id0 State1: x+y-z\']]',
-            u'[u\'Valid Math Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
-            u'[u\'Valid Numeric Expression\', [u\'exp_id0 State3: 3.5+4/2\']]']
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State1: x+y-z\']]',
+            u'[u\'MathEquationInput\', [u\'exp_id0 State2: y=m*x+c\']]',
+            u'[u\'NumericExpressionInput\', [u\'exp_id0 State3: 3.5+4/2\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -1202,6 +1203,9 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
                 'inputs': {'x': 'x<y>z'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x+y=c'}
             }],
             'outcome': {
                 'dest': 'Introduction',
@@ -1230,11 +1234,10 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'ERROR\', u\'There are some invalid inputs that need to be '
-            u'resolved before running the upgrade job. Please ensure that the '
-            u'audit job runs without any errors before running the upgrade '
-            u'job. The invalid inputs are as follows:\']',
-            u'[u\'Invalid\', [u\'exp_id0 State1: x<y>z\']]']
+            u'[u\'Invalid\', [u\'exp_id0 State1: x<y>z\']]',
+            u'[u\'ERROR\', [u\'There are some invalid inputs that need to be '
+            u'resolved before running the upgrade job.\']]',
+            u'[u\'MathEquationInput\', [u\'exp_id0 State1: x+y=c\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -1245,6 +1248,62 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.get_interaction_id_by_state_name('State1'),
             'MathExpressionInput')
+
+        # Now, when the invalid inputs are fixed, and the job is re-run,
+        # the upgrade should be done as expected.
+
+        updated_answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x=y+z'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x+y=c'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.VALID_EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State1',
+                    'property_name': 'answer_groups',
+                    'new_value': updated_answer_group_list1
+                })], 'Fixed invalid inputs.')
+
+        job_id = (
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.create_new())
+        exp_jobs_one_off.MathExpressionUpgradeOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
+                job_id))
+        expected_output = [
+            u'[u\'MathEquationInput\', [u\'exp_id0 State1: x=y+z\', '
+            u'u\'exp_id0 State1: x+y=c\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
+        exploration = exp_fetchers.get_exploration_by_id('exp_id0')
+
+        self.assertEqual(
+            exploration.get_interaction_id_by_state_name('State1'),
+            'MathEquationInput')
+
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""

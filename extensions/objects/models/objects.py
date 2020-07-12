@@ -1079,8 +1079,7 @@ class AlgebraicExpression(BaseObject):
     SCHEMA = {
         'type': 'unicode',
         'validators': [{
-            'id': 'is_valid_math_expression',
-            'algebraic': True
+            'id': 'is_valid_algebraic_expression'
         }]
     }
 

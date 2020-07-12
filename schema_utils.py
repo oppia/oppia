@@ -398,7 +398,7 @@ class _Validators(python_utils.OBJECT):
         considered valid algebraic expressions.
 
         Args:
-            obj: str. The given expression.
+            obj: str. The given math expression string.
             algebraic: bool. True if the given expression is algebraic
                 else numeric.
 
@@ -416,11 +416,37 @@ class _Validators(python_utils.OBJECT):
         return not algebraic ^ expression_is_algebraic
 
     @staticmethod
+    def is_valid_algebraic_expression(obj):
+        """Checks if the given obj (a string) represents a valid algebraic
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid algebraic expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=True)
+
+    @staticmethod
+    def is_valid_numeric_expression(obj):
+        """Checks if the given obj (a string) represents a valid numeric
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid numeric expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=False)
+
+    @staticmethod
     def is_valid_math_equation(obj):
         """Checks if the given obj (a string) represents a valid math equation.
 
         Args:
-            obj: str. A string.
+            obj: str. The given math equation string.
 
         Returns:
             bool. Whether the given object is a valid math equation.
@@ -428,21 +454,19 @@ class _Validators(python_utils.OBJECT):
         if obj.count('=') != 1:
             return False
 
-        is_valid_math_expression = get_validator(
-            'is_valid_math_expression')
+        is_valid_algebraic_expression = get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = get_validator(
+            'is_valid_numeric_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
         # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_math_expression(
-            lhs, algebraic=True)
-        rhs_is_algebraically_valid = is_valid_math_expression(
-            rhs, algebraic=True)
+        lhs_is_algebraically_valid = is_valid_algebraic_expression(lhs)
+        rhs_is_algebraically_valid = is_valid_algebraic_expression(rhs)
 
-        lhs_is_numerically_valid = is_valid_math_expression(
-            lhs, algebraic=False)
-        rhs_is_numerically_valid = is_valid_math_expression(
-            rhs, algebraic=False)
+        lhs_is_numerically_valid = is_valid_numeric_expression(lhs)
+        rhs_is_numerically_valid = is_valid_numeric_expression(rhs)
 
         if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
             return True

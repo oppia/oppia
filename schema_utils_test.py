@@ -169,6 +169,8 @@ VALIDATOR_SPECS = {
                 'type': SCHEMA_TYPE_BOOL
             }
         },
+        'is_valid_algebraic_expression': {},
+        'is_valid_numeric_expression': {},
         'is_valid_math_equation': {},
         'is_supported_audio_language_code': {}
     },
@@ -482,24 +484,24 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             schema_utils.get_validator('some invalid validator method name')
 
     def test_is_valid_algebraic_expression_validator(self):
-        """Tests for the is_valid_math_expression static method with
+        """Tests for the is_valid_algebraic_expression static method with
         algebraic type.
         """
-        is_valid_math_expression = schema_utils.get_validator(
-            'is_valid_math_expression')
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
 
-        self.assertTrue(is_valid_math_expression('a+b*2', algebraic=True))
-        self.assertFalse(is_valid_math_expression('3+4/2', algebraic=True))
+        self.assertTrue(is_valid_algebraic_expression('a+b*2'))
+        self.assertFalse(is_valid_algebraic_expression('3+4/2'))
 
     def test_is_valid_numeric_expression_validator(self):
-        """Tests for the is_valid_math_expression static method with
+        """Tests for the is_valid_numeric_expression static method with
         numeric type.
         """
-        is_valid_math_expression = schema_utils.get_validator(
-            'is_valid_math_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
 
-        self.assertFalse(is_valid_math_expression('a+b*2', algebraic=False))
-        self.assertTrue(is_valid_math_expression('3+4/2', algebraic=False))
+        self.assertFalse(is_valid_numeric_expression('a+b*2'))
+        self.assertTrue(is_valid_numeric_expression('3+4/2'))
 
     def test_is_valid_math_equation_validator(self):
         """Tests for the is_valid_math_equation static method."""
