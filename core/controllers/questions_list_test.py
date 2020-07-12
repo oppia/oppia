@@ -195,5 +195,6 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
         self.assertEqual(json_response['total_question_count'], 0)
 
     def test_get_question_count_fails_with_invalid_skill_ids(self):
-        self.get_json('%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, 'id1'),
-                      expected_status_int=400)
+        self.get_json(
+            '%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, 'id1'),
+            expected_status_int=400)

@@ -34,10 +34,7 @@ def _require_valid_skill_ids(skill_ids):
         skill_ids: list(str). The skill ids to validate.
     """
     for skill_id in skill_ids:
-        try:
-            skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
-            raise utils.ValidationError('Invalid skill id')
+        skill_domain.Skill.require_valid_skill_id(skill_id)
 
 
 class QuestionsListHandler(base.BaseHandler):
