@@ -100,10 +100,9 @@ def is_algebraic(expression):
     # This raises an exception if the syntax is invalid.
     Parser().parse(expression)
     token_list = tokenize(expression)
-    token_texts = [token.text for token in token_list]
 
     return any(
-        token_text in VALID_ALGEBRAIC_IDENTIFIERS for token_text in token_texts)
+        token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list)
 
 
 def tokenize(expression):
@@ -194,12 +193,12 @@ class Token(python_utils.OBJECT):
         self.text = text
 
         # Categorize the token.
-        if self.is_identifier(text):
+        if self.is_number(text):
+            self.category = _TOKEN_CATEGORY_NUMBER
+        elif self.is_identifier(text):
             self.category = _TOKEN_CATEGORY_IDENTIFIER
         elif self.is_function(text):
             self.category = _TOKEN_CATEGORY_FUNCTION
-        elif self.is_number(text):
-            self.category = _TOKEN_CATEGORY_NUMBER
         elif self.is_operator(text):
             self.category = _TOKEN_CATEGORY_OPERATOR
         else:
@@ -231,7 +230,7 @@ class Token(python_utils.OBJECT):
 
     def is_number(self, text):
         """Checks if the given token represents a valid real number without a
-        '+'/'-' sign.
+        '+'/'-' sign. 'pi' and 'e' are also considered as numeric values.
 
         Args:
             text: str. String representation of the token.
@@ -239,7 +238,7 @@ class Token(python_utils.OBJECT):
         Returns:
             bool. Whether the given string represents a valid real number.
         """
-        return text.replace('.', '', 1).isdigit()
+        return text.replace('.', '', 1).isdigit() or text in ('pi', 'e')
 
     def is_operator(self, text):
         """Checks if the given token represents a valid math operator.
