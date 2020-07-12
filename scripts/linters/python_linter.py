@@ -548,7 +548,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 summary_messages.append(summary_message)
         return summary_messages
 
-
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
