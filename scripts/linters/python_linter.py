@@ -354,7 +354,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """
         files_to_lint = self.all_filepaths
         start_time = time.time()
-        are_there_errors = False
+        errors_found = False
         summary_messages = []
 
         num_py_files = len(files_to_lint)
@@ -397,7 +397,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             if pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
                 summary_messages.append(summary_message)
-                are_there_errors = True
+                errors_found = True
 
             if pylinter.msg_status != 0:
                 for message in pylint_report.read():
@@ -405,12 +405,11 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pylint_error_messages = (
                     self._get_trimmed_error_output(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
-                python_utils.PRINT(summary_message)
-                are_there_errors = True
+                errors_found = True
 
             current_batch_start_index = current_batch_end_index
 
-        if are_there_errors:
+        if errors_found:
             summary_message = (
                 '%s Python linting failed' % (
                     linter_utils.FAILED_MESSAGE_PREFIX))
