@@ -71,8 +71,8 @@ export class SkillMasteryBackendApiService {
     };
 
     this.httpClient.put(
-      SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE,
-      putData).toPromise().then(() => {
+      SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, putData
+    ).toPromise().then(() => {
       if (successCallback) {
         successCallback();
       }

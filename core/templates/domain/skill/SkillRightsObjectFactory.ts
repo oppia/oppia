@@ -16,6 +16,7 @@
  * @fileoverview Factory for creating and mutating instances of frontend
  * skill rights domain objects.
  */
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 

@@ -90,7 +90,8 @@ export class StoryViewerBackendApiService {
         node_id: nodeId
       });
     this.http.post<StoryChapterCompletionBackendResponse>(
-      chapterCompletionUrl, {}).toPromise().then(data => {
+      chapterCompletionUrl, {}
+    ).toPromise().then(data => {
       successCallback({
         summaries: data.summaries.map(
           expSummary => this.learnerExplorationSummaryObjectFactory
