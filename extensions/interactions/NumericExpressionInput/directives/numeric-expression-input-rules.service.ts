@@ -34,10 +34,6 @@ export class NumericExpressionInputRulesService {
       inputs: INumericExpressionRuleInputs): boolean {
     let mis = new MathInteractionsService();
 
-    // Inserting '*' signs wherever necessary, if not present.
-    answer = mis.insertMultiplicationSigns(answer);
-    inputs.x = mis.insertMultiplicationSigns(inputs.x);
-
     // The expression is first split into terms by addition and subtraction.
     let answerTerms = mis.getTerms(answer);
     let inputTerms = mis.getTerms(inputs.x);
@@ -75,10 +71,6 @@ export class NumericExpressionInputRulesService {
     // At least one term should match between answer and input.
     let mis = new MathInteractionsService();
 
-    // Inserting '*' signs wherever necessary, if not present.
-    answer = mis.insertMultiplicationSigns(answer);
-    inputs.x = mis.insertMultiplicationSigns(inputs.x);
-
     // The expression is first split into terms by addition and subtraction.
     let answerTerms = mis.getTerms(answer);
     let inputTerms = mis.getTerms(inputs.x);
@@ -99,10 +91,6 @@ export class NumericExpressionInputRulesService {
     // There must be at least one term in the input that is not present in the
     // answer.
     let mis = new MathInteractionsService();
-
-    // Inserting '*' signs wherever necessary, if not present.
-    answer = mis.insertMultiplicationSigns(answer);
-    inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
     // The expression is first split into terms by addition and subtraction.
     let answerTerms = mis.getTerms(answer);
