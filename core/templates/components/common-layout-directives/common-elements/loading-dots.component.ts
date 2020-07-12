@@ -13,21 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying animated loading dots.
+ * @fileoverview Component for displaying animated loading dots.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').directive('loadingDots', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'loading-dots.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+@Component({
+  selector: 'loading-dots',
+  templateUrl: './loading-dots.component.html',
+  styleUrls: []
+})
+export class LoadingDotsComponent {
+  constructor() {}
+}
+angular.module('oppia').directive(
+  'loadingDots', downgradeComponent(
+    {component: LoadingDotsComponent}));
