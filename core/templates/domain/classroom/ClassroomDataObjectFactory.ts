@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import {
-  TopicSummary, TopicSummaryObjectFactory, ITopicSummaryBackendDict
+  TopicSummary, TopicSummaryObjectFactory, TopicSummaryBackendDict
 } from 'domain/topic/TopicSummaryObjectFactory';
 
 export class ClassroomData {
@@ -63,7 +63,7 @@ export class ClassroomDataObjectFactory {
       private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   createFromBackendData(
-      name: string, topicSummaryDicts: ITopicSummaryBackendDict[],
+      name: string, topicSummaryDicts: TopicSummaryBackendDict[],
       courseDetails: string, topicListIntro: string): ClassroomData {
     let topicSummaries = topicSummaryDicts.map(
       (summaryDict) => {

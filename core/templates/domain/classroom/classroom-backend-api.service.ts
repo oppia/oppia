@@ -26,7 +26,7 @@ import {
   ClassroomData,
   ClassroomDataObjectFactory
 } from 'domain/classroom/ClassroomDataObjectFactory';
-import { ITopicSummaryBackendDict } from
+import { TopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -37,7 +37,7 @@ interface IClassroomStatusBackendDict {
 
 interface IClassroomDataBackendDict {
   name: string,
-  'topic_summary_dicts': ITopicSummaryBackendDict[],
+  'topic_summary_dicts': TopicSummaryBackendDict[],
   'course_details': string,
   'topic_list_intro': string
 }
@@ -94,7 +94,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
+  fetchClassroomData(classroomName: string): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
     });

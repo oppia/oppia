@@ -50,7 +50,7 @@ export class TopicSummary {
       public version: number,
       public additionalStoryCount: number,
       public topicModelCreatedOn: number,
-      public topicModelLastUpdated: number
+      public topicModelLastUpdated: number,
       public thumbnailFilename: string,
       public thumbnailBgColor: string) { }
 

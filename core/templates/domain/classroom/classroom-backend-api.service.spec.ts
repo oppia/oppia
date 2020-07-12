@@ -24,7 +24,7 @@ import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
-import { ITopicSummaryBackendDict } from
+import { TopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
 
 describe('Classroom backend API service', function() {
@@ -33,7 +33,7 @@ describe('Classroom backend API service', function() {
   let httpTestingController: HttpTestingController;
   let classroomDataObjectFactory:
     ClassroomDataObjectFactory = null;
-  let firstTopicSummaryDict: ITopicSummaryBackendDict = {
+  let firstTopicSummaryDict: TopicSummaryBackendDict = {
     id: 'topic1',
     name: 'Topic name',
     canonical_story_count: 4,
@@ -41,9 +41,15 @@ describe('Classroom backend API service', function() {
     total_skill_count: 20,
     uncategorized_skill_count: 5,
     thumbnail_filename: 'image.svg',
-    thumbnail_bg_color: '#C6DCDA'
+    thumbnail_bg_color: '#C6DCDA',
+    language_code: 'en',
+    description: 'Topic description',
+    version: 2,
+    additional_story_count: 0,
+    topic_model_created_on: 231241343,
+    topic_model_last_updated: 3454354354
   };
-  let secondTopicSummaryDict: ITopicSummaryBackendDict = {
+  let secondTopicSummaryDict: TopicSummaryBackendDict = {
     id: 'topic2',
     name: 'Topic name 2',
     canonical_story_count: 3,
@@ -51,7 +57,13 @@ describe('Classroom backend API service', function() {
     total_skill_count: 10,
     uncategorized_skill_count: 3,
     thumbnail_filename: 'image.svg',
-    thumbnail_bg_color: '#C6DCDA'
+    thumbnail_bg_color: '#C6DCDA',
+    language_code: 'en',
+    description: 'Topic description',
+    version: 2,
+    additional_story_count: 0,
+    topic_model_created_on: 231241343,
+    topic_model_last_updated: 3454354354 
   };
 
   let responseDictionaries = {
