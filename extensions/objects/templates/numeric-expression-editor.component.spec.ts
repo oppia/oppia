@@ -24,7 +24,7 @@ import { GuppyInitializationService } from
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
-fdescribe('NumericExpressionEditor', function() {
+describe('NumericExpressionEditor', function() {
   var ctrl = null, $window = null;
   var mockGuppyObject = {
     guppyInstance: {
