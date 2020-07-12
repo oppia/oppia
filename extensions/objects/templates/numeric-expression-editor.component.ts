@@ -48,7 +48,7 @@ angular.module('oppia').component('numericExpressionEditor', {
           var answerIsValid = MathInteractionsService.validateExpression(
             ctrl.value, false);
           if (answerIsValid) {
-            // Explicitly inserting '*' signs wherever necessary. 
+            // Explicitly inserting '*' signs wherever necessary.
             ctrl.value = MathInteractionsService.insertMultiplicationSigns(
               ctrl.value);
           }
