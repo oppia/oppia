@@ -3399,9 +3399,9 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             return suggestion_services.get_suggestion_from_model(item)
         else:
-            cls.errors['model id check'].append((
-                'Entity id %s: Entity id does not match regex pattern') % (
-                    item.id))
+            cls.errors['target type check'].append(
+                'Entity id %s: Target type %s is not allowed' % (
+                    item.id, item.target_type))
             return None
 
     @classmethod
