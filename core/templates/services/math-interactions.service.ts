@@ -88,6 +88,7 @@ export class MathInteractionsService {
         ' values. Please enter numbers only.';
       return false;
     }
+    this.warningText = '';
     return true;
   }
 
