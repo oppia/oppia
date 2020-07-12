@@ -353,7 +353,7 @@ URLS = MAPREDUCE_HANDLERS + [
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.UNASSIGN_SKILL_DATA_HANDLER_URL,
-        topics_and_skills_dashboard.SkillAssignmentsHandler),
+        topics_and_skills_dashboard.TopicAssignmentsHandler),
     get_redirect_route(
         r'%s' % feconf.SKILL_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.SkillsDashboardPageDataHandler),

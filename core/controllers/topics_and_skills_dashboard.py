@@ -167,7 +167,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SkillAssignmentsHandler(base.BaseHandler):
+class TopicAssignmentsHandler(base.BaseHandler):
     """Provides information about which topics contain the given skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

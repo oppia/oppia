@@ -167,7 +167,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.logout()
 
 
-class SkillAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
+class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_get(self):
         self.login(self.ADMIN_EMAIL)
