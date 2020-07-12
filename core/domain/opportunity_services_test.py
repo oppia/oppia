@@ -615,6 +615,35 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(opportunities[0].id, '0')
 
+    def test_get_exploration_opportunity_summaries_by_ids_warns_if_invalid_id(
+            self):
+        """Tests that a warning is logged if there is no
+        ExplorationOpportunitySummaryModel associated with one of the ids.
+        """
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.warning()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+
+        with logging_swap:
+            opportunities = (
+                opportunity_services.
+                get_exploration_opportunity_summaries_by_ids(
+                    ['badID'])
+            )
+
+        self.assertEqual(len(opportunities), 0)
+        self.assertEqual(
+            observed_log_messages,
+            [
+                'When getting the exploration opportunity summary models for '
+                'ids: [u\'badID\'], one of the models was None.'
+            ]
+        )
+
     def test_get_exploration_opportunity_summary_from_model_populates_new_lang(
             self):
         observed_log_messages = []
