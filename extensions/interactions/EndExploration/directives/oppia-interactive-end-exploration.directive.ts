@@ -66,7 +66,7 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
                 .loadCollection(ctrl.collectionId)
                 .then(function(collection) {
                   ctrl.getCollectionTitle = function() {
-                    return collection.title;
+                    return collection.getTitle();
                   };
                 });
             }

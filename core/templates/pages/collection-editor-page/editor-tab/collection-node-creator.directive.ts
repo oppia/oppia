@@ -65,14 +65,13 @@ angular.module('oppia').directive('collectionNodeCreator', [
               ctrl.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
                 searchQuery
-              ).then(function(explorationMetadata) {
+              ).then(function(explorationMetadataList) {
                 var options = [];
-                explorationMetadata.getMetadataList().
-                  map(function(item) {
-                    if (!ctrl.collection.containsCollectionNode(item.id)) {
-                      options.push(item.title + ' (' + item.id + ')');
-                    }
-                  });
+                explorationMetadataList.map(function(item) {
+                  if (!ctrl.collection.containsCollectionNode(item.id)) {
+                    options.push(item.title + ' (' + item.id + ')');
+                  }
+                });
                 return options;
               }, function() {
                 AlertsService.addWarning(
