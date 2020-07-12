@@ -11,7 +11,7 @@
     <h2 translate="I18N_CLASSROOM_PAGE_COURSE_DETAILS"></h2>
     <p class="course-details"> <[$ctrl.classroomData.getCourseDetails()]> </p>
     <h2 translate="I18N_CLASSROOM_PAGE_TOPICS_COVERED"></h2>
-    <p> <[$ctrl.classroomData.getTopicsCovered()]> </p>
+    <p> <[$ctrl.classroomData.getTopicListIntro()]> </p>
   </div>
   <div class="oppia-topic-summary-tiles">
     <div ng-repeat="topicSummary in $ctrl.classroomData.getTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
