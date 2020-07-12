@@ -340,9 +340,10 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': re.compile(r'self.assertRaises\('),
-        'message': 'Please do not use self.assertRaises method. ' +
-                   'This method has been deprecated. Instead use ' +
-                   'self.assertRaisesRegexp method.',
+        'message': 'Please use assertRaises method instead use ' +
+                   'assertRaisesRegexp method because it also tests that regexp'
+                   ' matches on the string representation of the raised '
+                   'exception.'
         'excluded_files': (),
         'excluded_dirs': ()
     },
