@@ -1,16 +1,16 @@
 <div class="oppia-subtopics-list-container">
   <md-card class="oppia-page-card oppia-long-text">
     <h2 class="tab-title">
-      <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate"></span>
+      <span translate="I18N_TOPIC_VIEWER_STUDY_SKILLS"></span>
     </h2>
     <span class="subtopic-subheading">
-      <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate"></span>
+      <span translate="I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE"></span>
     </span>
     <div class="subtopics-container">
-      <subtopic-summary-tile *ngFor="let subtopic of subtopicsList"
+      <subtopic-summary-tile ng-repeat="subtopic in $ctrl.getSubtopics()"
                              subtopic="subtopic"
-                             topic-id="topicId"
-                             topic-name="topicName">
+                             topic-id="$ctrl.getTopicId()"
+                             topic-name="$ctrl.getTopicName()">
       </subtopic-summary-tile>
     </div>
   </md-card>
