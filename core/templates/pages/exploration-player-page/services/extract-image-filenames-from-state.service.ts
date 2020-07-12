@@ -22,11 +22,16 @@ import { Injectable } from '@angular/core';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { State } from 'domain/state/StateObjectFactory';
 import {
+  IDragAndDropSortInputCustomizationArgs,
   IImageClickInputCustomizationArgs,
   IItemSelectionInputCustomizationArgs,
-  IMultipleChoiceInputCustomizationArgs,
-  IDragAndDropSortInputCustomizationArgs
+  IMultipleChoiceInputCustomizationArgs
 } from 'interactions/customization-args-defs';
+
+type CustomizationArgsWithChoices = (
+  IDragAndDropSortInputCustomizationArgs |
+  IItemSelectionInputCustomizationArgs |
+  IMultipleChoiceInputCustomizationArgs);
 
 @Injectable({
   providedIn: 'root'
@@ -108,11 +113,8 @@ export class ExtractImageFilenamesFromStateService {
           state.interaction.id === this.INTERACTION_TYPE_ITEM_SELECTION ||
           state.interaction.id === this.INTERACTION_TYPE_DRAG_AND_DROP_SORT) {
         let customizationArgsHtml = '';
-        (<IMultipleChoiceInputCustomizationArgs |
-          IItemSelectionInputCustomizationArgs |
-          IDragAndDropSortInputCustomizationArgs> state.interaction
-            .customizationArgs).choices.value.forEach(
-          function(value) {
+        (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
+          .choices.value.forEach(function(value) {
             customizationArgsHtml = customizationArgsHtml.concat(value);
           });
         _allHtmlInTheState.push(customizationArgsHtml);

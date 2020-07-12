@@ -33,12 +33,12 @@ import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import {
-  IInteractionAnswer,
-  IMathExpressionAnswer,
-  IPencilCodeEditorAnswer,
-  ILogicProofAnswer,
   IFractionAnswer,
-  INumberWithUnitsAnswer
+  IInteractionAnswer,
+  ILogicProofAnswer,
+  IMathExpressionAnswer,
+  INumberWithUnitsAnswer,
+  IPencilCodeEditorAnswer
 } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
