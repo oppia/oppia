@@ -254,10 +254,6 @@ class MathExplorationImagesModel(base_models.BaseModel):
     # value.
     estimated_size_of_images_in_bytes = (
         ndb.FloatProperty(indexed=True, default=0))
-    # A field to store the intermediate exploration data while in the process
-    # of generation of Math images. This field will be non-empty only during
-    # the process of the generation and saving of images for math-expressions.
-    intermediate_exploration_data = ndb.JsonProperty(default={}, indexed=False)
 
     @staticmethod
     def get_deletion_policy():
