@@ -45,8 +45,7 @@
           </a>
           <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
               ng-mouseover="$ctrl.openSubmenu($event, 'aboutMenu')"
-              ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
-              role="menu">
+              ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
             <li class="nav-item">
               <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {shiftTab: $ctrl.ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
@@ -180,7 +179,7 @@
         </div>
       </a>
 
-      <ul uib-dropdown-menu class="ng-cloak oppia-navbar-dropdown uib-dropdown-menu" role="menu"
+      <ul uib-dropdown-menu class="ng-cloak oppia-navbar-dropdown uib-dropdown-menu"
           ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
           ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
         <li class="nav-item">
@@ -254,14 +253,14 @@
           <span translate="I18N_TOPNAV_SIGN_IN"></span>
         </button>
       </div>
-      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
           style="margin-right: 15px; padding: 0;">
         <li class="nav-item">
           <a href="" style="padding: 0; width: 190px;" ng-click="$ctrl.onLoginButtonClicked()"
              class="nav-link">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
-                <img ng-src="<[$ctrl.googleSignInIconUrl]>">
+                <img ng-src="<[$ctrl.googleSignInIconUrl]>" alt="google signin icon">
               </div>
               <span class="oppia-signin-text" translate="I18N_TOPNAV_SIGN_IN_WITH_GOOGLE"></span>
             </div>

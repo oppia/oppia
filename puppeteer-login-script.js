@@ -29,6 +29,8 @@ module.exports = async(browser, context) => {
     await setRoleAdmin(context, page);
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
+  } else if(context.url.includes('explore/0')) {
+    await createExplorations(context, page);
   }
   await page.close();
 };
@@ -115,3 +117,27 @@ const createCollections = async function(context, page) {
     console.log(e);
   }
 };
+
+const createExplorations = async function(context, page) {
+  try {
+    // eslint-disable-next-line no-console
+    console.log('Creating Exploration...');
+    // Load in Exploration
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://127.0.0.1:8181/admin');
+    await page.waitFor(2000);
+    await page.evaluate('window.confirm = () => true');
+    await page.screenshot({path: 'buddy-screenshot.png'});
+    await page.click('body > oppia-root > section > ng-transclude > admin-page > div:nth-child(3)' +
+    '> admin-dev-mode-activities-tab > md-card.oppia-admin-page-card.oppia-page-card.oppia-long-text._md > div' +
+    '> div:nth-child(2) > span.col-lg-2.col-md-2.col-sm-2.ml-auto > button');
+    // eslint-disable-next-line no-console
+    console.log('Exploration Created');
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Creating Exploration Failed');
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+};
+

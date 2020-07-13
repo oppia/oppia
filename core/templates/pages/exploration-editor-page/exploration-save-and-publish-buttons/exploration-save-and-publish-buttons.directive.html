@@ -72,7 +72,7 @@
           <button type="button" style="height: 34px; border-color: black;" class="btn btn-light uib-dropdown-toggle protractor-test-save-discard-toggle-for-small-screens dropdown-toggle"
                   ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
           </button>
-          <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
+          <ul uib-dropdown-menu style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
             <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item nav-item protractor-test-discard-changes-for-small-screens">Discard Draft</a></li>
           </ul>
         </div>
@@ -148,9 +148,9 @@
         </span>
       </button>
       <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle protractor-test-save-discard-toggle dropdown-toggle"
-              ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
+              ng-disabled="!getChangeListLength()" uib-dropdown-toggle aria-label="Discard Draft">
       </button>
-      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
+      <ul uib-dropdown-menu style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item nav-item protractor-test-discard-changes">Discard Draft</a></li>
       </ul>
     </div>
