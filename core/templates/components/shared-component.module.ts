@@ -43,7 +43,7 @@ import { SchemaBasedBoolEditorComponent } from
   './forms/schema-based-editors/schema-based-bool-editor.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SchemaBasedExpressionEditorComponent } from
-  './forms/schema-based-editors/schema-based-expression-editor.directive';
+  './forms/schema-based-editors/schema-based-expression-editor.component';
 
 
 

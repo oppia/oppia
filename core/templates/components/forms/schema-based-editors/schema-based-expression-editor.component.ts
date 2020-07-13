@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-expression-editor',
-  templateUrl: './schema-based-expression-editor.directive.html',
+  templateUrl: './schema-based-expression-editor.component.html',
   styleUrls: []
 })
 export class SchemaBasedExpressionEditorComponent {
