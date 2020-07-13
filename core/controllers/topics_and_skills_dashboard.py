@@ -29,6 +29,7 @@ from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
@@ -164,6 +165,25 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)
+
+
+class TopicAssignmentsHandler(base.BaseHandler):
+    """Provides information about which topics contain the given skill."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self, skill_id):
+        """Handles GET requests."""
+        topic_assignments = skill_services.get_all_topic_assignments_for_skill(
+            skill_id)
+        topic_assignment_dicts = [
+            topic_assignment.to_dict()
+            for topic_assignment in topic_assignments]
+
+        self.render_json({
+            'topic_assignment_dicts': topic_assignment_dicts
+        })
 
 
 class SkillsDashboardPageDataHandler(base.BaseHandler):
@@ -368,11 +388,11 @@ class MergeSkillHandler(base.BaseHandler):
         """Handles the POST request."""
         old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')
-        new_skill = skill_services.get_skill_by_id(new_skill_id, strict=False)
+        new_skill = skill_fetchers.get_skill_by_id(new_skill_id, strict=False)
         if new_skill is None:
             raise self.PageNotFoundException(
                 Exception('The new skill with the given id doesn\'t exist.'))
-        old_skill = skill_services.get_skill_by_id(old_skill_id, strict=False)
+        old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=False)
         if old_skill is None:
             raise self.PageNotFoundException(
                 Exception('The old skill with the given id doesn\'t exist.'))

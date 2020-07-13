@@ -46,16 +46,16 @@ angular.module('oppia').component('preferencesPage', {
   template: require('./preferences-page.component.html'),
   controller: [
     '$http', '$q', '$translate', '$timeout', '$window',
-    '$uibModal', 'AlertsService', 'LanguageUtilService', 'LoaderService',
-    'UrlInterpolationService', 'UserService',
-    'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
+    '$uibModal', 'AlertsService', 'I18nLanguageCodeService',
+    'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
+    'UserService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
     'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
     'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
     function(
         $http, $q, $translate, $timeout, $window,
-        $uibModal, AlertsService, LanguageUtilService, LoaderService,
-        UrlInterpolationService, UserService,
-        DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
+        $uibModal, AlertsService, I18nLanguageCodeService,
+        LanguageUtilService, LoaderService, UrlInterpolationService,
+        UserService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
         ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
         SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
@@ -95,6 +95,8 @@ angular.module('oppia').component('preferencesPage', {
       ctrl.savePreferredSiteLanguageCodes = function(
           preferredSiteLanguageCode) {
         $translate.use(preferredSiteLanguageCode);
+        I18nLanguageCodeService.setI18nLanguageCode(
+          preferredSiteLanguageCode);
         _forceSelect2Refresh();
         _saveDataItem(
           'preferred_site_language_code', preferredSiteLanguageCode);
