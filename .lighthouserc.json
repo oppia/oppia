@@ -18,6 +18,7 @@
         "http://127.0.0.1:8181/emaildashboard",
         "http://127.0.0.1:8181/get-started",
         "http://127.0.0.1:8181/community-library",
+        "http://127.0.0.1:8181/moderator",
         "http://127.0.0.1:8181/privacy-policy",
         "http://127.0.0.1:8181/teach",
         "http://127.0.0.1:8181/terms",
