@@ -1439,6 +1439,44 @@ class AugmentedSkillSummary(python_utils.OBJECT):
         }
 
 
+class TopicAssignment(python_utils.OBJECT):
+    """Domain object for Topic Assignment, which provides the details of a
+    single topic (and, if applicable, the subtopic within that topic) to which
+    the skill is assigned.
+    """
+
+    def __init__(
+            self, topic_id, topic_name, topic_version, subtopic_id):
+        """Constructs a TopicAssignment domain object.
+
+        Args:
+            topic_id: str. The unique id of the topic.
+            topic_name: str. The name of the topic.
+            topic_version: int. The current version of the topic to which the
+                skill is assigned.
+            subtopic_id: str or None. The id of the subtopic to which the skill
+                is assigned, or None if the skill is not assigned to any
+                subtopic.
+        """
+        self.topic_id = topic_id
+        self.topic_name = topic_name
+        self.topic_version = topic_version
+        self.subtopic_id = subtopic_id
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this TopicAssignment object.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'topic_name': self.topic_name,
+            'topic_version': self.topic_version,
+            'subtopic_id': self.subtopic_id,
+        }
+
+
 class UserSkillMastery(python_utils.OBJECT):
     """Domain object for a user's mastery of a particular skill."""
 
