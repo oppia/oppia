@@ -55,7 +55,7 @@ describe('Subtopic editor tab', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     directive = $injector.get('subtopicEditorTabDirective')[0];

@@ -28,32 +28,32 @@
         <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>" class="list-summary">
           <div class="skill-description protractor-test-skill-description"> <[skill.description]> </div>
           <div class="skill-topic">
-            <span ng-if="!skill.topic_name">
+            <span ng-if="!skill.topicName">
               Unassigned
               <i class="fa fa-exclamation-triangle"></i>
             </span>
-            <span ng-if="skill.topic_name">
-              <[skill.topic_name]>
+            <span ng-if="skill.topicName">
+              <[skill.topicName]>
             </span>
           </div>
         </a>
       </td>
       <td>
         <span class="list-summary text-center">
-          <span> <[skill.worked_examples_count]> </span>
+          <span> <[skill.workedExamplesCount]> </span>
         </span>
       </td>
       <td>
         <span class="list-summary text-center">
-          <span> <[skill.misconception_count]> </span>
+          <span> <[skill.misconceptionCount]> </span>
         </span>
       </td>
       <td class="text-right">
         <span>
-          <span ng-if="skill.topic_name">
+          <span ng-if="skill.topicName">
             Assigned
           </span>
-          <span ng-if="!skill.topic_name" class="skill-topic-unassigned protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+          <span ng-if="!skill.topicName" class="skill-topic-unassigned protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
             Unassigned
           </span>
         </span>
@@ -120,12 +120,12 @@
               </div>
             </div>
             <div class="skill-topic">
-              <span ng-if="!skill.topic_name">
+              <span ng-if="!skill.topicName">
                 Unassigned
                 <i class="fa fa-exclamation-triangle"></i>
               </span>
-              <span ng-if="skill.topic_name">
-              <[skill.topic_name]>
+              <span ng-if="skill.topicName">
+              <[skill.topicName]>
               </span>
             </div>
           </div>
@@ -134,16 +134,16 @@
       <div class="skill-item-entities">
         <div class="skill-item-entity">
           <div class="skill-item-key"><span>Worked Examples</span></div>
-          <div class="skill-item-value"><span> <[skill.worked_examples_count]></span></div>
+          <div class="skill-item-value"><span> <[skill.workedExamplesCount]></span></div>
         </div>
         <div class="skill-item-entity">
           <div class="skill-item-key"><span>Misconceptions</span></div>
-          <div class="skill-item-value"><span> <[skill.misconception_count]></span></div>
+          <div class="skill-item-value"><span> <[skill.misconceptionCount]></span></div>
         </div>
         <div class="skill-item-entity">
           <div class="skill-item-key"><span>Status</span></div>
-          <div ng-if="skill.topic_name" class="skill-item-value"><span> <[skill.topic_name]></span></div>
-          <div ng-if="!skill.topic_name" class="skill-item-value"><span>Not Assigned</span></div>
+          <div ng-if="skill.topicName" class="skill-item-value"><span> <[skill.topicName]></span></div>
+          <div ng-if="!skill.topicName" class="skill-item-value"><span>Not Assigned</span></div>
         </div>
       </div>
     </div>

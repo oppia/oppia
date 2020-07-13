@@ -26,8 +26,8 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { SubtitledHtmlObjectFactory } from
@@ -74,14 +74,14 @@ describe('Topic update service', function() {
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value(
-      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
     $provide.value(
       'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value(
       'SubtopicObjectFactory',
-      new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
+      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()));
     $provide.value(
       'SubtopicPageContentsObjectFactory',
       new SubtopicPageContentsObjectFactory(
@@ -110,7 +110,7 @@ describe('Topic update service', function() {
     subtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
-    skillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    skillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
 
     var sampleTopicBackendObject = {
       topicDict: {

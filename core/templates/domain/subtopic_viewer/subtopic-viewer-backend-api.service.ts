@@ -20,8 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ISubtopicDataBackendDict, ReadOnlySubtopicPageObjectFactory } from
-  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+import {
+  SubtopicDataBackendDict,
+  ReadOnlySubtopicPageData,
+  ReadOnlySubtopicPageObjectFactory
+} from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';
 import { UrlInterpolationService } from
@@ -38,31 +41,32 @@ export class SubtopicViewerBackendApiService {
 
   private _fetchSubtopicData(
       topicName: string, subtopicId: string,
-      successCallback: (value?: Object) => void,
-      errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: ReadOnlySubtopicPageData) => void,
+      errorCallback: (reason?: Object) => void): void {
     var subtopicDataUrl = this.urlInterpolation.interpolateUrl(
       SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE, {
         topic_name: topicName,
         subtopic_id: subtopicId
       });
 
-    this.http.get(subtopicDataUrl).toPromise().then((
-        response: ISubtopicDataBackendDict) => {
-      let subtopicDataObject = (
-        this.readOnlySubtopicPageFactory.createFromBackendDict(
-          response
-        ));
-      if (successCallback) {
-        successCallback(subtopicDataObject);
-      }
-    }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse);
-      }
-    });
+    this.http.get<SubtopicDataBackendDict>(subtopicDataUrl).toPromise()
+      .then(response => {
+        let subtopicDataObject = (
+          this.readOnlySubtopicPageFactory.createFromBackendDict(
+            response));
+        if (successCallback) {
+          successCallback(subtopicDataObject);
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse);
+        }
+      });
   }
 
-  fetchSubtopicData(topicName: string, subtopicId: string): Promise<object> {
+  fetchSubtopicData(
+      topicName: string,
+      subtopicId: string): Promise<ReadOnlySubtopicPageData> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicData(topicName, subtopicId, resolve, reject);
     });

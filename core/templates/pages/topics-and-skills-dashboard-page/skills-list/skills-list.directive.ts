@@ -55,6 +55,7 @@ angular.module('oppia').directive('skillsList', [
         getItemsPerPage: '&itemsPerPage',
         getEditableTopicSummaries: '&editableTopicSummaries',
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
+        getUntriagedSkillSummaries: '&untriagedSkillSummaries',
         canDeleteSkill: '&userCanDeleteSkill',
         canCreateSkill: '&userCanCreateSkill',
         isUnpublishedSkill: '&unpublishedSkill',
@@ -160,6 +161,7 @@ angular.module('oppia').directive('skillsList', [
           ctrl.mergeSkill = function(skill) {
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var categorizedSkills = $scope.getSkillsCategorizedByTopics();
+            var untriagedSkillSummaries = $scope.getUntriagedSkillSummaries();
             var allowSkillsFromOtherTopics = true;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -169,7 +171,8 @@ angular.module('oppia').directive('skillsList', [
                 skill: () => skill,
                 skillSummaries: () => skillSummaries,
                 categorizedSkills: () => categorizedSkills,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => untriagedSkillSummaries
               },
               controller: 'MergeSkillModalController',
               windowClass: 'skill-select-modal',

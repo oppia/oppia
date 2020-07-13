@@ -40,7 +40,7 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
-require('domain/skill/SkillSummaryObjectFactory.ts');
+require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');

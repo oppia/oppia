@@ -22,8 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -41,11 +41,11 @@ describe('Topic viewer backend API service', () => {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
     $provide.value(
       'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
-        new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
-        new SkillSummaryObjectFactory()));
+        new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
+        new ShortSkillSummaryObjectFactory()));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
