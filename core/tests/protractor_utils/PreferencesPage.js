@@ -55,6 +55,12 @@ var PreferencesPage = function() {
     by.css('.protractor-test-photo-crop .cropper-container'));
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
+  var toastMessageElement = element(by.css('.toast-message'));
+
+  var checkIfFieldHasBeenSaved = async function(fieldName) {
+    await waitFor.visibilityOf(
+      toastMessageElement, `${fieldName} takes too long to get saved.`);
+  };
 
   this.expectUploadError = async function() {
     expect(await profilePhotoUploadError.isDisplayed()).toBe(true);
@@ -75,8 +81,10 @@ var PreferencesPage = function() {
   };
 
   this.editUserBio = async function(bio) {
+    await userBioElement.click();
     await userBioElement.sendKeys(bio);
     await navBar.click();
+    await checkIfFieldHasBeenSaved('User Bio');
     await preferencesLink.click();
   };
 
@@ -87,10 +95,12 @@ var PreferencesPage = function() {
 
   this.toggleEditorRoleEmailsCheckbox = async function() {
     await editorRoleEmailsCheckbox.click();
+    await checkIfFieldHasBeenSaved('Editor Role Emails');
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
     await feedbackMessageEmailsCheckbox.click();
+    await checkIfFieldHasBeenSaved('Feedback Emails');
   };
 
   this.selectSystemLanguage = async function(language) {
@@ -98,6 +108,7 @@ var PreferencesPage = function() {
     var option = element(
       by.cssContainingText('.select2-dropdown li', language));
     await option.click();
+    await checkIfFieldHasBeenSaved('System Language');
   };
 
   this.selectPreferredAudioLanguage = async function(language) {
@@ -105,14 +116,17 @@ var PreferencesPage = function() {
     var correctOption = element(
       by.cssContainingText('.select2-results li', language));
     await correctOption.click();
+    await checkIfFieldHasBeenSaved('Preferred Audio Language');
   };
 
   this.setUserBio = async function(bio) {
     await waitFor.visibilityOf(
       userBioElement, 'User bio field takes too long to appear.');
     await userBioElement.clear();
+    await userBioElement.click();
     await userBioElement.sendKeys(bio);
     await navBar.click();
+    await checkIfFieldHasBeenSaved('User Bio');
     await waitFor.elementToBeClickable(
       preferencesLink, 'Preferences takes too long to be clickable.');
     await preferencesLink.click();
@@ -123,6 +137,7 @@ var PreferencesPage = function() {
     await Promise.all(interests.map(async function(interest) {
       await userInterestsInput.sendKeys(interest, protractor.Key.RETURN);
     }));
+    await checkIfFieldHasBeenSaved('User Interests');
   };
 
   this.isFeedbackEmailsCheckboxSelected = async function() {
@@ -177,10 +192,12 @@ var PreferencesPage = function() {
 
   this.selectCreatorDashboard = async function() {
     await createrDashboardRadio.click();
+    await checkIfFieldHasBeenSaved('Creator Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {
     await learnerDashboardRadio.click();
+    await checkIfFieldHasBeenSaved('Learner Dashboard Option');
   };
 };
 
