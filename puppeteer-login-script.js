@@ -128,8 +128,9 @@ const createExplorations = async function(context, page) {
     await page.waitFor(2000);
     await page.evaluate('window.confirm = () => true');
     await page.screenshot({path: 'buddy-screenshot.png'});
-    await page.click('body > oppia-root > section > ng-transclude > admin-page > div:nth-child(3)' +
-    '> admin-dev-mode-activities-tab > md-card.oppia-admin-page-card.oppia-page-card.oppia-long-text._md > div' +
+    await page.click('body > oppia-root > section > ng-transclude > admin-page' +
+    '> div:nth-child(3) > admin-dev-mode-activities-tab >' +
+    'md-card.oppia-admin-page-card.oppia-page-card.oppia-long-text._md > div'+
     '> div:nth-child(2) > span.col-lg-2.col-md-2.col-sm-2.ml-auto > button');
     // eslint-disable-next-line no-console
     console.log('Exploration Created');
@@ -140,4 +141,3 @@ const createExplorations = async function(context, page) {
     console.log(e);
   }
 };
-
