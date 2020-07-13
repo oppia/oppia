@@ -180,6 +180,28 @@ describe('Subtopic editor tab', function() {
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
+  it('should call TopicUpdateService when skill is rearranged',
+    function() {
+      var removeSkillSpy = spyOn(
+        TopicUpdateService, 'rearrangeSkillInSubtopic');
+      ctrl.onRearrangeMoveSkillFinish(1);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService if skill is rearranged to the ' +
+      'original place', function() {
+    ctrl.onRearrangeMoveSkillStart(10);
+    var removeSkillSpy = spyOn(
+      TopicUpdateService, 'rearrangeSkillInSubtopic');
+    ctrl.onRearrangeMoveSkillFinish(10);
+    expect(removeSkillSpy).not.toHaveBeenCalled();
+  });
+
+  it('should record the index of the skill to move', function() {
+    ctrl.onRearrangeMoveSkillStart(10);
+    expect(ctrl.fromIndex).toEqual(10);
+  });
+
   it('should not call TopicUpdateService when skill is moved to same subtopic',
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
