@@ -24,7 +24,7 @@ var clear = async function(inputName, inputElement) {
 };
 
 var click = async function(
-    elementName, clickableElement, clickableCheck=false) {
+    elementName, clickableElement, clickableCheck = false) {
   await waitFor.visibilityOf(
     clickableElement, `${elementName} is not visible.`);
   if (clickableCheck) {

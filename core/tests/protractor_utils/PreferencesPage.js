@@ -96,14 +96,14 @@ var PreferencesPage = function() {
   this.toggleEditorRoleEmailsCheckbox = async function() {
     await action.click(
       'Editor role emails checkbox', editorRoleEmailsCheckbox,
-      clickableCheck=true);
+      clickableCheck = true);
     await saveNewChanges('Editor Role Emails');
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
     await action.click(
       'Feedback emails checkbox', feedbackMessageEmailsCheckbox,
-      clickableCheck=true);
+      clickableCheck = true);
     await saveNewChanges('Feedback Emails');
   };
 
@@ -187,13 +187,13 @@ var PreferencesPage = function() {
 
   this.selectCreatorDashboard = async function() {
     await action.click(
-      'Creator Dashboard radio', createrDashboardRadio, clickableCheck=true);
+      'Creator Dashboard radio', createrDashboardRadio, clickableCheck = true);
     await saveNewChanges('Creator Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {
     await action.click(
-      'Learner Dashboard radio', learnerDashboardRadio, clickableCheck=true);
+      'Learner Dashboard radio', learnerDashboardRadio, clickableCheck = true);
     await saveNewChanges('Learner Dashboard Option');
   };
 };
