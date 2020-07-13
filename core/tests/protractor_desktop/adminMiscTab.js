@@ -47,17 +47,15 @@ describe('Admin misc tab', function() {
     topicId = temp.substring(0, temp.length - 1);
     await topicEditorPage.publishTopic();
     await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.get();
+    await adminPage.getMiscTab();
   });
 
   it('should upload and download similarity files', async function() {
-    await adminPage.get();
-    await browser.waitForAngularEnabled(true);
-    await adminPage.getMiscTab();
     await adminPage.uploadTopicSimilarities(
       '../data/sample_topic_similarities.csv', true);
     allowedErrors.push('encode', 'Object', 'resource');
     await adminPage.expectSimilaritiesToBeUploaded();
-    await browser.refresh();
     await adminPage.uploadTopicSimilarities('../data/cafe.mp3', false);
     await adminPage.downloadSimilarityFile();
     await waitFor.fileToBeDownloaded('topic_similarities.csv');
