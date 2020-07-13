@@ -17,14 +17,16 @@
  */
 
 describe('Editor Reloading Modal Controller', function() {
+  var $flushPendingTasks = null;
   var $scope = null;
-  var $timeout = null;
   var $uibModalInstance = null;
+  var $verifyNoPendingTasks = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
+    $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
+    $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -36,8 +38,10 @@ describe('Editor Reloading Modal Controller', function() {
     });
   }));
 
-  it('should dismiss modal after 2500 msecs', function() {
-    $timeout.flush(2500);
+  it('should dismiss modal after waiting timeout to finish', function() {
+    $flushPendingTasks();
+    $verifyNoPendingTasks('$timeout');
+
     expect($uibModalInstance.dismiss).toHaveBeenCalled();
   });
 });

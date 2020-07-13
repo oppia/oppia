@@ -17,9 +17,10 @@
  */
 
 describe('Refresher Exploration Confirmation Modal Controller', function() {
+  var $flushPendingTasks = null;
   var $scope = null;
-  var $timeout = null;
   var $uibModalInstance = null;
+  var $verifyNoPendingTasks = null;
   var ContextService = null;
   var ExplorationEngineService = null;
   var UrlService = null;
@@ -35,8 +36,10 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
     $provide.value('$window', mockWindow);
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
+    $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
+    $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
+
     ContextService = $injector.get('ContextService');
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
 
@@ -67,7 +70,8 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
     spyOn(mockWindow, 'open').and.callThrough();
     $scope.confirmRedirect();
 
-    $timeout.flush(150);
+    $flushPendingTasks();
+    $verifyNoPendingTasks('$timeout');
 
     expect(redirectConfirmationCallback).toHaveBeenCalled();
     expect(mockWindow.open).toHaveBeenCalledWith(
