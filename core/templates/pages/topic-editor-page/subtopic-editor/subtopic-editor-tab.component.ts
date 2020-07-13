@@ -64,10 +64,10 @@ angular.module('oppia').component('subtopicEditorTab', {
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
-          var skillIds = ctrl.subtopic.getSkillIds();
-          if (skillIds.length) {
+          ctrl.skillIds = ctrl.subtopic.getSkillIds();
+          if (ctrl.skillIds.length) {
             QuestionBackendApiService.fetchTotalQuestionCountForSkillIds(
-              skillIds).then((questionCount) => {
+              ctrl.skillIds).then((questionCount) => {
               ctrl.questionCount = questionCount;
             });
           }

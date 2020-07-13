@@ -83,6 +83,22 @@
     </div>
 
     <div class="subtopic-right-box">
+      <md-card>
+        <div class="entity-count">
+          <div class="skill-count">
+            <span class="skill-count-value"><[$ctrl.skillIds.length]></span>
+            <span class="skill-count-text">Skills</span>
+          </div>
+          <div class="question-count">
+            <span class="question-count-value"><[$ctrl.questionCount]></span>
+            <span class="question-count-text">Questions</span>
+          </div>
+          <div class="create-skill-container" ng-click="$ctrl.createSkill()">
+            <i class="fa fa-plus-circle"></i>
+            <span class="create-skill-text">Create New Skill</span>
+          </div>
+        </div>
+      </md-card>
       <md-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container">
         <div class="skill-card-header">
           <h3>Skills</h3>
@@ -228,6 +244,37 @@
   .subtopic-content .subtopic-skill-card i {
     display: none;
   }
+  .subtopic-content .entity-count {
+    align-items: center;
+    background-color: #ffffff;
+    display: flex;
+    flex-wrap: wrap;
+    height: 100px;
+    justify-content: center;
+  }
+  .subtopic-content .skill-count,
+  .subtopic-content .question-count,
+  .subtopic-content .create-skill-container {
+    border-right: 2px solid #aaaac1;
+    display: inline-block;
+    text-align: center;
+    width: 33%;
+  }
+  .subtopic-content .create-skill-container {
+    border-right: none;
+  }
+  .subtopic-content .skill-count-value,
+  .subtopic-content .question-count-value,
+  .subtopic-content .story-count-value {
+    display: block;
+    font-size: 26px;
+    height: 40px;
+  }
+  .subtopic-content .create-skill-container i {
+    color: #00645C;
+    font-size: 30px;
+    width: 100%;
+  }
   @media screen and (max-width: 1100px) {
     .subtopic-content .subtopic-left-box {
       width: 55%;
@@ -237,14 +284,9 @@
     }
   }
   @media screen and (max-width: 768px) {
-    .subtopic-content .subtopic-left-box {
-      width: 60%;
+    .subtopic-content .entity-count {
+      display: none;
     }
-    .subtopic-item-container {
-      margin: 1px;
-    }
-  }
-  @media screen and (max-width: 700px) {
     .subtopic-content .subtopic-left-box,
     .subtopic-content .subtopic-right-box {
       width: 100%;
