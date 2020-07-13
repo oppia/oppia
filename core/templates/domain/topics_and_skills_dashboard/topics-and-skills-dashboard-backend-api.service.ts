@@ -18,8 +18,9 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
@@ -27,6 +28,8 @@ import {
   TopicsAndSkillsDashboardFilter
 // eslint-disable-next-line max-len
 } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 export interface ITopicSummaryBackendDict {
   'id': string;
@@ -72,16 +75,38 @@ interface ISkillsDashboardDataBackendDict {
   'total_skill_count': number
 }
 
+interface IAssignedSkillDataBackendDict {
+  'topic_assignments_dict': {
+    [key: string]: {
+      'topic_id': string,
+      'topic_name': string,
+      'topic_version': number,
+      'subtopic_id': number|null
+    }
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
 
 export class TopicsAndSkillsDashboardBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+              private urlInterpolationService: UrlInterpolationService) {}
 
   fetchDashboardData(): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
     return this.http.get<ITopicsAndSkillsDashboardDataBackendDict>(
       '/topics_and_skills_dashboard/data').toPromise();
+  }
+
+  fetchTopicAssignmentsForSkill(
+      skillId): Promise<IAssignedSkillDataBackendDict> {
+    const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+      '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
+        skill_id: skillId
+      });
+    return this.http.get<IAssignedSkillDataBackendDict>(
+      assignSkillDataUrl).toPromise();
   }
 
   fetchSkillsDashboardData(
