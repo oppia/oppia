@@ -6034,6 +6034,89 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class MathExplorationImagesModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(MathExplorationImagesModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(3)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        self.model_instance_0 = (
+            exp_models.MathExplorationImagesModel(id='0'))
+        self.model_instance_0.put()
+        self.model_instance_1 = (
+            exp_models.MathExplorationImagesModel(id='1'))
+        self.model_instance_1.put()
+        self.model_instance_2 = (
+            exp_models.MathExplorationImagesModel(id='2'))
+        self.model_instance_2.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.
+            MathExplorationImagesModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated MathExplorationImagesModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of MathExplorationImagesModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated MathExplorationImagesModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'MathExplorationImagesModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exp_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'exp_ids field check of MathExplorationImagesModel\', '
+                '[u"Entity id 2: based on field '
+                'exp_ids having value 2, expect model ExplorationModel '
+                'with id 2 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated MathExplorationImagesModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class QuestionSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
 
