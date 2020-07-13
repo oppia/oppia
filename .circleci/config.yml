@@ -22,15 +22,15 @@ workflows:
       # - e2e_non_prod_tests:
       #     requires:
       #       - setup_and_typescript_tests
-      # - e2e_navigation_and_misc:
-      #     requires:
-      #       - setup_and_typescript_tests
+      - e2e_navigation_and_misc:
+          requires:
+            - setup_and_typescript_tests
       # - e2e_library_and_collections:
       #     requires:
       #       - e2e_navigation_and_misc
-      - e2e_users
-          # requires:
-          #   - e2e_navigation_and_misc
+      - e2e_users:
+          requires:
+            - e2e_navigation_and_misc
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -124,71 +124,71 @@ jobs:
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
   # should be run in the non-prod environment.
-  # e2e_navigation_and_misc:
-  #   <<: *job_defaults
-  #   steps:
-  #     - checkout
-  #     - merge_target_branch
-  #     - install_chrome
-  #     - attach_workspace:
-  #         at: /home/circleci/
-  #     - run:
-  #         name: Run e2e navigation test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-  #         # Provide a longer time period for this first test (which omits the
-  #         # --skip-build flag), since the webpack build process itself can take
-  #         # up to 10 minutes. If this is not done, then the test may stall due
-  #         # to lack of test output during this time.
-  #         no_output_timeout: 20m
-  #     - check_release_chaneglog_update_branch
-  #     - run:
-  #         name: Run e2e admin page test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env --sharding-instances=1
-  #     - persist_to_workspace:
-  #         root: /home/circleci/
-  #         paths:
-  #           - oppia/app.yaml
-  #           - oppia/assets/constants.ts
-  #           - oppia/assets/hashes.json
-  #           - oppia/backend_prod_files/
-  #           - oppia/build/
-  #           - oppia/third_party/generated/
+  e2e_navigation_and_misc:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
+      - install_chrome
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e navigation test
+          command: |
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
+          # Provide a longer time period for this first test (which omits the
+          # --skip-build flag), since the webpack build process itself can take
+          # up to 10 minutes. If this is not done, then the test may stall due
+          # to lack of test output during this time.
+          no_output_timeout: 20m
+      - check_release_chaneglog_update_branch
+      - run:
+          name: Run e2e admin page test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppia/app.yaml
+            - oppia/assets/constants.ts
+            - oppia/assets/hashes.json
+            - oppia/backend_prod_files/
+            - oppia/build/
+            - oppia/third_party/generated/
 
-  # e2e_library_and_collections:
-  #   <<: *job_defaults
-  #   steps:
-  #     - checkout
-  #     - check_release_chaneglog_update_branch
-  #     - merge_target_branch
-  #     - install_chrome
-  #     - attach_workspace:
-  #         at: /home/circleci/
-  #     - run:
-  #         name: Run e2e publication test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
-  #     - run:
-  #         name: Run e2e library test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env --sharding-instances=1
-  #     - run:
-  #         name: Run e2e classroomPage test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
-  #     - run:
-  #         name: Run e2e collections test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env --sharding-instances=1
-  #     - run:
-  #         name: Run e2e accessibility page test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env --sharding-instances=1
-  #     - run:
-  #         name: Run e2e embedding page test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env --sharding-instances=1
+  e2e_library_and_collections:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - check_release_chaneglog_update_branch
+      - merge_target_branch
+      - install_chrome
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e publication test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
+      - run:
+          name: Run e2e library test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+      - run:
+          name: Run e2e classroomPage test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
+      - run:
+          name: Run e2e collections test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+      - run:
+          name: Run e2e accessibility page test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+      - run:
+          name: Run e2e embedding page test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
 
   e2e_users:
     <<: *job_defaults
@@ -199,18 +199,18 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
-      - run:
-          name: Run e2e users test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env --sharding-instances=1
+      # - run:
+      #     name: Run e2e users test
+      #     command: |
+      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
       # - run:
       #     name: Run e2e subscriptions test
       #     command: |
-      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env --sharding-instances=1
+      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
       # - run:
       #     name: Run e2e profileMenu test
       #     command: |
-      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env --sharding-instances=1
+      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
       - run:
           name: Run e2e preferences test
           command: |
@@ -223,43 +223,43 @@ jobs:
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
   # All other e2e tests should be run in prod mode.
-  # e2e_non_prod_tests:
-  #   <<: *job_defaults
-  #   steps:
-  #     - checkout
-  #     - check_release_chaneglog_update_branch
-  #     - merge_target_branch
-  #     - install_chrome
-  #     - attach_workspace:
-  #         at: /home/circleci/
-  #     - run:
-  #         name: Run e2e file upload features test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
-  #     - run:
-  #         name: Run e2e topics and skills dashboard test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --sharding-instances=1 --server_log_level=info
-  #     - run:
-  #         name: Run e2e topics and story editor
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --server_log_level=info
-  #     - run:
-  #         name: Run e2e classroom page test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --sharding-instances=1 --server_log_level=info
-  #     - run:
-  #         name: Run e2e topic and story editor test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
-  #     - run:
-  #         name: Run e2e play voiceovers test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
-  #     - run:
-  #         name: Run e2e file upload extensions test
-  #         command: |
-  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
+  e2e_non_prod_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - check_release_chaneglog_update_branch
+      - merge_target_branch
+      - install_chrome
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e file upload features test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+      - run:
+          name: Run e2e topics and skills dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
+      - run:
+          name: Run e2e topics and story editor
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --server_log_level=info
+      - run:
+          name: Run e2e classroom page test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info
+      - run:
+          name: Run e2e topic and story editor test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
+      - run:
+          name: Run e2e play voiceovers test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+      - run:
+          name: Run e2e file upload extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
 
 notify:
   webhooks:
