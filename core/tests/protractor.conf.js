@@ -2,7 +2,7 @@ var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob')
 var path = require('path')
 var Constants = require('./protractor_utils/ProtractorConstants');
-var DOWNLOAD_PATH = path.resolve(__dirname, Constants.protractorConstants.DOWNLOAD_PATH);
+var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
 var suites = {
     // The tests on Travis are run individually to parallelize

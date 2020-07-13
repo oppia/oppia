@@ -125,7 +125,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
  */
 
 var fileToBeDownloaded = async function(filename) {
-  var name = Constants.protractorConstants.DOWNLOAD_PATH + '/' + filename;
+  var name = Constants.DOWNLOAD_PATH + '/' + filename;
   browser.driver.wait(function() {
     return fs.existsSync(name);
   }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
