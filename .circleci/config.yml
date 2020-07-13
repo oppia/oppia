@@ -19,18 +19,18 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      - e2e_non_prod_tests:
-          requires:
-            - setup_and_typescript_tests
-      - e2e_navigation_and_misc:
-          requires:
-            - setup_and_typescript_tests
-      - e2e_library_and_collections:
-          requires:
-            - e2e_navigation_and_misc
+      # - e2e_non_prod_tests:
+      #     requires:
+      #       - setup_and_typescript_tests
+      # - e2e_navigation_and_misc:
+      #     requires:
+      #       - setup_and_typescript_tests
+      # - e2e_library_and_collections:
+      #     requires:
+      #       - e2e_navigation_and_misc
       - e2e_users:
-          requires:
-            - e2e_navigation_and_misc
+          # requires:
+          #   - e2e_navigation_and_misc
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
