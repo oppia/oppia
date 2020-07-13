@@ -943,12 +943,20 @@ def estimate_size_of_svg_for_math_expressions_in_html(html_string):
         html_string.encode(encoding='utf-8'), 'html.parser')
     size_in_bytes = 0
     largest_math_expression = ''
+    # The approximate size for an SVG image for a Latex with one character
+    # is around 1000 Kb. But, when the number of characters increase the
+    # size of SVG per character reduces. For example: If the size of SVG
+    # for the character 'a' is 1000 bytes, the size of SVG for 'abc' will
+    # be lesser than 3000 bytes. So the below approximation to find the
+    # size will give us the maximum size.
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
             json.loads(unescape_html(
                 math_tag['math_content-with-value'])))
         raw_latex = (
             objects.UnicodeString.normalize(math_content_dict['raw_latex']))
+        # The characters in special Latex keywords like 'frac' and 'sqrt' don't
+        # add up to the size of SVG. Also 'frac' and 'sqrt' are commonly used. 
         raw_latex = (
             raw_latex.replace('frac', '').replace('sqrt', '').replace(
                 ' ', ''))
