@@ -546,7 +546,6 @@ class MathExplorationsImageGenerationAuditJob(
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        num_of_math = 0
         size_of_math_svg = 0
         largest_math_expression = ''
         for state in exploration.states.values():
@@ -563,19 +562,15 @@ class MathExplorationsImageGenerationAuditJob(
                     len(largest_math_expression)):
                 largest_math_expression = largest_math_expression_in_state
             size_of_math_svg = size_of_math_svg + size_of_math_svg_in_state
-            if size_of_math_svg_in_state > 0:
-                num_of_math = num_of_math + 1
         value_dict = {
             'exploration_id': item.id,
             'size_of_math_svgs': size_of_math_svg,
-            'no_of_states_having_math': num_of_math,
             'largest_math_expression': largest_math_expression
         }
         yield ('Information about math-expressions in explorations', value_dict)
 
     @staticmethod
     def reduce(key, values):
-        final_list = []
         final_values = [ast.literal_eval(value) for value in values]
         number_of_explorations_having_math = 0
         largest_math_expression = ''
@@ -583,7 +578,6 @@ class MathExplorationsImageGenerationAuditJob(
         size_of_math_svgs_in_a_batch = 0
         for value in final_values:
             if int(value['size_of_math_svgs']) > 0:
-                final_list.append(value['exploration_id'])
                 exp_models.MathExplorationImagesModel(
                     id=value['exploration_id'],
                     estimated_size_of_images_in_bytes=int(
