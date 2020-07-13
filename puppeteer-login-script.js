@@ -70,7 +70,7 @@ const setRoleAdmin = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:9999/admin#/roles');
     await page.waitFor(2000);
     await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', 'string:ADMIN');
@@ -93,7 +93,7 @@ const createCollections = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:9999/admin#/roles');
     await page.waitFor(2000);
     await page.type('#update-role-username-textbook', 'username1');
     await page.select('#update-role-input', 'string:COLLECTION_EDITOR');
@@ -102,7 +102,7 @@ const createCollections = async function(context, page) {
     await page.waitFor(2000);
     // Load in Collection
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin');
+    await page.goto('http://127.0.0.1:9999/admin');
     await page.waitFor(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
