@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface ITopicRightsBackendDict {
+export interface ITopicRightsBackendDict {
   'published': boolean;
   'can_publish_topic': boolean;
   'can_edit_topic': boolean;
