@@ -44,7 +44,8 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        story_is_published: true
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       additional_story_dicts: [{
         id: '1',
@@ -53,7 +54,8 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        story_is_published: true
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -120,6 +122,9 @@ describe('Read only topic object Factory', () => {
       .getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeTitles())
       .toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0].isNodeCompleted(
+        'Chapter 1')).toEqual(true);
   });
 
   it('should return correct values of additional stories', () => {
@@ -131,6 +136,9 @@ describe('Read only topic object Factory', () => {
       .getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
       .getNodeTitles()).toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].isNodeCompleted(
+        'Chapter 1')).toEqual(true);
   });
 
   it('should return the correct value of degrees for skills', () => {
