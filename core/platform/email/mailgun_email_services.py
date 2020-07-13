@@ -113,7 +113,7 @@ def send_mail(
                 Content-type: text/plain
                 Data length: %d
             Body
-                Conten-type: text/html
+                Content-type: text/html
                 Data length: %d
             ''' % (
                 sender_email, recipient_email, subject, len(plaintext_body),
@@ -186,7 +186,7 @@ def send_bulk_mail(
                     Content-type: text/plain
                     Data length: %d
                 Body
-                    Conten-type: text/html
+                    Content-type: text/html
                     Data length: %d
                 ''' % (
                     sender_email, recipient_email, subject, len(plaintext_body),
