@@ -216,7 +216,7 @@ describe('Customize Interaction Modal Controller', function() {
       interactionDetailsCacheService.removeDetails('LogicProof');
     });
 
-    it('should save interaction button to be enabled and return warning' +
+    it('should have save interaction button enabled and return warning' +
       ' message', function() {
       $scope.form.schemaForm = {
         $valid: true
@@ -238,7 +238,7 @@ describe('Customize Interaction Modal Controller', function() {
       expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
     });
 
-    it('should save interaction button to be disabled when form entries' +
+    it('should have save interaction button disabled when form entries' +
       ' are invalid', function() {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {
@@ -266,7 +266,7 @@ describe('Customize Interaction Modal Controller', function() {
       expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
     });
 
-    it('should save interaction button to be enabled when there is no' +
+    it('should have save interaction button enabled when there is no' +
       ' warning message', function() {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {
@@ -314,14 +314,14 @@ describe('Customize Interaction Modal Controller', function() {
       });
     }));
 
-    it('should save interaction button to be disabled when there is no' +
+    it('should have save interaction button disabled when there is no' +
       ' customization arg', function() {
       expect($scope.getSaveInteractionButtonTooltip()).toBe(
         'No customization arguments');
       expect($scope.isSaveInteractionButtonEnabled()).toBe(false);
     });
 
-    it('should save interaction button to be disabled when there is no' +
+    it('should have save interaction button disabled when there is no' +
       ' interaction being displayed', function() {
       // Change customization args.
       stateCustomizationArgsService.displayed = {
