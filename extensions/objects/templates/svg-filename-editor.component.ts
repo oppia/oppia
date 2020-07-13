@@ -61,7 +61,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       const CLOSED_POLYGON_MODE = 'closed';
       // The canvas height and width were determined based on the initial
       // modal dimensions.
-      const CANVAS_WIDTH = 496;
+      const CANVAS_WIDTH = 494;
       const CANVAS_HEIGHT = 338;
       ctrl.drawMode = DRAW_MODE_NONE;
       ctrl.polygonMode = CLOSED_POLYGON_MODE;
@@ -123,7 +123,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         fill: 'rgba(0, 0, 0, 0)',
         bg: 'rgba(0, 0, 0, 0)',
         fontFamily: 'helvetica',
-        size: '9px',
+        size: '3px',
         bold: false,
         italic: false
       };

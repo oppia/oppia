@@ -51,21 +51,21 @@
           <div>
             <div class="color-well">
               <div>Stroke</div>
-              <div id="stroke-color" class="colorPicker">
+              <div id="stroke-color" class="colorPicker" tooltip-placement="right" uib-tooltip="Stroke Color">
                 <div id="top-stroke-alpha" class="alphaSquare top"></div>
                 <div id="bottom-stroke-alpha" class="alphaSquare bottom"></div>
               </div>
             </div>
             <div class="color-well">
               <div>Fill</div>
-              <div id="fill-color" class="colorPicker">
+              <div id="fill-color" class="colorPicker" tooltip-placement="right" uib-tooltip="Fill Color">
                 <div id="top-fill-alpha" class="alphaSquare top"></div>
                 <div id="bottom-fill-alpha" class="alphaSquare bottom"></div>
               </div>
             </div>
             <div class="color-well">
               <div>bg</div>
-              <div id="bg-color" class="colorPicker">
+              <div id="bg-color" class="colorPicker" tooltip-placement="right" uib-tooltip="Background Color">
                 <div id="top-bg-alpha" class="alphaSquare top"></div>
                 <div id="bottom-bg-alpha" class="alphaSquare bottom"></div>
               </div>
@@ -211,7 +211,7 @@
 
   .svg-editor .fabric-canvas .fabric-canvas-container {
     height: 338px;
-    width: 496px;
+    width: 494px;
   }
 
   .svg-editor .horizontal-toolbar {
@@ -316,6 +316,7 @@
     background-color: #000000;
     border: 1px solid #000000;
     border-radius: 3px;
+    cursor: pointer;
     height: 28px;
     margin: 0 auto;
     width: 28px;
