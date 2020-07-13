@@ -44,6 +44,10 @@ import { ObjectsDomainConstants } from
 import { ServicesConstants } from 'services/services.constants';
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 
+import { AdminProdModeActivitiesTabComponent } from
+  'pages/admin-page/activities-tab/admin-prod-mode-activities-tab.component';
+
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -51,10 +55,10 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent, AdminProdModeActivitiesTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent, AdminProdModeActivitiesTabComponent
   ],
   providers: [
     AppConstants,
