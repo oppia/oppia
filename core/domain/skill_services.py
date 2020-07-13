@@ -27,7 +27,10 @@ from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import state_domain
+from core.domain import suggestion_services
+from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -628,6 +631,63 @@ def get_skill_by_id(skill_id, strict=True, version=None):
             return skill
         else:
             return None
+
+
+def get_all_topic_assignments_for_skill(skill_id):
+    """Returns a list containing all the topics to which the given skill is
+    assigned along with topic details.
+
+    Args:
+        skill_id: str. ID of the skill.
+
+    Returns:
+        list(TopicAssignment). A list of TopicAssignment domain objects.
+    """
+    topic_assignments = []
+    topics = topic_fetchers.get_all_topics()
+    for topic in topics:
+        if skill_id in topic.get_all_skill_ids():
+            subtopic_id = None
+            for subtopic in topic.subtopics:
+                if skill_id in subtopic.skill_ids:
+                    subtopic_id = subtopic.id
+                    break
+
+            topic_assignments.append(skill_domain.TopicAssignment(
+                topic.id, topic.name, topic.version, subtopic_id))
+
+    return topic_assignments
+
+
+def remove_skill_from_all_topics(user_id, skill_id):
+    """Deletes the skill with the given id from all the associated topics.
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        skill_id: str. ID of the skill.
+    """
+    all_topics = topic_fetchers.get_all_topics()
+    for topic in all_topics:
+        change_list = []
+        if skill_id in topic.get_all_skill_ids():
+            for subtopic in topic.subtopics:
+                if skill_id in subtopic.skill_ids:
+                    change_list.append(topic_domain.TopicChange({
+                        'cmd': 'remove_skill_id_from_subtopic',
+                        'subtopic_id': subtopic.id,
+                        'skill_id': skill_id
+                    }))
+                    break
+
+            change_list.append(topic_domain.TopicChange({
+                'cmd': 'remove_uncategorized_skill_id',
+                'uncategorized_skill_id': skill_id
+            }))
+            skill_name = get_skill_summary_by_id(skill_id).description
+            topic_services.update_topic_and_subtopic_pages(
+                user_id, topic.id, change_list,
+                'Removed skill with id %s and name %s from the topic' % (
+                    skill_id, skill_name))
 
 
 def get_skill_summary_by_id(skill_id, strict=True):
