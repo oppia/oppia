@@ -786,9 +786,11 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', u\'exp_id0 State5: '
             u'\\xe2\\xe9\\xee\\xf4\\xfc\']]',
             u'[u\'ERROR\', [u\'There are some invalid inputs that need to be '
-            u'resolved before running the upgrade job.\', u\'There are some '
-            u'invalid inputs that need to be resolved before running the '
-            u'upgrade job.\']]',
+            u'resolved before running the upgrade job. Please check the '
+            u'output values of the Invalid key for more info.\', u\'There are '
+            u'some invalid inputs that need to be resolved before running the '
+            u'upgrade job. Please check the output values of the Invalid key '
+            u'for more info.\']]',
             u'[u\'MathEquationInput\', [u\'exp_id0 State2: y=m*x+c\', '
             u'u\'exp_id0 State6: (sin(theta))^2 + (cos(theta))^2 = 1\']]',
             u'[u\'NumericExpressionInput\', [u\'exp_id0 State9: '
@@ -1225,6 +1227,8 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
+        exploration_version_before_job_run = exploration.version
+
         job_id = (
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.create_new())
         exp_jobs_one_off.MathExpressionUpgradeOneOffJob.enqueue(job_id)
@@ -1236,7 +1240,8 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [
             u'[u\'Invalid\', [u\'exp_id0 State1: x<y>z\']]',
             u'[u\'ERROR\', [u\'There are some invalid inputs that need to be '
-            u'resolved before running the upgrade job.\']]',
+            u'resolved before running the upgrade job. Please check the '
+            u'output values of the Invalid key for more info.\']]',
             u'[u\'MathEquationInput\', [u\'exp_id0 State1: x+y=c\']]']
 
         self.assertEqual(actual_output, expected_output)
@@ -1246,8 +1251,7 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         # The exploration contains an invalid input and must therefore, not be
         # upgraded to one of the new interactions.
         self.assertEqual(
-            exploration.get_interaction_id_by_state_name('State1'),
-            'MathExpressionInput')
+            exploration.version, exploration_version_before_job_run)
 
         # Now, when the invalid inputs are fixed, and the job is re-run,
         # the upgrade should be done as expected.

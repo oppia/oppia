@@ -81,7 +81,7 @@ AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 # This threshold puts a cap on the number of valid inputs, i.e.,
 # expressions/equations that can be yielded by the math expression one-off jobs.
 # The reason for limiting the number of valid inputs yielded by the jobs is that
-# we don't need to closesly inspect all of the valid inputs, they are displayed
+# we don't need to closely inspect all of the valid inputs, they are displayed
 # just to make sure that the job output is what we expect.
 VALID_MATH_INPUTS_YIELD_LIMIT = 200
 _TYPE_INVALID_EXPRESSION = 'Invalid'
@@ -147,10 +147,11 @@ def _clean_math_expression(math_expression):
         math_expression = re.sub(
             r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
 
-    # The pylatexenc lib outputs the unicode values of
-    # special characters like sqrt and pi, which is why
-    # they need to be replaced with their corresponding
-    # text values before performing validation.
+    # The pylatexenc lib outputs the unicode values of special characters like
+    # sqrt and pi, which is why they need to be replaced with their
+    # corresponding text values before performing validation. Other unicode
+    # characters will be left in the string as-is, and will be rejected by the
+    # expression parser.
     for unicode_char, text in unicode_to_text.items():
         math_expression = math_expression.replace(unicode_char, text)
 
@@ -295,7 +296,9 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if _TYPE_INVALID_EXPRESSION in types_of_inputs:
                         yield ('ERROR', (
                             'There are some invalid inputs that need to be '
-                            'resolved before running the upgrade job.'))
+                            'resolved before running the upgrade job. Please '
+                            'check the output values of the Invalid key for '
+                            'more info.'))
                     elif len(types_of_inputs) > 1:
                         yield ('ERROR', (
                             'The exploration with ID: %s and state name: %s '
@@ -307,7 +310,10 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key.endswith('Input'):
+        if key in (
+                _TYPE_VALID_ALGEBRAIC_EXPRESSION,
+                _TYPE_VALID_MATH_EQUATION,
+                _TYPE_VALID_NUMERIC_EXPRESSION):
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
@@ -376,7 +382,9 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if _TYPE_INVALID_EXPRESSION in types_of_inputs:
                         yield ('ERROR', (
                             'There are some invalid inputs that need to be '
-                            'resolved before running the upgrade job.'))
+                            'resolved before running the upgrade job. Please '
+                            'check the output values of the Invalid key for '
+                            'more info.'))
                     elif len(types_of_inputs) > 1:
                         yield ('ERROR', (
                             'The exploration with ID: %s and state name: %s '
@@ -403,7 +411,10 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key.endswith('Input'):
+        if key in (
+                _TYPE_VALID_ALGEBRAIC_EXPRESSION,
+                _TYPE_VALID_MATH_EQUATION,
+                _TYPE_VALID_NUMERIC_EXPRESSION):
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
