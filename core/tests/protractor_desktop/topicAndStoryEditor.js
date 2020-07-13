@@ -91,7 +91,7 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      Constants.protractorConstants.SKILL_STATUS_UNASSIGNED);
+      Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
     await topicEditorPage.get(topicId);
@@ -182,7 +182,7 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        Constants.protractorConstants.SKILL_STATUS_UNASSIGNED);
+        Constants.SKILL_STATUS_UNASSIGNED);
       await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
         0, TOPIC_NAME);
 
