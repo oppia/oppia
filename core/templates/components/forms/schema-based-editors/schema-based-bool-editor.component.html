@@ -1,7 +1,7 @@
 <div class="input-group oppia-bool-editor-input-group">
   <span *ngIf="!expressionMode">
     <input type="checkbox" ng-model="localValue" ng-disabled="isDisabled"
-           (focus)="{{ labelForFocusTarget }}">
+           (focus)="labelForFocusTarget"> 
   </span>
 </div>
 <style>
