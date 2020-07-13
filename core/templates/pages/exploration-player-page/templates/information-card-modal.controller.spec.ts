@@ -16,24 +16,13 @@
  * @fileoverview Unit tests for InformationCardModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ExplorationSummaryObjectFactory } from
-  'domain/summary/exploration-summary-object.factory';
-
 describe('Information Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
-  var explorationSummaryObjectFactory = null;
 
   var expInfo = null;
 
   beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(function() {
-    explorationSummaryObjectFactory = TestBed.get(
-      ExplorationSummaryObjectFactory);
-  });
-
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
@@ -78,7 +67,6 @@ describe('Information Card Modal Controller', function() {
     $controller('InformationCardModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      ExplorationSummaryObjectFactory: explorationSummaryObjectFactory,
       expInfo: expInfo
     });
   }));
