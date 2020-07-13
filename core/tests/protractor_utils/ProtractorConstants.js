@@ -17,6 +17,7 @@
  * tests.
  */
 
-exports.protractorConstants = {
-  SKILL_STATUS_UNASSIGNED: 'Unassigned'
+module.exports = {
+  SKILL_STATUS_UNASSIGNED: 'Unassigned',
+  SKILL_STATUS_ASSIGNED: 'Assigned'
 };
