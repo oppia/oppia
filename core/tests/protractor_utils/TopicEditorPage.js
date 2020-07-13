@@ -62,8 +62,12 @@ var TopicEditorPage = function() {
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
   var subtopicColumns = element.all(
     by.css('.protractor-test-subtopic-column'));
-  var deleteSubtopicButtons = element.all(
+  var subtopicEditOptions = element.all(by.css(
+    '.protractor-test-show-subtopic-options'));
+  var deleteSubtopicButton = element(
     by.css('.protractor-test-delete-subtopic-button'));
+  var reassignSkillButton = element(
+    by.css('.protractor-test-reassign-skill-button'));
   var skillCards = element.all(
     by.css('.protractor-test-skill-card'));
   var uncategorizedSkills = element.all(
@@ -225,7 +229,11 @@ var TopicEditorPage = function() {
   };
 
   this.deleteSubtopicWithIndex = async function(index) {
-    await (await deleteSubtopicButtons.get(index)).click();
+    var subtopicEditOptionBox = subtopicEditOptions.get(index);
+    await subtopicEditOptionBox.click();
+    await waitFor.elementToBeClickable(deleteSubtopicButton,
+      'Delete subtopic button taking too long to be clickable');
+    await deleteSubtopicButton.click();
   };
 
   this.expectNumberOfSubtopicsToBe = async function(count) {
@@ -261,11 +269,11 @@ var TopicEditorPage = function() {
   };
 
   this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
-    await waitFor.visibilityOf(await uncategorizedSkills.first(),
+    await waitFor.visibilityOf(uncategorizedSkills.first(),
       'Uncategorized skills taking too long to appear.');
-    const target = (subtopicColumns.get(subtopicIndex));
+    const target = subtopicColumns.get(subtopicIndex);
     var uncategorizedSkillIndex = -1;
-    for (var i = 0;i < await uncategorizedSkills.count();i++) {
+    for (var i = 0; i < await uncategorizedSkills.count(); i++) {
       if (skillDescription === await uncategorizedSkills.get(i).getText()) {
         uncategorizedSkillIndex = i;
         break;
@@ -277,8 +285,6 @@ var TopicEditorPage = function() {
   };
 
   this.navigateToReassignModal = async function() {
-    var reassignSkillButton = element(
-      by.css('.protractor-test-reassign-skill-button'));
     await waitFor.elementToBeClickable(reassignSkillButton,
       'Reassign skill button taking too long to be clickable');
     await reassignSkillButton.click();
@@ -293,7 +299,7 @@ var TopicEditorPage = function() {
 
     expect(skillNames.length).toEqual(assignedSkillsLength);
 
-    for (let i = 0;i < assignedSkillsLength;i++) {
+    for (var i = 0; i < assignedSkillsLength; i++) {
       const skillDescription = await assignedSkillDescriptions.get(i).getText();
       expect(skillDescription).toEqual(skillNames[i]);
     }
@@ -301,51 +307,44 @@ var TopicEditorPage = function() {
 
   this.dragSkillFromSubtopicToSubtopic = async function(
       fromSubtopicIndex, toSubtopicIndex, skillDescription) {
-    const fromSubtopicColumn = subtopicColumns.get(fromSubtopicIndex);
-    const assignedSkills = fromSubtopicColumn.all(
-      by.css('.protractor-test-subtopic-skill-description'));
-    const assignedSkillsLength = await assignedSkills.count();
-    var toMoveSkillIndex = -1;
-    for (var i = 0;i < assignedSkillsLength;i++) {
-      if (skillDescription === await assignedSkills.get(i).getText()) {
-        toMoveSkillIndex = i;
-        break;
-      }
-    }
-    expect(toMoveSkillIndex).not.toEqual(-1);
-    const assignedSkillToMove = assignedSkills.get(toMoveSkillIndex);
+    const assignedSkillToMove = await this.getTargetMoveSkill(
+      fromSubtopicIndex, skillDescription);
     const toSubtopicColumn = subtopicColumns.get(toSubtopicIndex);
     await dragAndDrop(assignedSkillToMove, toSubtopicColumn);
   };
 
   this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
-    var uncategorizedSkills = (
-      element.all(by.css('.protractor-test-uncategorized-skill-card')));
-
-    await waitFor.visibilityOf(await uncategorizedSkills.first(),
+    await waitFor.visibilityOf(uncategorizedSkills.first(),
       'Uncategorized skills taking too long to appear.');
 
-    for (var i = 0;i < await uncategorizedSkills.count();i++) {
+    for (var i = 0; i < await uncategorizedSkills.count(); i++) {
       expect(skillDescriptions[i]).toEqual(
         await uncategorizedSkills.get(i).getText());
     }
   };
 
-  this.dragSkillFromSubtopicToUncategorized = async function(
+  this.getTargetMoveSkill = async function(
       subtopicIndex, skillDescription) {
     const fromSubtopicColumn = subtopicColumns.get(subtopicIndex);
     const assignedSkills = fromSubtopicColumn.all(
       by.css('.protractor-test-subtopic-skill-description'));
     const assignedSkillsLength = await assignedSkills.count();
     var toMoveSkillIndex = -1;
-    for (var i = 0;i < assignedSkillsLength;i++) {
+    for (var i = 0; i < assignedSkillsLength; i++) {
       if (skillDescription === await assignedSkills.get(i).getText()) {
         toMoveSkillIndex = i;
         break;
       }
     }
     expect(toMoveSkillIndex).not.toEqual(-1);
-    const assignedSkillToMove = assignedSkills.get(toMoveSkillIndex);
+
+    return assignedSkills.get(toMoveSkillIndex);
+  };
+
+  this.dragSkillFromSubtopicToUncategorized = async function(
+      subtopicIndex, skillDescription) {
+    const assignedSkillToMove = await this.getTargetMoveSkill(
+      subtopicIndex, skillDescription);
     await dragAndDrop(assignedSkillToMove, uncategorizedSkillsContainer);
   };
 

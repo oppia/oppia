@@ -166,7 +166,6 @@ describe('Topic editor functionality', function() {
   it('should assign a skill to, and from subtopics',
     async function() {
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.get();
       await (
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 2', 'Concept card explanation', true));
@@ -189,7 +188,7 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        Constants.protractorConstants.SKILL_STATUS_UNASSIGNED);
+        Constants.SKILL_STATUS_UNASSIGNED);
       await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
         0, TOPIC_NAME);
 
