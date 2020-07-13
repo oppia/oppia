@@ -8,8 +8,10 @@
         </a>
         <div ng-show="$ctrl.getTotalWarningsCount()"
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+             ng-mouseover="$ctrl.warningsAreShown=true"
+             ng-mouseleave="$ctrl.warningsAreShown=false"
              ng-click="$ctrl.selectMainTab()">
-          <span class="oppia-editor-warnings-count" ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
+          <span class="oppia-editor-warnings-count">
             <[$ctrl.getTotalWarningsCount()]>
           </span>
           <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu oppia-editor-warnings-box oppia-editor-warnings-box-block">
@@ -95,5 +97,9 @@
   .topic-editor-main .navbar-tab span {
     color: #FFFFFF;
     font-size: 12px;
+  }
+
+  .topic-editor-main .oppia-editor-warnings-box {
+    max-width: none;
   }
 </style>
