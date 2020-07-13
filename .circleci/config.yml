@@ -19,15 +19,15 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      # - e2e_non_prod_tests:
-      #     requires:
-      #       - setup_and_typescript_tests
+      - e2e_non_prod_tests:
+          requires:
+            - setup_and_typescript_tests
       - e2e_navigation_and_misc:
           requires:
             - setup_and_typescript_tests
-      # - e2e_library_and_collections:
-      #     requires:
-      #       - e2e_navigation_and_misc
+      - e2e_library_and_collections:
+          requires:
+            - e2e_navigation_and_misc
       - e2e_users:
           requires:
             - e2e_navigation_and_misc
@@ -145,7 +145,7 @@ jobs:
       - run:
           name: Run e2e admin page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env --sharding-instances=1
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -172,7 +172,7 @@ jobs:
       - run:
           name: Run e2e library test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env --sharding-instances=1
       - run:
           name: Run e2e classroomPage test
           command: |
@@ -180,15 +180,15 @@ jobs:
       - run:
           name: Run e2e collections test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env --sharding-instances=1
       - run:
           name: Run e2e accessibility page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env --sharding-instances=1
       - run:
           name: Run e2e embedding page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env --sharding-instances=1
 
   e2e_users:
     <<: *job_defaults
@@ -199,26 +199,26 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
-      # - run:
-      #     name: Run e2e users test
-      #     command: |
-      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
-      # - run:
-      #     name: Run e2e subscriptions test
-      #     command: |
-      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
-      # - run:
-      #     name: Run e2e profileMenu test
-      #     command: |
-      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+      - run:
+          name: Run e2e users test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env --sharding-instances=1
+      - run:
+          name: Run e2e subscriptions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env --sharding-instances=1
+      - run:
+          name: Run e2e profileMenu test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env --sharding-instances=1
       - run:
           name: Run e2e preferences test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
-      # - run:
-      #     name: Run e2e profileFeatures test
-      #     command: |
-      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+      - run:
+          name: Run e2e profileFeatures test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
@@ -239,7 +239,7 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --sharding-instances=1 --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
@@ -247,7 +247,7 @@ jobs:
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --sharding-instances=1 --server_log_level=info
       - run:
           name: Run e2e topic and story editor test
           command: |

@@ -187,13 +187,13 @@ var PreferencesPage = function() {
 
   this.selectCreatorDashboard = async function() {
     await action.click(
-      'Creator Dashboard radio', createrDashboardRadio, clickableCheck = true);
+      'Creator Dashboard radio', createrDashboardRadio, clickableCheck=true);
     await saveNewChanges('Creator Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {
     await action.click(
-      'Learner Dashboard radio', learnerDashboardRadio, clickableCheck = true);
+      'Learner Dashboard radio', learnerDashboardRadio, clickableCheck=true);
     await saveNewChanges('Learner Dashboard Option');
   };
 };
