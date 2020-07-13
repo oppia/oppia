@@ -222,7 +222,7 @@ import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
 import { ExplorationImprovementsTaskRegistrarService } from
-  'services/exploration-improvements-task-registrar.service';
+  'domain/improvements/exploration-improvements-task-registrar.service';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissionsObjectFactory } from

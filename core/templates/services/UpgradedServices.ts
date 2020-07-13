@@ -180,7 +180,7 @@ import { ExplorationHtmlFormatterService } from
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
 import { ExplorationImprovementsTaskRegistrarService } from
-  'services/exploration-improvements-task-registrar.service';
+  'domain/improvements/exploration-improvements-task-registrar.service';
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from

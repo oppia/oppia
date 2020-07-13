@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ExplorationImprovementsTaskRegistrarService } from
-  'services/exploration-improvements-task-registrar.service';
+  'domain/improvements/exploration-improvements-task-registrar.service';
 
 import { AnswerStatsObjectFactory, IAnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
