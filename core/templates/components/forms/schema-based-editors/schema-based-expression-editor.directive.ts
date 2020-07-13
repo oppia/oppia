@@ -16,25 +16,8 @@
  * @fileoverview Component for a schema-based editor for expressions.
  */
 
-// angular.module('oppia').directive('schemaBasedExpressionEditor', [
-//   function() {
-//     return {
-//       scope: {
-//         localValue: '=',
-//         isDisabled: '&',
-//         // TODO(sll): Currently only takes a string which is either 'bool',
-//         // 'int' or 'float'. May need to generalize.
-//         outputType: '&',
-//         labelForFocusTarget: '&'
-//       },
-//       template: require('./schema-based-expression-editor.directive.html'),
-//       restrict: 'E'
-//     };
-//   }]);
-
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { easeBackInOut } from 'd3';
 
 @Component({
   selector: 'schema-based-expression-editor',
