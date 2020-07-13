@@ -47,8 +47,10 @@ describe('Admin misc tab', function() {
     topicId = temp.substring(0, temp.length - 1);
     await topicEditorPage.publishTopic();
     await general.closeCurrentTabAndSwitchTo(handle);
+    await browser.waitForAngularEnabled(false);
     await adminPage.get();
     await adminPage.getMiscTab();
+    await browser.waitForAngularEnabled(true);
   });
 
   it('should upload and download similarity files', async function() {
