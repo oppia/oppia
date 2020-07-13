@@ -188,7 +188,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           _updateTopicRights(TopicRightsObject);
           _topicIsLoading = false;
           // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the directive is migrated to angular.
+          // once the service is migrated to angular.
           $rootScope.$apply();
         }, function(error) {
           AlertsService.addWarning(
