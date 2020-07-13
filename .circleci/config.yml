@@ -28,7 +28,7 @@ workflows:
       # - e2e_library_and_collections:
       #     requires:
       #       - e2e_navigation_and_misc
-      - e2e_users:
+      - e2e_users
           # requires:
           #   - e2e_navigation_and_misc
 
