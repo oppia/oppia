@@ -185,7 +185,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
       if (interactionId) {
         interactionHtml = ExplorationHtmlFormatterService.getInteractionHtml(
           interactionId,
-          exploration.getInteractionCustomizationArgs(currentStateName).values,
+          exploration.getInteractionCustomizationArgs(currentStateName),
           true, nextFocusLabel);
       }
 
@@ -230,7 +230,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
 
       return ExplorationHtmlFormatterService.getInteractionHtml(
         interactionId,
-        exploration.getInteractionCustomizationArgs(nextStateName).values,
+        exploration.getInteractionCustomizationArgs(nextStateName),
         true,
         labelForFocusTarget);
     };

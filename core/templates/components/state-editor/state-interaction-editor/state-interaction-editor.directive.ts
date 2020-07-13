@@ -69,6 +69,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
       scope: {
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionId: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
         recomputeGraph: '='
@@ -80,7 +81,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService', 'StateEditorService',
         'INTERACTION_SPECS', 'StateInteractionIdService',
-        'StateCustomizationArgsService', 'EditabilityService',
+        'StateCustomizationArgsService', 'StateNextContentIdIndexService',
+        'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
         'StateSolutionService', 'StateHintsService',
@@ -88,7 +90,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
             AlertsService, HtmlEscaperService, StateEditorService,
             INTERACTION_SPECS, StateInteractionIdService,
-            StateCustomizationArgsService, EditabilityService,
+            StateCustomizationArgsService, StateNextContentIdIndexService,
+            EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
             StateSolutionService, StateHintsService,
@@ -161,6 +164,15 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.onCustomizationModalSavePostHook = function() {
+            let hasNextContentIdIndexChanged = (
+              StateNextContentIdIndexService.displayed !==
+              StateNextContentIdIndexService.savedMemento);
+            if (hasNextContentIdIndexChanged) {
+              StateNextContentIdIndexService.saveDisplayedValue();
+              $scope.onSaveNextContentIdIndex(
+                StateNextContentIdIndexService.displayed);
+            }
+
             var hasInteractionIdChanged = (
               StateInteractionIdService.displayed !==
               StateInteractionIdService.savedMemento);
@@ -213,6 +225,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 $scope.onCustomizationModalSavePostHook, function() {
                   StateInteractionIdService.restoreFromMemento();
                   StateCustomizationArgsService.restoreFromMemento();
+                  StateNextContentIdIndexService.restoreFromMemento();
                 });
             }
           };

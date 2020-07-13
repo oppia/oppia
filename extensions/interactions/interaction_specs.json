@@ -126,7 +126,7 @@
         },
         "default_value": [
           {
-            "content_id": "custarg_choices_default",
+            "content_id": "",
             "html": ""
           }
         ]
@@ -209,7 +209,7 @@
           }
         },
         "default_value": [
-          {"content_id": "custarg_choices_default", "html": ""}
+          {"content_id": "", "html": ""}
         ]
       }
     ],
@@ -244,7 +244,7 @@
           "obj_type": "SubtitledUnicode"
         },
         "default_value": {
-          "content_id": "custarg_buttonText",
+          "content_id": "",
           "unicode_str": "Continue"
         }
       }
@@ -427,7 +427,7 @@
           "obj_type": "SubtitledUnicode"
         },
         "default_value": {
-          "content_id": "custarg_buttonText",
+          "content_id": "",
           "unicode_str": "Add item"
         }
       }
@@ -624,7 +624,7 @@
           }
         },
         "default_value": [{
-          "content_id": "custarg_choices_default",
+          "content_id": "",
           "html": ""
         }]
       }, {
@@ -702,7 +702,7 @@
           "obj_type": "SubtitledUnicode"
         },
         "default_value": {
-          "content_id": "custarg_placeholder",
+          "content_id": "",
           "unicode_str": ""
         }
       },
@@ -932,7 +932,7 @@
           "obj_type": "SubtitledUnicode"
         },
         "default_value": {
-          "content_id": "custarg_customPlaceholder",
+          "content_id": "",
           "unicode_str": ""
         }
       }

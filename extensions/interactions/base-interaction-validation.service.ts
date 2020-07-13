@@ -41,8 +41,7 @@ export class baseInteractionValidationService {
   requireCustomizationArguments(
       customizationArguments: {}, argNames: string[]): void {
     var missingArgs = [];
-    
-    console.log(customizationArguments)
+
     for (var i = 0; i < argNames.length; i++) {
       if (!customizationArguments.hasOwnProperty(argNames[i])) {
         missingArgs.push(argNames[i]);

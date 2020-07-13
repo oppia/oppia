@@ -23,13 +23,6 @@ import { Injectable } from '@angular/core';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import {
-  InteractionCustomizationArgsUtilService,
-  InteractionCustArgsConversionFn
-} from './interaction-customization-args-util.service';
 
 // Service for assembling extension tags (for interactions).
 @Injectable({
@@ -37,36 +30,10 @@ import {
 })
 export class ExtensionTagAssemblerService {
   constructor(private htmlEscaperService: HtmlEscaperService,
-              private camelCaseToHyphens: CamelCaseToHyphensPipe,
-              private interactionCustomizationArgsUtilService:
-                InteractionCustomizationArgsUtilService
-  ) {}
+              private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
 
   formatCustomizationArgAttrs(
-      interactionId: string,
-      element: JQuery,
-      customizationArgSpecs: Object
-  ): JQuery {
-    customizationArgSpecs = angular.copy(customizationArgSpecs);
-    const conversionFn: InteractionCustArgsConversionFn = (
-        caValue,
-        schemaObjType
-    ) => {
-      if (schemaObjType === 'SubtitledHtml') {
-        return (<SubtitledHtml>caValue).getHtml();
-      } else if (schemaObjType === 'SubtitledUnicode') {
-        return (<SubtitledUnicode>caValue).getUnicode();
-      }
-
-      return caValue;
-    };
-
-    this.interactionCustomizationArgsUtilService.convertContent(
-      interactionId,
-      customizationArgSpecs,
-      conversionFn
-    );
-
+      element: JQuery, customizationArgSpecs: Object): JQuery {
     for (let caSpecName in customizationArgSpecs) {
       let caSpecValue = customizationArgSpecs[caSpecName].value;
       element.attr(

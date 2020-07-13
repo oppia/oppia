@@ -70,6 +70,7 @@ angular.module('oppia').factory('ChangeListService', [
       recorded_voiceovers: true,
       default_outcome: true,
       hints: true,
+      next_content_id_index: true,
       param_changes: true,
       param_specs: true,
       solicit_answer_details: true,

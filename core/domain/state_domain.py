@@ -2362,6 +2362,14 @@ class State(python_utils.OBJECT):
         # updates interaction_answer_groups directly after this, but we should
         # fix it.
 
+    def update_next_content_id_index(self, next_content_id_index):
+        """Update the interaction id attribute.
+
+        Args:
+            next_content_id_index: number. The new next content id index to set.
+        """
+        self.next_content_id_index = next_content_id_index
+
     def update_interaction_customization_args(self, customization_args):
         """Update the customization_args of InteractionInstance domain object.
 

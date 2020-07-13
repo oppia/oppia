@@ -248,7 +248,7 @@ import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';;
+  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { InteractionCustomizationArgsUtilService } from
   'services/interaction-customization-args-util.service';
 import { InteractionDetailsCacheService } from
@@ -485,6 +485,9 @@ import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
@@ -609,6 +612,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+
 
 @Injectable({
   providedIn: 'root'
@@ -921,10 +925,6 @@ export class UpgradedServices {
     upgradedServices['ImageClickInputValidationService'] =
       new ImageClickInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['InteractionCustomizationArgsUtilService'] =
-      new InteractionCustomizationArgsUtilService(
-        upgradedServices['SubtitledHtmlObjectFactory'],
-        upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['InteractiveMapValidationService'] =
       new InteractiveMapValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1079,11 +1079,6 @@ export class UpgradedServices {
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
-    upgradedServices['ExtensionTagAssemblerService'] =
-      new ExtensionTagAssemblerService(
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['CamelCaseToHyphensPipe'],
-        upgradedServices['InteractionCustomizationArgsUtilService']);
     upgradedServices['ExtractImageFilenamesFromStateService'] =
       new ExtractImageFilenamesFromStateService(
         upgradedServices['HtmlEscaperService']);
@@ -1117,6 +1112,9 @@ export class UpgradedServices {
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateInteractionIdService'] =
       new StateInteractionIdService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateNextContentIdIndexService'] =
+      new StateNextContentIdIndexService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StatePropertyService'] = new StatePropertyService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
@@ -1181,6 +1179,11 @@ export class UpgradedServices {
       new ExplorationRecommendationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['ExplorationSummaryObjectFactory']);
+    upgradedServices['InteractionCustomizationArgsUtilService'] =
+      new InteractionCustomizationArgsUtilService(
+        upgradedServices['SubtitledHtmlObjectFactory'],
+        upgradedServices['SubtitledUnicodeObjectFactory'],
+        upgradedServices['StateNextContentIdIndexService']);
     upgradedServices['InteractionRulesRegistryService'] =
       new InteractionRulesRegistryService(
         upgradedServices['AlgebraicExpressionInputRulesService'],
@@ -1242,11 +1245,6 @@ export class UpgradedServices {
       new ExplorationFeaturesBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
-    upgradedServices['ExplorationHtmlFormatterService'] =
-      new ExplorationHtmlFormatterService(
-        upgradedServices['CamelCaseToHyphensPipe'],
-        upgradedServices['ExtensionTagAssemblerService'],
-        upgradedServices['HtmlEscaperService']);
     upgradedServices['ExplorationImprovementsBackendApiService'] =
       new ExplorationImprovementsBackendApiService(
         upgradedServices['ExplorationTaskObjectFactory'],
@@ -1412,6 +1410,16 @@ export class UpgradedServices {
         upgradedServices['ExplorationRecommendationsBackendApiService']);
     upgradedServices['ExplorationStatsService'] = new ExplorationStatsService(
       upgradedServices['ExplorationStatsBackendApiService']);
+    upgradedServices['ExtensionTagAssemblerService'] =
+      new ExtensionTagAssemblerService(
+        upgradedServices['HtmlEscaperService'],
+        upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
+      upgradedServices['AnswerGroupObjectFactory'],
+      upgradedServices['HintObjectFactory'],
+      upgradedServices['SolutionObjectFactory'],
+      upgradedServices['OutcomeObjectFactory'],
+      upgradedServices['InteractionCustomizationArgsUtilService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
@@ -1446,11 +1454,12 @@ export class UpgradedServices {
         upgradedServices['InteractionSpecsService'],
         upgradedServices['PredictionAlgorithmRegistryService'],
         upgradedServices['StateClassifierMappingService']);
-    upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
-      upgradedServices['AnswerGroupObjectFactory'],
-      upgradedServices['HintObjectFactory'],
-      upgradedServices['SolutionObjectFactory'],
-      upgradedServices['OutcomeObjectFactory']);
+    upgradedServices['ExplorationHtmlFormatterService'] =
+      new ExplorationHtmlFormatterService(
+        upgradedServices['CamelCaseToHyphensPipe'],
+        upgradedServices['ExtensionTagAssemblerService'],
+        upgradedServices['HtmlEscaperService'],
+        upgradedServices['InteractionCustomizationArgsUtilService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],

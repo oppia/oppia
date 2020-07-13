@@ -33,6 +33,8 @@ import {
   IInteractionCustomizationArgsValueBackendDict,
   IInteractionCustomizationArgsValue
 } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgsUtilService } from
+  'services/interaction-customization-args-util.service';
 
 export interface IInteractionBackendDict {
   'default_outcome': IOutcomeBackendDict;
@@ -57,6 +59,8 @@ export interface IInteractionCustomizationArgs {
 }
 
 export class Interaction {
+  private interactionCustomizationArgsUtilService:
+    InteractionCustomizationArgsUtilService;
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: any;
   customizationArgs: IInteractionCustomizationArgs;
@@ -65,9 +69,13 @@ export class Interaction {
   id: string;
   solution: Solution;
   constructor(
+      interactionCustomizationArgsUtilService:
+        InteractionCustomizationArgsUtilService,
       answerGroups: AnswerGroup[], confirmedUnclassifiedAnswers: any,
       customizationArgs: IInteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
+    this.interactionCustomizationArgsUtilService = (
+      interactionCustomizationArgsUtilService);
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -118,7 +126,9 @@ export class Interaction {
         return answerGroup.toBackendDict();
       }),
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
-      customization_args: {},
+      customization_args: (
+        this.interactionCustomizationArgsUtilService.toBackendDict(
+          this.customizationArgs)),
       default_outcome:
         this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
       hints: this.hints.map(function(hint) {
@@ -139,6 +149,8 @@ export class InteractionObjectFactory {
       private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
       private outcomeFactory: OutcomeObjectFactory,
+      private interactionCustomizationArgsUtilService:
+        InteractionCustomizationArgsUtilService
   ) {}
 
   createFromBackendDict(
@@ -151,9 +163,11 @@ export class InteractionObjectFactory {
       defaultOutcome = null;
     }
     return new Interaction(
+      this.interactionCustomizationArgsUtilService,
       this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
       interactionDict.confirmed_unclassified_answers,
-      {},
+      this.interactionCustomizationArgsUtilService.fromBackendDict(
+        interactionDict.id, interactionDict.customization_args),
       defaultOutcome,
       this.generateHintsFromBackend(interactionDict.hints),
       interactionDict.id,

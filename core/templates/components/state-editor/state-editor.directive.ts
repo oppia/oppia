@@ -61,9 +61,10 @@ angular.module('oppia').directive('stateEditor', [
         navigateToState: '=',
         onSaveHints: '=',
         onSaveInteractionAnswerGroups: '=',
-        onSaveInteractionId: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveInteractionId: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
@@ -77,12 +78,14 @@ angular.module('oppia').directive('stateEditor', [
         '$rootScope', '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
+        'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'INTERACTION_SPECS',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
+            StateNextContentIdIndexService,
             StateParamChangesService, StateSolicitAnswerDetailsService,
             StateSolutionService, INTERACTION_SPECS) {
           var ctrl = this;
@@ -129,6 +132,8 @@ angular.module('oppia').directive('stateEditor', [
               StateCustomizationArgsService.init(
                 $scope.stateName, stateData.interaction.customizationArgs);
               StateNameService.init($scope.stateName, stateData.name);
+              StateNextContentIdIndexService.init(
+                $scope.stateName, stateData.nextContentIdIndex);
               StateParamChangesService.init(
                 $scope.stateName, stateData.paramChanges);
               StateSolicitAnswerDetailsService.init(

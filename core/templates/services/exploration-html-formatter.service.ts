@@ -24,12 +24,11 @@ import { CamelCaseToHyphensPipe } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { IInteractionCustomizationArgs } from
+  'domain/exploration/InteractionObjectFactory';
+import { InteractionCustomizationArgsUtilService } from
+  'services/interaction-customization-args-util.service';
 
-interface InteractionArgs {
-  choices: {
-    value: string;
-  };
-}
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -38,9 +37,13 @@ interface InteractionArgs {
 })
 export class ExplorationHtmlFormatterService {
   constructor(
-    private camelCaseToHyphens: CamelCaseToHyphensPipe,
-    private extensionTagAssembler: ExtensionTagAssemblerService,
-    private htmlEscaper: HtmlEscaperService) {}
+      private camelCaseToHyphens: CamelCaseToHyphensPipe,
+      private extensionTagAssembler: ExtensionTagAssemblerService,
+      private htmlEscaper: HtmlEscaperService,
+      private interactionCustomizationArgsUtilService:
+        InteractionCustomizationArgsUtilService
+  ) {}
+
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgSpecs - The various
@@ -56,14 +59,19 @@ export class ExplorationHtmlFormatterService {
    *   the interaction.
    */
   getInteractionHtml(
-      interactionId: string, interactionCustomizationArgSpecs: object,
+      interactionId: string,
+      interactionCustomizationArgs: IInteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
+
+    const ca = angular.copy(interactionCustomizationArgs);
+    this.interactionCustomizationArgsUtilService.unwrapSubtitled(
+      interactionId, ca);
+
     element = (
-      this.extensionTagAssembler.formatCustomizationArgAttrs(
-        interactionId, element, interactionCustomizationArgSpecs));
+      this.extensionTagAssembler.formatCustomizationArgAttrs(element, ca));
     element.attr('last-answer', parentHasLastAnswerProperty ?
       'lastAnswer' : 'null');
     if (labelForFocusTarget) {
@@ -74,9 +82,14 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs): string {
+      interactionCustomizationArgs: IInteractionCustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
+
+    interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
+    this.interactionCustomizationArgsUtilService.unwrapSubtitled(
+      interactionId, interactionCustomizationArgs);
+
     if (interactionCustomizationArgs.choices) {
       interactionChoices = interactionCustomizationArgs.choices.value;
     }
@@ -94,9 +107,14 @@ export class ExplorationHtmlFormatterService {
 
   getShortAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs) : string {
+      interactionCustomizationArgs: IInteractionCustomizationArgs) : string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
+
+    interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
+    this.interactionCustomizationArgsUtilService.unwrapSubtitled(
+      interactionId, interactionCustomizationArgs);
+
     if (interactionCustomizationArgs.choices) {
       interactionChoices = interactionCustomizationArgs.choices.value;
     }

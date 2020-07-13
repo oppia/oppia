@@ -21,6 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
+import { AppConstants } from 'app.constants';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { ISetInputCustomizationArgs } from
@@ -29,7 +30,8 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
   'domain/exploration/RuleObjectFactory';
-import { AppConstants } from 'app.constants';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 interface IPreviousRule {
   answerGroupIndex: number;
@@ -89,14 +91,14 @@ export class SetInputValidationService {
       customizationArgs: ISetInputCustomizationArgs): IWarning[] {
     let warningsList = [];
 
-    let buttonText = customizationArgs.buttonText &&
-      customizationArgs.buttonText.value.getUnicode();
-    if (!angular.isString(buttonText)) {
+    let buttonText = (
+      customizationArgs.buttonText && customizationArgs.buttonText.value);
+    if (!(buttonText instanceof SubtitledUnicode)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Button text must be a string.'
+        message: 'Button text must be a SubtitledUnicode object.'
       });
-    } else if (buttonText.length === 0) {
+    } else if (buttonText.getUnicode().length === 0) {
       warningsList.push({
         message: 'Label for this button should not be empty.',
         type: AppConstants.WARNING_TYPES.ERROR

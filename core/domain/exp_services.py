@@ -370,6 +370,10 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_id(change.new_value)
                 elif (
                         change.property_name ==
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    state.update_next_content_id_index(change.new_value)
+                elif (
+                        change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)

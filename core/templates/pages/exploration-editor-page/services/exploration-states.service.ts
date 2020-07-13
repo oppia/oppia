@@ -40,6 +40,7 @@ require(
   'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('services/interaction-customization-args-util.service.ts');
 require('services/validators.service.ts');
 
 angular.module('oppia').factory('ExplorationStatesService', [
@@ -124,6 +125,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
+      next_content_id_index: ['nextContentIdIndex'],
       solicit_answer_details: ['solicitAnswerDetails'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
@@ -321,6 +323,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
+      },
+      saveNextContentIdIndex: function(stateName, newNextContentIdIndex) {
+        saveStateProperty(
+          stateName, 'next_content_id_index', newNextContentIdIndex);
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');

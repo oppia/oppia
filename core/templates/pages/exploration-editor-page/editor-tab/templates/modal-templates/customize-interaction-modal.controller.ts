@@ -16,17 +16,10 @@
  * @fileoverview Controller for customize interaction modal.
  */
 
-import { InteractionCustArgsConversionFn } from
-  'services/interaction-customization-args-util.service';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');
@@ -259,15 +252,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.populateBlankContentIds = function() {
-      const conversionFn: InteractionCustArgsConversionFn = (
-          caValue, unusedSchemaObjType
-      ) => {
-        return caValue;
-      };
-      InteractionCustomizationArgsUtilService.convertContent(
+      InteractionCustomizationArgsUtilService.populateBlankContentIds(
         $scope.StateInteractionIdService.displayed,
-        StateCustomizationArgsService.displayed,
-        conversionFn
+        StateCustomizationArgsService.displayed
       );
     };
 
