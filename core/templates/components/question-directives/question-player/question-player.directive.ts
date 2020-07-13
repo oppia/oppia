@@ -51,7 +51,7 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
+  'schema-based-expression-editor.component.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-float-editor.directive.ts');
