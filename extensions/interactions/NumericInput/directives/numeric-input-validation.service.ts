@@ -171,17 +171,22 @@ export class NumericInputValidationService {
     if (data.length === 1) {
       stringValue = data[0];
     } else {
-      var  z = '', sign = value < 0 ? '-' : '',
-      str = data[0].replace('.', ''),
-      mag = Number(data[1]) + 1;
+      var z = '',
+        sign = value < 0 ? '-' : '',
+        str = data[0].replace('.', ''),
+        mag = Number(data[1]) + 1;
 
       if (mag < 0) {
         z = sign + '0.';
-        while (mag++) z += '0';
-        stringValue = z + str.replace(/^\-/,'');
+        while (mag++) {
+          z += '0';
+        }
+        stringValue = z + str.replace(/^\-/, '');
       } else {
-        mag -= str.length;  
-        while(mag--) z += '0';
+        mag -= str.length;
+        while (mag--) {
+          z += '0';
+        }
         stringValue = str + z;
       }
     }
