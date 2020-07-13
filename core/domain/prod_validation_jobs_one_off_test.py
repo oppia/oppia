@@ -217,7 +217,7 @@ class MockSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            prod_validation_jobs_one_off.ExternalModelFetchingDetails(
+            prod_validation_jobs_one_off.ExternalModelFetcherDetails(
                 'external_model_ids', MockModel, [])]
 
 
