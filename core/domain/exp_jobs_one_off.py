@@ -79,50 +79,6 @@ AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 
 
-
-class NumericInputInteractionOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of all (exploration, state) pairs that use the
-    NumericInput interaction which have rules containing string values.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-        exp_status = rights_manager.get_exploration_rights(item.id).status
-        if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-            return
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        validation_errors = []
-        for state_name, state in exploration.states.items():
-            if state.interaction.id == 'NumericInput':
-                for answer_group_index, answer_group in enumerate(
-                        state.interaction.answer_groups):
-                    for rule_index, rule_spec in enumerate(
-                            answer_group.rule_specs):
-                        for rule_input in rule_spec.inputs:
-                            value = rule_spec.inputs[rule_input]
-                            if isinstance(value, python_utils.BASESTRING):
-                                validation_errors.append(
-                                    'State name: %s, AnswerGroup: %s,' % (
-                                        state_name,
-                                        answer_group_index) +
-                                    ' Rule input %s in rule with index %s'
-                                    ' is a string. ' % (rule_input, rule_index)
-                                )
-        if validation_errors:
-            yield (item.id, validation_errors)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class DragAndDropSortInputInteractionOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
