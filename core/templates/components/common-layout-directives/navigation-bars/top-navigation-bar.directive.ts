@@ -84,6 +84,9 @@ angular.module('oppia').directive('topNavigationBar', [
                 } else {
                   $window.location.reload();
                 }
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $scope.$applyAsync();
               }
             );
           };
@@ -279,9 +282,15 @@ angular.module('oppia').directive('topNavigationBar', [
                   }
                 });
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $scope.$applyAsync();
             });
             UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $scope.$applyAsync();
             });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
