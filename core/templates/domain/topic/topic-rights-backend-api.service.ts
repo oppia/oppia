@@ -38,8 +38,6 @@ export class TopicRightsBackendApiService {
     private topicRightsObjectFactory:
       TopicRightsObjectFactory,
     private urlInterpolation: UrlInterpolationService) {}
-  // Maps previously loaded topic rights to their IDs.
-  private topicRightsCache = {};
 
   private _fetchTopicRights(
       topicId: string,
@@ -84,7 +82,6 @@ export class TopicRightsBackendApiService {
     this.http.put<number>(
       changeTopicStatusUrl, putParams).toPromise().then(
       (response) => {
-        this.topicRightsCache[topicId] = response;
         if (successCallback) {
           successCallback(response);
         }
@@ -120,12 +117,6 @@ export class TopicRightsBackendApiService {
         }
       });
   }
-
-  private _isCached(
-      topicId: string): boolean {
-    return this.topicRightsCache.hasOwnProperty(topicId);
-  }
-
   /**
    * Gets a topic's rights, given its ID.
    */
@@ -136,55 +127,6 @@ export class TopicRightsBackendApiService {
       this._fetchTopicRights(topicId, resolve, reject);
     });
   }
-
-  /**
-   * Behaves exactly as fetchTopicRights (including callback
-   * behavior and returning a promise object), except this function will
-   * attempt to see whether the given topic rights has been
-   * cached. If it has not yet been cached, it will fetch the topic
-   * rights from the backend. If it successfully retrieves the topic
-   * rights from the backend, it will store it in the cache to avoid
-   * requests from the backend in further function calls.
-   */
-  loadTopicRights(topicId: string): Promise<Object> {
-    console.log('Function: Load topic rights');
-    return new Promise((resolve, reject) => {
-      if (this._isCached(topicId)) {
-        if (resolve) {
-          resolve(this.topicRightsCache[topicId]);
-        }
-      } else {
-        this._fetchTopicRights(topicId, (topicRights) => {
-          // Save the fetched topic rights to avoid future fetches.
-          this.topicRightsCache[topicId] = topicRights;
-          if (resolve) {
-            resolve(this.topicRightsCache[topicId]);
-          }
-        }, reject);
-      }
-    });
-  }
-
-  /**
-   * Returns whether the given topic rights is stored within the
-   * local data cache or if it needs to be retrieved from the backend
-   * upon a laod.
-   */
-  isCached(topicId: string): boolean {
-    console.log('Function: is Cached');
-    return this._isCached(topicId);
-  }
-
-  /**
-   * Replaces the current topic rights in the cache given by the
-   * specified topic ID with a new topic rights object.
-   */
-  cacheTopicRights(topicId: string, topicRights: ITopicRightsBackendDict):
-  void {
-    console.log('Function: Cache Topic Rights');
-    this.topicRightsCache[topicId] = cloneDeep(topicRights);
-  }
-
   /**
    * Publishes a topic.
    */

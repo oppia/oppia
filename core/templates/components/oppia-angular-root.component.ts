@@ -608,8 +608,6 @@ import { TopicCreationBackendApiService } from
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsBackendApiService } from
   'domain/topic/topic-rights-backend-api.service';
-import { TopicRightsResponseObjectFactory } from
-  'domain/topic/TopicRightsResponseObjectFactory';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
@@ -940,7 +938,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static topicCreationBackendApiService: TopicCreationBackendApiService;
   static topicObjectFactory: TopicObjectFactory;
   static topicRightsBackendApiService: TopicRightsBackendApiService;
-  static topicRightsResponseObjectFactory: TopicRightsResponseObjectFactory;
   static topicRightsObjectFactory: TopicRightsObjectFactory;
   static topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   static topicSummaryObjectFactory: TopicSummaryObjectFactory;
@@ -1245,7 +1242,6 @@ private threadStatusDisplayService: ThreadStatusDisplayService,
 private topicCreationBackendApiService: TopicCreationBackendApiService,
 private topicObjectFactory: TopicObjectFactory,
 private topicRightsBackendApiService: TopicRightsBackendApiService,
-private topicRightsResponseObjectFactory: TopicRightsResponseObjectFactory,
 private topicRightsObjectFactory: TopicRightsObjectFactory,
 private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
 private topicSummaryObjectFactory: TopicSummaryObjectFactory,
@@ -1551,7 +1547,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.topicCreationBackendApiService = this.topicCreationBackendApiService;
     OppiaAngularRootComponent.topicObjectFactory = this.topicObjectFactory;
     OppiaAngularRootComponent.topicRightsBackendApiService = this.topicRightsBackendApiService;
-    OppiaAngularRootComponent.topicRightsResponseObjectFactory = this.topicRightsResponseObjectFactory;
     OppiaAngularRootComponent.topicRightsObjectFactory = this.topicRightsObjectFactory;
     OppiaAngularRootComponent.topicsAndSkillsDashboardBackendApiService = this.topicsAndSkillsDashboardBackendApiService;
     OppiaAngularRootComponent.topicSummaryObjectFactory = this.topicSummaryObjectFactory;

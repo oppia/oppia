@@ -143,66 +143,6 @@ describe('Topic rights backend API service', () => {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should report an uncached topic rights after caching it',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      // The topic should not currently be cached.
-      expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
-
-      // A new topic should be fetched from the backend. Also,
-      // the returned topic should match the expected topic object.
-      topicRightsBackendApiService.loadTopicRights(topicId).then(
-        successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/rightshandler/get_topic_rights/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        topic_id: 0,
-        topic_is_published: true,
-        manager_ids: ['user_id']
-      });
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-      // It should now be cached.
-      expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
-    }));
-
-  it('should report a cached topic rights after caching it', fakeAsync(() => {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    // The topic should not currently be cached.
-    expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
-
-    // Cache a topic rights object.
-    topicRightsBackendApiService.cacheTopicRights(topicId, {
-      topic_id: 0,
-      topic_is_published: true,
-      manager_ids: ['user_id']
-    });
-
-    // It should now be cached.
-    expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
-
-    // A new topic should not have been fetched from the backend. Also,
-    // the returned topic should match the expected topic object.
-    topicRightsBackendApiService.loadTopicRights(topicId).then(
-      successHandler, failHandler);
-
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith({
-      topic_id: 0,
-      topic_is_published: true,
-      manager_ids: ['user_id']
-    });
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
 
   it('should send a topic rights mail', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');

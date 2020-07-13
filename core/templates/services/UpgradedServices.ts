@@ -576,8 +576,6 @@ import { TopicRightsBackendApiService } from
   'domain/topic/topic-rights-backend-api.service';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
-import { TopicRightsResponseObjectFactory } from
-  'domain/topic/TopicRightsResponseObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -847,8 +845,6 @@ export class UpgradedServices {
         new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicRightsObjectFactory'] =
       new TopicRightsObjectFactory();
-    upgradedServices['TopicRightsResponseObjectFactory'] =
-      new TopicRightsResponseObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
       new TopicSummaryObjectFactory();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
@@ -1405,7 +1401,7 @@ export class UpgradedServices {
     upgradedServices['TopicRightsBackendApiService'] =
       new TopicRightsBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['TopicRightsResponseObjectFactory'],
+        upgradedServices['TopicRightsObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
       new TopicsAndSkillsDashboardBackendApiService(
