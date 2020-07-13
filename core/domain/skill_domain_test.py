@@ -77,15 +77,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.skill.validate()
 
-    def _assert_valid_skill_id(self, expected_error_substring, skill_id):
-        """Checks that the skill passes strict validation."""
+    def test_skill_id_validation_fails_with_invalid_skill_id_type(self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            skill_domain.Skill.require_valid_skill_id(skill_id)
+            utils.ValidationError, 'Skill id should be a string'):
+            skill_domain.Skill.require_valid_skill_id(10)
 
-    def test_valid_skill_id(self):
-        self._assert_valid_skill_id('Skill id should be a string', 10)
-        self._assert_valid_skill_id('Invalid skill id', 'abc')
+    def test_skill_id_validation_fails_with_invalid_skill_id_length(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid skill id'):
+            skill_domain.Skill.require_valid_skill_id('abc')
 
     def test_valid_misconception_id(self):
         self.skill.next_misconception_id = 'invalid_id'
