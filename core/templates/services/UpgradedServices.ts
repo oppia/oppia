@@ -1414,12 +1414,6 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
-    upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
-      upgradedServices['AnswerGroupObjectFactory'],
-      upgradedServices['HintObjectFactory'],
-      upgradedServices['SolutionObjectFactory'],
-      upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['InteractionCustomizationArgsUtilService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
@@ -1460,6 +1454,12 @@ export class UpgradedServices {
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService'],
         upgradedServices['InteractionCustomizationArgsUtilService']);
+    upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
+      upgradedServices['AnswerGroupObjectFactory'],
+      upgradedServices['HintObjectFactory'],
+      upgradedServices['SolutionObjectFactory'],
+      upgradedServices['OutcomeObjectFactory'],
+      upgradedServices['InteractionCustomizationArgsUtilService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],

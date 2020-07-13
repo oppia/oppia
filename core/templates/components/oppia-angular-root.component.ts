@@ -569,6 +569,8 @@ import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicodeObjectFactory } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
@@ -909,6 +911,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storySummaryObjectFactory: StorySummaryObjectFactory;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
+  static subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   static subtopicObjectFactory: SubtopicObjectFactory;
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
@@ -1209,6 +1212,7 @@ private storyReferenceObjectFactory: StoryReferenceObjectFactory,
 private storySummaryObjectFactory: StorySummaryObjectFactory,
 private storyViewerBackendApiService: StoryViewerBackendApiService,
 private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
 private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
@@ -1510,6 +1514,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.storySummaryObjectFactory = this.storySummaryObjectFactory;
     OppiaAngularRootComponent.storyViewerBackendApiService = this.storyViewerBackendApiService;
     OppiaAngularRootComponent.subtitledHtmlObjectFactory = this.subtitledHtmlObjectFactory;
+    OppiaAngularRootComponent.subtitledUnicodeObjectFactory = this.subtitledUnicodeObjectFactory;
     OppiaAngularRootComponent.subtopicObjectFactory = this.subtopicObjectFactory;
     OppiaAngularRootComponent.subtopicPageContentsObjectFactory = this.subtopicPageContentsObjectFactory;
     OppiaAngularRootComponent.subtopicPageObjectFactory = this.subtopicPageObjectFactory;

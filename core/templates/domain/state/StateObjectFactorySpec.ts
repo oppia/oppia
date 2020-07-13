@@ -21,6 +21,8 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { ParamChangesObjectFactory } from
@@ -61,7 +63,7 @@ describe('State Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: 'Type your answer here.'
+            value: new SubtitledUnicode('Type your answer here.', '')
           }
         },
         answer_groups: [],
@@ -118,7 +120,7 @@ describe('State Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: 'Type your answer here.'
+            value: new SubtitledUnicode('Type your answer here.', '')
           }
         },
         default_outcome: {

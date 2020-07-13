@@ -20,56 +20,54 @@ import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('SubtitledUnicode object factory', () => {
-  describe('SubtitledUnicodeObjectFactory', () => {
-    let suof: SubtitledUnicodeObjectFactory, subtitledUnicode: SubtitledUnicode;
+  let suof: SubtitledUnicodeObjectFactory, subtitledUnicode: SubtitledUnicode;
 
-    beforeEach(() => {
-      suof = new SubtitledUnicodeObjectFactory();
+  beforeEach(() => {
+    suof = new SubtitledUnicodeObjectFactory();
 
-      subtitledUnicode = suof.createFromBackendDict({
-        content_id: 'content_id',
-        unicode_str: 'some string'
-      });
+    subtitledUnicode = suof.createFromBackendDict({
+      content_id: 'content_id',
+      unicode_str: 'some string'
     });
+  });
 
-    it('should get and set HTML correctly', () => {
-      expect(subtitledUnicode.unicode).toEqual('some string');
-      subtitledUnicode.unicode = 'new string';
-      expect(subtitledUnicode.unicode).toEqual('new string');
+  it('should get and set HTML correctly', () => {
+    expect(subtitledUnicode.getUnicode()).toEqual('some string');
+    subtitledUnicode.setUnicode('new string');
+    expect(subtitledUnicode.getUnicode()).toEqual('new string');
+  });
+
+  it('should get contentId correctly', () => {
+    expect(subtitledUnicode.getContentId()).toEqual('content_id');
+  });
+
+  it('should correctly check existence of HTML', () => {
+    expect(subtitledUnicode.hasNoUnicode()).toBe(false);
+    subtitledUnicode.setUnicode('');
+    expect(subtitledUnicode.hasNoUnicode()).toBe(true);
+  });
+
+  it('should correctly check emptiness', () => {
+    expect(subtitledUnicode.isEmpty()).toBe(false);
+
+    subtitledUnicode.setUnicode('');
+    expect(subtitledUnicode.isEmpty()).toBe(true);
+
+    subtitledUnicode.setUnicode('hello');
+    expect(subtitledUnicode.isEmpty()).toBe(false);
+  });
+
+  it('should convert to backend dict correctly', () => {
+    expect(subtitledUnicode.toBackendDict()).toEqual({
+      content_id: 'content_id',
+      unicode_str: 'some string'
     });
+  });
 
-    it('should get contentId correctly', () => {
-      expect(subtitledUnicode.contentId).toEqual('content_id');
-    });
-
-    it('should correctly check existence of HTML', () => {
-      expect(subtitledUnicode.hasNoUnicode()).toBe(false);
-      subtitledUnicode.unicode = '';
-      expect(subtitledUnicode.hasNoUnicode()).toBe(true);
-    });
-
-    it('should correctly check emptiness', () => {
-      expect(subtitledUnicode.isEmpty()).toBe(false);
-
-      subtitledUnicode.unicode = '';
-      expect(subtitledUnicode.isEmpty()).toBe(true);
-
-      subtitledUnicode.unicode = 'hello';
-      expect(subtitledUnicode.isEmpty()).toBe(false);
-    });
-
-    it('should convert to backend dict correctly', () => {
-      expect(subtitledUnicode.toBackendDict()).toEqual({
-        content_id: 'content_id',
-        unicode_str: 'some string'
-      });
-    });
-
-    it('should create default object', () => {
-      var defaultSubtitledUnicode = suof
-        .createDefault('test string', 'content_id');
-      expect(defaultSubtitledUnicode.unicode).toEqual('test string');
-      expect(defaultSubtitledUnicode.contentId).toEqual('content_id');
-    });
+  it('should create default object', () => {
+    var defaultSubtitledUnicode = suof
+      .createDefault('test string', 'content_id');
+    expect(defaultSubtitledUnicode.getUnicode()).toEqual('test string');
+    expect(defaultSubtitledUnicode.getContentId()).toEqual('content_id');
   });
 });

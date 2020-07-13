@@ -55,6 +55,14 @@ export class SubtitledUnicode {
       content_id: this._contentId
     };
   }
+
+  hasNoUnicode(): boolean {
+    return !this._unicode;
+  }
+
+  isEmpty(): boolean {
+    return this.hasNoUnicode();
+  }
 }
 
 @Injectable({

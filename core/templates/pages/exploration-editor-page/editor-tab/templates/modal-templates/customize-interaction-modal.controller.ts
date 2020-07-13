@@ -35,6 +35,7 @@ require(
   'interaction-details-cache.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+require('services/interaction-customization-args-util.service.ts');
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',

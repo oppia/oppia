@@ -22,6 +22,8 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 
@@ -115,7 +117,7 @@ describe('States Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: 'Type your answer here.'
+            value: new SubtitledUnicode('Type your answer here.', '')
           }
         },
         default_outcome: {
@@ -465,7 +467,7 @@ describe('States Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: 'Type your answer here.'
+            value: new SubtitledUnicode('Type your answer here.', '')
           }
         },
         default_outcome: {

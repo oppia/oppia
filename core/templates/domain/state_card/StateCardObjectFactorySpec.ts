@@ -26,6 +26,8 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 
@@ -56,7 +58,7 @@ describe('State card object factory', () => {
           value: 1
         },
         placeholder: {
-          value: 'Type your answer here.'
+          value: new SubtitledUnicode('Type your answer here.', '')
         }
       },
       default_outcome: {
