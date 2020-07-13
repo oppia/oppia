@@ -956,7 +956,7 @@ def estimate_size_of_svg_for_math_expressions_in_html(html_string):
         raw_latex = (
             objects.UnicodeString.normalize(math_content_dict['raw_latex']))
         # The characters in special Latex keywords like 'frac' and 'sqrt' don't
-        # add up to the size of SVG. Also 'frac' and 'sqrt' are commonly used. 
+        # add up to the total size of SVG.
         raw_latex = (
             raw_latex.replace('frac', '').replace('sqrt', '').replace(
                 ' ', ''))
