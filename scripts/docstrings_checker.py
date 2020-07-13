@@ -82,7 +82,7 @@ def get_setters_property(node):
         astroid.FunctionDef|None. The node relating to the property of
         the given setter node, or None if one could not be found.
     """
-    property_ = None
+    setters_property = None
 
     property_name = get_setters_property_name(node)
     class_node = utils.node_frame_class(node)
@@ -90,10 +90,10 @@ def get_setters_property(node):
         class_attrs = class_node.getattr(node.name)
         for attr in class_attrs:
             if utils.decorated_with_property(attr):
-                property_ = attr
+                setters_property = attr
                 break
 
-    return property_
+    return setters_property
 
 
 def returns_something(return_node):
