@@ -23,47 +23,34 @@ import { Injectable } from '@angular/core';
 
 import { ReviewTestDomainConstants } from
   'domain/review_test/review-test-domain.constants';
+import { ReviewTestBackendDict, ReviewTest, ReviewTestObjectFactory } from
+  'domain/review_test/review-test-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-
-interface ReviewTestBackendResponse {
-  'story_name': string;
-  'skill_descriptions': {
-    [skillId: string]: string;
-  }
-}
-
-interface ReviewTestData {
-  storyName: string;
-  skillDescriptions: {
-    [skillId: string]: string;
-  }
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReviewTestBackendApiService {
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private reviewTestObjectFactory: ReviewTestObjectFactory,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  _fetchReviewTestData(storyId: string): Promise<ReviewTestData> {
-    return this.http.get<ReviewTestBackendResponse>(
+  _fetchReviewTestData(storyId: string): Promise<ReviewTest> {
+    return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
         {story_id: storyId}
       )
     ).toPromise().then(backendResponse => {
-      return {
-        storyName: backendResponse.story_name,
-        skillDescriptions: backendResponse.skill_descriptions
-      };
+      return this.reviewTestObjectFactory.createFromBackendDict(
+        backendResponse);
     });
   }
 
-  fetchReviewTestData(storyId: string): Promise<ReviewTestData> {
+  fetchReviewTestData(storyId: string): Promise<ReviewTest> {
     return this._fetchReviewTestData(storyId);
   }
 }

@@ -427,6 +427,8 @@ import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service.ts';
+import { ReviewTestObjectFactory } from
+  'domain/review_test/review-test-object.factory';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -791,6 +793,7 @@ export class UpgradedServices {
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
+    upgradedServices['ReviewTestObjectFactory'] = new ReviewTestObjectFactory();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
@@ -1331,8 +1334,9 @@ export class UpgradedServices {
         upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =
       new ReviewTestBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['ReviewTestObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['SearchExplorationsBackendApiService'] =
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
