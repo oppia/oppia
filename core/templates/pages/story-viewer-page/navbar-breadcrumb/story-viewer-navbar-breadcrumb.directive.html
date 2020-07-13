@@ -1,6 +1,27 @@
-<div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
-  <span class="oppia-navbar-breadcrumb-separator"></span>
-  <span>
-    <[$ctrl.storyTitle]>
-  </span>
+<div ng-if="$ctrl.storyTitle" class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak oppia-story-viewer-nav-breadcrumb">
+  <div class="oppia-story-viewer-nav-separator"></div>
+  <div class="oppia-story-viewer-nav-labels-container">
+    <p style="margin: 0; font-size: 18px;"><[$ctrl.storyTitle]></p>
+    <a ng-href="<[$ctrl.getTopicUrl()]>" style="color: white; font-size: 12px;"><[$ctrl.topicName]></a>
+  </div>
 </div>
+
+<style>
+  .oppia-story-viewer-nav-breadcrumb {
+    align-items: center;
+    height: 56px;
+    padding-top: 0;
+  }
+
+  .oppia-story-viewer-nav-separator {
+    background-color: white;
+    height: 80%;
+    margin-right: 12px;
+    width: 1px;
+  }
+
+  .oppia-story-viewer-nav-labels-container {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
