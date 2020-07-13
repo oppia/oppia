@@ -192,6 +192,19 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.schemaEditorIsShown = true;
       };
 
+      ctrl.onRearrangeMoveSkillFinish = function(toIndex) {
+        ctrl.toIndex = toIndex;
+        if (ctrl.fromIndex === ctrl.toIndex) {
+          return;
+        }
+        TopicUpdateService.rearrangeSkillInSubtopic(
+          ctrl.topic, ctrl.subtopic.getId(), ctrl.fromIndex, ctrl.toIndex);
+      };
+
+      ctrl.onRearrangeMoveSkillStart = function(fromIndex) {
+        ctrl.fromIndex = fromIndex;
+      };
+
       ctrl.createSkill = function() {
         EntityCreationService.createSkill();
       };

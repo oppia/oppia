@@ -62,6 +62,63 @@ describe('Topic update service', function() {
   var _thirdSkillSummary = null;
   var _sampleSubtopicPage = null;
 
+  var sampleTopicBackendObject = {
+    topicDict: {
+      id: 'sample_topic_id',
+      name: 'Topic name',
+      description: 'Topic description',
+      version: 1,
+      uncategorized_skill_ids: ['skill_1'],
+      canonical_story_references: [{
+        story_id: 'story_1',
+        story_is_published: true
+      }, {
+        story_id: 'story_2',
+        story_is_published: true
+      }, {
+        story_id: 'story_3',
+        story_is_published: true
+      }],
+      additional_story_references: [{
+        story_id: 'story_2',
+        story_is_published: true
+      }],
+      subtopics: [{
+        id: 1,
+        title: 'Title',
+        skill_ids: ['skill_2']
+      }],
+      next_subtopic_id: 2,
+      language_code: 'en'
+    },
+    skillIdToDescriptionDict: {
+      skill_1: 'Description 1',
+      skill_2: 'Description 2'
+    }
+  };
+  var sampleSubtopicPageObject = {
+    id: 'topic_id-1',
+    topic_id: 'topic_id',
+    page_contents: {
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    },
+    language_code: 'en'
+  };
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
@@ -112,63 +169,6 @@ describe('Topic update service', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     skillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
 
-    var sampleTopicBackendObject = {
-      topicDict: {
-        id: 'sample_topic_id',
-        name: 'Topic name',
-        description: 'Topic description',
-        version: 1,
-        uncategorized_skill_ids: ['skill_1'],
-        canonical_story_references: [{
-          story_id: 'story_1',
-          story_is_published: true
-        }, {
-          story_id: 'story_2',
-          story_is_published: true
-        }, {
-          story_id: 'story_3',
-          story_is_published: true
-        }],
-        additional_story_references: [{
-          story_id: 'story_2',
-          story_is_published: true
-        }],
-        subtopics: [{
-          id: 1,
-          title: 'Title',
-          skill_ids: ['skill_2']
-        }],
-        next_subtopic_id: 2,
-        language_code: 'en'
-      },
-      skillIdToDescriptionDict: {
-        skill_1: 'Description 1',
-        skill_2: 'Description 2'
-      }
-    };
-    var sampleSubtopicPageObject = {
-      id: 'topic_id-1',
-      topic_id: 'topic_id',
-      page_contents: {
-        subtitled_html: {
-          html: 'test content',
-          content_id: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'test.mp3',
-                file_size_bytes: 100,
-                needs_update: false,
-                duration_secs: 0.1
-              }
-            }
-          }
-        }
-      },
-      language_code: 'en'
-    };
     _firstSkillSummary = skillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
     _secondSkillSummary = skillSummaryObjectFactory.create(
@@ -565,6 +565,45 @@ describe('Topic update service', function() {
     expect(canonicalStoryIds[0]).toEqual('story_1');
     expect(canonicalStoryIds[1]).toEqual('story_2');
     expect(canonicalStoryIds[2]).toEqual('story_3');
+  });
+
+  it('should rearrange a skill in a subtopic', function() {
+    sampleTopicBackendObject.topicDict.subtopics[0].skill_ids = [
+      'skill_id_1', 'skill_id_2', 'skill_id_3'];
+    _sampleTopic = TopicObjectFactory.create(
+      sampleTopicBackendObject.topicDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
+    let skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills.length).toEqual(3);
+    expect(skills[0].getId()).toEqual('skill_id_1');
+    expect(skills[1].getId()).toEqual('skill_id_2');
+    expect(skills[2].getId()).toEqual('skill_id_3');
+
+    TopicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual('skill_id_2');
+    expect(skills[1].getId()).toEqual('skill_id_1');
+    expect(skills[2].getId()).toEqual('skill_id_3');
+
+    TopicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual('skill_id_2');
+    expect(skills[1].getId()).toEqual('skill_id_3');
+    expect(skills[2].getId()).toEqual('skill_id_1');
+
+    TopicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual('skill_id_1');
+    expect(skills[1].getId()).toEqual('skill_id_2');
+    expect(skills[2].getId()).toEqual('skill_id_3');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual('skill_id_2');
+
+    expect(skills[1].getId()).toEqual('skill_id_3');
+    expect(skills[2].getId()).toEqual('skill_id_1');
+    sampleTopicBackendObject.topicDict.subtopics[0].skill_ids = ['skill_2'];
   });
 
   it('should create a proper backend change dict for adding a subtopic',

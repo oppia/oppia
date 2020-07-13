@@ -67,6 +67,7 @@ CMD_UNPUBLISH_STORY = 'unpublish_story'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
+CMD_REARRANGE_SKILL_IN_SUBTOPIC = 'rearrange_skill_in_subtopic'
 CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -168,6 +169,10 @@ class TopicChange(change_domain.BaseChange):
         'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
         'required_attribute_names': [
             'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
         'optional_attribute_names': [],
     }, {
         'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
@@ -737,9 +742,12 @@ class Topic(python_utils.OBJECT):
                             'to be different.')
 
         if (from_index >= len(self.canonical_story_references) or
-                to_index >= len(self.canonical_story_references) or
-                from_index < 0 or to_index < 0):
-            raise Exception('Expected index values to be with-in bounds.')
+                from_index < 0):
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if (to_index >= len(self.canonical_story_references) or
+                to_index < 0):
+            raise Exception('Expected to_index value to be with-in bounds.')
 
         canonical_story_reference_to_move = copy.deepcopy(
             self.canonical_story_references[from_index])
@@ -1243,6 +1251,45 @@ class Topic(python_utils.OBJECT):
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].thumbnail_bg_color = (
             new_thumbnail_bg_color)
+
+    def rearrange_skill_in_subtopic(self, subtopic_id, from_index, to_index):
+        """Rearranges the skills in the subtopic with the given id.
+
+        Args:
+            subtopic_id: int. The id of subtopic.
+            from_index: int. The index of skill to move.
+            to_index: int. The index at which to insert the moved skill.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception('Expected from_index value to be a number, '
+                            'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception('Expected to_index value to be a number, '
+                            'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception('Expected from_index and to_index values '
+                            'to be different.')
+
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+
+        if (from_index >= len(self.subtopics[subtopic_index].skill_ids) or
+                from_index < 0):
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if (to_index >= len(self.subtopics[subtopic_index].skill_ids) or
+                to_index < 0):
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        skill_to_move = copy.deepcopy(
+            self.subtopics[subtopic_index].skill_ids[from_index])
+        del self.subtopics[subtopic_index].skill_ids[from_index]
+        self.subtopics[subtopic_index].skill_ids.insert(
+            to_index, skill_to_move)
 
     def move_skill_id_to_subtopic(
             self, old_subtopic_id, new_subtopic_id, skill_id):
