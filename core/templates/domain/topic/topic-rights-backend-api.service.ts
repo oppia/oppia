@@ -47,14 +47,10 @@ export class TopicRightsBackendApiService {
       TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
         topic_id: topicId
       });
-    console.log('FN: _fetchtr');
-    console.log(topicRightsUrl);
     this.http.get<ITopicRightsBackendDict>(topicRightsUrl).toPromise().then(
       (response) => {
         let res =
           this.topicRightsObjectFactory.createFromBackendDict(response);
-        console.log(response);
-        console.log(res);
         if (successCallback) {
           successCallback(res);
         }
@@ -121,8 +117,6 @@ export class TopicRightsBackendApiService {
    * Gets a topic's rights, given its ID.
    */
   fetchTopicRights(topicId: string): Promise<Object> {
-    console.log('Function: Fetch topic rights');
-    console.log('Called by ' + this.fetchTopicRights.caller);
     return new Promise((resolve, reject) => {
       this._fetchTopicRights(topicId, resolve, reject);
     });
@@ -131,14 +125,12 @@ export class TopicRightsBackendApiService {
    * Publishes a topic.
    */
   publishTopic(topicId: string): Promise<Object> {
-    console.log('Function: Publish topic');
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, true, resolve, reject);
     });
   }
 
   sendMail(topicId: string, topicName: string): Promise<Object> {
-    console.log('Function: Send mail');
     return new Promise((resolve, reject) => {
       this._sendMail(topicId, topicName, resolve, reject);
     });
@@ -148,7 +140,6 @@ export class TopicRightsBackendApiService {
    * Unpublishes a topic.
    */
   unpublishTopic(topicId: string): Promise<Object> {
-    console.log('Function: unpublish topic');
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, false, resolve, reject);
     });

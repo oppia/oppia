@@ -67,7 +67,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.get(topicId);
   });
 
-  fit('should add and delete subtopics correctly', async function() {
+  it('should add and delete subtopics correctly', async function() {
     await topicEditorPage.addSubtopic(
       'Subtopic 1', '../data/test2_svg.svg', 'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');

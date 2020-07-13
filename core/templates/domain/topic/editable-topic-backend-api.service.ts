@@ -178,7 +178,6 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
        */
       updateTopic: function(
           topicId, topicVersion, commitMessage, changeList) {
-        console.log('Trying to update');
         return $q(function(resolve, reject) {
           _updateTopic(
             topicId, topicVersion, commitMessage, changeList,

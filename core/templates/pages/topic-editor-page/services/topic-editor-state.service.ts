@@ -117,8 +117,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
       return null;
     };
     var _updateTopic = function(newBackendTopicDict, skillIdToDescriptionDict) {
-      console.log('update topic');
-      console.log('called by ' + _updateTopic.caller);
       _setTopic(
         TopicObjectFactory.create(
           newBackendTopicDict, skillIdToDescriptionDict));
@@ -161,8 +159,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * additional behavior of this function.
        */
       loadTopic: function(topicId) {
-        console.log('Load topic');
-        console.log('called by ' + this.loadTopic.caller);
         _topicIsLoading = true;
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
@@ -382,7 +378,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * shares behavior with setTopic(), when it succeeds.
        */
       saveTopic: function(commitMessage, successCallback) {
-        console.log('Try to save topic');
         if (!_topicIsInitialized) {
           AlertsService.fatalWarning(
             'Cannot save a topic before one is loaded.');
