@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for performing any action on element.
+ * @fileoverview Utilities for performing actions on element.
  */
 
 var waitFor = require('./waitFor.js');
-
 
 var clear = async function(inputName, inputElement) {
   await click(inputName, inputElement);
@@ -25,7 +24,7 @@ var clear = async function(inputName, inputElement) {
 };
 
 var click = async function(
-    elementName, clickableElement, clickableCheck = false) {
+    elementName, clickableElement, clickableCheck=false) {
   await waitFor.visibilityOf(
     clickableElement, `${elementName} is not visible.`);
   if (clickableCheck) {

@@ -96,14 +96,14 @@ var PreferencesPage = function() {
   this.toggleEditorRoleEmailsCheckbox = async function() {
     await action.click(
       'Editor role emails checkbox', editorRoleEmailsCheckbox,
-      clickableCheck = true);
+      clickableCheck=true);
     await saveNewChanges('Editor Role Emails');
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
     await action.click(
       'Feedback emails checkbox', feedbackMessageEmailsCheckbox,
-      clickableCheck = true);
+      clickableCheck=true);
     await saveNewChanges('Feedback Emails');
   };
 
