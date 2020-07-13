@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface IUserInfoBackendDict {
+export interface IUserInfoBackendDict {
   'is_moderator': boolean;
   'is_admin': boolean;
   'is_super_admin': boolean;

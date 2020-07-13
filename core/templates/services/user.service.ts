@@ -24,8 +24,38 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { UrlInterpolationService } from 
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service.ts';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+import { UserInfoObjectFactory, UserInfo, IUserInfoBackendDict } from 
+  'domain/user/UserInfoObjectFactory.ts';
 import { AppConstants } from 'app.constants';
+import { List } from 'lodash';
+
+interface subscription_summary {
+  'creator_picture_data_url': string;
+  'creator_username': string;
+  'creator_impact': number;
+}
+interface IPreferencesBackendDict {
+  'preferred_language_codes': string;
+  'preferred_site_language_code': string;
+  'preferred_audio_language_code': string;  
+  'profile_picture_data_url': string;
+  'default_dashboard': string;
+  'user_bio': string;
+  'subject_interests': string;
+  'can_receive_email_updates': boolean;
+  'can_receive_editor_role_email': boolean;
+  'can_receive_feedback_message_email': boolean;
+  'can_receive_subscription_email': boolean;
+  'subscription_list': List<subscription_summary>;
+}
+interface IUrlBackendDict {
+  'login_url': string;
+}
+interface IUserCommunityRightsDataBackendDict {
+  'can_review_translation_for_language_codes': boolean;
+  'can_review_voiceover_for_language_codes': boolean;
+  'can_review_questions': boolean;
+}
 
 
 @Injectable({
@@ -45,20 +75,20 @@ export class UserService{
     private userInfo = null;
     private userCommunityRightsInfo = null;
 
-    getUserInfoAsync(): Promise<Object> {
+    getUserInfoAsync(): Promise<UserInfo> {
       if (this.urlService.getPathname() === '/signup'){
         return Promise.resolve(this.userInfoObjectFactory.createDefault())
       }
       if (this.userInfo) {
         return Promise.resolve(this.userInfo);
       }
-      return this.http.get( //fix this method
-        '/userinfohandler', { observe: 'response' }).toPromise().then(
-          (response) => {
-            if (response.body.user_is_logged_in) {
+      return this.http.get<IUserInfoBackendDict>(
+        '/userinfohandler').toPromise().then(
+          (backendDict) => {
+            if (backendDict.user_is_logged_in) {
               this.userInfo = 
                 this.userInfoObjectFactory.createFromBackendDict(
-                  response.body);
+                  backendDict);
               return Promise.resolve(this.userInfo);
             } else {
               return Promise.resolve(
@@ -66,20 +96,20 @@ export class UserService{
             }
       });
     }
-    getProfileImageDataUrlAsync(): Promise<Object> {
+    getProfileImageDataUrlAsync(): Promise<string> {
       let profilePictureDataUrl = (
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
       return this.getUserInfoAsync().then(
-        () => {
-          if (this.userInfo.isLoggedIn()){
-            return this.http.get(
-              '/preferenceshandler/profile_picture', { observe: 'response' }
+        (userInfo) => {
+          if (userInfo.isLoggedIn()){
+            return this.http.get<IPreferencesBackendDict>(
+              '/preferenceshandler/profile_picture'
             ).toPromise().then(
-              (response) => {
-                if (response.body.profile_picture_data_url){
+              (backendDict) => {
+                if (backendDict.profile_picture_data_url){
                   profilePictureDataUrl = 
-                    response.body.profile_picture_data_url;
+                    backendDict.profile_picture_data_url;
                 }
                 return profilePictureDataUrl;
             });
@@ -88,30 +118,31 @@ export class UserService{
           }
         });
     }
-    setProfileImageDataUrlAsync(newProfileImageDataUrl) { //need return type?
-      return this.http.put(this.PREFERENCES_DATA_URL, {
+    setProfileImageDataUrlAsync(newProfileImageDataUrl: string): Promise<{}> {
+      let putData = {
         update_type: 'profile_picture_data_url',
         data: newProfileImageDataUrl
-      });
+      }
+      return this.http.put<{}>(this.PREFERENCES_DATA_URL, putData).toPromise();
     }
-    getLoginUrlAsync(): Promise<Object> {
+    getLoginUrlAsync(): Promise<string> {
       let urlParameters = {
         current_url: this.windowRef.nativeWindow.location.pathname
       };
-      return this.http.get('/url_handler', { params: urlParameters, 
-        observe: 'response'}).toPromise().then(
-          (response) => {
-            return response.body.login_url;
+      return this.http.get<IUrlBackendDict>('/url_handler', 
+        { params: urlParameters }).toPromise().then(
+          (backendDict) => {
+            return backendDict.login_url;
         });
     }
-    getUserCommunityRightsData(): Promise<Object> {
+    getUserCommunityRightsData(): Promise<IUserCommunityRightsDataBackendDict>{
       if (this.userCommunityRightsInfo) {
         return Promise.resolve(this.userCommunityRightsInfo);
       } else {
-        return this.http.get(
-          this.USER_COMMUNITY_RIGHTS_DATA_URL, { observe: 'response' }).toPromise().then(
-            (response) => {
-              this.userCommunityRightsInfo = response.body;
+        return this.http.get<IUserCommunityRightsDataBackendDict>(
+          this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
+            (backendDict) => {
+              this.userCommunityRightsInfo = backendDict;
               return Promise.resolve(this.userCommunityRightsInfo);
         });
       }
