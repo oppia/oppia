@@ -26,7 +26,7 @@ from core.platform.email import gae_email_services
 import feconf
 import logging
 import python_utils
-
+from textwrap import dedent
 
 def post_to_mailgun(data):
     """Send POST HTTP request to mailgun api. This method is adopted from
@@ -103,7 +103,7 @@ def send_mail(
     if not constants.DEV_MODE:
         post_to_mailgun(data)
     else:
-        msg_title = 'MailgunService.Send'
+        msg_title = 'MailgunService.SendMail'
         msg_body = (
             '''
             From: %s
@@ -157,19 +157,19 @@ def send_bulk_mail(
     # post data. Maximum limit of recipients per request is 1000.
     # For more detail check following link:
     # https://documentation.mailgun.com/user_manual.html#batch-sending
-    recipient_email_sets = [
+    recipient_email_lists = [
         recipient_emails[i:i + 1000]
         for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
 
-    if not constants.DEV_MODE:
+    if constants.DEV_MODE:
         logging.info('MailgunService.SendBulkMail')
-    for email_set in recipient_email_sets:
+    for email_list in recipient_email_lists:
         # 'recipient-variable' in post data forces mailgun to send individual
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
         data = {
             'from': sender_email,
-            'to': email_set,
+            'to': email_list,
             'subject': subject.encode(encoding='utf-8'),
             'text': plaintext_body.encode(encoding='utf-8'),
             'html': html_body.encode(encoding='utf-8'),
@@ -177,6 +177,13 @@ def send_bulk_mail(
         if not constants.DEV_MODE:
             post_to_mailgun(data)
         else:
+            recipient_email_list_str = ' '.join(
+                ['%s' % 
+                    (recipient_email,) for recipient_email in email_list[:3]])
+            # Show the first 3 emails in the list up to 1000 emails
+            if(len(email_list) > 3):
+                recipient_email_list_str += (
+                    '... Total: '+str(len(email_list))+' emails.')
             msg = (
                 '''
                 From: %s
@@ -189,13 +196,11 @@ def send_bulk_mail(
                     Content-type: text/html
                     Data length: %d
                 ''' % (
-                    sender_email, recipient_email, subject, len(plaintext_body),
-                    len(html_body)))
-            logging.info(msg)
-    if not constants.DEV_MODE:
+                    sender_email, recipient_email_list_str, subject,
+                    len(plaintext_body), len(html_body)))
+            logging.info(dedent(msg))
+    if constants.DEV_MODE:
         logging.info(
             'You are not currently sending out real email since this is a' +
             ' dev environment. Emails are sent out in the production' +
             ' environment.')
-
-

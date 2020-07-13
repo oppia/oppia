@@ -25,6 +25,7 @@ import datetime
 import inspect
 import itertools
 import json
+import logging
 import os
 import unittest
 
@@ -2416,6 +2417,37 @@ class GenericEmailTestBase(GenericTestBase):
 
 EmailTestBase = GenericEmailTestBase
 
+class MockLoggingHandler(python_utils.OBJECT):
+    """Mock logging handler to check for expected logs.
+
+    Messages are available from an instance's ``messages`` dict, in order, indexed by
+    a lowercase log level string (e.g., 'debug', 'info', etc.).
+    """
+
+    def __init__(self):
+        self.messages = {'debug': [], 'info': [], 'warning': [], 'error': [],
+                         'critical': []}
+
+    def info(self, message):
+        "Store a message from ``record`` in the instance's ``messages`` dict."
+        self.messages['info'].append(message)
+    
+    def debug(self, message):
+        "Store a message from ``record`` in the instance's ``messages`` dict."
+        self.messages['debug'].append(message)
+
+    def warning(self, message):
+        self.messages['warning'].append(message)
+
+    def error(self, message):
+        self.messages['error'].append(message)
+    
+    def critical(self, message):
+        self.messages['critical'].append(message)
+
+    def reset(self):
+        self.messages = {'debug': [], 'info': [], 'warning': [], 'error': [],
+                         'critical': []}
 
 class FunctionWrapper(python_utils.OBJECT):
     """A utility for making function wrappers. Create a subclass and override
