@@ -30,10 +30,9 @@ import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
 import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import {
-  IInteractionCustomizationArgsBackendDict,
-  InteractionCustomizationArgs,
-  InteractionCustomizationArgsObjectFactory
-} from 'domain/exploration/InteractionCustomizationArgsObjectFactory';
+  IInteractionCustomizationArgsValueBackendDict,
+  IInteractionCustomizationArgsValue
+} from 'interactions/customization-args-defs';
 
 export interface IInteractionBackendDict {
   'default_outcome': IOutcomeBackendDict;
@@ -45,17 +44,29 @@ export interface IInteractionBackendDict {
   'solution': ISolutionBackendDict;
 }
 
+export interface IInteractionCustomizationArgsBackendDict {
+  [customizationArgName: string]: {
+    value: IInteractionCustomizationArgsValueBackendDict
+  }
+}
+
+export interface IInteractionCustomizationArgs {
+  [customizationArgName: string]: {
+    value: IInteractionCustomizationArgsValue
+  }
+}
+
 export class Interaction {
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: any;
-  customizationArgs: InteractionCustomizationArgs;
+  customizationArgs: IInteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
   id: string;
   solution: Solution;
   constructor(
       answerGroups: AnswerGroup[], confirmedUnclassifiedAnswers: any,
-      customizationArgs: InteractionCustomizationArgs,
+      customizationArgs: IInteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
@@ -78,7 +89,7 @@ export class Interaction {
     this.defaultOutcome = newValue;
   }
 
-  setCustomizationArgs(newValue: InteractionCustomizationArgs): void {
+  setCustomizationArgs(newValue: IInteractionCustomizationArgs): void {
     this.customizationArgs = newValue;
   }
 
@@ -107,7 +118,7 @@ export class Interaction {
         return answerGroup.toBackendDict();
       }),
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
-      customization_args: this.customizationArgs.toBackendDict(),
+      customization_args: {},
       default_outcome:
         this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
       hints: this.hints.map(function(hint) {
@@ -128,8 +139,6 @@ export class InteractionObjectFactory {
       private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
       private outcomeFactory: OutcomeObjectFactory,
-      private interactionCustomizationArgsObjectFactory:
-        InteractionCustomizationArgsObjectFactory
   ) {}
 
   createFromBackendDict(
@@ -144,10 +153,7 @@ export class InteractionObjectFactory {
     return new Interaction(
       this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
       interactionDict.confirmed_unclassified_answers,
-      (this.interactionCustomizationArgsObjectFactory
-        .createFromBackendDict(
-          interactionDict.id,
-          interactionDict.customization_args)),
+      {},
       defaultOutcome,
       this.generateHintsFromBackend(interactionDict.hints),
       interactionDict.id,

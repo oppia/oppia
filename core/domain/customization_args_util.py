@@ -54,6 +54,7 @@ def get_full_customization_args(customization_args, ca_specs):
             }
     return customization_args
 
+
 def validate_customization_args_and_values(
         item_name, item_type, customization_args,
         ca_specs_to_validate_against):

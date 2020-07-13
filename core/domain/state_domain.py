@@ -827,8 +827,6 @@ class InteractionInstance(python_utils.OBJECT):
             conversion_fn: function. The function to be used for converting the
                 content. It is passed the customization argument value and obj_type.
         """
-        if 'type' not in schema:
-            raise Exception(schema)
         schema_type = schema['type']
         schema_obj_type = schema.get('obj_type', None)
         

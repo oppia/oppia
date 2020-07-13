@@ -20,11 +20,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  SubtitledHtml, ISubtitledHtmlBackendDict
+  SubtitledHtml, ISubtitledHtmlBackendDict, SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import {
-  SubtitledUnicode, ISubtitledUnicodeBackendDict
+  SubtitledUnicode, ISubtitledUnicodeBackendDict, SubtitledUnicodeObjectFactory
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {
+  IInteractionCustomizationArgsBackendDict, IInteractionCustomizationArgs
+} from 'domain/exploration/InteractionObjectFactory';
+
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export type InteractionCustArgsConversionFn = (
   caValue: SubtitledHtml |
@@ -32,70 +37,140 @@ export type InteractionCustArgsConversionFn = (
     ISubtitledHtmlBackendDict |
     ISubtitledUnicodeBackendDict,
   schemaObjType: 'SubtitledHtml' | 'SubtitledUnicode',
-  contentId: string,
-  inList: boolean
 ) => any;
+
+interface Schema {
+  type: string;
+  'obj_type'?: string;
+  items?: Schema;
+  properties: {
+    name: string;
+    schema: Schema;
+  }[]
+}
 
 @Injectable({providedIn: 'root'})
 export class InteractionCustomizationArgsUtilService {
-  private findSubtitled(
-      ca: {value: any},
-      caSpec: any,
-      conversionFn: InteractionCustArgsConversionFn,
-      contentId: string = 'custarg'
+  constructor(
+      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+      private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory
+  ) {}
+
+  private applyConversionFnOnContent(
+      value: any,
+      schema: Schema,
+      conversionFn: InteractionCustArgsConversionFn
   ) {
-    const schema = 'schema' in caSpec ? caSpec.schema : caSpec;
     const schemaType = schema.type;
-    let schemaObjType;
-    if (schemaType === 'custom') {
-      schemaObjType = schema.obj_type;
-    }
+    const schemaObjType = schema.obj_type;
 
-    if ('name' in caSpec) {
-      contentId += '_' + caSpec.name;
-    }
-
-    if (
-      schemaObjType === 'SubtitledUnicode' ||
-      schemaObjType === 'SubtitledHtml'
-    ) {
-      if (ca.value instanceof SubtitledUnicode ||
-          ca.value instanceof SubtitledHtml) {
-        ca.value = conversionFn(ca.value, schemaObjType, contentId, false);
-      } else if (Array.isArray(ca.value)) {
-        for (let i = 0; i < ca.value.length; i++) {
-          ca.value[i] = conversionFn(
-            ca.value[i], schemaObjType, contentId, true);
-        }
-      } else if (typeof ca.value === 'object') {
-        if ('content_id' in ca.value) {
-          ca.value = conversionFn(ca.value, schemaObjType, contentId, false);
-        } else {
-          ca.value[caSpec.name] = conversionFn(
-            ca.value[caSpec.name], schemaObjType, contentId, false);
-        }
-      }
+    if (schemaObjType === 'SubtitledUnicode' ||
+        schemaObjType === 'SubtitledHtml') {
+      value = conversionFn(value, schemaObjType);
     } else if (schemaType === 'list') {
-      this.findSubtitled(
-        ca, caSpec.schema.items, conversionFn, contentId);
+      for (let i = 0; i < value.length; i++) {
+        value[i] = this.applyConversionFnOnContent(
+          value[i],
+          schema.items,
+          conversionFn);
+      }
     } else if (schemaType === 'dict') {
-      for (let i = 0; i < caSpec.properties.length; i++) {
-        this.findSubtitled(
-          ca, caSpec.schema.properties[i], conversionFn, contentId);
+      schema.properties.forEach(property => {
+        const name = property.name;
+        value[name] = this.applyConversionFnOnContent(
+          value[name],
+          property.schema,
+          conversionFn);
+      });
+    }
+
+    return value;
+  }
+
+  private applyConversionFnOnSubtitled(
+      value: any,
+      conversionFn: InteractionCustArgsConversionFn
+  ) {
+    if (value instanceof SubtitledUnicode) {
+      value = conversionFn(value, 'SubtitledUnicode');
+    } else if (value instanceof SubtitledHtml) {
+      value = conversionFn(value, 'SubtitledHtml');
+    } else if (value instanceof Array) {
+      for (let i = 0; i < value.length; i++) {
+        value[i] = this.applyConversionFnOnSubtitled(
+          value[i],
+          conversionFn);
+      }
+    } else if (value instanceof Object) {
+      Object.keys(value).forEach(key => {
+        value[key] = this.applyConversionFnOnSubtitled(
+          value[key],
+          conversionFn);
+      });
+    }
+
+    return value;
+  }
+
+  convertContent(
+      interactionId: string,
+      caValues:
+        IInteractionCustomizationArgsBackendDict |
+        IInteractionCustomizationArgs,
+      conversionFn: InteractionCustArgsConversionFn
+  ): void {
+    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+
+    for (let caSpec of caSpecs) {
+      const name = caSpec.name;
+      if (name in caValues) {
+        caValues[name].value = this.applyConversionFnOnContent(
+          caValues[name].value, caSpec.schema, conversionFn);
       }
     }
   }
 
-  convertTranslatable(
-      caValues: {[caName: string]: any},
-      caSpecs: any[],
-      conversionFn: InteractionCustArgsConversionFn
-  ) {
-    for (let caSpec of caSpecs) {
-      if (caSpec.name in caValues) {
-        this.findSubtitled(caValues[caSpec.name], caSpec, conversionFn);
+  fromBackendDict(
+      interactionId: string,
+      caValuesBackendDict: IInteractionCustomizationArgsBackendDict
+  ): IInteractionCustomizationArgs {
+    let caValues = angular.copy(caValuesBackendDict);
+
+    let convertToSubtitled: InteractionCustArgsConversionFn = (
+        caValue,
+        schemaObjType
+    ) => {
+      if (schemaObjType === 'SubtitledHtml') {
+        return this.subtitledHtmlObjectFactory.createFromBackendDict(
+          <ISubtitledHtmlBackendDict> caValue);
+      } else if (schemaObjType === 'SubtitledUnicode') {
+        return this.subtitledUnicodeObjectFactory.createFromBackendDict(
+          <ISubtitledUnicodeBackendDict> caValue);
       }
-    }
+    };
+
+    this.convertContent(interactionId, caValues, convertToSubtitled);
+    return <IInteractionCustomizationArgs> caValues;
+  }
+
+  toBackendDict(
+      caValues: IInteractionCustomizationArgs
+  ): IInteractionCustomizationArgsBackendDict {
+    let caValuesBackendDict = angular.copy(caValues);
+
+    let convertSubtitledToBackendDict: InteractionCustArgsConversionFn = (
+        caValue,
+        _
+    ) => {
+      caValue = <SubtitledHtml | SubtitledUnicode> caValue;
+      return caValue.toBackendDict();
+    };
+
+    Object.keys(caValuesBackendDict).forEach(key => {
+      caValuesBackendDict[key] = this.applyConversionFnOnSubtitled(
+        caValuesBackendDict[key], convertSubtitledToBackendDict);
+    });
+    return <IInteractionCustomizationArgsBackendDict> caValuesBackendDict;
   }
 }
 

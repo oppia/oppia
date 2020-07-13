@@ -228,7 +228,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
             _states.getState(stateName).interaction.id + 'ValidationService';
           var validatorService = $injector.get(validatorServiceName);
           var interactionWarnings = validatorService.getAllWarnings(
-            stateName, interaction.customizationArgs.values,
+            stateName, interaction.customizationArgs,
             interaction.answerGroups, interaction.defaultOutcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {

@@ -33,13 +33,12 @@ import {
   IItemSelectionInputCustomizationArgs,
   IMultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, IInteractionCustomizationArgs } from
+  'domain/exploration/InteractionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { InteractionCustomizationArgs } from 'domain/exploration/InteractionCustomizationArgsObjectFactory';
-/* eslint-enable max-len */
 
 interface IAnswerChoice {
   val: string | number;
@@ -147,7 +146,7 @@ export class StateEditorService {
   }
 
   setInteractionCustomizationArgs(
-      newArgs: InteractionCustomizationArgs): void {
+      newArgs: IInteractionCustomizationArgs): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 

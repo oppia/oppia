@@ -63,7 +63,7 @@ angular.module('oppia').directive('trainingPanel', [
             $scope.answerTemplate = (
               ExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.answer, StateInteractionIdService.savedMemento,
-                StateCustomizationArgsService.savedMemento.values));
+                StateCustomizationArgsService.savedMemento));
           };
 
           var _getExistingOutcomeContentIds = function() {

@@ -47,7 +47,7 @@ angular.module('oppia').controller(
       $scope.inputTemplate = (
         ExplorationHtmlFormatterService.getInteractionHtml(
           StateInteractionIdService.savedMemento,
-          StateCustomizationArgsService.savedMemento.values,
+          StateCustomizationArgsService.savedMemento,
           false, FOCUS_LABEL_TEST_INTERACTION_INPUT));
 
       var _rebuildTrainingData = function() {
@@ -57,7 +57,7 @@ angular.module('oppia').controller(
           var answerTemplate = (
             ExplorationHtmlFormatterService.getAnswerHtml(
               answer, StateInteractionIdService.savedMemento,
-              StateCustomizationArgsService.savedMemento.values));
+              StateCustomizationArgsService.savedMemento));
           $scope.trainingData.push({
             answer: answer,
             answerTemplate: answerTemplate
@@ -99,7 +99,7 @@ angular.module('oppia').controller(
         var newAnswerTemplate = (
           ExplorationHtmlFormatterService.getAnswerHtml(
             newAnswer, StateInteractionIdService.savedMemento,
-            StateCustomizationArgsService.savedMemento.values));
+            StateCustomizationArgsService.savedMemento));
 
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(

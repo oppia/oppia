@@ -113,7 +113,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
           $scope.correctAnswerEditorHtml = (
             ExplorationHtmlFormatterService.getInteractionHtml(
               StateInteractionIdService.savedMemento,
-              StateCustomizationArgsService.savedMemento.values,
+              StateCustomizationArgsService.savedMemento,
               false,
               $scope.SOLUTION_EDITOR_FOCUS_LABEL));
 

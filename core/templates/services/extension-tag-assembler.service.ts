@@ -30,9 +30,6 @@ import {
   InteractionCustomizationArgsUtilService,
   InteractionCustArgsConversionFn
 } from './interaction-customization-args-util.service';
-import { InteractionCustomizationArgs } from 'domain/exploration/InteractionCustomizationArgsObjectFactory';
-
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 // Service for assembling extension tags (for interactions).
 @Injectable({
@@ -53,9 +50,7 @@ export class ExtensionTagAssemblerService {
     customizationArgSpecs = angular.copy(customizationArgSpecs);
     const conversionFn: InteractionCustArgsConversionFn = (
         caValue,
-        schemaObjType,
-        unusedContentId,
-        unusedInList
+        schemaObjType
     ) => {
       if (schemaObjType === 'SubtitledHtml') {
         return (<SubtitledHtml>caValue).getHtml();
@@ -66,9 +61,9 @@ export class ExtensionTagAssemblerService {
       return caValue;
     };
 
-    this.interactionCustomizationArgsUtilService.convertTranslatable(
+    this.interactionCustomizationArgsUtilService.convertContent(
+      interactionId,
       customizationArgSpecs,
-      INTERACTION_SPECS[interactionId].customization_arg_specs,
       conversionFn
     );
 

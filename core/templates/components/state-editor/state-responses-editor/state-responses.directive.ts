@@ -148,7 +148,7 @@ angular.module('oppia').directive('stateResponses', [
             // for the interaction.
             var answerChoices = [];
             var customizationArgs = (
-              StateCustomizationArgsService.savedMemento.values);
+              StateCustomizationArgsService.savedMemento);
             var handledAnswersArray = [];
 
             if (interactionId === 'MultipleChoiceInput') {

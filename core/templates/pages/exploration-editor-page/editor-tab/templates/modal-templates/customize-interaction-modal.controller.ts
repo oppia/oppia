@@ -46,7 +46,6 @@ require(
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',
   'EditorFirstTimeEventsService',
-  'InteractionCustomizationArgsObjectFactory',
   'InteractionCustomizationArgsUtilService',
   'InteractionDetailsCacheService',
   'StateCustomizationArgsService', 'StateEditorService',
@@ -57,7 +56,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   function(
       $controller, $injector, $scope, $uibModalInstance,
       EditorFirstTimeEventsService,
-      InteractionCustomizationArgsObjectFactory,
       InteractionCustomizationArgsUtilService,
       InteractionDetailsCacheService,
       StateCustomizationArgsService, StateEditorService,
@@ -105,7 +103,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
       StateInteractionIdService.displayed = angular.copy(
         StateInteractionIdService.savedMemento);
-      StateCustomizationArgsService.displayed.clear();
+      StateCustomizationArgsService.displayed = {};
 
       // Ensure that StateCustomizationArgsService.displayed is
       // fully populated.
@@ -115,12 +113,11 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         i++) {
         var argName = $scope.customizationArgSpecs[i].name;
         if (
-          StateCustomizationArgsService.savedMemento.values
-            .hasOwnProperty(argName)
+          StateCustomizationArgsService.savedMemento.hasOwnProperty(argName)
         ) {
-          StateCustomizationArgsService.displayed.values[argName] = (
+          StateCustomizationArgsService.displayed[argName] = (
             angular.copy(
-              StateCustomizationArgsService.savedMemento.values[argName]
+              StateCustomizationArgsService.savedMemento[argName]
             )
           );
         } else {
@@ -130,15 +127,14 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
 
       const defaultCustomizationArgs = (
-        InteractionCustomizationArgsObjectFactory.createFromBackendDict(
+        InteractionCustomizationArgsUtilService.fromBackendDict(
           StateInteractionIdService.displayed,
           customizationArgsBackendDict
         )
       );
-      StateCustomizationArgsService.displayed.interactionId = (
-        StateInteractionIdService.displayed);
-      StateCustomizationArgsService.displayed.values = {
-        ...StateCustomizationArgsService.displayed.values,
+
+      StateCustomizationArgsService.displayed = {
+        ...StateCustomizationArgsService.displayed,
         ...defaultCustomizationArgs
       };
 
@@ -146,8 +142,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       $scope.$broadcast('schemaBasedFormsShown');
       $scope.form = {};
       $scope.hasCustomizationArgs = (
-        StateCustomizationArgsService.displayed.values &&
-        Object.keys(StateCustomizationArgsService.displayed.values).length > 0
+        StateCustomizationArgsService.displayed &&
+        Object.keys(StateCustomizationArgsService.displayed).length > 0
       );
     }
 
@@ -160,7 +156,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         validationServiceName);
       var warningsList =
         validationService.getCustomizationArgsWarnings(
-          StateCustomizationArgsService.displayed.values);
+          StateCustomizationArgsService.displayed);
       return warningsList;
     };
 
@@ -183,7 +179,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         interactionSpec.customization_arg_specs);
 
       StateInteractionIdService.displayed = newInteractionId;
-      StateCustomizationArgsService.displayed.clear();
+      StateCustomizationArgsService.displayed = {};
       if (
         InteractionDetailsCacheService.contains(
           newInteractionId)) {
@@ -199,7 +195,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         });
 
         StateCustomizationArgsService.displayed = (
-          InteractionCustomizationArgsObjectFactory.createFromBackendDict(
+          InteractionCustomizationArgsUtilService.fromBackendDict(
             newInteractionId,
             customizationArgsBackendDict
           )
@@ -208,7 +204,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
       if (
         Object.keys(
-          StateCustomizationArgsService.displayed.values
+          StateCustomizationArgsService.displayed
         ).length === 0
       ) {
         $scope.save();
@@ -227,7 +223,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         StateCustomizationArgsService.displayed);
 
       StateInteractionIdService.displayed = null;
-      StateCustomizationArgsService.displayed.clear();
+      StateCustomizationArgsService.displayed = {};
     };
 
     $scope.isSaveInteractionButtonEnabled = function() {
@@ -264,23 +260,13 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
     $scope.populateBlankContentIds = function() {
       const conversionFn: InteractionCustArgsConversionFn = (
-          caValue, unusedSchemaObjType, contentId, inList
+          caValue, unusedSchemaObjType
       ) => {
-        caValue = <SubtitledHtml | SubtitledUnicode> caValue;
-        if (caValue.getContentId() !== '') {
-          return caValue;
-        }
-
-        if (inList) {
-          contentId += '_temp';
-        }
-        caValue.setContentId(contentId);
-
         return caValue;
       };
-      InteractionCustomizationArgsUtilService.convertTranslatable(
-        StateCustomizationArgsService.displayed.values,
-        $scope.customizationArgSpecs,
+      InteractionCustomizationArgsUtilService.convertContent(
+        $scope.StateInteractionIdService.displayed,
+        StateCustomizationArgsService.displayed,
         conversionFn
       );
     };
