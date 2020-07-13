@@ -74,6 +74,18 @@
             + ADD SKILL
           </button>
         </div>
+        <div>
+          <div ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index"
+               dnd-list="$ctrl.subtopic.getSkillSummaries()"
+               dnd-dragstart="$ctrl.onRearrangeMoveSkillStart($index)"
+               dnd-drop="$ctrl.onRearrangeMoveSkillFinish($index)"
+               dnd-draggable="skillSummary">
+            <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
+               ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+              <[skillSummary.getDescription()]>
+            </a>
+          </div>
+        </div>
       </md-card>
 
       <md-card class="skills-card protractor-test-subtopic-column"

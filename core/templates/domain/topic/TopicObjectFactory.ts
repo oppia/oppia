@@ -353,6 +353,14 @@ export class Topic {
     this._canonicalStoryReferences.splice(toIndex, 0, canonicalStoryToMove);
   }
 
+  rearrangeSkillInSubtopic(subtopicId, fromIndex, toIndex) {
+    const subtopic = this.getSubtopicById(subtopicId);
+    const skillToMove = cloneDeep(
+      subtopic.getSkillSummaries()[fromIndex]);
+    subtopic._skillSummaries.splice(fromIndex, 1);
+    subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
+  }
+
   clearCanonicalStoryReferences(): void {
     this._canonicalStoryReferences.length = 0;
   }
