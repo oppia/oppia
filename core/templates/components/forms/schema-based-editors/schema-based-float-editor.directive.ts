@@ -47,7 +47,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             NumericInputValidationService) {
           var ctrl = this;
           ctrl.validate = function(localValue) {
-            return !NumericInputValidationService.getErrorString(localValue);
+            return (
+              !angular.isUndefined(localValue) &&
+              localValue !== null &&
+              angular.isUndefined(
+                NumericInputValidationService.getErrorString(localValue)));
           };
 
           ctrl.onFocus = function() {
@@ -82,16 +86,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.generateErrors = function() {
-            if (!ctrl.localValue) {
-              // If localValue is not undefined, it gets transformed to 0
-              // in the UI when ideally the input should be empty.
-              ctrl.localValue = undefined;
-              ctrl.errorString = '';
-            } else {
-              ctrl.errorString = (
-                NumericInputValidationService.getErrorString(
-                  ctrl.localValue));
-            }
+            ctrl.errorString = (
+              NumericInputValidationService.getErrorString(ctrl.localValue));
           };
 
           ctrl.onKeypress = function(evt) {
