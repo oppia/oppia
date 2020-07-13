@@ -32,7 +32,9 @@ interface CkEditorCopyEvent {
   providedIn: 'root'
 })
 export class CkEditorCopyContentService {
-  private readonly whitelistedWidgets = new Set([
+  private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
+  private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
+  private readonly WHITELISTED_WIDGETS = new Set([
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
@@ -63,34 +65,34 @@ export class CkEditorCopyContentService {
 
     while (true) {
       const currentTagName = currentElement.tagName.toLowerCase();
-      if (currentTagName.includes('-noninteractive-')) {
+      if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
         containedWidgetTagName = currentTagName;
       }
 
-      if (currentElement.parentElement.tagName === 'ANGULAR-HTML-BIND') {
+      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
       }
 
       currentElement = currentElement.parentElement;
     }
 
-    let descendents = Array.from(target.childNodes);
-    while (descendents.length !== 0) {
-      let currentDescendent = descendents.shift();
-      const currentTagName = currentDescendent.nodeName.toLowerCase();
-      if (currentTagName.includes('-noninteractive-')) {
+    let descendants = Array.from(target.childNodes);
+    while (descendants.length !== 0) {
+      let currentDescendant = descendants.shift();
+      const currentTagName = currentDescendant.nodeName.toLowerCase();
+      if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
         containedWidgetTagName = currentTagName;
         break;
       }
 
-      descendents = [
-        ...descendents,
-        ...Array.from(currentDescendent.childNodes)
+      descendants = [
+        ...descendants,
+        ...Array.from(currentDescendant.childNodes)
       ];
     }
 
     if (containedWidgetTagName &&
-        !this.whitelistedWidgets.has(containedWidgetTagName)) {
+        !this.WHITELISTED_WIDGETS.has(containedWidgetTagName)) {
       return {};
     }
 
@@ -134,6 +136,8 @@ export class CkEditorCopyContentService {
 
       while ((match = valueMatcher.exec(html)) !== null) {
         const key = match[1];
+        // Must replace & for html escaper to properly work- html escaper
+        // service depends on & already escaped.
         const value = match[3].replace(/&amp;/g, '&');
 
         startupData[key] = JSON.parse(

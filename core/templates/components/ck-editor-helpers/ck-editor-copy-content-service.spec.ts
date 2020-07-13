@@ -159,7 +159,6 @@ describe('Ck editor copy content service', () => {
     const nestedMathWidgetElement = (
       <HTMLElement>mathWidgetElement.firstChild.firstChild);
 
-
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(nestedMathWidgetElement);
 
