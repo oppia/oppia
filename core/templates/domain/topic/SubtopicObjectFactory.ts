@@ -115,7 +115,7 @@ export class Subtopic {
   }
 
   getSkillIds(): Array<string> {
-    return this._skillIds;
+    return this._skillIds.slice();
   }
 
   hasSkill(skillId: string): boolean {

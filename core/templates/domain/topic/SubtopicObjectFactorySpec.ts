@@ -24,6 +24,7 @@ describe('Subtopic object factory', () => {
   let subtopicObjectFactory: SubtopicObjectFactory = null;
   var _sampleSubtopic = null;
   var skillIds = ['skill_1', 'skill_2'];
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [SubtopicObjectFactory]

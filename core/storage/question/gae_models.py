@@ -271,8 +271,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 requested.
 
         Returns:
-            question_count: int. The number of questions assigned to the
-            given skill_ids.
+            int. The number of questions assigned to the given skill_ids.
         """
         total_question_count = cls.query().filter(
             cls.skill_id.IN(skill_ids)).count()

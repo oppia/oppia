@@ -38,20 +38,18 @@ require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
-    '$scope', 'SubtopicValidationService', 'TopicEditorStateService',
-    'TopicUpdateService',
-    'EntityCreationService',
-    'TopicEditorRoutingService', 'QuestionBackendApiService',
-    'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
-    'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
+    '$scope', 'EntityCreationService', 'QuestionBackendApiService',
+    'SubtopicValidationService', 'TopicEditorStateService',
+    'TopicEditorRoutingService', 'TopicUpdateService',
+    'UrlInterpolationService', 'EVENT_SUBTOPIC_PAGE_LOADED',
+    'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     function(
-        $scope, SubtopicValidationService, TopicEditorStateService,
-        TopicUpdateService,
-        EntityCreationService,
-        TopicEditorRoutingService, QuestionBackendApiService,
-        UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
-        EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
+        $scope, EntityCreationService, QuestionBackendApiService,
+        SubtopicValidationService, TopicEditorStateService,
+        TopicEditorRoutingService, TopicUpdateService,
+        UrlInterpolationService, EVENT_SUBTOPIC_PAGE_LOADED,
+        EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
         MAX_CHARS_IN_SUBTOPIC_TITLE) {
       var ctrl = this;
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';

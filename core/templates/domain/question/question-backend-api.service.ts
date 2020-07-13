@@ -65,7 +65,7 @@ export class QuestionBackendApiService {
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
     var questionsCountUrl = this.urlInterpolationService.interpolateUrl(
-      QuestionDomainConstants.QUESTIONS_COUNT_URL_TEMPLATE, {
+      QuestionDomainConstants.QUESTION_COUNT_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
       }
     );
