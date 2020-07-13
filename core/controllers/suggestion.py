@@ -31,26 +31,6 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
-    """Checks whether the given target_type and suggestion_type are valid.
-
-    Args:
-        target_type: str. The type of the suggestion target.
-        suggestion_type: str. The type of the suggestion.
-
-    Raises:
-        InvalidInputException: If the given target_type of suggestion_type are
-            invalid.
-    """
-    if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
-        raise utils.InvalidInputException(
-            'Invalid target_type: %s' % target_type)
-
-    if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
-        raise utils.InvalidInputException(
-            'Invalid suggestion_type: %s' % suggestion_type)
-
-
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
     """Returns a dict of target_id to exploration opportunity summary dict.
 
@@ -207,6 +187,26 @@ class SuggestionsProviderHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    def _require_valid_suggestion_and_target_types(
+            self, target_type, suggestion_type):
+        """Checks whether the given target_type and suggestion_type are valid.
+
+        Args:
+            target_type: str. The type of the suggestion target.
+            suggestion_type: str. The type of the suggestion.
+
+        Raises:
+            InvalidInputException: If the given target_type of suggestion_type
+                are invalid.
+        """
+        if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+            raise self.InvalidInputException(
+                'Invalid target_type: %s' % target_type)
+
+        if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
+            raise self.InvalidInputException(
+                'Invalid suggestion_type: %s' % suggestion_type)
+
     def _render_suggestions(self, target_type, suggestions):
         """Renders retrieved suggestions.
 
@@ -242,14 +242,11 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-            suggestions = suggestion_services.get_reviewable_suggestions(
-                self.user_id, suggestion_type)
-            self._render_suggestions(target_type, suggestions)
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        self._require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
@@ -260,14 +257,11 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-            suggestions = suggestion_services.get_submitted_suggestions(
-                self.user_id, suggestion_type)
-            self._render_suggestions(target_type, suggestions)
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        self._require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_submitted_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class SuggestionListHandler(base.BaseHandler):
