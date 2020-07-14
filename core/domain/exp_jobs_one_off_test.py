@@ -1227,7 +1227,7 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        exploration_version_before_job_run = exploration.version
+        exploration_yaml_before_job_run = exploration.to_yaml()
 
         job_id = (
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.create_new())
@@ -1250,8 +1250,7 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
 
         # The exploration contains an invalid input and must therefore, not be
         # upgraded to one of the new interactions.
-        self.assertEqual(
-            exploration.version, exploration_version_before_job_run)
+        self.assertEqual(exploration.to_yaml(), exploration_yaml_before_job_run)
 
         # Now, when the invalid inputs are fixed, and the job is re-run,
         # the upgrade should be done as expected.
