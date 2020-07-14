@@ -683,12 +683,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
-        interaction.customization_args = {'placeholder': {
+        init_state.update_interaction_customization_args({'placeholder': {
             'value': {
                 'content_id': 'custarg_placeholder',
                 'unicode_str': ''
             }
-        }}
+        }})
         exploration.validate()
 
         interaction.answer_groups = {}
@@ -7741,9 +7741,9 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: custarg_choices_default
-            html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
           - content_id: custarg_choices_3
+            html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
+          - content_id: custarg_choices_4
             html: <p>This is value2 for <br>MultipleChoice</p>
         showChoicesInShuffledOrder:
           value: false
@@ -7767,13 +7767,13 @@ states:
             forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
-    next_content_id_index: 4
+    next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
         custarg_choices_3: {}
-        custarg_choices_default: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
         feedback_2: {}
@@ -7784,7 +7784,7 @@ states:
       translations_mapping:
         content: {}
         custarg_choices_3: {}
-        custarg_choices_default: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
         feedback_2: {}
@@ -7826,11 +7826,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: custarg_choices_default
-            html: <p>This is value1 for ItemSelection</p>
           - content_id: custarg_choices_2
-            html: <p>This is value2 for ItemSelection</p>
+            html: <p>This is value1 for ItemSelection</p>
           - content_id: custarg_choices_3
+            html: <p>This is value2 for ItemSelection</p>
+          - content_id: custarg_choices_4
             html: <p>This is value3 for ItemSelection</p>
         maxAllowableSelectionCount:
           value: 1
@@ -7848,14 +7848,14 @@ states:
       hints: []
       id: ItemSelectionInput
       solution: null
-    next_content_id_index: 4
+    next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
         custarg_choices_2: {}
         custarg_choices_3: {}
-        custarg_choices_default: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
@@ -7864,7 +7864,7 @@ states:
         content: {}
         custarg_choices_2: {}
         custarg_choices_3: {}
-        custarg_choices_default: {}
+        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
 states_schema_version: 35

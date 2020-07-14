@@ -91,7 +91,7 @@ describe('DragAndDropSortInputValidationService', () => {
     customizationArgs = {
       choices: {
         value: [
-          new SubtitledHtml('a', 'custarg_choices_default'),
+          new SubtitledHtml('a', ''),
           new SubtitledHtml('b', ''),
           new SubtitledHtml('c', ''),
           new SubtitledHtml('d', '')
@@ -239,7 +239,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect at least two choices', () => {
     customizationArgs.choices.value = [
-      new SubtitledHtml('1', 'custarg_choices_default')
+      new SubtitledHtml('1', '')
     ];
 
     var warnings = validatorService.getAllWarnings(

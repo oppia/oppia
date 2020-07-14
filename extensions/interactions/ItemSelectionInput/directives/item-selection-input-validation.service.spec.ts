@@ -79,7 +79,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments = {
       choices: {
         value: [
-          new SubtitledHtml('Selection 1', 'custarg_choices_default'),
+          new SubtitledHtml('Selection 1', ''),
           new SubtitledHtml('Selection 2', ''),
           new SubtitledHtml('Selection 3', '')
         ]

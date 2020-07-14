@@ -85,7 +85,7 @@ describe('MultipleChoiceInputValidationService', () => {
     customizationArguments = {
       choices: {
         value: [
-          new SubtitledHtml('Option 1', 'custarg_choices_default'),
+          new SubtitledHtml('Option 1', ''),
           new SubtitledHtml('Option 2', '')
         ]
       }

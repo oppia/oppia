@@ -1438,7 +1438,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }
         customization_args_dict2 = {
             'choices': {'value': [{
-                'content_id': 'custarg_choices_default',
+                'content_id': 'custarg_choices_0',
                 'html': (
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1447,7 +1447,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
                 )
             }, {
-                'content_id': 'custarg_choices_0',
+                'content_id': 'custarg_choices_1',
                 'html': (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1459,7 +1459,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }
         customization_args_dict3 = {
             'choices': {'value': [{
-                'content_id': 'custarg_choices_default',
+                'content_id': 'custarg_choices_0',
                 'html': (
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1468,7 +1468,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
-                'content_id': 'custarg_choices_0',
+                'content_id': 'custarg_choices_1',
                 'html': (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1477,7 +1477,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
-                'content_id': 'custarg_choices_1',
+                'content_id': 'custarg_choices_2',
                 'html': (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -2432,11 +2432,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                 {'choices': {'value': [
                     {
-                        'content_id': 'custarg_choices_default',
+                        'content_id': 'custarg_choices_0',
                         'html': '<p>Option A</p>'
                     },
                     {
-                        'content_id': 'custarg_choices_0',
+                        'content_id': 'custarg_choices_1',
                         'html': '<p>Option B</p>'
                     }
                 ]}}),
@@ -2447,10 +2447,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.interaction.customization_args[
                 'choices']['value'],
             [{
-                'content_id': 'custarg_choices_default',
+                'content_id': 'custarg_choices_0',
                 'html': '<p>Option A</p>'
             }, {
-                'content_id': 'custarg_choices_0',
+                'content_id': 'custarg_choices_1',
                 'html': '<p>Option B</p>'
             }]
         )
@@ -4527,19 +4527,19 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [
                     {
-                        'content_id': 'custarg_choices_default',
+                        'content_id': 'custarg_choices_0',
                         'html': '<p>state customization arg html 1</p>'
                     },
                     {
-                        'content_id': 'custarg_choices_0',
+                        'content_id': 'custarg_choices_1',
                         'html': '<p>state customization arg html 2</p>'
                     },
                     {
-                        'content_id': 'custarg_choices_1',
+                        'content_id': 'custarg_choices_2',
                         'html': '<p>state customization arg html 3</p>'
                     },
                     {
-                        'content_id': 'custarg_choices_2',
+                        'content_id': 'custarg_choices_3',
                         'html': '<p>state customization arg html 4</p>'
                     }
                 ]
@@ -4563,15 +4563,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                 'choices': {
                     'value': [
                         {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_0',
                             'html': '<p>1</p>'
                         },
                         {
-                            'content_id': 'custarg_choices_0',
+                            'content_id': 'custarg_choices_1',
                             'html': '<p>2</p>'
                         },
                         {
-                            'content_id': 'custarg_choices_1',
+                            'content_id': 'custarg_choices_2',
                             'html': (
                                 '<oppia-noninteractive-math raw_latex-with'
                                 '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
@@ -4580,7 +4580,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                             )
                         },
                         {
-                            'content_id': 'custarg_choices_2',
+                            'content_id': 'custarg_choices_3',
                             'html': '<p>4</p>'
                         }
                     ]

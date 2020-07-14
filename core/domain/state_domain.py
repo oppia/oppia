@@ -764,16 +764,26 @@ class InteractionInstance(python_utils.OBJECT):
             customization arguments.
 
             Args:
-                ca_value: dict. Dictionary of key 'value' to
-                    original value of customization argument.
+                ca_value: dict|str. The original value of customization
+                    argument.
                 obj_type: str. Indicates the obj_type found in
                     the customization arguments schema.
 
             Returns:
                 str. The updated customization argument value.
             """
-            if obj_type == 'SubtitledHtml':
+
+            # Because convert_html_in_interaction is used in multiple state
+            # migrations, we must handle the case where the value has not yet
+            # been migrated to a SubtitledHtml object (pre schema v40).
+            if isinstance(
+                ca_value,
+                (python_utils.UNICODE, python_utils.BASESTRING)
+            ):
+                ca_value = conversion_fn(ca_value)
+            elif obj_type == 'SubtitledHtml':
                 ca_value['html'] = conversion_fn(ca_value['html'])
+
             return ca_value
 
         InteractionInstance.convert_content_in_cust_args(
@@ -834,7 +844,7 @@ class InteractionInstance(python_utils.OBJECT):
                 schema_obj_type == 'SubtitledHtml'):
             value = conversion_fn(value, schema_obj_type)
         elif schema_type == 'list':
-            for i in range(len(value)):
+            for i in python_utils.RANGE(len(value)):
                 value[i] = InteractionInstance.apply_conversion_fn_on_content(
                     value[i],
                     schema['items'],

@@ -2454,81 +2454,32 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
 
-        def convert_ca_unicode_to_subtitled_unicode_dict(ca_value, ca_default):
-            """Convert a customization argument value of type unicode to
-            subtitled unicode dict.
-
-            Args:
-                ca_value: str | None. Customization argument value. If None,
-                    populate with default.
-                ca_default: dict. The default value of the customization
-                    argument.
-
-            Returns:
-                tuple. A 2-tuple with the first element as the new customization
-                argument value, and the second element as new content_id's
-                generated.
-            """
-            new_value = ca_default.copy()
-            if ca_value is not None:
-                new_value['unicode_str'] = ca_value
-            return new_value, [new_value['content_id']]
-
-        def convert_ca_html_to_subtitled_html_dict(ca_value, ca_default):
-            """Convert a customization argument value of type unicode to
-            subtitled unicode dict.
-
-            Args:
-                ca_value: str | None. Customization argument value. If None,
-                    populate with default.
-                ca_default: dict. The default value of the customization
-                    argument.
-
-            Returns:
-                tuple. A 2-tuple with the first element as the new customization
-                argument value, and the second element as new content_id's
-                generated.
-            """
-            new_value = ca_default.copy()
-            if ca_value is not None:
-                new_value['html'] = ca_value
-            return new_value, [new_value['content_id']]
-
         def convert_ca_html_list_to_subtitled_html_dict_list(
-                ca_value, ca_default, next_content_id_index):
-            """Convert a customization argument value of type unicode to
-            subtitled unicode dict.
+                ca_value, content_id_prefix, next_content_id_index):
+            """Convert a customization argument value of type html list to
+            list of subtitled html dict.
 
             Args:
-                ca_value: str | None. Customization argument value. If None,
-                    populate with default.
-                ca_default: list(dict). The default value of the customization
-                    argument.
+                ca_value: list(str) | None. Customization argument value.
+                content_id_predix: str. The content id prefix.
                 next_content_id_index: int. The next content_id index.
 
             Returns:
-                tuple. A 2-tuple with the first element as the new customization
-                argument value, and the second element as new content_id's
-                generated.
+                list(dict). A list of SubtitledHtml dicts.
             """
-            new_value = copy.deepcopy(ca_default)
-            content_id_prefix = (
-                new_value[0]['content_id'].replace('_default', '_'))
-            new_content_ids = [new_value[0]['content_id']]
+            new_value = []
+            new_content_ids = []
 
-            if ca_value is not None:
-                for i, value in enumerate(ca_value):
-                    if i == 0:
-                        new_value[0]['html'] = value
-                    else:
-                        content_id = (
-                            content_id_prefix + str(next_content_id_index))
-                        new_content_ids.append(content_id)
-                        new_value.append({
-                            'content_id': content_id,
-                            'html': value
-                        })
-                        next_content_id_index += 1
+            for value in ca_value:
+                content_id = (
+                    content_id_prefix +
+                    python_utils.UNICODE(next_content_id_index))
+                new_content_ids.append(content_id)
+                new_value.append({
+                    'content_id': content_id,
+                    'html': value
+                })
+                next_content_id_index += 1
 
             return new_value, new_content_ids
 
@@ -2559,46 +2510,49 @@ class Exploration(python_utils.OBJECT):
                     interaction_id
                 ).customization_arg_specs)
 
+                obj_type_to_subtitled_key = {
+                    'SubtitledUnicode': 'unicode_str',
+                    'SubtitledHtml': 'html'
+                }
+
                 for ca_spec in ca_specs:
                     new_content_ids = []
 
                     schema = ca_spec.schema
                     schema_obj_type = schema.get('obj_type')
                     ca_name = ca_spec.name
+                    content_id = 'custarg_' + ca_name
 
-                    if schema_obj_type == 'SubtitledUnicode':
-                        if ca_name not in ca:
+                    if (schema_obj_type in obj_type_to_subtitled_key):
+                        
+                        new_content_ids.append(content_id)
+
+                        new_value = { 'content_id': content_id }
+
+                        subtitled_key = (
+                            obj_type_to_subtitled_key[schema_obj_type])
+                        if ca_name in ca:
+                            new_value[subtitled_key] = ca[ca_name]['value']
+                        else:
                             ca[ca_name] = {'value': None}
-                        ca[ca_name]['value'], new_content_ids = (
-                            convert_ca_unicode_to_subtitled_unicode_dict(
-                                ca[ca_name]['value'],
-                                ca_spec.default_value)
-                        )
-                    elif schema_obj_type == 'SubtitledHtml':
-                        if ca_name not in ca:
-                            ca[ca_name] = {'value': None}
-                        ca[ca_name]['value'], new_content_ids = (
-                            convert_ca_html_to_subtitled_html_dict(
-                                ca[ca_name]['value'],
-                                ca_spec.default_value)
-                        )
+                            new_value[subtitled_key] = (
+                                ca_spec.default_value[subtitled_key])
+
+                        ca[ca_name]['value'] = new_value
                     elif (schema['type'] == 'list' and
                         schema['items']['type'] == 'custom' and
                         schema['items']['obj_type'] == 'SubtitledHtml'
                     ):
-                        if ca_name not in ca:
-                            ca[ca_name] = {'value': None}
+                        value = ca[ca_name]['value'] if ca_name in ca else ['']
                         ca[ca_name]['value'], new_content_ids = (
                             convert_ca_html_list_to_subtitled_html_dict_list(
-                                ca[ca_name]['value'],
-                                ca_spec.default_value,
+                                value,
+                                content_id + '_',
                                 next_content_id_index)
                         )
-                        if len(new_content_ids) > 1:
-                            next_content_id_index += len(new_content_ids) - 1
-                    else:
-                        if ca_name not in ca:
-                            ca[ca_name] = {'value': ca_spec.default_value}
+                        next_content_id_index += len(new_content_ids)
+                    elif ca_name not in ca:
+                        ca[ca_name] = {'value': ca_spec.default_value}
 
                     all_new_content_ids.extend(new_content_ids)
 

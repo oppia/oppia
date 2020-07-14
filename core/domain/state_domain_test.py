@@ -60,7 +60,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [
                     {
-                        'content_id': 'custarg_choices_default',
+                        'content_id': 'custarg_choices_0',
                         'html': '<p>state customization arg html 1</p>'
                     }, {
                         'content_id': 'custarg_choices_1',
@@ -148,19 +148,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     }
                 },
-                'custarg_choices_default': {
+                'custarg_choices_0': {
                     'hi': {
                         'type': 'html',
                         'translation':
-                            ('<p>state written_translation custarg_choices_defa'
-                             'ult-hi</p>'),
+                            ('<p>state written_translation custarg_choices_0-hi'
+                             '</p>'),
                         'needs_update': False
                     },
                     'en': {
                         'type': 'html',
                         'translation':
-                            ('<p>state written_translation custarg_choices_defa'
-                             'ult-en</p>'),
+                            ('<p>state written_translation custarg_choices_0'
+                             '-en</p>'),
                         'needs_update': False
                     }
                 },
@@ -323,14 +323,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state written_translation content-en</p>',
                 '<p>state written_translation custarg_choices_3-hi</p>',
                 '<p>state written_translation custarg_choices_3-en</p>',
+                '<p>state written_translation custarg_choices_0-hi</p>',
+                '<p>state written_translation custarg_choices_0-en</p>',
                 '<p>state written_translation custarg_choices_1-hi</p>',
                 '<p>state written_translation custarg_choices_1-en</p>',
                 '<p>state written_translation hint_1-hi</p>',
                 '<p>state written_translation hint_1-en</p>',
                 '<p>state written_translation outcome-hi</p>',
                 '<p>state written_translation outcome-en</p>',
-                '<p>state written_translation custarg_choices_default-hi</p>',
-                '<p>state written_translation custarg_choices_default-en</p>',
                 '<p>state written_translation feedback-hi</p>',
                 '<p>state written_translation feedback-en</p>',
                 '<p>State Feedback</p>',
@@ -460,7 +460,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [
                     {
-                        'content_id': 'custarg_choices_default',
+                        'content_id': 'custarg_choices_0',
                         'html': '<p>init_state customization arg html 1</p>'
                     }, {
                         'content_id': 'custarg_choices_1',
@@ -674,7 +674,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [
                     {
-                        'content_id': 'custarg_choices_default',
+                        'content_id': 'custarg_choices_0',
                         'html': '<p>init_state customization arg html 1</p>'
                     }, {
                         'content_id': 'custarg_choices_1',
@@ -731,7 +731,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [
                     {
-                        'content_id': 'custarg_choices_default',
+                        'content_id': 'custarg_choices_0',
                         'html': '<p>state customization arg html 1</p>'
                     }, {
                         'content_id': 'custarg_choices_1',
@@ -1699,16 +1699,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'customization_args': {
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_0',
                             'html': html_with_old_math_schema
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_1',
                             'html': '<p>2</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_2',
                             'html': '<p>3</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_3',
                             'html': '<p>4</p>'
                         }]
                     }
@@ -1778,16 +1778,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'customization_args': {
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_0',
                             'html': html_with_new_math_schema
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_1',
                             'html': '<p>2</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_2',
                             'html': '<p>3</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_3',
                             'html': '<p>4</p>'
                         }]
                     }
@@ -1968,16 +1968,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_0',
                             'html': '<p>init_state customization arg html 1</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_1',
                             'html': html_with_old_math_schema
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_2',
                             'html': '<p>init_state customization arg html 3</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_3',
                             'html': '<p>init_state customization arg html 4</p>'
                         }]
                     }
@@ -2037,16 +2037,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_0',
                             'html': '<p>init_state customization arg html 1</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_1',
                             'html': html_with_new_math_schema
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_2',
                             'html': '<p>init_state customization arg html 3</p>'
                         }, {
-                            'content_id': 'custarg_choices_default',
+                            'content_id': 'custarg_choices_3',
                             'html': '<p>init_state customization arg html 4</p>'
                         }]
                     }
