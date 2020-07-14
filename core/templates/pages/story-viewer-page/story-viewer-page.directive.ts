@@ -121,13 +121,11 @@ angular.module('oppia').directive('storyViewerPage', [
             StoryViewerBackendApiService.fetchStoryData(ctrl.storyId).then(
               function(storyDataDict) {
                 ctrl.storyIsLoaded = true;
-                ctrl.storyPlaythroughObject =
-                  StoryPlaythroughObjectFactory.createFromBackendDict(
-                    storyDataDict);
+                ctrl.storyPlaythroughObject = storyDataDict;
                 PageTitleService.setPageTitle(
-                  storyDataDict.story_title + ' - Oppia');
-                ctrl.storyTitle = storyDataDict.story_title;
-                ctrl.storyDescription = storyDataDict.story_description;
+                  storyDataDict.title + ' - Oppia');
+                ctrl.storyTitle = storyDataDict.title;
+                ctrl.storyDescription = storyDataDict.description;
 
                 $rootScope.$broadcast('storyData', {
                   topicName: storyDataDict.topic_name,
