@@ -387,7 +387,6 @@ var AdminPage = function() {
 
   this.fillExtractDataForm = async function(expID, expVer, state, ans) {
     await waitFor.pageToFullyLoad();
-    var parentHandle = await browser.getWindowHandle();
     await extractDataExplorationIdInput.sendKeys(expID);
     await extractDataExplorationVersionInput.sendKeys(expVer);
     await extractDataStateNameInput.sendKeys(state);
@@ -399,7 +398,6 @@ var AdminPage = function() {
       '=0&state_name=0&num_answers=0';
     waitFor.newTabToBeCreated('Tab showing data not opened',
       'explorationdataextractionhandler');
-    await browser.driver.close();
   };
 
   this.regenerateContributionsForTopic = async function(topicId) {

@@ -36,21 +36,11 @@ describe('Admin misc tab', function() {
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
+
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
-    var handle = await browser.getWindowHandle();
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic('adminPageMiscTabTestTopic',
-      'A topic to test the admin page\'s misc tab', false);
-    var url = await browser.getCurrentUrl();
-    var temp = url.split('/')[4];
-    topicId = temp.substring(0, temp.length - 1);
-    await topicEditorPage.publishTopic();
-    await general.closeCurrentTabAndSwitchTo(handle);
-    await browser.waitForAngularEnabled(false);
     await adminPage.get();
     await adminPage.getMiscTab();
-    await browser.waitForAngularEnabled(true);
   });
 
   it('should upload and download similarity files', async function() {
@@ -75,7 +65,6 @@ describe('Admin misc tab', function() {
 
   it('should successfully change the username', async function() {
     await adminPage.changeUsername('miscTabTester', 'mTabChecker');
-    await browser.refresh();
     await adminPage.expectUsernameToBeChanged('mTabChecker');
   });
 
@@ -90,8 +79,6 @@ describe('Admin misc tab', function() {
       await adminPage.regenerateContributionsForTopic('0');
       await adminPage.expectRegenerationError('0');
       allowedErrors.push('500', 'Entity');
-      await adminPage.regenerateContributionsForTopic(topicId);
-      await adminPage.expectConributionsToBeRegeneratedForTopic();
     });
 
   it('should fill out extract data form and extract data', async function() {
