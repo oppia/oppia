@@ -19,15 +19,14 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 
+
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDevModeActivitiesTabBackendApiService } from
   'pages/admin-page/services/admin-dev-mode-activities-tab-backend-api-service';
-
-
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'admin-dev-mode-activities-tab',
