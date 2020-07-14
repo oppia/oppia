@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ThanksPageComponent } from './thanks-page.component';
 import { UrlInterpolationService } from
@@ -27,13 +27,17 @@ describe('Thanks page', function() {
   let component: ThanksPageComponent;
   let fixture: ComponentFixture<ThanksPageComponent>;
 
-  beforeEach(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ThanksPageComponent],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+  }));
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(ThanksPageComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should set thanks image url when getStaticImageUrl is called', () => {
