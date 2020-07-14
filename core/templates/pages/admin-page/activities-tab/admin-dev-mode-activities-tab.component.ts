@@ -17,6 +17,9 @@
  * is in developer mode.
  */
 
+// for httpclient checks
+// eslint-disable
+
 import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
