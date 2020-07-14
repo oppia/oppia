@@ -50,6 +50,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             return (
               !angular.isUndefined(localValue) &&
               localValue !== null &&
+              localValue !== '' &&
               angular.isUndefined(
                 NumericInputValidationService.getErrorString(localValue)));
           };
