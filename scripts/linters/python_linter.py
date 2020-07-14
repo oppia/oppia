@@ -469,14 +469,13 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     'Linting Python files for Python 3 compatibility %s to %s..'
                     % (current_batch_start_index + 1, current_batch_end_index))
 
-            with linter_utils.redirect_stdout(sys.stdout):
-                # This line invokes Pylint and redirect its output
-                # to the StringMessageStream.
-                pylint_report = StringMessageStream()
-                pylinter_for_python3 = lint.Run(
-                    current_files_to_lint + ['--py3k'],
-                    reporter=text.TextReporter(pylint_report),
-                    exit=False).linter
+            # This line invokes Pylint and redirect its output
+            # to the StringMessageStream.
+            pylint_report = StringMessageStream()
+            pylinter_for_python3 = lint.Run(
+                current_files_to_lint + ['--py3k'],
+                reporter=text.TextReporter(pylint_report),
+                exit=False).linter
 
             if pylinter_for_python3.msg_status != 0:
                 pylint_error_messages = (
