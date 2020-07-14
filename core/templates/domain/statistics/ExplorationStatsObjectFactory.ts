@@ -43,7 +43,9 @@ export class ExplorationStats {
       public readonly numStarts: number,
       public readonly numActualStarts: number,
       public readonly numCompletions: number,
-      private readonly stateStatsMapping: Map<string, StateStats>) {}
+      public readonly stateStatsMapping: ReadonlyMap<string, StateStats>) {
+    this.stateStatsMapping = new Map(stateStatsMapping);
+  }
 
   getBounceRate(stateName: string): number {
     if (this.numStarts === 0) {
@@ -62,8 +64,37 @@ export class ExplorationStats {
   }
 
   getStateStats(stateName: string): StateStats {
-    return this.stateStatsMapping.has(stateName) ?
-      this.stateStatsMapping.get(stateName) : new StateStats(0, 0, 0, 0, 0, 0);
+    if (!this.stateStatsMapping.has(stateName)) {
+      throw new Error('no stats exist for state: ' + stateName);
+    }
+    return this.stateStatsMapping.get(stateName);
+  }
+
+  withStateAdded(newStateName: string): ExplorationStats {
+    const newStateStatsMapping = new Map(this.stateStatsMapping);
+    newStateStatsMapping.set(newStateName, new StateStats(0, 0, 0, 0, 0, 0));
+    return new ExplorationStats(
+      this.expId, this.expVersion, this.numStarts, this.numActualStarts,
+      this.numCompletions, newStateStatsMapping);
+  }
+
+  withStateDeleted(oldStateName: string): ExplorationStats {
+    const newStateStatsMapping = new Map(this.stateStatsMapping);
+    newStateStatsMapping.delete(oldStateName);
+    return new ExplorationStats(
+      this.expId, this.expVersion, this.numStarts, this.numActualStarts,
+      this.numCompletions, newStateStatsMapping);
+  }
+
+  withStateRenamed(
+      oldStateName: string, newStateName: string): ExplorationStats {
+    const newStateStatsMapping = new Map(this.stateStatsMapping);
+    newStateStatsMapping.set(
+      newStateName, this.stateStatsMapping.get(oldStateName));
+    newStateStatsMapping.delete(oldStateName);
+    return new ExplorationStats(
+      this.expId, this.expVersion, this.numStarts, this.numActualStarts,
+      this.numCompletions, newStateStatsMapping);
   }
 }
 
@@ -77,9 +108,10 @@ export class ExplorationStatsObjectFactory {
       backendDict: IExplorationStatsBackendDict): ExplorationStats {
     const stateStatsMapping = (
       new Map(Object.entries(backendDict.state_stats_mapping).map(
-        ([stateName, stateStatsDict]) => [
+        ([stateName, stateStatsBackendDict]) => [
           stateName,
-          this.stateStatsObjectFactory.createFromBackendDict(stateStatsDict)
+          this.stateStatsObjectFactory.createFromBackendDict(
+            stateStatsBackendDict)
         ])));
     return new ExplorationStats(
       backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,

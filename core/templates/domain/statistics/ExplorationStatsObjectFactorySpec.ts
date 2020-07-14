@@ -108,9 +108,9 @@ describe('Exploration stats', function() {
         jasmine.arrayWithExactContents(['Introduction', 'Middle', 'End']));
     });
 
-    it('should return zero-value stats if state do not exist', () => {
-      expect(explorationStats.getStateStats('Prelude'))
-        .toEqual(new StateStats(0, 0, 0, 0, 0, 0));
+    it('should throw an error if state stats do not exist', () => {
+      expect(() => explorationStats.getStateStats('Prelude'))
+        .toThrowError('no stats exist for state: Prelude');
     });
 
     it('should calculate bounce rate of state compared to exploration', () => {
@@ -145,6 +145,65 @@ describe('Exploration stats', function() {
       });
       expect(() => explorationStats.getBounceRate('Introduction'))
         .toThrowError('Can not get bounce rate of an unplayed exploration');
+    });
+  });
+
+  describe('Deriving new exploration stats', () => {
+    let original: ExplorationStats;
+    beforeEach(() => {
+      original = explorationStatsObjectFactory.createFromBackendDict({
+        exp_id: 'eid',
+        exp_version: 100,
+        num_starts: 100,
+        num_actual_starts: 100,
+        num_completions: 100,
+        state_stats_mapping: {
+          Introduction: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          Middle: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          End: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+        },
+      });
+    });
+
+    it('should create a copy with an added state', () => {
+      let copy = original.withStateAdded('Epilogue');
+      expect(copy.hasStateStates('Epilogue')).toBeTrue();
+      expect(original.hasStateStates('Epilogue')).toBeFalse();
+    });
+
+    it('should create a copy with a deleted state', () => {
+      let copy = original.withStateDeleted('End');
+      expect(copy.hasStateStates('End')).toBeFalse();
+      expect(original.hasStateStates('End')).toBeTrue();
+    });
+
+    it('should create a copy with a renamed state', () => {
+      let copy = original.withStateRenamed('Introduction', 'Prologue');
+      expect(copy.hasStateStates('Introduction')).toBeFalse();
+      expect(original.hasStateStates('Prologue')).toBeFalse();
+      expect(copy.getStateStats('Prologue'))
+        .toEqual(original.getStateStats('Introduction'));
     });
   });
 });

@@ -57,57 +57,85 @@ type CstPlaythroughIssue = CyclicStateTransitionsPlaythroughIssue;
 type EqPlaythroughIssue = EarlyQuitPlaythroughIssue;
 type MisPlaythroughIssue = MultipleIncorrectSubmissionsPlaythroughIssue;
 
-class StateStats {
+/**
+ * Holds shallow references to the state-specific statistics used to support the
+ * tasks of a state. These statistics determine whether a task should become
+ * open, resolved, or obsolete.
+ *
+ * We keep shallow references to the statistics because they are shared across
+ * services. Thus, the referenced instances can be expected to silently change.
+ *
+ * NOTE: Although some tasks do require exploration-level statistics, this class
+ * does not hold onto them because it would be extremely wasteful (since such
+ * stats would be equivalent across every state).
+ */
+class SupportingStateStats {
+  public readonly answerStats: readonly AnswerStats[];
+  public readonly cstPlaythroughIssues: readonly CstPlaythroughIssue[];
+  public readonly eqPlaythroughIssues: readonly EqPlaythroughIssue[];
+  public readonly misPlaythroughIssues: readonly MisPlaythroughIssue[];
+
   constructor(
-      public answerStats: AnswerStats[] = [],
-      public cstPlaythroughIssues: CstPlaythroughIssue[] = [],
-      public eqPlaythroughIssues: EqPlaythroughIssue[] = [],
-      public misPlaythroughIssues: MisPlaythroughIssue[] = []) {}
+      answerStats: AnswerStats[] = [],
+      cstPlaythroughIssues: CstPlaythroughIssue[] = [],
+      eqPlaythroughIssues: EqPlaythroughIssue[] = [],
+      misPlaythroughIssues: MisPlaythroughIssue[] = []) {
+    this.answerStats = [...answerStats];
+    this.cstPlaythroughIssues = [...cstPlaythroughIssues];
+    this.eqPlaythroughIssues = [...eqPlaythroughIssues];
+    this.misPlaythroughIssues = [...misPlaythroughIssues];
+  }
 }
 
-class StateTasks {
-  public readonly stateName: string;
+/**
+ * Manages the tasks of a particular state using references to the statistics
+ * which supports them.
+ *
+ * The class behaves like a ReadonlyMap<ExplorationTaskType, ExplorationTask>,
+ * while also ensuring that the full set of tasks always exist. As such, it
+ * provides a map-like interface to help communicate this intent.
+ */
+class StateTasks implements Iterable<ExplorationTask> {
+  public readonly supportingStateStats: SupportingStateStats;
+
   public readonly hbrTask: HighBounceRateTask;
   public readonly iflTask: IneffectiveFeedbackLoopTask;
   public readonly ngrTask: NeedsGuidingResponsesTask;
   public readonly siaTask: SuccessiveIncorrectAnswersTask;
-  public readonly supportingStats: StateStats;
-  public readonly initialHbrTaskStatus: string;
-  public readonly ngrTaskWasInitiallyOpen: boolean;
 
   constructor(
-      stateName: string,
-      tasksByType: Map<ExplorationTaskType, ExplorationTask>,
-      supportingStats: StateStats = new StateStats()) {
-    this.stateName = stateName;
-    this.hbrTask = <HbrTask> tasksByType.get('high_bounce_rate');
-    this.iflTask = <IflTask> tasksByType.get('ineffective_feedback_loop');
-    this.ngrTask = <NgrTask> tasksByType.get('needs_guiding_responses');
-    this.siaTask = <SiaTask> tasksByType.get('successive_incorrect_answers');
-    this.initialHbrTaskStatus = this.hbrTask.getStatus();
-    this.ngrTaskWasInitiallyOpen = this.ngrTask.isOpen();
-    this.supportingStats = supportingStats;
+      tasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask>,
+      supportingStateStats: SupportingStateStats = new SupportingStateStats()) {
+    this.hbrTask = <HbrTask> tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
+    this.iflTask = <IflTask> tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+    this.ngrTask = <NgrTask> tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+    this.siaTask = <SiaTask> tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+    this.supportingStateStats = supportingStateStats;
   }
 
   public refresh(expStats: ExplorationStats): void {
     this.hbrTask.refreshStatus(
-      expStats, this.supportingStats.eqPlaythroughIssues.length);
+      expStats, this.supportingStateStats.eqPlaythroughIssues.length);
     this.iflTask.refreshStatus(
-      this.supportingStats.cstPlaythroughIssues.length);
+      this.supportingStateStats.cstPlaythroughIssues.length);
     this.ngrTask.refreshStatus(
-      this.supportingStats.answerStats);
+      this.supportingStateStats.answerStats);
     this.siaTask.refreshStatus(
-      this.supportingStats.misPlaythroughIssues.length);
+      this.supportingStateStats.misPlaythroughIssues.length);
   }
 
-  public forEach(fn: <T extends ExplorationTask>(t: T) => void): void {
-    fn(this.hbrTask);
-    fn(this.iflTask);
-    fn(this.ngrTask);
-    fn(this.siaTask);
+  *[Symbol.iterator](): Iterator<ExplorationTask> {
+    yield this.hbrTask;
+    yield this.iflTask;
+    yield this.ngrTask;
+    yield this.siaTask;
   }
 
-  public map<U>(fn: <T extends ExplorationTask>(t: T) => U): U[] {
+  map<U>(fn: <T extends ExplorationTask>(t: T) => U): U[] {
     return [
       fn(this.hbrTask),
       fn(this.iflTask),
@@ -117,15 +145,26 @@ class StateTasks {
   }
 }
 
-export class ExplorationImprovementsTaskRegistry {
-  public readonly expId: string;
-  public readonly expVersion: number;
-  private readonly expStats: ExplorationStats;
-  private tasksByState: Map<string, StateTasks> = new Map();
-  private tasksByType: Map<ExplorationTaskType, ExplorationTask[]> = new Map(
-    ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, []]));
+/**
+ * Keeps track of all improvement tasks for an exploration.
+ *
+ * To access the tasks, use the get*Tasks() family of methods.
+ *
+ * Provides hooks for keeping the tasks fresh in the event of an exploration
+ * change, giving the task an opportunity to refresh itself.
+ */
+@Injectable({providedIn: 'root'})
+export class ExplorationImprovementsTaskRegistryService {
+  private expId: string;
+  private expVersion: number;
+  private expStats: ExplorationStats;
+  private tasksByState: Map<string, StateTasks>;
+  private tasksByType: Map<ExplorationTaskType, ExplorationTask[]>;
 
   constructor(
+      private explorationTaskObjectFactory: ExplorationTaskObjectFactory) {}
+
+  initialize(
       expId: string,
       expVersion: number,
       states: States,
@@ -133,18 +172,23 @@ export class ExplorationImprovementsTaskRegistry {
       openTasks: ExplorationTask[],
       resolvedTaskTypesByStateName: Map<string, ExplorationTaskType[]>,
       topAnswersByStateName: Map<string, AnswerStats[]>,
-      playthroughIssues: PlaythroughIssue[],
-      private explorationTaskObjectFactory: ExplorationTaskObjectFactory) {
+      playthroughIssues: PlaythroughIssue[]): void {
+    this.validateInitializationArgs(
+      expId, expVersion, states, expStats, openTasks,
+      resolvedTaskTypesByStateName, topAnswersByStateName,
+      playthroughIssues);
+
     this.expId = expId;
     this.expVersion = expVersion;
     this.expStats = expStats;
+    this.tasksByState = new Map();
+    this.tasksByType = new Map(
+      ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, []]));
 
-    // Organize the inputs to make construction simpler.
     const openTasksByStateName = group(openTasks, t => t.targetId);
     const playthroughIssuesByStateName = (
       group(playthroughIssues, p => p.getStateNameWithIssue()));
 
-    // Generate a new set of tasks for each state, based on the input stats.
     for (const stateName of states.getStateNames()) {
       const playthroughIssuesByType = group(
         playthroughIssuesByStateName.get(stateName) || [], p => p.issueType);
@@ -175,6 +219,8 @@ export class ExplorationImprovementsTaskRegistry {
       cstPlaythroughIssues: CstPlaythroughIssue[],
       eqPlaythroughIssues: EqPlaythroughIssue[],
       misPlaythroughIssues: MisPlaythroughIssue[]): StateTasks {
+    // NOTE TO DEVELOPERS: This type is required to help the compiler realize
+    // that the arguments to the new Map are all of the same type.
     type MapPair = [ExplorationTaskType, ExplorationTask];
     const tasksByType = new Map([
       // NOTE TO DEVELOPERS: The last repeated key wins. For example:
@@ -192,78 +238,94 @@ export class ExplorationImprovementsTaskRegistry {
           this.expId, this.expVersion, taskType, stateName)
       ]),
     ]);
-    const newStateStats = new StateStats(
+    const supportingStateStats = new SupportingStateStats(
       answerStats, cstPlaythroughIssues, eqPlaythroughIssues,
       misPlaythroughIssues);
-    const newStateTasks = new StateTasks(stateName, tasksByType, newStateStats);
+    const newStateTasks = new StateTasks(tasksByType, supportingStateStats);
+
+    for (const task of newStateTasks) {
+      this.tasksByType.get(task.taskType).push(task);
+    }
+
     this.tasksByState.set(stateName, newStateTasks);
-    newStateTasks.forEach(t => this.tasksByType.get(t.taskType).push(t));
     return newStateTasks;
   }
 
   onStateAdd(newStateName: string): void {
     const newStateTasks = new StateTasks(
-      newStateName, new Map(ImprovementsConstants.TASK_TYPES.map(taskType => [
+      new Map(ImprovementsConstants.TASK_TYPES.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
           this.expId, this.expVersion, taskType, newStateName),
       ])));
+
+    for (const newTask of newStateTasks) {
+      this.tasksByType.get(newTask.taskType).push(newTask);
+    }
+
     this.tasksByState.set(newStateName, newStateTasks);
-    newStateTasks.forEach(t => this.tasksByType.get(t.taskType).push(t));
+    this.expStats = this.expStats.withStateAdded(newStateName);
   }
 
   onStateDelete(oldStateName: string): void {
-    const stateTasks = this.tasksByState.get(oldStateName);
-    stateTasks.forEach(t => t.markAsObsolete());
+    const oldStateTasks = this.tasksByState.get(oldStateName);
 
-    // eslint-disable-next-line dot-notation
+    for (const oldTask of oldStateTasks) {
+      oldTask.markAsObsolete();
+    }
+
     this.tasksByState.delete(oldStateName);
+    this.expStats = this.expStats.withStateDeleted(oldStateName);
   }
 
   onStateRename(oldStateName: string, newStateName: string): void {
     const oldStateTasks = this.tasksByState.get(oldStateName);
     const newStateTasks = new StateTasks(
-      newStateName, new Map(oldStateTasks.map(task => [
-        task.taskType, this.explorationTaskObjectFactory.createFromBackendDict({
-          ...task.toBackendDict(),
+      new Map(oldStateTasks.map(oldTask => [
+        oldTask.taskType,
+        this.explorationTaskObjectFactory.createFromBackendDict({
+          ...oldTask.toBackendDict(),
           ...{target_id: newStateName},
         })
-      ])));
+      ])),
+      oldStateTasks.supportingStateStats);
 
-    newStateTasks.forEach(t => this.tasksByType.get(t.taskType).push(t));
-    oldStateTasks.forEach(t => t.markAsObsolete());
+    for (const newTask of newStateTasks) {
+      this.tasksByType.get(newTask.taskType).push(newTask);
+    }
+    for (const oldTask of oldStateTasks) {
+      oldTask.markAsObsolete();
+    }
 
     this.tasksByState.set(newStateName, newStateTasks);
-    // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
+    this.expStats = this.expStats.withStateRenamed(oldStateName, newStateName);
   }
 
-  onChangeAnswerGroups(stateName: string): void {
+  onChangeInteraction(stateName: string): void {
     this.tasksByState.get(stateName).refresh(this.expStats);
   }
 
   getHighBounceRateTasks(): HbrTask[] {
-    return <HbrTask[]> this.tasksByType.get('high_bounce_rate');
+    return <HbrTask[]> this.tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
   }
 
   getIneffectiveFeedbackLoopTasks(): IflTask[] {
-    return <IflTask[]> this.tasksByType.get('ineffective_feedback_loop');
+    return <IflTask[]> this.tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
   }
 
   getNeedsGuidingResponsesTasks(): NgrTask[] {
-    return <NgrTask[]> this.tasksByType.get('needs_guiding_responses');
+    return <NgrTask[]> this.tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
   }
 
   getSuccessiveIncorrectAnswersTasks(): SiaTask[] {
-    return <SiaTask[]> this.tasksByType.get('successive_incorrect_answers');
+    return <SiaTask[]> this.tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
   }
-}
 
-@Injectable({providedIn: 'root'})
-export class ExplorationImprovementsTaskRegistryObjectFactory {
-  constructor(
-      private explorationTaskObjectFactory: ExplorationTaskObjectFactory) {}
-
-  createNew(
+  private validateInitializationArgs(
       expId: string,
       expVersion: number,
       states: States,
@@ -271,8 +333,9 @@ export class ExplorationImprovementsTaskRegistryObjectFactory {
       openTasks: ExplorationTask[],
       resolvedTaskTypesByStateName: Map<string, ExplorationTaskType[]>,
       topAnswersByStateName: Map<string, AnswerStats[]>,
-      playthroughIssues: PlaythroughIssue[],
-  ): ExplorationImprovementsTaskRegistry {
+      playthroughIssues: PlaythroughIssue[]): void {
+    // Validate that the exploration stats correspond to the provided
+    // exploration.
     if (expStats.expId !== expId) {
       throw new Error(
         'Expected stats for exploration "' + expId + '", but got stats for ' +
@@ -284,6 +347,9 @@ export class ExplorationImprovementsTaskRegistryObjectFactory {
         'stats for exploration version ' + expStats.expVersion);
     }
 
+    // Validate that all state names referenced by the provided statistics refer
+    // to one of the states in the given states, which acts as the
+    // "source-of-truth".
     const actualStateNames = new Set<string>(states.getStateNames());
     const allStateNameReferences = new Set<string>([
       ...openTasks.map(t => t.targetId),
@@ -299,9 +365,9 @@ export class ExplorationImprovementsTaskRegistryObjectFactory {
       }
     }
 
+    // Validate that at most one task type is targeting a state.
     const stateNameReferencesByTaskType = new Map(
       ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, new Set()]));
-
     for (const task of openTasks) {
       if (task.entityId !== expId) {
         throw new Error(
@@ -323,7 +389,6 @@ export class ExplorationImprovementsTaskRegistryObjectFactory {
         stateNameReferences.add(task.targetId);
       }
     }
-
     for (const stateName of resolvedTaskTypesByStateName.keys()) {
       for (const taskType of resolvedTaskTypesByStateName.get(stateName)) {
         const stateNameReferences = stateNameReferencesByTaskType.get(taskType);
@@ -336,14 +401,9 @@ export class ExplorationImprovementsTaskRegistryObjectFactory {
         }
       }
     }
-
-    return new ExplorationImprovementsTaskRegistry(
-      expId, expVersion, states, expStats, openTasks,
-      resolvedTaskTypesByStateName, topAnswersByStateName,
-      playthroughIssues, this.explorationTaskObjectFactory);
   }
 }
 
 angular.module('oppia').factory(
-  'ExplorationImprovementsTaskRegistryObjectFactory',
-  downgradeInjectable(ExplorationImprovementsTaskRegistryObjectFactory));
+  'ExplorationImprovementsTaskRegistryService',
+  downgradeInjectable(ExplorationImprovementsTaskRegistryService));

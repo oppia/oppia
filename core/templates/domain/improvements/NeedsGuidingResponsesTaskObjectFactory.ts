@@ -49,7 +49,7 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
     super(backendDict);
   }
 
-  public refreshStatus(topStateAnswersStats: AnswerStats[]): void {
+  public refreshStatus(topStateAnswersStats: readonly AnswerStats[]): void {
     const numUnaddressedTopStateAnswers = (
       topStateAnswersStats.filter(a => !a.isAddressed).length);
     if (numUnaddressedTopStateAnswers === 0) {
