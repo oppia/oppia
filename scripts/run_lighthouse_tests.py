@@ -18,13 +18,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import atexit
 import os
+import re
 import subprocess
+import sys
 
 import python_utils
 from scripts import common
+from scripts import build
 
 FECONF_FILE_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
+GOOGLE_APP_ENGINE_PORT = 8181
+SUBPROCESSES = []
 
 
 def cleanup():
@@ -37,6 +42,17 @@ def cleanup():
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
+
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
+    processes_to_kill = [
+        '.*%s.*' % re.escape(google_app_engine_path),
+    ]
+    for p in SUBPROCESSES:
+        p.kill()
+
+    for p in processes_to_kill:
+        common.kill_processes_based_on_regex(p)
+    build.set_constants_to_default()
 
 
 def run_lighthouse_checks():
@@ -52,6 +68,7 @@ def run_lighthouse_checks():
     except subprocess.CalledProcessError:
         python_utils.PRINT(
             'Lighthouse checks failed. More details can be found above.')
+        sys.exit(1)
 
 
 def enable_webpages():
@@ -66,11 +83,32 @@ def enable_webpages():
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
 
+def start_google_app_engine_server():
+    """Start the Google App Engine server."""
+
+    app_yaml_filepath = 'app.yaml'
+
+    p = subprocess.Popen(
+        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
+        '--clear_datastore=yes --dev_appserver_log_level=%s '
+        '--log_level=%s --skip_sdk_update_check=true %s' %
+        (common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+         GOOGLE_APP_ENGINE_PORT, app_yaml_filepath),
+        shell=True)
+    SUBPROCESSES.append(p)
+
+
 def main():
     """Runs lighthouse checks and deletes reports."""
 
     enable_webpages()
     atexit.register(cleanup)
+
+    python_utils.PRINT('Building files in production mode.')
+    build.main(args=['--prod_env'])
+    build.modify_constants(prod_env=True)
+    start_google_app_engine_server()
+    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     run_lighthouse_checks()
 
 

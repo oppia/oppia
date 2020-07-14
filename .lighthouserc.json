@@ -2,7 +2,6 @@
   "ci": {
     "collect": {
       "numberOfRuns": 1,
-      "startServerCommand": "python -m scripts.start --no_browser --prod_env",
       "puppeteerScript": "puppeteer-login-script.js",
       "startServerReadyPattern": "default: \"GET /_ah/warmup HTTP/1.1\"",
       "startServerReadyTimeout": 250000,
