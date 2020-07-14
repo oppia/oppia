@@ -112,6 +112,33 @@ VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
 
+ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
+ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
+ERROR_CATEGORY_COUNT_CHECK = 'count check'
+ERROR_CATEGORY_CURRENT_TIME_CHECK = 'current time check'
+ERROR_CATEGORY_DATETIME_CHECK = 'datetime check'
+ERROR_CATEGORY_DOMAIN_OBJECT_CHECK = 'domain object check'
+ERROR_CATEGORY_EMAIL_CHECK = 'email check'
+ERROR_CATEGORY_ERROR_CHECK = 'error check'
+ERROR_CATEGORY_FIELD_CHECK = 'field check'
+ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK = 'first published msec check'
+ERROR_CATEGORY_ID_CHECK = 'id check'
+ERROR_CATEGORY_LAST_UPDATED_CHECK = 'last updated check'
+ERROR_CATEGORY_LENGTH_CHECK = 'length check'
+ERROR_CATEGORY_NAME_CHECK = 'name check'
+ERROR_CATEGORY_OUTPUT_CHECK = 'output check'
+ERROR_CATEGORY_PRIVATE_COMMIT_CHECK = 'post commit is private check'
+ERROR_CATEGORY_PROPERTY_FETCH_CHECK = 'fetch properties'
+ERROR_CATEGORY_RATED_ON_CHECK = 'rated on check'
+ERROR_CATEGORY_RATINGS_CHECK = 'ratings check'
+ERROR_CATEGORY_REFERENCE_CHECK = 'reference check'
+ERROR_CATEGORY_REVIEWER_CHECK = 'reviewer check'
+ERROR_CATEGORY_STATE_NAME_CHECK = 'state name check'
+ERROR_CATEGORY_SUMMARY_CHECK = 'summary check'
+ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
+ERROR_CATEGORY_TYPE_CHECK = 'type check'
+ERROR_CATEGORY_VERSION_CHECK = 'version check'
+
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
     """Value object providing the class and ids to fetch an external model."""
@@ -164,17 +191,17 @@ class BaseModelValidator(python_utils.OBJECT):
     field_name_to_external_model_references = collections.defaultdict(list)
 
     @classmethod
-    def _add_error(cls, error_key, error_val):
+    def _add_error(cls, error_category, error_message):
         """Adds an error to the errors dict.
 
         This method can be overridden by subclasses, if needed.
 
         Args:
-            error_key: string. The error category in which the error
+            error_category: str. The error category in which the error
                 message should be added.
-            error_val: string. The error message.
+            error_message: str. The error message.
         """
-        cls.errors[error_key].append(error_val)
+        cls.errors[error_category].append(error_message)
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -201,7 +228,7 @@ class BaseModelValidator(python_utils.OBJECT):
         regex_string = cls._get_model_id_regex(item)
         if not re.compile(regex_string).match(item.id):
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
 
@@ -236,7 +263,7 @@ class BaseModelValidator(python_utils.OBJECT):
             model_domain_object_instance.validate()
         except Exception as e:
             cls._add_error(
-                'domain object check',
+                ERROR_CATEGORY_DOMAIN_OBJECT_CHECK,
                 'Entity id %s: Entity fails domain validation with the '
                 'error %s' % (item.id, e))
 
@@ -276,7 +303,7 @@ class BaseModelValidator(python_utils.OBJECT):
                     model_class = external_model_reference.class_name
                     model_id = external_model_reference.model_id
                     cls._add_error(
-                        '%s field check' % field_name,
+                        '%s %s' % (field_name, ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having'
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
@@ -323,7 +350,7 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         if item.created_on > item.last_updated:
             cls._add_error(
-                'time field relation check',
+                ERROR_CATEGORY_TIME_FIELD_CHECK,
                 'Entity id %s: The created_on field has a value %s which '
                 'is greater than the value %s of last_updated field'
                 % (item.id, item.created_on, item.last_updated))
@@ -331,7 +358,7 @@ class BaseModelValidator(python_utils.OBJECT):
         current_datetime = datetime.datetime.utcnow()
         if item.last_updated > current_datetime:
             cls._add_error(
-                'current time check',
+                ERROR_CATEGORY_CURRENT_TIME_CHECK,
                 'Entity id %s: The last_updated field has a value %s which '
                 'is greater than the time when the job was run'
                 % (item.id, item.last_updated))
@@ -423,10 +450,10 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -449,7 +476,9 @@ class BaseSummaryModelValidator(BaseModelValidator):
                     model_class = external_model_reference.class_name
                     model_id = external_model_reference.model_id
                     cls._add_error(
-                        '%s field check' % external_model_field_key,
+                        '%s %s' % (
+                            external_model_field_key,
+                            ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having value %s, '
                         'expect model %s with id %s but it doesn\'t'
                         ' exist' % (
@@ -464,7 +493,8 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
                     if value_in_summary_model != value_in_external_model:
                         cls._add_error(
-                            '%s field check' % property_name,
+                            '%s %s' % (
+                                property_name, ERROR_CATEGORY_FIELD_CHECK),
                             'Entity id %s: %s field in entity: %s does not '
                             'match corresponding %s %s field: %s' % (
                                 item.id, property_name,
@@ -519,10 +549,10 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -552,7 +582,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 model_class = external_model_reference.class_name
                 model_id = external_model_reference.model_id
                 cls._add_error(
-                    '%s_ids field check' % key_to_fetch,
+                    '%s_ids %s' % (key_to_fetch, ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -561,7 +591,9 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 continue
             if int(external_model.version) < int(version):
                 cls._add_error(
-                    '%s model version check' % cls.EXTERNAL_MODEL_NAME,
+                    '%s model %s' % (
+                        cls.EXTERNAL_MODEL_NAME,
+                        ERROR_CATEGORY_VERSION_CHECK),
                     'Entity id %s: %s model corresponding to '
                     'id %s has a version %s which is less than '
                     'the version %s in %s model id' % (
@@ -598,7 +630,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         if item.commit_type not in (
                 base_models.VersionedModel.COMMIT_TYPE_CHOICES):
             cls._add_error(
-                'commit type check',
+                'commit %s' % ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Commit type %s is not allowed' % (
                     item.id, item.commit_type))
 
@@ -635,7 +667,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             # not have id starting with collection/rights, there is
             # no commit command domain object defined for this model.
             cls._add_error(
-                'commit cmd check',
+                ERROR_CATEGORY_COMMIT_CMD_CHECK,
                 'Entity id %s: No commit command domain object defined '
                 'for entity with commands: %s' % (item.id, item.commit_cmds))
             return
@@ -682,7 +714,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
                 feconf.POST_COMMIT_STATUS_PUBLIC,
                 feconf.POST_COMMIT_STATUS_PRIVATE]:
             cls._add_error(
-                'post commit status check',
+                ERROR_CATEGORY_COMMIT_STATUS_CHECK,
                 'Entity id %s: Post commit status %s is invalid' % (
                     item.id, item.post_commit_status))
 
@@ -695,7 +727,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         """
         if item.post_commit_status != feconf.POST_COMMIT_STATUS_PUBLIC:
             cls._add_error(
-                'post commit status check',
+                ERROR_CATEGORY_COMMIT_STATUS_CHECK,
                 'Entity id %s: Post commit status %s is invalid' % (
                     item.id, item.post_commit_status))
 
@@ -710,14 +742,14 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         if item.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE and (
                 not item.post_commit_is_private):
             cls._add_error(
-                'post commit is private check',
+                ERROR_CATEGORY_PRIVATE_COMMIT_CHECK,
                 'Entity id %s: Post commit status is private but '
                 'post_commit_is_private is False' % item.id)
 
         if item.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC and (
                 item.post_commit_is_private):
             cls._add_error(
-                'post commit is private check',
+                ERROR_CATEGORY_PRIVATE_COMMIT_CHECK,
                 'Entity id %s: Post commit status is public but '
                 'post_commit_is_private is True' % item.id)
 
@@ -757,10 +789,10 @@ class BaseUserModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -779,7 +811,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 model_class = exploration_model_reference.class_name
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -807,10 +839,10 @@ class BaseUserModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -829,7 +861,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 model_class = collection_model_reference.class_name
                 model_id = collection_model_reference.model_id
                 cls._add_error(
-                    'collection_ids field check',
+                    'collection_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field collection_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -923,7 +955,7 @@ class ActivityReferencesModelValidator(BaseModelValidator):
                         reference['type'], reference['id']))
         except Exception as e:
             cls._add_error(
-                'fetch properties',
+                ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
                 'Entity id %s: Entity properties cannot be fetched completely '
                 'with the error %s' % (item.id, e))
             return None
@@ -943,7 +975,7 @@ class ActivityReferencesModelValidator(BaseModelValidator):
                     collection_ids.append(reference['id'])
         except Exception as e:
             cls._add_error(
-                'fetch properties',
+                ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
                 'Entity id %s: Entity properties cannot be fetched completely '
                 'with the error %s' % (item.id, e))
             return {}
@@ -1024,10 +1056,10 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1041,7 +1073,7 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 model_class = exp_model_reference.class_name
                 model_id = exp_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1049,7 +1081,7 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 continue
             if item.exp_version > exp_model.version:
                 cls._add_error(
-                    'exp version check',
+                    'exp %s' % ERROR_CATEGORY_VERSION_CHECK,
                     'Entity id %s: Exploration version %s in entity is greater '
                     'than the version %s of exploration corresponding to '
                     'exp_id %s' % (
@@ -1068,10 +1100,10 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1085,7 +1117,7 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 model_class = exp_model_reference.class_name
                 model_id = exp_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1093,7 +1125,7 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                 continue
             if item.state_name not in exp_model.states.keys():
                 cls._add_error(
-                    'state name check',
+                    ERROR_CATEGORY_STATE_NAME_CHECK,
                     'Entity id %s: State name %s in entity is not present '
                     'in states of exploration corresponding to '
                     'exp_id %s' % (
@@ -1139,10 +1171,10 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1156,7 +1188,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 model_class = exp_model_reference.class_name
                 model_id = exp_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1164,7 +1196,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 continue
             if item.exp_version > exp_model.version:
                 cls._add_error(
-                    'exp version check',
+                    'exp %s' % ERROR_CATEGORY_VERSION_CHECK,
                     'Entity id %s: Exploration version %s in entity is greater '
                     'than the version %s of exploration corresponding to '
                     'exp_id %s' % (
@@ -1183,10 +1215,10 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1200,7 +1232,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 model_class = exp_model_reference.class_name
                 model_id = exp_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1208,7 +1240,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                 continue
             if item.state_name not in exp_model.states.keys():
                 cls._add_error(
-                    'state name check',
+                    ERROR_CATEGORY_STATE_NAME_CHECK,
                     'Entity id %s: State name %s in entity is not present '
                     'in states of exploration corresponding to '
                     'exp_id %s' % (
@@ -1341,7 +1373,7 @@ class CollectionRightsModelValidator(BaseModelValidator):
         current_time_msec = utils.get_current_time_in_millisecs()
         if item.first_published_msec > current_time_msec:
             cls._add_error(
-                'first published msec check',
+                ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
                 % (item.id, item.first_published_msec))
@@ -1409,7 +1441,7 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             return collection_domain.CollectionChange
         else:
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -1471,7 +1503,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
         if sorted(item.contributor_ids) != sorted(
                 contributor_ids_from_contributors_summary):
             cls._add_error(
-                'contributors summary check',
+                'contributors %s' % ERROR_CATEGORY_SUMMARY_CHECK,
                 'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s' % (
                     item.id, sorted(item.contributor_ids),
@@ -1489,10 +1521,10 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1506,7 +1538,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = collection_model_reference.class_name
                 model_id = collection_model_reference.model_id
                 cls._add_error(
-                    'collection_ids field check',
+                    'collection_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field collection_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1515,7 +1547,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
             nodes = collection_model.collection_contents['nodes']
             if item.node_count != len(nodes):
                 cls._add_error(
-                    'node count check',
+                    'node %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Node count: %s does not match the number of '
                     'nodes in collection_contents dict: %s' % (
                         item.id, item.node_count, nodes))
@@ -1529,7 +1561,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
         """
         if item.ratings:
             cls._add_error(
-                'ratings check',
+                ERROR_CATEGORY_RATINGS_CHECK,
                 'Entity id %s: Expected ratings for the entity to be '
                 'empty but received %s' % (item.id, item.ratings))
 
@@ -1609,10 +1641,10 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1626,7 +1658,7 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 model_class = exploration_model_reference.class_name
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1638,7 +1670,7 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 exploration.get_translation_counts())
             if exploration_translation_counts != item.translation_counts:
                 cls._add_error(
-                    'translation counts check',
+                    'translation %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Translation counts: %s does not match the '
                     'translation counts of external exploration model: %s' % (
                         item.id, item.translation_counts,
@@ -1656,10 +1688,10 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1673,7 +1705,7 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 model_class = exploration_model_reference.class_name
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1684,7 +1716,7 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
             exploration_content_count = exploration.get_content_count()
             if exploration_content_count != item.content_count:
                 cls._add_error(
-                    'content count check',
+                    'content %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Content count: %s does not match the '
                     'content count of external exploration model: %s' % (
                         item.id, item.content_count, exploration_content_count))
@@ -1701,10 +1733,10 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1718,7 +1750,7 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                 model_class = story_model_reference.class_name
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids field check',
+                    'story_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1792,10 +1824,10 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1809,7 +1841,7 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
                 model_class = skill_model_reference.class_name
                 model_id = skill_model_reference.model_id
                 cls._add_error(
-                    'skill_ids field check',
+                    'skill_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field skill_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1822,7 +1854,7 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
             question_count = len(question_skill_links)
             if question_count != item.question_count:
                 cls._add_error(
-                    'question_count check',
+                    'question_%s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: question_count: %s does not match the '
                     'question_count of external skill model: %s' % (
                         item.id, item.question_count, question_count))
@@ -1943,7 +1975,7 @@ class SentEmailModelValidator(BaseModelValidator):
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
             cls._add_error(
-                'sent datetime check',
+                'sent %s' % ERROR_CATEGORY_DATETIME_CHECK,
                 'Entity id %s: The sent_datetime field has a value %s which is '
                 'greater than the time when the job was run' % (
                     item.id, item.sent_datetime))
@@ -1960,10 +1992,10 @@ class SentEmailModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -1977,7 +2009,7 @@ class SentEmailModelValidator(BaseModelValidator):
                 model_class = sender_model_reference.class_name
                 model_id = sender_model_reference.model_id
                 cls._add_error(
-                    'sender_id field check',
+                    'sender_id %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field sender_id having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1985,7 +2017,7 @@ class SentEmailModelValidator(BaseModelValidator):
                 continue
             if sender_model.email != item.sender_email:
                 cls._add_error(
-                    'sender email check',
+                    'sender %s' % ERROR_CATEGORY_EMAIL_CHECK,
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
                     'sender id %s' % (
@@ -2004,10 +2036,10 @@ class SentEmailModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -2021,7 +2053,7 @@ class SentEmailModelValidator(BaseModelValidator):
                 model_class = recipient_model_reference.class_name
                 model_id = recipient_model_reference.model_id
                 cls._add_error(
-                    'recipient_id field check',
+                    'recipient_id %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field recipient_id having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2029,7 +2061,7 @@ class SentEmailModelValidator(BaseModelValidator):
                 continue
             if recipient_model.email != item.recipient_email:
                 cls._add_error(
-                    'recipient email check',
+                    'recipient %s' % ERROR_CATEGORY_EMAIL_CHECK,
                     'Entity id %s: Recipient email %s in entity does '
                     'not match with email %s of user obtained through '
                     'recipient id %s' % (
@@ -2069,7 +2101,7 @@ class BulkEmailModelValidator(BaseModelValidator):
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
             cls._add_error(
-                'sent datetime check',
+                'sent %s' % ERROR_CATEGORY_DATETIME_CHECK,
                 'Entity id %s: The sent_datetime field has a value %s which is '
                 'greater than the time when the job was run' % (
                     item.id, item.sent_datetime))
@@ -2086,10 +2118,10 @@ class BulkEmailModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -2103,7 +2135,7 @@ class BulkEmailModelValidator(BaseModelValidator):
                 model_class = sender_model_reference.class_name
                 model_id = sender_model_reference.model_id
                 cls._add_error(
-                    'sender_id field check',
+                    'sender_id %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field sender_id having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2111,7 +2143,7 @@ class BulkEmailModelValidator(BaseModelValidator):
                 continue
             if sender_model.email != item.sender_email:
                 cls._add_error(
-                    'sender email check',
+                    'sender %s' % ERROR_CATEGORY_EMAIL_CHECK,
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
                     'sender id %s' % (
@@ -2165,7 +2197,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         # email_models.REPLY_TO_ID_LENGTH.
         if len(item.reply_to_id) > email_models.REPLY_TO_ID_LENGTH:
             cls._add_error(
-                'reply_to_id length check',
+                'reply_to_id %s' % ERROR_CATEGORY_LENGTH_CHECK,
                 'Entity id %s: reply_to_id %s should have length less than or '
                 'equal to %s but instead has length %s' % (
                     item.id, item.reply_to_id, email_models.REPLY_TO_ID_LENGTH,
@@ -2299,7 +2331,7 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         current_time_msec = utils.get_current_time_in_millisecs()
         if item.first_published_msec > current_time_msec:
             cls._add_error(
-                'first published msec check',
+                ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run' % (
                     item.id, item.first_published_msec))
@@ -2367,7 +2399,7 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             return exp_domain.ExplorationChange
         else:
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -2428,7 +2460,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
         if sorted(item.contributor_ids) != sorted(
                 contributor_ids_from_contributors_summary):
             cls._add_error(
-                'contributors summary check',
+                'contributors %s' % ERROR_CATEGORY_SUMMARY_CHECK,
                 'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s' % (
                     item.id, sorted(item.contributor_ids),
@@ -2448,7 +2480,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
         current_time_msec = utils.get_current_time_in_millisecs()
         if item.first_published_msec > current_time_msec:
             cls._add_error(
-                'first published msec check',
+                ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run' % (
                     item.id, item.first_published_msec))
@@ -2465,10 +2497,10 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -2482,7 +2514,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = exploration_model_reference.class_name
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2494,7 +2526,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
                 python_utils.divide(last_human_update_ms, 1000.0))
             if item.exploration_model_last_updated != last_human_update_time:
                 cls._add_error(
-                    'exploration model last updated check',
+                    'exploration model %s' % ERROR_CATEGORY_LAST_UPDATED_CHECK,
                     'Entity id %s: The exploration_model_last_updated '
                     'field: %s does not match the last time a commit was '
                     'made by a human contributor: %s' % (
@@ -2588,7 +2620,7 @@ class GeneralFeedbackThreadModelValidator(BaseModelValidator):
         """
         if item.entity_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'entity type check',
+                'entity %s' % ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Entity type %s is not allowed' % (
                     item.id, item.entity_type))
 
@@ -2650,10 +2682,10 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -2668,7 +2700,7 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
                 model_class = feedback_thread_model_reference.class_name
                 model_id = feedback_thread_model_reference.model_id
                 cls._add_error(
-                    'feedback_thread_ids field check',
+                    'feedback_thread_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field feedback_thread_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2676,7 +2708,7 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
                 continue
             if item.message_id >= feedback_thread_model.message_count:
                 cls._add_error(
-                    'message id check',
+                    'message %s' % ERROR_CATEGORY_ID_CHECK,
                     'Entity id %s: message id %s not less than total count '
                     'of messages %s in feedback thread model with id %s '
                     'corresponding to the entity' % (
@@ -2745,7 +2777,7 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
                     reference['thread_id'], reference['message_id']))
             except Exception:
                 cls._add_error(
-                    'feedback message reference check',
+                    'feedback message %s' % ERROR_CATEGORY_REFERENCE_CHECK,
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
         return [
@@ -2769,12 +2801,12 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
                 if split_thread_id[0] != reference['entity_type'] or (
                         split_thread_id[1] != reference['entity_id']):
                     cls._add_error(
-                        'feedback message reference check',
+                        'feedback message %s' % ERROR_CATEGORY_REFERENCE_CHECK,
                         'Entity id %s: Invalid feedback reference: %s' % (
                             item.id, reference))
             except Exception:
                 cls._add_error(
-                    'feedback message reference check',
+                    'feedback message %s' % ERROR_CATEGORY_REFERENCE_CHECK,
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
 
@@ -2838,14 +2870,14 @@ class JobModelValidator(BaseModelValidator):
         if item.error and item.status_code not in [
                 job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
             cls._add_error(
-                'error check',
+                ERROR_CATEGORY_ERROR_CHECK,
                 'Entity id %s: error: %s for job is not empty but '
                 'job status is %s' % (item.id, item.error, item.status_code))
 
         if not item.error and item.status_code in [
                 job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
             cls._add_error(
-                'error check',
+                ERROR_CATEGORY_ERROR_CHECK,
                 'Entity id %s: error for job is empty but '
                 'job status is %s' % (item.id, item.status_code))
 
@@ -2860,14 +2892,14 @@ class JobModelValidator(BaseModelValidator):
         """
         if item.output and item.status_code != job_models.STATUS_CODE_COMPLETED:
             cls._add_error(
-                'output check',
+                ERROR_CATEGORY_OUTPUT_CHECK,
                 'Entity id %s: output: %s for job is not empty but '
                 'job status is %s' % (item.id, item.output, item.status_code))
 
         if item.output is None and (
                 item.status_code == job_models.STATUS_CODE_COMPLETED):
             cls._add_error(
-                'output check',
+                ERROR_CATEGORY_OUTPUT_CHECK,
                 'Entity id %s: output for job is empty but '
                 'job status is %s' % (item.id, item.status_code))
 
@@ -3047,7 +3079,7 @@ class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             return question_domain.QuestionChange
         else:
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -3085,10 +3117,10 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -3102,7 +3134,7 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = question_model_reference.class_name
                 model_id = question_model_reference.model_id
                 cls._add_error(
-                    'question_ids field check',
+                    'question_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field question_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3155,7 +3187,7 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
         """
         if item.id in item.recommended_exploration_ids:
             cls._add_error(
-                'item exploration id check',
+                'item exploration %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: The exploration id: %s for which the entity is '
                 'created is also present in the recommended exploration ids '
                 'for entity' % (item.id, item.id))
@@ -3324,7 +3356,7 @@ class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             return skill_domain.SkillChange
         else:
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -3361,10 +3393,10 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -3378,7 +3410,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = skill_model_reference.class_name
                 model_id = skill_model_reference.model_id
                 cls._add_error(
-                    'skill_ids field check',
+                    'skill_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field skill_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3386,7 +3418,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                 continue
             if item.misconception_count != len(skill_model.misconceptions):
                 cls._add_error(
-                    'misconception count check',
+                    'misconception %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Misconception count: %s does not match '
                     'the number of misconceptions in skill model: %s' % (
                         item.id, item.misconception_count,
@@ -3404,10 +3436,10 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -3421,7 +3453,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = skill_model_reference.class_name
                 model_id = skill_model_reference.model_id
                 cls._add_error(
-                    'skill_ids field check',
+                    'skill_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field skill_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3430,7 +3462,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
             if item.worked_examples_count != len(
                     skill_model.skill_contents['worked_examples']):
                 cls._add_error(
-                    'worked examples count check',
+                    'worked examples %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Worked examples count: %s does not match '
                     'the number of worked examples in skill_contents '
                     'in skill model: %s' % (
@@ -3548,7 +3580,7 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             return story_domain.StoryChange
         else:
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -3586,10 +3618,10 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -3603,7 +3635,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
                 model_class = story_model_reference.class_name
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids field check',
+                    'story_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3656,7 +3688,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
             return suggestion_services.get_suggestion_from_model(item)
         else:
             cls._add_error(
-                'target type check',
+                'target %s' % ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
             return None
@@ -3691,7 +3723,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'target type check',
+                'target %s' % ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
 
@@ -3707,17 +3739,17 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'target type check',
+                'target %s' % ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
             return
@@ -3732,7 +3764,8 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                 model_class = target_model_reference.class_name
                 model_id = target_model_reference.model_id
                 cls._add_error(
-                    '%s_ids field check' % item.target_type,
+                    '%s_ids %s' % (
+                        item.target_type, ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3759,14 +3792,14 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         if item.final_reviewer_id is None and (
                 item.status != suggestion_models.STATUS_IN_REVIEW):
             cls._add_error(
-                'final reviewer check',
+                'final %s' % ERROR_CATEGORY_REVIEWER_CHECK,
                 'Entity id %s: Final reviewer id is empty but '
                 'suggestion is %s' % (item.id, item.status))
 
         if item.final_reviewer_id and (
                 item.status == suggestion_models.STATUS_IN_REVIEW):
             cls._add_error(
-                'final reviewer check',
+                'final %s' % ERROR_CATEGORY_REVIEWER_CHECK,
                 'Entity id %s: Final reviewer id %s is not empty but '
                 'suggestion is in review' % (item.id, item.final_reviewer_id))
 
@@ -3782,17 +3815,17 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'target type check',
+                'target %s' % ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
             return
@@ -3813,7 +3846,8 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                     model_class = target_model_reference.class_name
                     model_id = target_model_reference.model_id
                     cls._add_error(
-                        '%s_ids field check' % item.target_type,
+                        '%s_ids %s' % (
+                            item.target_type, ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s_ids having'
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
@@ -3822,7 +3856,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                     continue
                 if target_model.category != score_category_sub_type:
                     cls._add_error(
-                        'score category subtype check',
+                        'score category sub%s' % ERROR_CATEGORY_TYPE_CHECK,
                         'Entity id %s: score category sub %s does not match'
                         ' target exploration category %s' % (
                             item.id, score_category_sub_type,
@@ -3948,7 +3982,7 @@ class TopicModelValidator(BaseModelValidator):
             for topic_model in topic_models_list if topic_model.id != item.id]
         if topic_model_ids:
             cls._add_error(
-                'unique name check',
+                'unique %s' % ERROR_CATEGORY_NAME_CHECK,
                 'Entity id %s: canonical name %s matches with canonical '
                 'name of topic models with ids %s' % (
                     item.id, item.canonical_name, topic_model_ids))
@@ -3964,7 +3998,7 @@ class TopicModelValidator(BaseModelValidator):
         name = item.name
         if name.lower() != item.canonical_name:
             cls._add_error(
-                'canonical name check',
+                'canonical %s' % ERROR_CATEGORY_NAME_CHECK,
                 'Entity id %s: Entity name %s in lowercase does not match '
                 'canonical name %s' % (item.id, item.name, item.canonical_name))
 
@@ -3980,7 +4014,7 @@ class TopicModelValidator(BaseModelValidator):
             for subtopic in item.subtopics:
                 if skill_id in subtopic['skill_ids']:
                     cls._add_error(
-                        'uncategorized skill ids check',
+                        'uncategorized skill %s' % ERROR_CATEGORY_ID_CHECK,
                         'Entity id %s: uncategorized skill id %s is present '
                         'in subtopic for entity with id %s' % (
                             item.id, skill_id, subtopic['id']))
@@ -4106,7 +4140,7 @@ class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             return topic_domain.TopicChange
         else:
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -4151,10 +4185,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4168,7 +4202,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = topic_model_reference.class_name
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids field check',
+                    'topic_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4180,7 +4214,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 if reference['story_is_published']]
             if item.canonical_story_count != len(pubished_canonical_story_ids):
                 cls._add_error(
-                    'canonical story count check',
+                    'canonical story %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Canonical story count: %s does not '
                     'match the number of story ids in canonical_story_ids in '
                     'topic model: %s' % (
@@ -4199,10 +4233,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4216,7 +4250,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = topic_model_reference.class_name
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids field check',
+                    'topic_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4230,7 +4264,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                     item.additional_story_count !=
                     len(published_additional_story_ids)):
                 cls._add_error(
-                    'additional story count check',
+                    'additional story %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Additional story count: %s does not '
                     'match the number of story ids in additional_story_ids in '
                     'topic model: %s' % (
@@ -4249,10 +4283,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4266,7 +4300,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = topic_model_reference.class_name
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids field check',
+                    'topic_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4275,7 +4309,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             if item.uncategorized_skill_count != len(
                     topic_model.uncategorized_skill_ids):
                 cls._add_error(
-                    'uncategorized skill count check',
+                    'uncategorized skill %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Uncategorized skill count: %s does not '
                     'match the number of skill ids in '
                     'uncategorized_skill_ids in topic model: %s' % (
@@ -4295,10 +4329,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4312,7 +4346,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = topic_model_reference.class_name
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids field check',
+                    'topic_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4324,7 +4358,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             if item.total_skill_count != len(
                     topic_model.uncategorized_skill_ids + subtopic_skill_ids):
                 cls._add_error(
-                    'total skill count check',
+                    'total skill %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Total skill count: %s does not '
                     'match the total number of skill ids in '
                     'uncategorized_skill_ids in topic model: %s and skill_ids '
@@ -4345,10 +4379,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4362,7 +4396,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 model_class = topic_model_reference.class_name
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids field check',
+                    'topic_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4370,7 +4404,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                 continue
             if item.subtopic_count != len(topic_model.subtopics):
                 cls._add_error(
-                    'subtopic count check',
+                    'subtopic %s' % ERROR_CATEGORY_COUNT_CHECK,
                     'Entity id %s: Subtopic count: %s does not '
                     'match the total number of subtopics in topic '
                     'model: %s ' % (
@@ -4504,7 +4538,7 @@ class SubtopicPageCommitLogEntryModelValidator(
             return subtopic_page_domain.SubtopicPageChange
         else:
             cls._add_error(
-                'model id check',
+                'model %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -4689,7 +4723,7 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 learner_progress_services.get_all_incomplete_exp_ids(
                     item.user_id)):
             cls._add_error(
-                'incomplete exp id check',
+                'incomplete exp %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Exploration id %s for entity is not marked '
                 'as incomplete' % (item.id, item.exploration_id))
 
@@ -4705,10 +4739,10 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4722,7 +4756,7 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 model_class = exploration_model_reference.class_name
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4730,7 +4764,7 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 continue
             if item.last_played_exp_version > exploration_model.version:
                 cls._add_error(
-                    'version check',
+                    ERROR_CATEGORY_VERSION_CHECK,
                     'Entity id %s: last played exp version %s is greater than '
                     'current version %s of exploration with id %s' % (
                         item.id, item.last_played_exp_version,
@@ -4748,10 +4782,10 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4765,7 +4799,7 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 model_class = exploration_model_reference.class_name
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4774,7 +4808,7 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
             if item.last_played_state_name not in (
                     exploration_model.states.keys()):
                 cls._add_error(
-                    'state name check',
+                    ERROR_CATEGORY_STATE_NAME_CHECK,
                     'Entity id %s: last played state name %s is not present '
                     'in exploration states %s for exploration id %s' % (
                         item.id, item.last_played_state_name,
@@ -4931,10 +4965,10 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -4948,7 +4982,7 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
                 model_class = subscriber_model_reference.class_name
                 model_id = subscriber_model_reference.model_id
                 cls._add_error(
-                    'subscriber_ids field check',
+                    'subscriber_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field subscriber_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4956,7 +4990,7 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
                 continue
             if item.id not in subscriber_model.subscriber_ids:
                 cls._add_error(
-                    'subscriber id check',
+                    'subscriber %s' % ERROR_CATEGORY_ID_CHECK,
                     'Entity id %s: User id is not present in subscriber ids of '
                     'creator with id %s to whom the user has subscribed' % (
                         item.id, subscriber_model.id))
@@ -4995,7 +5029,7 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
         """
         if item.id in item.subscriber_ids:
             cls._add_error(
-                'subscriber id check',
+                'subscriber %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: User id is present in subscriber ids '
                 'for user' % item.id)
 
@@ -5012,10 +5046,10 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -5029,7 +5063,7 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
                 model_class = subscription_model_reference.class_name
                 model_id = subscription_model_reference.model_id
                 cls._add_error(
-                    'subscription_ids field check',
+                    'subscription_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field subscription_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5037,7 +5071,7 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
                 continue
             if item.id not in subscription_model.creator_ids:
                 cls._add_error(
-                    'subscription creator id check',
+                    'subscription creator %s' % ERROR_CATEGORY_ID_CHECK,
                     'Entity id %s: User id is not present in creator ids to '
                     'which the subscriber of user with id %s has subscribed' % (
                         item.id, subscription_model.id))
@@ -5099,7 +5133,7 @@ class UserStatsModelValidator(BaseUserModelValidator):
         """
         if item.schema_version > feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
             cls._add_error(
-                'schema version check',
+                'schema %s' % ERROR_CATEGORY_VERSION_CHECK,
                 'Entity id %s: schema version %s is greater than '
                 'current version %s' % (
                     item.id, item.schema_version,
@@ -5187,7 +5221,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         """
         if item.rating is not None and (item.rating < 1 or item.rating > 5):
             cls._add_error(
-                'rating check',
+                ERROR_CATEGORY_RATINGS_CHECK,
                 'Entity id %s: Expected rating to be in range [1, 5], '
                 'received %s' % (item.id, item.rating))
 
@@ -5201,13 +5235,13 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         """
         if item.rating is not None and not item.rated_on:
             cls._add_error(
-                'rated on check',
+                ERROR_CATEGORY_RATED_ON_CHECK,
                 'Entity id %s: rating %s exists but rated on is None' % (
                     item.id, item.rating))
         current_time = datetime.datetime.utcnow()
         if item.rated_on is not None and item.rated_on > current_time:
             cls._add_error(
-                'rated on check',
+                ERROR_CATEGORY_RATED_ON_CHECK,
                 'Entity id %s: rated on %s is greater than the time '
                 'when job was run' % (item.id, item.rated_on))
 
@@ -5221,7 +5255,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         """
         if item.draft_change_list and not item.draft_change_list_last_updated:
             cls._add_error(
-                'draft change list last updated check',
+                'draft change list %s' % ERROR_CATEGORY_LAST_UPDATED_CHECK,
                 'Entity id %s: draft change list %s exists but '
                 'draft change list last updated is None' % (
                     item.id, item.draft_change_list))
@@ -5229,7 +5263,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         if item.draft_change_list_last_updated is not None and (
                 item.draft_change_list_last_updated > current_time):
             cls._add_error(
-                'draft change list last updated check',
+                'draft change list %s' % ERROR_CATEGORY_LAST_UPDATED_CHECK,
                 'Entity id %s: draft change list last updated %s is '
                 'greater than the time when job was run' % (
                     item.id, item.draft_change_list_last_updated))
@@ -5246,10 +5280,10 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -5263,7 +5297,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
                 model_class = exploration_model_reference.class_name
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids field check',
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5271,7 +5305,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
                 continue
             if item.draft_change_list_exp_version > exploration_model.version:
                 cls._add_error(
-                    'exp version check',
+                    'exp %s' % ERROR_CATEGORY_VERSION_CHECK,
                     'Entity id %s: draft change list exp version %s is '
                     'greater than version %s of corresponding exploration '
                     'with id %s' % (
@@ -5327,10 +5361,10 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -5348,7 +5382,7 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                 model_class = completed_activities_model_reference.class_name
                 model_id = completed_activities_model_reference.model_id
                 cls._add_error(
-                    'completed_activities_ids field check',
+                    'completed_activities_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field completed_activities_ids '
                     'having value %s, expect model %s with id %s but it '
                     'doesn\'t exist' % (
@@ -5374,7 +5408,7 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                 model_class = collection_model_reference.class_name
                 model_id = collection_model_reference.model_id
                 cls._add_error(
-                    'collection_ids field check',
+                    'collection_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field collection_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5431,10 +5465,10 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -5448,7 +5482,7 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                 model_class = story_model_reference.class_name
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids field check',
+                    'story_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5481,10 +5515,10 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -5500,7 +5534,7 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                 model_class = story_model_reference.class_name
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids field check',
+                    'story_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5603,10 +5637,10 @@ class UserQueryModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -5620,7 +5654,7 @@ class UserQueryModelValidator(BaseUserModelValidator):
                 model_class = email_model_reference.class_name
                 model_id = email_model_reference.model_id
                 cls._add_error(
-                    'sent_email_model_ids field check',
+                    'sent_email_model_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field sent_email_model_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5657,7 +5691,7 @@ class UserQueryModelValidator(BaseUserModelValidator):
                 if user_bulk_emails_model is None or (
                         user_bulk_emails_model.deleted):
                     cls._add_error(
-                        'user bulk email check',
+                        'user bulk %s' % ERROR_CATEGORY_EMAIL_CHECK,
                         'Entity id %s: UserBulkEmails model is missing for '
                         'recipient with id %s' % (
                             item.id, recipient_user_ids[index]))
@@ -5691,10 +5725,10 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -5708,7 +5742,7 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
                 model_class = email_model_reference.class_name
                 model_id = email_model_reference.model_id
                 cls._add_error(
-                    'sent_email_model_ids field check',
+                    'sent_email_model_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field sent_email_model_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5913,7 +5947,7 @@ class TaskEntryModelValidator(BaseModelValidator):
                 item.entity_type, item.entity_id, item.entity_version))
         if item.composite_entity_id != expected_composite_entity_id:
             cls._add_error(
-                'composite_entity_id field check',
+                'composite_entity_id %s' % ERROR_CATEGORY_FIELD_CHECK,
                 'Entity id %s: composite_entity_id "%s" should be "%s"' % (
                     item.id,
                     item.composite_entity_id,
@@ -5929,23 +5963,23 @@ class TaskEntryModelValidator(BaseModelValidator):
         if item.status == improvements_models.TASK_STATUS_OPEN:
             if item.resolver_id:
                 cls._add_error(
-                    'status field check',
+                    'status %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: status is open but resolver_id is "%s", '
                     'should be empty.' % (item.id, item.resolver_id))
             if item.resolved_on:
                 cls._add_error(
-                    'status field check',
+                    'status %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: status is open but resolved_on is "%s", '
                     'should be empty.' % (item.id, item.resolved_on))
         elif item.status == improvements_models.TASK_STATUS_RESOLVED:
             if item.resolver_id is None:
                 cls._add_error(
-                    'status field check',
+                    'status %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: status is resolved but resolver_id is not '
                     'set' % (item.id,))
             if item.resolved_on is None:
                 cls._add_error(
-                    'status field check',
+                    'status %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: status is resolved but resolved_on is not '
                     'set' % (item.id,))
 
@@ -5962,13 +5996,13 @@ class TaskEntryModelValidator(BaseModelValidator):
                 item.entity_id, strict=True, version=item.entity_version)
         except Exception:
             cls._add_error(
-                'target_id field check',
+                'target_id %s' % ERROR_CATEGORY_FIELD_CHECK,
                 'Entity id %s: exploration with id "%s" does not exist at '
                 'version %d' % (item.id, item.entity_id, item.entity_version))
             return
         if item.target_id not in exp_model.states.keys():
             cls._add_error(
-                'target_id field check',
+                'target_id %s' % ERROR_CATEGORY_FIELD_CHECK,
                 'Entity id %s: exploration with id "%s" does not have a state '
                 'named "%s" at version %d' % (
                     item.id, item.entity_id, item.target_id,
@@ -6027,7 +6061,7 @@ class PlaythroughModelValidator(BaseModelValidator):
 
         if item.exp_id not in whitelisted_exp_ids_for_playthroughs:
             cls._add_error(
-                'exploration id check',
+                'exploration %s' % ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: recorded in exploration_id:%s which '
                 'has not been curated for recording.' % (
                     item.id, item.exp_id)
@@ -6043,10 +6077,10 @@ class PlaythroughModelValidator(BaseModelValidator):
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
-                model to which the external model is associated. Each
-                value contains a list of ExternalModelReference corresponding
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
                 to the field_name. For examples, all the external Exploration
-                Models corresponding to a storgae model can be associated
+                Models corresponding to a storage model can be associated
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
@@ -6061,7 +6095,7 @@ class PlaythroughModelValidator(BaseModelValidator):
                 model_class = exp_issues_model_reference.class_name
                 model_id = exp_issues_model_reference.model_id
                 cls._add_error(
-                    'exp_issues_ids field check',
+                    'exp_issues_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exp_issues_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -6088,7 +6122,7 @@ class PlaythroughModelValidator(BaseModelValidator):
 
             if len(issues) == 0:
                 cls._add_error(
-                    'reference check',
+                    '%s' % ERROR_CATEGORY_REFERENCE_CHECK,
                     'Entity id %s: not referenced by any issue of the'
                     ' corresponding exploration (id=%s, version=%s).' % (
                         item.id, exp_id, exp_version)
@@ -6096,7 +6130,7 @@ class PlaythroughModelValidator(BaseModelValidator):
             elif len(issues) > 1:
                 issue_indices = [index for index, _ in issues]
                 cls._add_error(
-                    'reference check',
+                    '%s' % ERROR_CATEGORY_REFERENCE_CHECK,
                     'Entity id %s: referenced by more than one issues of the '
                     'corresponding exploration (id=%s, version=%s), '
                     'issue indices: %s.' % (
@@ -6111,7 +6145,7 @@ class PlaythroughModelValidator(BaseModelValidator):
                         id_indices.append(id_index)
                 if len(id_indices) > 1:
                     cls._add_error(
-                        'reference check',
+                        '%s' % ERROR_CATEGORY_REFERENCE_CHECK,
                         'Entity id %s: referenced multiple times in an '
                         'issue (index=%s) of the corresponding exploration '
                         '(id=%s, version=%s), duplicated id indices: %s.' % (

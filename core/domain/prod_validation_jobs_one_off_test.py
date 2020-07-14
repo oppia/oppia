@@ -2490,7 +2490,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         self.model_instance_1.put()
         expected_output = [
             (
-                u'[u\'failed validation check for translation counts check '
+                u'[u\'failed validation check for translation count check '
                 'of ExplorationOpportunitySummaryModel\', '
                 '[u"Entity id 1: Translation counts: {u\'hi\': 2} does not '
                 'match the translation counts of external exploration model: '
@@ -9506,7 +9506,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for uncategorized skill '
-                'ids check of TopicModel\', '
+                'id check of TopicModel\', '
                 '[u\'Entity id 0: uncategorized skill id 0 is present '
                 'in subtopic for entity with id 1\']]'
             ), u'[u\'fully-validated TopicModel\', 2]']
@@ -13531,7 +13531,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.rating = -1
         self.model_instance.put()
         expected_output = [(
-            u'[u\'failed validation check for rating check of '
+            u'[u\'failed validation check for ratings check of '
             'ExplorationUserDataModel\', [u\'Entity id %s: Expected '
             'rating to be in range [1, 5], received -1\']]') % (
                 self.model_instance.id)]
