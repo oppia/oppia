@@ -925,18 +925,19 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
-def estimate_size_of_svg_for_math_expressions_in_html(html_string):
-    """Find the approximate size of Math rich-text components SVG images that
-    would be generated for each math tags according to the length of raw_latex
-    value.
+def extract_math_rich_text_related_information_from_html(html_string):
+    """Extract information from the math rich-text components from an HTML
+    string. This information will be useful for generating SVG images for these
+    math tags.
 
     Args:
         html_string: str. The HTML string.
 
     Returns:
-        tuple. A 3-tuple whose elements are as follows:
+        tuple(int, str, list). A 3-tuple whose elements are as follows:
         - int. The approximate size of Math SVGs in bytes.
         - str. The largest raw_latex value in the html string by length.
+        - list. All unique raw_latex values in the math tags.
     """
 
     soup = bs4.BeautifulSoup(

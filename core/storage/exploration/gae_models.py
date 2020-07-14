@@ -256,7 +256,7 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     # Approximate maximum size of Math rich-text components SVG images that
     # would be generated for the exploration according to the length of
     # raw_latex value.
-    estimated_max_size_of_images_in_bytes = ndb.FloatProperty(
+    estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
         indexed=True, default=0)
     # Set of latex values from all the math-rich text components of the
     # exploration.

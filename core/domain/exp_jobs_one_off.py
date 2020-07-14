@@ -562,7 +562,7 @@ class MathExplorationsImageGenerationAuditJob(
                 size_of_math_svg_in_state, largest_math_expression_in_state,
                 list_of_latex_values_in_state) = (
                     html_validation_service.
-                    estimate_size_of_svg_for_math_expressions_in_html(
+                    extract_math_rich_text_related_information_from_html(
                         html_string))
             list_of_latex_values.extend(list_of_latex_values_in_state)
             largest_math_expression = (

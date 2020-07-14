@@ -1672,10 +1672,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertTrue(
                 python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
 
-    def test_estimate_size_of_svg_for_math_expressions_in_html(self):
+    def test_extract_math_rich_text_related_information_from_html(self):
         """Test that the estimate_size_of_svg_for_math_expressions_in_html
-        method validates approximates the size of Math SVGs for raw_latex values
-        in a given HTML string.
+        extracts the required information from all the math tags.
         """
         html_string1 = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
@@ -1697,7 +1696,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         expected_largest_expression = '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
         size, largest_expression, list_of_latex = (
             html_validation_service.
-            estimate_size_of_svg_for_math_expressions_in_html(html_string1))
+            extract_math_rich_text_related_information_from_html(html_string1))
         self.assertEqual(expected_size, size)
         self.assertEqual(largest_expression, expected_largest_expression)
         self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
@@ -1722,7 +1721,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         expected_largest_expression = '+,+,+,+(x^2)'
         size, largest_expression, list_of_latex = (
             html_validation_service.
-            estimate_size_of_svg_for_math_expressions_in_html(html_string2))
+            extract_math_rich_text_related_information_from_html(html_string2))
         self.assertEqual(expected_size, size)
         self.assertEqual(largest_expression, expected_largest_expression)
         self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
@@ -1736,7 +1735,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             html_validation_service.
-            estimate_size_of_svg_for_math_expressions_in_html(
+            extract_math_rich_text_related_information_from_html(
                 html_string_with_no_math), (0, '', []))
 
     def test_check_for_math_component_in_html(self):

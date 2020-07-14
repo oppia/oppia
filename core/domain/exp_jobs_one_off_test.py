@@ -2966,7 +2966,7 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
             exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id3'))
         self.assertEqual(
             exp1_math_image_model.estimated_max_size_of_images_in_bytes,
-            47000.0)
+            47000)
         expected_latex_values_1 = [
             '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
         expected_latex_values_2 = [
@@ -2977,13 +2977,13 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
             sorted(expected_latex_values_1))
         self.assertEqual(
             exp2_math_image_model.estimated_max_size_of_images_in_bytes,
-            54000.0)
+            54000)
         self.assertEqual(
             sorted(exp2_math_image_model.latex_values),
             sorted(expected_latex_values_2))
         self.assertEqual(
             exp3_math_image_model.estimated_max_size_of_images_in_bytes,
-            47000.0)
+            47000)
         self.assertEqual(
             sorted(exp3_math_image_model.latex_values),
             sorted(expected_latex_values_1))
