@@ -29,8 +29,8 @@ import feconf
 import python_utils
 
 
-def post_to_mailgun(
-        sender_email, recipient_email, subject,
+def send_email_to_recipients(
+        sender_email, recipient_emails, subject,
         plaintext_body, html_body, bcc=None, reply_to=None,
         recipient_variables=None):
     """Send POST HTTP request to mailgun api. This method is adopted from
@@ -39,14 +39,16 @@ def post_to_mailgun(
     Args:
         sender_email: str. the email address of the sender. This should be in
             the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'. Must be utf-8
-        recipient_email: str|list(str). The email address or email addresses
-            of the recipients. Must be utf-8
+        recipient_emails: list(str). The email address or email addresses
+            of the recipients. Must be utf-8.
         subject: str. The subject line of the email, Must be utf-8.
         plaintext_body: str. The plaintext body of the email. Must be utf-8
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Must be utf-8.
-        bcc: str|None. bcc emails
-        reply_to: str|None. Reply_to email address for replying.
+        bcc: list(str)|None. List of bcc emails.
+        reply_to: str|None. Reply address formatted like
+            “reply+<reply_id>@<incoming_email_domain_name>
+            reply_id is the unique id of the sender.
         recipient_variables: dict|None. If batch sends(sending emails in bulk)
             requires differentiated email body text, pass in each key value as
             (recipient, id) to differentiate the recipients.
@@ -63,14 +65,21 @@ def post_to_mailgun(
 
     data = {
         'from': sender_email,
-        'to': recipient_email,
         'subject': subject,
         'text': plaintext_body,
         'html': html_body
     }
 
+    if len(recipient_emails) == 1:
+        data['to'] = recipient_emails[0]
+    else:
+        data['to'] = recipient_emails
+
     if bcc:
-        data['bcc'] = bcc
+        if len(bcc) == 1:
+            data['bcc'] = bcc[0]
+        else:
+            data['bcc'] = bcc
 
     if reply_to:
         data['h:Reply-To'] = reply_to
@@ -124,10 +133,10 @@ def send_mail(
         if reply_to_id else '')
 
     if not constants.DEV_MODE:
-        post_to_mailgun(
-            sender_email, recipient_email, subject.encode(encoding='utf-8'),
+        send_email_to_recipients(
+            sender_email, [recipient_email], subject.encode(encoding='utf-8'),
             plaintext_body.encode(encoding='utf-8'),
-            html_body.encode(encoding='utf-8'), bcc=bcc, reply_to=reply_to)
+            html_body.encode(encoding='utf-8'), bcc=[bcc], reply_to=reply_to)
     else:
         msg_title = 'MailgunService.SendMail'
         # pylint: disable=division-operator-used
@@ -196,7 +205,7 @@ def send_bulk_mail(
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
         if not constants.DEV_MODE:
-            post_to_mailgun(
+            send_email_to_recipients(
                 sender_email, email_list, subject.encode(encoding='utf-8'),
                 plaintext_body.encode(encoding='utf-8'),
                 html_body.encode(encoding='utf-8'),

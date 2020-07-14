@@ -41,7 +41,7 @@ class EmailTests(test_utils.GenericTestBase):
         super(EmailTests, self).setUp()
         self._log_handler.reset()
 
-    def test_post_to_mailgun(self):
+    def test_send_email_to_recipients(self):
         """Test for sending HTTP POST request."""
 
         swapped_urlopen = lambda x: x
@@ -53,9 +53,9 @@ class EmailTests(test_utils.GenericTestBase):
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            result = mailgun_email_services.post_to_mailgun(
+            result = mailgun_email_services.send_email_to_recipients(
                 sender_email='a@a.com',
-                recipient_email='b@b.com',
+                recipient_emails=['b@b.com'],
                 subject=(
                     'Hola 😂 - invitation to collaborate'
                     .encode(encoding='utf-8')),
@@ -64,8 +64,36 @@ class EmailTests(test_utils.GenericTestBase):
             )
             expected = (
                 'https://api.mailgun.net/v3/domain/messages',
-                ('to=b%40b.com&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
-                 '%2C%3Cbr%3E+%F0%9F%98%82&from=a%40a.com&subject=Hola+%F0'
+                ('text=plaintext_body+%F0%9F%98%82&html=Hi+abc%2C%3Cbr%3E+' +
+                 '%F0%9F%98%82&from=a%40a.com&to=b%40b.com&subject=Hola+%F0'
+                 '%9F%98%82+-+invitation+to+collaborate'),
+                {'Authorization': 'Basic YXBpOmtleQ=='})
+            self.assertEqual(result, expected)
+
+    def test_post_batch_send_to_mailgun(self):
+        """Test for sending HTTP POST request."""
+        swapped_urlopen = lambda x: x
+        swapped_request = lambda *args: args
+        swap_urlopen_context = self.swap(
+            python_utils, 'url_open', swapped_urlopen)
+        swap_request_context = self.swap(
+            python_utils, 'url_request', swapped_request)
+        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
+        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
+            result = mailgun_email_services.send_email_to_recipients(
+                sender_email='a@a.com',
+                recipient_emails=['b@b.com', 'c@c.com', 'd@d.com'],
+                subject='Hola 😂 - invitation to collaborate'.encode(
+                    encoding='utf-8'),
+                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
+                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8')
+            )
+            expected = (
+                'https://api.mailgun.net/v3/domain/messages',
+                ('text=plaintext_body+%F0%9F%98%82&html=Hi+abc%2C%3Cbr%3E+' +
+                 '%F0%9F%98%82&from=a%40a.com&to=%5Bu%27b%40b.com%27%2C+u' +
+                 '%27c%40c.com%27%2C+u%27d%40d.com%27%5D&subject=Hola+%F0'
                  '%9F%98%82+-+invitation+to+collaborate'),
                 {'Authorization': 'Basic YXBpOmtleQ=='})
             self.assertEqual(result, expected)
@@ -142,34 +170,6 @@ class EmailTests(test_utils.GenericTestBase):
             [email_header, dedent(logging_info_email_body),
              logging_info_notification])
 
-    def test_post_batch_send_to_mailgun(self):
-        """Test for sending HTTP POST request."""
-        swapped_urlopen = lambda x: x
-        swapped_request = lambda *args: args
-        swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
-        swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            result = mailgun_email_services.post_to_mailgun(
-                sender_email='a@a.com',
-                recipient_email=['b@b.com', 'c@c.com', 'd@d.com'],
-                subject='Hola 😂 - invitation to collaborate'.encode(
-                    encoding='utf-8'),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8')
-            )
-            expected = (
-                'https://api.mailgun.net/v3/domain/messages',
-                ('to=%5Bu%27b%40b.com%27%2C+u%27c%40c.com%27%2C+u%27d%40d.com' +
-                 '%27%5D&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
-                 '%2C%3Cbr%3E+%F0%9F%98%82&from=a%40a.com&subject=Hola+%F0'
-                 '%9F%98%82+-+invitation+to+collaborate'),
-                {'Authorization': 'Basic YXBpOmtleQ=='})
-            self.assertEqual(result, expected)
-
     def test_send_mail_raises_exception_for_missing_api_key(self):
         """Tests the missing Mailgun API key exception."""
         mailgun_api_exception = (
@@ -216,18 +216,18 @@ class EmailTests(test_utils.GenericTestBase):
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         # Data we expect to have been sent in the
-        # mailgun_email_services.post_to_mailgun().
+        # mailgun_email_services.send_email_to_recipients().
         expected = {'from': feconf.SYSTEM_EMAIL_ADDRESS,
                     'to': feconf.ADMIN_EMAIL_ADDRESS,
                     'subject': 'subject',
                     'text': 'body',
                     'html': 'html'}
 
-        # Lambda function, will replace post_to_mailgun().
+        # Lambda function, will replace send_email_to_recipients().
         req_post_lambda = (lambda data=None:
                            self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
-            mailgun_email_services, 'post_to_mailgun', req_post_lambda)
+            mailgun_email_services, 'send_email_to_recipients', req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             mailgun_email_services.send_mail(
@@ -237,7 +237,7 @@ class EmailTests(test_utils.GenericTestBase):
     def test_bcc_admin_flag(self):
         """Verifies that the bcc admin flag is working properly in send_mail.
 
-        Note that we replace the mailgun_email_services.post_to_mailgun()
+        Note that we replace the mailgun_email_services.send_email_to_recipients()
         function in send_mail with an alternate lambda that asserts the correct
         values were placed in the data dictionary that is then passed to the
         mailgun api.
@@ -246,12 +246,12 @@ class EmailTests(test_utils.GenericTestBase):
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        # Lambda function, will replace post_to_mailgun().
+        # Lambda function, will replace send_email_to_recipients().
         req_post_lambda = (lambda data=None:
                            self.assertEqual(
                                data['bcc'], feconf.ADMIN_EMAIL_ADDRESS))
         post_request = self.swap(
-            mailgun_email_services, 'post_to_mailgun', req_post_lambda)
+            mailgun_email_services, 'send_email_to_recipients', req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             mailgun_email_services.send_mail(
@@ -265,7 +265,7 @@ class EmailTests(test_utils.GenericTestBase):
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         reply_id = 123
 
-        # Lambda function, will replace post_to_mailgun().
+        # Lambda function, will replace send_email_to_recipients().
         req_post_lambda = (
             lambda data=None:
             self.assertEqual(
@@ -273,7 +273,7 @@ class EmailTests(test_utils.GenericTestBase):
                 'reply+' + python_utils.UNICODE(reply_id) + '@' +
                 feconf.INCOMING_EMAILS_DOMAIN_NAME))
         post_request = self.swap(
-            mailgun_email_services, 'post_to_mailgun', req_post_lambda)
+            mailgun_email_services, 'send_email_to_recipients', req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             mailgun_email_services.send_mail(
@@ -334,16 +334,16 @@ class EmailTests(test_utils.GenericTestBase):
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
 
-        # Data that we expect to have been sent in the post_to_mailgun().
+        # Data that we expect to have been sent in the send_email_to_recipients().
         expected = ({'from': feconf.SYSTEM_EMAIL_ADDRESS, 'to': recipients,
                      'subject': 'subject', 'text': 'body', 'html': 'html',
                      'recipient-variables': '{}'})
 
-        # Lambda function, will replace post_to_mailgun().
+        # Lambda function, will replace send_email_to_recipients().
         req_post_lambda = (lambda data=None:
                            self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
-            mailgun_email_services, 'post_to_mailgun', req_post_lambda)
+            mailgun_email_services, 'send_email_to_recipients', req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             mailgun_email_services.send_bulk_mail(
