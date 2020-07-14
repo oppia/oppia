@@ -5,9 +5,9 @@
     <br>
     <div style="float:left;">
       <picture>
-        <source type="image/webp" [src]="getStaticImageUrl('/general/donate.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/general/donate.png')">
-        <img [src]="getStaticImageUrl('/general/donate.png')" alt="Otter holding a gift", style="height: 250px;">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/general/donate.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/general/donate.png')">
+        <img [src]="getStaticImageUrl('/general/donate.png')" alt="Otter holding a gift" style="height: 250px;">
       </picture>
     </div>
     <div style="float:right;">
