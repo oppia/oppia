@@ -1360,9 +1360,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': 'hello',
+                            'content_id': ''
+                        }]
+                    }
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
@@ -1393,9 +1400,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>hello</p>',
+                            'content_id': ''
+                        }]
+                    }
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
@@ -1427,9 +1441,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>hello</p>',
+                            'content_id': ''
+                        }]
+                    }
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
@@ -1461,9 +1482,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>hello</p>',
+                            'content_id': ''
+                        }]
+                    }
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
