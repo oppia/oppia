@@ -29,16 +29,16 @@ import { UrlInterpolationService } from
   styleUrls: []
 })
 export class TeachPageComponent implements OnInit {
-  constructor(
-    private siteAnalyticsService: SiteAnalyticsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
-  ) {}
   TAB_ID_TEACH: string = 'teach';
   TAB_ID_PARTICIPATION: string = 'participation';
   TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
   ALLOWED_TABS = [this.TAB_ID_TEACH, this.TAB_ID_PARTICIPATION];
   activeTabName = this.TAB_ID_TEACH;
+  constructor(
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
+  ) {}
   ngOnInit(): void {
     console.log('Fires up teach-page');
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
@@ -53,10 +53,11 @@ export class TeachPageComponent implements OnInit {
       }
     };
   }
-  onTabClick(tabName: string): void {
+  onTabClick(tabName: string) {
     // ---- Update hash ----
     this.windowRef.nativeWindow.location.hash = '#' + tabName;
     this.activeTabName = tabName;
+    return this.windowRef.nativeWindow;
   }
 
   getStaticImageUrl(imagePath: string): string {
