@@ -24,11 +24,11 @@ import { Injectable } from '@angular/core';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
-export interface ITaskEntryBackendDict {
+export interface ITaskEntryBackendDict<TaskType = string> {
   'entity_type': string;
   'entity_id': string;
   'entity_version': number;
-  'task_type': string;
+  'task_type': TaskType;
   'target_type': string;
   'target_id': string;
   'issue_description': string;
@@ -38,19 +38,19 @@ export interface ITaskEntryBackendDict {
   'resolved_on_msecs': number;
 }
 
-export interface ITaskEntryPayloadDict {
+export interface ITaskEntryPayloadDict<TaskType = string> {
   'entity_version': number;
-  'task_type': string;
+  'task_type': TaskType;
   'target_id': string;
   'issue_description': string;
   'status': string;
 }
 
-export class TaskEntry {
+export class TaskEntry<TaskType = string> {
   public readonly entityType: string;
   public readonly entityId: string;
   public readonly entityVersion: number;
-  public readonly taskType: string;
+  public readonly taskType: TaskType;
   public readonly targetType: string;
   public readonly targetId: string;
   public readonly resolverUsername: string;
@@ -59,7 +59,7 @@ export class TaskEntry {
   protected issueDescription: string;
   private taskStatus: string;
 
-  constructor(backendDict: ITaskEntryBackendDict) {
+  constructor(backendDict: ITaskEntryBackendDict<TaskType>) {
     this.entityType = backendDict.entity_type;
     this.entityId = backendDict.entity_id;
     this.entityVersion = backendDict.entity_version;
@@ -74,23 +74,7 @@ export class TaskEntry {
     this.taskStatus = backendDict.status;
   }
 
-  cloneWithNewTarget<T extends TaskEntry>(this: T, newTargetId: string): T {
-    return new (<Constructor<T>> this.constructor)({
-      entity_type: this.entityType,
-      entity_id: this.entityId,
-      entity_version: this.entityVersion,
-      task_type: this.taskType,
-      target_type: this.targetType,
-      target_id: newTargetId,
-      resolver_username: this.resolverUsername,
-      resolver_profile_picture_data_url: this.resolverProfilePictureDataUrl,
-      issue_description: this.issueDescription,
-      status: this.taskStatus,
-      resolved_on_msecs: this.resolvedOnMsecs,
-    });
-  }
-
-  public toPayloadDict(): ITaskEntryPayloadDict {
+  public toPayloadDict(): ITaskEntryPayloadDict<TaskType> {
     return {
       entity_version: this.entityVersion,
       task_type: this.taskType,

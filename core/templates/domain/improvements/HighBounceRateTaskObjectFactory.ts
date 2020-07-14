@@ -26,10 +26,8 @@ import { ITaskEntryBackendDict, TaskEntry } from
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
-export class HighBounceRateTask extends TaskEntry {
-  public readonly taskType: 'high_bounce_rate';
-
-  constructor(backendDict: ITaskEntryBackendDict) {
+export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
+  constructor(backendDict: ITaskEntryBackendDict<'high_bounce_rate'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -143,7 +141,8 @@ export class HighBounceRateTaskObjectFactory {
    * not represent a high bounce rate task.
    */
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict): HighBounceRateTask {
+      backendDict: ITaskEntryBackendDict<'high_bounce_rate'>
+  ): HighBounceRateTask {
     return new HighBounceRateTask(backendDict);
   }
 }

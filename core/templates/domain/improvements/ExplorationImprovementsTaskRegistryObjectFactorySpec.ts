@@ -13,13 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ExplorationImprovementsTaskRegistrarService.
+ * @fileoverview Unit tests for the ExplorationImprovementsTaskRegistry.
  */
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationImprovementsTaskRegistrarService } from
-  'domain/improvements/exploration-improvements-task-registrar.service';
+import {
+  ExplorationImprovementsTaskRegistry,
+  ExplorationImprovementsTaskRegistryObjectFactory
+} from 'domain/improvements/ExplorationImprovementsTaskRegistryObjectFactory';
 
 import { AnswerStatsObjectFactory, IAnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
@@ -56,8 +58,8 @@ import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 
 describe('Exploration improvements task registrar service', () => {
-  let taskRegistrarService:
-    ExplorationImprovementsTaskRegistrarService;
+  let explorationImprovementsTaskRegistryObjectFactory:
+    ExplorationImprovementsTaskRegistryObjectFactory;
 
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
@@ -80,8 +82,8 @@ describe('Exploration improvements task registrar service', () => {
   const expVersion = 1;
 
   beforeEach(() => {
-    taskRegistrarService = (
-      TestBed.get(ExplorationImprovementsTaskRegistrarService));
+    explorationImprovementsTaskRegistryObjectFactory = (
+      TestBed.get(ExplorationImprovementsTaskRegistryObjectFactory));
 
     answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
     explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
@@ -272,20 +274,20 @@ describe('Exploration improvements task registrar service', () => {
       playthroughObjectFactory.createFromBackendDict(dict));
   };
 
-  it('should initialize successfully using default test values', () => {
+  it('should createNew successfully using default test values', () => {
     expect(
-      () => taskRegistrarService.initialize(
+      () => explorationImprovementsTaskRegistryObjectFactory.createNew(
         expId, expVersion, makeStates(), makeExpStats(), [],
         new Map(), new Map(), new Map(), new Map(), new Map()))
       .not.toThrowError();
   });
 
-  describe('Validating initialize arguments', () => {
+  describe('Validating createNew arguments', () => {
     it('should throw if stats is for wrong exploration', () => {
       const expId = 'eid';
       expStatsBackendDict.exp_id = 'wrong_exp_id';
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), new Map(), new Map(), new Map()))
         .toThrowError(
@@ -297,7 +299,7 @@ describe('Exploration improvements task registrar service', () => {
       const expVersion = 1;
       expStatsBackendDict.exp_version = 2;
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), new Map(), new Map(), new Map()))
         .toThrowError(
@@ -309,7 +311,7 @@ describe('Exploration improvements task registrar service', () => {
       delete statesBackendDict.End;
       taskBackendDict.target_id = 'End';
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
           new Map(), new Map(), new Map(), new Map(), new Map()))
         .toThrowError(
@@ -323,7 +325,7 @@ describe('Exploration improvements task registrar service', () => {
           ['End', <ExplorationTaskType[]> ['high_bounce_rate']]
         ]));
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
           new Map()))
@@ -335,7 +337,7 @@ describe('Exploration improvements task registrar service', () => {
       delete statesBackendDict.End;
       const answerStats = new Map([['End', [makeAnswerStats()]]]);
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), answerStats, new Map(), new Map(), new Map()))
         .toThrowError(
@@ -348,7 +350,7 @@ describe('Exploration improvements task registrar service', () => {
         ['End', [makeCstPlaythrough()]],
       ]);
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
           new Map()))
@@ -362,7 +364,7 @@ describe('Exploration improvements task registrar service', () => {
         ['End', [makeEqPlaythrough()]],
       ]);
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
           new Map()))
@@ -376,7 +378,7 @@ describe('Exploration improvements task registrar service', () => {
         ['End', [makeMisPlaythrough()]],
       ]);
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), new Map(), new Map(),
           misPlaythroughsByStateName))
@@ -390,7 +392,7 @@ describe('Exploration improvements task registrar service', () => {
       const cstPlaythroughsByStateName = (
         new Map([['Introduction', [makeCstPlaythrough()]]]));
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
           new Map()))
@@ -405,7 +407,7 @@ describe('Exploration improvements task registrar service', () => {
       const eqPlaythroughsByStateName = (
         new Map([['Introduction', [makeEqPlaythrough()]]]));
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
           new Map()))
@@ -420,7 +422,7 @@ describe('Exploration improvements task registrar service', () => {
       const misPlaythroughsByStateName = (
         new Map([['Introduction', [makeMisPlaythrough()]]]));
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           new Map(), new Map(), new Map(), new Map(),
           misPlaythroughsByStateName))
@@ -436,7 +438,7 @@ describe('Exploration improvements task registrar service', () => {
         const cstPlaythroughsByStateName = (
           new Map([['Introduction', [makeCstPlaythrough()]]]));
         expect(
-          () => taskRegistrarService.initialize(
+          () => explorationImprovementsTaskRegistryObjectFactory.createNew(
             expId, expVersion, makeStates(), makeExpStats(), [],
             new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
             new Map()))
@@ -452,7 +454,7 @@ describe('Exploration improvements task registrar service', () => {
         const eqPlaythroughsByStateName = (
           new Map([['Introduction', [makeEqPlaythrough()]]]));
         expect(
-          () => taskRegistrarService.initialize(
+          () => explorationImprovementsTaskRegistryObjectFactory.createNew(
             expId, expVersion, makeStates(), makeExpStats(), [],
             new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
             new Map()))
@@ -468,7 +470,7 @@ describe('Exploration improvements task registrar service', () => {
         const misPlaythroughsByStateName = (
           new Map([['Introduction', [makeMisPlaythrough()]]]));
         expect(
-          () => taskRegistrarService.initialize(
+          () => explorationImprovementsTaskRegistryObjectFactory.createNew(
             expId, expVersion, makeStates(), makeExpStats(), [],
             new Map(), new Map(), new Map(), new Map(),
             misPlaythroughsByStateName))
@@ -481,7 +483,7 @@ describe('Exploration improvements task registrar service', () => {
       const expId = 'eid';
       taskBackendDict.entity_id = 'wrong_exp_id';
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
           new Map(), new Map(), new Map(), new Map(), new Map()))
         .toThrowError(
@@ -493,7 +495,7 @@ describe('Exploration improvements task registrar service', () => {
       const expVersion = 1;
       taskBackendDict.entity_version = 2;
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
           new Map(), new Map(), new Map(), new Map(), new Map()))
         .toThrowError(
@@ -507,7 +509,7 @@ describe('Exploration improvements task registrar service', () => {
       taskBackendDict.task_type = 'high_bounce_rate';
       const tasks = [makeTask(), makeTask()];
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), tasks,
           new Map(), new Map(), new Map(), new Map(), new Map()))
         .toThrowError(
@@ -523,7 +525,7 @@ describe('Exploration improvements task registrar service', () => {
         ['Introduction', <ExplorationTaskType[]> ['high_bounce_rate']]
       ]);
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
           resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
           new Map()))
@@ -539,7 +541,7 @@ describe('Exploration improvements task registrar service', () => {
           <ExplorationTaskType[]> ['high_bounce_rate', 'high_bounce_rate']],
       ]);
       expect(
-        () => taskRegistrarService.initialize(
+        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
           resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
           new Map()))
@@ -561,18 +563,19 @@ describe('Exploration improvements task registrar service', () => {
       const siaTask = makeTask<SuccessiveIncorrectAnswersTask>(
         {...taskBackendDict, ...{task_type: 'successive_incorrect_answers'}});
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(statesBackendDict), makeExpStats(),
-        [hbrTask, iflTask, ngrTask, siaTask],
-        new Map(), new Map(), new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(statesBackendDict), makeExpStats(),
+          [hbrTask, iflTask, ngrTask, siaTask],
+          new Map(), new Map(), new Map(), new Map(), new Map()));
 
-      expect(taskRegistrarService.getHighBounceRateTasks()).toEqual(
+      expect(taskRegistry.getHighBounceRateTasks()).toEqual(
         [hbrTask]);
-      expect(taskRegistrarService.getIneffectiveFeedbackLoopTasks()).toEqual(
+      expect(taskRegistry.getIneffectiveFeedbackLoopTasks()).toEqual(
         [iflTask]);
-      expect(taskRegistrarService.getNeedsGuidingResponsesTasks()).toEqual(
+      expect(taskRegistry.getNeedsGuidingResponsesTasks()).toEqual(
         [ngrTask]);
-      expect(taskRegistrarService.getSuccessiveIncorrectAnswersTasks()).toEqual(
+      expect(taskRegistry.getSuccessiveIncorrectAnswersTasks()).toEqual(
         [siaTask]);
     });
 
@@ -586,18 +589,16 @@ describe('Exploration improvements task registrar service', () => {
           ]],
         ]));
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
-        new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
+          new Map()));
 
-      expect(taskRegistrarService.getHighBounceRateTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getIneffectiveFeedbackLoopTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getNeedsGuidingResponsesTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getSuccessiveIncorrectAnswersTasks().length)
+      expect(taskRegistry.getHighBounceRateTasks().length).toEqual(1);
+      expect(taskRegistry.getIneffectiveFeedbackLoopTasks().length).toEqual(1);
+      expect(taskRegistry.getNeedsGuidingResponsesTasks().length).toEqual(1);
+      expect(taskRegistry.getSuccessiveIncorrectAnswersTasks().length)
         .toEqual(1);
     });
   });
@@ -605,17 +606,15 @@ describe('Exploration improvements task registrar service', () => {
   describe('Generating new tasks', () => {
     it('should generate obsolete tasks when no tasks exist yet', () => {
       statesBackendDict = {Introduction: stateBackendDict};
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), new Map(), new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), new Map(), new Map(), new Map(), new Map()));
 
-      expect(taskRegistrarService.getHighBounceRateTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getIneffectiveFeedbackLoopTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getNeedsGuidingResponsesTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getSuccessiveIncorrectAnswersTasks().length)
+      expect(taskRegistry.getHighBounceRateTasks().length).toEqual(1);
+      expect(taskRegistry.getIneffectiveFeedbackLoopTasks().length).toEqual(1);
+      expect(taskRegistry.getNeedsGuidingResponsesTasks().length).toEqual(1);
+      expect(taskRegistry.getSuccessiveIncorrectAnswersTasks().length)
         .toEqual(1);
     });
 
@@ -633,11 +632,13 @@ describe('Exploration improvements task registrar service', () => {
       const eqPlaythroughsByStateName = (
         new Map([['Introduction', [makeEqPlaythrough()]]]));
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), new Map(), new Map(), eqPlaythroughsByStateName, new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
+          new Map()));
 
-      const [hbrTask] = taskRegistrarService.getHighBounceRateTasks();
+      const [hbrTask] = taskRegistry.getHighBounceRateTasks();
       expect(hbrTask.isOpen()).toBeTrue();
     });
 
@@ -645,11 +646,13 @@ describe('Exploration improvements task registrar service', () => {
       const cstPlaythroughsByStateName = (
         new Map([['Introduction', [makeCstPlaythrough()]]]));
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), new Map(), cstPlaythroughsByStateName, new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
+          new Map()));
 
-      const [iflTask] = taskRegistrarService.getIneffectiveFeedbackLoopTasks();
+      const [iflTask] = taskRegistry.getIneffectiveFeedbackLoopTasks();
       expect(iflTask.isOpen()).toBeTrue();
     });
 
@@ -658,11 +661,12 @@ describe('Exploration improvements task registrar service', () => {
       answerStats.isAddressed = false;
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), stateAnswerStats, new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), stateAnswerStats, new Map(), new Map(), new Map()));
 
-      const [ngrTask] = taskRegistrarService.getNeedsGuidingResponsesTasks();
+      const [ngrTask] = taskRegistry.getNeedsGuidingResponsesTasks();
       expect(ngrTask.isOpen()).toBeTrue();
     });
 
@@ -671,12 +675,14 @@ describe('Exploration improvements task registrar service', () => {
         ['Introduction', [makeMisPlaythrough()]]
       ]);
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), new Map(), new Map(), new Map(), misPlaythroughsByStateName);
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), new Map(), new Map(), new Map(),
+          misPlaythroughsByStateName));
 
       const [siaTask] = (
-        taskRegistrarService.getSuccessiveIncorrectAnswersTasks());
+        taskRegistry.getSuccessiveIncorrectAnswersTasks());
       expect(siaTask.isOpen()).toBeTrue();
     });
   });
@@ -696,11 +702,12 @@ describe('Exploration improvements task registrar service', () => {
         },
       };
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [task],
-        new Map(), new Map(), new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [task],
+          new Map(), new Map(), new Map(), new Map(), new Map()));
 
-      const [hbrTask] = taskRegistrarService.getHighBounceRateTasks();
+      const [hbrTask] = taskRegistry.getHighBounceRateTasks();
       expect(hbrTask.isObsolete()).toBeTrue();
     });
 
@@ -709,16 +716,17 @@ describe('Exploration improvements task registrar service', () => {
       answerStats.isAddressed = false;
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), stateAnswerStats, new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), stateAnswerStats, new Map(), new Map(), new Map()));
 
-      const [ngrTask] = taskRegistrarService.getNeedsGuidingResponsesTasks();
+      const [ngrTask] = taskRegistry.getNeedsGuidingResponsesTasks();
       expect(ngrTask.isOpen()).toBeTrue();
 
       answerStats.isAddressed = true;
 
-      taskRegistrarService.onChangeAnswerGroups('Introduction');
+      taskRegistry.onChangeAnswerGroups('Introduction');
       expect(ngrTask.isOpen()).toBeFalse();
     });
   });
@@ -726,28 +734,23 @@ describe('Exploration improvements task registrar service', () => {
   describe('Handling state changes', () => {
     it('should create new obsolete tasks for newly created state', () => {
       statesBackendDict = {Introduction: stateBackendDict};
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), new Map(), new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), new Map(), new Map(), new Map(), new Map()));
 
-      expect(taskRegistrarService.getHighBounceRateTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getIneffectiveFeedbackLoopTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getNeedsGuidingResponsesTasks().length)
-        .toEqual(1);
-      expect(taskRegistrarService.getSuccessiveIncorrectAnswersTasks().length)
+      expect(taskRegistry.getHighBounceRateTasks().length).toEqual(1);
+      expect(taskRegistry.getIneffectiveFeedbackLoopTasks().length).toEqual(1);
+      expect(taskRegistry.getNeedsGuidingResponsesTasks().length).toEqual(1);
+      expect(taskRegistry.getSuccessiveIncorrectAnswersTasks().length)
         .toEqual(1);
 
-      taskRegistrarService.onStateAdd('Middle');
+      taskRegistry.onStateAdd('Middle');
 
-      expect(taskRegistrarService.getHighBounceRateTasks().length)
-        .toEqual(2);
-      expect(taskRegistrarService.getIneffectiveFeedbackLoopTasks().length)
-        .toEqual(2);
-      expect(taskRegistrarService.getNeedsGuidingResponsesTasks().length)
-        .toEqual(2);
-      expect(taskRegistrarService.getSuccessiveIncorrectAnswersTasks().length)
+      expect(taskRegistry.getHighBounceRateTasks().length).toEqual(2);
+      expect(taskRegistry.getIneffectiveFeedbackLoopTasks().length).toEqual(2);
+      expect(taskRegistry.getNeedsGuidingResponsesTasks().length).toEqual(2);
+      expect(taskRegistry.getSuccessiveIncorrectAnswersTasks().length)
         .toEqual(2);
     });
 
@@ -782,11 +785,12 @@ describe('Exploration improvements task registrar service', () => {
       ];
       statesBackendDict = {Introduction: stateBackendDict};
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(),
-        [hbrTask, iflTask, ngrTask, siaTask],
-        new Map(), stateAnswerStats, new Map(), eqPlaythroughsByStateName,
-        new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(),
+          [hbrTask, iflTask, ngrTask, siaTask],
+          new Map(), stateAnswerStats, new Map(), eqPlaythroughsByStateName,
+          new Map()));
 
       expect(hbrTask.targetId).toEqual('Introduction');
       expect(hbrTask.isOpen()).toBeTrue();
@@ -797,7 +801,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(siaTask.targetId).toEqual('Introduction');
       expect(siaTask.isOpen()).toBeTrue();
 
-      taskRegistrarService.onStateRename('Introduction', 'Prologue');
+      taskRegistry.onStateRename('Introduction', 'Prologue');
 
       let [
         [oldHbrTask, newHbrTask],
@@ -805,10 +809,10 @@ describe('Exploration improvements task registrar service', () => {
         [oldNgrTask, newNgrTask],
         [oldSiaTask, newSiaTask],
       ] = [
-        taskRegistrarService.getHighBounceRateTasks(),
-        taskRegistrarService.getIneffectiveFeedbackLoopTasks(),
-        taskRegistrarService.getNeedsGuidingResponsesTasks(),
-        taskRegistrarService.getSuccessiveIncorrectAnswersTasks(),
+        taskRegistry.getHighBounceRateTasks(),
+        taskRegistry.getIneffectiveFeedbackLoopTasks(),
+        taskRegistry.getNeedsGuidingResponsesTasks(),
+        taskRegistry.getSuccessiveIncorrectAnswersTasks(),
       ];
 
       expect(oldHbrTask.isObsolete()).toBeTrue();
@@ -860,11 +864,12 @@ describe('Exploration improvements task registrar service', () => {
       ];
       statesBackendDict = {Introduction: stateBackendDict};
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(),
-        [hbrTask, iflTask, ngrTask, siaTask],
-        new Map(), stateAnswerStats, new Map(), eqPlaythroughsByStateName,
-        new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(),
+          [hbrTask, iflTask, ngrTask, siaTask],
+          new Map(), stateAnswerStats, new Map(), eqPlaythroughsByStateName,
+          new Map()));
 
       expect(hbrTask.targetId).toEqual('Introduction');
       expect(hbrTask.isOpen()).toBeTrue();
@@ -875,7 +880,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(siaTask.targetId).toEqual('Introduction');
       expect(siaTask.isOpen()).toBeTrue();
 
-      taskRegistrarService.onStateDelete('Introduction');
+      taskRegistry.onStateDelete('Introduction');
 
       expect(hbrTask.isOpen()).toBeFalse();
       expect(iflTask.isOpen()).toBeFalse();
@@ -889,16 +894,17 @@ describe('Exploration improvements task registrar service', () => {
       answerStats.isAddressed = true;
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), stateAnswerStats, new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [],
+          new Map(), stateAnswerStats, new Map(), new Map(), new Map()));
 
-      const [ngrTask] = taskRegistrarService.getNeedsGuidingResponsesTasks();
+      const [ngrTask] = taskRegistry.getNeedsGuidingResponsesTasks();
       expect(ngrTask.isOpen()).toBeFalse();
 
       answerStats.isAddressed = false;
 
-      taskRegistrarService.onChangeAnswerGroups('Introduction');
+      taskRegistry.onChangeAnswerGroups('Introduction');
       expect(ngrTask.isOpen()).toBeTrue();
     });
   });
@@ -919,15 +925,14 @@ describe('Exploration improvements task registrar service', () => {
         const eqPlaythroughsByStateName = (
           new Map([['Introduction', [makeEqPlaythrough()]]]));
 
-        taskRegistrarService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
-          new Map());
+        const taskRegistry = (
+          explorationImprovementsTaskRegistryObjectFactory.createNew(
+            expId, expVersion, makeStates(), makeExpStats(), [],
+            new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
+            new Map()));
 
-        expect(taskRegistrarService.flushInitializationChanges().length)
-          .toEqual(1);
-        expect(taskRegistrarService.flushInitializationChanges().length)
-          .toEqual(0);
+        expect(taskRegistry.flushInitializationChanges().length).toEqual(1);
+        expect(taskRegistry.flushInitializationChanges().length).toEqual(0);
       });
 
     it('should return payload of newly discarded HBR task only on first call',
@@ -945,16 +950,15 @@ describe('Exploration improvements task registrar service', () => {
           },
         };
 
-        taskRegistrarService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [task],
-          new Map(), new Map(), new Map(), new Map(), new Map());
+        const taskRegistry = (
+          explorationImprovementsTaskRegistryObjectFactory.createNew(
+            expId, expVersion, makeStates(), makeExpStats(), [task],
+            new Map(), new Map(), new Map(), new Map(), new Map()));
 
-        const [hbrTask] = taskRegistrarService.getHighBounceRateTasks();
+        const [hbrTask] = taskRegistry.getHighBounceRateTasks();
         expect(hbrTask.isObsolete()).toBeTrue();
-        expect(taskRegistrarService.flushInitializationChanges().length)
-          .toEqual(1);
-        expect(taskRegistrarService.flushInitializationChanges().length)
-          .toEqual(0);
+        expect(taskRegistry.flushInitializationChanges().length).toEqual(1);
+        expect(taskRegistry.flushInitializationChanges().length).toEqual(0);
       });
 
     it('should return empty payload when HBR task does not change', () => {
@@ -971,14 +975,14 @@ describe('Exploration improvements task registrar service', () => {
         },
       };
 
-      taskRegistrarService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [task],
-        new Map(), new Map(), new Map(), new Map(), new Map());
+      const taskRegistry = (
+        explorationImprovementsTaskRegistryObjectFactory.createNew(
+          expId, expVersion, makeStates(), makeExpStats(), [task],
+          new Map(), new Map(), new Map(), new Map(), new Map()));
 
-      const [hbrTask] = taskRegistrarService.getHighBounceRateTasks();
+      const [hbrTask] = taskRegistry.getHighBounceRateTasks();
       expect(hbrTask.isOpen()).toBeTrue();
-      expect(taskRegistrarService.flushInitializationChanges().length)
-        .toEqual(0);
+      expect(taskRegistry.flushInitializationChanges().length).toEqual(0);
     });
   });
 });

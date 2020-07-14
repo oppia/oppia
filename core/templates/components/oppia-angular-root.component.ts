@@ -221,8 +221,8 @@ import { ExplorationOpportunitySummaryObjectFactory } from
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
-import { ExplorationImprovementsTaskRegistrarService } from
-  'domain/improvements/exploration-improvements-task-registrar.service';
+import { ExplorationImprovementsTaskRegistryObjectFactory } from
+  'domain/improvements/ExplorationImprovementsTaskRegistryObjectFactory';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissionsObjectFactory } from
@@ -738,7 +738,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationFeaturesService: ExplorationFeaturesService;
   static explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   static explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService;
-  static explorationImprovementsTaskRegistrarService: ExplorationImprovementsTaskRegistrarService;
+  static explorationImprovementsTaskRegistryObjectFactory: ExplorationImprovementsTaskRegistryObjectFactory;
   static explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   static explorationObjectFactory: ExplorationObjectFactory;
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
@@ -1042,7 +1042,7 @@ private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiServi
 private explorationFeaturesService: ExplorationFeaturesService,
 private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
 private explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService,
-private explorationImprovementsTaskRegistrarService: ExplorationImprovementsTaskRegistrarService,
+private explorationImprovementsTaskRegistryObjectFactory: ExplorationImprovementsTaskRegistryObjectFactory,
 private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
@@ -1347,7 +1347,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationFeaturesService = this.explorationFeaturesService;
     OppiaAngularRootComponent.explorationHtmlFormatterService = this.explorationHtmlFormatterService;
     OppiaAngularRootComponent.explorationImprovementsBackendApiService = this.explorationImprovementsBackendApiService;
-    OppiaAngularRootComponent.explorationImprovementsTaskRegistrarService = this.explorationImprovementsTaskRegistrarService;
+    OppiaAngularRootComponent.explorationImprovementsTaskRegistryObjectFactory = this.explorationImprovementsTaskRegistryObjectFactory;
     OppiaAngularRootComponent.explorationMetadataObjectFactory = this.explorationMetadataObjectFactory;
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;

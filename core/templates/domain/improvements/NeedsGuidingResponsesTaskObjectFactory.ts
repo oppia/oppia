@@ -25,10 +25,9 @@ import { ITaskEntryBackendDict, TaskEntry } from
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
-export class NeedsGuidingResponsesTask extends TaskEntry {
-  public readonly taskType: 'needs_guiding_responses';
-
-  constructor(backendDict: ITaskEntryBackendDict) {
+export class NeedsGuidingResponsesTask extends TaskEntry<
+    'needs_guiding_responses'> {
+  constructor(backendDict: ITaskEntryBackendDict<'needs_guiding_responses'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -104,7 +103,8 @@ export class NeedsGuidingResponsesTaskObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict): NeedsGuidingResponsesTask {
+      backendDict: ITaskEntryBackendDict<'needs_guiding_responses'>
+  ): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask(backendDict);
   }
 }
