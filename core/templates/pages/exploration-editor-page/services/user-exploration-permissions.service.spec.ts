@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the UserExplorationPermissionsService.
  */
 
-import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
