@@ -377,14 +377,13 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT('Linting Python files %s to %s...' % (
                     current_batch_start_index + 1, current_batch_end_index))
 
-            with linter_utils.redirect_stdout(sys.stdout):
-                # This line invokes Pylint and prints its output
-                # to the target stdout.
-                pylint_report = StringMessageStream()
-                pylinter = lint.Run(
-                    current_files_to_lint + [config_pylint],
-                    reporter=text.TextReporter(pylint_report),
-                    exit=False).linter
+            # This line invokes Pylint and redirect its output
+            # to the StringMessageStream.
+            pylint_report = StringMessageStream()
+            pylinter = lint.Run(
+                current_files_to_lint + [config_pylint],
+                reporter=text.TextReporter(pylint_report),
+                exit=False).linter
 
             with linter_utils.redirect_stdout(stdout):
                 # These lines invoke Pycodestyle and print its output
