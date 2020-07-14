@@ -105,6 +105,33 @@ def is_algebraic(expression):
         token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list)
 
 
+def replace_abs_symbol_with_text(expression):
+    """The guppy editor outputs abs as a symbol '|x|' but that is incompatible
+    with nerdamer and the backend validations. Both of them need 'abs(x)',
+    hence the replacement.
+
+    Args:
+        expression: str. A math expression.
+
+    Returns:
+        str. The modified math expression with symbols replaced with text.
+    """
+
+    opening = True
+    modified_expression_list = []
+    for character in expression:
+        if character == '|':
+            if opening:
+                modified_expression_list.append('abs(')
+                opening = False
+            else:
+                modified_expression_list.append(')')
+                opening = True
+        else:
+            modified_expression_list.append(character)
+    return ''.join(modified_expression_list)
+
+
 def tokenize(expression):
     """Splits the given expression into separate tokens based on the grammar
     definitions.
@@ -120,6 +147,7 @@ def tokenize(expression):
         Exception: Invalid token.
     """
     expression = expression.replace(' ', '')
+    expression = replace_abs_symbol_with_text(expression)
 
     # Note: Greek letters and math functions are sorted in reverse by length so
     # that longer ones get matched before shorter ones.

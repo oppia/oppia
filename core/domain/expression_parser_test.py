@@ -82,6 +82,19 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             expression_parser.is_algebraic('alpha + bet/22.3.4')
 
+    def test_replace_abs_symbol_with_text(self):
+        """Tests for replace_abs_symbol_with_text method."""
+        self.assertEqual(expression_parser.replace_abs_symbol_with_text(
+            '|x|'), 'abs(x)')
+        self.assertEqual(expression_parser.replace_abs_symbol_with_text(
+            '40alpha/|beta|'), '40alpha/abs(beta)')
+        self.assertEqual(expression_parser.replace_abs_symbol_with_text(
+            'abs(xyz)'), 'abs(xyz)')
+        self.assertEqual(expression_parser.replace_abs_symbol_with_text(
+            '|sqrt(a+b^2)|'), 'abs(sqrt(a+b^2))')
+        self.assertEqual(expression_parser.replace_abs_symbol_with_text(
+            '||'), 'abs()')
+
     def test_tokenize(self):
         """Tests for tokenize method."""
         expression = 'a+b'
