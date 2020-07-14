@@ -49,9 +49,10 @@ def send_email_to_recipients(
         reply_to: str|None. Reply address formatted like
             “reply+<reply_id>@<incoming_email_domain_name>
             reply_id is the unique id of the sender.
-        recipient_variables: dict|None. If batch sends(sending emails in bulk)
-            requires differentiated email body text, pass in each key value as
-            (recipient, id) to differentiate the recipients.
+        recipient_variables: dict|None. If batch sending requires
+            differentiating each email based on the recipient, we can assign
+            an id to the recipient and pass it as this dict where each key
+            value pair is the recipient and an integer id. 
 
     Returns:
         Response from the server. The object is a file-like object.
@@ -217,7 +218,8 @@ def send_bulk_mail(
             # Show the first 3 emails in the list for up to 1000 emails.
             if len(email_list) > 3:
                 recipient_email_list_str += (
-                    '... Total: ' + str(len(email_list)) + ' emails.')
+                    '... Total: ' +
+                    python_utils.convert_to_bytes(len(email_list)) + ' emails.')
             # pylint: disable=division-operator-used
             msg = (
                 """

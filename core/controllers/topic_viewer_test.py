@@ -136,7 +136,7 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
 
 class TopicPageDataHandlerTests(
-    BaseTopicViewerControllerTests, test_utils.EmailTestBase):
+        BaseTopicViewerControllerTests, test_utils.EmailTestBase):
 
     def test_get_with_no_user_logged_in(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):

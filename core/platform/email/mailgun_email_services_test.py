@@ -237,8 +237,9 @@ class EmailTests(test_utils.GenericTestBase):
     def test_bcc_admin_flag(self):
         """Verifies that the bcc admin flag is working properly in send_mail.
 
-        Note that we replace the mailgun_email_services.send_email_to_recipients()
-        function in send_mail with an alternate lambda that asserts the correct
+        Note that we replace the
+        mailgun_email_services.send_email_to_recipients() function in send_mail
+        with an alternate lambda that asserts the correct
         values were placed in the data dictionary that is then passed to the
         mailgun api.
         """
@@ -334,7 +335,8 @@ class EmailTests(test_utils.GenericTestBase):
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
 
-        # Data that we expect to have been sent in the send_email_to_recipients().
+        # Data that we expect to have been sent in the
+        # send_email_to_recipients().
         expected = ({'from': feconf.SYSTEM_EMAIL_ADDRESS, 'to': recipients,
                      'subject': 'subject', 'text': 'body', 'html': 'html',
                      'recipient-variables': '{}'})
