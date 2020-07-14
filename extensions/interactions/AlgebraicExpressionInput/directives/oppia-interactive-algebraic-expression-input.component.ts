@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'algebraic-expression-input-rules.service.ts');
