@@ -21,17 +21,20 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 
-import { ISkillRightBackend } from 'domain/skill/SkillRightsObjectFactory.ts';
+import { SkillRightsBackendDict, SkillRights, SkillRightsObjectFactory } from
+  'domain/skill/SkillRightsObjectFactory.ts';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 
 describe('Skill rights backend API service', () => {
   let skillRightsBackendApiService:SkillRightsBackendApiService = null;
+  let skillRightsObjectFactory: SkillRightsObjectFactory = null;
   let httpTestingController: HttpTestingController = null;
-  let sampleSkillRights:ISkillRightBackend = {
+  let sampleSkillRights: SkillRightsBackendDict = {
     skill_id: '0',
     can_edit_skill_description: true
   };
+  let skillRightsObject: SkillRights = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -39,6 +42,10 @@ describe('Skill rights backend API service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     skillRightsBackendApiService = TestBed.get(SkillRightsBackendApiService);
+    skillRightsObjectFactory = TestBed.get(SkillRightsObjectFactory);
+
+    skillRightsObject = skillRightsObjectFactory.createFromBackendDict(
+      sampleSkillRights);
   });
   afterEach(() => {
     httpTestingController.verify();
@@ -56,7 +63,7 @@ describe('Skill rights backend API service', () => {
       expect(req.request.method).toEqual('GET');
       req.flush(sampleSkillRights);
       flushMicrotasks();
-      expect(successHandler).toHaveBeenCalledWith(sampleSkillRights);
+      expect(successHandler).toHaveBeenCalledWith(skillRightsObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -100,7 +107,7 @@ describe('Skill rights backend API service', () => {
       // The skill should not currently be cached.
       expect(skillRightsBackendApiService.isCached('0')).toBe(false);
       // Cache a skill.
-      skillRightsBackendApiService.cacheSkillRights('0', sampleSkillRights);
+      skillRightsBackendApiService.cacheSkillRights('0', skillRightsObject);
 
       // It should now be cached.
       expect(skillRightsBackendApiService.isCached('0')).toBe(true);
@@ -111,7 +118,7 @@ describe('Skill rights backend API service', () => {
         successHandler, failHandler);
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleSkillRights);
+      expect(successHandler).toHaveBeenCalledWith(skillRightsObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

@@ -20,31 +20,59 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import {
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryObjectFactory
+} from 'domain/summary/learner-exploration-summary-object.factory';
+import {
+  StoryPlaythroughBackendDict,
+  StoryPlaythrough,
+  StoryPlaythroughObjectFactory
+} from 'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+interface StoryChapterCompletionBackendResponse {
+  'next_node_id': string;
+  'ready_for_review_test': boolean;
+  'summaries': LearnerExplorationSummaryBackendDict[];
+}
+
+interface StoryChapterCompletionResponse {
+  nextNodeId: string;
+  readyForReviewTest: boolean;
+  summaries: LearnerExplorationSummary[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoryViewerBackendApiService {
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
+    private learnerExplorationSummaryObjectFactory:
+    LearnerExplorationSummaryObjectFactory,
+    private http: HttpClient,
+    private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   _fetchStoryData(storyId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: StoryPlaythrough) => void,
+      errorCallback: (reason?: Object) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
 
-    this.http.get(storyDataUrl).toPromise().then((data) => {
+    this.http.get<StoryPlaythroughBackendDict>(
+      storyDataUrl).toPromise().then(data => {
       if (successCallback) {
-        successCallback(data);
+        let storyPlaythrough = this.storyPlaythroughObjectFactory
+          .createFromBackendDict(data);
+        successCallback(storyPlaythrough);
       }
     }, (error) => {
       if (errorCallback) {
@@ -54,28 +82,34 @@ export class StoryViewerBackendApiService {
   }
 
   _recordChapterCompletion(storyId: string, nodeId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: StoryChapterCompletionResponse) => void,
+      errorCallback: (reason?: Object) => void): void {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
         story_id: storyId,
         node_id: nodeId
       });
-    this.http.post(chapterCompletionUrl, {}).toPromise().then((data: any) => {
+    this.http.post<StoryChapterCompletionBackendResponse>(
+      chapterCompletionUrl, {}
+    ).toPromise().then(data => {
       successCallback({
-        summaries: data.summaries,
+        summaries: data.summaries.map(
+          expSummary => this.learnerExplorationSummaryObjectFactory
+            .createFromBackendDict(expSummary)),
         nextNodeId: data.next_node_id,
         readyForReviewTest: data.ready_for_review_test});
     });
   }
 
-  fetchStoryData(storyId: string): Promise<Object> {
+  fetchStoryData(storyId: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
       this._fetchStoryData(storyId, resolve, reject);
     });
   }
 
-  recordChapterCompletion(storyId: string, nodeId: string): Promise<Object> {
+  recordChapterCompletion(
+      storyId: string,
+      nodeId: string): Promise<StoryChapterCompletionResponse> {
     return new Promise((resolve, reject) => {
       this._recordChapterCompletion(storyId, nodeId, resolve, reject);
     });
