@@ -59,15 +59,17 @@ type MisPlaythroughIssue = MultipleIncorrectSubmissionsPlaythroughIssue;
 
 /**
  * Holds shallow references to the state-specific statistics used to support the
- * tasks of a state. These statistics determine whether a task should become
- * open, resolved, or obsolete.
+ * tasks of a state. These statistics help determine whether a task should
+ * become open, resolved, or obsolete.
  *
  * We keep shallow references to the statistics because they are shared across
- * services. Thus, the referenced instances can be expected to silently change.
+ * services. As a consequence, we can receive updates to the stats with minimal
+ * communication between services.
  *
- * NOTE: Although some tasks do require exploration-level statistics, this class
- * does not hold onto them because it would be extremely wasteful (since such
- * stats would be equivalent across every state).
+ * Although some tasks do require exploration-level statistics, this class does
+ * not hold onto them. Doing so would be extremely wasteful, since every state
+ * would be holding a reference to the exact same instance. Instead, we pass
+ * them explicitly as needed.
  */
 class SupportingStateStats {
   public readonly answerStats: readonly AnswerStats[];
@@ -88,12 +90,11 @@ class SupportingStateStats {
 }
 
 /**
- * Manages the tasks of a particular state using references to the statistics
- * which supports them.
+ * Container for the tasks of an exploration's state, coupled with references to
+ * their supporting statistics.
  *
- * The class behaves like a ReadonlyMap<ExplorationTaskType, ExplorationTask>,
- * while also ensuring that the full set of tasks always exist. As such, it
- * provides a map-like interface to help communicate this intent.
+ * The class provides a container-like interface for convenience and because it
+ * fits with the "container" model the class aims to fulfill.
  */
 class StateTasks implements Iterable<ExplorationTask> {
   public readonly hbrTask: HighBounceRateTask;
@@ -147,12 +148,10 @@ class StateTasks implements Iterable<ExplorationTask> {
 }
 
 /**
- * Keeps track of all improvement tasks for an exploration.
+ * Manages all of the improvement tasks for an exploration.
  *
- * To access the tasks, use the get*Tasks() method family.
- *
- * Provides hooks for keeping the tasks fresh in the event of an exploration
- * change, giving the task an opportunity to refresh itself.
+ * Provides hooks for keeping the tasks fresh after events which could otherwise
+ * invalidate them.
  */
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsTaskRegistryService {
@@ -299,7 +298,7 @@ export class ExplorationImprovementsTaskRegistryService {
       resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
       topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
       playthroughIssues: readonly PlaythroughIssue[]): void {
-    // Validate that the exploration stats correspond to the given exploration.
+    // Validate that the exploration stats correspond with provided exploration.
     if (expStats.expId !== expId) {
       throw new Error(
         'Expected stats for exploration "' + expId + '", but got stats for ' +
@@ -311,8 +310,8 @@ export class ExplorationImprovementsTaskRegistryService {
         'stats for exploration version ' + expStats.expVersion);
     }
 
-    // Validate that all state names referenced by the provided statistics can
-    // be found in the source-of-truth (the `states` argument).
+    // Validate that all state names referenced by the provided arguments exist
+    // according to the source-of-truth: the `states` argument.
     const actualStateNames = new Set<string>(states.getStateNames());
     const allStateNameReferences = new Set<string>([
       ...openTasks.map(t => t.targetId),
@@ -328,10 +327,7 @@ export class ExplorationImprovementsTaskRegistryService {
       }
     }
 
-    // Validate that there are no tasks with the same type targeting the same
-    // state.
-    const stateNameReferencesByTaskType = new Map(
-      ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, new Set()]));
+    // Validate that each open task is targeting the provided exploration.
     for (const task of openTasks) {
       if (task.entityId !== expId) {
         throw new Error(
@@ -343,18 +339,25 @@ export class ExplorationImprovementsTaskRegistryService {
           'Expected task for exploration version ' + expVersion + ', but got ' +
           'task for exploration version ' + task.entityVersion);
       }
-      const {taskType, targetId: stateName} = task;
-      const stateNameReferences = stateNameReferencesByTaskType.get(taskType);
+    }
+
+    // Validate that there are no tasks with the same type targeting the same
+    // state.
+    const stateNameReferencesByTaskType = new Map(
+      ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, new Set()]));
+    for (const task of openTasks) {
+      const stateNameReferences = (
+        stateNameReferencesByTaskType.get(task.taskType));
       if (stateNameReferences.has(task.targetId)) {
         throw new Error(
-          'Found duplicate task of type "' + taskType + '" targeting state ' +
-          '"' + stateName + '"');
+          'Found duplicate task of type "' + task.taskType + '" targeting ' +
+          'state "' + task.targetId + '"');
       } else {
         stateNameReferences.add(task.targetId);
       }
     }
-    for (const stateName of resolvedTaskTypesByStateName.keys()) {
-      for (const taskType of resolvedTaskTypesByStateName.get(stateName)) {
+    for (const [stateName, taskTypes] of resolvedTaskTypesByStateName) {
+      for (const taskType of taskTypes) {
         const stateNameReferences = stateNameReferencesByTaskType.get(taskType);
         if (stateNameReferences.has(stateName)) {
           throw new Error(
