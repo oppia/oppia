@@ -193,7 +193,7 @@ describe('Teach Page', function() {
       location: ''
     });
     component.onApplyToTeachWithOppia();
-    // Added more delay than 150 to avoid race condition
+    // Added more delay than 150 to avoid race condition.
     setTimeout(() => {
       expect(windowRef.nativeWindow.location.href).toBe(
         'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
