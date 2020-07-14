@@ -31,7 +31,6 @@ import {
 import {
   IInteractionCustomizationArgsBackendDict, IInteractionCustomizationArgs
 } from 'domain/exploration/InteractionObjectFactory';
-import { IInteractionCustomizationArgsValueBackendDict } from 'interactions/customization-args-defs';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
