@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'early-quit-issue.directive.ts');
+  'early-quit-issue.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'multiple-incorrect-issue.directive.ts');

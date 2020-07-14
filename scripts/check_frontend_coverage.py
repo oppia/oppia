@@ -117,7 +117,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'customize-interaction-modal.controller.ts',
     'drag-and-drop-html-string-editor.directive.ts',
     'drag-and-drop-positive-int-editor.directive.ts',
-    'early-quit-issue.directive.ts',
     'editable-collection-backend-api.service.ts',
     'editable-story-backend-api.service.ts',
     'editor-navbar-breadcrumb.directive.ts',
