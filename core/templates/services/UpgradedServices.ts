@@ -31,7 +31,7 @@ import { AdminBackendApiService } from
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminDevModeActivitiesTabBackendApiService } from
-  'pages/admin-page/services/admin-dev-mode-activities-tab-backend-api-service';
+  'pages/admin-page/services/admin-dev-mode-activities-tab-backend-api.service';
 import { AdminRouterService } from
   'pages/admin-page/services/admin-router.service.ts';
 import { AdminTaskManagerService } from
