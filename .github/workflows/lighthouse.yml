@@ -1,5 +1,5 @@
 name: Lighthouse CI tests
-on: [pull_request, push]
+on: [pull_request]
 
 jobs:
   lighthouse:

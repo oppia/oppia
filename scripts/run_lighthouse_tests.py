@@ -23,8 +23,8 @@ import subprocess
 import sys
 
 import python_utils
-from scripts import common
 from scripts import build
+from scripts import common
 
 FECONF_FILE_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
@@ -91,8 +91,10 @@ def start_google_app_engine_server():
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
-        (common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-         GOOGLE_APP_ENGINE_PORT, app_yaml_filepath),
+        (
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
+        ),
         shell=True)
 
     SUBPROCESSES.append(p)
