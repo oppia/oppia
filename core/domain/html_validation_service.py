@@ -934,7 +934,7 @@ def estimate_size_of_svg_for_math_expressions_in_html(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        tuple. A 3-tuple whose elements are as follows:
         - int. The approximate size of Math SVGs in bytes.
         - str. The largest raw_latex value in the html string by length.
     """
@@ -949,22 +949,26 @@ def estimate_size_of_svg_for_math_expressions_in_html(html_string):
     # for the character 'a' is 1000 bytes, the size of SVG for 'abc' will
     # be lesser than 3000 bytes. So the below approximation to find the
     # size will give us the maximum size.
+    latex_values = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
             json.loads(unescape_html(
                 math_tag['math_content-with-value'])))
         raw_latex = (
             objects.UnicodeString.normalize(math_content_dict['raw_latex']))
+        latex_values.append(raw_latex)
+    unique_latex_values = list(set(latex_values))
+    for latex_value in unique_latex_values:
         # The characters in special Latex keywords like 'frac' and 'sqrt' don't
         # add up to the total size of SVG.
-        raw_latex = (
-            raw_latex.replace('frac', '').replace('sqrt', '').replace(
-                ' ', ''))
-        length_of_expression = len(raw_latex)
+        length_of_expression = (
+            len(
+                latex_value.replace('frac', '').replace('sqrt', '').replace(
+                    ' ', '')))
         size_in_bytes = size_in_bytes + (length_of_expression * 1000)
-        if length_of_expression > len(largest_math_expression):
-            largest_math_expression = raw_latex
-    return (size_in_bytes, largest_math_expression)
+        largest_math_expression = (
+            max(latex_value, largest_math_expression, key=len))
+    return (size_in_bytes, largest_math_expression, unique_latex_values)
 
 
 def add_math_content_to_math_rte_components(html_string):

@@ -239,41 +239,35 @@ class ExplorationContextModel(base_models.BaseModel):
         return False
 
 
-class MathExplorationImagesModel(base_models.BaseModel):
+class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     """Temporary Storage model for storing information useful while generating
     images for math rich-text components in explorations.
 
     The id of each instance is the id of the corresponding exploration.
     """
 
-    # A boolean which indicates if there are images saved in datastore for all
-    # the math rich-text components in an exploration.
-    math_images_exist = ndb.BooleanProperty(indexed=True, default=False)
-    # Approximate size of Math rich-text components SVG images that would be
-    # generated for the exploration according to the length of raw_latex
-    # value.
-    estimated_size_of_images_in_bytes = (
-        ndb.FloatProperty(indexed=True, default=0))
+    # A boolean which indicates whether the exploration requires images to be
+    # generated and saved for the math rich-text components. If this field is
+    # False, we will need to generate math rich-text component images for the
+    # exploration. The field will be true only if for each math rich-text
+    # components there is a valid image stored in the datastore.
+    math_images_generation_required = ndb.BooleanProperty(
+        indexed=True, default=False)
+    # Approximate maximum size of Math rich-text components SVG images that
+    # would be generated for the exploration according to the length of
+    # raw_latex value.
+    estimated_max_size_of_images_in_bytes = ndb.FloatProperty(
+        indexed=True, default=0)
+    # Set of latex values from all the math-rich text components of the
+    # exploration.
+    latex_values = ndb.JsonProperty(default=None)
 
     @staticmethod
     def get_deletion_policy():
-        """MathExplorationImagesModel are temporary model that will be
+        """ExplorationMathRichTextInfoModel are temporary model that will be
         deleted after user migration.
         """
         return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether MathExplorationImagesModel references the given
-        user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @staticmethod
     def get_export_policy():

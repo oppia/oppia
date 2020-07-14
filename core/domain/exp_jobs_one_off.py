@@ -546,28 +546,42 @@ class MathExplorationsImageGenerationAuditJob(
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
+        try:
+            exploration.validate()
+        except Exception as e:
+            logging.error(
+                'Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            return
         size_of_math_svg = 0
         largest_math_expression = ''
+        list_of_latex_values = []
         for state in exploration.states.values():
             html_string = ''.join(state.get_all_html_content_strings())
-            size_of_math_svg_in_state = (
-                (html_validation_service.
-                 estimate_size_of_svg_for_math_expressions_in_html(
-                     html_string))[0])
-            largest_math_expression_in_state = (
-                (html_validation_service.
-                 estimate_size_of_svg_for_math_expressions_in_html(
-                     html_string))[1])
-            if (len(largest_math_expression_in_state) >
-                    len(largest_math_expression)):
-                largest_math_expression = largest_math_expression_in_state
+            (
+                size_of_math_svg_in_state, largest_math_expression_in_state,
+                list_of_latex_values_in_state) = (
+                    html_validation_service.
+                    estimate_size_of_svg_for_math_expressions_in_html(
+                        html_string))
+            list_of_latex_values.extend(list_of_latex_values_in_state)
+            largest_math_expression = (
+                max(
+                    largest_math_expression,
+                    largest_math_expression_in_state, key=len)
+            )
             size_of_math_svg = size_of_math_svg + size_of_math_svg_in_state
-        value_dict = {
-            'exploration_id': item.id,
-            'size_of_math_svgs': size_of_math_svg,
-            'largest_math_expression': largest_math_expression
-        }
-        yield ('Information about math-expressions in explorations', value_dict)
+
+        if size_of_math_svg > 0:
+            value_dict = {
+                'exploration_id': item.id,
+                'size_of_math_svgs': size_of_math_svg,
+                'largest_math_expression': largest_math_expression,
+                'latex_values': list(set(list_of_latex_values))
+            }
+            yield (
+                'Information about math-expressions in explorations',
+                value_dict)
 
     @staticmethod
     def reduce(key, values):
@@ -577,23 +591,24 @@ class MathExplorationsImageGenerationAuditJob(
         estimated_no_of_batches = 1
         size_of_math_svgs_in_a_batch = 0
         for value in final_values:
-            if int(value['size_of_math_svgs']) > 0:
-                exp_models.MathExplorationImagesModel(
-                    id=value['exploration_id'],
-                    estimated_size_of_images_in_bytes=int(
-                        value['size_of_math_svgs'])).put()
-                number_of_explorations_having_math = (
-                    number_of_explorations_having_math + 1)
-                if (len(value['largest_math_expression']) >
-                        len(largest_math_expression)):
-                    largest_math_expression = value['largest_math_expression']
-                size_of_math_svgs_in_a_batch = (
-                    size_of_math_svgs_in_a_batch +
-                    int(value['size_of_math_svgs']))
-                if (size_of_math_svgs_in_a_batch >
-                        feconf.MAX_SIZE_OF_MATH_SVG_BATCH_BYTES):
-                    size_of_math_svgs_in_a_batch = 0
-                    estimated_no_of_batches = estimated_no_of_batches + 1
+            exp_models.ExplorationMathRichTextInfoModel(
+                id=value['exploration_id'],
+                latex_values=value['latex_values'],
+                estimated_max_size_of_images_in_bytes=int(
+                    value['size_of_math_svgs'])).put()
+            number_of_explorations_having_math = (
+                number_of_explorations_having_math + 1)
+            largest_math_expression = (
+                max(
+                    value['largest_math_expression'], largest_math_expression,
+                    key=len))
+            size_of_math_svgs_in_a_batch = (
+                size_of_math_svgs_in_a_batch +
+                int(value['size_of_math_svgs']))
+            if (size_of_math_svgs_in_a_batch >
+                    feconf.MAX_SIZE_OF_MATH_SVG_BATCH_BYTES):
+                size_of_math_svgs_in_a_batch = 0
+                estimated_no_of_batches = estimated_no_of_batches + 1
         final_value_dict = {
             'estimated_no_of_batches': estimated_no_of_batches,
             'largest_math_expression': largest_math_expression,

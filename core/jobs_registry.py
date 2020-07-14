@@ -131,7 +131,7 @@ AUDIT_JOB_MANAGERS = [
         prod_validation_jobs_one_off
         .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
     prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob,
-    prod_validation_jobs_one_off.MathExplorationImagesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationMathRichTextInfoModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationSnapshotContentModelAuditOneOffJob,

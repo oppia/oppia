@@ -2803,6 +2803,13 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
             'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>'
         )
+        valid_html_content3 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+
         content_dict = {
             'content_id': 'content',
             'html': valid_html_content1
@@ -2818,7 +2825,7 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
             }
         }
 
-        answer_group_dict = {
+        drag_and_drop_answer_group_dict = {
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -2861,33 +2868,72 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-
+        item_selection_answer_group = {
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [valid_html_content3]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [valid_html_content1]
+                }
+            }, {
+                'rule_type': 'IsProperSubsetOf',
+                'inputs': {
+                    'x': [valid_html_content3]
+                }
+            }, {
+                'rule_type': 'DoesNotContainAtLeastOneOf',
+                'inputs': {
+                    'x': [valid_html_content1]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': valid_html_content1
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
         exploration1_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration1_state.update_interaction_id('DragAndDropSortInput')
         exploration1_state.update_interaction_customization_args(
             customization_args_dict)
-        exploration1_state.update_interaction_answer_groups([answer_group_dict])
+        exploration1_state.update_interaction_answer_groups(
+            [drag_and_drop_answer_group_dict])
         exploration2_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration2_state.update_interaction_id('ItemSelectionInput')
         exploration2_state.update_interaction_customization_args(
             customization_args_dict)
+        exploration2_state.update_interaction_answer_groups(
+            [item_selection_answer_group])
         exploration3_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration3_state.update_interaction_id('DragAndDropSortInput')
         exploration3_state.update_interaction_customization_args(
             customization_args_dict)
-        exploration3_state.update_interaction_answer_groups([answer_group_dict])
+        exploration3_state.update_interaction_answer_groups(
+            [drag_and_drop_answer_group_dict])
 
         exp_services.save_new_exploration(self.albert_id, exploration1)
         exp_services.save_new_exploration(self.albert_id, exploration2)
         exp_services.save_new_exploration(self.albert_id, exploration3)
 
-        mock_max_size_of_math_svg_batch = 0.5 * 1024 * 1024
+        mock_max_size_of_math_svg_batch = 0.06 * 1024 * 1024
         self.assertEqual(
-            exp_models.MathExplorationImagesModel.get_math_exploration_count(),
-            0)
+            exp_models.ExplorationMathRichTextInfoModel.
+            get_math_exploration_count(), 0)
         with self.swap(
             feconf, 'MAX_SIZE_OF_MATH_SVG_BATCH_BYTES',
             mock_max_size_of_math_svg_batch):
@@ -2905,26 +2951,79 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
         actual_output_list = ast.literal_eval(actual_output[0])
         self.assertEqual(
             actual_output_list[1]['largest_math_expression'],
-            '(x-a_1)(x-a_2)(x-a_3)...(x-a_n-1)(x-a_n)')
+            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)')
         self.assertEqual(
             actual_output_list[1]['number_of_explorations_having_math'], 3)
         self.assertEqual(
             actual_output_list[1]['estimated_no_of_batches'], 2)
+        # Checks below assert that the temporary models are created with
+        # values.
         exp1_math_image_model = (
-            exp_models.MathExplorationImagesModel.get_by_id('exp_id1'))
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
         exp2_math_image_model = (
-            exp_models.MathExplorationImagesModel.get_by_id('exp_id2'))
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id2'))
         exp3_math_image_model = (
-            exp_models.MathExplorationImagesModel.get_by_id('exp_id3'))
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id3'))
         self.assertEqual(
-            exp1_math_image_model.estimated_size_of_images_in_bytes, 261000.0)
+            exp1_math_image_model.estimated_max_size_of_images_in_bytes,
+            47000.0)
+        expected_latex_values_1 = [
+            '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+        expected_latex_values_2 = [
+            '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)',
+            '\\frac{x}{y}']
         self.assertEqual(
-            exp2_math_image_model.estimated_size_of_images_in_bytes, 87000.0)
+            sorted(exp1_math_image_model.latex_values),
+            sorted(expected_latex_values_1))
         self.assertEqual(
-            exp3_math_image_model.estimated_size_of_images_in_bytes, 261000.0)
+            exp2_math_image_model.estimated_max_size_of_images_in_bytes,
+            54000.0)
         self.assertEqual(
-            exp_models.MathExplorationImagesModel.get_math_exploration_count(),
-            3)
+            sorted(exp2_math_image_model.latex_values),
+            sorted(expected_latex_values_2))
+        self.assertEqual(
+            exp3_math_image_model.estimated_max_size_of_images_in_bytes,
+            47000.0)
+        self.assertEqual(
+            sorted(exp3_math_image_model.latex_values),
+            sorted(expected_latex_values_1))
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.
+            get_math_exploration_count(), 3)
+
+    def test_one_off_job_fails_with_invalid_exploration(self):
+        """Test the audit job fails when there is an invalid exploration."""
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.language_code = 'invalid_language_code'
+        exploration_model.commit(
+            self.albert_id, 'Changed language_code.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = (
+            exp_jobs_one_off
+            .MathExplorationsImageGenerationAuditJob.create_new())
+        exp_jobs_one_off.MathExplorationsImageGenerationAuditJob.enqueue(
+            job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Exploration %s failed non-strict validation: '
+             'Invalid language_code: invalid_language_code'
+             % (self.VALID_EXP_ID)])
+
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""

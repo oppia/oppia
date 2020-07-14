@@ -1691,10 +1691,17 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
             ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
 
-        self.assertEqual(
+        expected_list_of_latex = [
+            '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
+        expected_size = 45000
+        expected_largest_expression = '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
+        size, largest_expression, list_of_latex = (
             html_validation_service.
-            estimate_size_of_svg_for_math_expressions_in_html(html_string1),
-            (45000, '(x-a_1)(x-a_2)(x-a_3)...(x-a_n)'))
+            estimate_size_of_svg_for_math_expressions_in_html(html_string1))
+        self.assertEqual(expected_size, size)
+        self.assertEqual(largest_expression, expected_largest_expression)
+        self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
+
         html_string2 = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}'
@@ -1709,10 +1716,18 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'p;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></opp'
             'ia-noninteractive-math>')
 
-        self.assertEqual(
+        expected_list_of_latex = [
+            '\\sqrt{x}', '\\frac{x}{y}', '+,+,+,+(x^2)']
+        expected_size = 23000
+        expected_largest_expression = '+,+,+,+(x^2)'
+        size, largest_expression, list_of_latex = (
             html_validation_service.
-            estimate_size_of_svg_for_math_expressions_in_html(html_string2),
-            (23000, '+,+,+,+(x^2)'))
+            estimate_size_of_svg_for_math_expressions_in_html(html_string2))
+        self.assertEqual(expected_size, size)
+        self.assertEqual(largest_expression, expected_largest_expression)
+        self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
+
+
 
         html_string_with_no_math = (
             '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
@@ -1722,7 +1737,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.
             estimate_size_of_svg_for_math_expressions_in_html(
-                html_string_with_no_math), (0, ''))
+                html_string_with_no_math), (0, '', []))
 
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for
