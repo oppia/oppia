@@ -62,12 +62,12 @@ export class Solution {
   constructor(
       ehfs: ExplorationHtmlFormatterService,
       shof: SubtitledHtmlObjectFactory,
-      answerisexclusive: boolean, correctanswer: IInteractionAnswer,
+      answerIsExclusive: boolean, correctAnswer: IInteractionAnswer,
       explanation: SubtitledHtml) {
     this.ehfs = ehfs;
     this.shof = shof;
-    this.answerIsExclusive = answerisexclusive;
-    this.correctAnswer = correctanswer;
+    this.answerIsExclusive = answerIsExclusive;
+    this.correctAnswer = correctAnswer;
     this.explanation = explanation;
   }
 
