@@ -19,6 +19,7 @@
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { TeachPageComponent } from './teach-page.component';
 import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
