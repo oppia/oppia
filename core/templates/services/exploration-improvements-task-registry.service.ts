@@ -76,10 +76,10 @@ class SupportingStateStats {
   public readonly misPlaythroughIssues: readonly MisPlaythroughIssue[];
 
   constructor(
-      answerStats: AnswerStats[] = [],
-      cstPlaythroughIssues: CstPlaythroughIssue[] = [],
-      eqPlaythroughIssues: EqPlaythroughIssue[] = [],
-      misPlaythroughIssues: MisPlaythroughIssue[] = []) {
+      answerStats: readonly AnswerStats[] = [],
+      cstPlaythroughIssues: readonly CstPlaythroughIssue[] = [],
+      eqPlaythroughIssues: readonly EqPlaythroughIssue[] = [],
+      misPlaythroughIssues: readonly MisPlaythroughIssue[] = []) {
     this.answerStats = [...answerStats];
     this.cstPlaythroughIssues = [...cstPlaythroughIssues];
     this.eqPlaythroughIssues = [...eqPlaythroughIssues];
@@ -96,12 +96,12 @@ class SupportingStateStats {
  * provides a map-like interface to help communicate this intent.
  */
 class StateTasks implements Iterable<ExplorationTask> {
-  public readonly supportingStateStats: SupportingStateStats;
-
   public readonly hbrTask: HighBounceRateTask;
   public readonly iflTask: IneffectiveFeedbackLoopTask;
   public readonly ngrTask: NeedsGuidingResponsesTask;
   public readonly siaTask: SuccessiveIncorrectAnswersTask;
+
+  public readonly supportingStateStats: SupportingStateStats;
 
   constructor(
       tasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask>,
@@ -114,6 +114,7 @@ class StateTasks implements Iterable<ExplorationTask> {
       ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
     this.siaTask = <SiaTask> tasksByType.get(
       ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+
     this.supportingStateStats = supportingStateStats;
   }
 
@@ -148,7 +149,7 @@ class StateTasks implements Iterable<ExplorationTask> {
 /**
  * Keeps track of all improvement tasks for an exploration.
  *
- * To access the tasks, use the get*Tasks() family of methods.
+ * To access the tasks, use the get*Tasks() method family.
  *
  * Provides hooks for keeping the tasks fresh in the event of an exploration
  * change, giving the task an opportunity to refresh itself.
@@ -169,10 +170,10 @@ export class ExplorationImprovementsTaskRegistryService {
       expVersion: number,
       states: States,
       expStats: ExplorationStats,
-      openTasks: ExplorationTask[],
-      resolvedTaskTypesByStateName: Map<string, ExplorationTaskType[]>,
-      topAnswersByStateName: Map<string, AnswerStats[]>,
-      playthroughIssues: PlaythroughIssue[]): void {
+      openTasks: readonly ExplorationTask[],
+      resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
+      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      playthroughIssues: readonly PlaythroughIssue[]): void {
     this.validateInitializationArgs(
       expId, expVersion, states, expStats, openTasks,
       resolvedTaskTypesByStateName, topAnswersByStateName,
@@ -209,46 +210,6 @@ export class ExplorationImprovementsTaskRegistryService {
         misPlaythroughIssues || []);
       newStateTasks.refresh(this.expStats);
     }
-  }
-
-  private registerNewStateTasks(
-      stateName: string,
-      openTasks: ExplorationTask[],
-      resolvedTaskTypes: ExplorationTaskType[],
-      answerStats: AnswerStats[],
-      cstPlaythroughIssues: CstPlaythroughIssue[],
-      eqPlaythroughIssues: EqPlaythroughIssue[],
-      misPlaythroughIssues: MisPlaythroughIssue[]): StateTasks {
-    // NOTE TO DEVELOPERS: This type is required to help the compiler realize
-    // that the arguments to the new Map are all of the same type.
-    type MapPair = [ExplorationTaskType, ExplorationTask];
-    const tasksByType = new Map([
-      // NOTE TO DEVELOPERS: The last repeated key wins. For example:
-      //    let map = new Map([['a', 1], ['b', 3], ['a', 9]]);
-      //    map.get('a'); // Returns 9.
-      ...ImprovementsConstants.TASK_TYPES.map(taskType => <MapPair> [
-        taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
-          this.expId, this.expVersion, taskType, stateName)
-      ]),
-      ...openTasks.map(task => <MapPair> [
-        task.taskType, task
-      ]),
-      ...resolvedTaskTypes.map(taskType => <MapPair> [
-        taskType, this.explorationTaskObjectFactory.createNewResolvedTask(
-          this.expId, this.expVersion, taskType, stateName)
-      ]),
-    ]);
-    const supportingStateStats = new SupportingStateStats(
-      answerStats, cstPlaythroughIssues, eqPlaythroughIssues,
-      misPlaythroughIssues);
-    const newStateTasks = new StateTasks(tasksByType, supportingStateStats);
-
-    for (const task of newStateTasks) {
-      this.tasksByType.get(task.taskType).push(task);
-    }
-
-    this.tasksByState.set(stateName, newStateTasks);
-    return newStateTasks;
   }
 
   onStateAdd(newStateName: string): void {
@@ -334,12 +295,11 @@ export class ExplorationImprovementsTaskRegistryService {
       expVersion: number,
       states: States,
       expStats: ExplorationStats,
-      openTasks: ExplorationTask[],
-      resolvedTaskTypesByStateName: Map<string, ExplorationTaskType[]>,
-      topAnswersByStateName: Map<string, AnswerStats[]>,
-      playthroughIssues: PlaythroughIssue[]): void {
-    // Validate that the exploration stats correspond to the provided
-    // exploration.
+      openTasks: readonly ExplorationTask[],
+      resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
+      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      playthroughIssues: readonly PlaythroughIssue[]): void {
+    // Validate that the exploration stats correspond to the given exploration.
     if (expStats.expId !== expId) {
       throw new Error(
         'Expected stats for exploration "' + expId + '", but got stats for ' +
@@ -351,9 +311,8 @@ export class ExplorationImprovementsTaskRegistryService {
         'stats for exploration version ' + expStats.expVersion);
     }
 
-    // Validate that all state names referenced by the provided statistics refer
-    // to one of the states in the given states, which acts as the
-    // "source-of-truth".
+    // Validate that all state names referenced by the provided statistics can
+    // be found in the source-of-truth (the `states` argument).
     const actualStateNames = new Set<string>(states.getStateNames());
     const allStateNameReferences = new Set<string>([
       ...openTasks.map(t => t.targetId),
@@ -369,7 +328,8 @@ export class ExplorationImprovementsTaskRegistryService {
       }
     }
 
-    // Validate that at most one task type is targeting a state.
+    // Validate that there are no tasks with the same type targeting the same
+    // state.
     const stateNameReferencesByTaskType = new Map(
       ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, new Set()]));
     for (const task of openTasks) {
@@ -405,6 +365,46 @@ export class ExplorationImprovementsTaskRegistryService {
         }
       }
     }
+  }
+
+  private registerNewStateTasks(
+      stateName: string,
+      openTasks: readonly ExplorationTask[],
+      resolvedTaskTypes: readonly ExplorationTaskType[],
+      answerStats: readonly AnswerStats[],
+      cstPlaythroughIssues: readonly CstPlaythroughIssue[],
+      eqPlaythroughIssues: readonly EqPlaythroughIssue[],
+      misPlaythroughIssues: readonly MisPlaythroughIssue[]): StateTasks {
+    // NOTE TO DEVELOPERS: This type is required to help the compiler realize
+    // that the arguments to the new Map are all of the same type.
+    type MapPair = [ExplorationTaskType, ExplorationTask];
+    const tasksByType = new Map([
+      // NOTE TO DEVELOPERS: The last repeated key wins. For example:
+      //    let map = new Map([['a', 1], ['b', 3], ['a', 9]]);
+      //    map.get('a'); // Returns 9.
+      ...ImprovementsConstants.TASK_TYPES.map(taskType => <MapPair> [
+        taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
+          this.expId, this.expVersion, taskType, stateName)
+      ]),
+      ...openTasks.map(task => <MapPair> [
+        task.taskType, task
+      ]),
+      ...resolvedTaskTypes.map(taskType => <MapPair> [
+        taskType, this.explorationTaskObjectFactory.createNewResolvedTask(
+          this.expId, this.expVersion, taskType, stateName)
+      ]),
+    ]);
+    const supportingStateStats = new SupportingStateStats(
+      answerStats, cstPlaythroughIssues, eqPlaythroughIssues,
+      misPlaythroughIssues);
+    const newStateTasks = new StateTasks(tasksByType, supportingStateStats);
+
+    for (const task of newStateTasks) {
+      this.tasksByType.get(task.taskType).push(task);
+    }
+
+    this.tasksByState.set(stateName, newStateTasks);
+    return newStateTasks;
   }
 }
 
