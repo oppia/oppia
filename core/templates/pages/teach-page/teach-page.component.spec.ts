@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, flushMicrotasks, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from
+  '@angular/core/testing';
 import { TeachPageComponent } from './teach-page.component';
 import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
 
