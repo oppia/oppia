@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -200,16 +202,17 @@ def _hard_delete_explorations_and_collections(pending_deletion):
 
 
 def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
-    """Generate mapping from activity IDs to user IDs.
+    """Generate mapping from activity IDs to pseudonymous user IDs.
 
     Args:
         activity_ids: list(str). List of activity IDs for which to generate
-            new user IDs.
+            new pseudonymous user IDs. The IDs are of activities that were
+            somehow modified by the user that is currently being deleted.
 
     Returns:
-        dict(str, str). Mapping between the activity IDs and pseudonymized
-        user IDs. For each activity (with distinct ID) we generate new
-        pseudonymized user ID.
+        dict(str, str). Mapping between the activity IDs and pseudonymous
+        user IDs. For each activity (with distinct ID) we generate a new
+        pseudonymous user ID.
     """
     return {
         activity_id: user_models.PseudonymizedUserModel.get_new_id()
@@ -230,11 +233,17 @@ def _delete_story_models(pending_deletion_request):
     ).fetch()
     story_ids = set([
         model.get_unversioned_instance_id() for model in metadata_models])
+
     commit_log_models = story_models.StoryCommitLogEntryModel.query(
         story_models.StoryCommitLogEntryModel.user_id == user_id
     ).fetch()
-    story_ids = story_ids | set(model.story_id for model in commit_log_models)
+    commit_log_ids = set(model.story_id for model in commit_log_models)
+    if story_ids != commit_log_ids:
+        logging.warning(
+            'The commit log and snapshot story IDs differ: %s',
+            list(story_ids ^ commit_log_ids))
 
+    story_ids |= commit_log_ids
     if not pending_deletion_request.story_mappings:
         pending_deletion_request.story_mappings = (
             _generate_activity_to_pseudonymized_ids_mapping(story_ids))

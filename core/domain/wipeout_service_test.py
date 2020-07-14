@@ -17,6 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
+from constants import constants
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
@@ -504,6 +507,53 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model.story_mappings[self.STORY_1_ID])
+
+    def test_delete_story_simple_invalid_data(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.warning()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+
+        story_models.StoryCommitLogEntryModel(
+            id='story-%s-1' % self.STORY_2_ID,
+            story_id=self.STORY_2_ID,
+            user_id=self.user_1_id,
+            commit_type='create_new',
+            commit_cmds=[{}],
+            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            version=1
+        ).put()
+
+        with logging_swap:
+            wipeout_service.delete_user(
+                wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertEqual(
+            observed_log_messages,
+            ['The commit log and snapshot story IDs differ: '
+             '[u\'%s\']' % self.STORY_2_ID])
+
+        # Verify user is deleted.
+        pending_deletion_model = (
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+        metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
+            '%s-1' % self.STORY_1_ID)
+        self.assertEqual(
+            metadata_model.committer_id,
+            pending_deletion_model.story_mappings[self.STORY_1_ID])
+        commit_log_model_1 = story_models.StoryCommitLogEntryModel.get_by_id(
+            'story-%s-1' % self.STORY_1_ID)
+        self.assertEqual(
+            commit_log_model_1.user_id,
+            pending_deletion_model.story_mappings[self.STORY_1_ID])
+        commit_log_model_2 = story_models.StoryCommitLogEntryModel.get_by_id(
+            'story-%s-1' % self.STORY_2_ID)
+        self.assertEqual(
+            commit_log_model_2.user_id,
+            pending_deletion_model.story_mappings[self.STORY_2_ID])
 
     def test_delete_story_repeated(self):
         wipeout_service.delete_user(

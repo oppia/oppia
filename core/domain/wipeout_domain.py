@@ -32,12 +32,15 @@ class PendingDeletionRequest(python_utils.OBJECT):
         """Constructs a PendingDeletionRequest domain object.
 
         Args:
-            user_id: str.
-            email: str.
-            deletion_complete: bool.
-            exploration_ids: list(str).
-            collection_ids: list(str).
-            story_mappings: dict(str, str).
+            user_id: str. The ID of the user who is being deleted.
+            email: str. The email of the user who is being deleted.
+            deletion_complete: bool. Whether the deletion is completed.
+            exploration_ids: list(str). Private explorations that are marked as
+                deleted and need to be hard deleted.
+            collection_ids: list(str). Private collections that are marked as
+                deleted and need to be hard deleted.
+            story_mappings: dict(str, str). Mapping between the story IDs and
+                pseudonymized user IDs.
         """
         self.user_id = user_id
         self.email = email

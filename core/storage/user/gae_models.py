@@ -2141,8 +2141,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # Dict of story IDs as keys and pseudonymous user IDs as values. For
-    # different story we used different pseudonymous user ID.
+    # A dict mapping story IDs to pseudonymous user IDs. For each story, we
+    # use a different pseudonymous user ID. Note that all these pseudonymous
+    # user IDs originate from the same about-to-be-deleted user.
     story_mappings = ndb.JsonProperty(default={})
 
     @staticmethod

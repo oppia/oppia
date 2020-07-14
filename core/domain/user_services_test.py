@@ -1239,6 +1239,25 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_user_id(self):
+        self.user_settings.user_id = 'uid_' + 'a' * 31 + 'A'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'uid_' + 'a' * 31
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
     def test_validate_non_str_gae_id(self):
         self.user_settings.gae_id = 0
         with self.assertRaisesRegexp(

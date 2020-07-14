@@ -176,6 +176,8 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
