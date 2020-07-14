@@ -240,26 +240,4 @@ describe('Playthrough Object Factory', () => {
       'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
   });
-
-  it('should return the state in which the issue appears', () => {
-    let eqPlaythrough = pof.createNewEarlyQuitPlaythrough(
-      'expId1', 1, {
-        state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000},
-      }, []);
-    expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
-
-    let cstPlaythrough = pof.createNewCyclicStateTransitionsPlaythrough(
-      'expId1', 1, {
-        state_names: {value: ['state3', 'state1']},
-      }, []);
-    expect(cstPlaythrough.getStateNameWithIssue()).toEqual('state1');
-
-    let misPlaythrough = pof.createNewMultipleIncorrectSubmissionsPlaythrough(
-      'expId1', 1, {
-        state_name: {value: 'state'},
-        num_times_answered_incorrectly: {value: 5},
-      }, []);
-    expect(misPlaythrough.getStateNameWithIssue()).toEqual('state');
-  });
 });

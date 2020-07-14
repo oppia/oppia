@@ -18,13 +18,19 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import {
-  ExplorationImprovementsTaskRegistry,
-  ExplorationImprovementsTaskRegistryObjectFactory
-} from 'domain/improvements/ExplorationImprovementsTaskRegistryObjectFactory';
-
 import { AnswerStatsObjectFactory, IAnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
+import {
+  CyclicStateTransitionsPlaythroughIssue,
+  EarlyQuitPlaythroughIssue,
+  ICyclicStateTransitionsPlaythroughIssueBackendDict,
+  IEarlyQuitPlaythroughIssueBackendDict,
+  IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
+  MultipleIncorrectSubmissionsPlaythroughIssue,
+  PlaythroughIssueObjectFactory,
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
+import { ExplorationImprovementsTaskRegistryObjectFactory } from
+  'domain/improvements/ExplorationImprovementsTaskRegistryObjectFactory';
 import { ExplorationStatsObjectFactory, IExplorationStatsBackendDict } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import {
@@ -33,15 +39,6 @@ import {
   ExplorationTask,
   IExplorationTaskBackendDict,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
-import {
-  CyclicStateTransitionsPlaythrough,
-  EarlyQuitPlaythrough,
-  ICyclicStateTransitionsPlaythroughBackendDict,
-  IEarlyQuitPlaythroughBackendDict,
-  IMultipleIncorrectSubmissionsPlaythroughBackendDict,
-  MultipleIncorrectSubmissionsPlaythrough,
-  PlaythroughObjectFactory,
-} from 'domain/statistics/PlaythroughObjectFactory';
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { IStateBackendDict } from
@@ -64,15 +61,17 @@ describe('Exploration improvements task registrar service', () => {
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
-  let playthroughObjectFactory: PlaythroughObjectFactory;
+  let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
 
   let answerStatsBackendDict: IAnswerStatsBackendDict;
-  let cstPlaythroughBackendDict: ICyclicStateTransitionsPlaythroughBackendDict;
-  let eqPlaythroughBackendDict: IEarlyQuitPlaythroughBackendDict;
+  let cstPlaythroughIssueBackendDict:
+    ICyclicStateTransitionsPlaythroughIssueBackendDict;
+  let eqPlaythroughIssueBackendDict:
+    IEarlyQuitPlaythroughIssueBackendDict;
   let expStatsBackendDict: IExplorationStatsBackendDict;
-  let misPlaythroughBackendDict:
-    IMultipleIncorrectSubmissionsPlaythroughBackendDict;
+  let misPlaythroughIssueBackendDict:
+    IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict;
   let stateBackendDict: IStateBackendDict;
   let stateStatsBackendDict: IStateStatsBackendDict;
   let statesBackendDict: {[stateName: string]: IStateBackendDict};
@@ -88,7 +87,7 @@ describe('Exploration improvements task registrar service', () => {
     answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
     explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
     explorationTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
-    playthroughObjectFactory = TestBed.get(PlaythroughObjectFactory);
+    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
 
     stateBackendDict = {
@@ -166,21 +165,19 @@ describe('Exploration improvements task registrar service', () => {
       frequency: 5,
     };
 
-    cstPlaythroughBackendDict = {
-      exp_id: expId,
-      exp_version: expVersion,
+    cstPlaythroughIssueBackendDict = {
       issue_type: 'CyclicStateTransitions',
       issue_customization_args: {
         state_names: {
           value: ['Middle', 'Introduction']
         }
       },
-      actions: []
+      playthrough_ids: ['pid'],
+      schema_version: 1,
+      is_valid: true,
     };
 
-    eqPlaythroughBackendDict = {
-      exp_id: expId,
-      exp_version: expVersion,
+    eqPlaythroughIssueBackendDict = {
       issue_type: 'EarlyQuit',
       issue_customization_args: {
         state_name: {
@@ -190,41 +187,20 @@ describe('Exploration improvements task registrar service', () => {
           value: 1200
         }
       },
-      actions: [{
-        action_type: 'AnswerSubmit',
-        action_customization_args: {
-          state_name: {
-            value: 'Inroduction'
-          },
-          dest_state_name: {
-            value: 'Middle'
-          },
-          interaction_id: {
-            value: 'TextInput'
-          },
-          submitted_answer: {
-            value: 'answer'
-          },
-          feedback: {
-            value: 'feedback'
-          },
-          time_spent_state_in_msecs: {
-            value: 2000
-          }
-        },
-        schema_version: 1
-      }]
+      playthrough_ids: ['pid'],
+      schema_version: 1,
+      is_valid: true,
     };
 
-    misPlaythroughBackendDict = {
-      exp_id: expId,
-      exp_version: expVersion,
+    misPlaythroughIssueBackendDict = {
       issue_type: 'MultipleIncorrectSubmissions',
       issue_customization_args: {
         state_name: { value: 'Introduction' },
         num_times_answered_incorrectly: { value: 3 },
       },
-      actions: []
+      playthrough_ids: ['pid'],
+      schema_version: 1,
+      is_valid: true,
     };
 
     taskBackendDict = {
@@ -261,24 +237,24 @@ describe('Exploration improvements task registrar service', () => {
   const makeAnswerStats = (dict = answerStatsBackendDict) => {
     return answerStatsObjectFactory.createFromBackendDict(dict);
   };
-  const makeCstPlaythrough = (dict = cstPlaythroughBackendDict) => {
-    return <CyclicStateTransitionsPlaythrough> (
-      playthroughObjectFactory.createFromBackendDict(dict));
+  const makeCstPlaythroughIssue = (dict = cstPlaythroughIssueBackendDict) => {
+    return <CyclicStateTransitionsPlaythroughIssue> (
+      playthroughIssueObjectFactory.createFromBackendDict(dict));
   };
-  const makeEqPlaythrough = (dict = eqPlaythroughBackendDict) => {
-    return <EarlyQuitPlaythrough> (
-      playthroughObjectFactory.createFromBackendDict(dict));
+  const makeEqPlaythroughIssue = (dict = eqPlaythroughIssueBackendDict) => {
+    return <EarlyQuitPlaythroughIssue> (
+      playthroughIssueObjectFactory.createFromBackendDict(dict));
   };
-  const makeMisPlaythrough = (dict = misPlaythroughBackendDict) => {
-    return <MultipleIncorrectSubmissionsPlaythrough> (
-      playthroughObjectFactory.createFromBackendDict(dict));
+  const makeMisPlaythroughIssue = (dict = misPlaythroughIssueBackendDict) => {
+    return <MultipleIncorrectSubmissionsPlaythroughIssue> (
+      playthroughIssueObjectFactory.createFromBackendDict(dict));
   };
 
   it('should createNew successfully using default test values', () => {
     expect(
       () => explorationImprovementsTaskRegistryObjectFactory.createNew(
         expId, expVersion, makeStates(), makeExpStats(), [],
-        new Map(), new Map(), new Map(), new Map(), new Map()))
+        new Map(), new Map(), []))
       .not.toThrowError();
   });
 
@@ -289,7 +265,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), new Map(), new Map()))
+          new Map(), new Map(), []))
         .toThrowError(
           'Expected stats for exploration "eid", but got stats for ' +
           'exploration "wrong_exp_id"');
@@ -301,7 +277,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), new Map(), new Map()))
+          new Map(), new Map(), []))
         .toThrowError(
           'Expected stats for exploration version 1, but got stats for ' +
           'exploration version 2');
@@ -313,22 +289,20 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
-          new Map(), new Map(), new Map(), new Map(), new Map()))
+          new Map(), new Map(), []))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
     });
 
     it('should throw if a resolved task type targets an unknown state', () => {
       delete statesBackendDict.End;
-      const resolvedTaskTypesByStateName = (
-        new Map<string, ExplorationTaskType[]>([
-          ['End', <ExplorationTaskType[]> ['high_bounce_rate']]
-        ]));
+      const resolvedTaskTypesByStateName = new Map([
+        ['End', <ExplorationTaskType[]> ['high_bounce_rate']]
+      ]);
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
-          new Map()))
+          resolvedTaskTypesByStateName, new Map(), []))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
     });
@@ -339,145 +313,46 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), answerStats, new Map(), new Map(), new Map()))
+          new Map(), answerStats, []))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
     });
 
-    it('should throw if CST playthrough maps to an unknown state', () => {
+    it('should throw if CST playthrough issue maps to an unknown state', () => {
       delete statesBackendDict.End;
-      const cstPlaythroughsByStateName = new Map([
-        ['End', [makeCstPlaythrough()]],
-      ]);
+      cstPlaythroughIssueBackendDict.issue_customization_args
+        .state_names.value = ['Introduction', 'End'];
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
-          new Map()))
+          new Map(), new Map(), [makeCstPlaythroughIssue()]))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
     });
 
-    it('should throw if EQ playthrough maps to an unknown state', () => {
+    it('should throw if EQ playthrough issue maps to an unknown state', () => {
       delete statesBackendDict.End;
-      const eqPlaythroughsByStateName = new Map([
-        ['End', [makeEqPlaythrough()]],
-      ]);
+      eqPlaythroughIssueBackendDict.issue_customization_args
+        .state_name.value = 'End';
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
-          new Map()))
+          new Map(), new Map(), [makeEqPlaythroughIssue()]))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
     });
 
-    it('should throw if MIS playthrough maps to an unknown state', () => {
+    it('should throw if MIS playthrough issue maps to an unknown state', () => {
       delete statesBackendDict.End;
-      const misPlaythroughsByStateName = new Map([
-        ['End', [makeMisPlaythrough()]],
-      ]);
+      misPlaythroughIssueBackendDict.issue_customization_args
+        .state_name.value = 'End';
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), new Map(),
-          misPlaythroughsByStateName))
+          new Map(), new Map(), [makeMisPlaythroughIssue()]))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
     });
-
-    it('should throw if CST playthrough targets wrong exploration', () => {
-      const expId = 'eid';
-      cstPlaythroughBackendDict.exp_id = 'wrong_exp_id';
-      const cstPlaythroughsByStateName = (
-        new Map([['Introduction', [makeCstPlaythrough()]]]));
-      expect(
-        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
-          expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
-          new Map()))
-        .toThrowError(
-          'Expected playthrough for exploration "eid", but got playthrough ' +
-          'for exploration "wrong_exp_id"');
-    });
-
-    it('should throw if EQ playthrough targets wrong exploration', () => {
-      const expId = 'eid';
-      eqPlaythroughBackendDict.exp_id = 'wrong_exp_id';
-      const eqPlaythroughsByStateName = (
-        new Map([['Introduction', [makeEqPlaythrough()]]]));
-      expect(
-        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
-          expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
-          new Map()))
-        .toThrowError(
-          'Expected playthrough for exploration "eid", but got playthrough ' +
-          'for exploration "wrong_exp_id"');
-    });
-
-    it('should throw if MIS playthrough targets wrong exploration', () => {
-      const expId = 'eid';
-      misPlaythroughBackendDict.exp_id = 'wrong_exp_id';
-      const misPlaythroughsByStateName = (
-        new Map([['Introduction', [makeMisPlaythrough()]]]));
-      expect(
-        () => explorationImprovementsTaskRegistryObjectFactory.createNew(
-          expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), new Map(),
-          misPlaythroughsByStateName))
-        .toThrowError(
-          'Expected playthrough for exploration "eid", but got playthrough ' +
-          'for exploration "wrong_exp_id"');
-    });
-
-    it('should throw if CST playthrough targets wrong exploration version',
-      () => {
-        const expVersion = 1;
-        cstPlaythroughBackendDict.exp_version = 2;
-        const cstPlaythroughsByStateName = (
-          new Map([['Introduction', [makeCstPlaythrough()]]]));
-        expect(
-          () => explorationImprovementsTaskRegistryObjectFactory.createNew(
-            expId, expVersion, makeStates(), makeExpStats(), [],
-            new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
-            new Map()))
-          .toThrowError(
-            'Expected playthrough for exploration version 1, but got ' +
-            'playthrough for exploration version 2');
-      });
-
-    it('should throw if EQ playthrough targets wrong exploration version',
-      () => {
-        const expVersion = 1;
-        eqPlaythroughBackendDict.exp_version = 2;
-        const eqPlaythroughsByStateName = (
-          new Map([['Introduction', [makeEqPlaythrough()]]]));
-        expect(
-          () => explorationImprovementsTaskRegistryObjectFactory.createNew(
-            expId, expVersion, makeStates(), makeExpStats(), [],
-            new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
-            new Map()))
-          .toThrowError(
-            'Expected playthrough for exploration version 1, but got ' +
-            'playthrough for exploration version 2');
-      });
-
-    it('should throw if MIS playthrough targets wrong exploration version',
-      () => {
-        const expVersion = 1;
-        misPlaythroughBackendDict.exp_version = 2;
-        const misPlaythroughsByStateName = (
-          new Map([['Introduction', [makeMisPlaythrough()]]]));
-        expect(
-          () => explorationImprovementsTaskRegistryObjectFactory.createNew(
-            expId, expVersion, makeStates(), makeExpStats(), [],
-            new Map(), new Map(), new Map(), new Map(),
-            misPlaythroughsByStateName))
-          .toThrowError(
-            'Expected playthrough for exploration version 1, but got ' +
-            'playthrough for exploration version 2');
-      });
 
     it('should throw if task targets wrong exploration', () => {
       const expId = 'eid';
@@ -485,7 +360,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
-          new Map(), new Map(), new Map(), new Map(), new Map()))
+          new Map(), new Map(), []))
         .toThrowError(
           'Expected task for exploration "eid", but got task for exploration ' +
           '"wrong_exp_id"');
@@ -497,7 +372,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
-          new Map(), new Map(), new Map(), new Map(), new Map()))
+          new Map(), new Map(), []))
         .toThrowError(
           'Expected task for exploration version 1, but got task for ' +
           'exploration version 2');
@@ -511,7 +386,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), tasks,
-          new Map(), new Map(), new Map(), new Map(), new Map()))
+          new Map(), new Map(), []))
         .toThrowError(
           'Found duplicate task of type "high_bounce_rate" targeting state ' +
           '"Introduction"');
@@ -527,8 +402,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
-          resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
-          new Map()))
+          resolvedTaskTypesByStateName, new Map(), []))
         .toThrowError(
           'Found duplicate task of type "high_bounce_rate" targeting state ' +
           '"Introduction"');
@@ -543,8 +417,7 @@ describe('Exploration improvements task registrar service', () => {
       expect(
         () => explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
-          new Map()))
+          resolvedTaskTypesByStateName, new Map(), []))
         .toThrowError(
           'Found duplicate task of type "high_bounce_rate" targeting state ' +
           '"Introduction"');
@@ -567,7 +440,7 @@ describe('Exploration improvements task registrar service', () => {
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(statesBackendDict), makeExpStats(),
           [hbrTask, iflTask, ngrTask, siaTask],
-          new Map(), new Map(), new Map(), new Map(), new Map()));
+          new Map(), new Map(), []));
 
       expect(taskRegistry.getHighBounceRateTasks()).toEqual(
         [hbrTask]);
@@ -592,8 +465,7 @@ describe('Exploration improvements task registrar service', () => {
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          resolvedTaskTypesByStateName, new Map(), new Map(), new Map(),
-          new Map()));
+          resolvedTaskTypesByStateName, new Map(), []));
 
       expect(taskRegistry.getHighBounceRateTasks().length).toEqual(1);
       expect(taskRegistry.getIneffectiveFeedbackLoopTasks().length).toEqual(1);
@@ -609,7 +481,7 @@ describe('Exploration improvements task registrar service', () => {
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), new Map(), new Map()));
+          new Map(), new Map(), []));
 
       expect(taskRegistry.getHighBounceRateTasks().length).toEqual(1);
       expect(taskRegistry.getIneffectiveFeedbackLoopTasks().length).toEqual(1);
@@ -629,28 +501,21 @@ describe('Exploration improvements task registrar service', () => {
           ...{total_hit_count: 500, num_completions: 350},
         },
       };
-      const eqPlaythroughsByStateName = (
-        new Map([['Introduction', [makeEqPlaythrough()]]]));
 
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
-          new Map()));
+          new Map(), new Map(), [makeEqPlaythroughIssue()]));
 
       const [hbrTask] = taskRegistry.getHighBounceRateTasks();
       expect(hbrTask.isOpen()).toBeTrue();
     });
 
     it('should generate a new ineffective feedback loop task', () => {
-      const cstPlaythroughsByStateName = (
-        new Map([['Introduction', [makeCstPlaythrough()]]]));
-
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), cstPlaythroughsByStateName, new Map(),
-          new Map()));
+          new Map(), new Map(), [makeCstPlaythroughIssue()]));
 
       const [iflTask] = taskRegistry.getIneffectiveFeedbackLoopTasks();
       expect(iflTask.isOpen()).toBeTrue();
@@ -664,22 +529,17 @@ describe('Exploration improvements task registrar service', () => {
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), stateAnswerStats, new Map(), new Map(), new Map()));
+          new Map(), stateAnswerStats, []));
 
       const [ngrTask] = taskRegistry.getNeedsGuidingResponsesTasks();
       expect(ngrTask.isOpen()).toBeTrue();
     });
 
     it('should generate a new successive incorrect answers task', () => {
-      const misPlaythroughsByStateName = new Map([
-        ['Introduction', [makeMisPlaythrough()]]
-      ]);
-
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), new Map(),
-          misPlaythroughsByStateName));
+          new Map(), new Map(), [makeMisPlaythroughIssue()]));
 
       const [siaTask] = (
         taskRegistry.getSuccessiveIncorrectAnswersTasks());
@@ -705,7 +565,7 @@ describe('Exploration improvements task registrar service', () => {
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [task],
-          new Map(), new Map(), new Map(), new Map(), new Map()));
+          new Map(), new Map(), []));
 
       const [hbrTask] = taskRegistry.getHighBounceRateTasks();
       expect(hbrTask.isObsolete()).toBeTrue();
@@ -719,7 +579,7 @@ describe('Exploration improvements task registrar service', () => {
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), stateAnswerStats, new Map(), new Map(), new Map()));
+          new Map(), stateAnswerStats, []));
 
       const [ngrTask] = taskRegistry.getNeedsGuidingResponsesTasks();
       expect(ngrTask.isOpen()).toBeTrue();
@@ -737,7 +597,7 @@ describe('Exploration improvements task registrar service', () => {
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), new Map(), new Map(), new Map(), new Map()));
+          new Map(), new Map(), []));
 
       expect(taskRegistry.getHighBounceRateTasks().length).toEqual(1);
       expect(taskRegistry.getIneffectiveFeedbackLoopTasks().length).toEqual(1);
@@ -766,8 +626,6 @@ describe('Exploration improvements task registrar service', () => {
           ...{total_hit_count: 500, num_completions: 350},
         },
       };
-      const eqPlaythroughsByStateName = (
-        new Map([['Introduction', [makeEqPlaythrough()]]]));
       const answerStats = makeAnswerStats();
       answerStats.isAddressed = false;
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
@@ -789,8 +647,7 @@ describe('Exploration improvements task registrar service', () => {
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(),
           [hbrTask, iflTask, ngrTask, siaTask],
-          new Map(), stateAnswerStats, new Map(), eqPlaythroughsByStateName,
-          new Map()));
+          new Map(), stateAnswerStats, [makeEqPlaythroughIssue()]));
 
       expect(hbrTask.targetId).toEqual('Introduction');
       expect(hbrTask.isOpen()).toBeTrue();
@@ -845,8 +702,6 @@ describe('Exploration improvements task registrar service', () => {
           ...{total_hit_count: 500, num_completions: 350},
         },
       };
-      const eqPlaythroughsByStateName = (
-        new Map([['Introduction', [makeEqPlaythrough()]]]));
       const answerStats = makeAnswerStats();
       answerStats.isAddressed = false;
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
@@ -868,8 +723,7 @@ describe('Exploration improvements task registrar service', () => {
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(),
           [hbrTask, iflTask, ngrTask, siaTask],
-          new Map(), stateAnswerStats, new Map(), eqPlaythroughsByStateName,
-          new Map()));
+          new Map(), stateAnswerStats, [makeEqPlaythroughIssue()]));
 
       expect(hbrTask.targetId).toEqual('Introduction');
       expect(hbrTask.isOpen()).toBeTrue();
@@ -897,7 +751,7 @@ describe('Exploration improvements task registrar service', () => {
       const taskRegistry = (
         explorationImprovementsTaskRegistryObjectFactory.createNew(
           expId, expVersion, makeStates(), makeExpStats(), [],
-          new Map(), stateAnswerStats, new Map(), new Map(), new Map()));
+          new Map(), stateAnswerStats, []));
 
       const [ngrTask] = taskRegistry.getNeedsGuidingResponsesTasks();
       expect(ngrTask.isOpen()).toBeFalse();
@@ -906,83 +760,6 @@ describe('Exploration improvements task registrar service', () => {
 
       taskRegistry.onChangeAnswerGroups('Introduction');
       expect(ngrTask.isOpen()).toBeTrue();
-    });
-  });
-
-  describe('Flushing post-initialization changes', () => {
-    it('should return payload of newly created HBR task only after first call',
-      () => {
-        statesBackendDict = {
-          Introduction: stateBackendDict,
-        };
-        expStatsBackendDict.num_starts = 500;
-        expStatsBackendDict.state_stats_mapping = {
-          Introduction: {
-            ...stateStatsBackendDict,
-            ...{total_hit_count: 500, num_completions: 350},
-          },
-        };
-        const eqPlaythroughsByStateName = (
-          new Map([['Introduction', [makeEqPlaythrough()]]]));
-
-        const taskRegistry = (
-          explorationImprovementsTaskRegistryObjectFactory.createNew(
-            expId, expVersion, makeStates(), makeExpStats(), [],
-            new Map(), new Map(), new Map(), eqPlaythroughsByStateName,
-            new Map()));
-
-        expect(taskRegistry.flushInitializationChanges().length).toEqual(1);
-        expect(taskRegistry.flushInitializationChanges().length).toEqual(0);
-      });
-
-    it('should return payload of newly discarded HBR task only on first call',
-      () => {
-        const task = makeTask<HighBounceRateTask>(
-          {...taskBackendDict, ...{status: 'open'}});
-        statesBackendDict = {
-          Introduction: stateBackendDict,
-        };
-        expStatsBackendDict.num_starts = 500;
-        expStatsBackendDict.state_stats_mapping = {
-          Introduction: {
-            ...stateStatsBackendDict,
-            ...{total_hit_count: 500, num_completions: 450},
-          },
-        };
-
-        const taskRegistry = (
-          explorationImprovementsTaskRegistryObjectFactory.createNew(
-            expId, expVersion, makeStates(), makeExpStats(), [task],
-            new Map(), new Map(), new Map(), new Map(), new Map()));
-
-        const [hbrTask] = taskRegistry.getHighBounceRateTasks();
-        expect(hbrTask.isObsolete()).toBeTrue();
-        expect(taskRegistry.flushInitializationChanges().length).toEqual(1);
-        expect(taskRegistry.flushInitializationChanges().length).toEqual(0);
-      });
-
-    it('should return empty payload when HBR task does not change', () => {
-      const task = makeTask<HighBounceRateTask>(
-        {...taskBackendDict, ...{status: 'open'}});
-      statesBackendDict = {
-        Introduction: stateBackendDict,
-      };
-      expStatsBackendDict.num_starts = 500;
-      expStatsBackendDict.state_stats_mapping = {
-        Introduction: {
-          ...stateStatsBackendDict,
-          ...{total_hit_count: 500, num_completions: 350},
-        },
-      };
-
-      const taskRegistry = (
-        explorationImprovementsTaskRegistryObjectFactory.createNew(
-          expId, expVersion, makeStates(), makeExpStats(), [task],
-          new Map(), new Map(), new Map(), new Map(), new Map()));
-
-      const [hbrTask] = taskRegistry.getHighBounceRateTasks();
-      expect(hbrTask.isOpen()).toBeTrue();
-      expect(taskRegistry.flushInitializationChanges().length).toEqual(0);
     });
   });
 });

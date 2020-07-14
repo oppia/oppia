@@ -17,8 +17,6 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Constructor } from
-  '@angular/material/core/typings/common-behaviors/constructor';
 import { Injectable } from '@angular/core';
 
 import { ImprovementsConstants } from
@@ -72,6 +70,22 @@ export class TaskEntry<TaskType = string> {
     this.resolvedOnMsecs = backendDict.resolved_on_msecs;
     this.issueDescription = backendDict.issue_description;
     this.taskStatus = backendDict.status;
+  }
+
+  public toBackendDict(): ITaskEntryBackendDict<TaskType> {
+    return {
+      entity_type: this.entityType,
+      entity_id: this.entityId,
+      entity_version: this.entityVersion,
+      task_type: this.taskType,
+      target_type: this.targetType,
+      target_id: this.targetId,
+      issue_description: this.issueDescription,
+      status: this.taskStatus,
+      resolver_username: this.resolverUsername,
+      resolver_profile_picture_data_url: this.resolverProfilePictureDataUrl,
+      resolved_on_msecs: this.resolvedOnMsecs,
+    };
   }
 
   public toPayloadDict(): ITaskEntryPayloadDict<TaskType> {
