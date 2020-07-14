@@ -31,12 +31,10 @@ import time
 from . import install_third_party_libs
 install_third_party_libs.main()
 
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
+import python_utils  # isort:skip  pylint: disable=wrong-import-position
 
-from . import build  # isort:skip
-from . import common  # isort:skip
-# pylint: enable=wrong-import-position
+from . import build  # isort:skip  pylint: disable=wrong-import-position
+from . import common  # isort:skip  pylint: disable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser(description="""
 Run the script from the oppia root folder:

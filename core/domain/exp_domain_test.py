@@ -7392,7 +7392,6 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
     YAML_CONTENT_V35_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -7634,7 +7633,6 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
     YAML_CONTENT_V39_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -8251,8 +8249,6 @@ states_schema_version: 34
 tags: []
 title: Title
 """)
-
-# pylint: enable=line-too-long
 
 
     def test_load_from_v26_textangular(self):

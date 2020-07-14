@@ -41,12 +41,8 @@ ESPRIMA_PATH = os.path.join(
 
 sys.path.insert(1, ESPRIMA_PATH)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import esprima  # isort:skip
-from .. import build  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import esprima  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from .. import build  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
     CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')

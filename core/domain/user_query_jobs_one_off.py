@@ -32,8 +32,6 @@ import python_utils
     models.Registry.import_models(
         [models.NAMES.user, models.NAMES.exploration, models.NAMES.job]))
 
-# pylint: disable=too-many-return-statements
-
 
 class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for excuting query with given query parameters.
@@ -48,7 +46,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [user_models.UserSettingsModel]
 
     @staticmethod
-    def map(user_settings_model):
+    def map(user_settings_model):  # pylint: disable=too-many-return-statements
         query_id = (
             jobs.BaseMapReduceOneOffJobManager.get_mapper_param('query_id'))
         query_model = user_models.UserQueryModel.get(query_id)

@@ -664,7 +664,6 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
-    # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.

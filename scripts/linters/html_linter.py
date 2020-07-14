@@ -28,9 +28,7 @@ import python_utils
 from . import linter_utils
 from .. import common
 
-# pylint: disable=wrong-import-position
-import html.parser # isort:skip
-# pylint: enable=wrong-import-position
+import html.parser # isort:skip  pylint: disable=wrong-import-position
 
 
 class TagMismatchException(Exception):

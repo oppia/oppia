@@ -49,8 +49,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'check_call_is_called': False,
         }
         self.print_arr = []
-        # pylint: disable=unused-argument
-        def mock_check_call(unused_cmd_tokens, *args, **kwargs):
+        def mock_check_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
             class Ret(python_utils.OBJECT):
                 """Return object with required attributes."""
@@ -61,7 +60,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     """Return required meathod."""
                     return '', ''
             return Ret()
-        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):
+        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             class Ret(python_utils.OBJECT):
                 """Return object that gives user-prefix error."""
 
@@ -71,9 +70,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     """Return user-prefix error as stderr."""
                     return '', 'can\'t combine user with prefix'
             return Ret()
-        def mock_print(msg, end=''):
+        def mock_print(msg, end=''):  # pylint: disable=unused-argument
             self.print_arr.append(msg)
-        # pylint: enable=unused-argument
 
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
@@ -224,18 +222,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 'ensure_pip_library_is_installed_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
-        # pylint: disable=unused-argument
-        def mock_main_for_install_third_party(args):
+        def mock_main_for_install_third_party(args):  # pylint: disable=unused-argument
             check_function_calls['install_third_party_main_is_called'] = True
-        def mock_main_for_setup(args):
+        def mock_main_for_setup(args):  # pylint: disable=unused-argument
             check_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(args):
+        def mock_main_for_setup_gae(args):  # pylint: disable=unused-argument
             check_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(args):
+        def mock_main_for_pre_commit_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args):
+        def mock_main_for_pre_push_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_push_hook_main_is_called'] = True
-        # pylint: enable=unused-argument
         def mock_tweak_yarn_executable():
             check_function_calls['tweak_yarn_executable_is_called'] = True
 
@@ -316,18 +312,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 'ensure_pip_library_is_installed_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
-        # pylint: disable=unused-argument
-        def mock_main_for_install_third_party(args):
+        def mock_main_for_install_third_party(args):  # pylint: disable=unused-argument
             check_function_calls['install_third_party_main_is_called'] = True
-        def mock_main_for_setup(args):
+        def mock_main_for_setup(args):  # pylint: disable=unused-argument
             check_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(args):
+        def mock_main_for_setup_gae(args):  # pylint: disable=unused-argument
             check_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(args):
+        def mock_main_for_pre_commit_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args):
+        def mock_main_for_pre_push_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_push_hook_main_is_called'] = True
-        # pylint: enable=unused-argument
         def mock_tweak_yarn_executable():
             check_function_calls['tweak_yarn_executable_is_called'] = True
 

@@ -1022,8 +1022,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            # pylint: disable=protected-access
-            email_manager._send_email(
+            email_manager._send_email(  # pylint: disable=protected-access
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
@@ -1040,11 +1039,10 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # No error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 0)
 
-            email_manager._send_email(
+            email_manager._send_email(  # pylint: disable=protected-access
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
-            # pylint: enable=protected-access
 
             # An error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)

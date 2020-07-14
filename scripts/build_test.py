@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# pylint: disable=invalid-name
 import collections
 import os
 import random
@@ -54,7 +53,7 @@ EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
 
 # Override Pylint's protected access rule due to multiple private functions in
 # the file.
-# pylint: disable=protected-access
+# pylint: disable=protected-access, single-line-pragma
 
 
 class BuildTests(test_utils.GenericTestBase):

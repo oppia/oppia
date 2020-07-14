@@ -30,9 +30,7 @@ from scripts import common
 from scripts.release_scripts import generate_release_info
 from scripts.release_scripts import update_changelog_and_credits
 
-# pylint: disable=wrong-import-position
-import github  # isort:skip
-# pylint: enable=wrong-import-position
+import github  # isort:skip  pylint: disable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
@@ -57,10 +55,8 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
                 requester='', headers='', attributes={}, completed='')
         def mock_get_repo(unused_self, unused_org):
             return self.mock_repo
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'test-token'
-        # pylint: enable=unused-argument
 
         self.branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)

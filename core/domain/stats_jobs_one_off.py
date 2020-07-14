@@ -202,7 +202,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return RecomputeStatisticsOneOffJob.ENTITY_CLASSES_TO_MAP_OVER
 
     @classmethod
-    def prepare_map(cls, item):
+    def prepare_map(cls, item):  # pylint: disable=too-many-return-statements
         """Returns a tuple that represents the given model instance, so that it
         can be processed by the MapReduce pipeline.
 
@@ -223,7 +223,6 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Raises:
             Exception: The item type is wrong.
         """
-        # pylint: disable=too-many-return-statements
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             return (
                 item.exp_id,
@@ -304,7 +303,6 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
-        # pylint: enable=too-many-return-statements
 
     @staticmethod
     def map(item):

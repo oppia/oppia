@@ -1835,8 +1835,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# coding: utf-8
-                    # pylint: disable
+                u"""# coding: utf-8\n# pylint: disable
                 """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename

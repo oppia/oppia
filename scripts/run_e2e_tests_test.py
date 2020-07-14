@@ -42,10 +42,8 @@ class MockProcessClass(python_utils.OBJECT):
 
     kill_count = 0
 
-    # pylint: disable=missing-docstring
-    def kill(self):
+    def kill(self):  # pylint: disable=missing-docstring
         MockProcessClass.kill_count += 1
-    # pylint: enable=missing-docstring
 
 
 class RunE2ETestsTests(test_utils.GenericTestBase):
@@ -62,13 +60,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_check_call(unused_commands):
             pass
 
-        # pylint: disable=unused-argument
-        def mock_build_main(args):
+        def mock_build_main(args):  # pylint: disable=unused-argument
             pass
 
-        def mock_popen(args, shell):
+        def mock_popen(args, shell):  # pylint: disable=unused-argument
             return
-        # pylint: enable=unused-argument
 
         def mock_remove(unused_path):
             pass
