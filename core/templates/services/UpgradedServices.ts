@@ -1542,7 +1542,7 @@ export class UpgradedServices {
     // Topological level: 9.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
-    
+
     // Topological level: 10.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],

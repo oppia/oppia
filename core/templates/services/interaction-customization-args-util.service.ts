@@ -34,13 +34,16 @@ import {
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
+type CustArgValue = SubtitledHtml |
+  SubtitledUnicode |
+  ISubtitledHtmlBackendDict |
+  ISubtitledUnicodeBackendDict |
+  string;
+
 export type InteractionCustArgsConversionFn = (
-  caValue: SubtitledHtml |
-    SubtitledUnicode |
-    ISubtitledHtmlBackendDict |
-    ISubtitledUnicodeBackendDict,
+  caValue: CustArgValue,
   schemaObjType: 'SubtitledHtml' | 'SubtitledUnicode',
-) => any;
+) => CustArgValue;
 
 interface Schema {
   type: string;
@@ -63,19 +66,20 @@ export class InteractionCustomizationArgsUtilService {
   ) {}
 
   private applyConversionFnOnContent(
-      value: any,
+      value: CustArgValue | CustArgValue[],
       schema: Schema,
       conversionFn: InteractionCustArgsConversionFn
-  ) {
+  ): CustArgValue | CustArgValue[] {
     const schemaType = schema.type;
     const schemaObjType = schema.obj_type;
 
     if (schemaObjType === 'SubtitledUnicode' ||
         schemaObjType === 'SubtitledHtml') {
-      value = conversionFn(value, schemaObjType);
+      value = conversionFn(<CustArgValue>value, schemaObjType);
     } else if (schemaType === 'list') {
+      value = <CustArgValue[]> value;
       for (let i = 0; i < value.length; i++) {
-        value[i] = this.applyConversionFnOnContent(
+        value[i] = <CustArgValue> this.applyConversionFnOnContent(
           value[i],
           schema.items,
           conversionFn);
@@ -94,10 +98,10 @@ export class InteractionCustomizationArgsUtilService {
   }
 
   private assignContentIdsToEmptyContent(
-      value: any,
+      value: CustArgValue | CustArgValue[],
       schema: Schema,
       contentId: string
-  ) {
+  ): boolean {
     const schemaType = schema.type;
     const schemaObjType = schema.obj_type;
 
@@ -105,11 +109,13 @@ export class InteractionCustomizationArgsUtilService {
 
     if (schemaObjType === 'SubtitledUnicode' ||
         schemaObjType === 'SubtitledHtml') {
+      value = <SubtitledHtml | SubtitledUnicode> value;
       if (value.getContentId() === '') {
         value.setContentId(contentId);
         contentIdAssigned = true;
       }
     } else if (schemaType === 'list') {
+      value = <CustArgValue[]> value;
       for (let i = 0; i < value.length; i++) {
         const contentIdIndex = this.stateNextContentIdIndexService.displayed;
         const subprocessAssignedContentId = this.assignContentIdsToEmptyContent(
@@ -150,7 +156,7 @@ export class InteractionCustomizationArgsUtilService {
       const name = caSpec.name;
       if (name in caValues) {
         caValues[name].value = this.applyConversionFnOnContent(
-          caValues[name].value, caSpec.schema, conversionFn);
+          <CustArgValue>caValues[name].value, caSpec.schema, conversionFn);
       }
     }
   }
@@ -224,7 +230,7 @@ export class InteractionCustomizationArgsUtilService {
       const name = caSpec.name;
       if (name in caValues) {
         this.assignContentIdsToEmptyContent(
-          caValues[name].value, caSpec.schema, `custarg_${name}`);
+          <CustArgValue>caValues[name].value, caSpec.schema, `custarg_${name}`);
       }
     }
 

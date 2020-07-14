@@ -2460,8 +2460,8 @@ class Exploration(python_utils.OBJECT):
             list of subtitled html dict.
 
             Args:
-                ca_value: list(str) | None. Customization argument value.
-                content_id_predix: str. The content id prefix.
+                ca_value: list(str)|None. Customization argument value.
+                content_id_prefix: str. The content id prefix.
                 next_content_id_index: int. The next content_id index.
 
             Returns:
@@ -2485,7 +2485,7 @@ class Exploration(python_utils.OBJECT):
 
 
         for state_dict in states_dict.values():
-            # Find maximum existing content_id index
+            # Find maximum existing content_id index.
             max_existing_content_id_index = -1
             translations_mapping = state_dict[
                 'written_translations']['translations_mapping']
@@ -2523,11 +2523,9 @@ class Exploration(python_utils.OBJECT):
                     ca_name = ca_spec.name
                     content_id = 'custarg_' + ca_name
 
-                    if (schema_obj_type in obj_type_to_subtitled_key):
-                        
+                    if schema_obj_type in obj_type_to_subtitled_key:
                         new_content_ids.append(content_id)
-
-                        new_value = { 'content_id': content_id }
+                        new_value = {'content_id': content_id}
 
                         subtitled_key = (
                             obj_type_to_subtitled_key[schema_obj_type])
@@ -2540,9 +2538,8 @@ class Exploration(python_utils.OBJECT):
 
                         ca[ca_name]['value'] = new_value
                     elif (schema['type'] == 'list' and
-                        schema['items']['type'] == 'custom' and
-                        schema['items']['obj_type'] == 'SubtitledHtml'
-                    ):
+                          schema['items']['type'] == 'custom' and
+                          schema['items']['obj_type'] == 'SubtitledHtml'):
                         value = ca[ca_name]['value'] if ca_name in ca else ['']
                         ca[ca_name]['value'], new_content_ids = (
                             convert_ca_html_list_to_subtitled_html_dict_list(

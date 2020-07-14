@@ -752,7 +752,6 @@ class InteractionInstance(python_utils.OBJECT):
 
         Args:
             interaction_dict: dict. The interaction dict.
-            states_schema_version: int. The state schema version.
             conversion_fn: function. The function to be used for converting the
                 HTML.
 
@@ -777,9 +776,8 @@ class InteractionInstance(python_utils.OBJECT):
             # migrations, we must handle the case where the value has not yet
             # been migrated to a SubtitledHtml object (pre schema v40).
             if isinstance(
-                ca_value,
-                (python_utils.UNICODE, python_utils.BASESTRING)
-            ):
+                    ca_value,
+                    (python_utils.UNICODE, python_utils.BASESTRING)):
                 ca_value = conversion_fn(ca_value)
             elif obj_type == 'SubtitledHtml':
                 ca_value['html'] = conversion_fn(ca_value['html'])
@@ -800,7 +798,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         Args:
             interaction_id: string. The interaction id.
-            ca_values: dict. The customization dict. The keys are names
+            customization_args: dict. The customization dict. The keys are names
                 of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
@@ -835,11 +833,15 @@ class InteractionInstance(python_utils.OBJECT):
             value: dict. The current nested customization argument value to be
                 modifed.
             conversion_fn: function. The function to be used for converting the
-                content. It is passed the customization argument value and obj_type.
+                content. It is passed the customization argument value and
+                obj_type.
+
+        Returns:
+            dict. The converted customization dict.
         """
         schema_type = schema['type']
         schema_obj_type = schema.get('obj_type', None)
-        
+
         if (schema_obj_type == 'SubtitledUnicode' or
                 schema_obj_type == 'SubtitledHtml'):
             value = conversion_fn(value, schema_obj_type)
@@ -858,7 +860,7 @@ class InteractionInstance(python_utils.OBJECT):
                         property_spec['schema'],
                         conversion_fn)
                 )
-        
+
         return value
 
     def get_all_content_ids_in_cust_args(self):
@@ -869,8 +871,8 @@ class InteractionInstance(python_utils.OBJECT):
         """
         content_ids = []
         def extract_content_ids(ca_value, unused_obj_type):
-            """Conversion function used to extract all content_ids. Customization
-            argument is returned unmodified.
+            """Conversion function used to extract all content_ids.
+            Customization argument is returned unmodified.
 
             Args:
                 ca_value: dict. Dictionary of key 'value' to
@@ -2392,10 +2394,6 @@ class State(python_utils.OBJECT):
             # in update_interaction_id.
             old_content_id_list = []
             new_content_id_list = []
-
-            ca_specs = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    self.interaction.id).customization_arg_specs)
 
             old_content_id_list.extend(
                 self.interaction.get_all_content_ids_in_cust_args())
