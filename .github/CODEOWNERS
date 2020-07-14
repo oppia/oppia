@@ -261,6 +261,7 @@
 
 
 # Lesson Analytics team.
+# TODO(brianrodri): Reclaim ownership after 2020-07-27.
 /core/controllers/features*.py @seanlip
 /core/controllers/improvements*.py @seanlip
 /core/domain/action_registry*.py @seanlip
