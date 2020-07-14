@@ -37,7 +37,7 @@ export class StoryPlaythrough {
   nodes: ReadOnlyStoryNode[];
   title: string;
   description: string;
-  topicName: string
+  topicName: string;
 
   constructor(
       nodes: ReadOnlyStoryNode[],
