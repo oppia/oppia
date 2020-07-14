@@ -109,6 +109,11 @@ class ExplorationMathRichTextInfoModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationMathRichTextInfoModel.
             get_math_exploration_count(), 1)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            exp_models.ExplorationContextModel
+            .has_reference_to_user_id('any_id'))
+
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""

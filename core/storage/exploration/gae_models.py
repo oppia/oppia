@@ -279,6 +279,20 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
         """Returns the total number of math explorations."""
         return cls.get_all().count()
 
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether ExplorationMathRichTextInfoModel references the given
+        user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+                be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
 
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
