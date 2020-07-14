@@ -398,6 +398,7 @@
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
+/core/domain/image_service*.py @seanlip
 /core/domain/prod_validation_jobs_one_off*.py @ankita240796
 /core/domain/storage_model_audit_jobs_test.py @ankita240796
 /core/jobs*.py @seanlip
@@ -418,7 +419,6 @@
 /core/templates/services/interaction-specs.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
-/core/domain/image_service*.py @seanlip
 
 
 # Miscellaneous.

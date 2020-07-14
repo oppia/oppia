@@ -22,19 +22,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import io
 
 from PIL import Image
-from core.platform import models
-
-app_identity_services = models.Registry.import_app_identity_services()
 
 
 def _get_pil_image_dimensions(pil_image):
-    """Gets the dimensions of the image with the given file_content.
+    """Gets the dimensions of the Pillow Image.
 
     Args:
         pil_image: Image. A file in the Pillow Image format.
 
     Returns:
-        tuple(int). Returns height and width of the image.
+        tuple(int, int). Returns height and width of the image.
     """
     width, height = pil_image.size
     return height, width
@@ -65,7 +62,9 @@ def compress_image(image_content, scaling_factor):
         str. Returns the content of the compressed image.
     """
     if scaling_factor > 1 or scaling_factor <= 0:
-        raise ValueError('Scaling factor should be in the interval (0, 1].')
+        raise ValueError(
+            ('Scaling factor should be in the interval (0, 1], received %f.'
+             % scaling_factor))
     image = Image.open(io.BytesIO(image_content))
 
     image_format = image.format

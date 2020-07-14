@@ -39,7 +39,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ImageServicesUnitTests, self).setUp()
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'dummyLargeImage.jpg'),
+            os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
             mode='rb', encoding=None) as f:
             self.jpeg_raw_image = f.read()
         with python_utils.open_file(
@@ -63,9 +63,22 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_scaling_factor_triggers_value_error(self):
         value_exception = self.assertRaisesRegexp(
-            ValueError, r'Scaling factor should be in the interval \(0, 1].')
+            ValueError,
+            r'Scaling factor should be in the interval \(0, 1], received 1.1.')
         with value_exception:
             image_services.compress_image(self.jpeg_raw_image, 1.1)
+
+        value_exception = self.assertRaisesRegexp(
+            ValueError,
+            r'Scaling factor should be in the interval \(0, 1], received 0.')
+        with value_exception:
+            image_services.compress_image(self.jpeg_raw_image, 0)
+
+        value_exception = self.assertRaisesRegexp(
+            ValueError,
+            r'Scaling factor should be in the interval \(0, 1], received -1.')
+        with value_exception:
+            image_services.compress_image(self.jpeg_raw_image, -1)
 
     def test_compression_results_in_correct_format(self):
         compressed_image = (
