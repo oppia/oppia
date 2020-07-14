@@ -385,6 +385,14 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 reporter=text.TextReporter(pylint_report),
                 exit=False).linter
 
+            if pylinter.msg_status != 0:
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
+                pylint_error_messages = (
+                    self._get_trimmed_error_output(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
+                errors_found = True
+
             with linter_utils.redirect_stdout(stdout):
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
@@ -395,15 +403,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-                errors_found = True
-
-            if pylinter.msg_status != 0:
-                for message in pylint_report.read():
-                    python_utils.PRINT(message)
-                pylint_error_messages = (
-                    self._get_trimmed_error_output(pylint_report.read()))
-                summary_messages.append(pylint_error_messages)
                 errors_found = True
 
             current_batch_start_index = current_batch_end_index
@@ -469,9 +470,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     % (current_batch_start_index + 1, current_batch_end_index))
 
             with linter_utils.redirect_stdout(sys.stdout):
-                # This line invokes Pylint and prints its output
-                # to the target stdout.
-                python_utils.PRINT('Messages for Python 3 support:')
+                # This line invokes Pylint and redirect its output
+                # to the StringMessageStream.
                 pylint_report = StringMessageStream()
                 pylinter_for_python3 = lint.Run(
                     current_files_to_lint + ['--py3k'],
@@ -482,6 +482,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pylint_error_messages = (
                     self._get_trimmed_error_output(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
+                python_utils.PRINT('Messages for Python 3 support:')
                 for message in pylint_report.read():
                     python_utils.PRINT(message)
                 any_errors = True
