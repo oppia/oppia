@@ -48,8 +48,11 @@ describe('Early Quit Issue Component', function() {
     $scope.issue = () => (playthroughIssueObjectFactory.createFromBackendDict({
       issue_type: 'EarlyQuit',
       issue_customization_args: {
-        state_names: {
-          value: ['State1', 'State2']
+        state_name: {
+          value: 'State1'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 0
         }
       },
       playthrough_ids: ['1', '2', '3'],
