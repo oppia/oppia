@@ -16,12 +16,12 @@
                      ng-change="$ctrl.resetErrorMsg()">
               <span class="oppia-input-box-subtitle">
                 <i>
-                  Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+                  Subtopic title should be at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
                 </i>
               </span>
             </form>
             <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
-              <em><[errorMsg]></em>
+              <em><[$ctrl.errorMsg]></em>
             </span>
             <span class="form-text error-message" ng-if="$ctrl.editableTitle.length === 80">
               <em>The maximum length of subtopic title is 80 characters.</em>
