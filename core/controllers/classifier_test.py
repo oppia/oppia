@@ -37,7 +37,7 @@ import feconf
 import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
-email_services = models.Registry.import_email_services()
+from core.domain import email_services
 
 
 class TrainedClassifierHandlerTests(test_utils.EmailTestBase):

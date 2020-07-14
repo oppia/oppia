@@ -46,7 +46,7 @@ import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
-email_services = models.Registry.import_email_services()
+from core.domain import email_services
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""

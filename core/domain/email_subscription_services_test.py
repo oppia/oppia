@@ -27,7 +27,7 @@ import feconf
 
 (email_models, user_models) = models.Registry.import_models([
     models.NAMES.email, models.NAMES.user])
-email_services = models.Registry.import_email_services()
+from core.domain import email_services
 
 
 class InformSubscribersTest(test_utils.EmailTestBase):

@@ -34,14 +34,13 @@ import python_utils
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
 taskqueue_services = models.Registry.import_taskqueue_services()
-email_services = models.Registry.import_email_services()
+
 
 class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     """Test functions in feedback_services."""
 
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
-    emails_dict = {}
 
     def setUp(self):
         super(FeedbackServicesUnitTests, self).setUp()
@@ -82,7 +81,8 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
 
     def test_create_message_fails_if_invalid_thread_id(self):
         with self.assertRaises(
-            feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError):
+            feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError
+            ):
             feedback_services.create_message(
                 'invalid_thread_id', self.user_id, None, None, 'Hello')
 
@@ -628,7 +628,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         self.assertDictEqual(payload['reference_dict'], reference_dict)
 
 
-class FeedbackMessageEmailTests(test_utils.GenericTestBase):
+class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     """Tests for feedback message emails."""
 
     def setUp(self):
@@ -645,6 +645,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.email_services_mock.wipe_emails_dict()
 
     def test_pop_feedback_message_references(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -810,7 +811,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         user_services.update_email_preferences(
             self.editor_id, True, False, False, False)
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -821,7 +825,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_email_is_not_sent_recipient_has_muted_this_exploration(self):
@@ -829,7 +834,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.editor_id, self.exploration.id,
             mute_feedback_notifications=True)
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -840,11 +848,15 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_emails_are_not_sent_for_anonymous_user(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id, None,
                 'a subject', 'some text')
@@ -855,11 +867,15 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_emails_are_sent_for_registered_user(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -880,7 +896,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
 
     def test_that_emails_are_not_sent_if_service_is_disabled(self):
@@ -888,7 +905,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
         cannot_send_feedback_message_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
-        with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
+        with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -899,11 +919,15 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_emails_are_not_sent_for_thread_status_changes(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', '')
@@ -914,11 +938,15 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_email_are_not_sent_to_author_himself(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.editor_id, 'a subject', 'A message')
@@ -929,11 +957,15 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_email_is_sent_for_reply_on_feedback(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -963,7 +995,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_changing_status_of_thread(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -997,7 +1032,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_each_feedback_message(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1036,7 +1074,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
     def test_that_reply_to_id_is_created(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1065,7 +1106,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             self.assertEqual(queried_object.thread_id, thread_id)
 
 
-class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
+class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
     def setUp(self):
         super(FeedbackMessageBatchEmailHandlerTests, self).setUp()
@@ -1081,6 +1122,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.email_services_mock.wipe_emails_dict()
 
     def test_that_emails_are_sent(self):
         expected_email_html_body = (
@@ -1118,7 +1160,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1132,7 +1177,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -1177,7 +1223,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1195,7 +1244,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(
+            messages = self.email_services_mock.mock_get_sent_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1204,7 +1253,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
                 messages[0].body.decode(), expected_email_text_body)
 
     def test_that_emails_are_not_sent_if_already_seen(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1221,11 +1273,12 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
                 {'thread_id': thread_id}, csrf_token=csrf_token)
 
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
 
-class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
+class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     def setUp(self):
         super(FeedbackMessageInstantEmailHandlerTests, self).setUp()
@@ -1241,6 +1294,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.email_services_mock.wipe_emails_dict()
 
     def test_that_emails_are_sent_for_feedback_message(self):
         expected_email_html_body = (
@@ -1269,7 +1323,14 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)), (
+                    self.swap(
+                        email_services, 'send_bulk_mail',
+                        self.email_services_mock.mock_send_bulk_emails)
+                ):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1283,7 +1344,8 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
                 thread_id, self.editor_id, None, None, 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -1316,7 +1378,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             'The Oppia team\n'
             '\n'
             'You can change your email preferences via the Preferences page.')
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1331,7 +1396,8 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
                 feedback_models.STATUS_CHOICES_FIXED, None, '')
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -1390,7 +1456,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
             'The Oppia team\n'
             '\n'
             'You can change your email preferences via the Preferences page.')
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1406,7 +1475,8 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
                 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 2)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body_status)
@@ -1418,7 +1488,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
                 messages[1].body.decode(), expected_email_text_body_message)
 
     def test_that_emails_are_not_sent_to_anonymous_user(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             # Create thread as anonoymous user.
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
@@ -1435,5 +1508,6 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
                 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages()
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)

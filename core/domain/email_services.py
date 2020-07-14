@@ -142,13 +142,13 @@ def send_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
-    if not is_email_valid(recipient_email):
-        raise ValueError(
-            'Malformed recipient email address: %s' % recipient_email)
+    # if not is_email_valid(recipient_email):
+    #     raise ValueError(
+    #         'Malformed recipient email address: %s' % recipient_email)
 
-    if not is_email_valid(sender_email):
-        raise ValueError(
-            'Malformed sender email address: %s' % sender_email)
+    # if not is_email_valid(sender_email):
+    #     raise ValueError(
+    #         'Malformed sender email address: %s' % sender_email)
 
     bcc = feconf.ADMIN_EMAIL_ADDRESS if (bcc_admin) else ''
     reply_to = (
@@ -213,14 +213,15 @@ def send_bulk_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
-    for recipient_email in recipient_emails:
-        if not is_email_valid(recipient_email):
-            raise ValueError(
-                'Malformed recipient email address: %s' % recipient_email)
+    # for recipient_email in recipient_emails:
+    #     if not is_email_valid(recipient_email):
+    #         raise ValueError(
+    #             'Malformed recipient email address: %s' % recipient_email)
 
-    if not is_email_valid(sender_email):
-        raise ValueError(
-            'Malformed sender email address: %s' % sender_email)
+    # if not is_email_valid(sender_email):
+    #     raise ValueError(
+    #         'Malformed sender email address: %s' % sender_email)
+
     # To send bulk emails we pass list of recipients in 'to' paarameter of
     # post data. Maximum limit of recipients per request is 1000.
     # For more detail check following link:
