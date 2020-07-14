@@ -181,6 +181,46 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       });
     };
 
+    var _saveMathExpresionImage = function(
+        resampledFile, filename, entityType, entityId, successCallback,
+        errorCallback) {
+      let form = new FormData();
+      form.append('image', resampledFile);
+      form.append('payload', JSON.stringify({
+        filename: filename,
+        filename_prefix: 'image'
+      }));
+      var imageUploadUrlTemplate = (
+        '/createhandler/imageupload/<entity_type>/<entity_id>'
+      );
+      CsrfTokenService.getTokenAsync().then(function(token) {
+        form.append('csrf_token', token);
+        $.ajax({
+          url: UrlInterpolationService.interpolateUrl(
+            imageUploadUrlTemplate, {
+              entity_type: entityType,
+              entity_id: entityId
+            }
+          ),
+          data: form,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          dataFilter: removeXSSIPrefix,
+          dataType: 'text'
+        }).done(function(data) {
+          if (successCallback) {
+            successCallback(data);
+          }
+        }).fail(function(data) {
+          // Remove the XSSI prefix.
+          var parsedResponse = removeXSSIPrefix(data.responseText);
+          if (errorCallback) {
+            errorCallback(parsedResponse);
+          }
+        });
+      });
+    };
     var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
       var urlTemplate = null;
       urlTemplate = ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
@@ -241,6 +281,13 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       saveAudio: function(explorationId, filename, rawAssetData) {
         return $q(function(resolve, reject) {
           _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
+        });
+      },
+      saveMathExpresionImage: function(
+          resampledFile, filename, entityType, entityId) {
+        return $q(function(resolve, reject) {
+          _saveMathExpresionImage(
+            resampledFile, filename, entityType, entityId, resolve, reject);
         });
       },
       isCached: function(filename) {
