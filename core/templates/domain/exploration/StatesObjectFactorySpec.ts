@@ -87,6 +87,7 @@ describe('States Object Factory', () => {
         },
         hints: [],
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
@@ -134,6 +135,7 @@ describe('States Object Factory', () => {
         hints: [],
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
@@ -194,6 +196,7 @@ describe('States Object Factory', () => {
         },
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
@@ -485,6 +488,7 @@ describe('States Object Factory', () => {
         solution: null,
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {

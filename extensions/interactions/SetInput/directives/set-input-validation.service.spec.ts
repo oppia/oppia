@@ -110,7 +110,7 @@ describe('SetInputValidationService', () => {
       );
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Button text must be a SubtitledUnicode object.'
+        message: 'Button text must be a string.'
       }]);
     });
 

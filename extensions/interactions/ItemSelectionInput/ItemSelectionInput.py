@@ -78,7 +78,7 @@ class ItemSelectionInput(base.BaseInteraction):
             }
         },
         'default_value': [{
-            'content_id': 'custarg_choices_default', 'html': ''}],
+            'content_id': '', 'html': ''}],
     }]
 
     _answer_visualization_specs = [{

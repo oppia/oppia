@@ -21,123 +21,121 @@ import { TestBed } from '@angular/core/testing';
 /* eslint-disable max-len */
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('Editor state service', () => {
-  describe('editor state service', () => {
-    let ecs: StateEditorService = null;
+  let ecs: StateEditorService = null;
 
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        providers: [StateEditorService]
-      });
-
-      ecs = TestBed.get(StateEditorService);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [StateEditorService]
     });
 
-    it('should correctly set and get state names', () => {
-      ecs.setActiveStateName('A State');
-      expect(ecs.getActiveStateName()).toBe('A State');
-    });
+    ecs = TestBed.get(StateEditorService);
+  });
 
-    it('should not allow invalid state names to be set', () => {
-      ecs.setActiveStateName('');
-      expect(ecs.getActiveStateName()).toBeNull();
+  it('should correctly set and get state names', () => {
+    ecs.setActiveStateName('A State');
+    expect(ecs.getActiveStateName()).toBe('A State');
+  });
 
-      ecs.setActiveStateName(null);
-      expect(ecs.getActiveStateName()).toBeNull();
-    });
+  it('should not allow invalid state names to be set', () => {
+    ecs.setActiveStateName('');
+    expect(ecs.getActiveStateName()).toBeNull();
 
-    it('should correctly set and get solicitAnswerDetails', () => {
-      expect(ecs.getSolicitAnswerDetails()).toBeNull();
-      ecs.setSolicitAnswerDetails(false);
-      expect(ecs.getSolicitAnswerDetails()).toEqual(false);
-      ecs.setSolicitAnswerDetails(true);
-      expect(ecs.getSolicitAnswerDetails()).toEqual(true);
-    });
+    ecs.setActiveStateName(null);
+    expect(ecs.getActiveStateName()).toBeNull();
+  });
 
-    it('should correctly set and get misconceptionsBySkill', () => {
-      var misconceptionsBySkill = {
-        skillId1: [0],
-        skillId2: [1, 2]
-      };
-      expect(ecs.getMisconceptionsBySkill()).toEqual({});
-      ecs.setMisconceptionsBySkill(misconceptionsBySkill);
-      expect(ecs.getMisconceptionsBySkill()).toEqual(misconceptionsBySkill);
-    });
+  it('should correctly set and get solicitAnswerDetails', () => {
+    expect(ecs.getSolicitAnswerDetails()).toBeNull();
+    ecs.setSolicitAnswerDetails(false);
+    expect(ecs.getSolicitAnswerDetails()).toEqual(false);
+    ecs.setSolicitAnswerDetails(true);
+    expect(ecs.getSolicitAnswerDetails()).toEqual(true);
+  });
 
-    it('should correctly return answer choices for interaction', () => {
-      var customizationArgsForMultipleChoiceInput = {
-        choices: {
-          value: [
-            'Choice 1',
-            'Choice 2'
-          ]
+  it('should correctly set and get misconceptionsBySkill', () => {
+    var misconceptionsBySkill = {
+      skillId1: [0],
+      skillId2: [1, 2]
+    };
+    expect(ecs.getMisconceptionsBySkill()).toEqual({});
+    ecs.setMisconceptionsBySkill(misconceptionsBySkill);
+    expect(ecs.getMisconceptionsBySkill()).toEqual(misconceptionsBySkill);
+  });
+
+  it('should correctly return answer choices for interaction', () => {
+    var customizationArgsForMultipleChoiceInput = {
+      choices: {
+        value: [
+          new SubtitledHtml('Choice 1', ''),
+          new SubtitledHtml('Choice 2', '')
+        ]
+      }
+    };
+    expect(
+      ecs.getAnswerChoices(
+        'MultipleChoiceInput', customizationArgsForMultipleChoiceInput)
+    ).toEqual([{
+      val: 0,
+      label: 'Choice 1',
+    }, {
+      val: 1,
+      label: 'Choice 2',
+    }]);
+
+    var customizationArgsForImageClickInput = {
+      imageAndRegions: {
+        value: {
+          labeledRegions: [{
+            label: 'Label 1'
+          }, {
+            label: 'Label 2'
+          }]
         }
-      };
-      expect(
-        ecs.getAnswerChoices(
-          'MultipleChoiceInput', customizationArgsForMultipleChoiceInput)
-      ).toEqual([{
-        val: 0,
-        label: 'Choice 1',
-      }, {
-        val: 1,
-        label: 'Choice 2',
-      }]);
+      }
+    };
+    expect(
+      ecs.getAnswerChoices(
+        'ImageClickInput', customizationArgsForImageClickInput)
+    ).toEqual([{
+      val: 'Label 1',
+      label: 'Label 1',
+    }, {
+      val: 'Label 2',
+      label: 'Label 2',
+    }]);
 
-      var customizationArgsForImageClickInput = {
-        imageAndRegions: {
-          value: {
-            labeledRegions: [{
-              label: 'Label 1'
-            }, {
-              label: 'Label 2'
-            }]
-          }
-        }
-      };
-      expect(
-        ecs.getAnswerChoices(
-          'ImageClickInput', customizationArgsForImageClickInput)
-      ).toEqual([{
-        val: 'Label 1',
-        label: 'Label 1',
-      }, {
-        val: 'Label 2',
-        label: 'Label 2',
-      }]);
-
-      var customizationArgsForItemSelectionAndDragAndDropInput = {
-        choices: {
-          value: [
-            'Choice 1',
-            'Choice 2'
-          ]
-        }
-      };
-      expect(
-        ecs.getAnswerChoices(
-          'ItemSelectionInput',
-          customizationArgsForItemSelectionAndDragAndDropInput)
-      ).toEqual([{
-        val: 'Choice 1',
-        label: 'Choice 1',
-      }, {
-        val: 'Choice 2',
-        label: 'Choice 2',
-      }]);
-      expect(
-        ecs.getAnswerChoices(
-          'DragAndDropSortInput',
-          customizationArgsForItemSelectionAndDragAndDropInput)
-      ).toEqual([{
-        val: 'Choice 1',
-        label: 'Choice 1',
-      }, {
-        val: 'Choice 2',
-        label: 'Choice 2',
-      }]);
-    });
+    var customizationArgsForItemSelectionAndDragAndDropInput = {
+      choices: {
+        value: [
+          new SubtitledHtml('Choice 1', ''),
+          new SubtitledHtml('Choice 2', '')
+        ]
+      }
+    };
+    expect(
+      ecs.getAnswerChoices(
+        'ItemSelectionInput',
+        customizationArgsForItemSelectionAndDragAndDropInput)
+    ).toEqual([{
+      val: 'Choice 1',
+      label: 'Choice 1',
+    }, {
+      val: 'Choice 2',
+      label: 'Choice 2',
+    }]);
+    expect(
+      ecs.getAnswerChoices(
+        'DragAndDropSortInput',
+        customizationArgsForItemSelectionAndDragAndDropInput)
+    ).toEqual([{
+      val: 'Choice 1',
+      label: 'Choice 1',
+    }, {
+      val: 'Choice 2',
+      label: 'Choice 2',
+    }]);
   });
 });

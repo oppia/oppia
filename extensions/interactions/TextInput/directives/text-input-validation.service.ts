@@ -50,11 +50,15 @@ export class TextInputValidationService {
       ['placeholder', 'rows']);
 
     var placeholder = customizationArgs.placeholder.value;
-    if (!(placeholder instanceof SubtitledUnicode)) {
+
+    if (
+      !(placeholder instanceof SubtitledUnicode) ||
+      !angular.isString(placeholder.getUnicode())
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
-          'Placeholder must be a SubtitledUnicode object.')
+          'Placeholder text must be a string.')
       });
     }
 

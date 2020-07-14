@@ -52,7 +52,7 @@ class TextInput(base.BaseInteraction):
             'obj_type': 'SubtitledUnicode'
         },
         'default_value': {
-            'content_id': 'custarg_placeholder', 'unicode_str': ''}
+            'content_id': '', 'unicode_str': ''}
     }, {
         'name': 'rows',
         'description': 'Height (in rows)',

@@ -52,7 +52,9 @@ interface Schema {
   }[]
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({
+  providedIn: 'root'
+})
 export class InteractionCustomizationArgsUtilService {
   constructor(
       private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,

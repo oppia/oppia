@@ -93,10 +93,10 @@ export class SetInputValidationService {
 
     let buttonText = (
       customizationArgs.buttonText && customizationArgs.buttonText.value);
-    if (!(buttonText instanceof SubtitledUnicode)) {
+    if (!buttonText || !angular.isString(buttonText.getUnicode())) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Button text must be a SubtitledUnicode object.'
+        message: 'Button text must be a string.'
       });
     } else if (buttonText.getUnicode().length === 0) {
       warningsList.push({

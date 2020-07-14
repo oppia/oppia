@@ -310,7 +310,10 @@ describe('Exploration Warnings Service', function() {
                 value: 1
               },
               buttonText: {
-                value: new SubtitledUnicode('', '')
+                value: {
+                  unicode_str: '',
+                  content_id: ''
+                }
               }
             },
             hints: [],
@@ -923,7 +926,10 @@ describe('Exploration Warnings Service', function() {
                 value: 1
               },
               placeholder: {
-                value: 'placeholder value'
+                value: {
+                  unicode_str: 'placeholder value',
+                  content_id: ''
+                }
               }
             },
             hints: [],

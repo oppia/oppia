@@ -49,7 +49,7 @@ class Continue(base.BaseInteraction):
             'obj_type': 'SubtitledUnicode'
         },
         'default_value': {
-            'content_id': 'custarg_buttonText',
+            'content_id': '',
             'unicode_str': 'Continue'
         },
     }]

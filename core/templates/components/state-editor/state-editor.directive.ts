@@ -47,6 +47,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
 
 angular.module('oppia').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

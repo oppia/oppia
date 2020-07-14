@@ -62,7 +62,7 @@ class MultipleChoiceInput(base.BaseInteraction):
         },
         'default_value': [{
             'html': '',
-            'content_id': 'custarg_choices_default'
+            'content_id': ''
         }],
     }, {
         'name': 'showChoicesInShuffledOrder',

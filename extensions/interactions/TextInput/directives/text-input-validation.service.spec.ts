@@ -87,7 +87,19 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('Placeholder must be a SubtitledUnicode object.')
+      message: ('Placeholder text must be a string.')
+    }]);
+  });
+
+  it('should catch non-string value for placeholder', () => {
+    customizationArguments.placeholder.value = (
+      new SubtitledUnicode(undefined, undefined));
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Placeholder text must be a string.')
     }]);
   });
 

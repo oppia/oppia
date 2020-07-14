@@ -54,6 +54,9 @@ require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
 
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

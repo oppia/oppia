@@ -43,6 +43,7 @@ export class ContinueValidationService {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['buttonText']);
+
     if (customizationArgs.buttonText.value.getUnicode().length === 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,

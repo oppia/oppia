@@ -63,7 +63,10 @@ describe('State Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: new SubtitledUnicode('Type your answer here.', '')
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
           }
         },
         answer_groups: [],
@@ -82,6 +85,7 @@ describe('State Object Factory', () => {
         hints: [],
         solution: null
       },
+      next_content_id_index: 0,
       param_changes: [],
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -120,7 +124,10 @@ describe('State Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: new SubtitledUnicode('Type your answer here.', '')
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
           }
         },
         default_outcome: {

@@ -58,7 +58,10 @@ describe('State card object factory', () => {
           value: 1
         },
         placeholder: {
-          value: new SubtitledUnicode('Type your answer here.', '')
+          value: {
+            unicode_str: 'Type your answer here.',
+            content_id: ''
+          }
         }
       },
       default_outcome: {
@@ -144,7 +147,7 @@ describe('State card object factory', () => {
         value: 1
       },
       placeholder: {
-        value: 'Type your answer here.'
+        value: new SubtitledUnicode('Type your answer here.', '')
       }
     });
     expect(_sampleCard.getInteractionHtml()).toEqual(
