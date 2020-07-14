@@ -94,16 +94,13 @@ var PreferencesPage = function() {
   };
 
   this.toggleEditorRoleEmailsCheckbox = async function() {
-    await action.click(
-      'Editor role emails checkbox', editorRoleEmailsCheckbox,
-      clickableCheck = true);
+    await action.click('Editor role emails checkbox', editorRoleEmailsCheckbox);
     await saveNewChanges('Editor Role Emails');
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
     await action.click(
-      'Feedback emails checkbox', feedbackMessageEmailsCheckbox,
-      clickableCheck = true);
+      'Feedback emails checkbox', feedbackMessageEmailsCheckbox);
     await saveNewChanges('Feedback Emails');
   };
 
@@ -129,10 +126,10 @@ var PreferencesPage = function() {
 
   this.setUserInterests = async function(interests) {
     await userInterestsInput.click();
-    for (let i = 0; i <= interests.length; i++) {
-      await userInterestsInput.sendKeys(interests[i], protractor.Key.RETURN);
-    }
-    await saveNewChanges('User Interests');
+    await Promise.all(interests.map(async function(interest) {
+      await userInterestsInput.sendKeys(interest, protractor.Key.RETURN);
+      await saveNewChanges('User Interests');
+    }));
   };
 
   this.isFeedbackEmailsCheckboxSelected = async function() {
@@ -187,13 +184,13 @@ var PreferencesPage = function() {
 
   this.selectCreatorDashboard = async function() {
     await action.click(
-      'Creator Dashboard radio', createrDashboardRadio, clickableCheck = true);
+      'Creator Dashboard radio', createrDashboardRadio);
     await saveNewChanges('Creator Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {
     await action.click(
-      'Learner Dashboard radio', learnerDashboardRadio, clickableCheck = true);
+      'Learner Dashboard radio', learnerDashboardRadio);
     await saveNewChanges('Learner Dashboard Option');
   };
 };
