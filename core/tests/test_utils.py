@@ -32,6 +32,7 @@ from constants import constants
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import email_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -66,7 +67,6 @@ import webtest
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
-email_services = models.Registry.import_email_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -223,7 +223,7 @@ class EmailServicesMock(python_utils.OBJECT):
             raise ValueError(
                 'Malformed recipient email address: %s' % recipient_email)
 
-        if not email_services.is_sender_email_valid(sender_email):
+        if not email_services.is_email_valid(sender_email):
             raise ValueError(
                 'Malformed sender email address: %s' % sender_email)
 
@@ -269,7 +269,7 @@ class EmailServicesMock(python_utils.OBJECT):
                 raise ValueError(
                     'Malformed recipient email address: %s' % recipient_email)
 
-        if not email_services.is_sender_email_valid(sender_email):
+        if not email_services.ss_email_valid(sender_email):
             raise ValueError(
                 'Malformed sender email address: %s' % sender_email)
 

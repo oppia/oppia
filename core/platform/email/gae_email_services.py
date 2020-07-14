@@ -25,62 +25,6 @@ import python_utils
 from google.appengine.api import mail
 
 
-def get_incoming_email_address(reply_to_id):
-    """Gets the incoming email address. The client is responsible for recording
-    any audit logs.
-
-    Args:
-        reply_to_id: str. The unique id of the sender.
-
-    Returns:
-        str. The email address of the sender.
-    """
-    return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
-
-
-def is_email_valid(email_address):
-    """Determines whether an email address is invalid.
-
-    Args:
-        email_address: str. Email address to check.
-
-    Returns:
-        bool. Whether specified email address is valid.
-    """
-    if not isinstance(email_address, python_utils.BASESTRING):
-        return False
-
-    stripped_address = email_address.strip()
-    if not stripped_address:
-        return False
-
-    return True
-
-
-def is_sender_email_valid(sender_email):
-    """Gets the sender_email address and validates it is of the form
-    'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-
-    Args:
-        sender_email: str. The email address of the sender.
-
-    Returns:
-        bool. Whether the sender_email is valid.
-    """
-    if not is_email_valid(sender_email):
-        return False
-
-    split_sender_email = sender_email.split(' ')
-    if len(split_sender_email) < 2:
-        return False
-
-    email_address = split_sender_email[-1]
-    if not email_address.startswith('<') or not email_address.endswith('>'):
-        return False
-
-    return True
-
-
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body, html_body,
         bcc_admin=False, reply_to_id=None):
