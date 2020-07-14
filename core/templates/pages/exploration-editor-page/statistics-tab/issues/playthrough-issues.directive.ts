@@ -21,7 +21,7 @@ require(
   'early-quit-issue.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'multiple-incorrect-issue.directive.ts');
+  'multiple-incorrect-issue.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'cyclic-transitions-issue.component.ts');

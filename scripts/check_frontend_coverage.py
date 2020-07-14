@@ -201,7 +201,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'mathjax-bind.directive.ts',
     'messenger.service.ts',
     'misconception-editor.directive.ts',
-    'multiple-incorrect-issue.directive.ts',
     'multiple-incorrect-submissions-issue.directive.ts',
     'music-notes-input-rules.service.ts',
     'music-phrase-editor.directive.ts',
