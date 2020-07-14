@@ -284,7 +284,6 @@
 /core/templates/services/exploration-improvements-backend-api.service*.ts @seanlip
 /core/templates/services/exploration-stats.service*.ts @seanlip
 /core/templates/services/exploration-stats-backend-api.service*.ts @seanlip
-/core/templates/services/improvements.service*.ts @seanlip
 /core/templates/services/messenger.service.ts @seanlip
 /core/templates/services/playthrough*.ts @seanlip
 /core/templates/services/state-interaction-stats.service*.ts @seanlip
