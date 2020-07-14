@@ -143,11 +143,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 component_id)
             self.assertTrue(self._is_camel_cased(component_id))
 
-            # TODO(#9356): Remove this if condition once the Svgdiagram
-            # directive is created in the second part of 1st milestone.
-            if component_id == 'Svgdiagram':
-                continue
-
             # Check that the component directory exists.
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
@@ -174,6 +169,16 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 % hyphenated_component_id)
             main_html_file = os.path.join(
                 directives_dir, '%s.directive.html' % hyphenated_component_id)
+            # TODO(#9762): Remove this if condition once all the files in the
+            # rich_text_components directory is migrated from directives
+            # to component files.
+            if hyphenated_component_id == 'svgdiagram':
+                main_ts_file = os.path.join(
+                    directives_dir, 'oppia-noninteractive-%s.component.ts'
+                    % hyphenated_component_id)
+                main_html_file = os.path.join(
+                    directives_dir, '%s.component.html'
+                    % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 

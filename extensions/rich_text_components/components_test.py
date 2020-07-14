@@ -310,7 +310,4 @@ class ComponentE2eTests(test_utils.GenericTestBase):
                 text_inside_constant = text_inside_constant[
                     text_inside_constant.find(',') + 1:]
 
-        # TODO(#9356): Add svgdiagram to validations once the e2e tests for it
-        # are created in the 2nd milestone.
-        actual_components.remove('Svgdiagram')
         self.assertEqual(set(actual_components), set(rte_components_with_test))
