@@ -67,7 +67,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.directive.ts');
+  'playthrough-issues.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
 require(
