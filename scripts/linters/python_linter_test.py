@@ -36,6 +36,8 @@ INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
 INVALID_TEST_ONLY_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_test_only.py')
+INVALID_PYCODESTYLE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_pycodestyle_error.py')
 
 INVALID_JOBS_ONE_OFF_FILEPATHS = [
     'scripts/linters/test_files/invalid_duplicate_jobs_one_off.py']
@@ -73,17 +75,16 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
 
     def test_unsorted_import_order(self):
         with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                [INVALID_IMPORT_FILEPATH], FILE_CACHE,
-                True).perform_all_lint_checks()
+            python_linter.ThirdPartyPythonLintChecksManager(
+                [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
         self.assert_same_list_elements([
             'FAILED  Import order checks failed, file imports should be '
             'alphabetized, see affect files above.'], self.linter_stdout)
 
     def test_sorted_import_order(self):
         with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                [VALID_PY_FILEPATH], FILE_CACHE, True).perform_all_lint_checks()
+            python_linter.ThirdPartyPythonLintChecksManager(
+                [VALID_PY_FILEPATH], True).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['SUCCESS  Import order checks passed'],
             self.linter_stdout)
@@ -188,6 +189,13 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
         self.assert_same_list_elements(
             ['There are no Python files to lint.'],
             self.linter_stdout)
+
+    def test_pycodestyle_with_error_message(self):
+        summary_messages = python_linter.ThirdPartyPythonLintChecksManager(
+            [INVALID_PYCODESTYLE_FILEPATH], True).perform_all_lint_checks()
+        self.assert_same_list_elements(
+            ['27:1: E302 expected 2 blank lines, found 1'],
+            summary_messages)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = python_linter.get_linters(
