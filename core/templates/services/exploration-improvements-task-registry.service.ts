@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Registrar responsible for managing the improvements tasks of an
- * exploration.
+ * @fileoverview Service responsible for keeping track of all of the registered
+ * improvements tasks for an exploration.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
