@@ -294,8 +294,6 @@ import { ImageFileObjectFactory } from
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { InteractionCustomizationArgsUtilService } from
-  'services/interaction-customization-args-util.service';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -788,7 +786,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageFileObjectFactory: ImageFileObjectFactory;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
-  static interactionCustomizationArgsUtilService: InteractionCustomizationArgsUtilService;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
   static interactionObjectFactory: InteractionObjectFactory;
   static interactionRulesRegistryService: InteractionRulesRegistryService;
@@ -1095,7 +1092,6 @@ private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
-private interactionCustomizationArgsUtilService: InteractionCustomizationArgsUtilService,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
 private interactionObjectFactory: InteractionObjectFactory,
 private interactionRulesRegistryService: InteractionRulesRegistryService,
@@ -1404,7 +1400,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
-    OppiaAngularRootComponent.interactionCustomizationArgsUtilService = this.interactionCustomizationArgsUtilService;
     OppiaAngularRootComponent.interactionObjectFactory = this.interactionObjectFactory;
     OppiaAngularRootComponent.interactionRulesRegistryService = this.interactionRulesRegistryService;
     OppiaAngularRootComponent.interactionSpecsService = this.interactionSpecsService;

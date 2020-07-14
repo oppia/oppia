@@ -135,7 +135,6 @@ angular.module('oppia').directive('stateEditor', [
               StateCustomizationArgsService.init(
                 $scope.stateName, stateData.interaction.customizationArgs);
               StateNameService.init($scope.stateName, stateData.name);
-              console.log('init', stateData.nextContentIdIndex)
               StateNextContentIdIndexService.init(
                 $scope.stateName, stateData.nextContentIdIndex);
               StateParamChangesService.init(

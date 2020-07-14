@@ -16,6 +16,12 @@
  * @fileoverview Controller for customize interaction modal.
  */
 
+import { CustomizationArgsSchema } from
+  'domain/exploration/InteractionObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -32,19 +38,18 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-next-content-id-index.service');
+require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
-require('services/interaction-customization-args-util.service.ts');
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',
   'EditorFirstTimeEventsService',
-  'InteractionCustomizationArgsUtilService',
-  'InteractionDetailsCacheService',
+  'InteractionDetailsCacheService', 'InteractionObjectFactory',
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'StateNextContentIdIndexService',
   'UrlInterpolationService',
@@ -54,8 +59,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   function(
       $controller, $injector, $scope, $uibModalInstance,
       EditorFirstTimeEventsService,
-      InteractionCustomizationArgsUtilService,
-      InteractionDetailsCacheService,
+      InteractionDetailsCacheService, InteractionObjectFactory,
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
@@ -126,7 +130,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
 
       const defaultCustomizationArgs = (
-        InteractionCustomizationArgsUtilService.fromBackendDict(
+        InteractionObjectFactory.fromBackendDict(
           StateInteractionIdService.displayed,
           customizationArgsBackendDict
         )
@@ -194,7 +198,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         });
 
         StateCustomizationArgsService.displayed = (
-          InteractionCustomizationArgsUtilService.fromBackendDict(
+          InteractionObjectFactory.fromBackendDict(
             newInteractionId,
             customizationArgsBackendDict
           )
@@ -258,12 +262,54 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.populateBlankContentIds = function() {
-      StateNextContentIdIndexService.displayed = (
-        InteractionCustomizationArgsUtilService.populateBlankContentIds(
-          $scope.StateInteractionIdService.displayed,
-          StateCustomizationArgsService.displayed,
-          StateNextContentIdIndexService.displayed)
-      );
+      const interactionId = $scope.StateInteractionIdService.displayed;
+
+      let assignContentIdsToEmptyContent = (
+          value: any,
+          schema: CustomizationArgsSchema,
+          contentId: string,
+      ): void => {
+        const schemaType = schema.type;
+        const schemaObjType = schema.obj_type;
+
+        if (schemaObjType === 'SubtitledUnicode' ||
+            schemaObjType === 'SubtitledHtml') {
+          value = <SubtitledHtml | SubtitledUnicode> value;
+          if (value.getContentId() === '') {
+            contentId = (
+              `${contentId}_${StateNextContentIdIndexService.displayed}`);
+            value.setContentId(contentId);
+            StateNextContentIdIndexService.displayed += 1;
+          }
+        } else if (schemaType === 'list') {
+          for (let i = 0; i < value.length; i++) {
+            assignContentIdsToEmptyContent(
+              value[i],
+              schema.items,
+              `${contentId}_i${i}`);
+          }
+        } else if (schemaType === 'dict') {
+          schema.properties.forEach(property => {
+            const name = property.name;
+            assignContentIdsToEmptyContent(
+              value[name],
+              property.schema,
+              `${contentId}_${name}`);
+          });
+        }
+      };
+
+      const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+      const caValues = StateCustomizationArgsService.displayed;
+      for (let caSpec of caSpecs) {
+        const name = caSpec.name;
+        if (name in caValues) {
+          assignContentIdsToEmptyContent(
+            caValues[name].value,
+            caSpec.schema,
+            `custarg_${name}`);
+        }
+      }
     };
 
     $scope.save = function() {

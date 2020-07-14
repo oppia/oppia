@@ -17,9 +17,7 @@
  */
 
 import { IGraphAnswer } from 'interactions/answer-defs';
-import { IImageWithRegions } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.directive';
+
 import { ISubtitledHtmlBackendDict, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { ISubtitledUnicodeBackendDict, SubtitledUnicode } from

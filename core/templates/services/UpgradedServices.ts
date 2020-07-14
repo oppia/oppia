@@ -253,8 +253,6 @@ import { ImageFileObjectFactory } from
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { InteractionCustomizationArgsUtilService } from
-  'services/interaction-customization-args-util.service';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -945,10 +943,6 @@ export class UpgradedServices {
     upgradedServices['ImageClickInputValidationService'] =
       new ImageClickInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['InteractionCustomizationArgsUtilService'] =
-      new InteractionCustomizationArgsUtilService(
-        upgradedServices['SubtitledHtmlObjectFactory'],
-        upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['InteractiveMapValidationService'] =
       new InteractiveMapValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1490,8 +1484,7 @@ export class UpgradedServices {
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['InteractionCustomizationArgsUtilService']);
+        upgradedServices['HtmlEscaperService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],
@@ -1529,7 +1522,8 @@ export class UpgradedServices {
       upgradedServices['HintObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
       upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['InteractionCustomizationArgsUtilService']);
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['SubtitledUnicodeObjectFactory']);
 
     // Topological level: 8.
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(

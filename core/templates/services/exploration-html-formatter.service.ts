@@ -26,8 +26,7 @@ import { ExtensionTagAssemblerService } from
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IInteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { InteractionCustomizationArgsUtilService } from
-  'services/interaction-customization-args-util.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 
 // A service that provides a number of utility functions useful to both the
@@ -39,9 +38,7 @@ export class ExplorationHtmlFormatterService {
   constructor(
       private camelCaseToHyphens: CamelCaseToHyphensPipe,
       private extensionTagAssembler: ExtensionTagAssemblerService,
-      private htmlEscaper: HtmlEscaperService,
-      private interactionCustomizationArgsUtilService:
-        InteractionCustomizationArgsUtilService
+      private htmlEscaper: HtmlEscaperService
   ) {}
 
   /**
@@ -67,8 +64,7 @@ export class ExplorationHtmlFormatterService {
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     const ca = angular.copy(interactionCustomizationArgs);
-    this.interactionCustomizationArgsUtilService.unwrapSubtitled(
-      interactionId, ca);
+    Interaction.unwrapCustomizationArgsContent(interactionId, ca);
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(element, ca));
@@ -87,7 +83,7 @@ export class ExplorationHtmlFormatterService {
     var interactionChoices = null;
 
     interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
-    this.interactionCustomizationArgsUtilService.unwrapSubtitled(
+    Interaction.unwrapCustomizationArgsContent(
       interactionId, interactionCustomizationArgs);
 
     if ('choices' in interactionCustomizationArgs) {
@@ -112,7 +108,7 @@ export class ExplorationHtmlFormatterService {
     var interactionChoices = null;
 
     interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
-    this.interactionCustomizationArgsUtilService.unwrapSubtitled(
+    Interaction.unwrapCustomizationArgsContent(
       interactionId, interactionCustomizationArgs);
 
     if ('choices' in interactionCustomizationArgs) {
