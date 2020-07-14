@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, flushMicrotasks, tick } from '@angular/core/testing';
 import { TeachPageComponent } from './teach-page.component';
 import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
 
@@ -130,13 +130,14 @@ describe('Teach Page', function() {
     component = fixture.componentInstance;
   });
 
-  afterEach(function() {
+  afterEach(() => {
     // Property onhashchange and location.hash are reassigned because it shares
     // same memory reference to all test blocks and the controller itself
     // because $provide.value of WindowRef refers to windowRef as well.
     // Once location.hash or onhashchange is setted in the controller,
     // the value will be only available in the test block itself, not affecting
     // others test block.
+    windowRef.nativeWindow.location.href = '';
     windowRef.nativeWindow.onhashchange = null;
     windowRef.nativeWindow.location.hash = '';
   });
@@ -183,21 +184,23 @@ describe('Teach Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should apply to teach with oppia', () => {
+  it('should apply to teach with oppia', fakeAsync(() => {
     const applyToTeachWithOppiaEventSpy = spyOn(
       sas, 'registerApplyToTeachWithOppiaEvent')
       .and.callThrough();
 
     component.ngOnInit();
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
+      location: {
+        href: ''
+      }
     });
     component.onApplyToTeachWithOppia();
-    // Added more delay than 150 to avoid race condition.
-    setTimeout(() => {
-      expect(windowRef.nativeWindow.location.href).toBe(
-        'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
-      expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-    }, 300);
-  });
+
+    tick(200);
+
+    expect(windowRef.nativeWindow.location.href).toBe(
+      'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
+    expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
+  }));
 });
