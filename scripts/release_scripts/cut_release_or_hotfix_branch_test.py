@@ -36,6 +36,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CutReleaseOrHotfixBranchTests, self).setUp()
 
+        self.all_cmd_tokens = []
         self.check_function_calls = {
             'verify_local_repo_is_clean_is_called': False,
             'verify_current_branch_name_is_called': False,
@@ -84,7 +85,8 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_get_remote_alias(unused_remote_url):
             self.check_function_calls['get_remote_alias_is_called'] = True
             return 'upstream'
-        def mock_check_call(unused_cmd_tokens):
+        def mock_check_call(cmd_tokens):
+            self.all_cmd_tokens.extend(cmd_tokens)
             self.check_function_calls['check_call_is_called'] = True
         def mock_verify_target_branch(
                 unused_remote_alias, unused_new_branch_name):
@@ -368,6 +370,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'hotfix_number_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
+        expected_cmd_tokens = [
+            'git', 'pull', 'upstream', 'develop',
+            'git', 'checkout', '-b', 'release-1.2.3',
+            'git', 'push', 'upstream', 'release-1.2.3']
+        self.assertEqual(self.all_cmd_tokens, expected_cmd_tokens)
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_more_than_one(
             self):
@@ -384,6 +391,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
+        expected_cmd_tokens = [
+            'git', 'pull', 'upstream', 'develop',
+            'git', 'checkout', '-b', 'release-1.2.3-hotfix-3',
+            'release-1.2.3-hotfix-2']
+        self.assertEqual(self.all_cmd_tokens, expected_cmd_tokens)
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_equal_to_one(
             self):
@@ -400,3 +412,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             'latest_released_version_is_called'] = False
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
+        expected_cmd_tokens = [
+            'git', 'pull', 'upstream', 'develop',
+            'git', 'checkout', '-b', 'release-1.2.3-hotfix-1', 'release-1.2.3']
+        self.assertEqual(self.all_cmd_tokens, expected_cmd_tokens)

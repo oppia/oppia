@@ -466,6 +466,8 @@ import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service.ts';
+import { ReviewTestObjectFactory } from
+  'domain/review_test/review-test-object.factory';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -864,6 +866,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static reviewTestEngineService: ReviewTestEngineService;
+  static reviewTestObjectFactory: ReviewTestObjectFactory;
   static rubricObjectFactory: RubricObjectFactory;
   static ruleObjectFactory: RuleObjectFactory;
   static schemaDefaultValueService: SchemaDefaultValueService;
@@ -1167,6 +1170,7 @@ private readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory,
 private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
 private reviewTestBackendApiService: ReviewTestBackendApiService,
 private reviewTestEngineService: ReviewTestEngineService,
+private reviewTestObjectFactory: ReviewTestObjectFactory,
 private rubricObjectFactory: RubricObjectFactory,
 private ruleObjectFactory: RuleObjectFactory,
 private schemaDefaultValueService: SchemaDefaultValueService,
@@ -1471,6 +1475,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.recordedVoiceoversObjectFactory = this.recordedVoiceoversObjectFactory;
     OppiaAngularRootComponent.reviewTestBackendApiService = this.reviewTestBackendApiService;
     OppiaAngularRootComponent.reviewTestEngineService = this.reviewTestEngineService;
+    OppiaAngularRootComponent.reviewTestObjectFactory = this.reviewTestObjectFactory;
     OppiaAngularRootComponent.rubricObjectFactory = this.rubricObjectFactory;
     OppiaAngularRootComponent.ruleObjectFactory = this.ruleObjectFactory;
     OppiaAngularRootComponent.schemaDefaultValueService = this.schemaDefaultValueService;

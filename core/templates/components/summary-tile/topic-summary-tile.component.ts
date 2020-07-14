@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,35 +13,38 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the social buttons displayed in the footer.
+ * @fileoverview Component for a topic tile.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
+import { ClassroomDomainConstants } from
+  'domain/classroom/classroom-domain.constants';
+import { TopicSummary } from 'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 @Component({
-  selector: 'social-buttons',
-  templateUrl: './social-buttons.component.html',
+  selector: 'topic-summary-tile',
+  templateUrl: './topic-summary-tile.component.html',
   styleUrls: []
 })
-export class SocialButtonsComponent implements OnInit {
+export class TopicSummaryTileComponent {
+  @Input() topicSummary: TopicSummary;
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService) {
-    this.translateService.use('en');
   }
-  ngOnInit(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code));
+  getTopicLink(): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
+        topic_name: this.topicSummary.getName()});
   }
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
+
+angular.module('oppia').directive(
+  'topicSummaryTile', downgradeComponent(
+    {component: TopicSummaryTileComponent}));
