@@ -35,7 +35,7 @@ import utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
-email_services = models.Registry.import_email_services()
+from core.domain import email_services
 transaction_services = models.Registry.import_transaction_services()
 
 

@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import logging
 import types
 
 from constants import constants
@@ -34,7 +35,7 @@ import feconf
 import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
-email_services = models.Registry.import_email_services()
+from core.domain import email_services
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -172,7 +173,7 @@ class DummyMailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
             self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
-                          messages[0].html.decode())
+                          messages[0].html.decode())        
 
 
 class EmailRightsTest(test_utils.EmailTestBase):
@@ -2471,8 +2472,15 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
+    @classmethod
+    def setUpClass(cls):
+        super(VoiceoverApplicationEmailUnitTest, cls).setUpClass()
+        cls._log_handler = test_utils.MockLoggingHandler()
+
     def setUp(self):
         super(VoiceoverApplicationEmailUnitTest, self).setUp()
+        self._log_handler.reset()
+        self.email_services_mock.wipe_emails_dict()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         user_services.update_email_preferences(
@@ -2596,6 +2604,17 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
+    def test_can_send_emails_is_false_logs_error(self):
+        self.email_services_mock.wipe_emails_dict()
+
+        with self.swap(logging, 'error', self._log_handler.error):
+            email_manager.send_rejected_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en',
+                'A rejection message!')
+
+            self.assertEqual(
+                self._log_handler.messages['error'], 
+                ['This app cannot send emails to users.'])
 
 class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to account deletion application emails."""
