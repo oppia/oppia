@@ -24,7 +24,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 // Mocking window object here because changing location.href causes the
 // full page to reload. Page reloads raise an error in karma.
