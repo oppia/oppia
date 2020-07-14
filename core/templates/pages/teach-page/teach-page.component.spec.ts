@@ -24,6 +24,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 // Mocking window object here because changing location.href causes the
 // full page to reload. Page reloads raise an error in karma.
@@ -74,10 +75,6 @@ class MockWindowRef {
       },
       set href(val) {
         this._href = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
       },
       reload: (val) => val
     },
@@ -103,7 +100,7 @@ class MockSiteAnalyticsService {
 let component: TeachPageComponent;
 let fixture: ComponentFixture<TeachPageComponent>;
 
-describe('Teach Page', function() {
+fdescribe('Teach Page', function() {
   let windowRef: MockWindowRef;
   let sas = null;
   let i18n = null;
@@ -118,8 +115,9 @@ describe('Teach Page', function() {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
         },
-        { provide: TranslateService, useClass: MockTranslateService },
         { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
+        { provide: TranslateService, useClass: MockTranslateService },
+        UrlInterpolationService,
         { provide: WindowRef, useValue: windowRef }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -194,10 +192,11 @@ describe('Teach Page', function() {
       location: ''
     });
     component.onApplyToTeachWithOppia();
+    // Added more delay than 150 to avoid race condition
     setTimeout(() => {
       expect(windowRef.nativeWindow.location.href).toBe(
         'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
       expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-    }, 150);
+    }, 300);
   });
 });
