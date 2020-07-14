@@ -956,6 +956,9 @@ export class UpgradedServices {
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['MathExpressionInputValidationService'] =
+      new MathExpressionInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
