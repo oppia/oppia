@@ -40,6 +40,9 @@ require(
   'state-name.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-param-changes.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -47,9 +50,6 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-next-content-id-index.service');
 
 angular.module('oppia').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -135,6 +135,7 @@ angular.module('oppia').directive('stateEditor', [
               StateCustomizationArgsService.init(
                 $scope.stateName, stateData.interaction.customizationArgs);
               StateNameService.init($scope.stateName, stateData.name);
+              console.log('init', stateData.nextContentIdIndex)
               StateNextContentIdIndexService.init(
                 $scope.stateName, stateData.nextContentIdIndex);
               StateParamChangesService.init(

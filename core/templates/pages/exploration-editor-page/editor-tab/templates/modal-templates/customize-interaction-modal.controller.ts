@@ -29,6 +29,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
@@ -43,7 +46,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'InteractionCustomizationArgsUtilService',
   'InteractionDetailsCacheService',
   'StateCustomizationArgsService', 'StateEditorService',
-  'StateInteractionIdService', 'UrlInterpolationService',
+  'StateInteractionIdService', 'StateNextContentIdIndexService',
+  'UrlInterpolationService',
   'ALLOWED_INTERACTION_CATEGORIES',
   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
   'INTERACTION_SPECS',
@@ -53,7 +57,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       InteractionCustomizationArgsUtilService,
       InteractionDetailsCacheService,
       StateCustomizationArgsService, StateEditorService,
-      StateInteractionIdService, UrlInterpolationService,
+      StateInteractionIdService, StateNextContentIdIndexService,
+      UrlInterpolationService,
       ALLOWED_INTERACTION_CATEGORIES,
       ALLOWED_QUESTION_INTERACTION_CATEGORIES,
       INTERACTION_SPECS) {
@@ -253,9 +258,11 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.populateBlankContentIds = function() {
-      InteractionCustomizationArgsUtilService.populateBlankContentIds(
-        $scope.StateInteractionIdService.displayed,
-        StateCustomizationArgsService.displayed
+      StateNextContentIdIndexService.displayed = (
+        InteractionCustomizationArgsUtilService.populateBlankContentIds(
+          $scope.StateInteractionIdService.displayed,
+          StateCustomizationArgsService.displayed,
+          StateNextContentIdIndexService.displayed)
       );
     };
 

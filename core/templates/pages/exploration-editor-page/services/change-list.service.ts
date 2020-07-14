@@ -89,6 +89,7 @@ angular.module('oppia').factory('ChangeListService', [
       // opened):
       // - Version Mismatch.
       // - Non-strict Validation Fail.
+      console.log(explorationChangeList)
       ExplorationDataService.autosaveChangeList(
         explorationChangeList,
         function(response) {

@@ -90,7 +90,7 @@ export class ExplorationHtmlFormatterService {
     this.interactionCustomizationArgsUtilService.unwrapSubtitled(
       interactionId, interactionCustomizationArgs);
 
-    if (interactionCustomizationArgs.choices) {
+    if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value;
     }
 

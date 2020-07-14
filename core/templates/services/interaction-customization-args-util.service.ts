@@ -61,8 +61,7 @@ interface Schema {
 export class InteractionCustomizationArgsUtilService {
   constructor(
       private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
-      private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
-      private stateNextContentIdIndexService: StateNextContentIdIndexService
+      private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory
   ) {}
 
   private applyConversionFnOnContent(
@@ -100,43 +99,40 @@ export class InteractionCustomizationArgsUtilService {
   private assignContentIdsToEmptyContent(
       value: CustArgValue | CustArgValue[],
       schema: Schema,
-      contentId: string
-  ): boolean {
+      contentId: string,
+      nextContentIdIndex: number
+  ): number {
     const schemaType = schema.type;
     const schemaObjType = schema.obj_type;
-
-    let contentIdAssigned = false;
 
     if (schemaObjType === 'SubtitledUnicode' ||
         schemaObjType === 'SubtitledHtml') {
       value = <SubtitledHtml | SubtitledUnicode> value;
       if (value.getContentId() === '') {
         value.setContentId(contentId);
-        contentIdAssigned = true;
+        nextContentIdIndex += 1;
       }
     } else if (schemaType === 'list') {
       value = <CustArgValue[]> value;
       for (let i = 0; i < value.length; i++) {
-        const contentIdIndex = this.stateNextContentIdIndexService.displayed;
-        const subprocessAssignedContentId = this.assignContentIdsToEmptyContent(
+        nextContentIdIndex = this.assignContentIdsToEmptyContent(
           value[i],
           schema.items,
-          `${contentId}_${contentIdIndex}`);
-        if (subprocessAssignedContentId) {
-          this.stateNextContentIdIndexService.displayed += 1;
-        }
+          `${contentId}_${nextContentIdIndex}`,
+          nextContentIdIndex);
       }
     } else if (schemaType === 'dict') {
       schema.properties.forEach(property => {
         const name = property.name;
-        this.assignContentIdsToEmptyContent(
+        nextContentIdIndex = this.assignContentIdsToEmptyContent(
           value[name],
           property.schema,
-          `${contentId}_${name}`);
+          `${contentId}_${name}`,
+          nextContentIdIndex);
       });
     }
 
-    return contentIdAssigned;
+    return nextContentIdIndex;
   }
 
   convertContent(
@@ -221,23 +217,26 @@ export class InteractionCustomizationArgsUtilService {
 
   populateBlankContentIds(
       interactionId: string,
-      caValues: IInteractionCustomizationArgs
-  ): IInteractionCustomizationArgs {
+      caValues: IInteractionCustomizationArgs,
+      nextContentIdIndex: number
+  ): number {
     if (!interactionId || !(interactionId in INTERACTION_SPECS)) {
       return;
     }
 
     const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
-
     for (let caSpec of caSpecs) {
       const name = caSpec.name;
       if (name in caValues) {
-        this.assignContentIdsToEmptyContent(
-          <CustArgValue>caValues[name].value, caSpec.schema, `custarg_${name}`);
+        nextContentIdIndex = this.assignContentIdsToEmptyContent(
+          <CustArgValue>caValues[name].value,
+          caSpec.schema,
+          `custarg_${name}`,
+          nextContentIdIndex);
       }
     }
 
-    return caValues;
+    return nextContentIdIndex;
   }
 
   unwrapSubtitled(

@@ -52,7 +52,10 @@ describe('ImprovementsService', () => {
               value: 1
             },
             placeholder: {
-              value: 'Type your answer here.'
+              value: {
+                unicode_str: 'Type your answer here.',
+                content_id: ''
+              }
             }
           },
           answer_groups: [],
@@ -71,6 +74,7 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
+        next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -122,6 +126,7 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
+        next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {

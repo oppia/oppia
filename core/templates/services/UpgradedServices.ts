@@ -720,8 +720,6 @@ export class UpgradedServices {
     upgradedServices['FileDownloadRequestObjectFactory'] =
       new FileDownloadRequestObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
-    upgradedServices['GenerateContentIdService'] =
-      new GenerateContentIdService();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
@@ -947,6 +945,10 @@ export class UpgradedServices {
     upgradedServices['ImageClickInputValidationService'] =
       new ImageClickInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['InteractionCustomizationArgsUtilService'] =
+      new InteractionCustomizationArgsUtilService(
+        upgradedServices['SubtitledHtmlObjectFactory'],
+        upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['InteractiveMapValidationService'] =
       new InteractiveMapValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1199,11 +1201,6 @@ export class UpgradedServices {
       new ExplorationRecommendationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['LearnerExplorationSummaryObjectFactory']);
-    upgradedServices['InteractionCustomizationArgsUtilService'] =
-      new InteractionCustomizationArgsUtilService(
-        upgradedServices['SubtitledHtmlObjectFactory'],
-        upgradedServices['SubtitledUnicodeObjectFactory'],
-        upgradedServices['StateNextContentIdIndexService']);
     upgradedServices['InteractionRulesRegistryService'] =
       new InteractionRulesRegistryService(
         upgradedServices['AlgebraicExpressionInputRulesService'],
@@ -1286,6 +1283,9 @@ export class UpgradedServices {
         upgradedServices['ExplorationStatsObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['GenerateContentIdService'] =
+     new GenerateContentIdService(
+       upgradedServices['StateNextContentIdIndexService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],

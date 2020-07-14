@@ -30,11 +30,11 @@ require('services/context.service.ts');
 angular.module('oppia').controller('AddHintModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
   'GenerateContentIdService', 'HintObjectFactory', 'StateHintsService',
-  'existingHintsContentIds', 'COMPONENT_NAME_HINT',
+  'COMPONENT_NAME_HINT',
   function(
       $controller, $scope, $uibModalInstance, ContextService,
       GenerateContentIdService, HintObjectFactory, StateHintsService,
-      existingHintsContentIds, COMPONENT_NAME_HINT) {
+      COMPONENT_NAME_HINT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -52,8 +52,8 @@ angular.module('oppia').controller('AddHintModalController', [
     $scope.addHintForm = {};
     $scope.hintIndex = StateHintsService.displayed.length + 1;
     $scope.saveHint = function() {
-      var contentId = GenerateContentIdService.getNextId(
-        existingHintsContentIds, COMPONENT_NAME_HINT);
+      var contentId = GenerateContentIdService.getNextStateId(
+        COMPONENT_NAME_HINT);
       // Close the modal and save it afterwards.
       $uibModalInstance.close({
         hint: angular.copy(

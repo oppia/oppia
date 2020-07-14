@@ -86,7 +86,8 @@ export class StateInteractionStatsService {
       const customizationArgs = (
         <IMultipleChoiceInputCustomizationArgs>
         state.interaction.customizationArgs);
-      return customizationArgs.choices.value[<IMultipleChoiceAnswer> answer];
+      return customizationArgs.choices.value[
+        <IMultipleChoiceAnswer> answer].getHtml();
     }
     return answer;
   }

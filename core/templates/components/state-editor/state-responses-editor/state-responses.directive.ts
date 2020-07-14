@@ -71,6 +71,9 @@ require(
   'state-interaction-id.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -91,6 +94,7 @@ angular.module('oppia').directive('stateResponses', [
         onResponsesInitialized: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         navigateToState: '=',
         refreshWarnings: '&',
@@ -104,7 +108,8 @@ angular.module('oppia').directive('stateResponses', [
         'AnswerGroupObjectFactory', 'ContextService',
         'EditabilityService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
-        'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
+        'StateInteractionIdService', 'StateNextContentIdIndexService',
+        'StateSolicitAnswerDetailsService',
         'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
@@ -114,7 +119,8 @@ angular.module('oppia').directive('stateResponses', [
             AnswerGroupObjectFactory, ContextService,
             EditabilityService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
-            StateInteractionIdService, StateSolicitAnswerDetailsService,
+            StateInteractionIdService, StateNextContentIdIndexService,
+            StateSolicitAnswerDetailsService,
             UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
@@ -126,15 +132,6 @@ angular.module('oppia').directive('stateResponses', [
             }
             var explorationId = ContextService.getExplorationId();
             var currentStateName = $scope.stateName;
-          };
-
-          var _getExistingFeedbackContentIds = function() {
-            var existingContentIds = [];
-            $scope.answerGroups.forEach(function(answerGroup) {
-              var contentId = answerGroup.outcome.feedback.getContentId();
-              existingContentIds.push(contentId);
-            });
-            return existingContentIds;
           };
 
           $scope.isInQuestionMode = function() {
@@ -303,7 +300,6 @@ angular.module('oppia').directive('stateResponses', [
             $rootScope.$broadcast('externalSave');
             var stateName = StateEditorService.getActiveStateName();
             var addState = $scope.addState;
-            var existingContentIds = _getExistingFeedbackContentIds();
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -314,7 +310,6 @@ angular.module('oppia').directive('stateResponses', [
               resolve: {
                 addState: () => addState,
                 currentInteractionId: () => currentInteractionId,
-                existingContentIds: () => existingContentIds,
                 stateName: () => stateName,
               },
               controller: 'AddAnswerGroupModalController'
@@ -332,6 +327,10 @@ angular.module('oppia').directive('stateResponses', [
                 });
               $scope.changeActiveAnswerGroupIndex(
                 $scope.answerGroups.length - 1);
+
+              StateNextContentIdIndexService.saveDisplayedValue();
+              $scope.onSaveNextContentIdIndex(
+                StateNextContentIdIndexService.displayed);
 
               // After saving it, check if the modal should be reopened right
               // away.
