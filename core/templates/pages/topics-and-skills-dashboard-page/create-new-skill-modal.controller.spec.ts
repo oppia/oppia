@@ -17,7 +17,6 @@
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
-import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
 
 describe('Create new skill modal', function() {
   beforeEach(angular.mock.module('oppia'));

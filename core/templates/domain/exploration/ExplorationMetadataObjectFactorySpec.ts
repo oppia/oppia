@@ -18,7 +18,6 @@
 import { ExplorationMetadata, ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 
-
 describe('Exploration Metadata object factory', () => {
   let sampleExplorationMetadata: ExplorationMetadata = null;
 

@@ -27,7 +27,7 @@ angular.module('oppia', [
 ]);
 
 import { BrowserModule } from '@angular/platform-browser';
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 

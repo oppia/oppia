@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { fromEvent, Observable } from 'rxjs';
-import { HostListener, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
