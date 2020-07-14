@@ -24,7 +24,7 @@ require(
   'multiple-incorrect-issue.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'cyclic-transitions-issue.directive.ts');
+  'cyclic-transitions-issue.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/playthrough-issues.service.ts');

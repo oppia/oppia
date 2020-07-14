@@ -115,7 +115,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'csrf-token.service.ts',
     'current-interaction.service.ts',
     'customize-interaction-modal.controller.ts',
-    'cyclic-transitions-issue.directive.ts',
     'drag-and-drop-html-string-editor.directive.ts',
     'drag-and-drop-positive-int-editor.directive.ts',
     'early-quit-issue.directive.ts',
