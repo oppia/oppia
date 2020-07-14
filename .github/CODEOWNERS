@@ -239,18 +239,21 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @brianrodri
+# TODO(brianrodri): Reclaim ownership after 2020-07-27.
+/core/domain/customization_args_util*.py @seanlip
 /core/domain/expression_parser*.py @aks681
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
 /core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
 /core/templates/domain/objects/ @aks681
-/core/templates/expressions/ @brianrodri
+# TODO(brianrodri): Reclaim ownership after 2020-07-27.
+/core/templates/expressions/ @seanlip
 /core/templates/services/code-normalizer.service*.ts @aks681
 /core/templates/services/guppy-configuration.service.ts @aks681
 /core/templates/services/guppy-initialization.service.ts @aks681
 /core/templates/services/math-interactions.service.ts @aks681
-/extensions/domain*.py @brianrodri
+# TODO(brianrodri): Reclaim ownership after 2020-07-27.
+/extensions/domain*.py @seanlip
 /extensions/interactions/ @aks681 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
@@ -258,37 +261,38 @@
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @brianrodri
-/core/controllers/improvements*.py @brianrodri
-/core/domain/action_registry*.py @brianrodri
-/core/domain/calculation_registry*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
-/core/domain/improvements_domain*.py @brianrodri
-/core/domain/improvements_services*.py @brianrodri
-/core/domain/playthrough_issue_registry*.py @brianrodri
-/core/domain/stats*.py @brianrodri
-/core/domain/visualization_registry*.py @brianrodri
-/core/storage/improvements/ @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
-/core/templates/domain/statistics/ @brianrodri
-/core/templates/domain/improvements/ @brianrodri
-/core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
-/core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/services/exploration-improvements-backend-api.service*.ts @brianrodri
-/core/templates/services/exploration-stats.service*.ts @brianrodri
-/core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
-/core/templates/services/improvements.service*.ts @brianrodri
-/core/templates/services/messenger.service.ts @brianrodri
-/core/templates/services/playthrough*.ts @brianrodri
-/core/templates/services/state-interaction-stats.service*.ts @brianrodri
-/core/templates/services/state-top-answers-stats*.ts @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# TODO(brianrodri): Reclaim ownership after 2020-07-27.
+/core/controllers/features*.py @seanlip
+/core/controllers/improvements*.py @seanlip
+/core/domain/action_registry*.py @seanlip
+/core/domain/calculation_registry*.py @seanlip
+/core/domain/event_services*.py @seanlip
+/core/domain/improvements_domain*.py @seanlip
+/core/domain/improvements_services*.py @seanlip
+/core/domain/playthrough_issue_registry*.py @seanlip
+/core/domain/stats*.py @seanlip
+/core/domain/visualization_registry*.py @seanlip
+/core/storage/improvements/ @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @seanlip
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @seanlip
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @seanlip
+/core/templates/domain/statistics/ @seanlip
+/core/templates/domain/improvements/ @seanlip
+/core/templates/pages/exploration-editor-page/improvements-tab/ @seanlip
+/core/templates/pages/exploration-editor-page/statistics-tab/ @seanlip
+/core/templates/services/exploration-improvements-backend-api.service*.ts @seanlip
+/core/templates/services/exploration-stats.service*.ts @seanlip
+/core/templates/services/exploration-stats-backend-api.service*.ts @seanlip
+/core/templates/services/improvements.service*.ts @seanlip
+/core/templates/services/messenger.service.ts @seanlip
+/core/templates/services/playthrough*.ts @seanlip
+/core/templates/services/state-interaction-stats.service*.ts @seanlip
+/core/templates/services/state-top-answers-stats*.ts @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
@@ -528,6 +532,7 @@
 
 
 # User Data Takeout.
+/core/domain/takeout_domain.py @vojtechjelinek @seanlip
 /core/domain/takeout_service*.py @vojtechjelinek @seanlip
 /core/domain/wipeout_*.py @vojtechjelinek @seanlip
 
