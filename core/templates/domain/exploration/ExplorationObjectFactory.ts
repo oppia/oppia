@@ -30,10 +30,11 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { IParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
-import { IEndExplorationCustomizationArgs, IInteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { Interaction } from
-  'domain/exploration/InteractionObjectFactory';
+import {
+  IEndExplorationCustomizationArgs,
+  IInteractionCustomizationArgs
+} from 'interactions/customization-args-defs';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { IBindableVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';

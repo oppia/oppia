@@ -25,7 +25,7 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IInteractionCustomizationArgs } from
-  'domain/exploration/InteractionObjectFactory';
+  'interactions/customization-args-defs';
 import { InteractionCustomizationArgsUtilService } from
   'services/interaction-customization-args-util.service';
 
@@ -115,7 +115,7 @@ export class ExplorationHtmlFormatterService {
     this.interactionCustomizationArgsUtilService.unwrapSubtitled(
       interactionId, interactionCustomizationArgs);
 
-    if (interactionCustomizationArgs.choices) {
+    if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value;
     }
 

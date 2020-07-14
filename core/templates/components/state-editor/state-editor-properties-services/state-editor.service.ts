@@ -27,14 +27,13 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import {
-  IInteractionCustomizationArgsValue,
+  IInteractionCustomizationArgs,
   IDragAndDropSortInputCustomizationArgs,
   IImageClickInputCustomizationArgs,
   IItemSelectionInputCustomizationArgs,
   IMultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
-import { Interaction, IInteractionCustomizationArgs } from
-  'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -165,7 +164,7 @@ export class StateEditorService {
 
   getAnswerChoices(
       interactionId: string,
-      customizationArgs: IInteractionCustomizationArgsValue): IAnswerChoice[] {
+      customizationArgs: IInteractionCustomizationArgs): IAnswerChoice[] {
     if (!interactionId) {
       return null;
     }

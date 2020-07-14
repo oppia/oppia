@@ -25,11 +25,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IInteractionCustomizationArgsValue } from
+import { IInteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 
 interface IInteractionDetailsCache {
-  [interactionId: string]: IInteractionCustomizationArgsValue;
+  [interactionId: string]: IInteractionCustomizationArgs;
 }
 
 @Injectable({
@@ -52,13 +52,13 @@ export class InteractionDetailsCacheService {
 
   set(
       interactionId: string,
-      interactionCustomizationArgs: IInteractionCustomizationArgsValue): void {
+      interactionCustomizationArgs: IInteractionCustomizationArgs): void {
     InteractionDetailsCacheService._cache[interactionId] = {
       customization: cloneDeep(interactionCustomizationArgs)
     };
   }
 
-  get(interactionId: string): IInteractionCustomizationArgsValue {
+  get(interactionId: string): IInteractionCustomizationArgs {
     if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
       return null;
     }

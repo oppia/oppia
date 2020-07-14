@@ -28,7 +28,7 @@ import { AudioTranslationLanguageService } from
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { IBindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { IInteractionCustomizationArgsValue } from
+import { IInteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
@@ -140,7 +140,7 @@ export class StateCard {
         interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
   }
 
-  getInteractionCustomizationArgs(): IInteractionCustomizationArgsValue {
+  getInteractionCustomizationArgs(): IInteractionCustomizationArgs {
     let interaction = this.getInteraction();
     if (!interaction) {
       return null;

@@ -19,6 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import {
+  IInteractionCustomizationArgsBackendDict, IInteractionCustomizationArgs
+} from 'interactions/customization-args-defs';
 import { StateNextContentIdIndexService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
@@ -28,9 +31,6 @@ import {
 import {
   SubtitledUnicode, ISubtitledUnicodeBackendDict, SubtitledUnicodeObjectFactory
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {
-  IInteractionCustomizationArgsBackendDict, IInteractionCustomizationArgs
-} from 'domain/exploration/InteractionObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

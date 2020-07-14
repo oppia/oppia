@@ -293,7 +293,7 @@ export interface INumberWithUnitsCustomizationArgs extends
   INumberWithUnitsCustomizationArgsBackendDict { }
 
 
-export type IInteractionCustomizationArgsValueBackendDict = (
+export type IInteractionCustomizationArgsBackendDict = (
   IAlgebraicExpressionInputCustomizationArgsBackendDict |
   ICodeReplCustomizationArgsBackendDict |
   IContinueCustomizationArgsBackendDict |
@@ -315,7 +315,7 @@ export type IInteractionCustomizationArgsValueBackendDict = (
   INumericInputCustomizationArgsBackendDict |
   INumberWithUnitsCustomizationArgsBackendDict);
 
-export type IInteractionCustomizationArgsValue = (
+export type IInteractionCustomizationArgs = (
   IAlgebraicExpressionInputCustomizationArgs |
   ICodeReplCustomizationArgs |
   IContinueCustomizationArgs |

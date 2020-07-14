@@ -30,8 +30,8 @@ import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
 import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import {
-  IInteractionCustomizationArgsValueBackendDict,
-  IInteractionCustomizationArgsValue
+  IInteractionCustomizationArgsBackendDict,
+  IInteractionCustomizationArgs
 } from 'interactions/customization-args-defs';
 import { InteractionCustomizationArgsUtilService } from
   'services/interaction-customization-args-util.service';
@@ -44,18 +44,6 @@ export interface IInteractionBackendDict {
   'hints': IHintBackendDict[];
   'id': string;
   'solution': ISolutionBackendDict;
-}
-
-export interface IInteractionCustomizationArgsBackendDict {
-  [customizationArgName: string]: {
-    value: IInteractionCustomizationArgsValueBackendDict
-  }
-}
-
-export interface IInteractionCustomizationArgs {
-  [customizationArgName: string]: {
-    value: IInteractionCustomizationArgsValue
-  }
 }
 
 export class Interaction {
