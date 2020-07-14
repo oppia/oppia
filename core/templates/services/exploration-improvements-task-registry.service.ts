@@ -378,21 +378,18 @@ export class ExplorationImprovementsTaskRegistryService {
       cstPlaythroughIssues: readonly CstPlaythroughIssue[],
       eqPlaythroughIssues: readonly EqPlaythroughIssue[],
       misPlaythroughIssues: readonly MisPlaythroughIssue[]): StateTasks {
-    // NOTE TO DEVELOPERS: This type is required to help the compiler realize
-    // that the arguments to the new Map are all of the same type.
-    type MapPair = [ExplorationTaskType, ExplorationTask];
-    const tasksByType = new Map([
+    const tasksByType = new Map(<[ExplorationTaskType, ExplorationTask][]> [
       // NOTE TO DEVELOPERS: The last repeated key wins. For example:
       //    let map = new Map([['a', 1], ['b', 3], ['a', 9]]);
       //    map.get('a'); // Returns 9.
-      ...ImprovementsConstants.TASK_TYPES.map(taskType => <MapPair> [
+      ...ImprovementsConstants.TASK_TYPES.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
           this.expId, this.expVersion, taskType, stateName)
       ]),
-      ...openTasks.map(task => <MapPair> [
+      ...openTasks.map(task => [
         task.taskType, task
       ]),
-      ...resolvedTaskTypes.map(taskType => <MapPair> [
+      ...resolvedTaskTypes.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewResolvedTask(
           this.expId, this.expVersion, taskType, stateName)
       ]),
