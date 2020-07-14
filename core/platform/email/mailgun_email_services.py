@@ -20,20 +20,36 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
+import logging
+from textwrap import dedent # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform.email import gae_email_services
 import feconf
-import logging
 import python_utils
-from textwrap import dedent
 
-def post_to_mailgun(data):
+
+def post_to_mailgun(
+        sender_email, recipient_email, subject,
+        plaintext_body, html_body, bcc=None, reply_to=None,
+        recipient_variables=None):
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
 
     Args:
-        data: dict. The data to be sent in the request's body.
+        sender_email: str. the email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'. Must be utf-8
+        recipient_email: str|list(str). The email address or email addresses
+            of the recipients. Must be utf-8
+        subject: str. The subject line of the email, Must be utf-8.
+        plaintext_body: str. The plaintext body of the email. Must be utf-8
+        html_body: str. The HTML body of the email. Must fit in a datastore
+            entity. Must be utf-8.
+        bcc: str|None. bcc emails
+        reply_to: str|None. Reply_to email address for replying.
+        recipient_variables: dict|None. If batch sends(sending emails in bulk)
+            requires differentiated email body text, pass in each key value as
+            (recipient, id) to differentiate the recipients.
 
     Returns:
         Response from the server. The object is a file-like object.
@@ -45,13 +61,30 @@ def post_to_mailgun(data):
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')
 
+    data = {
+        'from': sender_email,
+        'to': recipient_email,
+        'subject': subject,
+        'text': plaintext_body,
+        'html': html_body
+    }
+
+    if bcc:
+        data['bcc'] = bcc
+
+    if reply_to:
+        data['h:Reply-To'] = reply_to
+
+    if recipient_variables:
+        data['recipient_variables'] = recipient_variables
+
     encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
     auth_str = 'Basic %s' % encoded
     header = {'Authorization': auth_str}
     server = (
         'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-    data = python_utils.url_encode(data)
-    req = python_utils.url_request(server, data, header)
+    encoded_url = python_utils.url_encode(data)
+    req = python_utils.url_request(server, encoded_url, header)
     return python_utils.url_open(req)
 
 
@@ -85,27 +118,21 @@ def send_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
-    data = {
-        'from': sender_email,
-        'to': recipient_email,
-        'subject': subject.encode(encoding='utf-8'),
-        'text': plaintext_body.encode(encoding='utf-8'),
-        'html': html_body.encode(encoding='utf-8')
-    }
-
-    if bcc_admin:
-        data['bcc'] = feconf.ADMIN_EMAIL_ADDRESS
-
-    if reply_to_id:
-        reply_to = gae_email_services.get_incoming_email_address(reply_to_id)
-        data['h:Reply-To'] = reply_to
+    bcc = feconf.ADMIN_EMAIL_ADDRESS if (bcc_admin) else ''
+    reply_to = (
+        gae_email_services.get_incoming_email_address(reply_to_id)
+        if reply_to_id else '')
 
     if not constants.DEV_MODE:
-        post_to_mailgun(data)
+        post_to_mailgun(
+            sender_email, recipient_email, subject.encode(encoding='utf-8'),
+            plaintext_body.encode(encoding='utf-8'),
+            html_body.encode(encoding='utf-8'), bcc=bcc, reply_to=reply_to)
     else:
         msg_title = 'MailgunService.SendMail'
+        # pylint: disable=division-operator-used
         msg_body = (
-            '''
+            """
             From: %s
             To: %s
             Subject: %s
@@ -115,9 +142,10 @@ def send_mail(
             Body
                 Content-type: text/html
                 Data length: %d
-            ''' % (
+            """ % (
                 sender_email, recipient_email, subject, len(plaintext_body),
                 len(html_body)))
+        # pylint: enable=division-operator-used
         msg = msg_title + dedent(msg_body)
         logging.info(msg)
         logging.info(
@@ -167,25 +195,23 @@ def send_bulk_mail(
         # 'recipient-variable' in post data forces mailgun to send individual
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
-        data = {
-            'from': sender_email,
-            'to': email_list,
-            'subject': subject.encode(encoding='utf-8'),
-            'text': plaintext_body.encode(encoding='utf-8'),
-            'html': html_body.encode(encoding='utf-8'),
-            'recipient-variables': '{}'}
         if not constants.DEV_MODE:
-            post_to_mailgun(data)
+            post_to_mailgun(
+                sender_email, email_list, subject.encode(encoding='utf-8'),
+                plaintext_body.encode(encoding='utf-8'),
+                html_body.encode(encoding='utf-8'),
+                recipient_variables={})
         else:
             recipient_email_list_str = ' '.join(
-                ['%s' % 
-                    (recipient_email,) for recipient_email in email_list[:3]])
-            # Show the first 3 emails in the list up to 1000 emails
-            if(len(email_list) > 3):
+                ['%s' %
+                 (recipient_email,) for recipient_email in email_list[:3]])
+            # Show the first 3 emails in the list for up to 1000 emails.
+            if len(email_list) > 3:
                 recipient_email_list_str += (
-                    '... Total: '+str(len(email_list))+' emails.')
+                    '... Total: ' + str(len(email_list)) + ' emails.')
+            # pylint: disable=division-operator-used
             msg = (
-                '''
+                """
                 From: %s
                 To: %s
                 Subject: %s
@@ -195,9 +221,10 @@ def send_bulk_mail(
                 Body
                     Content-type: text/html
                     Data length: %d
-                ''' % (
+                """ % (
                     sender_email, recipient_email_list_str, subject,
                     len(plaintext_body), len(html_body)))
+            # pylint: enable=division-operator-used
             logging.info(dedent(msg))
     if constants.DEV_MODE:
         logging.info(

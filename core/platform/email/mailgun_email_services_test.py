@@ -19,13 +19,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+from textwrap import dedent # pylint: disable=import-only-modules
+
 from constants import constants
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
-import logging
 import feconf
 import python_utils
-from textwrap import dedent
+
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
@@ -41,6 +43,7 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_post_to_mailgun(self):
         """Test for sending HTTP POST request."""
+
         swapped_urlopen = lambda x: x
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(
@@ -50,14 +53,15 @@ class EmailTests(test_utils.GenericTestBase):
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            result = mailgun_email_services.post_to_mailgun({
-                'from': 'a@a.com',
-                'to': 'b@b.com',
-                'subject': 'Hola 😂 - invitation to collaborate'.encode(
-                    encoding='utf-8'),
-                'text': 'plaintext_body 😂'.encode(encoding='utf-8'),
-                'html': 'Hi abc,<br> 😂'.encode(encoding='utf-8')
-            })
+            result = mailgun_email_services.post_to_mailgun(
+                sender_email='a@a.com',
+                recipient_email='b@b.com',
+                subject=(
+                    'Hola 😂 - invitation to collaborate'
+                    .encode(encoding='utf-8')),
+                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
+                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8')
+            )
             expected = (
                 'https://api.mailgun.net/v3/domain/messages',
                 ('to=b%40b.com&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
@@ -66,11 +70,13 @@ class EmailTests(test_utils.GenericTestBase):
                 {'Authorization': 'Basic YXBpOmtleQ=='})
             self.assertEqual(result, expected)
 
-    def test_DEV_mode_send_mail_logging(self):
-        """ In DEV Mode, email services logs email info to terminal."""
+    def test_send_mail_in_dev_mode_logs_to_terminal(self):
+        """In DEV Mode, email services logs email info to terminal."""
+
         msg_title = 'MailgunService.SendMail'
+        # pylint: disable=division-operator-used
         msg_body = (
-            '''
+            """
             From: %s
             To: %s
             Subject: %s
@@ -80,9 +86,10 @@ class EmailTests(test_utils.GenericTestBase):
             Body
                 Content-type: text/html
                 Data length: %d
-            ''' % (
+            """ % (
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 4, 4))
+        # pylint: enable=division-operator-used
         logging_info_email_body = msg_title + dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real email since this is a dev' +
@@ -95,28 +102,30 @@ class EmailTests(test_utils.GenericTestBase):
                 'subject', 'body', 'html', bcc_admin=False)
         self.assertEqual(len(self._log_handler.messages['info']), 2)
         self.assertEqual(
-            self._log_handler.messages['info'], [logging_info_email_body, 
-                logging_info_notification])
+            self._log_handler.messages['info'],
+            [logging_info_email_body, logging_info_notification])
 
-    def test_DEV_mode_send_bulk_mail_logging(self):
-        """ In DEV Mode, email services logs email info to terminal."""
+    def test_send_bulk_mail_in_dev_mode_logs_to_terminal(self):
+        """In DEV Mode, email services logs email info to terminal."""
+
         email_header = 'MailgunService.SendBulkMail'
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
+        # pylint: disable=division-operator-used
         logging_info_email_body = (
-                '''
-                From: %s
-                To: %s
-                Subject: %s
-                Body:
-                    Content-type: text/plain
-                    Data length: %d
-                Body
-                    Content-type: text/html
-                    Data length: %d
-                ''' % (
-                    feconf.SYSTEM_EMAIL_ADDRESS, recipient_email_list_str,
-                    'subject', 4, 4))
-
+            """
+            From: %s
+            To: %s
+            Subject: %s
+            Body:
+                Content-type: text/plain
+                Data length: %d
+            Body
+                Content-type: text/html
+                Data length: %d
+            """ % (
+                feconf.SYSTEM_EMAIL_ADDRESS, recipient_email_list_str,
+                'subject', 4, 4))
+        # pylint: enable=division-operator-used
         logging_info_notification = (
             'You are not currently sending out real email since this is a dev' +
             ' environment. Emails are sent out in the production environment.')
@@ -124,18 +133,15 @@ class EmailTests(test_utils.GenericTestBase):
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         with allow_emailing, self.swap(logging, 'info', self._log_handler.info):
             mailgun_email_services.send_bulk_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, 
+                feconf.SYSTEM_EMAIL_ADDRESS,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],
                 'subject', 'body', 'html')
-        #self.assertEqual(len(self._log_handler.messages['info']), 2)
-
         self.assertEqual(len(self._log_handler.messages['info']), 3)
         self.assertEqual(
-            self._log_handler.messages['info'], 
-                [email_header, dedent(logging_info_email_body),
-                    logging_info_notification])
-        
-        
+            self._log_handler.messages['info'],
+            [email_header, dedent(logging_info_email_body),
+             logging_info_notification])
+
     def test_post_batch_send_to_mailgun(self):
         """Test for sending HTTP POST request."""
         swapped_urlopen = lambda x: x
@@ -147,28 +153,23 @@ class EmailTests(test_utils.GenericTestBase):
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
-            result = mailgun_email_services.post_to_mailgun({
-                'from': 'a@a.com',
-                'to': ['b@b.com', 'c@c.com', 'd@d.com'],
-                'subject': 'Hola 😂 - invitation to collaborate'.encode(
+            result = mailgun_email_services.post_to_mailgun(
+                sender_email='a@a.com',
+                recipient_email=['b@b.com', 'c@c.com', 'd@d.com'],
+                subject='Hola 😂 - invitation to collaborate'.encode(
                     encoding='utf-8'),
-                'text': 'plaintext_body 😂'.encode(encoding='utf-8'),
-                'html': 'Hi abc,<br> 😂'.encode(encoding='utf-8')
-            })
+                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
+                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8')
+            )
             expected = (
                 'https://api.mailgun.net/v3/domain/messages',
-                ('to=%5Bu%27b%40b.com%27%2C+u%27c%40c.com%27%2C+u%27d%40d.com' + 
+                ('to=%5Bu%27b%40b.com%27%2C+u%27c%40c.com%27%2C+u%27d%40d.com' +
                  '%27%5D&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
                  '%2C%3Cbr%3E+%F0%9F%98%82&from=a%40a.com&subject=Hola+%F0'
                  '%9F%98%82+-+invitation+to+collaborate'),
                 {'Authorization': 'Basic YXBpOmtleQ=='})
             self.assertEqual(result, expected)
 
-    #def test_DEV_mode_send_mail_output():
-    # with mailgun_api_exception, allow_emailing:
-    #     mailgun_email_services.send_mail(
-    #         feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
-    # 'subject', 'body', 'html', bcc_admin=False)
     def test_send_mail_raises_exception_for_missing_api_key(self):
         """Tests the missing Mailgun API key exception."""
         mailgun_api_exception = (
