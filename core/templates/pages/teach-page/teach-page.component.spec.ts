@@ -103,7 +103,7 @@ class MockSiteAnalyticsService {
 let component: TeachPageComponent;
 let fixture: ComponentFixture<TeachPageComponent>;
 
-fdescribe('Teach Page', function() {
+describe('Teach Page', function() {
   let windowRef: MockWindowRef;
   let sas = null;
   let i18n = null;

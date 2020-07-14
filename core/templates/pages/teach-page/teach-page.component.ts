@@ -40,9 +40,7 @@ export class TeachPageComponent implements OnInit {
     private windowRef: WindowRef
   ) {}
   ngOnInit(): void {
-    console.log('Fires up teach-page');
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
-    console.log(hash);
     if (this.ALLOWED_TABS.includes(hash)) {
       this.activeTabName = hash;
     }
@@ -65,7 +63,6 @@ export class TeachPageComponent implements OnInit {
   }
 
   onApplyToTeachWithOppia(): boolean {
-    console.log('Click apply to teach');
     this.siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;
