@@ -24,43 +24,42 @@ var request = require('request');
 const SVGTAGS = {
   rectangle: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
-    '1999/xlink" version="1.1" width="496" height="338" viewBox="0 0 496 338' +
+    '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
     '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
-    'x(1 0 0 1 44.5 49.5)"><rect style="stroke: rgb(0,0,0); stroke-width: 9;' +
+    'x(1 0 0 1 41.5 46.5)"><rect style="stroke: rgb(0,0,0); stroke-width: 3;' +
     ' stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; st' +
     'roke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-opac' +
     'ity: 0; fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-stro' +
     'ke" x="-30" y="-35" rx="0" ry="0" width="60" height="70"/></g></svg>'),
   circle: ('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.' +
-  'w3.org/1999/xlink" version="1.1" width="496" height="338" viewBox="0 0 49' +
-  '6 338"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" ' +
+  'w3.org/1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 49' +
+  '4 338"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" ' +
   'y="0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matr' +
-  'ix(1 0 0 1 44.5 44.5)"><circle style="stroke: rgb(0,0,0); stroke-width: 9' +
+  'ix(1 0 0 1 41.5 41.5)"><circle style="stroke: rgb(0,0,0); stroke-width: 3' +
   '; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; str' +
   'oke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-opacity' +
   ': 0; fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-stroke" c' +
   'x="0" cy="0" r="30"/></g></svg>'),
   line: ('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3' +
-  '.org/1999/xlink" version="1.1" width="496" height="338" viewBox="0 0 496 ' +
+  '.org/1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 ' +
   '338"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y=' +
   '"0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matrix' +
-  '(1 0 0 1 34.5 34.5)"><line style="stroke: rgb(0,0,0); stroke-width: 9; st' +
+  '(1 0 0 1 31.5 31.5)"><line style="stroke: rgb(0,0,0); stroke-width: 3; st' +
   'roke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-' +
   'linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonze' +
   'ro; opacity: 1; vector-effect: non-scaling-stroke" x1="-20" y1="-20" x2="' +
   '20" y2="20"/></g></svg>'),
   text: ('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3' +
-  '.org/1999/xlink" version="1.1" width="496" height="338" viewBox="0 0 496 ' +
+  '.org/1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 ' +
   '338"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y=' +
   '"0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matrix' +
-  '(1 0 0 1 32.01 32.47)" style=""><text font-family="helvetica" font-siz' +
-  'e="18" font-style="normal" font-weight="normal" style="stroke: none; stro' +
-  'ke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoff' +
-  'set: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); f' +
-  'ill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51" y="-6' +
-  '.14">Enter</tspan><tspan x="-21.51" y="17.45">Text</tspan></t' +
-  'ext></g></svg>')
+  '(1 0 0 1 32.01 32.47)" style=""><text font-family="helvetica" font-size="' +
+  '18" font-style="normal" font-weight="normal" style="stroke: none; stroke-' +
+  'width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset' +
+  ': 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill' +
+  '-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51" y="-6.14' +
+  '">Enter</tspan><tspan x="-21.51" y="17.45">Text</tspan></text></g></svg>')
 };
 
 var customizeComponent = async function(modal, shape) {

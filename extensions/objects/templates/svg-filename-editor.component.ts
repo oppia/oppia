@@ -272,7 +272,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var getSVGString = function() {
-        var svgString = ctrl.canvas.toSVG();
+        var svgString = ctrl.canvas.toSVG().replace('\t\t', '');
         var domParser = new DOMParser();
         var doc = domParser.parseFromString(svgString, 'text/xml');
         var svg = doc.querySelector('svg');
