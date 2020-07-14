@@ -30,6 +30,8 @@ import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
+import { AdminDevModeActivitiesTabBackendApiService } from
+  'pages/admin-page/services/admin-dev-mode-activities-tab-backend-api-service';
 import { AdminRouterService } from
   'pages/admin-page/services/admin-router.service.ts';
 import { AdminTaskManagerService } from
@@ -1168,6 +1170,9 @@ export class UpgradedServices {
       upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
+    upgradedServices['AdminDevModeActivitiesTabBackendApiService'] =
+      new AdminDevModeActivitiesTabBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(
         upgradedServices['HttpClient'],
