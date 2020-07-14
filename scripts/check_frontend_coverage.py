@@ -39,7 +39,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'add-hint-modal.controller.ts',
     'add-or-update-solution-modal.controller.ts',
     'admin-config-tab.directive.ts',
-    'admin-dev-mode-activities-tab.directive.ts',
+    'admin-dev-mode-activities-tab.component.ts',
     'admin-jobs-tab.directive.ts',
     'admin-misc-tab.directive.ts',
     'admin-navbar.directive.ts',
