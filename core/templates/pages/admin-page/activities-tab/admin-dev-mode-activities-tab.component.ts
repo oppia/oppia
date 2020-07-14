@@ -64,7 +64,8 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm('This action is irreversible. Are you sure?')) {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible. Are you sure?')) {
       return;
     }
 
