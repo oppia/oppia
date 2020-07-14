@@ -21,48 +21,57 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  IStoryNodeBackendDict,
+  StoryNodeBackendDict,
   ReadOnlyStoryNodeObjectFactory,
   ReadOnlyStoryNode
 } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
-interface IStoryPlaythroughBackendDict {
-  'story_nodes': IStoryNodeBackendDict[];
+export interface StoryPlaythroughBackendDict {
+  'story_nodes': StoryNodeBackendDict[];
+  'story_title': string;
+  'story_description': string;
 }
 
 export class StoryPlaythrough {
-  _nodes: ReadOnlyStoryNode[];
+  nodes: ReadOnlyStoryNode[];
+  title: string;
+  description: string;
 
-  constructor(nodes: ReadOnlyStoryNode[]) {
-    this._nodes = nodes;
+  constructor(
+      nodes: ReadOnlyStoryNode[],
+      title: string,
+      description: string) {
+    this.nodes = nodes;
+    this.title = title;
+    this.description = description;
   }
 
   getInitialNode(): ReadOnlyStoryNode {
-    return this._nodes[0];
+    return this.nodes[0];
   }
 
   getStoryNodeCount(): Number {
-    return this._nodes.length;
+    return this.nodes.length;
   }
 
   getStoryNodes(): ReadOnlyStoryNode[] {
-    return this._nodes;
+    return this.nodes;
   }
 
   hasFinishedStory(): boolean {
-    return this._nodes.slice(-1)[0].isCompleted();
+    return this.nodes.slice(-1)[0].isCompleted();
   }
 
   getNextPendingNodeId(): string {
-    for (var i = 0; i < this._nodes.length; i++) {
-      if (!this._nodes[i].isCompleted()) {
-        return this._nodes[i].getId();
+    for (var i = 0; i < this.nodes.length; i++) {
+      if (!this.nodes[i].isCompleted()) {
+        return this.nodes[i].getId();
       }
     }
   }
 
   hasStartedStory(): boolean {
-    return this._nodes[0].isCompleted();
+    return this.nodes[0].isCompleted();
   }
 }
 
@@ -75,14 +84,15 @@ export class StoryPlaythroughObjectFactory {
 
   createFromBackendDict(
       storyPlaythroughBackendDict:
-      IStoryPlaythroughBackendDict): StoryPlaythrough {
-    var nodeObjects: ReadOnlyStoryNode[] = [];
-    var readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;
+      StoryPlaythroughBackendDict): StoryPlaythrough {
+    var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
+      storyNodeDict => this.readOnlyStoryNodeObjectFactory
+        .createFromBackendDict(storyNodeDict));
 
-    nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
-      readOnlyStoryNodeObjectFactory.createFromBackendDict);
-
-    return new StoryPlaythrough(nodeObjects);
+    return new StoryPlaythrough(
+      nodeObjects,
+      storyPlaythroughBackendDict.story_title,
+      storyPlaythroughBackendDict.story_description);
   }
 }
 

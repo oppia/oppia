@@ -20,14 +20,18 @@ import { TestBed } from '@angular/core/testing';
 
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { LearnerExplorationSummaryObjectFactory } from
+  'domain/summary/learner-exploration-summary-object.factory';
 
 describe('Read only story node object factory', () => {
   let readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory = null;
+  let esof: LearnerExplorationSummaryObjectFactory = null;
   var _sampleStoryNode = null;
 
   beforeEach(() => {
     readOnlyStoryNodeObjectFactory = TestBed.get(
       ReadOnlyStoryNodeObjectFactory);
+    esof = TestBed.get(LearnerExplorationSummaryObjectFactory);
 
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
@@ -41,7 +45,27 @@ describe('Read only story node object factory', () => {
       outline_is_finalized: false,
       exp_summary_dict: {
         title: 'Title',
-        status: 'private'
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
       },
       completed: true,
       thumbnail_bg_color: '#a33f40',
@@ -57,10 +81,31 @@ describe('Read only story node object factory', () => {
     expect(_sampleStoryNode.getDescription()).toEqual('Description');
     expect(_sampleStoryNode.getExplorationId()).toEqual('exp_id');
     expect(_sampleStoryNode.isCompleted()).toEqual(true);
-    expect(_sampleStoryNode.getExplorationSummaryObject()).toEqual({
-      title: 'Title',
-      status: 'private'
-    });
+    expect(_sampleStoryNode.getExplorationSummaryObject()).toEqual(
+      esof.createFromBackendDict({
+        title: 'Title',
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
+      }));
     expect(_sampleStoryNode.getOutline()).toEqual('Outline');
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);

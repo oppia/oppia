@@ -23,7 +23,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-// eslint-disable-next-line max-len
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary-object.factory';
 
