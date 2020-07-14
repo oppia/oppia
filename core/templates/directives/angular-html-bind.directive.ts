@@ -34,6 +34,16 @@ angular.module('oppia').directive('angularHtmlBind', [
           }
           elm.empty();
           newScope = scope.$new();
+          // When there are trailing spaces in the HTML, CKEditor adds &nbsp;
+          // to the HTML (eg: '<p> Text &nbsp; &nbsp; %nbsp;</p>'), which can
+          // lead to UI issues when displaying it. Hence, the following block
+          // replaces the trailing ' &nbsp; &nbsp; %nbsp;</p>' with just '</p>'.
+          // We can't just find and replace '&nbsp;' here since, those in the
+          // middle may actually be required. Only the trailing ones need to be
+          // replaced.
+          if (newValue) {
+            newValue = newValue.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
+          }
           elm.html(<string>newValue);
           $compile(elm.contents())(newScope);
         });
