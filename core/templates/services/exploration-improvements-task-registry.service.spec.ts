@@ -695,10 +695,10 @@ describe('Exploration improvements task registrar service', () => {
       ];
       statesBackendDict = {Introduction: stateBackendDict};
 
-        explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(),
-          [hbrTask, iflTask, ngrTask, siaTask],
-          new Map(), stateAnswerStats, [makeEqPlaythroughIssue()]);
+      explorationImprovementsTaskRegistryService.initialize(
+        expId, expVersion, makeStates(), makeExpStats(),
+        [hbrTask, iflTask, ngrTask, siaTask],
+        new Map(), stateAnswerStats, [makeEqPlaythroughIssue()]);
 
       expect(hbrTask.targetId).toEqual('Introduction');
       expect(hbrTask.isOpen()).toBeTrue();
