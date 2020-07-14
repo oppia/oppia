@@ -20,8 +20,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ThanksPageComponent } from './thanks-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
 
 describe('Thanks page', function() {
   let component: ThanksPageComponent;
