@@ -37,6 +37,10 @@ export interface IImageData {
   imageBlob: Blob
 }
 
+interface SkillCreationBackendResponse {
+  skillId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -60,8 +64,8 @@ export class SkillCreationBackendApiService {
    * @param {Blob} imageData.imageBlob - Image data represented as a Blob.
    */
   _createSkill(
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback:(reason?: any) => void,
+      successCallback: (value?: SkillCreationBackendResponse) => void,
+      errorCallback:(reason?: string) => void,
       description: string, rubrics: IRubricBackend, explanation: string,
       linkedTopicIds: string[], imagesData: IImageData[]): void {
     let postData:ISkillCreationBackend = {
@@ -78,9 +82,9 @@ export class SkillCreationBackendApiService {
       body.append(filenames[idx], imageBlobs[idx]);
     }
 
-    this.http.post(
+    this.http.post<SkillCreationBackendResponse>(
       '/skill_editor_handler/create_new', body).toPromise()
-      .then((response: { skillId: string }) => {
+      .then(response => {
         if (successCallback) {
           successCallback({
             skillId: response.skillId
@@ -95,7 +99,7 @@ export class SkillCreationBackendApiService {
 
   createSkill(description: string, rubrics: IRubricBackend,
       explanation: string, linkedTopicIds: string[], imagesData: IImageData[]
-  ): PromiseLike<Object> {
+  ): Promise<SkillCreationBackendResponse> {
     return new Promise((resolve, reject) => {
       this._createSkill(resolve, reject,
         description, rubrics, explanation, linkedTopicIds, imagesData);
