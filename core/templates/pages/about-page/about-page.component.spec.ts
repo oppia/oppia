@@ -28,6 +28,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -114,6 +115,7 @@ describe('About Page', function() {
     translate = TestBed.get(TranslateService);
     i18n = TestBed.get(I18nLanguageCodeService);
     fixture = TestBed.createComponent(AboutPageComponent);
+    sas = TestBed.get(SiteAnalyticsService);
     component = fixture.componentInstance;
   });
 
