@@ -128,7 +128,7 @@ angular.module('oppia').directive('storyViewerPage', [
                 ctrl.storyDescription = storyDataDict.description;
 
                 $rootScope.$broadcast('storyData', {
-                  topicName: storyDataDict.topic_name,
+                  topicName: ctrl.storyPlaythroughObject.topicName,
                   storyTitle: ctrl.storyTitle
                 });
 
