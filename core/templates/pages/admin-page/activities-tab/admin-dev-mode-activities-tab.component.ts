@@ -18,8 +18,6 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
 
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
@@ -30,7 +28,6 @@ import { AdminDevModeActivitiesTabBackendApiService } from
   'pages/admin-page/services/admin-dev-mode-activities-tab-backend-api-service';
 
 
-const constants = require('admin-page.constants.ts');
 
 @Component({
   selector: 'admin-dev-mode-activities-tab',
@@ -42,7 +39,6 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   constructor(
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private httpClient: HttpClient,
     private windowRef: WindowRef,
     private adminDevModeActivitiesTabBackendApiService:
       AdminDevModeActivitiesTabBackendApiService
