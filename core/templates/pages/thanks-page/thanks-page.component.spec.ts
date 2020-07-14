@@ -23,7 +23,7 @@ import { ThanksPageComponent } from './thanks-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 
-fdescribe('Thanks page', function() {
+describe('Thanks page', function() {
   let component: ThanksPageComponent;
   let fixture: ComponentFixture<ThanksPageComponent>;
 
@@ -37,8 +37,7 @@ fdescribe('Thanks page', function() {
   });
 
   it('should set thanks image url when getStaticImageUrl is called', () => {
-    console.log(component);
-    // expect(component.getStaticImageUrl('/general/donate.png'))
-    //   .toBe('/assets/images/general/donate.png');
+    expect(component.getStaticImageUrl('/general/donate.png'))
+      .toBe('/assets/images/general/donate.png');
   });
 });
