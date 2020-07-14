@@ -31,6 +31,7 @@ import {
 import {
   IInteractionCustomizationArgsBackendDict, IInteractionCustomizationArgs
 } from 'domain/exploration/InteractionObjectFactory';
+import { IInteractionCustomizationArgsValueBackendDict } from 'interactions/customization-args-defs';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -191,9 +192,11 @@ export class InteractionCustomizationArgsUtilService {
   toBackendDict(
       caValues: IInteractionCustomizationArgs
   ): IInteractionCustomizationArgsBackendDict {
-    let caValuesBackendDict = angular.copy(caValues);
+    caValues = angular.copy(caValues);
 
-    const convertToBackendDict = (value: any) => {
+    const convertToBackendDict = (
+        value: Array<Object> | Object
+    ) => {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         value = value.toBackendDict();
       } else if (value instanceof Array) {
@@ -209,11 +212,12 @@ export class InteractionCustomizationArgsUtilService {
       return value;
     };
 
-    Object.keys(caValuesBackendDict).forEach(key => {
+    let caValuesBackendDict = {};
+    Object.keys(caValues).forEach(key => {
       caValuesBackendDict[key] = (
-        convertToBackendDict(caValuesBackendDict[key]));
+        convertToBackendDict(caValues[key]));
     });
-    return <IInteractionCustomizationArgsBackendDict> caValuesBackendDict;
+    return caValuesBackendDict;
   }
 
   populateBlankContentIds(
