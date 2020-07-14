@@ -30,7 +30,7 @@ require(
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navbar-breadcrumb.directive.ts');
+  'editor-navbar-breadcrumb.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navigation.directive.ts');
