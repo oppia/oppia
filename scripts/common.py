@@ -159,7 +159,7 @@ def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
     if USER_PREFERENCES['open_new_tab_in_browser'] is None:
         python_utils.PRINT(
-            'Do you want the url to be opened in the browser? '
+            '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
         USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:

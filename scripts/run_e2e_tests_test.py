@@ -36,6 +36,9 @@ from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 
 
+CHROME_DRIVER_VERSION = '77.0.3865.40'
+
+
 class MockProcessClass(python_utils.OBJECT):
     def __init__(self):
         pass
@@ -149,7 +152,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         google_app_engine_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_HOME)
-        webdriver_download_path = '%s/downloads' % (
+        webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
             ('.*%s.*' % re.escape(google_app_engine_path),),
@@ -203,7 +206,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         google_app_engine_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_HOME)
-        webdriver_download_path = '%s/downloads' % (
+        webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
             ('.*%s.*' % re.escape(google_app_engine_path),),
@@ -334,13 +337,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
                 def read(self):
                     """Return required method."""
-                    return run_e2e_tests.CHROME_DRIVER_VERSION
+                    return CHROME_DRIVER_VERSION
             return Ret()
 
         url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         with popen_swap, url_open_swap:
             version = run_e2e_tests.get_chrome_driver_version()
-            self.assertEqual(version, run_e2e_tests.CHROME_DRIVER_VERSION)
+            self.assertEqual(version, CHROME_DRIVER_VERSION)
 
     def test_run_webpack_compilation_failed(self):
         def mock_isdir(unused_port):
@@ -632,9 +635,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         expected_commands = [
             (['update', '--versions.chrome',
-              run_e2e_tests.CHROME_DRIVER_VERSION],),
+              CHROME_DRIVER_VERSION],),
             (['start', '--versions.chrome',
-              run_e2e_tests.CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
+              CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
         ]
 
         run_swap = self.swap_with_checks(
@@ -642,7 +645,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=expected_commands)
         with tweak_swap, run_swap:
             run_e2e_tests.start_webdriver_manager(
-                run_e2e_tests.CHROME_DRIVER_VERSION)
+                CHROME_DRIVER_VERSION)
 
     def test_get_parameter_for_one_sharding_instance(self):
         result = run_e2e_tests.get_parameter_for_sharding(1)
@@ -769,6 +772,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_exit(unused_code):
             return
 
+        def mock_get_chrome_driver_version():
+            return CHROME_DRIVER_VERSION
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
         check_swap = self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running',
             mock_is_oppia_server_already_running)
@@ -787,7 +797,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_webdriver_swap = self.swap_with_checks(
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
-            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
+            expected_args=[(CHROME_DRIVER_VERSION,)])
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
@@ -816,7 +826,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
-                            run_e2e_tests.main(args=[])
+                            with get_chrome_driver_version_swap:
+                                run_e2e_tests.main(args=[])
 
     def test_start_tests_skip_build(self):
 
@@ -862,6 +873,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_exit(unused_code):
             return
 
+        def mock_get_chrome_driver_version():
+            return CHROME_DRIVER_VERSION
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
         check_swap = self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running',
             mock_is_oppia_server_already_running)
@@ -877,7 +895,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_webdriver_swap = self.swap_with_checks(
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
-            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
+            expected_args=[(CHROME_DRIVER_VERSION,)])
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
@@ -906,8 +924,29 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
-                            run_e2e_tests.main(
-                                args=['--skip-install', '--skip-build'])
+                            with get_chrome_driver_version_swap:
+                                run_e2e_tests.main(
+                                    args=['--skip-install', '--skip-build'])
+
+    def test_chrome_not_found_failure(self):
+
+        def mock_popen(unused_commands, stdout):
+            self.assertEqual(stdout, -1)
+            raise OSError('google-chrome not found')
+
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=[([
+                'google-chrome', '--version'],)])
+        expected_message = (
+            'Failed to execute "google-chrome --version" command. This is '
+            'used to determine the chromedriver version to use. Please set '
+            'the chromedriver version manually using --chrome_driver_version '
+            'flag. To determine the chromedriver version to be used, please '
+            'follow the instructions mentioned in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection')
+
+        with popen_swap, self.assertRaisesRegexp(Exception, expected_message):
+            run_e2e_tests.get_chrome_driver_version()
 
     def test_start_tests_in_debug_mode(self):
 
@@ -953,6 +992,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_exit(unused_code):
             return
 
+        def mock_get_chrome_driver_version():
+            return CHROME_DRIVER_VERSION
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
         check_swap = self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running',
             mock_is_oppia_server_already_running)
@@ -971,7 +1017,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_webdriver_swap = self.swap_with_checks(
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
-            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
+            expected_args=[(CHROME_DRIVER_VERSION,)])
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
@@ -1000,9 +1046,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
-                            run_e2e_tests.main(args=['--debug_mode'])
+                            with get_chrome_driver_version_swap:
+                                run_e2e_tests.main(args=['--debug_mode'])
 
-    def test_start_tests_in_with_autoselected_chromedriver(self):
+    def test_start_tests_in_with_chromedriver_flag(self):
 
         def mock_is_oppia_server_already_running(*unused_args):
             return False
@@ -1047,7 +1094,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_get_chrome_driver_version():
-            return run_e2e_tests.CHROME_DRIVER_VERSION
+            return CHROME_DRIVER_VERSION
 
         get_chrome_driver_version_swap = self.swap(
             run_e2e_tests, 'get_chrome_driver_version',
@@ -1071,7 +1118,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_webdriver_swap = self.swap_with_checks(
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
-            expected_args=[(run_e2e_tests.CHROME_DRIVER_VERSION,)])
+            expected_args=[(CHROME_DRIVER_VERSION,)])
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
@@ -1101,7 +1148,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         with get_parameters_swap, popen_swap, exit_swap:
                             with get_chrome_driver_version_swap:
                                 run_e2e_tests.main(
-                                    args=['--auto_select_chromedriver'])
+                                    args=[
+                                        '--chrome_driver_version',
+                                        CHROME_DRIVER_VERSION])
 
     def test_update_community_dashboard_status_with_dashboard_enabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
