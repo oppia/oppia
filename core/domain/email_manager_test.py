@@ -173,7 +173,7 @@ class DummyMailTest(test_utils.EmailTestBase):
                           messages[0].html.decode())
 
 
-class EmailRightsTest(test_utils.EmailTestBase):
+class EmailRightsTest(test_utils.GenericTestBase):
     """Test that only certain users can send certain types of emails."""
 
     def setUp(self):
@@ -1424,7 +1424,6 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
-
         feedback_messages = {
             self.exploration.id: {
                 'title': self.exploration.title,

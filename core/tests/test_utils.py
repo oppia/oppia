@@ -2433,8 +2433,9 @@ class MockLoggingHandler(python_utils.OBJECT):
     """
 
     def __init__(self):
-        self.messages = {'debug': [], 'info': [], 'warning': [], 'error': [],
-                         'critical': []}
+        self.messages = (
+            {'debug': [], 'info': [], 'warning': [], 'error': [],
+             'critical': []})
 
     def info(self, message):
         """Mocks logging.info(message)."""
@@ -2458,8 +2459,9 @@ class MockLoggingHandler(python_utils.OBJECT):
 
     def reset(self):
         """Resets the messages that were logged for the next test."""
-        self.messages = {'debug': [], 'info': [], 'warning': [], 'error': [],
-                         'critical': []}
+        self.messages = (
+            {'debug': [], 'info': [], 'warning': [], 'error': [],
+             'critical': []})
 
 
 class FunctionWrapper(python_utils.OBJECT):

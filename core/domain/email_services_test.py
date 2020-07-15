@@ -194,15 +194,14 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         # Data we expect to have been sent in the
         # email_services.send_email_to_recipients().
-        expected = {'from': feconf.SYSTEM_EMAIL_ADDRESS,
-                    'to': feconf.ADMIN_EMAIL_ADDRESS,
-                    'subject': 'subject',
-                    'text': 'body',
-                    'html': 'html'}
+        expected = (
+            {'from': feconf.SYSTEM_EMAIL_ADDRESS,
+             'to': feconf.ADMIN_EMAIL_ADDRESS, 'subject': 'subject',
+             'text': 'body', 'html': 'html'})
 
         # Lambda function, will replace send_email_to_recipients().
-        req_post_lambda = (lambda data=None:
-                           self.assertDictContainsSubset(expected, data))
+        req_post_lambda = (
+            lambda data=None: self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
             platform_email_services, 'send_email_to_recipients',
             req_post_lambda)
@@ -226,9 +225,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         # Lambda function, will replace send_email_to_recipients().
-        req_post_lambda = (lambda data=None:
-                           self.assertEqual(
-                               data['bcc'], feconf.ADMIN_EMAIL_ADDRESS))
+        req_post_lambda = (
+            lambda data=None:
+            self.assertEqual(data['bcc'], feconf.ADMIN_EMAIL_ADDRESS))
         post_request = self.swap(
             platform_email_services, 'send_email_to_recipients',
             req_post_lambda)
@@ -317,13 +316,14 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         # Data that we expect to have been sent in the
         # send_email_to_recipients().
-        expected = ({'from': feconf.SYSTEM_EMAIL_ADDRESS, 'to': recipients,
-                     'subject': 'subject', 'text': 'body', 'html': 'html',
-                     'recipient-variables': '{}'})
+        expected = (
+            {'from': feconf.SYSTEM_EMAIL_ADDRESS, 'to': recipients,
+             'subject': 'subject', 'text': 'body', 'html': 'html',
+             'recipient-variables': '{}'})
 
         # Lambda function, will replace send_email_to_recipients().
-        req_post_lambda = (lambda data=None:
-                           self.assertDictContainsSubset(expected, data))
+        req_post_lambda = (
+            lambda data=None: self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
             platform_email_services, 'send_email_to_recipients',
             req_post_lambda)
