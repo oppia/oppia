@@ -208,6 +208,13 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.PlaythroughModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotContentModelAuditOneOffJob),
 ]
 
 # List of all ContinuousComputation managers to show controls for on the

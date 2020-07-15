@@ -77,7 +77,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
-    opportunity_models, question_models,
+    opportunity_models, parameter_models, question_models,
     recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
     user_models,) = (
@@ -86,9 +86,9 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.question,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.opportunity, models.NAMES.platform_parameter,
+            models.NAMES.question, models.NAMES.recommendations,
+            models.NAMES.skill, models.NAMES.statistics, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
@@ -14999,3 +14999,323 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             )
         ]
         run_job_and_check_output(self, expected_output)
+
+
+class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(PlatformParameterModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.parameter_model = parameter_models.PlatformParameterModel.create(
+            name='parameter_model_1',
+            rule_dicts=[
+                { 'filters': [], 'value_when_matched': True }
+            ])
+        self.parameter_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+
+        self.job_class = (
+            prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.parameter_model.created_on = (
+            self.parameter_model.last_updated + datetime.timedelta(days=1))
+        self.parameter_model.commit(self.admin_id, [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of PlatformParameterModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.parameter_model.id,
+                    self.parameter_model.created_on,
+                    self.parameter_model.last_updated
+                )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PlatformParameterModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.parameter_model.id, self.parameter_model.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        parameter_models.PlatformParameterSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.parameter_model.id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_ids field'
+                ' check of PlatformParameterModel\', [u"Entity id %s: based on '
+                'field snapshot_metadata_ids having value %s-1, expect model '
+                'PlatformParameterSnapshotMetadataModel '
+                'with id %s-1 but it doesn\'t exist"]]' % (
+                    (self.parameter_model.id,) * 3))
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        parameter_models.PlatformParameterSnapshotContentModel.get_by_id(
+            '%s-1' % self.parameter_model.id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_ids field'
+                ' check of PlatformParameterModel\', [u"Entity id %s: based on '
+                'field snapshot_content_ids having value %s-1, expect model '
+                'PlatformParameterSnapshotContentModel '
+                'with id %s-1 but it doesn\'t exist"]]' % (
+                    (self.parameter_model.id,) * 3))
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class PlatformParameterSnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(
+            PlatformParameterSnapshotMetadataModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.parameter_model = parameter_models.PlatformParameterModel.create(
+            name='parameter_model_1',
+            rule_dicts=[
+                { 'filters': [], 'value_when_matched': True }
+            ])
+        self.parameter_model.commit(self.admin_id, [])
+
+        user_models.UserSettingsModel(
+            id=feconf.SYSTEM_COMMITTER_ID,
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
+            email='system@committer.com').put()
+        self.model_instance = (
+            parameter_models.PlatformParameterSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.parameter_model.id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .PlatformParameterSnapshotMetadataModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        self.parameter_model.commit(self.admin_id, [])
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of PlatformParameterSnapshotMetadataModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id,
+                    self.model_instance.created_on,
+                    self.model_instance.last_updated)
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PlatformParameterSnapshotMetadataModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_parameter_model_model_failure(self):
+        self.parameter_model.delete(self.admin_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform_parameter_ids '
+                'field check of PlatformParameterSnapshotMetadataModel\', '
+                '[u"Entity id %s-1: based on field '
+                'platform_parameter_ids having value %s, '
+                'expect model PlatformParameterModel with '
+                'id %s but it doesn\'t exist", '
+                'u"Entity id %s-2: based on field '
+                'platform_parameter_ids having value %s, expect model '
+                'PlatformParameterModel with id %s but it doesn\'t '
+                'exist"]]' % ((self.parameter_model.id,) * 6)
+            )]
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_ids field '
+                'check of PlatformParameterSnapshotMetadataModel\', '
+                '[u"Entity id %s-1: based on field committer_ids '
+                'having value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.parameter_model.id, self.admin_id, self.admin_id)
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_parameter_model_model_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            parameter_models.PlatformParameterSnapshotMetadataModel(
+                id='%s-3' % self.parameter_model.id, committer_id=self.admin_id,
+                commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform parameter model '
+                'version check of PlatformParameterSnapshotMetadataModel\', '
+                '[u\'Entity id %s-3: PlatformParameter model corresponding to '
+                'id %s has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]' % (
+                    self.parameter_model.id, self.parameter_model.id)
+            ),
+            u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance.commit_cmds = [{
+            'cmd': 'replace_parameter_rules',
+            'invalid_attribute': 'invalid'
+        }]
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd '
+                'replace_parameter_rules check of '
+                'PlatformParameterSnapshotMetadataModel\', [u"Entity id %s-1: '
+                'Commit command domain validation for command: {u\'cmd\': '
+                'u\'replace_parameter_rules\', u\'invalid_attribute\': u\''
+                'invalid\'} failed with error: The following required '
+                'attributes are missing: new_rules, The following extra '
+                'attributes are present: invalid_attribute"]]' % (
+                    self.parameter_model.id)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+
+class PlatformParameterSnapshotContentModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(
+            PlatformParameterSnapshotContentModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.parameter_model = parameter_models.PlatformParameterModel.create(
+            name='parameter_model_1',
+            rule_dicts=[
+                { 'filters': [], 'value_when_matched': True }
+            ])
+        self.parameter_model.commit(self.admin_id, [])
+
+        user_models.UserSettingsModel(
+            id=feconf.SYSTEM_COMMITTER_ID,
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
+            email='system@committer.com').put()
+        self.model_instance = (
+            parameter_models.PlatformParameterSnapshotContentModel.get_by_id(
+                '%s-1' % self.parameter_model.id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .PlatformParameterSnapshotContentModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        self.parameter_model.commit(self.admin_id, [])
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterSnapshotContentModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of PlatformParameterSnapshotContentModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id,
+                    self.model_instance.created_on,
+                    self.model_instance.last_updated
+                )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PlatformParameterSnapshotContentModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_platform_parameter_model_failure(self):
+        self.parameter_model.delete(self.admin_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform_parameter_ids '
+                'field check of PlatformParameterSnapshotContentModel\', '
+                '[u"Entity id %s-1: based on field platform_parameter_ids '
+                'having value %s, expect model PlatformParameterModel with '
+                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
+                'field platform_parameter_ids having value %s, expect model '
+                'PlatformParameterModel with id %s but it doesn\'t exist"]]' % (
+                    (self.parameter_model.id,) * 6)
+            ),
+        ]
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_invalid_config_property_model_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            parameter_models.PlatformParameterSnapshotContentModel(
+                id='%s-3' % (self.parameter_model.id)))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform parameter model '
+                'version check of PlatformParameterSnapshotContentModel\', '
+                '[u\'Entity id %s-3: PlatformParameter model corresponding '
+                'to id %s has a version 1 which is less than the version 3 '
+                'in snapshot content model id\']]' % (
+                    (self.parameter_model.id,) * 2)
+            ),
+            u'[u\'fully-validated PlatformParameterSnapshotContentModel\', 1]'
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)

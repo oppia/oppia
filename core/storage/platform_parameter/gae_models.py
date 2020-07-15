@@ -24,34 +24,35 @@ import core.storage.base_model.gae_models as base_models
 from google.appengine.ext import ndb
 
 
-class ConfigPropertySnapshotMetadataModel(
+class PlatformParameterSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a config property snapshot."""
+    """Storage model for the metadata for a platform parameter snapshot."""
 
     pass
 
 
-class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content for a config property snapshot."""
+class PlatformParameterSnapshotContentModel(
+        base_models.BaseSnapshotContentModel):
+    """Storage model for the content for a platform parameter snapshot."""
 
     pass
 
 
-class ConfigPropertyModel(base_models.VersionedModel):
-    """A class that represents a named configuration property.
+class PlatformParameterModel(base_models.VersionedModel):
+    """A class that represents a named dynamic platform parameter.
+    This model only stores fields that can be updated in run time.
 
-    The id is the name of the property.
+    The id is the name of the parameter.
     """
 
-    SNAPSHOT_METADATA_CLASS = ConfigPropertySnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
+    SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
-    # The property value.
-    value = ndb.JsonProperty(indexed=False)
+    rules = ndb.JsonProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():
-        """ConfigPropertyModel is not related to users."""
+        """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -59,5 +60,16 @@ class ConfigPropertyModel(base_models.VersionedModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """PlatformParameterModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def create(cls, name, rule_dicts):
+        """Creates a PlatformParameterModel instance."""
+        return cls(id=name, rules=rule_dicts)
+
     def commit(self, committer_id, commit_cmds):
-        super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+        super(PlatformParameterModel, self).commit(
+            committer_id, '', commit_cmds)

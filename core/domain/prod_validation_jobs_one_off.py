@@ -37,6 +37,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
+from core.domain import platform_parameter_domain
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
@@ -67,7 +68,7 @@ import utils
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
-    opportunity_models, question_models,
+    opportunity_models, parameter_models, question_models,
     recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
     user_models,) = (
@@ -76,9 +77,9 @@ import utils
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.question,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.opportunity, models.NAMES.platform_parameter,
+            models.NAMES.question, models.NAMES.recommendations, 
+            models.NAMES.skill, models.NAMES.statistics, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
@@ -5152,6 +5153,72 @@ class PlaythroughModelValidator(BaseModelValidator):
         ]
 
 
+class PlatformParameterModelValidator(BaseModelValidator):
+    """Class for validating PlatformParameterModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^.*$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version)
+            for version in python_utils.RANGE(1, item.version + 1)]
+        return {
+            'snapshot_metadata_ids': (
+                parameter_models.PlatformParameterSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_ids': (
+                parameter_models.PlatformParameterSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+
+class PlatformParameterSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating PlatformParameterSnapshotMetadataModel."""
+
+    EXTERNAL_MODEL_NAME = 'platform parameter'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^.*-\\d+$'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return platform_parameter_domain.PlatformParameterChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'platform_parameter_ids': (
+                parameter_models.PlatformParameterModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_ids': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+
+class PlatformParameterSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating PlatformParameterSnapshotContentModel."""
+
+    EXTERNAL_MODEL_NAME = 'platform parameter'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^.*-\\d+$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'platform_parameter_ids': (
+                parameter_models.PlatformParameterModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -5178,6 +5245,11 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ConfigPropertySnapshotMetadataModelValidator),
     config_models.ConfigPropertySnapshotContentModel: (
         ConfigPropertySnapshotContentModelValidator),
+    parameter_models.PlatformParameterModel: PlatformParameterModelValidator,
+    parameter_models.PlatformParameterSnapshotMetadataModel: (
+        PlatformParameterSnapshotMetadataModelValidator),
+    parameter_models.PlatformParameterSnapshotContentModel: (
+        PlatformParameterSnapshotContentModelValidator),
     email_models.SentEmailModel: SentEmailModelValidator,
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
@@ -6138,3 +6210,29 @@ class PlaythroughModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.PlaythroughModel]
+
+
+class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [parameter_models.PlatformParameterModel]
+
+
+class PlatformParameterSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [parameter_models.PlatformParameterSnapshotMetadataModel]
+
+
+class PlatformParameterSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [parameter_models.PlatformParameterSnapshotContentModel]
