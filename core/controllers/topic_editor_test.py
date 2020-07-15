@@ -257,9 +257,6 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 class TopicEditorTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
-    def setUp(self):
-        super(TopicEditorTests, self).setUp()
-
     def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
@@ -700,9 +697,6 @@ class TopicEditorTests(
 
 class TopicPublishSendMailHandlerTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
-
-    def setUp(self):
-        super(TopicPublishSendMailHandlerTests, self).setUp()
 
     def test_send_mail(self):
         with self.swap(

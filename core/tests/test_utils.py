@@ -166,7 +166,8 @@ def check_image_png_or_webp(image_string):
 
 class EmailMessageMock(python_utils.OBJECT):
     """Mock for core.domain.email_services message that is sent to mailgun
-    API."""
+    API.
+    """
 
     def __init__(
             self, sender_email, recipient_email, subject, plaintext_body,
