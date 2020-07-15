@@ -25,18 +25,11 @@ require('services/context.service.ts');
 
 angular.module('oppia').run([
   '$compile', '$rootScope', '$timeout', 'RteHelperService',
-  'HtmlEscaperService', 'ContextService', 'ENABLE_SVG_EDITOR_RTE',
+  'HtmlEscaperService', 'ContextService',
   function($compile, $rootScope, $timeout, RteHelperService,
-      HtmlEscaperService, ContextService, ENABLE_SVG_EDITOR_RTE) {
+      HtmlEscaperService, ContextService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-      // TODO(#9358): Remove the if condition once the svgdiagram is
-      // available for the users.
-      if (componentDefn.id === 'svgdiagram') {
-        if (!ENABLE_SVG_EDITOR_RTE) {
-          return;
-        }
-      }
       // The name of the CKEditor widget corresponding to this component.
       var ckName = 'oppia' + componentDefn.id;
 
