@@ -2532,7 +2532,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(choices[1].html, '<p>Option B</p>')
         self.assertEqual(choices[1].content_id, 'custarg_choices_1')
 
-
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
         exp_services.update_exploration(
