@@ -18,10 +18,11 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'teach-page',
@@ -32,8 +33,8 @@ export class TeachPageComponent implements OnInit {
   TAB_ID_TEACH: string = 'teach';
   TAB_ID_PARTICIPATION: string = 'participation';
   TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
-  ALLOWED_TABS = [this.TAB_ID_TEACH, this.TAB_ID_PARTICIPATION];
-  activeTabName = this.TAB_ID_TEACH;
+  ALLOWED_TABS: string[] = [this.TAB_ID_TEACH, this.TAB_ID_PARTICIPATION];
+  activeTabName: string = this.TAB_ID_TEACH;
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
@@ -51,7 +52,7 @@ export class TeachPageComponent implements OnInit {
       }
     };
   }
-  onTabClick(tabName: string) {
+  onTabClick(tabName: string): Window {
     // ---- Update hash ----
     this.windowRef.nativeWindow.location.hash = '#' + tabName;
     this.activeTabName = tabName;
