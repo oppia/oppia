@@ -47,6 +47,11 @@
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
+        <button class="icon-tool toolbar-button thin-button"
+                ng-class="{'disabled' : !$ctrl.isBezierEnabled()}" ng-click="$ctrl.createBezier()"
+                tooltip-placement="right" uib-tooltip="Bezier curve" ng-disabled="!$ctrl.isBezierEnabled()">
+          <i class="fas fa-bezier-curve" style="font-size: 21px;"></i>
+        </button>
         <div class="vert-bottom-toolbar">
           <div>
             <div class="color-well">
@@ -82,14 +87,14 @@
                     ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectUndoStack.length}"
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isUndoEnabled()}"
                     ng-click="$ctrl.onUndo()"
-                    ng-disabled="!$ctrl.objectUndoStack.length">
+                    ng-disabled="!$ctrl.isUndoEnabled()">
               <i class="fas fa-undo"></i>
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectRedoStack.length}"
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isRedoEnabled()}"
                     ng-click="$ctrl.onRedo()"
-                    ng-disabled="!$ctrl.objectRedoStack.length">
+                    ng-disabled="!$ctrl.isRedoEnabled()">
               <i class="fas fa-redo"></i>
             </button>
           </div>
@@ -97,7 +102,8 @@
                   ng-disabled="!$ctrl.objectIsSelected">
             Remove
           </button>
-          <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()">
+          <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()"
+                  ng-disabled="!$ctrl.isClearEnabled()">
             Clear
           </button>
         </div>

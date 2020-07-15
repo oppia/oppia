@@ -56,6 +56,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       const STATUS_SAVED = 'saved';
       const DRAW_MODE_POLY = 'polygon';
       const DRAW_MODE_PENCIL = 'pencil';
+      const DRAW_MODE_BEZIER = 'bezier';
       const DRAW_MODE_NONE = 'none';
       const OPEN_POLYGON_MODE = 'open';
       const CLOSED_POLYGON_MODE = 'closed';
@@ -431,8 +432,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.createRect = function() {
         var size = ctrl.fabricjsOptions.size;
         var rect = new fabric.Rect({
-          top: 10,
-          left: 10,
+          top: 50,
+          left: 50,
           width: 60,
           height: 70,
           fill: ctrl.fabricjsOptions.fill,
@@ -445,7 +446,7 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createLine = function() {
         var size = ctrl.fabricjsOptions.size;
-        var line = new fabric.Line([10, 10, 50, 50], {
+        var line = new fabric.Line([50, 50, 100, 100], {
           stroke: ctrl.fabricjsOptions.stroke,
           strokeWidth: parseInt(size.substring(0, size.length - 2)),
           strokeUniform: true
@@ -456,8 +457,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.createCircle = function() {
         var size = ctrl.fabricjsOptions.size;
         var circle = new fabric.Circle({
-          top: 10,
-          left: 10,
+          top: 50,
+          left: 50,
           radius: 30,
           fill: ctrl.fabricjsOptions.fill,
           stroke: ctrl.fabricjsOptions.stroke,
@@ -475,8 +476,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.fabricjsOptions.size = '18px';
         var size = ctrl.fabricjsOptions.size;
         var text = new fabric.Textbox('Enter Text', {
-          top: 10,
-          left: 10,
+          top: 50,
+          left: 50,
           fontFamily: ctrl.fabricjsOptions.fontFamily,
           fontSize: parseInt(size.substring(0, size.length - 2)),
           fill: ctrl.fabricjsOptions.fill,
@@ -598,6 +599,93 @@ angular.module('oppia').component('svgFilenameEditor', {
         createPolygon();
       };
 
+      function makeCurveCircle(left, top) {
+        var size = ctrl.fabricjsOptions.size;
+        var circle = new fabric.Circle({
+          left: left,
+          top: top,
+          radius: parseInt(size.substring(0, size.length - 2)) + 2,
+          fill: '#666666',
+          stroke: '#666666',
+          hasBorders: false,
+          hasControls: false
+        });
+        return circle;
+      };
+
+      function drawQuadratic() {
+        var size = ctrl.fabricjsOptions.size;
+        var curve = new fabric.Path('M 40 40 Q 95, 100, 150, 40', {
+          stroke: ctrl.fabricjsOptions.stroke,
+          fill: ctrl.fabricjsOptions.fill,
+          strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          objectCaching: false,
+          selectable: false
+        });
+        ctrl.canvas.add(curve);
+
+        var p1 = makeCurveCircle(95, 100)
+        p1.name = "p1";
+        p1.set({
+          radius: 12,
+          fill: '#ffffff',
+          strokeWidth: 5
+        })
+        ctrl.canvas.add(p1);
+
+        var p0 = makeCurveCircle(40, 40);
+        p0.name = "p0";
+        ctrl.canvas.add(p0);
+
+        var p2 = makeCurveCircle(150, 40);
+        p2.name = "p2";
+        ctrl.canvas.add(p2);
+      };
+
+      ctrl.createBezier = function() {
+        if (ctrl.drawMode === DRAW_MODE_NONE) {
+          ctrl.canvas.discardActiveObject();
+          ctrl.drawMode = DRAW_MODE_BEZIER;
+          ctrl.canvas.getObjects().forEach(function(item) {
+            item.set({
+              hoverCursor: 'default',
+              selectable: false
+            });
+          });
+          drawQuadratic();
+        } else {
+          // Remove the circles and the current path.
+          ctrl.canvas.getObjects().slice(-3).forEach(function(item) {
+            ctrl.canvas.remove(item);
+          });
+          var path = ctrl.canvas.getObjects().slice(-1)[0].get('path');
+          ctrl.canvas.remove(ctrl.canvas.getObjects().slice(-1)[0]);
+          ctrl.canvas.getObjects().forEach(function(item) {
+            item.set({
+              hoverCursor: 'move',
+              selectable: true
+            });
+          });
+          // Change mode and then add the path so that the object is added in
+          // cavasObjects array.
+          ctrl.drawMode = DRAW_MODE_NONE;
+          // Adding a new path so that the bbox is computed correctly.
+          var size = ctrl.fabricjsOptions.size;
+          var curve = new fabric.Path(path , {
+            stroke: ctrl.fabricjsOptions.stroke,
+            fill: ctrl.fabricjsOptions.fill,
+            strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          });
+          ctrl.canvas.add(curve);
+        }
+      };
+
+      ctrl.isBezierEnabled = function() {
+        return Boolean(
+          ctrl.areAllToolsEnabled() ||
+          ctrl.drawMode === DRAW_MODE_BEZIER);
+      }
+
       ctrl.bringObjectForward = function() {
         ctrl.canvas.bringForward(ctrl.canvas.getActiveObject());
         if (ctrl.layerNum < ctrl.canvas._objects.length) {
@@ -645,6 +733,11 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
       };
 
+      ctrl.isUndoEnabled = function() {
+        return Boolean(
+          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectUndoStack.length);
+      };
+
       ctrl.onRedo = function() {
         ctrl.canvas.discardActiveObject();
         if (ctrl.objectRedoStack.length > 0) {
@@ -662,6 +755,11 @@ angular.module('oppia').component('svgFilenameEditor', {
           }
         }
         ctrl.canvas.renderAll();
+      };
+
+      ctrl.isRedoEnabled = function() {
+        return Boolean(
+          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectRedoStack.length);
       };
 
       ctrl.removeShape = function() {
@@ -685,26 +783,45 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.canvas.clear();
       };
 
+      ctrl.isClearEnabled = function() {
+        return Boolean(
+          ctrl.canvasObjects.length > 0 && ctrl.drawMode === DRAW_MODE_NONE);
+      };
+
       ctrl.onStrokeChange = function() {
-        var shape = ctrl.canvas.getActiveObject();
-        var strokeShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
-        ctrl.canvas.freeDrawingBrush.color = ctrl.fabricjsOptions.stroke;
-        if (shape && strokeShapes.indexOf(shape.get('type')) !== -1) {
-          shape.set({
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          ctrl.canvas.getObjects().slice(-4, -3)[0].set({
             stroke: ctrl.fabricjsOptions.stroke
-          });
+          })
           ctrl.canvas.renderAll();
+        } else {
+          var shape = ctrl.canvas.getActiveObject();
+          var strokeShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
+          ctrl.canvas.freeDrawingBrush.color = ctrl.fabricjsOptions.stroke;
+          if (shape && strokeShapes.indexOf(shape.get('type')) !== -1) {
+            shape.set({
+              stroke: ctrl.fabricjsOptions.stroke
+            });
+            ctrl.canvas.renderAll();
+          }
         }
       };
 
       ctrl.onFillChange = function() {
-        var shape = ctrl.canvas.getActiveObject();
-        var fillShapes = ['rect', 'circle', 'path', 'textbox', 'polyline'];
-        if (shape && fillShapes.indexOf(shape.get('type')) !== -1) {
-          shape.set({
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          ctrl.canvas.getObjects().slice(-4, -3)[0].set({
             fill: ctrl.fabricjsOptions.fill
-          });
+          })
           ctrl.canvas.renderAll();
+        } else {
+          var shape = ctrl.canvas.getActiveObject();
+          var fillShapes = ['rect', 'circle', 'path', 'textbox', 'polyline'];
+          if (shape && fillShapes.indexOf(shape.get('type')) !== -1) {
+            shape.set({
+              fill: ctrl.fabricjsOptions.fill
+            });
+            ctrl.canvas.renderAll();
+          }
         }
       };
 
@@ -744,21 +861,35 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.onSizeChange = function() {
-        var shape = ctrl.canvas.getActiveObject();
-        var size = ctrl.fabricjsOptions.size;
-        ctrl.canvas.freeDrawingBrush.width = parseInt(
-          size.substring(0, size.length - 2));
-        var strokeWidthShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
-        if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
-          shape.set({
-            strokeWidth: parseInt(size.substring(0, size.length - 2))
-          });
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          var size = ctrl.fabricjsOptions.size;
+          var actualSize = parseInt(size.substring(0, size.length - 2));
+          ctrl.canvas.getObjects().slice(-2).forEach(function(object) {
+            object.set({
+              radius: actualSize + 2
+            })
+          })
+          ctrl.canvas.getObjects().slice(-4, -3)[0].set({
+            strokeWidth: actualSize
+          })
           ctrl.canvas.renderAll();
-        } else if (shape && shape.get('type') === 'textbox') {
-          shape.set({
-            fontSize: parseInt(size.substring(0, size.length - 2))
-          });
-          ctrl.canvas.renderAll();
+        } else {
+          var shape = ctrl.canvas.getActiveObject();
+          var size = ctrl.fabricjsOptions.size;
+          ctrl.canvas.freeDrawingBrush.width = parseInt(
+            size.substring(0, size.length - 2));
+          var strokeWidthShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
+          if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
+            shape.set({
+              strokeWidth: parseInt(size.substring(0, size.length - 2))
+            });
+            ctrl.canvas.renderAll();
+          } else if (shape && shape.get('type') === 'textbox') {
+            shape.set({
+              fontSize: parseInt(size.substring(0, size.length - 2))
+            });
+            ctrl.canvas.renderAll();
+          }
         }
       };
 
@@ -861,8 +992,28 @@ angular.module('oppia').component('svgFilenameEditor', {
           }
         });
 
+        ctrl.canvas.on('object:moving', function(e) {
+          if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+            var pt = e.target;
+            var curve = ctrl.canvas.getObjects().slice(-4,-3)[0];
+            if (e.target.name == "p0") {
+              curve.path[0][1] = pt.left;
+              curve.path[0][2] = pt.top;
+            } else if (e.target.name == "p1") {
+              curve.path[1][1] = pt.left;
+              curve.path[1][2] = pt.top;
+            } else if (e.target.name == "p2") {
+              curve.path[1][3] = pt.left;
+              curve.path[1][4] = pt.top;
+            }
+            ctrl.canvas.renderAll();
+          }
+        });
+
         ctrl.canvas.on('object:added', function() {
-          if (ctrl.drawMode !== DRAW_MODE_POLY) {
+          if (
+            ctrl.drawMode === DRAW_MODE_NONE ||
+            ctrl.drawMode === DRAW_MODE_PENCIL) {
             var shape = ctrl.canvas._objects[ctrl.canvas._objects.length - 1];
             ctrl.canvasObjects.push(shape);
             if (!ctrl.isRedo) {
@@ -893,29 +1044,33 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         var onSelection = function() {
-          var shape = ctrl.canvas.getActiveObject();
-          ctrl.layerNum = ctrl.canvas._objects.indexOf(shape) + 1;
-          ctrl.fillPicker.setOptions({
-            color: shape.get('fill')
-          });
-          ctrl.strokePicker.setOptions({
-            color: shape.get('stroke')
-          });
-          ctrl.objectIsSelected = true;
-          var strokeWidthShapes = [
-            'rect', 'circle', 'path', 'line', 'polyline'];
-          if (strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
-            ctrl.fabricjsOptions.size = (
-              shape.get('strokeWidth').toString() + 'px');
-          } else if (shape.get('type') === 'textbox') {
-            ctrl.displayFontStyles = true;
-            ctrl.fabricjsOptions.size = (
-              shape.get('fontSize').toString() + 'px');
-            ctrl.fabricjsOptions.fontFamily = shape.get('fontFamily');
-            ctrl.fabricjsOptions.italic = shape.get('fontStyle') === 'italic';
-            ctrl.fabricjsOptions.bold = shape.get('fontWeight') === 'bold';
+          if (
+            ctrl.drawMode === DRAW_MODE_NONE ||
+            ctrl.drawMode === DRAW_MODE_PENCIL) {
+            var shape = ctrl.canvas.getActiveObject();
+            ctrl.layerNum = ctrl.canvas._objects.indexOf(shape) + 1;
+            ctrl.fillPicker.setOptions({
+              color: shape.get('fill')
+            });
+            ctrl.strokePicker.setOptions({
+              color: shape.get('stroke')
+            });
+            ctrl.objectIsSelected = true;
+            var strokeWidthShapes = [
+              'rect', 'circle', 'path', 'line', 'polyline'];
+            if (strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
+              ctrl.fabricjsOptions.size = (
+                shape.get('strokeWidth').toString() + 'px');
+            } else if (shape.get('type') === 'textbox') {
+              ctrl.displayFontStyles = true;
+              ctrl.fabricjsOptions.size = (
+                shape.get('fontSize').toString() + 'px');
+              ctrl.fabricjsOptions.fontFamily = shape.get('fontFamily');
+              ctrl.fabricjsOptions.italic = shape.get('fontStyle') === 'italic';
+              ctrl.fabricjsOptions.bold = shape.get('fontWeight') === 'bold';
+            }
+            $scope.$applyAsync();
           }
-          $scope.$applyAsync();
         };
 
         ctrl.canvas.on('selection:created', function() {
@@ -947,6 +1102,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         createColorPicker('stroke');
         createColorPicker('fill');
         createColorPicker('bg');
+        fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
       };
 
       ctrl.$onInit = function() {
