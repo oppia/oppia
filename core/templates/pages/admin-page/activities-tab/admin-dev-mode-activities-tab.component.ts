@@ -76,7 +76,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       this.setStatusMessage('Data reloaded successfully.');
       this.adminTaskManagerService.finishTask();
     }, (errorResponse) => {
-      this.setStatusMessage('Server error: ' + errorResponse.body);
+      this.setStatusMessage('Server error: ' + errorResponse.error.error);
       this.adminTaskManagerService.finishTask();
     });
   }
@@ -99,7 +99,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     var numSucceeded = 0;
     var numFailed = 0;
     var numTried = 0;
-    var printResult = function() {
+    var printResult = () => {
       if (numTried < this.demoExplorationIds.length) {
         this.setStatusMessage(
           'Processing...' + numTried + '/' +
@@ -135,7 +135,6 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         'Publish count should be less than or equal to generate count');
       return;
     }
-    this.adminTaskManagerService.startTask();
     this.setStatusMessage('Processing...');
 
     this.adminDevModeActivitiesTabBackendApiService.generateDummyExplorations(
@@ -191,7 +190,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       collectionId).then(() => {
       this.setStatusMessage('Data reloaded successfully');
     }, (errorResponse) => {
-      this.setStatusMessage('Server error: ' + errorResponse.data.error);
+      this.setStatusMessage('Server error: ' + errorResponse.error.error);
     });
     this.adminTaskManagerService.finishTask();
   }

@@ -80,6 +80,8 @@ export class RequestInterceptor implements HttpInterceptor {
         .pipe(
           switchMap((token: string) => {
             if (request.method === 'POST' || request.method === 'PUT') {
+              console.log('Goes here');
+              console.log(token, request);
               // If the body of the http request created is already in FormData
               // form, no need to create the FormData object here.
               if (!(request.body instanceof FormData)) {
@@ -90,6 +92,7 @@ export class RequestInterceptor implements HttpInterceptor {
               }
               request.body.append('csrf_token', token);
               request.body.append('source', document.URL);
+              console.log(request.body);
             } else {
               // @ts-ignore
               request.body = {

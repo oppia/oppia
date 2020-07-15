@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const constants = require('pages/admin-page/admin-page.constants');
+const constants = require('pages/admin-page/admin-page.constants.ts');
 
 @Injectable({
   providedIn: 'root'
@@ -30,9 +30,9 @@ export class AdminDevModeActivitiesTabBackendApiService {
     private httpClient: HttpClient
   ) {}
   private _reloadExploration(explorationId: string): Promise<Object> {
-    return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
+    return this.httpClient.post('/adminhandler', {
       action: 'reload_exploration',
-      exploration_id: String(explorationId)
+      exploration_id: explorationId
     }).toPromise();
   }
   private _generateDummyExplorations(
