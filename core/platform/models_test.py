@@ -247,14 +247,6 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             self.registry_instance.import_gae_image_services(),
             gae_image_services)
 
-    def test_import_email_services_gae(self):
-        """Tests import email services method for when email service provider is
-        the default - GAE.
-        """
-        from core.platform.email import gae_email_services
-        self.assertEqual(
-            gae_email_services, self.registry_instance.import_email_services())
-
     def test_import_email_services_mailgun(self):
         """Tests import email services method for when email service provider is
         mailgun.

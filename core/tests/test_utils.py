@@ -192,7 +192,7 @@ class EmailServicesMock(python_utils.OBJECT):
     def mock_send_mail(
             self, sender_email='', recipient_email='', subject='',
             plaintext_body='', html_body='', bcc_admin=False, reply_to_id=None):
-        """Sends a mock email. Replaces gae_email_services.send_mail during
+        """Sends a mock email. Replaces mailgun_email_services.send_mail during
         testing.
 
         Args:
@@ -219,14 +219,6 @@ class EmailServicesMock(python_utils.OBJECT):
         if not feconf.CAN_SEND_EMAILS:
             raise Exception('This app cannot send emails.')
 
-        # if not email_services.is_email_valid(recipient_email):
-        #     raise ValueError(
-        #         'Malformed recipient email address: %s' % recipient_email)
-
-        # if not email_services.is_email_valid(sender_email):
-        #     raise ValueError(
-        #         'Malformed sender email address: %s' % sender_email)
-
         if bcc_admin:
             bcc = [feconf.ADMIN_EMAIL_ADDRESS]
         if reply_to_id:
@@ -242,8 +234,8 @@ class EmailServicesMock(python_utils.OBJECT):
     def mock_send_bulk_emails(
             self, sender_email, recipient_emails, subject, plaintext_body,
             html_body):
-        """Sends mock bulk emails. Replaces gae_email_services.send_mail during
-        testing.
+        """Sends mock bulk emails. Replaces mailgun_email_services.send_mail
+        during testing.
 
         Args:
             sender_email: str. The email address of the sender. This should be

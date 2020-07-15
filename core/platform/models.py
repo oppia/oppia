@@ -235,10 +235,7 @@ class _Gae(Platform):
             Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
                 to a valid email_services module.
         """
-        if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
-            from core.platform.email import gae_email_services
-            return gae_email_services
-        elif (feconf.EMAIL_SERVICE_PROVIDER ==
+        if (feconf.EMAIL_SERVICE_PROVIDER ==
               feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
