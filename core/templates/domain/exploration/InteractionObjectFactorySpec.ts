@@ -33,7 +33,7 @@ import { SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
 
-describe('Interaction object factory', () => {
+fdescribe('Interaction object factory', () => {
   let iof = null;
   let oof = null;
   let agof = null;
@@ -442,5 +442,33 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
     expect(testInteraction.toBackendDict()).toEqual(interactionDict);
+  });
+
+  it('should correctly convert it to backend dict with MultipleChoice', () => {
+    let mcInteractionDict = {
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        showChoicesInShuffledOrder: {
+          value: true
+        },
+        choices: {
+          value: [{
+            html: '<p>Choice 1</p>',
+            content_id: 'custarg_choices_0'
+          }, {
+            html: '<p>Choice 2</p>',
+            content_id: 'custarg_choices_1'
+          }]
+        }
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'MultipleChoice',
+      solution: solutionDict
+    };
+    const testInteraction = iof.createFromBackendDict(mcInteractionDict);
+
+    expect(testInteraction.toBackendDict()).toEqual(mcInteractionDict);
   });
 });

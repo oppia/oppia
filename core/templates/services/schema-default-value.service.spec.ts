@@ -22,6 +22,8 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Schema Default Value Service', () => {
   let sdvs, ls;
@@ -114,7 +116,8 @@ describe('Schema Default Value Service', () => {
     expect(sdvs.getDefaultValue(schema)).toBe(0);
   });
 
-  it('should not get default value if schema type is custom', () => {
+  it('should get default value if schema type is custom with obj_type as ' +
+     'SubtitledHtml', () => {
     let schema = {
       type: 'custom',
       obj_type: 'SubtitledHtml'
@@ -122,6 +125,17 @@ describe('Schema Default Value Service', () => {
     expect(
       sdvs.getDefaultValue(schema)
     ).toEqual(new SubtitledHtml('', ''));
+  });
+
+  it('should get default value if schema type is custom with obj_type as ' +
+     'SubtitledUnicode', () => {
+    let schema = {
+      type: 'custom',
+      obj_type: 'SubtitledUnicode'
+    };
+    expect(
+      sdvs.getDefaultValue(schema)
+    ).toEqual(new SubtitledUnicode('', ''));
   });
 
   it('should not get default value if schema type is invalid', () => {

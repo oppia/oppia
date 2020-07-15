@@ -59,7 +59,6 @@ MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
-
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
 
