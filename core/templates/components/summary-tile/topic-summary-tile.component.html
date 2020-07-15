@@ -1,17 +1,16 @@
-<a ng-href="<[$ctrl.getTopicLink()]>">
+<a href="{{ getTopicLink() }}">
   <div class="oppia-topic-image">
     <picture>
-      <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')]>">
-      <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>">
-      <img ng-src="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>" alt="" class="topic-thumbnail">
+      <source type="image/webp" [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')">
+      <img [src]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')" alt="" class="topic-thumbnail">
     </picture>
   </div>
   <div class="oppia-topic-details">
     <div class="oppia-topic-name">
-      <[::$ctrl.getTopicSummary().getName()]>
+      {{ topicSummary.getName() }}
     </div>
-    <span translate="I18N_TOPIC_SUMMARY_TILE_LESSONS"
-          translate-values="{lessonCount: $ctrl.getTopicSummary().getCanonicalStoryCount()}"
+    <span [innerHTML]="'I18N_TOPIC_SUMMARY_TILE_LESSONS' | translate:{lessonCount: topicSummary.getCanonicalStoryCount()}"
           translate-interpolation="messageformat">
     </span>
   </div>
