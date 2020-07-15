@@ -68,21 +68,27 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           ctrl.value, AlgebraicExpressionInputRulesService);
       };
 
+      var changeHandler = function() {
+        let activeGuppyObject = (
+          GuppyInitializationService.findActiveGuppyObject());
+        if (activeGuppyObject !== undefined) {
+          ctrl.hasBeenTouched = true;
+          ctrl.value = activeGuppyObject.guppyInstance.asciimath();
+          // Need to manually trigger the digest cycle to make any 'watchers'
+          // aware of changes in answer.
+          if ($scope.$root.$$phase != '$apply' && (
+            $scope.$root.$$phase != '$digest')) {
+            $scope.$apply();
+          }
+        }
+      };
+
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
         GuppyInitializationService.init('guppy-div-learner');
-        Guppy.event('change', () => {
-          let activeGuppyObject = (
-            GuppyInitializationService.findActiveGuppyObject());
-          if (activeGuppyObject !== undefined) {
-            ctrl.hasBeenTouched = true;
-            ctrl.value = activeGuppyObject.guppyInstance.asciimath();
-            // Need to manually trigger the digest cycle to make any 'watchers'
-            // aware of changes in answer.
-            $scope.$apply();
-          }
-        });
+        Guppy.event('change', changeHandler);
+        Guppy.event('focus', changeHandler);
 
         CurrentInteractionService.registerCurrentInteraction(
           ctrl.submitAnswer, ctrl.isCurrentAnswerValid);

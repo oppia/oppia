@@ -17,28 +17,35 @@
  * interactions.
  */
 
- // This doesn't work
-import { Component, OnInit } from '@angular/core';
-@Component({
-  selector: 'on-screen-keyboard',
-  templateUrl: './on-screen-keyboard.component.html',
-  styleUrls: []
-})
-export class OnScreenKeyboard implements OnInit {
-  constructor() {}
+require('services/guppy-configuration.service.ts');
+require('services/guppy-initialization.service.ts');
 
-  ngOnInit(): void {}
-}
-
-// This works:
 angular.module('oppia').component('onScreenKeyboard', {
   template: require('./on-screen-keyboard.component.html'),
-  controller: ['$scope',
-    function($scope) {
+  controller: ['$scope', 'GuppyInitializationService',
+    function($scope, GuppyInitializationService) {
       const ctrl = this;
+      let engine, guppyInstance;
+
+      ctrl.insertString = function(string) {
+        engine.insert_string(string);
+        guppyInstance.activate();
+      };
+
+      ctrl.insertSymbol = function(symbol) {
+        engine.insert_symbol(symbol);
+        guppyInstance.activate();
+      };
+
+      ctrl.delete = function() {
+        engine.backspace();
+        guppyInstance.activate();
+      }
 
       ctrl.$onInit = function() {
-        console.log('oninit called');
+        let guppyInstances = GuppyInitializationService.getGuppyInstances();
+        guppyInstance = guppyInstances[guppyInstances.length - 1].guppyInstance;
+        engine = guppyInstance.engine;
       };
     }
   ]

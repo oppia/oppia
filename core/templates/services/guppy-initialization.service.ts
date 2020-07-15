@@ -55,6 +55,10 @@ export class GuppyInitializationService {
       }
     }
   }
+
+  getGuppyInstances(): Array<GuppyObject> {
+    return this.guppyInstances;
+  }
 }
 
 angular.module('oppia').factory(
