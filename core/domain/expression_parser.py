@@ -39,9 +39,6 @@ import string
 from constants import constants
 import python_utils
 
-_MATH_FUNCTION_NAMES = [
-    'log', 'ln', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
-    'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
 _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']
 _VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
@@ -103,10 +100,9 @@ def is_algebraic(expression):
     # This raises an exception if the syntax is invalid.
     Parser().parse(expression)
     token_list = tokenize(expression)
-    token_texts = [token.text for token in token_list]
 
     return any(
-        token_text in VALID_ALGEBRAIC_IDENTIFIERS for token_text in token_texts)
+        token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list)
 
 
 def tokenize(expression):
@@ -131,7 +127,7 @@ def tokenize(expression):
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
-            constants.GREEK_LETTERS + _MATH_FUNCTION_NAMES,
+            constants.GREEK_LETTERS + constants.MATH_FUNCTION_NAMES,
             reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))
 
@@ -197,12 +193,12 @@ class Token(python_utils.OBJECT):
         self.text = text
 
         # Categorize the token.
-        if self.is_identifier(text):
+        if self.is_number(text):
+            self.category = _TOKEN_CATEGORY_NUMBER
+        elif self.is_identifier(text):
             self.category = _TOKEN_CATEGORY_IDENTIFIER
         elif self.is_function(text):
             self.category = _TOKEN_CATEGORY_FUNCTION
-        elif self.is_number(text):
-            self.category = _TOKEN_CATEGORY_NUMBER
         elif self.is_operator(text):
             self.category = _TOKEN_CATEGORY_OPERATOR
         else:
@@ -217,7 +213,7 @@ class Token(python_utils.OBJECT):
         Returns:
             bool. Whether the given string represents a valid math function.
         """
-        return text in _MATH_FUNCTION_NAMES
+        return text in constants.MATH_FUNCTION_NAMES
 
     def is_identifier(self, text):
         """Checks if the given token represents a valid identifier. A valid
@@ -234,7 +230,7 @@ class Token(python_utils.OBJECT):
 
     def is_number(self, text):
         """Checks if the given token represents a valid real number without a
-        '+'/'-' sign.
+        '+'/'-' sign. 'pi' and 'e' are also considered as numeric values.
 
         Args:
             text: str. String representation of the token.
@@ -242,7 +238,7 @@ class Token(python_utils.OBJECT):
         Returns:
             bool. Whether the given string represents a valid real number.
         """
-        return text.replace('.', '', 1).isdigit()
+        return text.replace('.', '', 1).isdigit() or text in ('pi', 'e')
 
     def is_operator(self, text):
         """Checks if the given token represents a valid math operator.

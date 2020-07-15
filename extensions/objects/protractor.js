@@ -228,6 +228,7 @@ var OBJECT_EDITORS = {
   NonnegativeInt: NonnegativeIntEditor,
   NormalizedString: NormalizedStringEditor,
   NumberWithUnits: NumberWithUnitsEditor,
+  NumericExpression: MathEditor,
   ParameterName: ParameterNameEditor,
   PositionOfTerms: ParameterNameEditor,
   SanitizedUrl: SanitizedUrlEditor,

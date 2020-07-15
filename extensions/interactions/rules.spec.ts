@@ -48,6 +48,8 @@ import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { NumericExpressionInputRulesService } from
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
@@ -96,6 +98,8 @@ describe('Rule spec services', function() {
         new NumberWithUnitsObjectFactory(
           new UnitsObjectFactory(), new FractionObjectFactory(),
         ), new UtilsService()));
+    $provide.value('NumericExpressionInputRulesService',
+      new NumericExpressionInputRulesService());
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
         new FractionObjectFactory(), new UtilsService()));

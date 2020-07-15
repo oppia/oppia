@@ -358,6 +358,12 @@ import { NumberWithUnitsRulesService } from
 import { NumberWithUnitsValidationService } from
   // eslint-disable-next-line max-len
   'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PageTitleService } from 'services/page-title.service';
 import { ParamChangeObjectFactory } from
@@ -769,6 +775,8 @@ export class UpgradedServices {
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['NumberAttemptsService'] = new NumberAttemptsService();
+    upgradedServices['NumericExpressionInputRulesService'] =
+      new NumericExpressionInputRulesService();
     upgradedServices['NumericInputRulesService'] =
       new NumericInputRulesService();
     upgradedServices['NewlyCreatedTopicObjectFactory'] =
@@ -948,11 +956,11 @@ export class UpgradedServices {
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['MathEquationInputValidationService'] =
-      new MathEquationInputValidationService(
+    upgradedServices['MathExpressionInputValidationService'] =
+      new MathExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
-      new MathExpressionInputValidationService(
+      new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MessengerService'] = new MessengerService(
       upgradedServices['LoggerService'],
@@ -977,6 +985,9 @@ export class UpgradedServices {
       new NumberWithUnitsObjectFactory(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['FractionObjectFactory']);
+    upgradedServices['NumericExpressionInputValidationService'] =
+      new NumericExpressionInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsRulesService'] =
       new NumberWithUnitsRulesService(
         upgradedServices['UnitsObjectFactory'],
@@ -1205,6 +1216,7 @@ export class UpgradedServices {
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
         upgradedServices['NumberWithUnitsRulesService'],
+        upgradedServices['NumericExpressionInputRulesService'],
         upgradedServices['NumericInputRulesService'],
         upgradedServices['PencilCodeEditorRulesService'],
         upgradedServices['SetInputRulesService'],
