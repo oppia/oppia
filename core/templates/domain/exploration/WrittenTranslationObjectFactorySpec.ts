@@ -54,8 +54,9 @@ describe('WrittenTranslation object factory', () => {
       translation: 'unicode',
       needs_update: false
     });
-    expect(() => writtenTranslation.getHtml())
-      .toThrow(new Error('This translation is not of type html'));
+    expect(
+      () => writtenTranslation.getHtml()
+    ).toThrowError('This translation is not of type html');
   });
 
   it('should throw error if the wrong setter is used', () => {
@@ -64,8 +65,9 @@ describe('WrittenTranslation object factory', () => {
       translation: 'unicode',
       needs_update: false
     });
-    expect(() => writtenTranslation.setHtml(''))
-      .toThrow(new Error('This translation is not of type html'));
+    expect(
+      () => writtenTranslation.setHtml('')
+    ).toThrowError('This translation is not of type html');
   });
 
   it('should correctly mark written translation as needing update',
