@@ -633,7 +633,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         customization_args_util.validate_customization_args_and_values(
             'interaction', self.id, self.customization_args,
-            interaction.customization_arg_specs)
+            interaction.customization_arg_specs, populate_missing_keys=False)
 
         if not isinstance(self.answer_groups, list):
             raise utils.ValidationError(
@@ -2376,7 +2376,6 @@ class State(python_utils.OBJECT):
         Args:
             customization_args: dict. The new customization_args to set.
         """
-
         if self.interaction.id:
             # If interaction id is None, content_id's have already been removed
             # in update_interaction_id.
@@ -2389,7 +2388,7 @@ class State(python_utils.OBJECT):
             self.interaction.customization_args = customization_args
             new_content_id_list.extend(
                 self.interaction.get_all_content_ids_in_cust_args())
-            print(old_content_id_list, new_content_id_list)
+
             self._update_content_ids_in_assets(
                 old_content_id_list, new_content_id_list)
         else:

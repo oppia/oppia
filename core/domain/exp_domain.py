@@ -2521,9 +2521,13 @@ class Exploration(python_utils.OBJECT):
                     schema = ca_spec.schema
                     schema_obj_type = schema.get('obj_type')
                     ca_name = ca_spec.name
-                    content_id = 'custarg_' + ca_name
+                    content_id_prefix = 'custarg_' + ca_name + '_'
 
                     if schema_obj_type in obj_type_to_subtitled_key:
+                        content_id = (
+                            content_id_prefix +
+                            python_utils.UNICODE(next_content_id_index))
+                        next_content_id_index += 1
                         new_content_ids.append(content_id)
                         new_value = {'content_id': content_id}
 
@@ -2544,7 +2548,7 @@ class Exploration(python_utils.OBJECT):
                         ca[ca_name]['value'], new_content_ids = (
                             convert_ca_html_list_to_subtitled_html_dict_list(
                                 value,
-                                content_id + '_',
+                                content_id_prefix,
                                 next_content_id_index)
                         )
                         next_content_id_index += len(new_content_ids)

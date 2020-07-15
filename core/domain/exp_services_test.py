@@ -1640,13 +1640,7 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value:
-            content_id: custarg_placeholder
-            unicode_str: ''
-        rows:
-          value: 1
+      customization_args: {}
       default_outcome:
         dest: %s
         feedback:
@@ -1664,13 +1658,11 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
         default_outcome: {}
   New state:
     classifier_model_id: null
@@ -1683,7 +1675,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -1699,18 +1691,18 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -1742,13 +1734,7 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value:
-            content_id: custarg_placeholder
-            unicode_str: ''
-        rows:
-          value: 1
+      customization_args: {}
       default_outcome:
         dest: %s
         feedback:
@@ -1766,13 +1752,11 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
         default_outcome: {}
   Renamed state:
     classifier_model_id: null
@@ -1785,7 +1769,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -1801,18 +1785,18 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -1849,6 +1833,28 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }), 
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'custarg_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
@@ -1895,6 +1901,28 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'custarg_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         with python_utils.open_file(
@@ -1945,6 +1973,27 @@ title: A title
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'custarg_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        }),
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+            'state_name': 'New state',
+            'new_value': 1
         })]
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -1999,13 +2048,7 @@ content:
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value:
-        content_id: custarg_placeholder
-        unicode_str: ''
-    rows:
-      value: 1
+  customization_args: {}
   default_outcome:
     dest: %s
     feedback:
@@ -2023,13 +2066,11 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
-    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
-    custarg_placeholder: {}
     default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -2045,7 +2086,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder
+        content_id: custarg_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -2061,18 +2102,18 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-next_content_id_index: 0
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 """)
     }
@@ -2089,7 +2130,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder
+        content_id: custarg_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -2105,18 +2146,18 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-next_content_id_index: 0
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 """)
     }
@@ -2146,6 +2187,28 @@ written_translations:
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'custarg_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         dict_output = exp_services.export_states_to_yaml(
@@ -2177,6 +2240,27 @@ written_translations:
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'custarg_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        }),
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+            'state_name': 'New state',
+            'new_value': 1
         })]
         exploration.objective = 'The objective'
         with python_utils.open_file(
@@ -2693,7 +2777,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'needs_update': True
                     }
                 },
-                'custarg_placeholder': {},
                 'default_outcome': {}
             }
         }

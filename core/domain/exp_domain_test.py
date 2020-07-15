@@ -1202,7 +1202,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
 
-        # Adds 1 to content count to exploration.
         init_state.update_interaction_id('TextInput')
 
         answer_group_dict = {
@@ -1250,7 +1249,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Adds 1 to content count to exploration.
         init_state.update_interaction_solution(solution)
 
-        self.assertEqual(exploration.get_content_count(), 8)
+        self.assertEqual(exploration.get_content_count(), 7)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -5795,7 +5794,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -5811,19 +5810,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -5861,7 +5860,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -5877,18 +5876,18 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -6358,7 +6357,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6374,19 +6373,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6515,7 +6514,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6531,19 +6530,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6581,7 +6580,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6600,19 +6599,19 @@ states:
           html: <p>Correct!</p>
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
 states_schema_version: 35
@@ -6693,7 +6692,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6709,19 +6708,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6759,7 +6758,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6783,12 +6782,12 @@ states:
         explanation:
           content_id: solution
           html: ''
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
         solution: {}
@@ -6796,7 +6795,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
         solution: {}
@@ -6860,7 +6859,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6876,19 +6875,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6930,7 +6929,7 @@ states:
           value: true
         customPlaceholder:
           value:
-            content_id: custarg_customPlaceholder
+            content_id: custarg_customPlaceholder_0
             unicode_str: ''
         placeholder:
           value: ''
@@ -6950,18 +6949,18 @@ states:
       hints: []
       id: FractionInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_customPlaceholder: {}
+        custarg_customPlaceholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_customPlaceholder: {}
+        custarg_customPlaceholder_0: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -7053,7 +7052,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -7069,19 +7068,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -7661,7 +7660,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -7682,19 +7681,19 @@ states:
         explanation:
           content_id: solution
           html: <p>This is <em>solution</em> for state1</p>
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
         solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
         solution: {}
   state2:
@@ -8026,7 +8025,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -8042,19 +8041,19 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 2
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -8092,7 +8091,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder
+            content_id: custarg_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -8108,18 +8107,18 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        custarg_placeholder: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []

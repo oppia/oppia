@@ -324,7 +324,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder
+        content_id: custarg_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -340,18 +340,18 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-next_content_id_index: 0
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 """),
         'State B': ("""classifier_model_id: null
@@ -364,7 +364,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder
+        content_id: custarg_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -380,18 +380,18 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-next_content_id_index: 0
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
-    custarg_placeholder: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
@@ -401,13 +401,7 @@ content:
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value:
-        content_id: custarg_placeholder
-        unicode_str: ''
-    rows:
-      value: 1
+  customization_args: {}
   default_outcome:
     dest: %s
     feedback:
@@ -425,13 +419,11 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
-    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
-    custarg_placeholder: {}
     default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -443,13 +435,7 @@ content:
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value:
-        content_id: custarg_placeholder
-        unicode_str: ''
-    rows:
-      value: 1
+  customization_args: {}
   default_outcome:
     dest: State A
     feedback:
@@ -467,13 +453,11 @@ param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
-    custarg_placeholder: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
-    custarg_placeholder: {}
     default_outcome: {}
 """)
 
@@ -519,15 +503,81 @@ written_translations:
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State A',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'custarg_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State A',
+                    'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 2',
                     'new_value': 'TextInput'
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State 2',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'custarg_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State 2',
+                    'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 3',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State 3',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'custarg_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State 3',
+                    'new_value': 1
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,

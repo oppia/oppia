@@ -57,7 +57,7 @@ def get_full_customization_args(customization_args, ca_specs):
 
 def validate_customization_args_and_values(
         item_name, item_type, customization_args,
-        ca_specs_to_validate_against):
+        ca_specs_to_validate_against, populate_missing_keys=True):
     """Validates the given `customization_args` dict against the specs set
     out in 'ca_specs_to_validate_against'. 'item_name' and 'item_type' are
     used to populate any error messages that arise during validation.
@@ -94,8 +94,9 @@ def validate_customization_args_and_values(
     # Validate and clean up the customization args.
 
     # Populate missing keys with the default values.
-    customization_args = get_full_customization_args(
-        customization_args, ca_specs_to_validate_against)
+    if populate_missing_keys:
+        customization_args = get_full_customization_args(
+            customization_args, ca_specs_to_validate_against)
 
     # Remove extra keys.
     extra_args = []
