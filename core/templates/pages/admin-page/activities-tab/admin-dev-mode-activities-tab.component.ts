@@ -52,7 +52,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.numDummyExpsToPublish = 0;
     this.numDummyExpsToGenerate = 0;
     this.reloadingAllExplorationPossible = false;
-    this.adminDataService.getDataAsync().then(function(adminDataObject) {
+    this.adminDataService.getDataAsync().then((adminDataObject) => {
       this.DEMO_EXPLORATIONS = adminDataObject.demoExplorations;
       this.DEMO_COLLECTIONS = adminDataObject.demoCollections;
       this.demoExplorationIds = adminDataObject.demoExplorationIds;
