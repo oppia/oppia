@@ -23,6 +23,7 @@ from constants import constants
 from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import email_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -46,7 +47,7 @@ import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
-from core.domain import email_services
+
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""

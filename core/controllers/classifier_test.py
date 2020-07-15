@@ -28,6 +28,7 @@ from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
+from core.domain import email_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
@@ -37,7 +38,6 @@ import feconf
 import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
-from core.domain import email_services
 
 
 class TrainedClassifierHandlerTests(test_utils.EmailTestBase):

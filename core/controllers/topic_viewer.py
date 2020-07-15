@@ -118,8 +118,6 @@ class TopicPageDataHandler(base.BaseHandler):
                 5, all_skill_ids, False)
             if len(questions) == 5:
                 train_tab_should_be_displayed = True
-        print("@@@@@")
-        print(degrees_of_mastery)
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,

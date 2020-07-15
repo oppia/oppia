@@ -25,6 +25,7 @@ from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
+from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -35,7 +36,6 @@ import feconf
 import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
-from core.domain import email_services
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -173,7 +173,7 @@ class DummyMailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
             self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
-                          messages[0].html.decode())        
+                          messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.EmailTestBase):
@@ -2613,8 +2613,9 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 'A rejection message!')
 
             self.assertEqual(
-                self._log_handler.messages['error'], 
+                self._log_handler.messages['error'],
                 ['This app cannot send emails to users.'])
+
 
 class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to account deletion application emails."""
