@@ -21,6 +21,7 @@ import argparse
 import contextlib
 import json
 import os
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -43,7 +44,6 @@ common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
 TARGET_DOWNLOAD_DIRS = {
     'frontend': THIRD_PARTY_STATIC_DIR,
-    'backend': THIRD_PARTY_DIR,
     'oppiaTools': TOOLS_DIR
 }
 
@@ -339,6 +339,22 @@ def download_manifest_files(filepath):
 def main(args=None):
     """Installs all the third party libraries."""
     unused_parsed_args = _PARSER.parse_args(args=args)
+    # Install third party libraries to third_party/
+    command = [
+        sys.executable, '-m', 'pip', 'install', '-r'
+        'requirements.txt', '--target', THIRD_PARTY_DIR]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    else:
+        python_utils.PRINT(stderr)
+        python_utils.PRINT(
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        raise Exception('Error installing python third party packages.')
+
+    # Install static frontend libraries to third_party/static
     download_manifest_files(MANIFEST_FILE_PATH)
 
 

@@ -24,6 +24,8 @@ import os
 import sys
 import time
 
+from google.appengine.ext import vendor
+
 # Whether to calculate costs for RPCs, in addition to time taken.
 appstats_CALC_RPC_COSTS = True
 # The number of lines to record for an RPC stacktrace.
@@ -89,27 +91,4 @@ if os.path.isdir(oppia_tools_path):
         raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
     sys.path.insert(0, pil_path)
 
-THIRD_PARTY_LIBS = [
-    os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.9.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.5'),
-    os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'future-0.17.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.43.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'packaging-20.3'),
-    os.path.join(ROOT_PATH, 'third_party', 'pylatexenc-2.5'),
-    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.17.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.5'),
-    os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
-]
-
-for lib_path in THIRD_PARTY_LIBS:
-    if not os.path.isdir(lib_path):
-        raise Exception('Invalid path for third_party library: %s' % lib_path)
-    sys.path.insert(0, lib_path)
+vendor.add(os.path.join(ROOT_PATH, 'third_party'))
