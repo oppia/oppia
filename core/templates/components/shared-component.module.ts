@@ -44,6 +44,8 @@ import { SchemaBasedBoolEditorComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SchemaBasedExpressionEditorComponent } from
   './forms/schema-based-editors/schema-based-expression-editor.component';
+import { TopicSummaryTileComponent } from
+  './summary-tile/topic-summary-tile.component';
 
 
 
@@ -53,11 +55,13 @@ import { SchemaBasedExpressionEditorComponent } from
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    SchemaBasedBoolEditorComponent, SchemaBasedExpressionEditorComponent],
+    SchemaBasedBoolEditorComponent, SchemaBasedExpressionEditorComponent,
+    TopicSummaryTileComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     SchemaBasedBoolEditorComponent, SchemaBasedExpressionEditorComponent,
+    TopicSummaryTileComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
   ],
