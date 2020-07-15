@@ -22,6 +22,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
+  AssignedSkillObjectFactory,
+  AssignedSkill,
+  AssignedSkillBackendDict
+} from 'domain/skill/assigned-skill-object.factory';
+import {
   AugmentedSkillSummaryObjectFactory,
   AugmentedSkillSummaryBackendDict,
   AugmentedSkillSummary
@@ -97,15 +102,8 @@ interface SkillsDashboardData {
   more: boolean;
 }
 
-interface IAssignedSkillDataBackendDict {
-  'topic_assignments_dict': {
-    [key: string]: {
-      'topic_id': string,
-      'topic_name': string,
-      'topic_version': number,
-      'subtopic_id': number|null
-    }
-  }
+interface AssignedSkillDataBackendDict {
+  'topic_assignments_dict': AssignedSkillBackendDict[];
 }
 
 @Injectable({
@@ -114,6 +112,7 @@ interface IAssignedSkillDataBackendDict {
 
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(
+    private assignedSkillObjectFactory: AssignedSkillObjectFactory,
     private augmentedSkillSummaryObjectFactory:
     AugmentedSkillSummaryObjectFactory,
     private http: HttpClient,
@@ -162,14 +161,17 @@ export class TopicsAndSkillsDashboardBackendApiService {
     });
   }
 
-  fetchTopicAssignmentsForSkill(
-      skillId): Promise<IAssignedSkillDataBackendDict> {
+  fetchTopicAssignmentsForSkill(skillId: string): Promise<AssignedSkill[]> {
     const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
       '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
         skill_id: skillId
       });
-    return this.http.get<IAssignedSkillDataBackendDict>(
-      assignSkillDataUrl).toPromise();
+    return this.http.get<AssignedSkillDataBackendDict>(
+      assignSkillDataUrl).toPromise().then(dict => {
+      return dict.topic_assignments_dict.map(
+        backendDict => this.assignedSkillObjectFactory
+          .createFromBackendDict(backendDict));
+    });
   }
 
   fetchSkillsDashboardData(

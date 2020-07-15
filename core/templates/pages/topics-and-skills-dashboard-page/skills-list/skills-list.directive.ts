@@ -134,10 +134,10 @@ angular.module('oppia').directive('skillsList', [
             }).result.then(function(topicsToUnassign) {
               for (let topic in topicsToUnassign) {
                 var changeList = [];
-                if (topicsToUnassign[topic].subtopic_id) {
+                if (topicsToUnassign[topic].subtopicId) {
                   changeList.push({
                     cmd: 'remove_skill_id_from_subtopic',
-                    subtopic_id: topicsToUnassign[topic].subtopic_id,
+                    subtopic_id: topicsToUnassign[topic].subtopicId,
                     skill_id: skillId
                   });
                 }
@@ -146,8 +146,8 @@ angular.module('oppia').directive('skillsList', [
                   uncategorized_skill_id: skillId
                 });
                 EditableTopicBackendApiService.updateTopic(
-                  topicsToUnassign[topic].topic_id,
-                  topicsToUnassign[topic].topic_version,
+                  topicsToUnassign[topic].topicId,
+                  topicsToUnassign[topic].topicVersion,
                   `Unassigned skill with id ${skillId} from the topic.`,
                   changeList
                 ).then(function() {

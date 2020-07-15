@@ -92,6 +92,8 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
+import { AssignedSkillObjectFactory } from
+  'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
@@ -681,6 +683,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
   static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
+  static assignedSkillObjectFactory: AssignedSkillObjectFactory;
   static audioBarStatusService: AudioBarStatusService;
   static audioFileObjectFactory: AudioFileObjectFactory;
   static audioLanguageObjectFactory: AudioLanguageObjectFactory;
@@ -989,6 +992,7 @@ private answerGroupsCacheService: AnswerGroupsCacheService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
 private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
+private assignedSkillObjectFactory: AssignedSkillObjectFactory,
 private audioBarStatusService: AudioBarStatusService,
 private audioFileObjectFactory: AudioFileObjectFactory,
 private audioLanguageObjectFactory: AudioLanguageObjectFactory,
@@ -1298,6 +1302,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.answerGroupObjectFactory = this.answerGroupObjectFactory;
     OppiaAngularRootComponent.answerStatsObjectFactory = this.answerStatsObjectFactory;
     OppiaAngularRootComponent.appService = this.appService;
+    OppiaAngularRootComponent.assignedSkillObjectFactory = this.assignedSkillObjectFactory;
     OppiaAngularRootComponent.audioBarStatusService = this.audioBarStatusService;
     OppiaAngularRootComponent.audioFileObjectFactory = this.audioFileObjectFactory;
     OppiaAngularRootComponent.audioLanguageObjectFactory = this.audioLanguageObjectFactory;

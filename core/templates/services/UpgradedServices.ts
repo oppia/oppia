@@ -55,6 +55,8 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
+import { AssignedSkillObjectFactory } from
+  'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
@@ -648,6 +650,8 @@ export class UpgradedServices {
       new AnswerStatsObjectFactory();
     upgradedServices['AudioFileObjectFactory'] = new AudioFileObjectFactory();
     upgradedServices['AppService'] = new AppService();
+    upgradedServices['AssignedSkillObjectFactory'] =
+      new AssignedSkillObjectFactory();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
     upgradedServices['AudioFileObjectFactory'] = new AudioFileObjectFactory();
     upgradedServices['AudioLanguageObjectFactory'] =
@@ -1419,6 +1423,7 @@ export class UpgradedServices {
       new TopicCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
       new TopicsAndSkillsDashboardBackendApiService(
+        upgradedServices['AssignedSkillObjectFactory'],
         upgradedServices['AugmentedSkillSummaryObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['ShortSkillSummaryObjectFactory'],
