@@ -33,7 +33,7 @@ import { SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
 
-fdescribe('Interaction object factory', () => {
+describe('Interaction object factory', () => {
   let iof = null;
   let oof = null;
   let agof = null;
