@@ -490,6 +490,32 @@ describe('Exploration improvements task registrar service', () => {
           .getSuccessiveIncorrectAnswersTasks().length)
         .toEqual(1);
     });
+
+    it('should return the supporting stats of a registered task', () => {
+      const task = makeTask<HighBounceRateTask>(
+        {...taskBackendDict, ...{status: 'open'}});
+      explorationImprovementsTaskRegistryService.initialize(
+        expId, expVersion, makeStates(), makeExpStats(), [task],
+        new Map(), new Map(), []);
+
+      expect(
+        explorationImprovementsTaskRegistryService.getSupportingStateStats(task)
+      ).toBeDefined();
+    });
+
+    it('should throw an error when fetching the supporting stats of an ' +
+      'unregistered task', () => {
+      delete statesBackendDict.End;
+      const task = makeTask<HighBounceRateTask>(
+        {...taskBackendDict, ...{target_id: 'End'}});
+      explorationImprovementsTaskRegistryService.initialize(
+        expId, expVersion, makeStates(), makeExpStats(), [],
+        new Map(), new Map(), []);
+
+      expect(
+        explorationImprovementsTaskRegistryService.getSupportingStateStats(task)
+      ).toThrowError('Unregistered task has no supporting stats');
+    });
   });
 
   describe('Generating new tasks', () => {

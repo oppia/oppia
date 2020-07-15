@@ -289,6 +289,13 @@ export class ExplorationImprovementsTaskRegistryService {
       ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
   }
 
+  getSupportingStateStats(task: ExplorationTask): SupportingStateStats {
+    if (!this.tasksByState.has(task.targetId)) {
+      throw new Error('Unregistered task has no supporting stats');
+    }
+    return this.tasksByState.get(task.targetId).supportingStateStats;
+  }
+
   private validateInitializationArgs(
       expId: string,
       expVersion: number,
