@@ -93,7 +93,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return 'invalid'
         branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)
-        with branch_name_swap, self.assertRaisesRegexp(AssertionError, ''):
+        with branch_name_swap, self.assertRaisesRegexp(
+            AssertionError, 'Current branch is not a release branch_name'):
             update_configs.main('test-token')
 
     def test_missing_terms_page(self):
@@ -192,7 +193,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         feconf_swap = self.swap(
             update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
         with getpass_swap, feconf_swap, self.assertRaisesRegexp(
-            AssertionError, ''):
+            AssertionError, 'Missing mailgun API key'):
             update_configs.add_mailgun_api_key()
 
     def test_addition_of_mailgun_api_key(self):

@@ -164,13 +164,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB',
             'xyzOppia', 'oppiaXyz', 'abcOppiaXyz']
         for username in bad_usernames:
-            with self.assertRaisesRegexp(utils.ValidationError, ''):
+            with self.assertRaisesRegexp(
+                utils.ValidationError,
+                r'(Usernames can only have alphanumeric characters.)|'
+                r'(Empty username supplied.)|'
+                r'(A username can have at most 30 characters.)|'
+                r'(This username is not available.)'):
                 user_services.set_username(user_id, username)
 
     def test_invalid_emails(self):
         bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
         for email in bad_email_addresses:
-            with self.assertRaisesRegexp(utils.ValidationError, ''):
+            with self.assertRaisesRegexp(
+                utils.ValidationError,
+                r'(Invalid email address: \S)|(No user email specified.)|'
+                r'(Expected email to be a string, received \S)'):
                 user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):

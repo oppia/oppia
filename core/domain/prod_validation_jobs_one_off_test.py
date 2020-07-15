@@ -244,11 +244,17 @@ class BaseValidatorTests(test_utils.GenericTestBase):
         self.item.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
-        with self.assertRaisesRegexp(NotImplementedError, ''):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'_get_external_id_relationships\(\) method has '
+            r'not yet been implemented'):
             MockBaseModelValidator().validate(self.item)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
-        with self.assertRaisesRegexp(NotImplementedError, ''):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'_get_external_model_properties\(\) method has not '
+            r'yet been implemented'):
             MockSummaryModelValidator().validate(self.item)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
@@ -257,15 +263,21 @@ class BaseValidatorTests(test_utils.GenericTestBase):
             MockSnapshotContentModelValidator().validate(self.item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
-        with self.assertRaisesRegexp(NotImplementedError, ''):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'_get_change_domain_class\(\) method has not '
+            r'yet been implemented'):
             snapshot_model = MockSnapshotModel(id='mockmodel')
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
     def test_error_is_raised_if_entity_classes_to_map_over_is_undefined(self):
         job_class = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        with self.assertRaisesRegexp(NotImplementedError, ''), self.swap(
-            jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'entity_classes_to_map_over\(\) method has not yet been '
+            r'implemented'), self.swap(
+                jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
             job_id = job_class.create_new()
             job_class.enqueue(job_id)
 

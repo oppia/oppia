@@ -46,7 +46,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             rte_component_class.validate(item)
 
         for item in invalid_items:
-            with self.assertRaisesRegexp(Exception, ''):
+            with self.assertRaisesRegexp(
+                Exception,
+                r'(Nested tabs and collapsible)|(Missing attributes)|'
+                r'(Invalid \w+)|(Expected [\w|\s]+, received [\w|\s]+)|'
+                r'(Video id length is not 11)|'
+                r'(Missing keys: \S+, Extra keys: \S+)'):
                 rte_component_class.validate(item)
 
     def test_collapsible_validation(self):

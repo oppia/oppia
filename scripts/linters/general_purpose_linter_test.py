@@ -644,9 +644,9 @@ class PythonLintTests(LintTests):
                 [INVALID_ASSERT_RAISES_FILEPATH], FILE_CACHE, True
             ).perform_all_lint_checks()
         self.assert_same_list_elements([
-            'Line 40: Please use assertRaises method instead use '
-            'assertRaisesRegexp method because it also tests that regexp '
-            'matches on the string representation of the raised exception.'
+            'Please do not use the assertRaises method. Instead, use '
+            'assertRaisesRegexp and provide a sufficiently strong regexp '
+            'string to validate that the correct error is being raised.'
             ], self.linter_stdout)
 
 

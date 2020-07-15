@@ -435,7 +435,12 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         for schema in valid_schemas:
             validate_schema(schema)
         for schema in invalid_schemas:
-            with self.assertRaisesRegexp((AssertionError, KeyError), ''):
+            with self.assertRaisesRegexp(
+                (AssertionError, KeyError),
+                r'(Missing keys: [\S|\s]+)|(^$)|(Validation failed)|'
+                r'(could not convert string to float: value_of_wrong_type)|'
+                r'(Received invalid_mode which is not in the allowed range of '
+                r'choices)'):
                 validate_schema(schema)
 
     def test_normalize_against_schema_raises_exception(self):
@@ -578,7 +583,12 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value in invalid_items:
-            with self.assertRaisesRegexp(Exception, ''):
+            with self.assertRaisesRegexp(
+                Exception,
+                r'(Missing keys: \S+, Extra keys: \S+)|'
+                r'(float\(\) argument must be a string or a number)|'
+                r'(Expected [\w|\s]+, received [\S|\s]+)|(^$)|'
+                r'(could not convert string to float)|(Validation failed)'):
                 schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self):

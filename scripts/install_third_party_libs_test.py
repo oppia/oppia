@@ -139,7 +139,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(Exception, ''):
+                with self.assertRaisesRegexp(Exception, 'Error importing pip'):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
         finally:
@@ -156,7 +156,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(Exception, ''):
+                with self.assertRaisesRegexp(Exception, 'Error importing pip'):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
         finally:
@@ -172,7 +172,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(Exception, ''):
+                with self.assertRaisesRegexp(Exception, 'Error importing pip'):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
         finally:

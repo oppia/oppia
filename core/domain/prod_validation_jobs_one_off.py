@@ -202,7 +202,9 @@ class BaseModelValidator(python_utils.OBJECT):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            '_get_external_id_relationships() method has '
+            'not yet been implemented')
 
     @classmethod
     def _validate_external_id_relationships(cls, item):
@@ -325,7 +327,9 @@ class BaseSummaryModelValidator(BaseModelValidator):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            '_get_external_model_properties() method has not '
+            'yet been implemented')
 
     @classmethod
     def _validate_external_model_properties(cls, item):
@@ -487,7 +491,8 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            '_get_change_domain_class() method has not yet been implemented')
 
     @classmethod
     def _validate_commit_cmds_schema(cls, item):
@@ -5325,8 +5330,13 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        raise NotImplementedError
+        """Return a list of datastore class references to map over.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
+        """
+        raise NotImplementedError(
+            'entity_classes_to_map_over() method has not yet been implemented')
 
     @staticmethod
     def map(model_instance):

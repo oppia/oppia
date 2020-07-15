@@ -137,7 +137,8 @@ class SetupGaeTests(test_utils.GenericTestBase):
 
         with self.walk_swap, self.remove_swap, self.makedirs_swap:
             with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with self.assertRaisesRegexp(Exception, ''):
+                with self.assertRaisesRegexp(
+                    Exception, 'Error downloading Google App Engine.'):
                     setup_gae.main(args=[])
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
@@ -193,7 +194,8 @@ class SetupGaeTests(test_utils.GenericTestBase):
 
         with self.walk_swap, self.remove_swap, self.makedirs_swap:
             with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with self.assertRaisesRegexp(Exception, ''):
+                with self.assertRaisesRegexp(
+                    Exception, 'Error downloading Google Cloud SDK.'):
                     setup_gae.main(args=[])
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)

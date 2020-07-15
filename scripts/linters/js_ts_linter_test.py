@@ -105,13 +105,13 @@ class JsTsLintTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_validate_and_parse_js_and_ts_files_with_exception(self):
-        def mock_parse_script(unused_file_content):
-            raise Exception()
+        def mock_parse_script(unused_file_content, comment):  # pylint: disable=unused-argument
+            raise Exception('Dummy Exception')
 
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
         with self.print_swap, esprima_swap, self.assertRaisesRegexp(
-            Exception, ''):
+            Exception, 'Dummy Exception'):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()

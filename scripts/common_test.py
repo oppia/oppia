@@ -770,10 +770,11 @@ class CommonTests(test_utils.GenericTestBase):
             origin_content = f.readlines()
 
         def mock_compile(unused_arg):
-            raise ValueError
+            raise ValueError('Dummy Exception')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaisesRegexp(ValueError, ''), compile_swap:
+        with self.assertRaisesRegexp(
+            ValueError, 'Dummy Exception'), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))

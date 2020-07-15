@@ -281,7 +281,11 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_raise_error_when_document_type_is_invalid(self):
         doc = {'abc': set('xyz')}
-        with self.assertRaisesRegexp(ValueError, ''):
+        with self.assertRaisesRegexp(
+            ValueError,
+            r'Value for document field abc should be a \(unicode\) string, '
+            r'numeric type, datetime.date, datetime.datetime or list of such '
+            r'types, got <type \'set\'>'):
             gae_search_services.add_documents_to_index([doc], 'my_index')
 
 

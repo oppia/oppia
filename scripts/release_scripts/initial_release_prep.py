@@ -115,7 +115,8 @@ def cut_release_branch():
         'Otherwise, increment the third version number '
         '(e.g. 2.5.3 -> 2.5.4)\n')
     release_version = python_utils.INPUT()
-    assert re.match(r'\d+\.\d+\.\d+$', release_version)
+    assert re.match(r'\d+\.\d+\.\d+$', release_version), (
+        'The version entered is invalid.')
     cut_release_or_hotfix_branch.main(
         args=['--release_version=%s' % release_version])
 

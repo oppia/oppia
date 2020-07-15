@@ -50,7 +50,11 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             )
 
         for item in invalid_items:
-            with self.assertRaisesRegexp(Exception, ''):
+            with self.assertRaisesRegexp(
+                Exception,
+                r'(Expected unicode string, received \S)|(^$)|'
+                r'(Expected list, received \S)|(Received string which is not '
+                r'in the allowed range of choices: \w|\s)|(u\'\\xa1\')'):
                 object_class.normalize(item)
 
     def test_boolean_validation(self):

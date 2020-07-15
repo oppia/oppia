@@ -843,9 +843,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         with self.assertRaisesRegexp(
             Exception,
-            '\'module\' object has no attribute '
-            '\'get_multiple_collection_by_id\''):
-            collection_services.get_multiple_collection_by_id(
+            'Couldn\'t find collections with the following ids:\ndoesnt_exist'):
+            collection_services.get_multiple_collections_by_id(
                 collection_ids + ['doesnt_exist'])
 
     def test_soft_deletion_of_collection(self):

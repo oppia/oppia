@@ -187,10 +187,11 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         function = lambda x: x ** 2
 
         failing_func = test_utils.FailingFunction(
-            function, MockError, test_utils.FailingFunction.INFINITY)
+            function, MockError('Dummy Exception'),
+            test_utils.FailingFunction.INFINITY)
 
         for i in python_utils.RANGE(20):
-            with self.assertRaisesRegexp(MockError, ''):
+            with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 
     def test_failing_function_raises_error_with_invalid_num_tries(self):
@@ -415,12 +416,12 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_capature_exception_raised_by_tested_function(
             self):
         def mock_getcwd():
-            raise ValueError()
+            raise ValueError('Dummy Exception')
 
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
-        with self.assertRaisesRegexp(ValueError, ''):
+        with self.assertRaisesRegexp(ValueError, 'Dummy Exception'):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
 

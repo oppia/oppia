@@ -90,7 +90,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'get_deletion_policy() method is not overwritten '
+            'in a derived class')
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -103,7 +105,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'has_reference_to_user_id() method is not overwritten '
+            'in a derived class.')
 
     @staticmethod
     def export_data(user_id):
@@ -116,7 +120,8 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'export_data() method is not overwritten in a derived class')
 
     @staticmethod
     def get_export_policy():
@@ -126,7 +131,8 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'get_export_policy() method is not overwritten in a derived class')
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -457,7 +463,8 @@ class BaseCommitLogEntryModel(BaseModel):
             NotImplementedError: The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            '_get_instance_id() method is not overwritten in derived classes')
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
@@ -782,7 +789,7 @@ class VersionedModel(BaseModel):
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
-        raise NotImplementedError
+        raise NotImplementedError('put() method has not yet been implemented')
 
     def commit(self, committer_id, commit_message, commit_cmds):
         """Saves a version snapshot and updates the model.

@@ -121,7 +121,7 @@ def pip_install(package, version, install_path):
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
-        raise Exception
+        raise Exception('Error importing pip')
 
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.

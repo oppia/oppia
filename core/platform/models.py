@@ -47,7 +47,8 @@ class Platform(python_utils.OBJECT):
             NotImplementedError: The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'import_models() method is not overwritten in derived classes')
 
 
 class _Gae(Platform):

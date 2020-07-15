@@ -340,10 +340,10 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': re.compile(r'self.assertRaises\('),
-        'message': 'Please use assertRaises method instead use ' +
-                   'assertRaisesRegexp method because it also tests that regexp'
-                   ' matches on the string representation of the raised '
-                   'exception.',
+        'message': 'Please do not use the assertRaises method. Instead, use ' +
+                   'assertRaisesRegexp and provide a sufficiently strong ' +
+                   'regexp string to validate that the correct error ' +
+                   'is being raised.',
         'excluded_files': (),
         'excluded_dirs': ()
     },
