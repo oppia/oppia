@@ -87,60 +87,6 @@
           </div>
         </div>
       </md-card>
-
-      <md-card class="skills-card protractor-test-subtopic-column"
-               dnd-list="$ctrl.subtopic.getSkillSummaries()"
-               dnd-drop="$ctrl.onMoveSkillFinish($ctrl.subtopic.getId())">
-        <div class="subtopic-container">
-          <h3>Drop Uncategorized skill here to assign it to this subtopic.</h3>
-          <div class="skill-id protractor-test-subtopic-skillcard"
-               ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index"
-               dnd-draggable="skillSummary"
-               dnd-dragstart="$ctrl.onMoveSkillStart($ctrl.subtopic.getId(), skillSummary)"
-               dnd-effect-allowed="move"
-               dnd-disable-if="$ctrl.isSkillDeleted(skillSummary)">
-            <div class="skill-card">
-              <a class="protractor-test-assigned-skill-card-text"
-                 ng-if="!$ctrl.isSkillDeleted(skillSummary)"
-                 ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                  <[skillSummary.getDescription()]>
-              </a>
-              <span ng-if="$ctrl.isSkillDeleted(skillSummary)" style="color: red;">
-                Skill Deleted
-              </span>
-            </div>
-          </div>
-        </div>
-      </md-card>
-
-      <md-card class="skills-card uncategorized-skill-ids protractor-test-uncategorized-skills-container"
-               dnd-list="$ctrl.uncategorizedSkillSummaries"
-               dnd-drop="$ctrl.onMoveSkillFinish(null)">
-        <h3 class="list-header"> Uncategorized Skills(Drag from here) </h3>
-        <div class="uncategorized-skills-container">
-          <div class="skill-id protractor-test-uncategorized-skill-item"
-               ng-repeat="skillSummary in $ctrl.uncategorizedSkillSummaries track by $index"
-               dnd-draggable="skillSummary"
-               dnd-effect-allowed="move"
-               dnd-dragstart="$ctrl.onMoveSkillStart(null, skillSummary)"
-               dnd-disable-if="$ctrl.isSkillDeleted(skillSummary)">
-            <div class="subtopics-list-item skill-card protractor-test-skill-card">
-              <a class="protractor-test-skill-card-text"
-                 ng-if="!$ctrl.isSkillDeleted(skillSummary)"
-                 ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                  <[skillSummary.getDescription()]>
-              </a>
-              <span ng-if="$ctrl.isSkillDeleted(skillSummary)" style="color: red;">
-                Skill Deleted
-              </span>
-            </div>
-          </div>
-          <p class="intro-card-message" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
-             There are no pending skills in the topic. To add skills to the topic, go to the skills list in
-             the topics and skills dashboard and click 'Assign to Topic' for the required skill.
-          </p>
-        </div>
-      </md-card>
     </div>
   </div>
 </div>
