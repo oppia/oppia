@@ -26,6 +26,8 @@ import { ProfilePageDomainConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service.ts';
+import { UserProfileObjectFactory, UserProfile, UserProfileBackendDict } from
+  'domain/user/user-profile-object.factory';
 
 @Injectable({
   providedIn: 'root'
@@ -34,37 +36,39 @@ export class ProfilePageBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private userProfileObjectFactory: UserProfileObjectFactory
   ) {}
 
-  _postSubscribe(creatorUsername: string): Promise<Object> {
-    return this.http.post(
+  _postSubscribe(creatorUsername: string): Promise<void> {
+    return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_SUBSCRIBE_URL,
       { creator_username: creatorUsername }
     ).toPromise();
   }
 
-  _postUnsubscribe(creatorUsername: string): Promise<Object> {
-    return this.http.post(
+  _postUnsubscribe(creatorUsername: string): Promise<void> {
+    return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_UNSUBSCRIBE_URL,
       { creator_username: creatorUsername }
     ).toPromise();
   }
 
-  _fetchProfileData(): Promise<Object> {
-    return this.http.get(
+  _fetchProfileData(): Promise<UserProfile> {
+    return this.http.get<UserProfileBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ProfilePageDomainConstants.PROFILE_DATA_URL,
         {username: this.urlService.getUsernameFromProfileUrl()}
       )
-    ).toPromise();
+    ).toPromise().then(userProfileDict => this.userProfileObjectFactory
+      .createFromBackendDict(userProfileDict));
   }
 
   /**
    * Subscribes to a profile for the given username.
    * @param {String} creatorUsername - username of profile to be subscribed.
    */
-  subscribe(creatorUsername: string): Promise<Object> {
+  subscribe(creatorUsername: string): Promise<void> {
     return this._postSubscribe(creatorUsername);
   }
 
@@ -72,14 +76,14 @@ export class ProfilePageBackendApiService {
    * Unsubscribes from a profile for the given username.
    * @param {String} creatorUsername - username of profile to be unsubscribed.
    */
-  unsubscribe(creatorUsername: string): Promise<Object> {
+  unsubscribe(creatorUsername: string): Promise<void> {
     return this._postUnsubscribe(creatorUsername);
   }
 
   /**
    * Fetches the profile for username in URL.
    */
-  fetchProfileData(): Promise<any> {
+  fetchProfileData(): Promise<UserProfile> {
     return this._fetchProfileData();
   }
 }

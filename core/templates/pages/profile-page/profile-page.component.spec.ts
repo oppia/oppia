@@ -26,6 +26,8 @@ import { ProfilePageBackendApiService } from
   './profile-page-backend-api.service';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { RatingComputationService } from
+  'components/ratings/rating-computation/rating-computation.service';
 
 require('pages/profile-page/profile-page.component.ts');
 
@@ -36,6 +38,7 @@ describe('Profile page', function() {
   var UserService = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
+  var UserProfileObjectFactory = null;
   var $log = null;
   var windowRefMock = {
     nativeWindow: {
@@ -68,6 +71,8 @@ describe('Profile page', function() {
     OppiaAngularRootComponent.profilePageBackendApiService = (
       TestBed.get(ProfilePageBackendApiService)
     );
+    OppiaAngularRootComponent.ratingComputationService = (
+      TestBed.get(RatingComputationService));
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -75,6 +80,7 @@ describe('Profile page', function() {
     UserService = $injector.get('UserService');
     CsrfTokenService = $injector.get('CsrfTokenService');
     DateTimeFormatService = $injector.get('DateTimeFormatService');
+    UserProfileObjectFactory = $injector.get('UserProfileObjectFactory');
     $log = $injector.get('$log');
 
     spyOn(CsrfTokenService, 'getTokenAsync')
@@ -105,58 +111,76 @@ describe('Profile page', function() {
       profile_username: 'username1',
       user_bio: 'User bio',
       user_impact_score: 100,
+      profile_is_of_current_user: false,
+      is_user_visiting_own_profile: false,
       created_exp_summary_dicts: [{
-        ratings: 2,
-      }, {
-        ratings: 1
-      }, {
-        ratings: 2
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
       }],
+      is_already_subscribed: false,
+      first_contribution_msec: null,
       edited_exp_summary_dicts: [{
-        ratings: 2,
-      }, {
-        ratings: 1
-      }, {
-        ratings: 2,
-        playthroughs: 1
-      }, {
-        ratings: 2,
-        playthroughs: 1
-      }, {
-        ratings: 2,
-        playthroughs: 0
-      }, {
-        ratings: 2,
-        playthroughs: 3
-      }]
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }],
+      subject_interests: [],
+      profile_picture_data_url: 'image',
     };
 
     beforeEach(function() {
       spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(profileData));
+        'fetchProfileData').and.returnValue($q.resolve(
+        UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
     });
 
     it('should get explorations to display when edited explorations are empty',
       function() {
-        expect(ctrl.getExplorationsToDisplay()).toEqual([{
-          ratings: 1
-        }, {
-          ratings: 2,
-          playthroughs: 0
-        }, {
-          ratings: 2,
-          playthroughs: 1
-        }, {
-          ratings: 2,
-          playthroughs: 1
-        }, {
-          ratings: 2,
-          playthroughs: 3
-        }, {
-          ratings: 2
-        }]);
+        var userProfile = UserProfileObjectFactory.createFromBackendDict(
+          profileData);
+        expect(ctrl.getExplorationsToDisplay()).toEqual(
+          userProfile.editedExpSummaries);
       });
   });
 
@@ -166,19 +190,156 @@ describe('Profile page', function() {
       profile_username: 'username1',
       user_bio: 'User bio',
       user_impact_score: 100,
-      created_exp_summary_dicts: new Array(10).fill({
-        ratings: 1,
-        playthroughs: 1
+      created_exp_summary_dicts: new Array(7).fill({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 10,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 1,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
       }),
-      edited_exp_summary_dicts: new Array(10).fill({
-        ratings: 1,
-        playthroughs: 1
+      edited_exp_summary_dicts: new Array(7).fill({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 10,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 1,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
       })
     };
 
     beforeEach(function() {
+      profileData.edited_exp_summary_dicts.push({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 5,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 1,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      });
+      profileData.edited_exp_summary_dicts.push({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 5,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 1,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      });
+      profileData.edited_exp_summary_dicts.push({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 5,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 1,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      });
+      profileData.edited_exp_summary_dicts.push({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 15,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 1,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      });
       spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(profileData));
+        'fetchProfileData').and.returnValue($q.resolve(
+        UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
     });
@@ -189,7 +350,7 @@ describe('Profile page', function() {
 
       expect(ctrl.currentPageNumber).toBe(1);
       expect(ctrl.startingExplorationNumber).toBe(7);
-      expect(ctrl.endingExplorationNumber).toBe(10);
+      expect(ctrl.endingExplorationNumber).toBe(11);
 
       spyOn($log, 'error').and.callThrough();
       ctrl.goToNextPage();
@@ -221,7 +382,8 @@ describe('Profile page', function() {
 
     beforeEach(function() {
       spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(profileData));
+        'fetchProfileData').and.returnValue($q.resolve(
+        UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
     });
@@ -276,7 +438,8 @@ describe('Profile page', function() {
 
     beforeEach(function() {
       spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(profileData));
+        'fetchProfileData').and.returnValue($q.resolve(
+        UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
     });

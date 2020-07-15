@@ -553,6 +553,8 @@ import { StateStatsObjectFactory } from
   'domain/statistics/StateStatsObjectFactory';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
+import { StateTopAnswersStatsObjectFactory } from
+  'domain/statistics/state-top-answers-stats-object.factory';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -632,6 +634,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { UserProfileObjectFactory } from
+  'domain/user/user-profile-object.factory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
@@ -910,6 +914,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateSolutionService: StateSolutionService;
   static stateStatsObjectFactory: StateStatsObjectFactory;
   static stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService;
+  static stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory;
   static stateWrittenTranslationsService: StateWrittenTranslationsService;
   static statesObjectFactory: StatesObjectFactory;
   static statsReportingBackendApiService: StatsReportingBackendApiService;
@@ -953,6 +958,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static urlService: UrlService;
   static userExplorationPermissionsService: UserExplorationPermissionsService;
   static userInfoObjectFactory: UserInfoObjectFactory;
+  static userProfileObjectFactory: UserProfileObjectFactory;
   static utilsService: UtilsService;
   static validatorsService: ValidatorsService;
   static versionTreeService: VersionTreeService;
@@ -1215,6 +1221,7 @@ private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
 private stateSolutionService: StateSolutionService,
 private stateStatsObjectFactory: StateStatsObjectFactory,
 private stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService,
+private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory,
 private stateWrittenTranslationsService: StateWrittenTranslationsService,
 private statesObjectFactory: StatesObjectFactory,
 private statsReportingBackendApiService: StatsReportingBackendApiService,
@@ -1258,6 +1265,7 @@ private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
 private userExplorationPermissionsService: UserExplorationPermissionsService,
 private userInfoObjectFactory: UserInfoObjectFactory,
+private userProfileObjectFactory: UserProfileObjectFactory,
 private utilsService: UtilsService,
 private validatorsService: ValidatorsService,
 private versionTreeService: VersionTreeService,
@@ -1520,6 +1528,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateSolicitAnswerDetailsService = this.stateSolicitAnswerDetailsService;
     OppiaAngularRootComponent.stateSolutionService = this.stateSolutionService;
     OppiaAngularRootComponent.stateTopAnswersStatsBackendApiService = this.stateTopAnswersStatsBackendApiService;
+    OppiaAngularRootComponent.stateTopAnswersStatsObjectFactory = this.stateTopAnswersStatsObjectFactory;
     OppiaAngularRootComponent.stateStatsObjectFactory = this.stateStatsObjectFactory;
     OppiaAngularRootComponent.stateWrittenTranslationsService = this.stateWrittenTranslationsService;
     OppiaAngularRootComponent.statesObjectFactory = this.statesObjectFactory;
@@ -1564,6 +1573,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.urlService = this.urlService;
     OppiaAngularRootComponent.userExplorationPermissionsService = this.userExplorationPermissionsService;
     OppiaAngularRootComponent.userInfoObjectFactory = this.userInfoObjectFactory;
+    OppiaAngularRootComponent.userProfileObjectFactory = this.userProfileObjectFactory;
     OppiaAngularRootComponent.utilsService = this.utilsService;
     OppiaAngularRootComponent.validatorsService = this.validatorsService;
     OppiaAngularRootComponent.versionTreeService = this.versionTreeService;

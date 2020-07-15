@@ -42,6 +42,8 @@ angular.module('oppia').component('profilePage', {
       var ctrl = this;
       const ProfilePageBackendApiService = (
         OppiaAngularRootComponent.profilePageBackendApiService);
+      const RatingComputationService = (
+        OppiaAngularRootComponent.ratingComputationService);
 
       var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
         .getStaticImageUrl('/general/no_profile_picture.png');
@@ -57,35 +59,40 @@ angular.module('oppia').component('profilePage', {
           LoaderService.hideLoadingScreen();
           ctrl.username = {
             title: 'Username',
-            value: data.profile_username,
-            helpText: (data.profile_username)
+            value: data.profileUsername,
+            helpText: (data.profileUsername)
           };
-          ctrl.usernameIsLong = data.profile_username.length > 16;
-          ctrl.userBio = data.user_bio;
+          ctrl.usernameIsLong = data.profileUsername.length > 16;
+          ctrl.userBio = data.userBio;
           ctrl.userDisplayedStatistics = [{
             title: 'Impact',
-            value: data.user_impact_score,
+            value: data.userImpactScore,
             helpText: (
               'A rough measure of the impact of explorations created by ' +
               'this user. Better ratings and more playthroughs improve ' +
               'this score.')
           }, {
             title: 'Created',
-            value: data.created_exp_summary_dicts.length
+            value: data.createdExpSummaries.length
           }, {
             title: 'Edited',
-            value: data.edited_exp_summary_dicts.length
+            value: data.editedExpSummaries.length
           }];
 
-          ctrl.userEditedExplorations = data.edited_exp_summary_dicts.sort(
+          ctrl.userEditedExplorations = data.editedExpSummaries.sort(
             function(exploration1, exploration2) {
-              if (exploration1.ratings > exploration2.ratings) {
+              const avgRating1 = RatingComputationService.computeAverageRating(
+                exploration1.ratings);
+              const avgRating2 = RatingComputationService.computeAverageRating(
+                exploration2.ratings);
+
+              if (avgRating1 > avgRating2) {
                 return 1;
-              } else if (exploration1.ratings === exploration2.ratings) {
-                if (exploration1.playthroughs > exploration2.playthroughs) {
+              } else if (avgRating1 === avgRating2) {
+                if (exploration1.numViews > exploration2.numViews) {
                   return 1;
                 } else if (
-                  exploration1.playthroughs === exploration2.playthroughs) {
+                  exploration1.numViews === exploration2.numViews) {
                   return 0;
                 } else {
                   return -1;
@@ -96,10 +103,10 @@ angular.module('oppia').component('profilePage', {
             }
           );
 
-          ctrl.userNotLoggedIn = !data.username;
+          ctrl.userNotLoggedIn = !data.currentUser;
 
-          ctrl.isAlreadySubscribed = data.is_already_subscribed;
-          ctrl.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
+          ctrl.isAlreadySubscribed = data.isAlreadySubscribed;
+          ctrl.isUserVisitingOwnProfile = data.isUserVisitingOwnProfile;
 
           ctrl.subscriptionButtonPopoverText = '';
 
@@ -108,7 +115,7 @@ angular.module('oppia').component('profilePage', {
           ctrl.startingExplorationNumber = 1;
           ctrl.endingExplorationNumber = 6;
           ctrl.Math = window.Math;
-          ctrl.profileIsOfCurrentUser = data.profile_is_of_current_user;
+          ctrl.profileIsOfCurrentUser = data.profileIsOfCurrentUser;
 
           ctrl.changeSubscriptionStatus = function() {
             if (ctrl.userNotLoggedIn) {
@@ -123,14 +130,14 @@ angular.module('oppia').component('profilePage', {
               );
             } else {
               if (!ctrl.isAlreadySubscribed) {
-                ProfilePageBackendApiService.subscribe(data.profile_username)
+                ProfilePageBackendApiService.subscribe(data.profileUsername)
                   .then(() => {
                     ctrl.isAlreadySubscribed = true;
                     ctrl.updateSubscriptionButtonPopoverText();
                     $scope.$apply();
                   });
               } else {
-                ProfilePageBackendApiService.unsubscribe(data.profile_username)
+                ProfilePageBackendApiService.unsubscribe(data.profileUsername)
                   .then(() => {
                     ctrl.isAlreadySubscribed = false;
                     ctrl.updateSubscriptionButtonPopoverText();
@@ -173,7 +180,7 @@ angular.module('oppia').component('profilePage', {
           };
           ctrl.goToNextPage = function() {
             if ((ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE >= (
-              data.edited_exp_summary_dicts.length)) {
+              data.editedExpSummaries.length)) {
               $log.error('Error: Cannot increment page');
             } else {
               ctrl.currentPageNumber++;
@@ -208,11 +215,11 @@ angular.module('oppia').component('profilePage', {
           };
 
           ctrl.numUserPortfolioExplorations = (
-            data.edited_exp_summary_dicts.length);
-          ctrl.subjectInterests = data.subject_interests;
-          ctrl.firstContributionMsec = data.first_contribution_msec;
+            data.editedExpSummaries.length);
+          ctrl.subjectInterests = data.subjectInterests;
+          ctrl.firstContributionMsec = data.firstContributionMsec;
           ctrl.profilePictureDataUrl = (
-            data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
+            data.profilePictureDataUrl || DEFAULT_PROFILE_PICTURE_URL);
           LoaderService.hideLoadingScreen();
         });
       };

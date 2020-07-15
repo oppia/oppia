@@ -517,6 +517,8 @@ import { StateStatsObjectFactory } from
   'domain/statistics/StateStatsObjectFactory';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
+import { StateTopAnswersStatsObjectFactory } from
+  'domain/statistics/state-top-answers-stats-object.factory';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -600,6 +602,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { UserProfileObjectFactory } from
+  'domain/user/user-profile-object.factory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
@@ -1019,6 +1023,9 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['SkillCreationBackendApiService'] =
         new SkillCreationBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['StateTopAnswersStatsObjectFactory'] =
+        new StateTopAnswersStatsObjectFactory(
+          upgradedServices['AnswerStatsObjectFactory']);
     upgradedServices['SpeechSynthesisChunkerService'] =
         new SpeechSynthesisChunkerService(
           upgradedServices['HtmlEscaperService']);
@@ -1054,6 +1061,9 @@ export class UpgradedServices {
           upgradedServices['HttpClient']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
+    upgradedServices['UserProfileObjectFactory'] =
+      new UserProfileObjectFactory(
+        upgradedServices['LearnerExplorationSummaryObjectFactory']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']);
     upgradedServices['WorkedExampleObjectFactory'] =
@@ -1313,8 +1323,8 @@ export class UpgradedServices {
       new ProfilePageBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient'],
-        upgradedServices['UrlService']
-      );
+        upgradedServices['UrlService'],
+        upgradedServices['UserProfileObjectFactory']);
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
@@ -1376,7 +1386,8 @@ export class UpgradedServices {
     upgradedServices['StateTopAnswersStatsBackendApiService'] =
       new StateTopAnswersStatsBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['StateTopAnswersStatsObjectFactory']);
     upgradedServices['StatsReportingBackendApiService'] =
       new StatsReportingBackendApiService(
         upgradedServices['ContextService'],

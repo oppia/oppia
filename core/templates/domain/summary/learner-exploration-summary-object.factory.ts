@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface ExpRatings {
+export interface ExpRatings {
   '1': number;
   '2': number;
   '3': number;

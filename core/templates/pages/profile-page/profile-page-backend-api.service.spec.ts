@@ -143,7 +143,66 @@ describe('Profile test backend API service', () => {
     let req = httpTestingController
       .expectOne('/profilehandler/data/testUsername');
     expect(req.request.method).toEqual('GET');
-    req.flush({});
+    req.flush({
+      username: 'user1',
+      profile_is_of_current_user: false,
+      is_user_visiting_own_profile: false,
+      created_exp_summary_dicts: [{
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }],
+      is_already_subscribed: false,
+      first_contribution_msec: null,
+      user_impact_score: 0,
+      edited_exp_summary_dicts: [{
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }],
+      subject_interests: [],
+      profile_username: 'user2',
+      user_bio: 'hi',
+      profile_picture_data_url: 'image',
+    });
 
     flushMicrotasks();
 

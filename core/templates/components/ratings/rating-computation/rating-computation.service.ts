@@ -19,15 +19,14 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface IRatingFrequencies {
-  [x: string]: number;
-}
+import { ExpRatings } from
+  'domain/summary/learner-exploration-summary-object.factory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RatingComputationService {
-  static areRatingsShown(ratingFrequencies: IRatingFrequencies): boolean {
+  static areRatingsShown(ratingFrequencies: ExpRatings): boolean {
     let MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS: number = 1;
 
     let totalNumber: number = 0;
@@ -38,7 +37,7 @@ export class RatingComputationService {
     return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
   }
 
-  computeAverageRating(ratingFrequencies: IRatingFrequencies): number {
+  computeAverageRating(ratingFrequencies: ExpRatings): number {
     if (!RatingComputationService.areRatingsShown(ratingFrequencies)) {
       return undefined;
     } else {
