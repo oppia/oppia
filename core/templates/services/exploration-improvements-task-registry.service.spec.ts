@@ -512,9 +512,9 @@ describe('Exploration improvements task registrar service', () => {
         expId, expVersion, makeStates(), makeExpStats(), [],
         new Map(), new Map(), []);
 
-      expect(
+      expect(() => (
         explorationImprovementsTaskRegistryService.getSupportingStateStats(task)
-      ).toThrowError('Unregistered task has no supporting stats');
+      )).toThrowError('Unregistered task has no supporting stats');
     });
   });
 
