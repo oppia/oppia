@@ -206,6 +206,6 @@ describe('Teach Page', function() {
       expect(windowRef.nativeWindow.location.href).toBe(
         'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
       expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-    }, 300);
+    }, 500);
   });
 });
