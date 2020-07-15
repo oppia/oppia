@@ -20,14 +20,14 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface ISkillMasteryBackend {
+export interface SkillMasteryBackendDict {
   [skillId: string]: number;
 }
 
 export class SkillMastery {
-  private _skillMasteryDict: ISkillMasteryBackend;
+  private _skillMasteryDict: SkillMasteryBackendDict;
 
-  constructor(backendDict: ISkillMasteryBackend) {
+  constructor(backendDict: SkillMasteryBackendDict) {
     this._skillMasteryDict = { ...backendDict };
   }
 
@@ -39,7 +39,7 @@ export class SkillMastery {
     this._skillMasteryDict[skillId] = masteryDegree;
   }
 
-  toBackendDict(): ISkillMasteryBackend {
+  toBackendDict(): SkillMasteryBackendDict {
     return { ...this._skillMasteryDict };
   }
 }
@@ -48,7 +48,7 @@ export class SkillMastery {
   providedIn: 'root'
 })
 export class SkillMasteryObjectFactory {
-  createFromBackendDict(backendDict: ISkillMasteryBackend): SkillMastery {
+  createFromBackendDict(backendDict: SkillMasteryBackendDict): SkillMastery {
     return new SkillMastery(backendDict);
   }
 }

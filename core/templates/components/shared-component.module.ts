@@ -40,6 +40,8 @@ import { ExplorationEmbedButtonModalComponent } from
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { TopicSummaryTileComponent } from
+  './summary-tile/topic-summary-tile.component';
 
 
 
@@ -48,10 +50,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent],
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    TopicSummaryTileComponent],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    TopicSummaryTileComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
   ],

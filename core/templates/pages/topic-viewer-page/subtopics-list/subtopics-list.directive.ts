@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,37 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for a topic tile.
+ * @fileoverview Directive for the subtopics list.
  */
 
-require('domain/classroom/classroom-domain.constants.ajs.ts');
+require('components/summary-tile/subtopic-summary-tile.directive.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('topicSummaryTile', [
+angular.module('oppia').directive('subtopicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
-        getTopicSummary: '&topicSummary'
+        getSubtopics: '&subtopicsList',
+        getTopicId: '&topicId',
+        getTopicName: '&topicName'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/topic-summary-tile.directive.html'),
+        '/pages/topic-viewer-page/subtopics-list/' +
+        'subtopics-list.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['TOPIC_VIEWER_URL_TEMPLATE',
-        function(TOPIC_VIEWER_URL_TEMPLATE) {
-          var ctrl = this;
-          ctrl.getTopicLink = function() {
-            return UrlInterpolationService.interpolateUrl(
-              TOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.getTopicSummary().getName()
-              });
-          };
-
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
-        }
-      ]
+      controller: [function() {}]
     };
   }]);

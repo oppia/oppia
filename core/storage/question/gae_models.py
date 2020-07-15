@@ -263,6 +263,22 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
+    def get_total_question_count_for_skill_ids(cls, skill_ids):
+        """Returns the number of questions assigned to the given skill_ids.
+
+        Args:
+            skill_ids: list(str). Skill IDs for which the question count is
+                requested.
+
+        Returns:
+            int. The number of questions assigned to the given skill_ids.
+        """
+        total_question_count = cls.query().filter(
+            cls.skill_id.IN(skill_ids)).count()
+
+        return total_question_count
+
+    @classmethod
     def get_question_skill_links_by_skill_ids(
             cls, question_count, skill_ids, start_cursor):
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
