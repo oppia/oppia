@@ -21,8 +21,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 @Component({
   selector: 'teach-page',
@@ -35,11 +35,13 @@ export class TeachPageComponent implements OnInit {
   TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
   ALLOWED_TABS: string[] = [this.TAB_ID_TEACH, this.TAB_ID_PARTICIPATION];
   activeTabName: string = this.TAB_ID_TEACH;
+
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef
   ) {}
+
   ngOnInit(): void {
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
     if (this.ALLOWED_TABS.includes(hash)) {
@@ -52,6 +54,7 @@ export class TeachPageComponent implements OnInit {
       }
     };
   }
+
   onTabClick(tabName: string): Window {
     // ---- Update hash ----
     this.windowRef.nativeWindow.location.hash = '#' + tabName;

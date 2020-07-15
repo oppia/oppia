@@ -23,10 +23,10 @@ import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
 import { TeachPageComponent } from './teach-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -108,7 +108,7 @@ describe('Teach Page', function() {
   let i18n = null;
   let translate = null;
 
-  beforeEach(() => {
+  beforeEach(async() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -127,6 +127,9 @@ describe('Teach Page', function() {
     i18n = TestBed.get(I18nLanguageCodeService);
     translate = TestBed.get(TranslateService);
     sas = TestBed.get(SiteAnalyticsService);
+  });
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(TeachPageComponent);
     component = fixture.componentInstance;
   });
