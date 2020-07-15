@@ -538,7 +538,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 self.email_services_mock.mock_send_mail)), (
                     self.swap(
                         email_services, 'send_bulk_mail',
-                        self.email_services_mock.mock_send_bulk_emails)):
+                        self.email_services_mock.mock_send_bulk_mail)):
             self.process_and_flush_pending_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()
@@ -714,7 +714,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 self.email_services_mock.mock_send_mail)), (
                     self.swap(
                         email_services, 'send_bulk_mail',
-                        self.email_services_mock.mock_send_bulk_emails)):
+                        self.email_services_mock.mock_send_bulk_mail)):
             self.process_and_flush_pending_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()

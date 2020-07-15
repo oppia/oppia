@@ -156,7 +156,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         with can_send_emails_ctx, can_send_feedback_email_ctx, (
             self.swap(
                 email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_emails)):
+                self.email_services_mock.mock_send_bulk_mail)):
             with fail_training_job, (
                 self.swap(
                     email_services, 'send_mail',

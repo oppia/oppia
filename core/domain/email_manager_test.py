@@ -70,7 +70,7 @@ class FailedMLTest(test_utils.EmailTestBase):
             # Send job failure email with mock Job ID.
             with self.swap(
                 email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_emails), (
+                self.email_services_mock.mock_send_bulk_mail), (
                     self.swap(
                         email_services, 'send_mail',
                         self.email_services_mock.mock_send_mail)):
@@ -114,7 +114,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             # Send an email to admin.
             with self.swap(
                 email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_emails), (
+                self.email_services_mock.mock_send_bulk_mail), (
                     self.swap(
                         email_services, 'send_mail',
                         self.email_services_mock.mock_send_mail)):
@@ -157,7 +157,7 @@ class DummyMailTest(test_utils.EmailTestBase):
             # Send an email.
             with self.swap(
                 email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_emails), (
+                self.email_services_mock.mock_send_bulk_mail), (
                     self.swap(
                         email_services, 'send_mail',
                         self.email_services_mock.mock_send_mail)):
@@ -2434,7 +2434,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 email_services, 'send_mail',
                 self.email_services_mock.mock_send_mail)):
             with self.swap(email_services, 'send_bulk_mail', (
-                self.email_services_mock.mock_send_bulk_emails)):
+                self.email_services_mock.mock_send_bulk_mail)):
                 email_manager.send_user_query_email(
                     self.sender_id, self.recipient_ids,
                     email_subject,
@@ -2727,7 +2727,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, (
             self.swap(
                 email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_emails)):
+                self.email_services_mock.mock_send_bulk_mail)):
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids, email_subject,
                 email_html_body, feconf.BULK_EMAIL_INTENT_MARKETING)
@@ -2797,7 +2797,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
                 Exception, 'Invalid sender_id for email')):
             with self.swap(
                 email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_emails):
+                self.email_services_mock.mock_send_bulk_mail):
                 email_manager.send_user_query_email(
                     self.fake_sender_id, self.recipient_ids, 'email_subject',
                     'email_html_body', feconf.BULK_EMAIL_INTENT_MARKETING)

@@ -165,7 +165,8 @@ def check_image_png_or_webp(image_string):
 
 
 class EmailMessageMock(python_utils.OBJECT):
-    """Mock for mailgun API message."""
+    """Mock for core.domain.email_services message that is sent to mailgun
+    API."""
 
     def __init__(
             self, sender_email, recipient_email, subject, plaintext_body,
@@ -180,7 +181,7 @@ class EmailMessageMock(python_utils.OBJECT):
 
 
 class EmailServicesMock(python_utils.OBJECT):
-    """Mock for mailgun API."""
+    """Mock for core.domain.email_services API."""
 
     def __init__(self):
         self.emails_dict = {}
@@ -192,12 +193,13 @@ class EmailServicesMock(python_utils.OBJECT):
     def mock_send_mail(
             self, sender_email='', recipient_email='', subject='',
             plaintext_body='', html_body='', bcc_admin=False, reply_to_id=None):
-        """Sends a mock email. Replaces mailgun_email_services.send_mail during
+        """Sends a mock email. Replaces email_services.send_mail during
         testing.
 
         Args:
             sender_email: str. The email address of the sender. This should be
-                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'
+                or just 'SENDER_EMAIL_ADDRESS'.
             recipient_email: str. The email address of the recipient.
             subject: str. The subject line of the email.
             plaintext_body: str. The plaintext body of the email.
@@ -240,10 +242,10 @@ class EmailServicesMock(python_utils.OBJECT):
             bcc, reply_to)
         self.emails_dict[recipient_email].append(new_email)
 
-    def mock_send_bulk_emails(
+    def mock_send_bulk_mail(
             self, sender_email, recipient_emails, subject, plaintext_body,
             html_body):
-        """Sends mock bulk emails. Replaces mailgun_email_services.send_mail
+        """Sends mock bulk emails. Replaces email_services.send_bulk_mail
         during testing.
 
         Args:

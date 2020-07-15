@@ -123,7 +123,8 @@ def is_sender_email_valid(sender_email):
         bool. Whether the sender_email is valid.
     """
     sender_email_with_only_first_name_regex = (
-        r'^[a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)>$')
+        r'^[a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})' +
+        '(]?)>$')
     sender_email_with_full_name_regex = (
         r'^[a-zA-Z._]+ [a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}' +
         r'|[0-9]{1,3})(]?)>$')
