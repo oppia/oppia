@@ -119,6 +119,9 @@
       <div class="info-tag" ng-if="$ctrl.isDrawModePolygon() && !$ctrl.isTouchDevice">
         Double click to complete the polygon.
       </div>
+      <div class="info-tag" ng-if="$ctrl.isDrawModeBezier()">
+        Click the bezier curve button to complete the diagram.
+      </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
         <span style="padding-left: 3px;">Italic</span>

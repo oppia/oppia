@@ -41,7 +41,7 @@ var initializeMockDocument = function(svgFilenameCtrl) {
   $document.find('body').append(mockDocument.outerHTML);
 };
 
-describe('SvgFilenameEditor', function() {
+fdescribe('SvgFilenameEditor', function() {
   var alertSpy = null;
   var contextService = null;
   var CsrfService = null;
@@ -241,8 +241,10 @@ describe('SvgFilenameEditor', function() {
       svgFilenameCtrl.createRect();
     }
     expect(svgFilenameCtrl.canvas.getObjects().length).toBe(6);
+    expect(svgFilenameCtrl.isUndoEnabled()).toBe(true);
     svgFilenameCtrl.onUndo();
     expect(svgFilenameCtrl.canvas.getObjects().length).toBe(5);
+    expect(svgFilenameCtrl.isRedoEnabled()).toBe(true);
     svgFilenameCtrl.onRedo();
     expect(svgFilenameCtrl.canvas.getObjects().length).toBe(6);
     svgFilenameCtrl.canvas.setActiveObject(
@@ -253,6 +255,7 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.canvas.getObjects().length).toBe(6);
     svgFilenameCtrl.onRedo();
     expect(svgFilenameCtrl.canvas.getObjects().length).toBe(5);
+    expect(svgFilenameCtrl.isClearEnabled()).toBe(true);
     svgFilenameCtrl.onClear();
     expect(svgFilenameCtrl.objectUndoStack.length).toBe(0);
   });
@@ -326,6 +329,43 @@ describe('SvgFilenameEditor', function() {
     });
     svgFilenameCtrl.createClosedPolygon();
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('polyline');
+  });
+
+  it('should create a bezier curve', function() {
+    svgFilenameCtrl.createRect();
+    svgFilenameCtrl.createBezier();
+    expect(svgFilenameCtrl.isBezierEnabled()).toBe(true);
+    expect(svgFilenameCtrl.isDrawModeBezier()).toBe(true);
+    svgFilenameCtrl.canvas.trigger('object:moving', {
+      target: {
+        name: 'p0',
+        left: 100,
+        top: 100
+      }
+    });
+    svgFilenameCtrl.canvas.trigger('object:moving', {
+      target: {
+        name: 'p1',
+        left: 200,
+        top: 200
+      }
+    });
+    svgFilenameCtrl.canvas.trigger('object:moving', {
+      target: {
+        name: 'p2',
+        left: 300,
+        top: 300
+      }
+    });
+    svgFilenameCtrl.onStrokeChange();
+    svgFilenameCtrl.onFillChange();
+    svgFilenameCtrl.onSizeChange();
+    svgFilenameCtrl.createBezier();
+    expect(svgFilenameCtrl.isDrawModeBezier()).toBe(false);
+    expect(svgFilenameCtrl.canvas.getObjects()[1].get('path')).toEqual(
+        [['M', 100, 100], ['Q', 200, 200, 300, 300]]
+      );
+    expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('path');
   });
 
   it('should trigger object selection and scaling events', function() {
@@ -410,7 +450,7 @@ describe('SvgFilenameEditor', function() {
 });
 
 
-describe('SvgFilenameEditor initialized with value attribute',
+fdescribe('SvgFilenameEditor initialized with value attribute',
   function() {
     var svgFilenameCtrl = null;
     var $httpBackend = null;
@@ -463,7 +503,7 @@ describe('SvgFilenameEditor initialized with value attribute',
   }
 );
 
-describe('SvgFilenameEditor with image save destination as ' +
+fdescribe('SvgFilenameEditor with image save destination as ' +
   'local storage', function() {
   var contextService = null;
   var svgFilenameCtrl = null;
@@ -581,7 +621,7 @@ describe('SvgFilenameEditor with image save destination as ' +
 });
 
 
-describe('should fail svg tag validation', function() {
+fdescribe('should fail svg tag validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {
@@ -612,7 +652,7 @@ describe('should fail svg tag validation', function() {
   });
 });
 
-describe('should fail svg attribute validation', function() {
+fdescribe('should fail svg attribute validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {

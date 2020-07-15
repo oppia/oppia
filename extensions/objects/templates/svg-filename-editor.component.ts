@@ -684,7 +684,11 @@ angular.module('oppia').component('svgFilenameEditor', {
         return Boolean(
           ctrl.areAllToolsEnabled() ||
           ctrl.drawMode === DRAW_MODE_BEZIER);
-      }
+      };
+
+      ctrl.isDrawModeBezier = function() {
+        return Boolean(ctrl.drawMode === DRAW_MODE_BEZIER);
+      };
 
       ctrl.bringObjectForward = function() {
         ctrl.canvas.bringForward(ctrl.canvas.getActiveObject());
@@ -996,13 +1000,13 @@ angular.module('oppia').component('svgFilenameEditor', {
           if (ctrl.drawMode === DRAW_MODE_BEZIER) {
             var pt = e.target;
             var curve = ctrl.canvas.getObjects().slice(-4,-3)[0];
-            if (e.target.name == "p0") {
+            if (e.target.name == 'p0') {
               curve.path[0][1] = pt.left;
               curve.path[0][2] = pt.top;
-            } else if (e.target.name == "p1") {
+            } else if (e.target.name == 'p1') {
               curve.path[1][1] = pt.left;
               curve.path[1][2] = pt.top;
-            } else if (e.target.name == "p2") {
+            } else if (e.target.name == 'p2') {
               curve.path[1][3] = pt.left;
               curve.path[1][4] = pt.top;
             }
