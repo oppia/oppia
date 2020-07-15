@@ -78,7 +78,7 @@ import utils
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.platform_parameter,
-            models.NAMES.question, models.NAMES.recommendations, 
+            models.NAMES.question, models.NAMES.recommendations,
             models.NAMES.skill, models.NAMES.statistics, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
@@ -6196,14 +6196,18 @@ class PlatformParameterModelValidator(BaseModelValidator):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
-        return {
-            'snapshot_metadata_ids': (
+        return [
+            ExternalModelFetcherDetails(
+                'snapshot_metadata_ids',
                 parameter_models.PlatformParameterSnapshotMetadataModel,
-                snapshot_model_ids),
-            'snapshot_content_ids': (
+                snapshot_model_ids
+            ),
+            ExternalModelFetcherDetails(
+                'snapshot_content_ids',
                 parameter_models.PlatformParameterSnapshotContentModel,
-                snapshot_model_ids),
-        }
+                snapshot_model_ids
+            ),
+        ]
 
 
 class PlatformParameterSnapshotMetadataModelValidator(
@@ -6222,13 +6226,18 @@ class PlatformParameterSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'platform_parameter_ids': (
+        return [
+            ExternalModelFetcherDetails(
+                'platform_parameter_ids',
                 parameter_models.PlatformParameterModel,
-                [item.id[:item.id.find('-')]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
+                [item.id[:item.id.find('-')]]
+            ),
+            ExternalModelFetcherDetails(
+                'committer_ids',
+                user_models.UserSettingsModel,
+                [item.committer_id]
+            )
+        ]
 
 
 class PlatformParameterSnapshotContentModelValidator(
@@ -6243,11 +6252,13 @@ class PlatformParameterSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'platform_parameter_ids': (
+        return [
+            ExternalModelFetcherDetails(
+                'platform_parameter_ids',
                 parameter_models.PlatformParameterModel,
-                [item.id[:item.id.find('-')]]),
-        }
+                [item.id[:item.id.find('-')]]
+            )
+        ]
 
 
 MODEL_TO_VALIDATOR_MAPPING = {

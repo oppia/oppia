@@ -107,8 +107,8 @@ class _Gae(Platform):
                 from core.storage.opportunity import gae_models as opportunity_models # pylint: disable=line-too-long
                 returned_models.append(opportunity_models)
             elif name == NAMES.platform_parameter:
-                from core.storage.platform_parameter import gae_models as platform_parameter # pylint: disable=line-too-long
-                returned_models.append(platform_parameter)
+                from core.storage.platform_parameter import gae_models as parameter_models # pylint: disable=line-too-long
+                returned_models.append(parameter_models)
             elif name == NAMES.question:
                 from core.storage.question import gae_models as question_models
                 returned_models.append(question_models)

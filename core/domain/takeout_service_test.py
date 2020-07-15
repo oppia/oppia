@@ -36,15 +36,15 @@ import utils
 (
     base_models, collection_models, config_models,
     email_models, exploration_models, feedback_models,
-    improvements_models, question_models, skill_models,
-    story_models, suggestion_models, topic_models,
-    user_models,
+    improvements_models, parameter_models,
+    question_models, skill_models, story_models,
+    suggestion_models, topic_models, user_models,
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user,
+    models.NAMES.improvements, models.NAMES.platform_parameter,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 
 
@@ -462,6 +462,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             resolver_id=self.USER_ID_1
         ).put()
 
+        parameter_models.PlatformParameterSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -559,6 +565,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_config_property_sm = {}
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
+        expected_platform_parameter_sm = {}
 
         expected_data = {
             'user_stats': stats_data,
@@ -605,6 +612,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
         }
 
         # Perform export and compare.
@@ -622,6 +630,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
+        self.maxDiff = None
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -955,6 +964,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_platform_parameter_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
         expected_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_settings_data,
@@ -1003,6 +1020,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
         }
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)
