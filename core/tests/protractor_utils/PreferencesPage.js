@@ -55,14 +55,13 @@ var PreferencesPage = function() {
     by.css('.protractor-test-photo-crop .cropper-container'));
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
-  var toastMessageElement = element(by.css('.toast-message'));
 
   var saveNewChanges = async function(fieldName) {
     await navBar.click();
-    await waitFor.visibilityOf(
-      toastMessageElement, `${fieldName} takes too long to get saved.`);
-    await waitFor.invisibilityOf(
-      toastMessageElement, 'Success message takes too long to disappear.');
+    await waitFor.visibilityOfSuccessToast(
+      `Succes toast for saving ${fieldName} takes too long to appear.`);
+    await waitFor.invisibilityOfSuccessToast(
+      'Success toast takes too long to disappear.');
   };
 
   this.get = async function() {
