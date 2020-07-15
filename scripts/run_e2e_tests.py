@@ -32,8 +32,6 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
-CHROME_DRIVER_VERSION = '77.0.3865.40'
-
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
@@ -117,10 +115,8 @@ _PARSER.add_argument(
          'For performing a full test, no argument is required.')
 
 _PARSER.add_argument(
-    '--auto_select_chromedriver',
-    help='Automatically sets the chromedriver version depending on the version '
-         'of Chrome installed in the environment.',
-    action='store_true')
+    '--chrome_driver_version',
+    help='Uses the specified version of the chrome driver ')
 
 _PARSER.add_argument(
     '--debug_mode',
@@ -163,9 +159,11 @@ def ensure_screenshots_dir_is_removed():
 
 
 def cleanup():
-    """Kill the running subprocesses and server fired in this program."""
+    """Kill the running subprocesses and server fired in this program, set
+    constants back to default values.
+    """
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
-    webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
+    webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
@@ -178,6 +176,7 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+    build.set_constants_to_default()
 
 
 def is_oppia_server_already_running():
@@ -447,13 +446,26 @@ def get_chrome_driver_version():
     This method follows the steps mentioned here:
     https://chromedriver.chromium.org/downloads/version-selection
     """
-    output = os.popen('google-chrome --version').read()
+    try:
+        proc = subprocess.Popen(
+            ['google-chrome', '--version'], stdout=subprocess.PIPE)
+        output = proc.stdout.readline()
+    except OSError:
+        raise Exception(
+            'Failed to execute "google-chrome --version" command. This is '
+            'used to determine the chromedriver version to use. Please set '
+            'the chromedriver version manually using --chrome_driver_version '
+            'flag. To determine the chromedriver version to be used, please '
+            'follow the instructions mentioned in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection')
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     chrome_version = '.'.join(chrome_version.split('.')[:-1])
     response = python_utils.url_open(
         'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
         % chrome_version)
-    return response.read()
+    chrome_driver_version = response.read()
+    python_utils.PRINT('\n\nCHROME VERSION: %s' % chrome_version)
+    return chrome_driver_version
 
 
 def main(args=None):
@@ -473,12 +485,13 @@ def main(args=None):
     update_community_dashboard_status_in_feconf_file(
         FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
 
-    if not parsed_args.skip_build:
+    if parsed_args.skip_build:
+        build.modify_constants(prod_env=parsed_args.prod_env)
+    else:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
-    version = (
-        get_chrome_driver_version() if parsed_args.auto_select_chromedriver
-        else CHROME_DRIVER_VERSION)
+    version = parsed_args.chrome_driver_version or get_chrome_driver_version()
+    python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
     start_google_app_engine_server(dev_mode, parsed_args.server_log_level)

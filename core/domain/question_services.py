@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -201,6 +201,24 @@ def delete_question_skill_link(user_id, question_id, skill_id):
     question_skill_link_model.delete()
 
 
+def get_total_question_count_for_skill_ids(skill_ids):
+    """Returns the number of questions assigned to the given skill_ids.
+
+    Args:
+        skill_ids: list(str). Skill IDs for which the question count is
+            requested.
+
+    Returns:
+        int. The total number of questions assigned to the given skill_ids.
+    """
+    question_skill_link_model = question_models.QuestionSkillLinkModel
+    question_count = (
+        question_skill_link_model.get_total_question_count_for_skill_ids(
+            skill_ids))
+
+    return question_count
+
+
 def get_questions_by_skill_ids(
         total_question_count, skill_ids, require_medium_difficulty):
     """Returns constant number of questions linked to each given skill id.
@@ -362,7 +380,7 @@ def get_skills_linked_to_question(question_id):
         list(Skill). The list of skills that are linked to the question.
     """
     question = get_question_by_id(question_id)
-    skills = skill_services.get_multi_skills(question.linked_skill_ids)
+    skills = skill_fetchers.get_multi_skills(question.linked_skill_ids)
     return skills
 
 

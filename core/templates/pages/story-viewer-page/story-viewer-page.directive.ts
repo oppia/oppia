@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
@@ -121,13 +121,11 @@ angular.module('oppia').directive('storyViewerPage', [
             StoryViewerBackendApiService.fetchStoryData(ctrl.storyId).then(
               function(storyDataDict) {
                 ctrl.storyIsLoaded = true;
-                ctrl.storyPlaythroughObject =
-                  StoryPlaythroughObjectFactory.createFromBackendDict(
-                    storyDataDict);
+                ctrl.storyPlaythroughObject = storyDataDict;
                 PageTitleService.setPageTitle(
-                  storyDataDict.story_title + ' - Oppia');
-                ctrl.storyTitle = storyDataDict.story_title;
-                ctrl.storyDescription = storyDataDict.story_description;
+                  storyDataDict.title + ' - Oppia');
+                ctrl.storyTitle = storyDataDict.title;
+                ctrl.storyDescription = storyDataDict.description;
 
                 LoaderService.hideLoadingScreen();
                 ctrl.pathIconParameters = ctrl.generatePathIconParameters();
