@@ -58,10 +58,10 @@ var PreferencesPage = function() {
 
   var saveNewChanges = async function(fieldName) {
     await navBar.click();
-    await waitFor.visibilityOfSuccessToast(
-      `Succes toast for saving ${fieldName} takes too long to appear.`);
-    await waitFor.invisibilityOfSuccessToast(
-      'Success toast takes too long to disappear.');
+    await waitFor.visibilityOfInfoToast(
+      `Info toast for saving ${fieldName} takes too long to appear.`);
+    await waitFor.invisibilityOfInfoToast(
+      'Info toast takes too long to disappear.');
   };
 
   this.get = async function() {
