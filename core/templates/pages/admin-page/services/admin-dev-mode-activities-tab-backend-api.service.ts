@@ -18,7 +18,6 @@
  */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 const constants = require('pages/admin-page/admin-page.constants');

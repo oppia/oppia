@@ -34,7 +34,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   styleUrls: []
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
-  @Input() setStatusMessage: Function;
+  @Input() setStatusMessage;
   constructor(
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
@@ -49,6 +49,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   reloadingAllExplorationPossible: boolean = false;
   demoExplorationIds: string[];
   ngOnInit(): void {
+    console.log('Inits act page');
     this.numDummyExpsToPublish = 0;
     this.numDummyExpsToGenerate = 0;
     this.reloadingAllExplorationPossible = false;
@@ -76,7 +77,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       this.setStatusMessage('Data reloaded successfully.');
       this.adminTaskManagerService.finishTask();
     }, (errorResponse) => {
-      this.setStatusMessage('Server error: ' + errorResponse.data.error);
+      this.setStatusMessage('Server error: ' + errorResponse.body);
       this.adminTaskManagerService.finishTask();
     });
   }
