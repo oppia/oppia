@@ -201,7 +201,6 @@ describe('Teach Page', function() {
       }
     });
     component.onApplyToTeachWithOppia();
-    // Increased time to 300ms to avoid race condition.
     setTimeout(() => {
       fixture.detectChanges();
       expect(windowRef.nativeWindow.location.href).toBe(
