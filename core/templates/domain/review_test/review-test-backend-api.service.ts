@@ -23,6 +23,8 @@ import { Injectable } from '@angular/core';
 
 import { ReviewTestDomainConstants } from
   'domain/review_test/review-test-domain.constants';
+import { ReviewTestBackendDict, ReviewTest, ReviewTestObjectFactory } from
+  'domain/review_test/review-test-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -31,20 +33,24 @@ import { UrlInterpolationService } from
 })
 export class ReviewTestBackendApiService {
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private reviewTestObjectFactory: ReviewTestObjectFactory,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  _fetchReviewTestData(storyId: string): Promise<Object> {
-    return this.http.get(
+  _fetchReviewTestData(storyId: string): Promise<ReviewTest> {
+    return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
         {story_id: storyId}
       )
-    ).toPromise();
+    ).toPromise().then(backendResponse => {
+      return this.reviewTestObjectFactory.createFromBackendDict(
+        backendResponse);
+    });
   }
 
-  fetchReviewTestData(storyId: string): Promise<Object> {
+  fetchReviewTestData(storyId: string): Promise<ReviewTest> {
     return this._fetchReviewTestData(storyId);
   }
 }

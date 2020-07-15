@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { StatisticsDomainConstants } from
@@ -35,7 +35,7 @@ export class LearnerAnswerDetailsBackendApiService {
 
   recordLearnerAnswerDetails(
       explorationId: string, stateName: string, interactionId: string,
-      answer: string, answerDetails: string): Promise<object> {
+      answer: string, answerDetails: string): Promise<void> {
     let recordLearnerAnswerDetailsUrl = (
       this.urlInterpolationService.interpolateUrl(
         StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
@@ -50,7 +50,7 @@ export class LearnerAnswerDetailsBackendApiService {
       answer_details: answerDetails
     };
 
-    return this.httpClient.put(
+    return this.httpClient.put<void>(
       recordLearnerAnswerDetailsUrl, payload).toPromise();
   }
 }

@@ -24,8 +24,6 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 interface CreditNames {
   letter: String;
