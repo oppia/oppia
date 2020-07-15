@@ -49,7 +49,6 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   reloadingAllExplorationPossible: boolean = false;
   demoExplorationIds: string[];
   ngOnInit(): void {
-    console.log('Inits act page');
     this.numDummyExpsToPublish = 0;
     this.numDummyExpsToGenerate = 0;
     this.reloadingAllExplorationPossible = false;
