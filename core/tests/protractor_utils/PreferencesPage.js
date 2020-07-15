@@ -125,10 +125,10 @@ var PreferencesPage = function() {
 
   this.setUserInterests = async function(interests) {
     await userInterestsInput.click();
-    await Promise.all(interests.map(async function(interest) {
-      await userInterestsInput.sendKeys(interest, protractor.Key.RETURN);
+    for (var i = 0; i < interests.length; i++) {
+      await userInterestsInput.sendKeys(interests[i], protractor.Key.RETURN);
       await saveNewChanges('User Interests');
-    }));
+    }
   };
 
   this.isFeedbackEmailsCheckboxSelected = async function() {
