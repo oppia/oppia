@@ -26,7 +26,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
