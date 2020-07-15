@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { ComponentFixture, TestBed} from
+import { ComponentFixture, TestBed } from
   '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
 
@@ -189,7 +189,7 @@ describe('Teach Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should apply to teach with oppia', (done) => {
+  it('should apply to teach with oppia', () => {
     const applyToTeachWithOppiaEventSpy = spyOn(
       siteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
       .and.callThrough();
@@ -201,11 +201,12 @@ describe('Teach Page', function() {
       }
     });
     component.onApplyToTeachWithOppia();
+    // Increased time to 300ms to avoid race condition.
     setTimeout(() => {
+      fixture.detectChanges();
       expect(windowRef.nativeWindow.location.href).toBe(
         'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
       expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-      done();
-    }, 150);
+    }, 300);
   });
 });
