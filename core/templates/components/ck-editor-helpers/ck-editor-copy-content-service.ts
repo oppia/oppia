@@ -34,7 +34,7 @@ interface CkEditorCopyEvent {
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
   private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
-  private readonly WHITELISTED_WIDGETS = new Set([
+  private readonly ALLOWLISTED_WIDGETS = new Set([
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
@@ -92,7 +92,7 @@ export class CkEditorCopyContentService {
     }
 
     if (containedWidgetTagName &&
-        !this.WHITELISTED_WIDGETS.has(containedWidgetTagName)) {
+        !this.ALLOWLISTED_WIDGETS.has(containedWidgetTagName)) {
       return {};
     }
 

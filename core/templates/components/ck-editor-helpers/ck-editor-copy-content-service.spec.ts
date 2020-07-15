@@ -86,8 +86,9 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
-    let listHtml = '<ul><li>Parent bullet<ul><li>Child bullet<ul>' +
-      '<li>Grandchild bullet</li></ul></li></ul></li></ul>';
+    // eslint-disable-next-line quotes
+    let listHtml = `<ul><li>Parent bullet<ul><li>Child bullet<ul>\
+<li>Grandchild bullet</li></ul></li></ul></li></ul>`;
     const listElement = generateContent(listHtml);
 
     let liElements = listElement.querySelectorAll('li');
@@ -106,11 +107,13 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
+    /* eslint-disable quotes */
     const imageWidgetElement = generateContent(
-      '<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" capt' +
-      'ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;' +
-      'quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
-      '"></oppia-noninteractive-image>');
+      `<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" capt\
+ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;\
+quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;\
+"></oppia-noninteractive-image>`);
+    /* eslint-enable quotes */
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(imageWidgetElement);
@@ -133,11 +136,13 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
+    /* eslint-disable quotes */
     const imageWidgetElement = generateContent(
-      '<oppia-noninteractive-fake alt-with-value="&amp;quot;&amp;quot;" capt' +
-      'ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;' +
-      'quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
-      '"></oppia-noninteractive-fake>');
+      `<oppia-noninteractive-fake alt-with-value="&amp;quot;&amp;quot;" capt\
+ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;\
+quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;\
+"></oppia-noninteractive-fake>`);
+    /* eslint-enable quotes */
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(imageWidgetElement);
@@ -151,11 +156,14 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
+    /* eslint-disable quotes */
     const mathWidgetElement = generateContent(
-      '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_' +
-      'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
-      'ame&amp;quot;:&amp;quot;&amp;quot;}"><span></span></oppia-noninteracti' +
-      've-math></p>');
+      `<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_\
+latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen\
+ame&amp;quot;:&amp;quot;&amp;quot;}"><span></span></oppia-noninteracti\
+ve-math></p>`);
+    /* eslint-enable quotes */
+
     const nestedMathWidgetElement = (
       <HTMLElement>mathWidgetElement.firstChild.firstChild);
 
@@ -180,10 +188,12 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
+    /* eslint-disable quotes */
     const mathWidgetElement = generateContent(
-      '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_' +
-      'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
-      'ame&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math></p>');
+      `<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_\
+latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen\
+ame&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math></p>`);
+    /* eslint-enable quotes */
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(mathWidgetElement);
