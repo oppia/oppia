@@ -40,10 +40,10 @@ import { ExplorationEmbedButtonModalComponent } from
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationSummaryTileDirective } from
+  './summary-tile/exploration-summary-tile.directive';
 import { TopicSummaryTileComponent } from
   './summary-tile/topic-summary-tile.component';
-
-
 
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule],
@@ -51,7 +51,7 @@ import { TopicSummaryTileComponent } from
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    TopicSummaryTileComponent],
+    TopicSummaryTileComponent, ExplorationSummaryTileDirective],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
@@ -61,7 +61,7 @@ import { TopicSummaryTileComponent } from
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, MaterialModule
+    SharingLinksComponent, MaterialModule, ExplorationSummaryTileDirective
   ],
 })
 
