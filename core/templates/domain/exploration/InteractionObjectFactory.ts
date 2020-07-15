@@ -63,13 +63,13 @@ export interface CustomizationArgsSchema {
   type: string;
   'obj_type'?: string;
   items?: CustomizationArgsSchema;
-  properties: {
+  properties?: {
     name: string;
     schema: CustomizationArgsSchema;
   }[]
 }
 
-const applyConversionFnOnInteractionCustArgsContent = function<T, S>(
+export const applyConversionFnOnInteractionCustArgsContent = function<T, S>(
     value: any,
     schema: CustomizationArgsSchema,
     conversionFn: InteractionCustArgsConversionFn<T, S>

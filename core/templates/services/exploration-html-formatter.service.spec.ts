@@ -23,6 +23,10 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Exploration Html Formatter Service', () => {
   let ehfs: ExplorationHtmlFormatterService = null;
@@ -34,15 +38,57 @@ describe('Exploration Html Formatter Service', () => {
     ehfs = TestBed.get(ExplorationHtmlFormatterService);
   });
 
-  it('should correctly set interaction HTML when it is in editor mode',
-    () => {
-      var interactionId = 'sampleId';
-      var expectedHtmlTag = '<oppia-interactive-sample-id ' +
-        'last-answer="lastAnswer"' +
-        '></oppia-interactive-sample-id>';
-      expect(ehfs.getInteractionHtml(interactionId, null, true, null))
-        .toBe(expectedHtmlTag);
-    });
+  it('should correctly set interaction HTML for TextInput when it is in' +
+     ' editor mode', () => {
+    var interactionId = 'TextInput';
+    let custArgs = {
+      placeholder: {
+        value: new SubtitledUnicode('enter here', '')
+      },
+      rows: { value: 1 }
+    };
+    var expectedHtmlTag = '<oppia-interactive-text-input ' +
+      'placeholder-with-value="&amp;quot;enter here&amp;quot;" ' +
+      'rows-with-value="1" last-answer="lastAnswer">' +
+      '</oppia-interactive-text-input>';
+    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null))
+      .toBe(expectedHtmlTag);
+  });
+
+  it('should correctly unwrap SubtitledUnicode and SubtitledHtml', () => {
+    // No interactions currently have dictionaries in their customization
+    // arguments, but we test here for coverage + future development.
+    let unwrappedCustArgs = ehfs.unwrapInteractionCustArgsContent(
+      {
+        test: [
+          {
+            content: new SubtitledUnicode('first', ''),
+            show: true
+          },
+          {
+            content: new SubtitledUnicode('second', ''),
+            show: true
+          }
+        ],
+        test2: new SubtitledHtml('third', '')
+      }
+    );
+
+    expect(unwrappedCustArgs)
+      .toEqual({
+        test: [
+          {
+            content: 'first',
+            show: true
+          },
+          {
+            content: 'second',
+            show: true
+          }
+        ],
+        test2: 'third'
+      });
+  });
 
   it('should correctly set interaction HTML when it is in player mode',
     () => {

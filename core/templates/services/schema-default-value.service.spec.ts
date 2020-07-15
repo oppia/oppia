@@ -112,6 +112,15 @@ describe('Schema Default Value Service', () => {
     expect(sdvs.getDefaultValue(schema)).toBe(0);
   });
 
+  it('should not get default value if schema type is custom', () => {
+    let schema = {
+      type: 'custom',
+      obj_type: 'SubtitledHtml'
+    };
+    expect(sdvs.getDefaultValue(schema))
+      .toBe({content_id: '', unicode_str: ''});
+  });
+
   it('should not get default value if schema type is invalid', () => {
     var loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
     const schema = {

@@ -23,12 +23,15 @@ import { AnswerGroupObjectFactory } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import {
+  InteractionObjectFactory, applyConversionFnOnInteractionCustArgsContent
+} from 'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory.ts';
 
 describe('Interaction object factory', () => {
   let iof = null;
@@ -106,15 +109,88 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        customArg: {
-          value: 'custom_value'
-        }
+        placeholder: {
+          value: {
+            content_id: 'custarg_placeholder_0',
+            unicode_str: 'Enter text'
+          }
+        },
+        rows: { value: 1 }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
-      id: 'interaction_id',
+      id: 'TextInput',
       solution: solutionDict
     };
+  });
+
+  it('should correctly set customization arguments for TextInput', () => {
+    const copyInteractionDict = { ...interactionDict };
+    const testInteraction = iof.createFromBackendDict(copyInteractionDict);
+
+    expect(testInteraction.customizationArgs).toEqual({
+      placeholder: {
+        value: new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
+      },
+      rows: { value: 1 }
+    });
+  });
+
+  it('should correctly set customization arguments for interactions ' +
+     'containing dictionaries', () => {
+    // No interactions currently have dictionaries in their customization
+    // arguments, but we test here for coverage + future development.
+
+    const conversionSpy = jasmine.createSpy();
+
+    // The customization argument value is an array of dictionaries.
+    const caSchema = {
+      type: 'list',
+      items: {
+        type: 'dict',
+        properties: [{
+          name: 'content',
+          schema: {
+            type: 'custom',
+            obj_type: 'SubtitledUnicode'
+          }
+        }, {
+          name: 'show',
+          schema: {
+            type: 'boolean'
+          }
+        }]
+      }
+    };
+
+    const caValue = [
+      {
+        content: { unicode_str: 'first', content_id: 'custarg_content_0' },
+        show: true
+      },
+      {
+        content: { unicode_str: 'second', content_id: 'custarg_content_1' },
+        show: true
+      }
+    ];
+
+    applyConversionFnOnInteractionCustArgsContent(
+      caValue,
+      caSchema,
+      conversionSpy
+    );
+
+    expect(conversionSpy).toHaveBeenCalledTimes(2);
+    expect(conversionSpy.calls.allArgs()).toEqual(
+      [
+        [
+          { unicode_str: 'first', content_id: 'custarg_content_0' },
+          'SubtitledUnicode'
+        ], [
+          { unicode_str: 'second', content_id: 'custarg_content_1' },
+          'SubtitledUnicode'
+        ]
+      ]);
   });
 
   it('should create an object when default outcome is null', () => {
@@ -129,7 +205,7 @@ describe('Interaction object factory', () => {
   it('should correctly set the new ID', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
-    expect(testInteraction.id).toEqual('interaction_id');
+    expect(testInteraction.id).toEqual('TextInput');
     testInteraction.setId('new_interaction_id');
     expect(testInteraction.id).toEqual('new_interaction_id');
   });
@@ -209,14 +285,16 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
     const newCustomizationArgs = {
-      customArgNew: {
-        value: 'custom_value_new'
-      }
+      placeholder: {
+        value: new SubtitledUnicode('', '')
+      },
+      rows: { value: 1 }
     };
     expect(testInteraction.customizationArgs).toEqual({
-      customArg: {
-        value: 'custom_value'
-      }
+      placeholder: {
+        value: new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
+      },
+      rows: { value: 1 }
     });
     testInteraction.setCustomizationArgs(newCustomizationArgs);
     expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
@@ -314,30 +392,48 @@ describe('Interaction object factory', () => {
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
       customization_args: {
-        customArg: {
-          value: 'custom_arg'
+        showChoicesInShuffledOrder: {
+          value: true
+        },
+        choices: {
+          value: [{
+            html: '<p>Choice 1</p>',
+            content_id: 'custarg_choices_0'
+          }, {
+            html: '<p>Choice 2</p>',
+            content_id: 'custarg_choices_1'
+          }]
         }
       },
       default_outcome: newDefaultOutcome,
       hints: newHintDict,
-      id: 'interaction_id_new',
+      id: 'MultipleChoice',
       solution: newSolutionDict
     };
     const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
-    otherInteraction.customizationArgs.customArg.value = 'custom_arg_new';
+    otherInteraction.customizationArgs.showChoicesInShuffledOrder.value = false;
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
       customization_args: {
-        customArg: {
-          value: 'custom_arg'
+        showChoicesInShuffledOrder: {
+          value: true
+        },
+        choices: {
+          value: [{
+            html: '<p>Choice 1</p>',
+            content_id: 'custarg_choices_0'
+          }, {
+            html: '<p>Choice 2</p>',
+            content_id: 'custarg_choices_1'
+          }]
         }
       },
       default_outcome: newDefaultOutcome,
       hints: newHintDict,
-      id: 'interaction_id_new',
+      id: 'MultipleChoice',
       solution: newSolutionDict
     }));
   });
