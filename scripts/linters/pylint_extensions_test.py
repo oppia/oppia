@@ -111,6 +111,47 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_call(func_call_node_six)
 
+    def test_finds_arg_name_for_non_keyword_arg(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ExplicitKeywordArgsChecker)
+        checker_test_object.setup_method()
+        (
+            func_call_node_one, func_call_node_two, func_call_node_three,
+            class_call_node) = astroid.extract_node("""
+        class TestClass():
+            def __init__(self, first, second):
+                pass
+
+        def test(test_var_one, test_var_two=4, test_var_three=5):
+            test_var_five = test_var_two + test_var_three
+            return test_var_five
+
+        def test_1(*args, **kwargs):
+            pass
+
+        test(test_var_one=2, test_var_two=5) #@
+        test(2, test_var_two=2) #@
+        test_1(first=1, second=2) #@
+
+        TestClass(first=1, second=2) #@
+        """)
+        message = testutils.Message(
+            msg_id='arg-name-for-non-keyword-arg',
+            node=func_call_node_one,
+            args=('\'test_var_one\'', 'function', 'test'))
+        with checker_test_object.assertAddsMessages(message):
+            checker_test_object.checker.visit_call(func_call_node_one)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(func_call_node_two)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(func_call_node_three)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(class_call_node)
+
     def test_register(self):
         pylinter_instance = lint.PyLinter()
         pylint_extensions.register(pylinter_instance)

@@ -78,7 +78,7 @@ def download_and_install_package(url_to_retrieve, filename):
             downloaded.
         filename: string. The name of the tar file.
     """
-    python_utils.url_retrieve(url_to_retrieve, filename=filename)
+    python_utils.url_retrieve(url_to_retrieve, filename)
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()

@@ -31,7 +31,7 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
     def test_requires_override_for_calculation(self):
         with self.assertRaises(NotImplementedError):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
-                state_answers_dict={})
+                {})
 
     def test_equality_of_hashable_answers(self):
         hashable_answer_1 = answer_models.HashableAnswer('answer_1')

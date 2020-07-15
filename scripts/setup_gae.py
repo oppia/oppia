@@ -66,7 +66,7 @@ def main(args=None):
         try:
             python_utils.url_retrieve(
                 'https://storage.googleapis.com/appengine-sdks/featured/'
-                'google_appengine_1.9.67.zip', filename='gae-download.zip')
+                'google_appengine_1.9.67.zip', 'gae-download.zip')
         except Exception:
             python_utils.PRINT('Error downloading Google App Engine. Exiting.')
             raise Exception
@@ -89,7 +89,7 @@ def main(args=None):
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-251.0.0-linux-x86_64.tar.gz',
-                filename='gcloud-sdk.tar.gz')
+                'gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
             raise Exception

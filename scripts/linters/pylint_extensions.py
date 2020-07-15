@@ -81,6 +81,13 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'non-explicit-keyword-args',
             'All keyword arguments should be explicitly named in function call.'
         ),
+        'C0027': (
+            'Keyword argument %s used for a non keyword argument in %s '
+            'call of %s.',
+            'arg-name-for-non-keyword-arg',
+            'Position arguments should not be used as keyword arguments '
+            'in function call.'
+        ),
     }
 
     def visit_call(self, node):
@@ -141,9 +148,11 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         num_positional_args_unused = num_positional_args
         # Check that all parameters with a default value have
         # been called explicitly.
+        keyword_args_in_funcdef = []
         for [(name, defval), _] in parameters:
             if defval:
                 display_name = repr(name)
+                keyword_args_in_funcdef.append(name)
 
                 if name not in keyword_args and (
                         num_positional_args_unused > (
@@ -164,6 +173,25 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                             callable_name,
                             func_name))
                     num_positional_args_unused -= 1
+
+
+        for arg in keyword_args:
+            # If there is *args and **kwargs in the functin definition skip the
+            # check because we can use keywords arguments in function call even
+            # if **kwargs is present in the function definition.
+            if not called.args.kwarg and callable_name != 'constructor':
+                if not arg in keyword_args_in_funcdef:
+                    # This try/except block tries to get the function
+                    # name. Since each node may differ, multiple
+                    # blocks have been used.
+                    try:
+                        func_name = node.func.attrname
+                    except AttributeError:
+                        func_name = node.func.name
+
+                    self.add_message(
+                        'arg-name-for-non-keyword-arg', node=node,
+                        args=(repr(arg), callable_name, func_name))
 
 
 class HangingIndentChecker(checkers.BaseChecker):

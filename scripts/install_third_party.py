@@ -97,7 +97,7 @@ def download_files(source_url_root, target_dir, source_filenames):
                 'Downloading file %s to %s ...' % (filename, target_dir))
             python_utils.url_retrieve(
                 '%s/%s' % (source_url_root, filename),
-                filename=os.path.join(target_dir, filename))
+                os.path.join(target_dir, filename))
 
             python_utils.PRINT('Download of %s succeeded.' % filename)
 
@@ -126,7 +126,7 @@ def download_and_unzip_files(
             zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
+        python_utils.url_retrieve(source_url, TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -178,7 +178,7 @@ def download_and_untar_files(
             tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
+        python_utils.url_retrieve(source_url, TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)

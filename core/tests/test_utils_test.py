@@ -450,5 +450,5 @@ class SwapWithCheckTestClass(python_utils.OBJECT):
     @classmethod
     def functions_with_kwargs(cls):
         """Run a few functions with kwargs."""
-        os.getenv(key='123', default='456')
-        os.getenv(key='678', default='900')
+        os.getenv('123', default='456')
+        os.getenv('678', default='900')

@@ -583,7 +583,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        exp_versions_diff, None)
 
     exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
 
@@ -600,8 +600,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         stats_services.create_stats_model(new_exp_stats)
 
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff=exp_versions_diff,
-            revert_to_version=None)
+            exploration, exp_versions_diff,
+            None)
 
     transaction_services.run_in_transaction(_update_storage_models)
 
@@ -1197,7 +1197,7 @@ def revert_exploration(
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration_id, current_version + 1,
         exploration_to_revert_to.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
+        None, revert_to_version)
 
     def _update_storage_models():
         """Groups all storage calls into a function call so that they can be
@@ -1220,8 +1220,8 @@ def revert_exploration(
         stats_services.create_stats_model(new_exp_stats)
 
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration_at_current_version, exp_versions_diff=None,
-            revert_to_version=revert_to_version)
+            exploration_at_current_version, None,
+            revert_to_version)
 
     transaction_services.run_in_transaction(_update_storage_models)
 
