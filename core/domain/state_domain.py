@@ -941,7 +941,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         Returns:
             dict. The customization arguments with the content converted to
-                the proper domain objects.
+            the proper domain objects.
         """
         if not interaction_id:
             return {}
@@ -978,14 +978,14 @@ class InteractionInstance(python_utils.OBJECT):
 
         Returns:
             dict. The customization arguments with the content converted to
-                dictionaries.
+            dictionaries.
         """
-        def convert_content_to_dict(unused_ca_value, unused_obj_type):
+        def convert_content_to_dict(ca_value, unused_obj_type):
             """Conversion function used to convert SubtitledHtml to
             SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
 
             Args:
-                unused_ca_value: dict. Dictionary of key 'value' to
+                ca_value: dict. Dictionary of key 'value' to
                     original value of customization argument.
                 unused_obj_type: str. Indicates the obj_type found in
                     the customization arguments schema.
