@@ -17,9 +17,11 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
+import { LoggerService } from 'services/contextual/logger.service';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
-import { LoggerService } from 'services/contextual/logger.service';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('Schema Default Value Service', () => {
   let sdvs, ls;
@@ -117,8 +119,9 @@ describe('Schema Default Value Service', () => {
       type: 'custom',
       obj_type: 'SubtitledHtml'
     };
-    expect(sdvs.getDefaultValue(schema))
-      .toBe({content_id: '', unicode_str: ''});
+    expect(
+      sdvs.getDefaultValue(schema)
+    ).toEqual(new SubtitledHtml('', ''));
   });
 
   it('should not get default value if schema type is invalid', () => {

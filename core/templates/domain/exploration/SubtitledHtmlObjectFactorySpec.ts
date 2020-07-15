@@ -40,7 +40,7 @@ describe('SubtitledHtml object factory', () => {
   it('should get and set contentId correctly', () => {
     expect(subtitledHtml.getContentId()).toEqual('content_id');
     subtitledHtml.setContentId('new_content_id');
-    expect(subtitledHtml.getContentId()).toEqual('new new_content_id');
+    expect(subtitledHtml.getContentId()).toEqual('new_content_id');
   });
 
   it('should correctly check existence of HTML', () => {

@@ -453,10 +453,13 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             dict. A dict mapping all fields of InteractionInstance instance.
         """
+        customization_args_dict = {}
+        if self.id:
+            customization_args_dict = self.convert_cust_args_to_dict()
+
         return {
             'id': self.id,
-            'customization_args': (
-                {} if self.id is None else self.customization_args),
+            'customization_args': customization_args_dict,
             'answer_groups': [group.to_dict() for group in self.answer_groups],
             'default_outcome': (
                 self.default_outcome.to_dict()
@@ -489,9 +492,13 @@ class InteractionInstance(python_utils.OBJECT):
             if (interaction_dict['solution'] and interaction_dict['id'])
             else None)
 
+        customization_args = InteractionInstance.convert_cust_args_from_dict(
+            interaction_dict['id'],
+            interaction_dict['customization_args'])
+
         return cls(
             interaction_dict['id'],
-            interaction_dict['customization_args'],
+            customization_args,
             [AnswerGroup.from_dict(h)
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
@@ -883,8 +890,7 @@ class InteractionInstance(python_utils.OBJECT):
             Returns:
                 str. The unmodified customization argument value.
             """
-            if 'content_id' in ca_value:
-                content_ids.append(ca_value['content_id'])
+            content_ids.append(ca_value.content_id)
 
             return ca_value
 
@@ -906,7 +912,7 @@ class InteractionInstance(python_utils.OBJECT):
             Args:
                 obj_type: str. Indicates the obj_type found in
                     the customization arguments schema.
-                ca_value: dict. Dictionary of key 'value' to
+                ca_value: str. Dictionary of key 'value' to
                     original value of customization argument.
 
             Returns:
@@ -915,8 +921,7 @@ class InteractionInstance(python_utils.OBJECT):
             if obj_type == 'SubtitledUnicode':
                 return ca_value
 
-            if 'html' in ca_value:
-                html.append(ca_value['html'])
+            html.append(ca_value.html)
 
             return ca_value
 
@@ -924,6 +929,76 @@ class InteractionInstance(python_utils.OBJECT):
             self.id, self.customization_args, extract_html)
         return html
 
+    @staticmethod
+    def convert_cust_args_from_dict(interaction_id, customization_args):
+        """Converts values of customization arguments from SubtitledHtml dicts
+        and SubtitledUnicode dicts to their corresponding domain object.
+
+        Args:
+            interaction_id: str. The interaction id.
+            customization_args: dict. The values of the customization arguments.
+                A dict of name to dict of value to the value.
+        
+        Returns:
+            dict. The customization arguments with the content converted to
+                the proper domain objects.
+        """
+        if not interaction_id:
+            return {}
+        
+        def convert_content_to_domain_obj(ca_value, obj_type):
+            """Conversion function used to convert SubtitledHtml dicts to
+            SubtitledHtml and SubtitledUnicode dicts to SubtitledUnicode.
+
+            Args:
+                ca_value: dict. Dictionary of key 'value' to
+                    original value of customization argument.
+                obj_type: str. Indicates the obj_type found in
+                    the customization arguments schema.
+
+            Returns:
+                dict. The unmodified customization argument value.
+            """
+            if obj_type == 'SubtitledUnicode':
+                return SubtitledUnicode(
+                    ca_value['content_id'], ca_value['unicode_str'])
+            
+            if obj_type == 'SubtitledHtml':
+                 return SubtitledHtml(
+                    ca_value['content_id'], ca_value['html'])
+
+        customization_args = copy.deepcopy(customization_args)
+        InteractionInstance.convert_content_in_cust_args(
+            interaction_id, customization_args, convert_content_to_domain_obj)
+        return customization_args
+
+    def convert_cust_args_to_dict(self):
+        """Converts customization arguments values from SubtitledHtml
+        and SubtitledUnicode to their dictionaries.
+        
+        Returns:
+            dict. The customization arguments with the content converted to
+                dictionaries.
+        """
+        def convert_content_to_dict(ca_value, obj_type):
+            """Conversion function used to convert SubtitledHtml to
+            SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
+
+            Args:
+                ca_value: dict. Dictionary of key 'value' to
+                    original value of customization argument.
+                obj_type: str. Indicates the obj_type found in
+                    the customization arguments schema.
+
+            Returns:
+                dict. The unmodified customization argument value.
+            """
+            return ca_value.to_dict()
+
+        customization_args = copy.deepcopy(self.customization_args)
+        self.convert_content_in_cust_args(
+            self.id, customization_args, convert_content_to_dict)
+        return customization_args
 
 class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
@@ -2376,6 +2451,9 @@ class State(python_utils.OBJECT):
         Args:
             customization_args: dict. The new customization_args to set.
         """
+        customization_args = InteractionInstance.convert_cust_args_from_dict(
+            self.interaction.id, customization_args)
+
         if self.interaction.id:
             # If interaction id is None, content_id's have already been removed
             # in update_interaction_id.

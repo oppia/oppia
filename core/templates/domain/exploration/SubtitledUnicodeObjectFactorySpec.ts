@@ -40,7 +40,7 @@ describe('SubtitledUnicode object factory', () => {
   it('should get and set contentId correctly', () => {
     expect(subtitledUnicode.getContentId()).toEqual('content_id');
     subtitledUnicode.setContentId('new_content_id');
-    expect(subtitledUnicode.getContentId()).toEqual('new new_content_id');
+    expect(subtitledUnicode.getContentId()).toEqual('new_content_id');
   });
 
   it('should correctly check existence of unicode', () => {

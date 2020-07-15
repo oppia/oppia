@@ -8290,7 +8290,12 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_interaction_id('DragAndDropSortInput')
 
         customization_args_dict1 = {
-            'placeholder': {'value': ''},
+            'placeholder': {
+                'value': {
+                    'content_id': '',
+                    'unicode_str': '<p>This is value1 for MultipleChoice</p>'
+                }
+            },
             'rows': {'value': 1}
         }
         customization_args_dict2 = {

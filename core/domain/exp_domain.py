@@ -567,8 +567,12 @@ class Exploration(python_utils.OBJECT):
                 state_domain.Solution.from_dict(idict['id'], idict['solution'])
                 if idict['solution'] else None)
 
+            customization_args = (
+                state_domain.InteractionInstance.convert_cust_args_from_dict(
+                    idict['id'], idict['customization_args'])
+            )
             state.interaction = state_domain.InteractionInstance(
-                idict['id'], idict['customization_args'],
+                idict['id'], customization_args,
                 interaction_answer_groups, default_outcome,
                 idict['confirmed_unclassified_answers'],
                 [state_domain.Hint.from_dict(h) for h in idict['hints']],

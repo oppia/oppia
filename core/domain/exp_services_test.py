@@ -2528,13 +2528,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.interaction.customization_args[
                 'choices']['value'],
-            [{
-                'content_id': 'custarg_choices_0',
-                'html': '<p>Option A</p>'
-            }, {
-                'content_id': 'custarg_choices_1',
-                'html': '<p>Option B</p>'
-            }]
+            [
+                state_domain.SubtitledHtml(
+                    'custarg_choices_0', '<p>Option A</p>'),
+                state_domain.SubtitledHtml(
+                    'custarg_choices_1', '<p>Option B</p>')
+            ]
         )
 
     def test_update_interaction_handlers_fails(self):
