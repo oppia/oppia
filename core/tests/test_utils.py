@@ -2412,9 +2412,14 @@ GenericTestBase = AppEngineTestBase
 class GenericEmailTestBase(GenericTestBase):
     """Base class for tests requiring email services."""
 
+    @classmethod
+    def setUpClass(cls):
+        super(GenericEmailTestBase, cls).setUpClass()
+        cls.email_services_mock = EmailServicesMock()
+
     def setUp(self):
-        super(EmailTestBase, self).setUp()
-        self.email_services_mock = EmailServicesMock()
+        super(GenericEmailTestBase, self).setUp()
+        self.email_services_mock.wipe_emails_dict()
 
 
 EmailTestBase = GenericEmailTestBase

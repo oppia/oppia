@@ -57,7 +57,6 @@ class FailedMLTest(test_utils.EmailTestBase):
             'committer_id', ['moderator@example.com'])
 
     def test_send_failed_ml_email(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -92,7 +91,6 @@ class EmailToAdminTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the admin."""
 
     def test_email_to_admin_is_sent_correctly(self):
-        self.email_services_mock.wipe_emails_dict()
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
         dummy_system_address = 'dummy@system.com'
         dummy_admin_address = 'admin@system.com'
@@ -135,7 +133,6 @@ class DummyMailTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the testing email id."""
 
     def test_sending_emails(self):
-        self.email_services_mock.wipe_emails_dict()
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
         dummy_system_address = 'dummy@system.com'
         dummy_receiver_address = 'admin@system.com'
@@ -193,7 +190,6 @@ class EmailRightsTest(test_utils.EmailTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_sender_id_validation(self):
-        self.email_services_mock.wipe_emails_dict()
         sender_ids_to_test = [
             feconf.SYSTEM_COMMITTER_ID, self.admin_id, self.moderator_id,
             self.editor_id]
@@ -266,7 +262,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EDITOR_ROLE_EMAILS', False)
 
     def test_role_email_is_sent_when_editor_assigns_role(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -286,7 +281,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
-        self.email_services_mock.wipe_emails_dict()
         user_services.update_email_preferences(
             self.new_user_id, True, False, False, False)
 
@@ -303,7 +297,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -316,7 +309,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_editor_role_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, (
             self.can_not_send_editor_role_email_ctx):
             with self.swap(
@@ -331,7 +323,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_role_emails_sent_are_correct(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -369,7 +360,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.expected_email_subject)
 
     def test_correct_rights_are_written_in_manager_role_email_body(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_html_body = (
             'Hi newuser,<br>'
             '<br>'
@@ -435,7 +425,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 expected_email_text_body)
 
     def test_correct_rights_are_written_in_editor_role_email_body(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_html_body = (
             'Hi newuser,<br>'
             '<br>'
@@ -499,7 +488,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 expected_email_text_body)
 
     def test_correct_rights_are_written_in_voice_artist_role_email_body(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_html_body = (
             'Hi newuser,<br>'
             '<br>'
@@ -564,7 +552,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 expected_email_text_body)
 
     def test_correct_rights_are_written_in_playtester_role_email_body(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_html_body = (
             'Hi newuser,<br>'
             '<br>'
@@ -626,7 +613,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 expected_email_text_body)
 
     def test_correct_undefined_role_raises_an_exception(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -681,7 +667,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             '<a href="https://www.site.com/prefs">Preferences page</a>.')
 
     def test_email_not_sent_if_config_does_not_permit_it(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.swap(feconf, 'CAN_SEND_EMAILS', False), (
             self.swap(
                 email_services, 'send_mail',
@@ -708,7 +693,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(0, len(messages))
 
     def test_email_not_sent_if_content_config_is_not_modified(self):
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -752,7 +736,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(0, len(messages))
 
     def test_email_not_sent_if_content_config_is_partially_modified(self):
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -804,7 +787,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(0, len(messages))
 
     def test_email_with_bad_content_is_not_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -851,7 +833,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(0, len(messages))
 
     def test_contents_of_signup_email_are_correct(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
             self.swap(
                 email_services, 'send_mail',
@@ -891,7 +872,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 messages[0].html.decode(), self.expected_html_email_content)
 
     def test_email_only_sent_once_for_repeated_signups_by_same_user(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
             self.swap(
                 email_services, 'send_mail',
@@ -930,7 +910,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(1, len(messages))
 
     def test_email_only_sent_if_signup_was_successful(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
             self.swap(
                 email_services, 'send_mail',
@@ -971,7 +950,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(1, len(messages))
 
     def test_record_of_sent_email_is_written_to_datastore(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
             self.swap(
                 email_services, 'send_mail',
@@ -1064,7 +1042,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 email_models.SentEmailModel))
 
     def test_send_email_does_not_resend_if_same_hash_exists(self):
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -1120,7 +1097,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(all_models), 1)
 
     def test_send_email_does_not_resend_within_duplicate_interval(self):
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -1188,7 +1164,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_recipient_but_same_hash(self):
         """Hash for both messages is same but recipients are different."""
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -1240,7 +1215,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_subject_but_same_hash(self):
         """Hash for both messages is same but subjects are different."""
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -1293,7 +1267,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_body_but_same_hash(self):
         """Hash for both messages is same but body is different."""
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -1345,7 +1318,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 sent_email_model1.html_body, sent_email_model2.html_body)
 
     def test_duplicate_emails_are_sent_after_some_time_has_elapsed(self):
-        self.email_services_mock.wipe_emails_dict()
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -1434,7 +1406,6 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         feedback_messages = {
             self.exploration.id: {
                 'title': self.exploration.title,
@@ -1453,7 +1424,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
+
         feedback_messages = {
             self.exploration.id: {
                 'title': self.exploration.title,
@@ -1472,7 +1443,6 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_feedback_messages_are_empty(self):
-        self.email_services_mock.wipe_emails_dict()
         feedback_messages = {}
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
             self.swap(
@@ -1487,7 +1457,6 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_correct_email_body_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_html_body = (
             'Hi editor,<br>'
             '<br>'
@@ -1596,7 +1565,6 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -1614,7 +1582,6 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
@@ -1626,7 +1593,6 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_suggestion_emails_are_correct(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'New suggestion for "Title"'
 
         expected_email_html_body = (
@@ -1720,7 +1686,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -1733,7 +1698,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_subscription_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
+
         with self.can_send_emails_ctx, (
             self.can_not_send_subscription_email_ctx):
             with self.swap(
@@ -1747,7 +1712,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_subscription_emails_are_correct(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'editor has published a new exploration!'
 
         expected_email_html_body = (
@@ -1838,7 +1802,6 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -1854,7 +1817,6 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -1870,7 +1832,6 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_feedback_message_emails_are_correct(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'New Oppia message in "a subject"'
 
         expected_email_html_body = (
@@ -1973,7 +1934,6 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -1988,7 +1948,6 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_flag_exploration_emails_are_correct(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'Exploration flagged by user: "Title"'
 
         expected_email_html_body = (
@@ -2097,7 +2056,6 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -2111,7 +2069,6 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'Invitation to review suggestions'
         expected_email_html_body = (
             'Hi reviewer,<br><br>'
@@ -2185,7 +2142,6 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -2198,7 +2154,6 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'Notification to review suggestions'
         expected_email_html_body = (
             'Hi reviewer,<br><br>'
@@ -2278,7 +2233,6 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
     def test_that_correct_completion_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         query_id = 'qid'
         expected_email_subject = 'Query qid has successfully completed'
         expected_email_html_body = (
@@ -2342,7 +2296,6 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
 
     def test_that_correct_failure_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         query_id = 'qid'
         query_params = {
             'key1': 'val1',
@@ -2425,7 +2378,6 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 admin_messages[0].body.decode(), expected_admin_email_text_body)
 
     def test_send_user_query_email(self):
-        self.email_services_mock.wipe_emails_dict()
         email_subject = 'Bulk Email User Query Subject'
         email_body = 'Bulk Email User Query Body'
         email_intent = feconf.BULK_EMAIL_INTENT_MARKETING
@@ -2480,7 +2432,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
     def setUp(self):
         super(VoiceoverApplicationEmailUnitTest, self).setUp()
         self._log_handler.reset()
-        self.email_services_mock.wipe_emails_dict()
+
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         user_services.update_email_preferences(
@@ -2490,7 +2442,6 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -2503,7 +2454,6 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_accepted_voiceover_application_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = (
             '[Accepted] Updates on submitted voiceover application')
         expected_email_html_body = (
@@ -2556,7 +2506,6 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
     def test_that_correct_rejected_voiceover_application_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'Updates on submitted voiceover application'
         expected_email_html_body = (
             'Hi applicant,<br><br>'
@@ -2605,8 +2554,6 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
     def test_can_send_emails_is_false_logs_error(self):
-        self.email_services_mock.wipe_emails_dict()
-
         with self.swap(logging, 'error', self._log_handler.error):
             email_manager.send_rejected_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en',
@@ -2632,7 +2579,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -2645,7 +2591,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_account_deleted_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = 'Account deleted'
         expected_email_html_body = (
             'Hi applicant@example.com,<br><br>'
@@ -2719,7 +2664,6 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self):
-        self.email_services_mock.wipe_emails_dict()
         email_subject = 'Dummy subject'
         email_html_body = 'Dummy email body.<br>'
         email_text_body = 'Dummy email body.\n'
@@ -2768,7 +2712,6 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             feconf.BULK_EMAIL_INTENT_MARKETING)
 
     def test_email_not_sent_if_original_html_not_matches_cleaned_html(self):
-        self.email_services_mock.wipe_emails_dict()
         email_subject = 'Dummy Email Subject'
         email_html_body = 'Dummy email body.<td>'
 
@@ -2791,7 +2734,6 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages_b), 0)
 
     def test_that_exception_is_raised_for_unauthorised_sender(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_send_emails_ctx, (
             self.assertRaisesRegexp(
                 Exception, 'Invalid sender_id for email')):
@@ -2814,7 +2756,6 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(all_models), 0)
 
     def test_that_test_email_is_sent_for_bulk_emails(self):
-        self.email_services_mock.wipe_emails_dict()
         email_subject = 'Test Subject'
         email_body = 'Test Body'
         with self.can_send_emails_ctx, (
@@ -3004,7 +2945,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
             self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -3019,7 +2959,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_assign_translation_reviewer_email_for_invalid_review_category(
             self):
-        self.email_services_mock.wipe_emails_dict()
         with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
             email_manager.send_email_to_new_community_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
@@ -3041,7 +2980,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             self.assertTrue('to_check' in category_details)
 
     def test_send_assigned_translation_reviewer_email(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = (
             'You have been invited to review Oppia translations')
         expected_email_html_body = (
@@ -3091,7 +3029,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
     def test_send_assigned_voiceover_reviewer_email(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = (
             'You have been invited to review Oppia voiceovers')
         expected_email_html_body = (
@@ -3141,7 +3078,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
     def test_send_assigned_question_reviewer_email(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = (
             'You have been invited to review Oppia questions')
         expected_email_html_body = (
@@ -3189,7 +3125,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
     def test_email_is_not_sent_can_send_emails_is_false(self):
-        self.email_services_mock.wipe_emails_dict()
         with self.can_not_send_emails_ctx, (
             self.swap(
                 email_services, 'send_mail',
@@ -3204,7 +3139,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_remove_translation_reviewer_email_for_invalid_review_category(
             self):
-        self.email_services_mock.wipe_emails_dict()
         with self.assertRaisesRegexp(Exception, 'Invalid review_category'), (
             self.swap(
                 email_services, 'send_mail',
@@ -3231,7 +3165,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             self.assertTrue('contribution_allowed' in category_details)
 
     def test_send_removed_translation_reviewer_email(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = (
             'You have been unassigned as a translation reviewer')
         expected_email_html_body = (
@@ -3281,7 +3214,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
 
     def test_send_removed_voiceover_reviewer_email(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = (
             'You have been unassigned as a voiceover reviewer')
         expected_email_html_body = (
@@ -3330,7 +3262,6 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
 
     def test_send_removed_question_reviewer_email(self):
-        self.email_services_mock.wipe_emails_dict()
         expected_email_subject = (
             'You have been unassigned as a question reviewer')
         expected_email_html_body = (

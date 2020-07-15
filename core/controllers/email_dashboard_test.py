@@ -199,7 +199,6 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.NEW_SUBMITTER_EMAIL)
         self.set_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
-        self.email_services_mock.wipe_emails_dict()
 
     def test_email_dashboard_result_page(self):
         self.login(self.SUBMITTER_EMAIL)

@@ -259,7 +259,6 @@ class TopicEditorTests(
 
     def setUp(self):
         super(TopicEditorTests, self).setUp()
-        self.email_services_mock.wipe_emails_dict()
 
     def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -704,7 +703,6 @@ class TopicPublishSendMailHandlerTests(
 
     def setUp(self):
         super(TopicPublishSendMailHandlerTests, self).setUp()
-        self.email_services_mock.wipe_emails_dict()
 
     def test_send_mail(self):
         with self.swap(

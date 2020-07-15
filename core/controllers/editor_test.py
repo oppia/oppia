@@ -1732,7 +1732,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
-        self.email_services_mock.wipe_emails_dict()
 
     def test_error_cases_for_email_sending(self):
         with self.swap(

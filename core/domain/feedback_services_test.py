@@ -645,7 +645,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.email_services_mock.wipe_emails_dict()
 
     def test_pop_feedback_message_references(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1122,7 +1121,6 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.email_services_mock.wipe_emails_dict()
 
     def test_that_emails_are_sent(self):
         expected_email_html_body = (
@@ -1294,7 +1292,6 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.email_services_mock.wipe_emails_dict()
 
     def test_that_emails_are_sent_for_feedback_message(self):
         expected_email_html_body = (

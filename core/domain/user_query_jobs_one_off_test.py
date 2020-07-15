@@ -147,7 +147,6 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
 
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
-        self.email_services_mock.wipe_emails_dict()
 
     def test_user_has_not_logged_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
