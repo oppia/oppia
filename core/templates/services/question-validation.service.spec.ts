@@ -21,8 +21,6 @@
 /* eslint-disable max-len */
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
@@ -30,7 +28,7 @@ import { StateEditorService } from
 
 import { TestBed } from '@angular/core/testing';
 
-import { QuestionObjectFactory, Question } from
+import { QuestionObjectFactory } from
   'domain/question/QuestionObjectFactory';
 import { QuestionValidationService } from
   'services/question-validation.service';
