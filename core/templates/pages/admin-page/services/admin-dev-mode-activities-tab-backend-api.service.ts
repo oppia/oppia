@@ -30,53 +30,53 @@ export class AdminDevModeActivitiesTabBackendApiService {
   constructor(
     private httpClient: HttpClient
   ) {}
-  private _reloadExploration(explorationId: string): Observable<Object> {
+  private _reloadExploration(explorationId: string): Promise<Object> {
     return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',
       exploration_id: String(explorationId)
-    });
+    }).toPromise();
   }
   private _generateDummyExplorations(
       numDummyExpsToGenerate: number, numDummyExpsToPublish: number):
-    Observable<Object> {
+    Promise<Object> {
     return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_explorations',
       num_dummy_exps_to_generate: numDummyExpsToGenerate,
       num_dummy_exps_to_publish: numDummyExpsToPublish
-    });
+    }).toPromise();
   }
-  private _generateDummyStructures(): Observable<Object> {
+  private _generateDummyStructures(): Promise<Object> {
     return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_structures_data'
-    });
+    }).toPromise();
   }
-  private _generateDummySkillData(): Observable<Object> {
+  private _generateDummySkillData(): Promise<Object> {
     return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_skill_data'
-    });
+    }).toPromise();
   }
-  private _reloadCollection(collectionId: string): Observable<Object> {
+  private _reloadCollection(collectionId: string): Promise<Object> {
     return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
       collection_id: String(collectionId)
-    });
+    }).toPromise();
   }
-  reloadExploration(explorationId: string): Observable<Object> {
+  reloadExploration(explorationId: string): Promise<Object> {
     return this._reloadExploration(explorationId);
   }
   generateDummyExplorations(
       numDummyExpsToGenerate: number, numDummyExpsToPublish: number):
-    Observable<Object> {
+    Promise<Object> {
     return this._generateDummyExplorations(
       numDummyExpsToGenerate, numDummyExpsToPublish);
   }
-  generateDummyStructures(): Observable<Object> {
+  generateDummyStructures(): Promise<Object> {
     return this._generateDummyStructures();
   }
-  generateDummySkillData(): Observable<Object> {
+  generateDummySkillData(): Promise<Object> {
     return this._generateDummySkillData();
   }
-  reloadCollection(collectionId: string): Observable<Object> {
+  reloadCollection(collectionId: string): Promise<Object> {
     return this._reloadCollection(collectionId);
   }
 }

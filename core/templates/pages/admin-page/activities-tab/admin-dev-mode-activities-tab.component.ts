@@ -72,7 +72,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminTaskManagerService.startTask();
     this.adminDevModeActivitiesTabBackendApiService.reloadExploration(
-      explorationId).toPromise().then(() => {
+      explorationId).then(() => {
       this.setStatusMessage('Data reloaded successfully.');
       this.adminTaskManagerService.finishTask();
     }, (errorResponse) => {
@@ -117,7 +117,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       var explorationId = this.demoExplorationIds[i];
 
       this.adminDevModeActivitiesTabBackendApiService.reloadExploration(
-        explorationId).toPromise().then(() => {
+        explorationId).then(() => {
         ++numSucceeded;
         ++numTried;
         printResult();
@@ -140,7 +140,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminDevModeActivitiesTabBackendApiService.generateDummyExplorations(
       this.numDummyExpsToGenerate, this.numDummyExpsToPublish
-    ).toPromise().then(() => {
+    ).then(() => {
       this.setStatusMessage('Dummy explorations generated succesfully.');
     }, (errorResponse) => {
       this.setStatusMessage('Server error: ' + errorResponse.data.error);
@@ -152,7 +152,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage('Processing...');
     this.adminDevModeActivitiesTabBackendApiService.generateDummyStructures(
-    ).toPromise().then(() => {
+    ).then(() => {
       this.setStatusMessage('Dummy new structures data generated successfully');
     }, (errorResponse) => {
       this.setStatusMessage('Server error: ' + errorResponse.data.error);
@@ -165,7 +165,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.setStatusMessage('Processing...');
 
     this.adminDevModeActivitiesTabBackendApiService.generateDummySkillData(
-    ).toPromise().then(() => {
+    ).then(() => {
       this.setStatusMessage(
         'Dummy new skill and questions generated successfully');
     }, (errorResponse) => {
@@ -188,7 +188,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
 
     this.adminDevModeActivitiesTabBackendApiService.reloadCollection(
-      collectionId).toPromise().then(() => {
+      collectionId).then(() => {
       this.setStatusMessage('Data reloaded successfully');
     }, (errorResponse) => {
       this.setStatusMessage('Server error: ' + errorResponse.data.error);
