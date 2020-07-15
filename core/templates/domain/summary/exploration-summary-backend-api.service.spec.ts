@@ -27,7 +27,7 @@ import { ExplorationSummaryBackendApiService } from
 
 
 describe('Exploration Summary Backend Api Service', () => {
-  let explorationSummaryBackendApiService: 
+  let explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
