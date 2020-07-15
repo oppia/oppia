@@ -18,6 +18,7 @@
     "core/templates/domain/skill/skill-mastery-backend-api.service.ts",
     "core/templates/domain/story_viewer/story-viewer-backend-api.service.ts",
     "core/templates/domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts",
+    "core/templates/domain/summary/exploration-summary-backend-api.service.ts",
     "core/templates/domain/topic/topic-creation-backend-api.service.ts",
     "core/templates/domain/topic_viewer/topic-viewer-backend-api.service.ts",
     "core/templates/domain/utilities/FileDownloadRequestObjectFactory.ts",
