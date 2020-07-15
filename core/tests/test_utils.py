@@ -216,8 +216,17 @@ class EmailServicesMock(python_utils.OBJECT):
         """
         bcc = []
         reply_to = ''
+
         if not feconf.CAN_SEND_EMAILS:
             raise Exception('This app cannot send emails.')
+
+        if not email_services.is_email_valid(recipient_email):
+            raise ValueError(
+                'Malformed recipient email address: %s' % recipient_email)
+
+        if not email_services.is_sender_email_valid(sender_email):
+            raise ValueError(
+                'Malformed sender email address: %s' % sender_email)
 
         if bcc_admin:
             bcc = [feconf.ADMIN_EMAIL_ADDRESS]
@@ -255,6 +264,15 @@ class EmailServicesMock(python_utils.OBJECT):
         """
         if not feconf.CAN_SEND_EMAILS:
             raise Exception('This app cannot send emails.')
+
+        for recipient_email in recipient_emails:
+            if not email_services.is_email_valid(recipient_email):
+                raise ValueError(
+                    'Malformed recipient email address: %s' % recipient_email)
+
+        if not email_services.is_sender_email_valid(sender_email):
+            raise ValueError(
+                'Malformed sender email address: %s' % sender_email)
 
         for recipient_email in recipient_emails:
             if recipient_email not in self.emails_dict:

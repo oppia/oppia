@@ -18,15 +18,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import re
 from textwrap import dedent # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import email_domain
 from core.platform import models
 
-from constants import constants
 import feconf
 import python_utils
-import re
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()
@@ -112,6 +112,26 @@ def is_email_valid(email_address):
     return re.search(regex, email_address)
 
 
+def is_sender_email_valid(sender_email):
+    """Gets the sender_email address and validates it is of the form
+    'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
+
+    Args:
+        sender_email: str. The email address of the sender.
+
+    Returns:
+        bool. Whether the sender_email is valid.
+    """
+    sender_email_with_only_first_name_regex = (
+        r'^[a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)>$')
+    sender_email_with_full_name_regex = (
+        r'^[a-zA-Z._]+ [a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}' +
+        r'|[0-9]{1,3})(]?)>$')
+    return is_email_valid(sender_email) or (
+        re.search(sender_email_with_only_first_name_regex, sender_email)) or (
+            re.search(sender_email_with_full_name_regex, sender_email))
+
+
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body,
         html_body, bcc_admin=False, reply_to_id=None):
@@ -142,13 +162,13 @@ def send_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
-    # if not is_email_valid(recipient_email):
-    #     raise ValueError(
-    #         'Malformed recipient email address: %s' % recipient_email)
+    if not is_email_valid(recipient_email):
+        raise ValueError(
+            'Malformed recipient email address: %s' % recipient_email)
 
-    # if not is_email_valid(sender_email):
-    #     raise ValueError(
-    #         'Malformed sender email address: %s' % sender_email)
+    if not is_sender_email_valid(sender_email):
+        raise ValueError(
+            'Malformed sender email address: %s' % sender_email)
 
     bcc = feconf.ADMIN_EMAIL_ADDRESS if (bcc_admin) else ''
     reply_to = (
@@ -213,14 +233,14 @@ def send_bulk_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
-    # for recipient_email in recipient_emails:
-    #     if not is_email_valid(recipient_email):
-    #         raise ValueError(
-    #             'Malformed recipient email address: %s' % recipient_email)
+    for recipient_email in recipient_emails:
+        if not is_email_valid(recipient_email):
+            raise ValueError(
+                'Malformed recipient email address: %s' % recipient_email)
 
-    # if not is_email_valid(sender_email):
-    #     raise ValueError(
-    #         'Malformed sender email address: %s' % sender_email)
+    if not is_sender_email_valid(sender_email):
+        raise ValueError(
+            'Malformed sender email address: %s' % sender_email)
 
     # To send bulk emails we pass list of recipients in 'to' paarameter of
     # post data. Maximum limit of recipients per request is 1000.

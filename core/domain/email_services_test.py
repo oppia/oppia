@@ -20,11 +20,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 from textwrap import dedent # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import email_services
 from core.platform import models
 from core.tests import test_utils
 
-from constants import constants
 import feconf
 import python_utils
 
@@ -204,7 +204,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
         req_post_lambda = (lambda data=None:
                            self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
-            platform_email_services, 'send_email_to_recipients', req_post_lambda)
+            platform_email_services, 'send_email_to_recipients',
+            req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             email_services.send_mail(
@@ -229,7 +230,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
                            self.assertEqual(
                                data['bcc'], feconf.ADMIN_EMAIL_ADDRESS))
         post_request = self.swap(
-            platform_email_services, 'send_email_to_recipients', req_post_lambda)
+            platform_email_services, 'send_email_to_recipients',
+            req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             email_services.send_mail(
@@ -251,7 +253,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'reply+' + python_utils.UNICODE(reply_id) + '@' +
                 feconf.INCOMING_EMAILS_DOMAIN_NAME))
         post_request = self.swap(
-            platform_email_services, 'send_email_to_recipients', req_post_lambda)
+            platform_email_services, 'send_email_to_recipients',
+            req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             email_services.send_mail(
@@ -322,62 +325,63 @@ class EmailServicesTest(test_utils.EmailTestBase):
         req_post_lambda = (lambda data=None:
                            self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
-            platform_email_services, 'send_email_to_recipients', req_post_lambda)
+            platform_email_services, 'send_email_to_recipients',
+            req_post_lambda)
 
         with mailgun_api, mailgun_domain, post_request, allow_emailing:
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
 
-    # def test_email_not_sent_if_email_addresses_are_malformed(self):
-    #     # Tests that email is not sent if recipient email address is malformed.
+    def test_email_not_sent_if_email_addresses_are_malformed(self):
+        # Tests that email is not sent if recipient email address is malformed.
 
-    #     # Case when malformed_recipient_email is None for send_mail.
-    #     malformed_recipient_email = None
-    #     email_exception = self.assertRaisesRegexp(
-    #         ValueError, 'Malformed recipient email address: %s'
-    #         % malformed_recipient_email)
-    #     with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
-    #         email_services.send_mail(
-    #             'sender@example.com', malformed_recipient_email,
-    #             'subject', 'body', 'html')
+        # Case when malformed_recipient_email is None for send_mail.
+        malformed_recipient_email = None
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed recipient email address: %s'
+            % malformed_recipient_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            email_services.send_mail(
+                'sender@example.com', malformed_recipient_email,
+                'subject', 'body', 'html')
 
-    #     # Case when malformed_recipient_email is an empty string for send_mail.
-    #     malformed_recipient_email = ''
-    #     email_exception = self.assertRaisesRegexp(
-    #         ValueError, 'Malformed recipient email address: %s'
-    #         % malformed_recipient_email)
-    #     with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
-    #         email_services.send_mail(
-    #             'sender@example.com', malformed_recipient_email,
-    #             'subject', 'body', 'html')
+        # Case when malformed_recipient_email is an empty string for send_mail.
+        malformed_recipient_email = ''
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed recipient email address: %s'
+            % malformed_recipient_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            email_services.send_mail(
+                'sender@example.com', malformed_recipient_email,
+                'subject', 'body', 'html')
 
-    #     # Case when sender is an malformed for send_mail.
-    #     malformed_sender_email = 'x@x@x'
-    #     email_exception = self.assertRaisesRegexp(
-    #         ValueError, 'Malformed sender email address: %s'
-    #         % malformed_sender_email)
-    #     with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
-    #         email_services.send_mail(
-    #             malformed_sender_email, 'recipient@example.com',
-    #             'subject', 'body', 'html')
+        # Case when sender is an malformed for send_mail.
+        malformed_sender_email = 'x@x@x'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            email_services.send_mail(
+                malformed_sender_email, 'recipient@example.com',
+                'subject', 'body', 'html')
 
-    #     # Case when sender is an malformed for send_bulk_mail.
-    #     malformed_sender_email = 'email'
-    #     email_exception = self.assertRaisesRegexp(
-    #         ValueError, 'Malformed sender email address: %s'
-    #         % malformed_sender_email)
-    #     with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
-    #         email_services.send_bulk_mail(
-    #             malformed_sender_email, ['recipient@example.com'],
-    #             'subject', 'body', 'html')
+        # Case when sender is an malformed for send_bulk_mail.
+        malformed_sender_email = 'email'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            email_services.send_bulk_mail(
+                malformed_sender_email, ['recipient@example.com'],
+                'subject', 'body', 'html')
 
-    #     # Case when sender is an malformed for send_bulk_mail.
-    #     malformed_recipient_emails = ['a@a.com', 'email.com']
-    #     email_exception = self.assertRaisesRegexp(
-    #         ValueError, 'Malformed recipient email address: %s'
-    #         % malformed_recipient_emails[1])
-    #     with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
-    #         email_services.send_bulk_mail(
-    #             'sender@example.com', malformed_recipient_emails,
-    #             'subject', 'body', 'html')
+        # Case when sender is an malformed for send_bulk_mail.
+        malformed_recipient_emails = ['a@a.com', 'email.com']
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed recipient email address: %s'
+            % malformed_recipient_emails[1])
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            email_services.send_bulk_mail(
+                'sender@example.com', malformed_recipient_emails,
+                'subject', 'body', 'html')
