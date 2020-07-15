@@ -264,15 +264,6 @@ class EmailServicesMock(python_utils.OBJECT):
         if not feconf.CAN_SEND_EMAILS:
             raise Exception('This app cannot send emails.')
 
-        # for recipient_email in recipient_emails:
-        #     if not email_services.is_email_valid(recipient_email):
-        #         raise ValueError(
-        #             'Malformed recipient email address: %s' % recipient_email)
-
-        # if not email_services.ss_email_valid(sender_email):
-        #     raise ValueError(
-        #         'Malformed sender email address: %s' % sender_email)
-
         for recipient_email in recipient_emails:
             if recipient_email not in self.emails_dict:
                 self.emails_dict[recipient_email] = []
@@ -283,6 +274,9 @@ class EmailServicesMock(python_utils.OBJECT):
 
     def mock_get_sent_messages(self, to, *_):
         return self.emails_dict[to] if to in self.emails_dict else []
+
+    def mock_get_all_messages(self):
+        return self.emails_dict
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -2207,9 +2201,6 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
-
-        self.testbed.init_mail_stub()
-        self.mail_stub = self.testbed.get_stub(testbed.MAIL_SERVICE_NAME)
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)

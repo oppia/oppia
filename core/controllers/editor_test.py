@@ -27,6 +27,7 @@ import zipfile
 from constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
+from core.domain import email_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -1705,7 +1706,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         self.logout()
 
 
-class ModeratorEmailsTests(test_utils.GenericTestBase):
+class ModeratorEmailsTests(test_utils.EmailTestBase):
     """Integration test for post-moderator action emails."""
 
     EXP_ID = 'eid'
@@ -1731,6 +1732,7 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
         config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
+        self.email_services_mock.wipe_emails_dict()
 
     def test_error_cases_for_email_sending(self):
         with self.swap(
@@ -1786,9 +1788,12 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
 
     def test_email_is_sent_correctly_when_unpublishing(self):
         with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
+            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True), (
+                self.swap(
+                    feconf, 'CAN_SEND_EMAILS', True)), (
+                        self.swap(
+                            email_services, 'send_mail',
+                            self.email_services_mock.mock_send_mail)):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1808,7 +1813,7 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
                 valid_payload, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self.mail_stub.get_sent_messages(
+            messages = self.email_services_mock.mock_get_sent_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1817,7 +1822,7 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
             self.assertFalse(hasattr(messages[0], 'cc'))
-            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(messages[0].bcc, [feconf.ADMIN_EMAIL_ADDRESS])
             self.assertEqual(
                 messages[0].subject,
                 'Your Oppia exploration "My Exploration" has been unpublished')

@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import email_services
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -253,7 +254,12 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicEditorTests(BaseTopicEditorControllerTests):
+class TopicEditorTests(
+        BaseTopicEditorControllerTests, test_utils.EmailTestBase):
+
+    def setUp(self):
+        super(TopicEditorTests, self).setUp()
+        self.email_services_mock.wipe_emails_dict()
 
     def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -312,8 +318,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         # Check that admins can access the editable topic data.
         self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.mail_stub.get_sent_messages(
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
+            messages = self.email_services_mock.mock_get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.get_json(
@@ -324,7 +333,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.mail_stub.get_sent_messages(
+            messages = self.email_services_mock.mock_get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
@@ -434,8 +443,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.mail_stub.get_sent_messages(
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
+            messages = self.email_services_mock.mock_get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.put_json(
@@ -449,7 +461,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.mail_stub.get_sent_messages(
+            messages = self.email_services_mock.mock_get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
@@ -687,26 +699,34 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
+class TopicPublishSendMailHandlerTests(
+        BaseTopicEditorControllerTests, test_utils.EmailTestBase):
+
+    def setUp(self):
+        super(TopicPublishSendMailHandlerTests, self).setUp()
+        self.email_services_mock.wipe_emails_dict()
 
     def test_send_mail(self):
-        self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
-                {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        messages = self.mail_stub.get_sent_messages(
-            to=feconf.ADMIN_EMAIL_ADDRESS)
-        expected_email_html_body = (
-            'wants to publish topic: Topic Name at URL %s, please review'
-            ' and publish if it looks good.'
-            % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
-        self.assertEqual(len(messages), 1)
-        self.assertIn(
-            expected_email_html_body,
-            messages[0].html.decode())
+        with self.swap(
+            email_services, 'send_mail',
+            self.email_services_mock.mock_send_mail):
+            self.login(self.ADMIN_EMAIL)
+            csrf_token = self.get_new_csrf_token()
+            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+                self.put_json(
+                    '%s/%s' % (
+                        feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
+                    {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'wants to publish topic: Topic Name at URL %s, please review'
+                ' and publish if it looks good.'
+                % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):

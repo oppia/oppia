@@ -19,12 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import email_services
 from core.domain import moderator_services
 from core.tests import test_utils
 import feconf
 
 
-class FlagExplorationEmailEnqueueTaskTests(test_utils.GenericTestBase):
+class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
     """Test that flag-exploration-email-tasks works as expected."""
 
     def setUp(self):
@@ -80,14 +81,18 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx:
+        with self.can_send_emails_ctx, (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             moderator_services.enqueue_flag_exploration_email_task(
                 self.exploration.id, self.report_text, self.new_user_id)
 
             self.process_and_flush_pending_tasks()
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),

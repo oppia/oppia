@@ -26,7 +26,6 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
-from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -183,7 +182,11 @@ class TopicPageDataHandlerTests(
 
     def test_get_with_user_logged_in(self):
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
+            self.login(self.NEW_USER_EMAIL)
             with self.swap(feconf, 'CAN_SEND_EMAILS', True):
                 messages = self.email_services_mock.mock_get_sent_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
@@ -196,10 +199,10 @@ class TopicPageDataHandlerTests(
                     'The deleted skills: %s are still'
                     ' present in topic with id %s' % (
                         self.skill_id_1, self.topic_id))
-                # self.assertEqual(len(messages), 1)
-                # self.assertIn(
-                #     expected_email_html_body,
-                #     messages[0].html.decode())
+                self.assertEqual(len(messages), 1)
+                self.assertIn(
+                    expected_email_html_body,
+                    messages[0].html.decode())
                 expected_dict = {
                     'topic_name': 'public_topic_name',
                     'topic_id': self.topic_id,

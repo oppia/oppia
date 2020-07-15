@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import email_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import user_query_jobs_one_off
@@ -35,7 +36,7 @@ import feconf
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class UserQueryJobOneOffTests(test_utils.GenericTestBase):
+class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     EXP_ID_3 = 'exp_id_3'
@@ -146,6 +147,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
+        self.email_services_mock.wipe_emails_dict()
 
     def test_user_has_not_logged_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
@@ -277,91 +279,97 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             sorted(qualifying_user_ids_combined))
 
     def test_that_correct_email_is_sent_upon_completion(self):
-        query_id = user_query_services.save_new_query_model(
-            self.submitter_id, edited_fewer_than_n_exps=1)
+        with self.swap(
+            email_services, 'send_mail',
+            self.email_services_mock.mock_send_mail):
+            query_id = user_query_services.save_new_query_model(
+                self.submitter_id, edited_fewer_than_n_exps=1)
 
-        self._run_one_off_job(query_id)
-        query = user_models.UserQueryModel.get(query_id)
-        self.assertEqual(
-            query.query_status, feconf.USER_QUERY_STATUS_COMPLETED)
+            self._run_one_off_job(query_id)
+            query = user_models.UserQueryModel.get(query_id)
+            self.assertEqual(
+                query.query_status, feconf.USER_QUERY_STATUS_COMPLETED)
 
-        expected_email_html_body = (
-            'Hi submit,<br>'
-            'Your query with id %s has succesfully completed its '
-            'execution. Visit the result page '
-            '<a href="https://www.oppia.org/emaildashboardresult/%s">'
-            'here</a> '
-            'to see result of your query.<br><br>'
-            'Thanks!<br>'
-            '<br>'
-            'Best wishes,<br>'
-            'The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
-        ) % (query_id, query_id)
+            expected_email_html_body = (
+                'Hi submit,<br>'
+                'Your query with id %s has succesfully completed its '
+                'execution. Visit the result page '
+                '<a href="https://www.oppia.org/emaildashboardresult/%s">'
+                'here</a> '
+                'to see result of your query.<br><br>'
+                'Thanks!<br>'
+                '<br>'
+                'Best wishes,<br>'
+                'The Oppia Team<br>'
+                '<br>'
+                'You can change your email preferences via the '
+                '<a href="https://www.example.com">Preferences</a> page.'
+            ) % (query_id, query_id)
 
-        expected_email_text_body = (
-            'Hi submit,\n'
-            'Your query with id %s has succesfully completed its '
-            'execution. Visit the result page here '
-            'to see result of your query.\n\n'
-            'Thanks!\n'
-            '\n'
-            'Best wishes,\n'
-            'The Oppia Team\n'
-            '\n'
-            'You can change your email preferences via the '
-            'Preferences page.'
-        ) % query_id
+            expected_email_text_body = (
+                'Hi submit,\n'
+                'Your query with id %s has succesfully completed its '
+                'execution. Visit the result page here '
+                'to see result of your query.\n\n'
+                'Thanks!\n'
+                '\n'
+                'Best wishes,\n'
+                'The Oppia Team\n'
+                '\n'
+                'You can change your email preferences via the '
+                'Preferences page.'
+            ) % query_id
 
-        messages = self.mail_stub.get_sent_messages(
-            to=self.USER_SUBMITTER_EMAIL)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-        self.assertEqual(
-            messages[0].body.decode(), expected_email_text_body)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_SUBMITTER_EMAIL)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(), expected_email_text_body)
 
     def test_that_correct_email_is_sent_upon_failure(self):
-        query_id = user_query_services.save_new_query_model(
-            self.submitter_id, edited_fewer_than_n_exps=1)
+        with self.swap(
+            email_services, 'send_mail',
+            self.email_services_mock.mock_send_mail):
+            query_id = user_query_services.save_new_query_model(
+                self.submitter_id, edited_fewer_than_n_exps=1)
 
-        self._run_one_off_job_resulting_in_failure(query_id)
-        query = user_models.UserQueryModel.get(query_id)
+            self._run_one_off_job_resulting_in_failure(query_id)
+            query = user_models.UserQueryModel.get(query_id)
 
-        self.assertEqual(
-            query.query_status, feconf.USER_QUERY_STATUS_FAILED)
+            self.assertEqual(
+                query.query_status, feconf.USER_QUERY_STATUS_FAILED)
 
-        expected_email_html_body = (
-            'Hi submit,<br>'
-            'Your query with id %s has failed due to error '
-            'during execution. '
-            'Please check the query parameters and submit query again.<br><br>'
-            'Thanks!<br>'
-            '<br>'
-            'Best wishes,<br>'
-            'The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
-        ) % query_id
+            expected_email_html_body = (
+                'Hi submit,<br>'
+                'Your query with id %s has failed due to error '
+                'during execution. '
+                'Please check the query parameters and submit query again.<br><br>'
+                'Thanks!<br>'
+                '<br>'
+                'Best wishes,<br>'
+                'The Oppia Team<br>'
+                '<br>'
+                'You can change your email preferences via the '
+                '<a href="https://www.example.com">Preferences</a> page.'
+            ) % query_id
 
-        expected_email_text_body = (
-            'Hi submit,\n'
-            'Your query with id %s has failed due to error '
-            'during execution. '
-            'Please check the query parameters and submit query again.\n\n'
-            'Thanks!\n'
-            '\n'
-            'Best wishes,\n'
-            'The Oppia Team\n'
-            '\n'
-            'You can change your email preferences via the Preferences page.'
-        ) % query_id
+            expected_email_text_body = (
+                'Hi submit,\n'
+                'Your query with id %s has failed due to error '
+                'during execution. '
+                'Please check the query parameters and submit query again.\n\n'
+                'Thanks!\n'
+                '\n'
+                'Best wishes,\n'
+                'The Oppia Team\n'
+                '\n'
+                'You can change your email preferences via the Preferences page.'
+            ) % query_id
 
-        messages = self.mail_stub.get_sent_messages(
-            to=self.USER_SUBMITTER_EMAIL)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-        self.assertEqual(
-            messages[0].body.decode(), expected_email_text_body)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_SUBMITTER_EMAIL)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(), expected_email_text_body)

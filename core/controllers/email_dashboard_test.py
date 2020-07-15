@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import email_services
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.platform import models
@@ -161,7 +162,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class EmailDashboardResultTests(test_utils.GenericTestBase):
+class EmailDashboardResultTests(test_utils.EmailTestBase):
     """Tests for email dashboard result handler."""
 
     USER_A_EMAIL = 'a@example.com'
@@ -198,6 +199,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.NEW_SUBMITTER_EMAIL)
         self.set_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
+        self.email_services_mock.wipe_emails_dict()
 
     def test_email_dashboard_result_page(self):
         self.login(self.SUBMITTER_EMAIL)
@@ -530,7 +532,13 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)), (
+                    self.swap(
+                        email_services, 'send_bulk_mail',
+                        self.email_services_mock.mock_send_bulk_emails)):
             self.process_and_flush_pending_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()
@@ -540,7 +548,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 sorted([self.user_a_id, self.user_b_id]))
 
             # Check that query completion email is sent to submitter.
-            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             # Send email from email dashboard result page.
@@ -557,14 +566,16 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.logout()
 
             # Check that emails are sent to qualified users.
-            messages_a = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            messages_a = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 1)
             self.assertEqual(
                 messages_a[0].html.decode(), 'body')
             self.assertEqual(
                 messages_a[0].body.decode(), 'body')
 
-            messages_b = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
+            messages_b = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 1)
             self.assertEqual(
                 messages_b[0].html.decode(), 'body')
@@ -697,7 +708,13 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
         query_models = user_models.UserQueryModel.query().fetch()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)), (
+                    self.swap(
+                        email_services, 'send_bulk_mail',
+                        self.email_services_mock.mock_send_bulk_emails)):
             self.process_and_flush_pending_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()
@@ -719,11 +736,15 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             # Check that emails are sent to max n qualified users.
             # One email is sent to submitter for query completion and second
             # is sent to one of the 2 qualified users.
-            messages = self.mail_stub.get_sent_messages()
-            self.assertEqual(len(messages), 2)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, self.SUBMITTER_EMAIL)
-            self.assertIn(
-                messages[1].to, [self.USER_A_EMAIL, self.USER_B_EMAIL])
+            messages_a = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_A_EMAIL)
+            messages_b = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_B_EMAIL)
+            self.assertTrue((len(messages_a) == 1) or (len(messages_b) == 1))
 
     def test_that_no_emails_are_sent_if_query_is_canceled(self):
         self.login(self.SUBMITTER_EMAIL)
@@ -742,7 +763,10 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
         query_models = user_models.UserQueryModel.query().fetch()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             self.process_and_flush_pending_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()
@@ -757,9 +781,11 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.logout()
 
             # Check that no email is sent to qualified users.
-            messages_a = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            messages_a = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 0)
-            messages_b = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
+            messages_b = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 0)
 
     def test_that_test_email_for_bulk_emails_is_sent(self):
@@ -779,7 +805,10 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
         query_models = user_models.UserQueryModel.query().fetch()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             self.process_and_flush_pending_tasks()
 
             email_subject = 'email_subject'
@@ -801,7 +830,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 '[This is a test email.]<br><br> %s' % email_body)
             test_email_text_body = '[This is a test email.]\n\n %s' % email_body
 
-            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
             self.assertEqual(
                 messages[1].html.decode(), test_email_html_body)
@@ -840,7 +870,10 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
         query_models = user_models.UserQueryModel.query().fetch()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
+            self.swap(
+                email_services, 'send_mail',
+                self.email_services_mock.mock_send_mail)):
             self.process_and_flush_pending_tasks()
 
             self.login(self.SUBMITTER_EMAIL)
@@ -854,7 +887,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Check that test email is sent to submitter of query.
             # One email is sent when query is completed and other is test email.
-            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            messages = self.email_services_mock.mock_get_sent_messages(
+                to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
 
             # Check that no emails are sent to query recipients.
@@ -865,7 +899,9 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 sorted(query_model.user_ids),
                 sorted([self.user_a_id, self.user_b_id]))
             # Check that no emails are sent to user A or user B.
-            messages_a = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            messages_a = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 0)
-            messages_b = self.mail_stub.get_sent_messages(to=self.USER_B_EMAIL)
+            messages_b = self.email_services_mock.mock_get_sent_messages(
+                to=self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 0)
