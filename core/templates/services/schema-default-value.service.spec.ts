@@ -138,6 +138,16 @@ describe('Schema Default Value Service', () => {
     ).toEqual(new SubtitledUnicode('', ''));
   });
 
+  it('should get default value if schema type is custom', () => {
+    let schema = {
+      type: 'custom',
+      obj_type: 'CodeString'
+    };
+    expect(
+      sdvs.getDefaultValue(schema)
+    ).toEqual('');
+  });
+
   it('should not get default value if schema type is invalid', () => {
     var loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
     const schema = {
