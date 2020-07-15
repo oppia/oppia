@@ -26,7 +26,10 @@ import { ExtensionTagAssemblerService } from
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IInteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 
 // A service that provides a number of utility functions useful to both the
@@ -40,6 +43,39 @@ export class ExplorationHtmlFormatterService {
       private extensionTagAssembler: ExtensionTagAssemblerService,
       private htmlEscaper: HtmlEscaperService
   ) {}
+
+  unwrapInteractionCustArgsContent(caValues: IInteractionCustomizationArgs) {
+    if (!caValues) {
+      return {};
+    }
+
+    const unwrapContent = (
+        value: Array<Object> | Object
+    ) => {
+      if (value instanceof SubtitledUnicode) {
+        value = value.getUnicode();
+      } else if (value instanceof SubtitledHtml) {
+        value = value.getHtml();
+      } else if (value instanceof Array) {
+        for (let i = 0; i < value.length; i++) {
+          value[i] = unwrapContent(value[i]);
+        }
+      } else if (value instanceof Object) {
+        Object.keys(value).forEach(key => {
+          value[key] = unwrapContent(value[key]);
+        });
+      }
+
+      return value;
+    };
+
+    let unwrappedCaValues = {};
+    Object.keys(caValues).forEach(key => {
+      unwrappedCaValues[key] = (
+        unwrapContent(caValues[key]));
+    });
+    return unwrappedCaValues;
+  }
 
   /**
    * @param {string} interactionId - The interaction id.
@@ -64,7 +100,7 @@ export class ExplorationHtmlFormatterService {
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     const ca = angular.copy(interactionCustomizationArgs);
-    Interaction.unwrapCustomizationArgsContent(interactionId, ca);
+    this.unwrapInteractionCustArgsContent(ca);
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(element, ca));
@@ -83,8 +119,7 @@ export class ExplorationHtmlFormatterService {
     var interactionChoices = null;
 
     interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
-    Interaction.unwrapCustomizationArgsContent(
-      interactionId, interactionCustomizationArgs);
+    this.unwrapInteractionCustArgsContent(interactionCustomizationArgs);
 
     if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value;
@@ -108,8 +143,7 @@ export class ExplorationHtmlFormatterService {
     var interactionChoices = null;
 
     interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
-    Interaction.unwrapCustomizationArgsContent(
-      interactionId, interactionCustomizationArgs);
+    this.unwrapInteractionCustArgsContent(interactionCustomizationArgs);
 
     if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value;

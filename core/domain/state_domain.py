@@ -2348,26 +2348,14 @@ class State(python_utils.OBJECT):
             interaction_id: str. The new interaction id to set.
         """
         old_content_id_list = []
-        new_content_id_list = []
 
         if self.interaction.id:
             old_content_id_list.extend(
                 self.interaction.get_all_content_ids_in_cust_args())
         self.interaction.id = interaction_id
 
-        if interaction_id:
-            interaction = interaction_registry.Registry.get_interaction_by_id(
-                interaction_id)
-            self.interaction.customization_args = (
-                customization_args_util.get_full_customization_args(
-                    {}, interaction.customization_arg_specs)
-            )
-            new_content_id_list.extend(
-                self.interaction.get_all_content_ids_in_cust_args())
-
-
         self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
+            old_content_id_list, [])
 
         # TODO(sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
@@ -2401,7 +2389,7 @@ class State(python_utils.OBJECT):
             self.interaction.customization_args = customization_args
             new_content_id_list.extend(
                 self.interaction.get_all_content_ids_in_cust_args())
-
+            print(old_content_id_list, new_content_id_list)
             self._update_content_ids_in_assets(
                 old_content_id_list, new_content_id_list)
         else:

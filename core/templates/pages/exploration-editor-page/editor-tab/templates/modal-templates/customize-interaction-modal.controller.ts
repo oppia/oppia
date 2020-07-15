@@ -130,7 +130,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
 
       const defaultCustomizationArgs = (
-        InteractionObjectFactory.fromBackendDict(
+        InteractionObjectFactory.convertCustomizationArgsBackendDict(
           StateInteractionIdService.displayed,
           customizationArgsBackendDict
         )
@@ -198,7 +198,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         });
 
         StateCustomizationArgsService.displayed = (
-          InteractionObjectFactory.fromBackendDict(
+          InteractionObjectFactory.convertCustomizationArgsBackendDict(
             newInteractionId,
             customizationArgsBackendDict
           )
@@ -286,7 +286,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             assignContentIdsToEmptyContent(
               value[i],
               schema.items,
-              `${contentId}_i${i}`);
+              `${contentId}`);
           }
         } else if (schemaType === 'dict') {
           schema.properties.forEach(property => {

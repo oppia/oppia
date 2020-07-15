@@ -69,7 +69,7 @@ export interface CustomizationArgsSchema {
   }[]
 }
 
-const applyConversionFnOnCustArgsContent = function<T, S>(
+const applyConversionFnOnInteractionCustArgsContent = function<T, S>(
     value: any,
     schema: CustomizationArgsSchema,
     conversionFn: InteractionCustArgsConversionFn<T, S>
@@ -82,7 +82,7 @@ const applyConversionFnOnCustArgsContent = function<T, S>(
     value = conversionFn(value, schemaObjType);
   } else if (schemaType === 'list') {
     for (let i = 0; i < value.length; i++) {
-      value[i] = applyConversionFnOnCustArgsContent<T, S>(
+      value[i] = applyConversionFnOnInteractionCustArgsContent<T, S>(
         value[i],
         schema.items,
         conversionFn);
@@ -90,7 +90,7 @@ const applyConversionFnOnCustArgsContent = function<T, S>(
   } else if (schemaType === 'dict') {
     schema.properties.forEach(property => {
       const name = property.name;
-      value[name] = applyConversionFnOnCustArgsContent<T, S>(
+      value[name] = applyConversionFnOnInteractionCustArgsContent<T, S>(
         value[name],
         property.schema,
         conversionFn);
@@ -100,7 +100,7 @@ const applyConversionFnOnCustArgsContent = function<T, S>(
   return value;
 };
 
-const convertCustomizationArgsContent = function<T, S>(
+const convertInteractionCustArgsContent = function<T, S>(
     interactionId: string,
     caValues: IInteractionCustomizationArgsBackendDict |
       IInteractionCustomizationArgs,
@@ -115,7 +115,7 @@ const convertCustomizationArgsContent = function<T, S>(
   for (let caSpec of caSpecs) {
     const name = caSpec.name;
     if (name in caValues) {
-      caValues[name].value = applyConversionFnOnCustArgsContent(
+      caValues[name].value = applyConversionFnOnInteractionCustArgsContent(
         caValues[name].value, caSpec.schema, conversionFn);
     }
   }
@@ -214,8 +214,10 @@ export class Interaction {
         return answerGroup.toBackendDict();
       }),
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
-      customization_args: Interaction.convertCustomizationArgsToBackendDict(
-        this.customizationArgs),
+      customization_args: (
+        Interaction.convertCustomizationArgsToBackendDict(
+          this.customizationArgs)
+      ),
       default_outcome:
         this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
       hints: this.hints.map(function(hint) {
@@ -224,26 +226,6 @@ export class Interaction {
       id: this.id,
       solution: this.solution ? this.solution.toBackendDict() : null
     };
-  }
-
-  static unwrapCustomizationArgsContent(
-      interactionId: string,
-      caValues: IInteractionCustomizationArgs
-  ) {
-    const unwrapSubtitled:
-      InteractionCustArgsConversionFn<Subtitled, string> = (
-          caValue,
-          schemaObjType
-      ) => {
-        if (schemaObjType === 'SubtitledHtml') {
-          return (<SubtitledHtml>caValue).getHtml();
-        } else if (schemaObjType === 'SubtitledUnicode') {
-          return (<SubtitledUnicode>caValue).getUnicode();
-        }
-
-        return '';
-      };
-    convertCustomizationArgsContent(interactionId, caValues, unwrapSubtitled);
   }
 }
 
@@ -283,7 +265,7 @@ export class InteractionObjectFactory {
         }
       };
 
-    convertCustomizationArgsContent(
+    convertInteractionCustArgsContent(
       interactionId, caValues, convertToSubtitled);
     return <IInteractionCustomizationArgs> caValues;
   }
@@ -330,5 +312,5 @@ export class InteractionObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'InteractionObjectFactory', downgradeInjectable(
-    InteractionObjectFactory));
+  'InteractionObjectFactory',
+  downgradeInjectable(InteractionObjectFactory));
