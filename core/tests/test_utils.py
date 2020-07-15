@@ -2417,6 +2417,7 @@ class GenericEmailTestBase(GenericTestBase):
 
 EmailTestBase = GenericEmailTestBase
 
+
 class MockLoggingHandler(python_utils.OBJECT):
     """Mock logging handler to check for expected logs.
 
@@ -2429,28 +2430,30 @@ class MockLoggingHandler(python_utils.OBJECT):
                          'critical': []}
 
     def info(self, message):
-        """ Mocks logging.info(message)."""
+        """Mocks logging.info(message)."""
         self.messages['info'].append(message)
 
     def debug(self, message):
-        """ Mocks logging.debug(message)."""
+        """Mocks logging.debug(message)."""
         self.messages['debug'].append(message)
 
     def warning(self, message):
-        """ Mocks logging.warning(message)."""
+        """Mocks logging.warning(message)."""
         self.messages['warning'].append(message)
 
     def error(self, message):
-        """ Mocks logging.error(message)."""
+        """Mocks logging.error(message)."""
         self.messages['error'].append(message)
 
     def critical(self, message):
-        """ Mocks logging.critical(message)."""
+        """Mocks logging.critical(message)."""
         self.messages['critical'].append(message)
 
     def reset(self):
+        """Resets the messages that were logged for the next test."""
         self.messages = {'debug': [], 'info': [], 'warning': [], 'error': [],
                          'critical': []}
+
 
 class FunctionWrapper(python_utils.OBJECT):
     """A utility for making function wrappers. Create a subclass and override
