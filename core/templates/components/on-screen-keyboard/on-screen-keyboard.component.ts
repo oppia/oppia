@@ -17,20 +17,20 @@
  * interactions.
  */
 
-// import { Component, OnInit } from '@angular/core';
+ // This doesn't work
+import { Component, OnInit } from '@angular/core';
+@Component({
+  selector: 'on-screen-keyboard',
+  templateUrl: './on-screen-keyboard.component.html',
+  styleUrls: []
+})
+export class OnScreenKeyboard implements OnInit {
+  constructor() {}
 
-// @Component({
-//   selector: 'on-screen-keyboard',
-//   templateUrl: './on-screen-keyboard.component.html',
-//   styleUrls: []
-// })
-// export class OnScreenKeyboard implements OnInit {
-//   constructor() {}
+  ngOnInit(): void {}
+}
 
-//   ngOnInit(): void {}
-// }
-
-
+// This works:
 angular.module('oppia').component('onScreenKeyboard', {
   template: require('./on-screen-keyboard.component.html'),
   controller: ['$scope',
