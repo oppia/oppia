@@ -45,6 +45,7 @@
       "units": []
     },
     "AlgebraicExpression": "x",
+    "NumericExpression": "1",
     "AlgebraicIdentifier": "x",
     "MathEquation": "x=y",
     "PositionOfTerms": "both"

@@ -282,6 +282,10 @@ export interface IMathExpressionCustomizationArgsBackendDict { }
 export interface IMathExpressionCustomizationArgs extends
   IMathExpressionCustomizationArgsBackendDict { }
 
+export interface INumericExpressionInputCustomizationArgsBackendDict { }
+export interface INumericExpressionInputCustomizationArgs extends
+  INumericExpressionInputCustomizationArgsBackendDict { }
+
 export interface INumericInputCustomizationArgsBackendDict { }
 export interface INumericInputCustomizationArgs extends
   INumericInputCustomizationArgsBackendDict { }
@@ -310,6 +314,7 @@ export type IInteractionCustomizationArgsBackendDict = (
   ISetInputCustomizationArgsBackendDict |
   ITextInputCustomizationArgsBackendDict |
   IMathExpressionCustomizationArgsBackendDict |
+  INumericExpressionInputCustomizationArgsBackendDict |
   INumericInputCustomizationArgsBackendDict |
   INumberWithUnitsCustomizationArgsBackendDict);
 
@@ -330,6 +335,7 @@ export type IInteractionCustomizationArgs = (
   IMultipleChoiceInputCustomizationArgs |
   IMusicNotesInputCustomizationArgs |
   INumberWithUnitsCustomizationArgs |
+  INumericExpressionInputCustomizationArgs |
   INumericInputCustomizationArgs |
   IPencilCodeCustomizationArgs |
   ISetInputCustomizationArgs |
