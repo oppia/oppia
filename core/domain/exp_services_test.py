@@ -1833,7 +1833,7 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
-                }), 
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name':
@@ -1987,8 +1987,7 @@ title: A title
                 },
                 'rows': {'value': 1}
             }
-        }),
-        exp_domain.ExplorationChange({
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name':
                 exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
@@ -2254,8 +2253,7 @@ written_translations:
                 },
                 'rows': {'value': 1}
             }
-        }),
-        exp_domain.ExplorationChange({
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name':
                 exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
