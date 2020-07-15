@@ -252,7 +252,7 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     # exploration. The field will be true only if for each math rich-text
     # components there is a valid image stored in the datastore.
     math_images_generation_required = ndb.BooleanProperty(
-        indexed=True, default=False)
+        indexed=True, default=True)
     # Approximate maximum size of Math rich-text components SVG images that
     # would be generated for the exploration according to the length of
     # raw_latex value.

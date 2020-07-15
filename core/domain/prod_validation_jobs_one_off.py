@@ -35,6 +35,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import html_validation_service
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -45,6 +46,7 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -3013,10 +3015,84 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'exp_ids': (
-                exp_models.ExplorationModel, [item.id])
-        }
+        return [
+            ExternalModelFetcherDetails(
+                'exp_ids', exp_models.ExplorationModel, [item.id])]
+
+    @classmethod
+    def _validate_latex_values(
+            cls, item, field_name_to_external_model_references):
+        """Validate that question_content model is equal to
+        QuestionModel.question_state_data.content.html.
+
+        Args:
+            item: ndb.Model. QuestionSummaryModel to validate.
+            field_name_to_external_model_references:
+                dict(str, (list(ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exploration_model_references = (
+            field_name_to_external_model_references['exp_ids'])
+
+        for exploration_model_reference in exploration_model_references:
+            exploration_model = exploration_model_reference.model_instance
+            list_of_latex_values = []
+            size_of_math_svg = 0
+            html_string_in_exploration = ''
+            for state in exploration_model.states.values():
+                state_object = state_domain.State.from_dict(state)
+                html_string = (
+                    ''.join(state_object.get_all_html_content_strings()))
+                html_string_in_exploration = (
+                    html_string_in_exploration + html_string)
+                (
+                    size_of_math_svg_in_state, _,
+                    list_of_latex_values_in_state) = (
+                        html_validation_service.
+                        extract_math_rich_text_related_information_from_html(
+                            html_string))
+                list_of_latex_values.extend(list_of_latex_values_in_state)
+
+                size_of_math_svg = size_of_math_svg + size_of_math_svg_in_state
+
+            unique_latex_values = list(set(list_of_latex_values))
+            if unique_latex_values != item.latex_values:
+                cls._add_error(
+                    'latex values check',
+                    'Entity id %s: Latex values in the model does not match '
+                    'latex values in the exploration model' % (
+                        item.id))
+            if size_of_math_svg != item.estimated_max_size_of_images_in_bytes:
+                cls._add_error(
+                    'svg size check',
+                    'Entity id %s: estimated svg size in the model does not'
+                    ' match estimated svg size in the exploration model' % (
+                        item.id))
+            if not item.math_images_generation_required:
+                error_list = (
+                    html_validation_service.
+                    validate_svg_image_filenames_in_math_rte_components(
+                        html_string_in_exploration,
+                        feconf.ENTITY_TYPE_EXPLORATION, exploration_model.id))
+                if len(error_list) > 0:
+                    cls._add_error(
+                        'image generation requirement check',
+                        'Entity id %s: status of image generation does not'
+                        ' match the image generation requirement for the'
+                        ' exploration model' % (
+                            item.id))
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_latex_values]
 
 
 class QuestionSkillLinkModelValidator(BaseModelValidator):

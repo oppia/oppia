@@ -1738,6 +1738,57 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             extract_math_rich_text_related_information_from_html(
                 html_string_with_no_math), (0, '', []))
 
+    def test_validate_svg_image_filenames_in_math_rte_components(self):
+        """Test that the validate_svg_image_filenames_in_math_rte_components
+        method checks all the filenames in the math-tag to have images saved in
+        gcs.
+        """
+        html_string_with_filename_having_image_saved = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img.png&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1'))
+        fs.commit('image/img.png', raw_image, mimetype='image/png')
+        self.assertEqual(
+            len(
+                html_validation_service.
+                validate_svg_image_filenames_in_math_rte_components(
+                    html_string_with_filename_having_image_saved,
+                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1')), 0)
+
+        html_string_with_filename_having_no_image_saved = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';invalid.png&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        self.assertEqual(
+            len(
+                html_validation_service.
+                validate_svg_image_filenames_in_math_rte_components(
+                    html_string_with_filename_having_no_image_saved,
+                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1')), 1)
+        html_string_with_no_filename = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        self.assertEqual(
+            len(
+                html_validation_service.
+                validate_svg_image_filenames_in_math_rte_components(
+                    html_string_with_no_filename,
+                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1')), 1)
+
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for
          math-tags in an HTML string and returns a boolean.

@@ -6054,16 +6054,39 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         ) for i in python_utils.RANGE(3)]
 
         for exp in explorations:
+            exp.add_states(['FirstState'])
+            exploration_state = exp.states['FirstState']
+            valid_html_content = (
+                '<oppia-noninteractive-math math_content-with-value="{&amp;'
+                'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+                'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+                '-noninteractive-math>'
+            )
+            content_dict = {
+                'content_id': 'content',
+                'html': valid_html_content
+            }
+            exploration_state.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
             exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance_0 = (
-            exp_models.ExplorationMathRichTextInfoModel(id='0'))
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='0',
+                latex_values=['+,+,+,+'],
+                estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_0.put()
         self.model_instance_1 = (
-            exp_models.ExplorationMathRichTextInfoModel(id='1'))
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='1',
+                latex_values=['+,+,+,+'],
+                estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_1.put()
         self.model_instance_2 = (
-            exp_models.ExplorationMathRichTextInfoModel(id='2'))
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='2',
+                latex_values=['+,+,+,+'],
+                estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_2.put()
 
         self.job_class = (
@@ -6074,6 +6097,53 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         expected_output = [
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
         run_job_and_check_output(self, expected_output)
+
+
+    def test_model_with_latex_values_not_matching_exploration(self):
+        self.model_instance_2 = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='2',
+                latex_values=['+,+,+,+', 'x^2'],
+                estimated_max_size_of_images_in_bytes=7000))
+        self.model_instance_2.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for latex values check of Explo'
+                'rationMathRichTextInfoModel\', '
+                '[u\'Entity id %s: Latex values in the model does not match '
+                'latex values in the exploration model\']]') % (
+                    self.model_instance_2.id,
+                ),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_estimated_svg_size_not_matching_exploration(self):
+        self.model_instance_2.estimated_max_size_of_images_in_bytes = (
+            8000)
+        self.model_instance_2.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for svg size check of '
+                'ExplorationMathRichTextInfoModel\', '
+                '[u\'Entity id %s: estimated svg size in the model does not '
+                'match estimated svg size in the exploration model\']]') % (
+                    self.model_instance_2.id,
+                ),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_wrong_status_of_image_generation_requirement(self):
+        self.model_instance_2.math_images_generation_required = False
+        self.model_instance_2.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for image generation requirement'
+                ' check of ExplorationMathRichTextInfoModel\', '
+                '[u\'Entity id %s: status of image generation does not match '
+                'the image generation requirement for the exploration'
+                ' model\']]') % (self.model_instance_2.id),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (

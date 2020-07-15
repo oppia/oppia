@@ -972,6 +972,40 @@ def extract_math_rich_text_related_information_from_html(html_string):
     return (size_in_bytes, largest_math_expression, unique_latex_values)
 
 
+def validate_svg_image_filenames_in_math_rte_components(
+        html_string, entity_type, entity_id):
+    """Validates whether all the svg_filenames in a math rich-text component
+    have a corresponding image saved in the gcs.
+
+    Args:
+        html_string: str. The HTML string.
+        entity_type: str. The type of the entity.
+        entity_id: str. The id of the entity.
+
+    Returns:
+        list(str). A list of math tags failing the validation in the HTML
+        string.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    error_list = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        svg_filename = math_content_dict['svg_filename']
+        normalized_svg_filename = (
+            objects.UnicodeString.normalize(svg_filename))
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            entity_type, entity_id))
+        filepath = 'image/%s' % normalized_svg_filename
+        if not fs.isfile(filepath):
+            error_list.append(math_tag)
+    return error_list
+
+
 def add_math_content_to_math_rte_components(html_string):
     """Replaces the attribute raw_latex-with-value in all Math component tags
     with a new attribute math_content-with-value. The new attribute has an
