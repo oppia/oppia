@@ -128,23 +128,6 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
   });
 
-  it('should move published skill to skills section and delete it',
-    async function() {
-      await topicsAndSkillsDashboardPage
-        .createSkillWithDescriptionAndExplanation(
-          'Skill 2', 'Concept card explanation', true);
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
-      await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
-
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-      await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
-    });
-
   it('should move skill to a topic', async function() {
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
