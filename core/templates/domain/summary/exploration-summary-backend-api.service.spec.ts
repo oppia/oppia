@@ -27,7 +27,8 @@ import { ExplorationSummaryBackendApiService } from
 
 
 describe('Exploration Summary Backend Api Service', () => {
-  let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService = null;
+  let explorationSummaryBackendApiService: 
+    ExplorationSummaryBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
   let alertsService: AlertsService = null;
@@ -125,7 +126,7 @@ describe('Exploration Summary Backend Api Service', () => {
       explorationSummaryBackendApiService
         .loadPublicAndPrivateExplorationSummaries(explorationIds).then(
           successHandler, failHandler);
-      
+
       const req = httpTestingController.expectOne(requestUrl);
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResults);
