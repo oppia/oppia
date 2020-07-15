@@ -34,9 +34,7 @@ interface CkeditorCustomScope extends ng.IScope {
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
-  'ENABLE_SVG_EDITOR_RTE',
-  function(CkEditorCopyContentService, ContextService, RteHelperService,
-      ENABLE_SVG_EDITOR_RTE) {
+  function(CkEditorCopyContentService, ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {
@@ -55,13 +53,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          // TODO(#9358): Remove the if condition once the svgdiagram is
-          // available for the users.
-          if (componentDefn.id === 'svgdiagram') {
-            if (!ENABLE_SVG_EDITOR_RTE) {
-              return;
-            }
-          }
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||

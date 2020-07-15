@@ -36,8 +36,9 @@ describe('Topic editor tab directive', function() {
   var ctrl = null;
   var $rootScope = null;
   var topic = null;
-  var subtopic1 = null;
-  var subtopic2 = null;
+  var skillSummary = null;
+  var story1 = null;
+  var story2 = null;
   var ContextService = null;
   var ImageUploadHelperService = null;
   var directive = null;
@@ -45,6 +46,7 @@ describe('Topic editor tab directive', function() {
   var TopicObjectFactory = null;
   var SkillCreationService = null;
   var EntityCreationService = null;
+  var SkillSummaryObjectFactory = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
   var StoryReferenceObjectFactory = null;
@@ -77,6 +79,7 @@ describe('Topic editor tab directive', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
+    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
     EntityCreationService = $injector.get('EntityCreationService');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
@@ -95,9 +98,12 @@ describe('Topic editor tab directive', function() {
       EntityCreationService: EntityCreationService
     });
     topic = TopicObjectFactory.createInterstitialTopic();
-    subtopic1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
-    subtopic2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
-    topic._canonicalStoryReferences = [subtopic1, subtopic2];
+    skillSummary = SkillSummaryObjectFactory.create(
+      'skill_1', 'Description 1');
+    topic._uncategorizedSkillSummaries = [skillSummary];
+    story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
+    story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    topic._canonicalStoryReferences = [story1, story2];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl.$onInit();
   }));
@@ -107,7 +113,6 @@ describe('Topic editor tab directive', function() {
     expect($scope.allowedBgColors).toEqual(['#C6DCDA']);
     expect($scope.topicDescriptionChanged).toEqual(false);
     expect($scope.subtopicsListIsShown).toEqual(true);
-    expect($scope.skillsListIsShown).toEqual(true);
     expect($scope.storiesListIsShown).toEqual(true);
     expect($scope.SUBTOPIC_LIST).toEqual('subtopic');
     expect($scope.SKILL_LIST).toEqual('skill');
@@ -118,6 +123,57 @@ describe('Topic editor tab directive', function() {
     var skillSpy = spyOn(EntityCreationService, 'createSkill');
     $scope.createSkill();
     expect(skillSpy).toHaveBeenCalled();
+  });
+
+  it('should toggle the subtopic card', function() {
+    var index = 1;
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(undefined);
+    $scope.toggleSubtopicCard(index);
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(true);
+    $scope.toggleSubtopicCard(index);
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(false);
+    $scope.toggleSubtopicCard(index);
+    expect($scope.subtopicCardSelectedIndexes[index]).toEqual(true);
+  });
+
+  it('should open the reassign modal', function() {
+    var uibModalSpy = spyOn($uibModalInstance, 'open').and.returnValue({
+      result: Promise.resolve()
+    });
+    $scope.reassignSkillsInSubtopics();
+    expect(uibModalSpy).toHaveBeenCalled();
+  });
+
+  it('should call the TopicUpdateService if skill is removed from subtopic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      $scope.removeSkillFromSubtopic(0, null);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if skill is removed from topic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      $scope.removeSkillFromTopic(0, skillSummary);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should show subtopic edit options', function() {
+    $scope.showSubtopicEditOptions(1);
+    expect($scope.subtopicEditOptionsAreShown).toEqual(1);
+    $scope.showSubtopicEditOptions(2);
+    expect($scope.subtopicEditOptionsAreShown).toEqual(2);
+    $scope.showSubtopicEditOptions(1);
+    expect($scope.subtopicEditOptionsAreShown).toEqual(1);
+  });
+
+  it('should show skill edit options', function() {
+    $scope.showSkillEditOptions(0, 1);
+    expect($scope.selectedSkillEditOptionsIndex[0][1]).toEqual(true);
+    $scope.showSkillEditOptions(0, 1);
+    expect($scope.selectedSkillEditOptionsIndex).toEqual({});
   });
 
   it('should open save changes warning modal before creating skill',
@@ -276,33 +332,20 @@ describe('Topic editor tab directive', function() {
     expect($scope.getPreviewFooter()).toEqual('2 Stories');
     topic._canonicalStoryReferences = [];
     expect($scope.getPreviewFooter()).toEqual('0 Stories');
-    topic._canonicalStoryReferences = [subtopic1];
+    topic._canonicalStoryReferences = [story1];
     expect($scope.getPreviewFooter()).toEqual('1 Story');
   });
 
   it('should toggle preview of entity lists', function() {
     expect($scope.subtopicsListIsShown).toEqual(true);
-    expect($scope.skillsListIsShown).toEqual(true);
     expect($scope.storiesListIsShown).toEqual(true);
 
     $scope.togglePreviewListCards('subtopic');
     expect($scope.subtopicsListIsShown).toEqual(false);
-    expect($scope.skillsListIsShown).toEqual(true);
-    expect($scope.storiesListIsShown).toEqual(true);
-
-    $scope.togglePreviewListCards('skill');
-    expect($scope.subtopicsListIsShown).toEqual(false);
-    expect($scope.skillsListIsShown).toEqual(false);
     expect($scope.storiesListIsShown).toEqual(true);
 
     $scope.togglePreviewListCards('story');
     expect($scope.subtopicsListIsShown).toEqual(false);
-    expect($scope.skillsListIsShown).toEqual(false);
-    expect($scope.storiesListIsShown).toEqual(false);
-
-    $scope.togglePreviewListCards('skill');
-    expect($scope.subtopicsListIsShown).toEqual(false);
-    expect($scope.skillsListIsShown).toEqual(true);
     expect($scope.storiesListIsShown).toEqual(false);
   });
 });
