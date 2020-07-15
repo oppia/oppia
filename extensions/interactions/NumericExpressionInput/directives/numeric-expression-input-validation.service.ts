@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Validator service for the AlgebraicExpressionInput interaction.
+ * @fileoverview Validator service for the NumericExpressionInput interaction.
  */
 
 import { Injectable } from '@angular/core';
@@ -23,10 +23,10 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IAlgebraicExpressionInputCustomizationArgs } from
+import { INumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { AlgebraicExpressionInputRulesService } from
-  './algebraic-expression-input-rules.service';
+import { NumericExpressionInputRulesService } from
+  './numeric-expression-input-rules.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
@@ -34,18 +34,18 @@ import { AppConstants } from 'app.constants';
 @Injectable({
   providedIn: 'root'
 })
-export class AlgebraicExpressionInputValidationService {
+export class NumericExpressionInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
+      customizationArgs: INumericExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     let warningsList = [];
     let algebraicRulesService = (
-      new AlgebraicExpressionInputRulesService());
+      new NumericExpressionInputRulesService());
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
@@ -105,5 +105,5 @@ export class AlgebraicExpressionInputValidationService {
 }
 
 angular.module('oppia').factory(
-  'AlgebraicExpressionInputValidationService',
-  downgradeInjectable(AlgebraicExpressionInputValidationService));
+  'NumericExpressionInputValidationService',
+  downgradeInjectable(NumericExpressionInputValidationService));
