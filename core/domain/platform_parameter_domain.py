@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import change_domain
+
 
 class PlatformParameterChange(change_domain.BaseChange):
     """Domain object for changes made to a platform parameter object.
