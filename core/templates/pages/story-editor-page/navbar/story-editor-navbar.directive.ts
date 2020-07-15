@@ -20,7 +20,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require('domain/editor/undo_redo/base-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');

@@ -354,8 +354,9 @@ angular.module('oppia').directive('conversationSkin', [
         'ExplorationRecommendationsService',
         'FatigueDetectionService', 'FocusManagerService',
         'GuestCollectionProgressService', 'HintsAndSolutionManagerService',
-        'ImagePreloaderService', 'LearnerAnswerInfoService', 'LoaderService',
-        'LearnerParamsService', 'LearnerViewRatingService', 'MessengerService',
+        'ImagePreloaderService', 'I18nLanguageCodeService',
+        'LearnerAnswerInfoService', 'LoaderService', 'LearnerParamsService',
+        'LearnerViewRatingService', 'MessengerService',
         'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
         'PlayerPositionService', 'PlayerTranscriptService',
         'QuestionPlayerEngineService', 'QuestionPlayerStateService',
@@ -385,8 +386,9 @@ angular.module('oppia').directive('conversationSkin', [
             ExplorationRecommendationsService,
             FatigueDetectionService, FocusManagerService,
             GuestCollectionProgressService, HintsAndSolutionManagerService,
-            ImagePreloaderService, LearnerAnswerInfoService, LoaderService,
-            LearnerParamsService, LearnerViewRatingService, MessengerService,
+            ImagePreloaderService, I18nLanguageCodeService,
+            LearnerAnswerInfoService, LoaderService, LearnerParamsService,
+            LearnerViewRatingService, MessengerService,
             NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
             PlayerPositionService, PlayerTranscriptService,
             QuestionPlayerEngineService, QuestionPlayerStateService,
@@ -736,13 +738,13 @@ angular.module('oppia').directive('conversationSkin', [
                 StoryViewerBackendApiService.fetchStoryData(storyId).then(
                   function(res) {
                     var nextStoryNode = [];
-                    for (var i = 0; i < res.story_nodes.length; i++) {
-                      if (res.story_nodes[i].id === nodeId &&
-                          (i + 1) < res.story_nodes.length) {
+                    for (var i = 0; i < res.nodes.length; i++) {
+                      if (res.nodes[i].id === nodeId &&
+                          (i + 1) < res.nodes.length) {
                         $scope.storyNodeIdToAdd = (
-                          res.story_nodes[i].destination_node_ids[0]);
+                          res.nodes[i].destinationNodeIds[0]);
                         nextStoryNode.push(
-                          res.story_nodes[i + 1].exp_summary_dict);
+                          res.nodes[i + 1].explorationSummary);
                         break;
                       }
                     }
@@ -802,8 +804,11 @@ angular.module('oppia').directive('conversationSkin', [
                 ExplorationPlayerStateService.getLanguageCode());
               if (langCodes.indexOf(explorationLanguageCode) !== -1) {
                 $translate.use(explorationLanguageCode);
+                I18nLanguageCodeService.setI18nLanguageCode(
+                  explorationLanguageCode);
               } else {
                 $translate.use('en');
+                I18nLanguageCodeService.setI18nLanguageCode('en');
               }
             }
             $scope.adjustPageHeight(false, null);
@@ -1244,7 +1249,7 @@ angular.module('oppia').directive('conversationSkin', [
               ReadOnlyCollectionBackendApiService
                 .loadCollection($scope.collectionId)
                 .then(function(collection) {
-                  $scope.collectionTitle = collection.title;
+                  $scope.collectionTitle = collection.getTitle();
                 });
             } else {
               $scope.collectionTitle = null;

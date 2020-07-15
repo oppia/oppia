@@ -39,7 +39,7 @@ describe('rich-text components', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display math expressions correctly', async function() {
+  it('should display rte involving file upload correctly', async function() {
     await users.createUser(
       'richTextuser@fileUploadExtensions.com',
       'fileUploadRichTextuser');
@@ -49,9 +49,10 @@ describe('rich-text components', function() {
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');
-      await richTextEditor.appendPlainText(' This is a math expression');
+      await richTextEditor.appendPlainText('This is a math expression');
       // TODO(Jacob): Add test for image RTE component.
       await richTextEditor.addRteComponent('Math', 'x^2 + y^2');
+      await richTextEditor.addRteComponent('Svgdiagram', 'rectangle');
     });
 
     await explorationEditorPage.navigateToPreviewTab();
@@ -59,8 +60,9 @@ describe('rich-text components', function() {
     await explorationPlayerPage.expectContentToMatch(
       async function(richTextChecker) {
         await richTextChecker.readBoldText('bold');
-        await richTextChecker.readPlainText(' This is a math expression');
+        await richTextChecker.readPlainText('This is a math expression');
         await richTextChecker.readRteComponent('Math', 'x^2 + y^2');
+        await richTextChecker.readRteComponent('Svgdiagram', 'rectangle');
       });
 
     await explorationEditorPage.discardChanges();
@@ -68,10 +70,6 @@ describe('rich-text components', function() {
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([
-      // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
-      // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
-      'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
-    ]);
+    await general.checkForConsoleErrors([]);
   });
 });

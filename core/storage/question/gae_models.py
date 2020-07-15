@@ -22,7 +22,6 @@ import random
 
 from constants import constants
 from core.platform import models
-import core.storage.user.gae_models as user_models
 import feconf
 import python_utils
 import utils
@@ -90,11 +89,6 @@ class QuestionModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """QuestionModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question in the form of random hash
@@ -141,16 +135,9 @@ class QuestionModel(base_models.VersionedModel):
         super(QuestionModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         question_commit_log = QuestionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
         question_commit_log.put()
@@ -233,11 +220,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         return False
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """QuestionSkillLinkModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_model_id(cls, question_id, skill_id):
         """Returns the model id by combining the questions and skill id.
@@ -279,6 +261,22 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill_difficulty=skill_difficulty
         )
         return question_skill_link_model_instance
+
+    @classmethod
+    def get_total_question_count_for_skill_ids(cls, skill_ids):
+        """Returns the number of questions assigned to the given skill_ids.
+
+        Args:
+            skill_ids: list(str). Skill IDs for which the question count is
+                requested.
+
+        Returns:
+            int. The number of questions assigned to the given skill_ids.
+        """
+        total_question_count = cls.query().filter(
+            cls.skill_id.IN(skill_ids)).count()
+
+        return total_question_count
 
     @classmethod
     def get_question_skill_links_by_skill_ids(
@@ -702,8 +700,3 @@ class QuestionSummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user_id.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """QuestionSummaryModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

@@ -20,6 +20,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
@@ -27,13 +28,13 @@ var TopicsAndSkillsDashboardPage = require(
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
+
 describe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
-  var SKILL_STATUS_UNASSIGNED = 'Unassigned';
 
   beforeAll(async function() {
     topicsAndSkillsDashboardPage = (
@@ -52,10 +53,42 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
   });
 
-  it('should add a new topic to list and delete it', async function() {
+  it('should assign, unassign, create and delete a skill', async function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
       'Topic1 TASD', 'Topic 1 description', true);
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        'Skill 2', 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_UNASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+
+    await topicsAndSkillsDashboardPage.unassignSkillFromTopicWithIndex(
+      'Skill 2', 0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_ASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_UNASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
@@ -103,7 +136,7 @@ describe('Topics and skills dashboard functionality', function() {
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        SKILL_STATUS_UNASSIGNED);
+        Constants.SKILL_STATUS_UNASSIGNED);
       await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
       await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
 
@@ -151,7 +184,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_UNASSIGNED);
+      Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(
       0, 0);
     await topicsAndSkillsDashboardPage.get();

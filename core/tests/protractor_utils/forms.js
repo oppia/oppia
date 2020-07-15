@@ -264,7 +264,10 @@ var RichTextEditor = async function(elem) {
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
-      if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
+      if (
+        [
+          'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
+        ].includes(componentName)) {
         await elem.all(
           by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
       }
@@ -529,14 +532,28 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
-      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
-
       // Need to convert arguments to an actual array; we tell the component
       // which element to act on but drop the componentName.
       var args = [elem];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
+      // TODO(#9821) :The Math rich text components are now rendered as SVGs by
+      // Math-Jax, and the XPATH_SELECTOR defined in the method expectRichText()
+      // cannot effectively parse the SVG tags, hence the elem.getText() won't
+      // work for Math components.
+      if (componentName === 'Math') {
+        // Math-Jax renders the equations with the help of a script having
+        // innerHTML equal to the latex value. In future we will have to remove
+        // the checks below because Math-Jax will be removed from learner view.
+        var mathScriptTag = elem.element(by.tagName('script'));
+        expect(await mathScriptTag.isPresent()).toBe(true);
+        expect(args.length).toBe(2);
+        expect(await mathScriptTag.getAttribute('innerHTML')).toBe(args[1]);
+      } else {
+        expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      }
+
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
