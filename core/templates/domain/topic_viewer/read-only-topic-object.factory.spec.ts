@@ -16,8 +16,6 @@
  * @fileoverview Tests for ReadOnlyTopicObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from

@@ -23,6 +23,9 @@ require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'assign-skill-to-topic-modal.controller.ts');
 require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'delete-skill-modal.controller.ts');
+require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 require(
@@ -34,6 +37,9 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'skills-list/assign-skill-to-topic-modal.controller.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'skills-list/unassign-skill-from-topics-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
@@ -91,8 +97,11 @@ angular.module('oppia').directive('skillsList', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
+              resolve: {
+                skillId: () => skillId
+              },
               windowClass: 'delete-skill-modal',
-              controller: 'ConfirmOrCancelModalController'
+              controller: 'DeleteSkillModalController'
             }).result.then(function() {
               SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
@@ -109,6 +118,50 @@ angular.module('oppia').directive('skillsList', [
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             }).then(function() {
+            });
+          };
+
+          ctrl.unassignSkill = function(skillId) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics-and-skills-dashboard-page/templates/' +
+                  'unassign-skill-from-topics-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                skillId: () => skillId
+              },
+              controller: 'UnassignSkillFromTopicModalController'
+            }).result.then(function(topicsToUnassign) {
+              for (let topic in topicsToUnassign) {
+                var changeList = [];
+                if (topicsToUnassign[topic].subtopic_id) {
+                  changeList.push({
+                    cmd: 'remove_skill_id_from_subtopic',
+                    subtopic_id: topicsToUnassign[topic].subtopic_id,
+                    skill_id: skillId
+                  });
+                }
+                changeList.push({
+                  cmd: 'remove_uncategorized_skill_id',
+                  uncategorized_skill_id: skillId
+                });
+                EditableTopicBackendApiService.updateTopic(
+                  topicsToUnassign[topic].topic_id,
+                  topicsToUnassign[topic].topic_version,
+                  `Unassigned skill with id ${skillId} from the topic.`,
+                  changeList
+                ).then(function() {
+                  $timeout(function() {
+                    $rootScope.$broadcast(
+                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+                      true);
+                  }, 100);
+                }).then(function() {
+                  var successToast = (
+                    'The skill has been unassigned to the topic.');
+                  AlertsService.addSuccessMessage(successToast, 1000);
+                });
+              }
             });
           };
 

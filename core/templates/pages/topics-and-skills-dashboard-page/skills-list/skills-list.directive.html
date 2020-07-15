@@ -26,7 +26,7 @@
       </td>
       <td class="protractor-test-skills-list-item">
         <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>" class="list-summary">
-          <div class="skill-description protractor-test-skill-description"> <[skill.description]> </div>
+          <div class="skill-description protractor-test-skill-description"><[skill.description]></div>
           <div class="skill-topic">
             <span ng-if="!skill.topicName">
               Unassigned
@@ -60,21 +60,26 @@
         <div class="skill-list-options-container">
           <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
           <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
-            <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-              <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+            <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+              <span class="skills-list-action-button">
                 <i class="fa fa-wrench"></i>
                 <span> Assign to Topic </span>
               </span>
             </div>
-            <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0">
-              <div class="protractor-test-merge-skills-button"
-                   ng-click="$ctrl.mergeSkill(skill)">
+            <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0" ng-click="$ctrl.mergeSkill(skill)">
+              <div class="protractor-test-merge-skills-button">
                 <i class="fa fa-plus"></i>
                 <span>Merge Skill</span>
               </div>
             </div>
-            <div class="delete-icon-box">
-              <a ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+            <div class="unassign-skill-box protractor-test-unassign-skill-button" ng-if="skill.topic_name" ng-click="$ctrl.unassignSkill(skill.id)">
+              <div>
+                <i class="fa fa-minus"></i>
+                <span>Unassign Skill</span>
+              </div>
+            </div>
+            <div class="delete-icon-box protractor-test-delete-skill-button" ng-click="$ctrl.deleteSkill(skill.id)">
+              <a ng-if="canDeleteSkill()">
                 <span class="fa fa-trash-alt"></span>
                 <span>Delete</span>
               </a>
@@ -96,7 +101,7 @@
               </a>
             </div>
             <div class="skill-list-options-container">
-              <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
+              <p class="fas fa-ellipsis-v skill-edit-box-icon" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
               <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
                 <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
                   <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
@@ -104,15 +109,14 @@
                     <span> Assign to Topic </span>
                   </span>
                 </div>
-                <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0">
-                  <div class="protractor-test-merge-skills-button"
-                       ng-click="$ctrl.mergeSkill(skill)">
+                <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0" ng-click="$ctrl.mergeSkill(skill)">
+                  <div class="protractor-test-merge-skills-button">
                     <i class="fa fa-plus"></i>
                     <span>Merge Skill</span>
                   </div>
                 </div>
-                <div class="delete-icon-box">
-                  <span ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+                <div class="delete-icon-box" ng-click="$ctrl.deleteSkill(skill.id)">
+                  <span ng-if="canDeleteSkill()" >
                     <i class="fa fa-trash-alt"></i>
                     <span>Delete</span>
                   </span>
@@ -149,7 +153,7 @@
     </div>
   </div>
 </md-card>
-<span ng-if="!canCreateSkill()" style="margin-left: 12.5%;">
+<span ng-if="!canCreateSkill()">
   <em>To create new skills, please talk to one of the lesson creation admins.</em>
 </span>
 
@@ -288,6 +292,7 @@
 
   skills-list .assign-skill-box,
   skills-list .merge-skill-box,
+  skills-list .unassign-skill-box,
   skills-list .delete-icon-box {
     border-bottom: 1px solid #000;
     cursor: pointer;

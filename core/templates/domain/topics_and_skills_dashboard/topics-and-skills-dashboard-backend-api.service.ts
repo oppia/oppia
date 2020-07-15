@@ -18,8 +18,8 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 import {
   AugmentedSkillSummaryObjectFactory,
@@ -42,6 +42,8 @@ import {
 } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicSummaryObjectFactory, TopicSummary, TopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 interface CategorizedSkillsBackendDict {
   [topicName: string]: {
@@ -95,6 +97,17 @@ interface SkillsDashboardData {
   more: boolean;
 }
 
+interface IAssignedSkillDataBackendDict {
+  'topic_assignments_dict': {
+    [key: string]: {
+      'topic_id': string,
+      'topic_name': string,
+      'topic_version': number,
+      'subtopic_id': number|null
+    }
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -106,7 +119,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
     private http: HttpClient,
     private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
     private skillSummaryObjectFactory: SkillSummaryObjectFactory,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
+    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
 
   fetchDashboardData(): Promise<TopicsAndSkillDashboardData> {
     return this.http.get<TopicsAndSkillsDashboardDataBackendDict>(
@@ -146,6 +160,16 @@ export class TopicsAndSkillsDashboardBackendApiService {
         categorizedSkillsDict: categorizedSkills
       };
     });
+  }
+
+  fetchTopicAssignmentsForSkill(
+      skillId): Promise<IAssignedSkillDataBackendDict> {
+    const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+      '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
+        skill_id: skillId
+      });
+    return this.http.get<IAssignedSkillDataBackendDict>(
+      assignSkillDataUrl).toPromise();
   }
 
   fetchSkillsDashboardData(
