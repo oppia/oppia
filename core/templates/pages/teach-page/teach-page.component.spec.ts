@@ -104,7 +104,7 @@ let fixture: ComponentFixture<TeachPageComponent>;
 
 describe('Teach Page', function() {
   let windowRef: MockWindowRef;
-  let sas = null;
+  let siteAnalyticsService = null;
   let i18n = null;
   let translate = null;
 
@@ -126,12 +126,13 @@ describe('Teach Page', function() {
     }).compileComponents();
     i18n = TestBed.get(I18nLanguageCodeService);
     translate = TestBed.get(TranslateService);
-    sas = TestBed.get(SiteAnalyticsService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TeachPageComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   afterEach(() => {
@@ -183,14 +184,14 @@ describe('Teach Page', function() {
     expect(component.activeTabName).toBe('participation');
   });
 
-  it('should get static image url', function() {
+  it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should apply to teach with oppia', fakeAsync(() => {
+  it('should apply to teach with oppia', (done) => {
     const applyToTeachWithOppiaEventSpy = spyOn(
-      sas, 'registerApplyToTeachWithOppiaEvent')
+      siteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
       .and.callThrough();
 
     component.ngOnInit();
@@ -200,11 +201,11 @@ describe('Teach Page', function() {
       }
     });
     component.onApplyToTeachWithOppia();
-
-    tick(200);
-
-    expect(windowRef.nativeWindow.location.href).toBe(
-      'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
-    expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-  }));
+    setTimeout(() => {
+      expect(windowRef.nativeWindow.location.href).toBe(
+        'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
+      expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
+      done();
+    }, 150);
+  });
 });
