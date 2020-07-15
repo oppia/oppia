@@ -15353,7 +15353,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
         ]
         run_job_and_check_output(self, expected_output, literal_eval=True)
 
-    def test_invalid_config_property_model_version_in_model_id(self):
+    def test_invalid_platform_parameter_model_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             parameter_models.PlatformParameterSnapshotContentModel(
                 id='%s-3' % (self.parameter_model.id)))
