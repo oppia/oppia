@@ -2525,16 +2525,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.init_state.interaction.customization_args[
-                'choices']['value'],
-            [
-                state_domain.SubtitledHtml(
-                    'custarg_choices_0', '<p>Option A</p>'),
-                state_domain.SubtitledHtml(
-                    'custarg_choices_1', '<p>Option B</p>')
-            ]
-        )
+        choices = exploration.init_state.interaction.customization_args[
+            'choices']['value']
+        self.assertEqual(choices[0].html, '<p>Option A</p>')
+        self.assertEqual(choices[0].content_id, 'custarg_choices_0')
+        self.assertEqual(choices[1].html, '<p>Option B</p>')
+        self.assertEqual(choices[1].content_id, 'custarg_choices_1')
+
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
