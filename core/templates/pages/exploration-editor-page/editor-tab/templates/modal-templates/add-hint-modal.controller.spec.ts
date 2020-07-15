@@ -46,7 +46,7 @@ describe('Add Hint Modal Controller', function() {
     ContextService = $injector.get('ContextService');
     spyOn(ContextService, 'getEntityType').and.returnValue('question');
 
-    spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(4);
+    stateHintsService.init('State1', new Array(4));
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -65,7 +65,7 @@ describe('Add Hint Modal Controller', function() {
   it('should evaluate scope variable values correctly', function() {
     expect($scope.tmpHint).toBe('');
     expect($scope.addHintForm).toEqual({});
-    expect($scope.hintIndex).toBe(4);
+    expect($scope.hintIndex).toBe(5);
   });
 
   it('should save hint successfully', function() {

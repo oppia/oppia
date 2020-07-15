@@ -50,7 +50,7 @@ angular.module('oppia').controller('AddHintModalController', [
 
     $scope.tmpHint = '';
     $scope.addHintForm = {};
-    $scope.hintIndex = StateHintsService.getActiveHintIndex();
+    $scope.hintIndex = StateHintsService.displayed.length + 1;
     $scope.saveHint = function() {
       var contentId = GenerateContentIdService.getNextId(
         existingHintsContentIds, COMPONENT_NAME_HINT);
