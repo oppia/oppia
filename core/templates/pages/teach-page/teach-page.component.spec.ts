@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { ComponentFixture, TestBed } from
-  '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
+import { ComponentFixture, TestBed, async } from
+  '@angular/core/testing';
 
 import { TeachPageComponent } from './teach-page.component';
 import { UrlInterpolationService } from
@@ -108,7 +108,7 @@ describe('Teach Page', function() {
   let i18n = null;
   let translate = null;
 
-  beforeEach(async() => {
+  beforeEach(async(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -127,7 +127,7 @@ describe('Teach Page', function() {
     i18n = TestBed.get(I18nLanguageCodeService);
     translate = TestBed.get(TranslateService);
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-  });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TeachPageComponent);
