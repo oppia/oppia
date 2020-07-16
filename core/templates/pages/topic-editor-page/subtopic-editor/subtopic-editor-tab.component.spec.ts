@@ -265,7 +265,7 @@ describe('Subtopic editor tab', function() {
     ctrl.togglePreviewSkillCard();
   });
 
-  it('should toggle skills list preview', function() {
+  it('should toggle subtopic preview', function() {
     expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
     ctrl.toggleSubtopicPreview();
     expect(ctrl.subtopicPreviewCardIsShown).toEqual(true);
