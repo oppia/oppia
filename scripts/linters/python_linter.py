@@ -30,6 +30,7 @@ import python_utils
 
 from . import linter_utils
 from .. import common
+from .. import concurrent_task_utils
 
 _PATHS_TO_INSERT = [
     common.PYLINT_PATH,
@@ -110,8 +111,9 @@ class PythonLintChecksManager(python_utils.OBJECT):
            with test_only in their names are in test files.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting function defintion checks')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting function defintion checks')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         summary_messages = []
         files_to_check = self.py_filepaths
         with linter_utils.redirect_stdout(sys.stdout):
@@ -131,7 +133,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
                         summary_message = (
                             '%s --> Line %s: Please do not use \'test_only\' '
                             'in the non-test file.' % (filepath, line_num + 1))
-                        python_utils.PRINT(summary_message)
+                        concurrent_task_utils.log(summary_message)
                         summary_messages.append(summary_message)
                         failed = True
 
@@ -145,7 +147,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     '%s Function definition checks passed'
                     % (linter_utils.SUCCESS_MESSAGE_PREFIX))
 
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
             summary_messages.append(summary_message)
         return summary_messages
 
@@ -179,8 +181,9 @@ class PythonLintChecksManager(python_utils.OBJECT):
             return class_names
 
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting job registry checks')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting job registry checks')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         summary_messages = []
         failed = False
         jobs_in_cron = [
@@ -217,7 +220,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     one_off_jobs_list))
             summary_message = 'Found one-off jobs with duplicate names: %s' % (
                 ', '.join(duplicate_one_off_job_names))
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
             summary_messages.append(summary_message)
 
         if validation_jobs_list:
@@ -232,7 +235,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             summary_message = (
                 'Found validation jobs with duplicate names: %s' % (
                     ', '.join(duplicate_validation_job_names)))
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
             summary_messages.append(summary_message)
 
         non_registered_one_off_jobs = (
@@ -242,7 +245,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             summary_message = (
                 'Found one-off jobs not listed in jobs_registry file: %s' % (
                     ',\n'.join(sorted(non_registered_one_off_jobs))))
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
             summary_messages.append(summary_message)
 
         non_registered_validation_jobs = (
@@ -252,14 +255,14 @@ class PythonLintChecksManager(python_utils.OBJECT):
             summary_message = (
                 'Found validation jobs not listed in jobs_registry file: %s' % (
                     ',\n'.join(sorted(non_registered_validation_jobs))))
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
             summary_messages.append(summary_message)
 
         summary_message = (
             '%s Job registry check %s' % (
                 (linter_utils.FAILED_MESSAGE_PREFIX, 'failed') if failed else
                 (linter_utils.SUCCESS_MESSAGE_PREFIX, 'passed')))
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
         return summary_messages
 
@@ -271,8 +274,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
             all_messages: str. All the messages returned by the lint checks.
         """
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT('There are no Python files to lint.')
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log('There are no Python files to lint.')
             return []
 
         job_registry_check_message = (
@@ -359,7 +362,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         num_py_files = len(files_to_lint)
 
-        python_utils.PRINT('Linting %s Python files' % num_py_files)
+        concurrent_task_utils.log('Linting %s Python files' % num_py_files)
 
         _batch_size = 50
         current_batch_start_index = 0
@@ -374,7 +377,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             current_files_to_lint = files_to_lint[
                 current_batch_start_index: current_batch_end_index]
             if self.verbose_mode_enabled:
-                python_utils.PRINT('Linting Python files %s to %s...' % (
+                concurrent_task_utils.log('Linting Python files %s to %s...' % (
                     current_batch_start_index + 1, current_batch_end_index))
 
             # This line invokes Pylint and redirect its output
@@ -387,7 +390,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter.msg_status != 0:
                 for message in pylint_report.read():
-                    python_utils.PRINT(message)
+                    concurrent_task_utils.log(message)
                 pylint_error_messages = (
                     self._get_trimmed_error_output(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
@@ -403,7 +406,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
                 errors_found = True
 
@@ -419,10 +422,10 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files,
                     time.time() - start_time))
 
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
 
-        python_utils.PRINT('Python linting finished.')
+        concurrent_task_utils.log('Python linting finished.')
         return summary_messages
 
     def _lint_py_files_for_python3_compatibility(self):
@@ -442,12 +445,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 r'^.*python_utils.*\.py$', file_name)]
         num_py_files = len(files_to_lint_for_python3_compatibility)
         if not files_to_lint_for_python3_compatibility:
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'There are no Python files to lint for Python 3 compatibility.')
             return []
 
-        python_utils.PRINT(
+        concurrent_task_utils.log(
             'Linting %s Python files for Python 3 compatibility.' % (
                 num_py_files))
 
@@ -465,7 +468,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             current_files_to_lint = files_to_lint_for_python3_compatibility[
                 current_batch_start_index: current_batch_end_index]
             if self.verbose_mode_enabled:
-                python_utils.PRINT(
+                concurrent_task_utils.log(
                     'Linting Python files for Python 3 compatibility %s to %s..'
                     % (current_batch_start_index + 1, current_batch_end_index))
 
@@ -481,9 +484,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pylint_error_messages = (
                     self._get_trimmed_error_output(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
-                python_utils.PRINT('Messages for Python 3 support:')
+                concurrent_task_utils.log('Messages for Python 3 support:')
                 for message in pylint_report.read():
-                    python_utils.PRINT(message)
+                    concurrent_task_utils.log(message)
                 any_errors = True
 
             current_batch_start_index = current_batch_end_index
@@ -499,10 +502,10 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 % (linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files, (
                     time.time() - start_time)))
 
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
 
-        python_utils.PRINT(
+        concurrent_task_utils.log(
             'Python linting for Python 3 compatibility finished.')
         return summary_messages
 
@@ -511,8 +514,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         has imports placed in alphabetical order.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting import-order checks')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting import-order checks')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         summary_messages = []
         files_to_check = self.all_filepaths
         failed = False
@@ -527,9 +531,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                         filepath, check=True, show_diff=(
                             True)).incorrectly_sorted):
                     failed = True
-                    python_utils.PRINT('')
+                    concurrent_task_utils.log('')
 
-            python_utils.PRINT('')
+            concurrent_task_utils.log('')
             if failed:
                 summary_message = stdout.getvalue()
                 summary_messages.append(summary_message)
@@ -537,13 +541,13 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     '%s Import order checks failed, file imports should be '
                     'alphabetized, see affect files above.' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s Import order checks passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
         return summary_messages
 
@@ -562,8 +566,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         all_messages = []
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT('There are no Python files to lint.')
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log('There are no Python files to lint.')
             return []
 
         all_messages.extend(

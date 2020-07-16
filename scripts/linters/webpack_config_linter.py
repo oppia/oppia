@@ -22,8 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import sys
 
-import python_utils
 from . import linter_utils
+from .. import concurrent_task_utils
 
 WEBPACK_CONFIG_FILE_NAME = 'webpack.common.config.ts'
 WEBPACK_CONFIG_FILEPATH = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
@@ -34,7 +34,7 @@ def check_webpack_config_file(file_cache, verbose_mode_enabled):
     webpack.common.config.ts contains all needed keys.
     """
     if verbose_mode_enabled:
-        python_utils.PRINT(
+        concurrent_task_utils.log(
             'Starting webpack config file check\n'
             '----------------------------------------')
 
@@ -67,8 +67,8 @@ def check_webpack_config_file(file_cache, verbose_mode_enabled):
                             error_line_num + 1, ', '.join(keys),
                             WEBPACK_CONFIG_FILE_NAME))
                     summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    python_utils.PRINT('')
+                    concurrent_task_utils.log(summary_message)
+                    concurrent_task_utils.log('')
                     failed = True
             if htmlwebpackplugin_section_found:
                 key = stripped_line.split(':')[0]
@@ -86,7 +86,7 @@ def check_webpack_config_file(file_cache, verbose_mode_enabled):
             summary_message = '%s webpack config file checks passed' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX)
         summary_messages.append(summary_message)
-        python_utils.PRINT(summary_message)
-        python_utils.PRINT('')
+        concurrent_task_utils.log(summary_message)
+        concurrent_task_utils.log('')
 
     return summary_messages

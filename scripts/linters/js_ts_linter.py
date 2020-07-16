@@ -32,6 +32,7 @@ import python_utils
 
 from . import linter_utils
 from .. import common
+from .. import concurrent_task_utils
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
@@ -176,10 +177,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         files_to_check = self.all_filepaths
         parsed_js_and_ts_files = dict()
         if not self.verbose_mode_enabled:
-            python_utils.PRINT('Validating and parsing JS and TS files ...')
+            concurrent_task_utils.log(
+                'Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
             if self.verbose_mode_enabled:
-                python_utils.PRINT(
+                concurrent_task_utils.log(
                     'Validating and parsing %s file ...' % filepath)
             file_content = self.file_cache.read(filepath)
 
@@ -245,8 +247,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """
         summary_messages = []
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting any type check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting any type check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
 
         # This pattern is used to match cases like ': any'.
         any_type_pattern = r':\ *any'
@@ -273,9 +276,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             '%s --> \'any\' type found at line %s. Please do '
                             'not declare variable as \'any\' type' % (
                                 file_path, line_number + 1))
-                        python_utils.PRINT(summary_message)
+                        concurrent_task_utils.log(summary_message)
                         summary_messages.append(summary_message)
-                        python_utils.PRINT('')
+                        concurrent_task_utils.log('')
 
                     if re.findall(any_type_pattern, line):
                         failed = True
@@ -283,9 +286,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             '%s --> \'any\' type found at line %s. Please do '
                             'not declare variable as \'any\' type' % (
                                 file_path, line_number + 1))
-                        python_utils.PRINT(summary_message)
+                        concurrent_task_utils.log(summary_message)
                         summary_messages.append(summary_message)
-                        python_utils.PRINT('')
+                        concurrent_task_utils.log('')
 
                     if line:
                         starts_with_type = line[len(line) - 1] == ':'
@@ -299,9 +302,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     '%s \'any\' type check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
 
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
             summary_messages.append(summary_message)
-            python_utils.PRINT('')
+            concurrent_task_utils.log('')
 
         return summary_messages
 
@@ -311,8 +314,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """
 
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting HTTP requests check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting HTTP requests check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
 
         http_client_pattern = r':\n? *HttpClient'
 
@@ -342,8 +346,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         'from files that are not backend api services.' % (
                             file_path))
                     summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    python_utils.PRINT('')
+                    concurrent_task_utils.log(summary_message)
+                    concurrent_task_utils.log('')
 
             if failed:
                 summary_message = (
@@ -356,8 +360,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
                 summary_messages.append(summary_message)
 
-            python_utils.PRINT(summary_message)
-            python_utils.PRINT('')
+            concurrent_task_utils.log(summary_message)
+            concurrent_task_utils.log('')
 
         return summary_messages
 
@@ -367,8 +371,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         build.JS_FILEPATHS_NOT_TO_BUILD.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting extra js files check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting extra js files check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
 
         summary_messages = []
         failed = False
@@ -383,7 +388,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     summary_message = (
                         '%s  --> Found extra .js file\n' % filepath)
                     summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
+                    concurrent_task_utils.log(summary_message)
                     failed = True
 
             if failed:
@@ -392,7 +397,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
                     'build.py. Otherwise, rename them to .ts\n')
                 summary_messages.append(err_msg)
-                python_utils.PRINT(err_msg)
+                concurrent_task_utils.log(err_msg)
 
             if failed:
                 summary_message = (
@@ -404,8 +409,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     '%s Extra JS files check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
             summary_messages.append(summary_message)
-            python_utils.PRINT(summary_message)
-            python_utils.PRINT('')
+            concurrent_task_utils.log(summary_message)
+            concurrent_task_utils.log('')
         return summary_messages
 
     def _check_js_and_ts_component_name_and_count(self):
@@ -414,8 +419,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         matches the filename.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting js component name and count check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log(
+                'Starting js component name and count check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
@@ -442,7 +449,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 '%s -> Please ensure that there is exactly one '
                                 'component in the file.' % (filepath))
                             failed = True
-                            python_utils.PRINT(summary_message)
+                            concurrent_task_utils.log(summary_message)
                             summary_messages.append(summary_message)
                             break
 
@@ -452,16 +459,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     '%s JS and TS Component name and count check failed, '
                     'see messages above for duplicate names.' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s JS and TS Component name and count check passed' %
                     (linter_utils.SUCCESS_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
 
-            python_utils.PRINT('')
+            concurrent_task_utils.log('')
         return summary_messages
 
     def _check_directive_scope(self):
@@ -469,8 +476,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         scope: {} and it should not be scope: true.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting directive scope check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting directive scope check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         # Select JS and TS files which need to be checked.
         files_to_check = self.all_filepaths
         failed = False
@@ -562,11 +570,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                     'does not have scope set '
                                                     'to true.' %
                                                     (directive_name, filepath))
-                                                python_utils.PRINT(
+                                                concurrent_task_utils.log(
                                                     summary_message)
                                                 summary_messages.append(
                                                     summary_message)
-                                                python_utils.PRINT('')
+                                                concurrent_task_utils.log('')
                                             elif scope_value.type != (
                                                     'ObjectExpression'):
                                                 # Check whether the directive
@@ -579,11 +587,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                     'a scope: {}.' % (
                                                         directive_name, filepath
                                                         ))
-                                                python_utils.PRINT(
+                                                concurrent_task_utils.log(
                                                     summary_message)
                                                 summary_messages.append(
                                                     summary_message)
-                                                python_utils.PRINT('')
+                                                concurrent_task_utils.log('')
 
         with linter_utils.redirect_stdout(stdout):
             if failed:
@@ -591,16 +599,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     '%s Directive scope check failed, '
                     'see messages above for suggested fixes.' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s Directive scope check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
 
-            python_utils.PRINT('')
+            concurrent_task_utils.log('')
         return summary_messages
 
     def _check_sorted_dependencies(self):
@@ -610,8 +618,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         imports, and constant imports, all in sorted order.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting sorted dependencies check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting sorted dependencies check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         files_to_check = self.all_filepaths
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
@@ -672,7 +681,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     'imports and constant imports, all in '
                                     'sorted order.'
                                     % (property_value, filepath))
-                                python_utils.PRINT(summary_message)
+                                concurrent_task_utils.log(summary_message)
                                 summary_messages.append(summary_message)
                             if sorted_imports != literal_args:
                                 failed = True
@@ -683,7 +692,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     'imports and constant imports, all in '
                                     'sorted order.'
                                     % (property_value, filepath))
-                                python_utils.PRINT(summary_message)
+                                concurrent_task_utils.log(summary_message)
                                 summary_messages.append(summary_message)
         with linter_utils.redirect_stdout(stdout):
             if failed:
@@ -697,10 +706,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
 
         summary_messages.append(summary_message)
-        python_utils.PRINT('')
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log('')
+        concurrent_task_utils.log(summary_message)
         if self.verbose_mode_enabled:
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         return summary_messages
 
     def _match_line_breaks_in_controller_dependencies(self):
@@ -709,9 +719,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         between the arguments of the controller function.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT(
+            concurrent_task_utils.log(
                 'Starting controller dependency line break check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         files_to_check = self.all_filepaths
         failed = False
         summary_messages = []
@@ -735,7 +746,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         function_parameters.strip().replace(' ', ''))
                     if stringfied_dependencies != function_parameters:
                         failed = True
-                        python_utils.PRINT(
+                        concurrent_task_utils.log(
                             'Please ensure that in file %s the line breaks '
                             'pattern between the dependencies mentioned as '
                             'strings:\n[%s]\nand the dependencies mentioned '
@@ -744,23 +755,23 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             'exactly match.' % (
                                 filepath, stringfied_dependencies,
                                 function_parameters))
-                        python_utils.PRINT('')
+                        concurrent_task_utils.log('')
 
             if failed:
                 summary_message = (
                     '%s Controller dependency line break check failed, '
                     'see messages above for the affected files.' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s Controller dependency line break check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
 
-            python_utils.PRINT('')
+            concurrent_task_utils.log('')
         return summary_messages
 
     def _check_constants_declaration(self):
@@ -772,8 +783,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """
 
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting constants declaration check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting constants declaration check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
 
         summary_messages = []
         failed = False
@@ -832,7 +844,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 if angularjs_constants_value != (
                                         angularjs_constants_name):
                                     failed = True
-                                    python_utils.PRINT(
+                                    concurrent_task_utils.log(
                                         '%s --> Please ensure that the '
                                         'constant %s is initialized '
                                         'from the value from the '
@@ -850,7 +862,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         if len(angularjs_constants_set) != len(
                                 angularjs_constants_list):
                             failed = True
-                            python_utils.PRINT(
+                            concurrent_task_utils.log(
                                 '%s --> Duplicate constant declaration '
                                 'found.' % (
                                     corresponding_angularjs_filepath))
@@ -872,7 +884,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 'separate constants file.' % (
                                     filepath, line_num))
                             summary_messages.append(summary_message)
-                            python_utils.PRINT(summary_message)
+                            concurrent_task_utils.log(summary_message)
 
                 # Check if the constant has multiple declarations which is
                 # prohibited.
@@ -898,7 +910,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     constants_to_source_filepaths_dict[
                                         constant_name]))
                             summary_messages.append(summary_message)
-                            python_utils.PRINT(summary_message)
+                            concurrent_task_utils.log(summary_message)
                         else:
                             constants_to_source_filepaths_dict[
                                 constant_name] = filepath
@@ -931,7 +943,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             '%s --> Duplicate constant declaration found.'
                             % filepath)
                         summary_messages.append(summary_message)
-                        python_utils.PRINT(summary_message)
+                        concurrent_task_utils.log(summary_message)
 
             if failed:
                 summary_message = (
@@ -943,7 +955,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     '%s Constants declaration check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
             summary_messages.append(summary_message)
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
 
         return summary_messages
 
@@ -957,7 +969,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         in the comment.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT(
+            concurrent_task_utils.log(
                 'Starting comment checks\n'
                 '----------------------------------------')
         summary_messages = []
@@ -1033,8 +1045,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 'the end of the comment.' % (
                                     filepath, line_num + 1))
                             summary_messages.append(summary_message)
-                            python_utils.PRINT(summary_message)
-                            python_utils.PRINT('')
+                            concurrent_task_utils.log(summary_message)
+                            concurrent_task_utils.log('')
 
             if failed:
                 summary_message = (
@@ -1044,7 +1056,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 summary_message = (
                     '%s Comments check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
             summary_messages.append(summary_message)
         return summary_messages
 
@@ -1057,8 +1069,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """
 
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
@@ -1172,10 +1184,10 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'ERROR    Please run start.sh first to install node-eslint ')
-            python_utils.PRINT(
+            concurrent_task_utils.log(
                 '         and its dependencies.')
             sys.exit(1)
 
@@ -1185,13 +1197,14 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         summary_messages = []
 
         num_js_and_ts_files = len(files_to_lint)
-        python_utils.PRINT('Total js and ts files: ', num_js_and_ts_files)
+        concurrent_task_utils.log(
+            'Total js and ts files: %s' % num_js_and_ts_files)
         eslint_cmd_args = [node_path, eslint_path, '--quiet']
         result_list = []
-        python_utils.PRINT('Linting JS and TS files.')
+        concurrent_task_utils.log('Linting JS and TS files.')
         for _, filepath in enumerate(files_to_lint):
             if self.verbose_mode_enabled:
-                python_utils.PRINT('Linting: ', filepath)
+                concurrent_task_utils.log('Linting: %s' % filepath)
             proc_args = eslint_cmd_args + [filepath]
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -1200,8 +1213,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
             linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
             if linter_stderr:
-                python_utils.PRINT('LINTER FAILED')
-                python_utils.PRINT(linter_stderr)
+                concurrent_task_utils.log('LINTER FAILED')
+                concurrent_task_utils.log(linter_stderr)
                 sys.exit(1)
 
             if linter_stdout:
@@ -1210,7 +1223,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for result in result_list:
-                python_utils.PRINT(result)
+                concurrent_task_utils.log(result)
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
             summary_message = (
@@ -1221,10 +1234,10 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
                 '%s %s JavaScript and Typescript files linted (%.1f secs)' % (
                     linter_utils.SUCCESS_MESSAGE_PREFIX, num_js_and_ts_files,
                     time.time() - start_time))
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
 
-        python_utils.PRINT('Js and Ts linting finished.')
+        concurrent_task_utils.log('Js and Ts linting finished.')
 
         return summary_messages
 
@@ -1236,8 +1249,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             all_messages: str. All the messages returned by the lint checks.
         """
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'There are no JavaScript or Typescript files to lint.')
             return []
 

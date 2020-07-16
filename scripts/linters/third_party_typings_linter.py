@@ -25,6 +25,7 @@ import sys
 
 import python_utils
 from . import linter_utils
+from .. import concurrent_task_utils
 
 MANIFEST_JSON_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
 PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
@@ -71,8 +72,8 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
     are up to date.
     """
     if verbose_mode_enabled:
-        python_utils.PRINT('Starting type defs check')
-        python_utils.PRINT('----------------------------------------')
+        concurrent_task_utils.log('Starting type defs check')
+        concurrent_task_utils.log('----------------------------------------')
 
     with linter_utils.redirect_stdout(sys.stdout):
         failed = False
@@ -109,16 +110,16 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
                 if file_name.startswith(prefix_name)]
 
             if len(files_with_prefix_name) > 1:
-                python_utils.PRINT(
+                concurrent_task_utils.log(
                     'There are multiple type definitions for %s in the typings '
                     'dir.' % third_party_lib['name'])
-                python_utils.PRINT('')
+                concurrent_task_utils.log('')
                 failed = True
             elif len(files_with_prefix_name) == 0:
-                python_utils.PRINT(
+                concurrent_task_utils.log(
                     'There are no type definitions for %s in the typings '
                     'dir.' % third_party_lib['name'])
-                python_utils.PRINT('')
+                concurrent_task_utils.log('')
                 failed = True
             else:
                 type_defs_filename = files_with_prefix_name[0]
@@ -127,14 +128,14 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
                     len(prefix_name): -_TYPE_DEFS_FILE_EXTENSION_LENGTH]
 
                 if lib_version != type_defs_version:
-                    python_utils.PRINT(
+                    concurrent_task_utils.log(
                         'Type definitions for %s are not up to date. The '
                         'current version of %s is %s and the type definitions '
                         'are for version %s. Please refer typings/README.md '
                         'for more details.' % (
                             third_party_lib['name'], third_party_lib['name'],
                             lib_version, type_defs_version))
-                    python_utils.PRINT('')
+                    concurrent_task_utils.log('')
                     failed = True
 
         if failed:
@@ -144,7 +145,7 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
         else:
             summary_message = '%s Third party type defs check passed' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX)
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
 
         summary_messages.append(summary_message)
 

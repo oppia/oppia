@@ -29,6 +29,7 @@ import python_utils
 
 from . import linter_utils
 from .. import common
+from .. import concurrent_task_utils
 
 
 class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
@@ -98,10 +99,10 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         stylelint_path = os.path.join(
             'node_modules', 'stylelint', 'bin', 'stylelint.js')
         if not os.path.exists(stylelint_path):
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'ERROR    Please run start.sh first to install node-eslint ')
-            python_utils.PRINT(
+            concurrent_task_utils.log(
                 '         or node-stylelint and its dependencies.')
             sys.exit(1)
         files_to_lint = self.all_filepaths
@@ -110,15 +111,15 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         summary_messages = []
 
         num_css_files = len(files_to_lint)
-        python_utils.PRINT('Total css files: ', num_css_files)
+        concurrent_task_utils.log('Total css files: %s' % num_css_files)
         stylelint_cmd_args = [
             node_path, stylelint_path, '--config=' + self.config_path]
         result_list = []
         if not self.verbose_mode_enabled:
-            python_utils.PRINT('Linting CSS files.')
+            concurrent_task_utils.log('Linting CSS files.')
         for _, filepath in enumerate(files_to_lint):
             if self.verbose_mode_enabled:
-                python_utils.PRINT('Linting: ', filepath)
+                concurrent_task_utils.log('Linting: %s' % filepath)
             proc_args = stylelint_cmd_args + [filepath]
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -127,8 +128,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
             linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
             if linter_stderr:
-                python_utils.PRINT('LINTER FAILED')
-                python_utils.PRINT(linter_stderr)
+                concurrent_task_utils.log('LINTER FAILED')
+                concurrent_task_utils.log(linter_stderr)
                 sys.exit(1)
 
             if linter_stdout:
@@ -137,7 +138,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for result in result_list:
-                python_utils.PRINT(result)
+                concurrent_task_utils.log(result)
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
             summary_message = ('%s %s CSS file' % (
@@ -146,10 +147,10 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             summary_message = ('%s %s CSS file linted (%.1f secs)' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX, num_css_files,
                 time.time() - start_time))
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
 
-        python_utils.PRINT('CSS linting finished.')
+        concurrent_task_utils.log('CSS linting finished.')
         return summary_messages
 
     def perform_all_lint_checks(self):
@@ -160,8 +161,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             all_messages: str. All the messages returned by the lint checks.
         """
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'There are no HTML or CSS files to lint.')
             return []
 

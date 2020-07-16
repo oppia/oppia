@@ -24,9 +24,8 @@ import os
 import subprocess
 import sys
 
-import python_utils
-
 from . import linter_utils
+from .. import concurrent_task_utils
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
@@ -134,14 +133,14 @@ def _check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
         summary_message = (
             '%s --> Duplicate pattern(s) found in critical rules'
             ' section.' % CODEOWNER_FILEPATH)
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
         failed = True
     if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
         summary_message = (
             'scripts/linters/pre_commit_linter.py --> Duplicate pattern(s) '
             'found in CODEOWNER_IMPORTANT_PATHS list.')
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
         failed = True
 
@@ -157,7 +156,7 @@ def _check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
             'scripts/linters/pre_commit_linter.py. Please add this rule in the '
             'mentioned list or remove this rule from the \'Critical files'
             '\' section.' % (CODEOWNER_FILEPATH, rule))
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
         failed = True
     for rule in list_minus_critical_rule_section_set:
@@ -168,7 +167,7 @@ def _check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
             'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
             'scripts/linters/pre_commit_linter.py if it is no longer an '
             'important rule.' % (CODEOWNER_FILEPATH, rule))
-        python_utils.PRINT(summary_message)
+        concurrent_task_utils.log(summary_message)
         summary_messages.append(summary_message)
         failed = True
 
@@ -194,8 +193,8 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
     """
     stdout = sys.stdout
     if verbose_mode_enabled:
-        python_utils.PRINT('Starting CODEOWNERS file check')
-        python_utils.PRINT('----------------------------------------')
+        concurrent_task_utils.log('Starting CODEOWNERS file check')
+        concurrent_task_utils.log('----------------------------------------')
 
 
     with linter_utils.redirect_stdout(stdout):
@@ -217,7 +216,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                     summary_message = (
                         '%s --> Pattern on line %s doesn\'t have '
                         'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
-                    python_utils.PRINT(summary_message)
+                    concurrent_task_utils.log(summary_message)
                     summary_messages.append(summary_message)
                     failed = True
                 else:
@@ -235,7 +234,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                             '%s --> Pattern on line %s is invalid. Use '
                             'full path relative to the root directory'
                             % (CODEOWNER_FILEPATH, line_num + 1))
-                        python_utils.PRINT(summary_message)
+                        concurrent_task_utils.log(summary_message)
                         summary_messages.append(summary_message)
                         failed = True
 
@@ -250,7 +249,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                                 '%s --> Pattern on line %s is invalid. '
                                 '\'**\' wildcard not allowed' % (
                                     CODEOWNER_FILEPATH, line_num + 1))
-                            python_utils.PRINT(summary_message)
+                            concurrent_task_utils.log(summary_message)
                             summary_messages.append(summary_message)
                             failed = True
                     # Adjustments to the dir paths in CODEOWNERS syntax
@@ -274,7 +273,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                                 '%s --> Pattern on line %s doesn\'t match '
                                 'any file or directory' % (
                                     CODEOWNER_FILEPATH, line_num + 1))
-                            python_utils.PRINT(summary_message)
+                            concurrent_task_utils.log(summary_message)
                             summary_messages.append(summary_message)
                             failed = True
                     # The following list is being populated with the
@@ -300,7 +299,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                     summary_message = (
                         '%s is not listed in the .github/CODEOWNERS file.' % (
                             file_path))
-                    python_utils.PRINT(summary_message)
+                    concurrent_task_utils.log(summary_message)
                     summary_messages.append(summary_message)
                     failed = True
 
@@ -318,10 +317,10 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
         else:
             summary_message = '%s CODEOWNERS file check passed' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX)
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
 
         summary_messages.append(summary_message)
-        python_utils.PRINT(summary_message)
-        python_utils.PRINT('')
+        concurrent_task_utils.log(summary_message)
+        concurrent_task_utils.log('')
 
     return summary_messages

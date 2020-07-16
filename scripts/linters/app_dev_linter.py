@@ -23,8 +23,8 @@ import glob
 import os
 import sys
 
-import python_utils
 from . import linter_utils
+from .. import concurrent_task_utils
 
 APP_YAML_FILEPATH = os.path.join(os.getcwd(), 'app_dev.yaml')
 
@@ -34,7 +34,7 @@ def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
     valid files in the repository.
     """
     if verbose_mode_enabled:
-        python_utils.PRINT(
+        concurrent_task_utils.log(
             'Starting app_dev file check\n'
             '----------------------------------------')
 
@@ -64,7 +64,7 @@ def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
                     'any file or directory' % (
                         APP_YAML_FILEPATH, line_num + 1))
                 summary_messages.append(summary_message)
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 failed = True
 
         if failed:
@@ -76,7 +76,7 @@ def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
             summary_message = '%s app_dev file check passed' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX)
         summary_messages.append(summary_message)
-        python_utils.PRINT(summary_message)
-        python_utils.PRINT('')
+        concurrent_task_utils.log(summary_message)
+        concurrent_task_utils.log('')
 
     return summary_messages

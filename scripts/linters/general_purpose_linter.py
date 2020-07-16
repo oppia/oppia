@@ -28,6 +28,7 @@ import python_utils
 from . import js_ts_linter
 from . import linter_utils
 from .. import common
+from .. import concurrent_task_utils
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -567,9 +568,9 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             if regexp.search(stripped_line):
                 summary_message = ('%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message']))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
                 summary_messages.append(summary_message)
-                python_utils.PRINT('')
+                concurrent_task_utils.log('')
                 bad_pattern_count += 1
         if bad_pattern_count:
             failed = True
@@ -682,7 +683,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     filepath,
                     pattern_list[pattern_found]['message']))
                 summary_messages.append(summary_message)
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(summary_message)
 
         return failed, summary_messages
 
@@ -691,8 +692,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         patterns.
         """
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting mandatory patterns check')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting mandatory patterns check')
+            concurrent_task_utils.log(
+                '----------------------------------------')
 
         summary_messages = []
         failed = False
@@ -716,9 +718,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 summary_message = (
                     '%s Mandatory pattern check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
 
-        python_utils.PRINT('')
+        concurrent_task_utils.log('')
 
         summary_messages.append(summary_message)
         return summary_messages
@@ -726,8 +728,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
     def _check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting Pattern Checks')
-            python_utils.PRINT('----------------------------------------')
+            concurrent_task_utils.log('Starting Pattern Checks')
+            concurrent_task_utils.log(
+                '----------------------------------------')
         total_files_checked = 0
         total_error_count = 0
         summary_messages = []
@@ -752,8 +755,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                                 filepath, line_num + 1,
                                 BAD_PATTERNS[pattern]['message']))
                             summary_messages.append(summary_message)
-                            python_utils.PRINT(summary_message)
-                            python_utils.PRINT('')
+                            concurrent_task_utils.log(summary_message)
+                            concurrent_task_utils.log('')
                             total_error_count += 1
 
                 for regexp in BAD_PATTERNS_REGEXP:
@@ -782,9 +785,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                             summary_message = ('%s --> %s' % (
                                 filepath,
                                 REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
-                            python_utils.PRINT(summary_message)
+                            concurrent_task_utils.log(summary_message)
                             summary_messages.append(summary_message)
-                            python_utils.PRINT('')
+                            concurrent_task_utils.log('')
                             total_error_count += 1
             if failed:
                 summary_message = (
@@ -797,19 +800,20 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     linter_utils.SUCCESS_MESSAGE_PREFIX)
                 summary_messages.append(summary_message)
 
-            python_utils.PRINT('')
+            concurrent_task_utils.log('')
             if total_files_checked == 0:
-                python_utils.PRINT('There are no files to be checked.')
+                concurrent_task_utils.log('There are no files to be checked.')
             else:
-                python_utils.PRINT('(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count))
-                python_utils.PRINT(summary_message)
+                concurrent_task_utils.log(
+                    '(%s files checked, %s errors found)' % (
+                        total_files_checked, total_error_count))
+                concurrent_task_utils.log(summary_message)
         return summary_messages
 
     def _check_newline_at_eof(self):
         """This function is used to detect newline at the end of file."""
         if self.verbose_mode_enabled:
-            python_utils.PRINT(
+            concurrent_task_utils.log(
                 'Starting newline at eof check\n'
                 '----------------------------------------')
         summary_messages = []
@@ -827,7 +831,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         '%s --> There should be a single newline at the '
                         'end of file.' % filepath)
                     summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
+                    concurrent_task_utils.log(summary_message)
                     failed = True
 
             if failed:
@@ -839,7 +843,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     '%s Newline at the eof check passed.' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
             summary_messages.append(summary_message)
-            python_utils.PRINT(summary_message)
+            concurrent_task_utils.log(summary_message)
 
         return summary_messages
 
