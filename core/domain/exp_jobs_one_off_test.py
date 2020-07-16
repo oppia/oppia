@@ -1348,7 +1348,7 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
                     'cmd': 'edit_state_property',
                     'state_name': 'State2',
                     'property_name': 'answer_groups',
-                    'new_value': updated_answer_group_list1
+                    'new_value': updated_answer_group_list2
                 })], 'Fixed invalid inputs.')
 
         job_id = (
@@ -1361,9 +1361,9 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         print(actual_output)
         expected_output = [
-            u'[u\'MathEquationInput\', [u\'exp_id0 State2: x=y+z\', '
-            u'u\'exp_id0 State2: x+y=c\', u\'exp_id0 State1: x=y+z\', '
-            u'u\'exp_id0 State1: x+y=c\']]']
+            u'[u\'MathEquationInput\', '
+            u'[u\'exp_id0 State2: x=y\', u\'exp_id0 State2: x+y=c\', '
+            u'u\'exp_id0 State1: x=y+z\', u\'exp_id0 State1: x+y=c\']]']
 
         self.assertEqual(actual_output, expected_output)
 
