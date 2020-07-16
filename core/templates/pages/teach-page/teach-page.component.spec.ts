@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, async } from
+import { ComponentFixture, TestBed, async, fakeAsync, tick } from
   '@angular/core/testing';
 
 import { TeachPageComponent } from './teach-page.component';
@@ -135,18 +135,6 @@ describe('Teach Page', function() {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    // Property onhashchange and location.hash are reassigned because it shares
-    // same memory reference to all test blocks and the controller itself
-    // because $provide.value of WindowRef refers to windowRef as well.
-    // Once location.hash or onhashchange is setted in the controller,
-    // the value will be only available in the test block itself, not affecting
-    // others test block.
-    windowRef.nativeWindow.location.href = '';
-    windowRef.nativeWindow.onhashchange = null;
-    windowRef.nativeWindow.location.hash = '';
-  });
-
   it('should click on teach tab', () => {
     component.ngOnInit();
     expect(component.activeTabName).toBe('teach');
@@ -189,7 +177,7 @@ describe('Teach Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should apply to teach with oppia', () => {
+  it('should apply to teach with oppia', fakeAsync(() => {
     const applyToTeachWithOppiaEventSpy = spyOn(
       siteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
       .and.callThrough();
@@ -201,11 +189,10 @@ describe('Teach Page', function() {
       }
     });
     component.onApplyToTeachWithOppia();
-    setTimeout(() => {
-      fixture.detectChanges();
-      expect(windowRef.nativeWindow.location.href).toBe(
-        'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
-      expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-    }, 500);
-  });
+    tick(150);
+    fixture.detectChanges();
+    expect(windowRef.nativeWindow.location.href).toBe(
+      'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
+    expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
+  }));
 });
