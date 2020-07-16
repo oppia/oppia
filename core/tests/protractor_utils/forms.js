@@ -264,7 +264,10 @@ var RichTextEditor = async function(elem) {
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
-      if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
+      if (
+        [
+          'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
+        ].includes(componentName)) {
         await elem.all(
           by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
       }

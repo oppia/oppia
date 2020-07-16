@@ -389,6 +389,12 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NumberAttemptsService } from
   'pages/exploration-player-page/services/number-attempts.service';
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { NumericInputValidationService } from
@@ -466,6 +472,8 @@ import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service.ts';
+import { ReviewTestObjectFactory } from
+  'domain/review_test/review-test-object.factory';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -825,6 +833,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe;
   static numberAttemptsService: NumberAttemptsService;
+  static numericExpressionInputRulesService: NumericExpressionInputRulesService;
+  static numericExpressionInputValidationService: NumericExpressionInputValidationService;
   static numericInputRulesService: NumericInputRulesService;
   static numericInputValidationService: NumericInputValidationService;
   static numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
@@ -865,6 +875,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static reviewTestEngineService: ReviewTestEngineService;
+  static reviewTestObjectFactory: ReviewTestObjectFactory;
   static rubricObjectFactory: RubricObjectFactory;
   static ruleObjectFactory: RuleObjectFactory;
   static schemaDefaultValueService: SchemaDefaultValueService;
@@ -1129,6 +1140,8 @@ private nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe,
 private numberAttemptsService: NumberAttemptsService,
+private numericExpressionInputRulesService: NumericExpressionInputRulesService,
+private numericExpressionInputValidationService: NumericExpressionInputValidationService,
 private numericInputRulesService: NumericInputRulesService,
 private numericInputValidationService: NumericInputValidationService,
 private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
@@ -1169,6 +1182,7 @@ private readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory,
 private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
 private reviewTestBackendApiService: ReviewTestBackendApiService,
 private reviewTestEngineService: ReviewTestEngineService,
+private reviewTestObjectFactory: ReviewTestObjectFactory,
 private rubricObjectFactory: RubricObjectFactory,
 private ruleObjectFactory: RuleObjectFactory,
 private schemaDefaultValueService: SchemaDefaultValueService,
@@ -1434,6 +1448,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.normalizeWhitespacePipe = this.normalizeWhitespacePipe;
     OppiaAngularRootComponent.normalizeWhitespacePunctuationAndCasePipe = this.normalizeWhitespacePunctuationAndCasePipe;
     OppiaAngularRootComponent.numberAttemptsService = this.numberAttemptsService;
+    OppiaAngularRootComponent.numericExpressionInputRulesService = this.numericExpressionInputRulesService;
+    OppiaAngularRootComponent.numericExpressionInputValidationService = this.numericExpressionInputValidationService;
     OppiaAngularRootComponent.numericInputRulesService = this.numericInputRulesService;
     OppiaAngularRootComponent.numericInputValidationService = this.numericInputValidationService;
     OppiaAngularRootComponent.numberWithUnitsObjectFactory = this.numberWithUnitsObjectFactory;
@@ -1474,6 +1490,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.recordedVoiceoversObjectFactory = this.recordedVoiceoversObjectFactory;
     OppiaAngularRootComponent.reviewTestBackendApiService = this.reviewTestBackendApiService;
     OppiaAngularRootComponent.reviewTestEngineService = this.reviewTestEngineService;
+    OppiaAngularRootComponent.reviewTestObjectFactory = this.reviewTestObjectFactory;
     OppiaAngularRootComponent.rubricObjectFactory = this.rubricObjectFactory;
     OppiaAngularRootComponent.ruleObjectFactory = this.ruleObjectFactory;
     OppiaAngularRootComponent.schemaDefaultValueService = this.schemaDefaultValueService;
