@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for stateParamChangesEditor directive.
+ * @fileoverview Unit tests for stateParamChangesEditor component.
  */
 
 import { TestBed } from '@angular/core/testing';

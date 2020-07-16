@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the param changes editor section of the
+ * @fileoverview Component for the param changes editor section of the
  * state editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-param-changes.service.ts');

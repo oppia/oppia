@@ -17,8 +17,6 @@
  * exploration editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').component('improvementsTab', {
   template: require('./improvements-tab.component.html')
 });

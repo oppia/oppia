@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive to get changes in human readable form.
+ * @fileoverview Component to get changes in human readable form.
  */
-
-require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').component('changesInHumanReadableForm', {
   bindings: {
