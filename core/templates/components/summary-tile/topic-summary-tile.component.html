@@ -1,0 +1,44 @@
+<a href="{{ getTopicLink() }}">
+  <div class="oppia-topic-image">
+    <picture>
+      <source type="image/webp" [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')">
+      <img [src]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')" alt="" class="topic-thumbnail">
+    </picture>
+  </div>
+  <div class="oppia-topic-details">
+    <div class="oppia-topic-name">
+      {{ topicSummary.getName() }}
+    </div>
+    <span [innerHTML]="'I18N_TOPIC_SUMMARY_TILE_LESSONS' | translate:{lessonCount: topicSummary.getCanonicalStoryCount()}"
+          translate-interpolation="messageformat">
+    </span>
+  </div>
+</a>
+<style>
+  topic-summary-tile .oppia-topic-image {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 0 34px 0 34px;
+    z-index: 1;
+  }
+  topic-summary-tile .topic-thumbnail {
+    height: 17vh;
+    margin-left: 12%;
+  }
+  topic-summary-tile .oppia-topic-details {
+    color: white;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    padding: 10px;
+  }
+  topic-summary-tile .oppia-topic-name {
+    display: block;
+    font-size: 1.4em;
+    padding-bottom: 5px;
+    text-align: center;
+  }
+  topic-summary-tile a:hover {
+    text-decoration: none;
+  }
+</style>

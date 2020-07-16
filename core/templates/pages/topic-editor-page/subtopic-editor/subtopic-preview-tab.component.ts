@@ -30,7 +30,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 
 angular.module('oppia').component('subtopicPreviewTab', {
   template: require('./subtopic-preview-tab.component.html'),
