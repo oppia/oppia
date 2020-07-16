@@ -187,19 +187,19 @@ describe('Exploration stats', function() {
     });
 
     it('should create a copy with an added state', () => {
-      let copy = original.withStateAdded('Epilogue');
+      let copy = original.createNewWithStateAdded('Epilogue');
       expect(copy.hasStateStates('Epilogue')).toBeTrue();
       expect(original.hasStateStates('Epilogue')).toBeFalse();
     });
 
     it('should create a copy with a deleted state', () => {
-      let copy = original.withStateDeleted('End');
+      let copy = original.createNewWithStateDeleted('End');
       expect(copy.hasStateStates('End')).toBeFalse();
       expect(original.hasStateStates('End')).toBeTrue();
     });
 
     it('should create a copy with a renamed state', () => {
-      let copy = original.withStateRenamed('Introduction', 'Prologue');
+      let copy = original.createNewWithStateRenamed('Introduction', 'Prologue');
       expect(copy.hasStateStates('Introduction')).toBeFalse();
       expect(original.hasStateStates('Prologue')).toBeFalse();
       expect(copy.getStateStats('Prologue'))

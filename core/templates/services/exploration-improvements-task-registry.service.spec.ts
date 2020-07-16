@@ -34,10 +34,10 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsObjectFactory, IExplorationStatsBackendDict } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import {
-  ExplorationTaskObjectFactory,
-  ExplorationTaskType,
   ExplorationTask,
-  IExplorationTaskBackendDict,
+  ExplorationTaskType,
+  ExplorationTaskBackendDict,
+  ExplorationTaskObjectFactory,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
@@ -75,7 +75,7 @@ describe('Exploration improvements task registrar service', () => {
   let stateBackendDict: IStateBackendDict;
   let stateStatsBackendDict: IStateStatsBackendDict;
   let statesBackendDict: {[stateName: string]: IStateBackendDict};
-  let taskBackendDict: IExplorationTaskBackendDict;
+  let taskBackendDict: ExplorationTaskBackendDict;
 
   const expId = 'eid';
   const expVersion = 1;

@@ -70,7 +70,7 @@ export class ExplorationStats {
     return this.stateStatsMapping.get(stateName);
   }
 
-  withStateAdded(newStateName: string): ExplorationStats {
+  createNewWithStateAdded(newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     newStateStatsMapping.set(newStateName, new StateStats(0, 0, 0, 0, 0, 0));
     return new ExplorationStats(
@@ -78,7 +78,7 @@ export class ExplorationStats {
       this.numCompletions, newStateStatsMapping);
   }
 
-  withStateDeleted(oldStateName: string): ExplorationStats {
+  createNewWithStateDeleted(oldStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     // ES2016 Map uses delete as a method name despite it being a reserved word.
     // eslint-disable-next-line dot-notation
@@ -88,7 +88,7 @@ export class ExplorationStats {
       this.numCompletions, newStateStatsMapping);
   }
 
-  withStateRenamed(
+  createNewWithStateRenamed(
       oldStateName: string, newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     newStateStatsMapping.set(

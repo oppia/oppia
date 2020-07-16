@@ -223,7 +223,7 @@ export class ExplorationImprovementsTaskRegistryService {
     }
 
     this.tasksByState.set(newStateName, newStateTasks);
-    this.expStats = this.expStats.withStateAdded(newStateName);
+    this.expStats = this.expStats.createNewWithStateAdded(newStateName);
   }
 
   onStateDelete(oldStateName: string): void {
@@ -233,10 +233,8 @@ export class ExplorationImprovementsTaskRegistryService {
       oldTask.markAsObsolete();
     }
 
-    // ES2016 Map uses delete as a method name despite it being a reserved word.
-    // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
-    this.expStats = this.expStats.withStateDeleted(oldStateName);
+    this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
   }
 
   onStateRename(oldStateName: string, newStateName: string): void {
@@ -259,10 +257,9 @@ export class ExplorationImprovementsTaskRegistryService {
     }
 
     this.tasksByState.set(newStateName, newStateTasks);
-    // ES2016 Map uses delete as a method name despite it being a reserved word.
-    // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
-    this.expStats = this.expStats.withStateRenamed(oldStateName, newStateName);
+    this.expStats = this.expStats.createNewWithStateRenamed(
+      oldStateName, newStateName);
   }
 
   onChangeInteraction(stateName: string): void {

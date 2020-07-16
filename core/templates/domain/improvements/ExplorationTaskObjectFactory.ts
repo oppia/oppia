@@ -44,7 +44,7 @@ export type ExplorationTaskType = (
   'needs_guiding_responses' |
   'successive_incorrect_answers');
 
-export type IExplorationTaskBackendDict = (
+export type ExplorationTaskBackendDict = (
   ITaskEntryBackendDict<'high_bounce_rate'> |
   ITaskEntryBackendDict<'ineffective_feedback_loop'> |
   ITaskEntryBackendDict<'needs_guiding_responses'> |
@@ -109,7 +109,7 @@ export class ExplorationTaskObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: IExplorationTaskBackendDict): ExplorationTask {
+      backendDict: ExplorationTaskBackendDict): ExplorationTask {
     switch (backendDict.task_type) {
       case 'high_bounce_rate':
         return this.hbrTaskObjectFactory.createFromBackendDict(backendDict);
