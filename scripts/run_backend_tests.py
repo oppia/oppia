@@ -166,9 +166,13 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 class TestingTaskSpec(python_utils.OBJECT):
     """Executes a set of tests given a test class name."""
 
-    def __init__(self, test_target, generate_coverage_report):
+    def __init__(
+            self, test_target, generate_coverage_report,
+            verbose=False, name=None):
         self.test_target = test_target
         self.generate_coverage_report = generate_coverage_report
+        self.verbose = verbose
+        self.name = name
 
     def run(self):
         """Runs all tests corresponding to the given test target."""
@@ -180,7 +184,14 @@ class TestingTaskSpec(python_utils.OBJECT):
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        return run_shell_cmd(exc_list)
+        result = run_shell_cmd(exc_list)
+
+        if self.verbose:
+            concurrent_task_utils.log('LOG %s:' % self.name, show_time=True)
+            concurrent_task_utils.log(result)
+            concurrent_task_utils.log(
+                '----------------------------------------')
+        return result
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -310,9 +321,10 @@ def main(args=None):
     tasks = []
     for test_target in all_test_targets:
         test = TestingTaskSpec(
-            test_target, parsed_args.generate_coverage_report)
+            test_target, parsed_args.generate_coverage_report,
+            parsed_args.verbose, name=test_target)
         task = concurrent_task_utils.create_task(
-            test.run, parsed_args.verbose, semaphore, name=test_target)
+            test.run, semaphore, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 

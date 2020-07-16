@@ -45,13 +45,12 @@ def log(message, show_time=False):
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, semaphore, name):
+    def __init__(self, func, semaphore, name):
         super(TaskThread, self).__init__()
         self.func = func
         self.output = None
         self.exception = None
         self.stacktrace = None
-        self.verbose = verbose
         self.name = name
         self.semaphore = semaphore
         self.finished = False
@@ -59,10 +58,6 @@ class TaskThread(threading.Thread):
     def run(self):
         try:
             self.output = self.func()
-            if self.verbose:
-                log('LOG %s:' % self.name, show_time=True)
-                log(self.output)
-                log('----------------------------------------')
             log('FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)
         except Exception as e:
@@ -131,12 +126,11 @@ def execute_tasks(tasks, semaphore):
     _check_all_tasks(currently_running_tasks)
 
 
-def create_task(func, verbose, semaphore, name=None):
+def create_task(func, semaphore, name=None):
     """Create a Task in its Thread.
 
     Args:
         func: Function. The function that is going to run.
-        verbose: bool. True if verbose mode is enabled.
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
         name: str. Name of the task that is going to be created.
@@ -144,5 +138,5 @@ def create_task(func, verbose, semaphore, name=None):
     Returns:
         task: TaskThread object. Created task.
     """
-    task = TaskThread(func, verbose, semaphore, name)
+    task = TaskThread(func, semaphore, name)
     return task

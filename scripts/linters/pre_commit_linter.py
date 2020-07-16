@@ -523,13 +523,12 @@ def main(args=None):
 
     for linter in custom_linters:
         task_custom = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks, verbose_mode_enabled,
-            custom_semaphore, name='custom')
+            linter.perform_all_lint_checks, custom_semaphore, name='custom')
         tasks_custom.append(task_custom)
 
     for linter in third_party_linters:
         task_third_party = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks, verbose_mode_enabled,
+            linter.perform_all_lint_checks,
             third_party_semaphore, name='third_party')
         tasks_third_party.append(task_third_party)
 
