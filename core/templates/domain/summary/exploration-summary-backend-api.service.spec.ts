@@ -43,7 +43,7 @@ describe('Exploration Summary Backend Api Service', () => {
       ExplorationSummaryBackendApiService
     );
     csrfService = TestBed.get(CsrfTokenService);
-    alertsService = TestBed.get(UpgradedServices);
+    alertsService = TestBed.get(AlertsService);
     httpTestingController = TestBed.get(HttpTestingController);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(function() {
