@@ -69,7 +69,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_build_main(args):
             pass
 
-        def mock_popen(args, shell):
+        def mock_popen(args, env, shell):
             return
         # pylint: enable=unused-argument
 
@@ -695,7 +695,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 'app_dev.yaml'))
         popen_swap = self.popen_swap(
             expected_args=[(expected_command,)],
-            expected_kwargs=[{'shell': True}])
+            expected_kwargs=[{
+                'env': {
+                    'PORTSERVER_ADDRESS':
+                        run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                },
+                'shell': True,
+            }])
         with popen_swap:
             run_e2e_tests.start_google_app_engine_server(True, 'critical')
 
@@ -710,7 +716,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 'app.yaml'))
         popen_swap = self.popen_swap(
             expected_args=[(expected_command,)],
-            expected_kwargs=[{'shell': True}])
+            expected_kwargs=[{
+                'env': {
+                    'PORTSERVER_ADDRESS':
+                        run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                },
+                'shell': True,
+            }])
         with popen_swap:
             run_e2e_tests.start_google_app_engine_server(False, 'critical')
 
@@ -730,13 +742,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_when_no_other_instance_running(self):
 
+        mock_process = MockProcessClass()
+
         def mock_is_oppia_server_already_running(*unused_args):
             return False
 
         def mock_setup_and_install_dependencies(unused_arg):
             return
 
-        def mock_register(unused_func):
+        def mock_register(unused_func, unused_arg=None):
             return
 
         def mock_cleanup():
@@ -764,7 +778,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_commands):
             def mock_communicate():
                 return
-            result = MockProcessClass()
+            result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
@@ -788,7 +802,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_setup_and_install_dependencies, expected_args=[(False,)])
 
         register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[(mock_cleanup,)])
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup,),
+                (run_e2e_tests.cleanup_portserver, mock_process),
+            ])
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
         build_swap = self.swap_with_checks(
@@ -815,10 +832,21 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[([
-                common.NODE_BIN_PATH, '--unhandled-rejections=strict',
-                run_e2e_tests.PROTRACTOR_BIN_PATH,
-                'commands'],)])
+            subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    'python',
+                    'scripts/run_portserver.py',
+                    '--portserver_unix_socket_address',
+                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                ],),
+                ([
+                    common.NODE_BIN_PATH,
+                    '--unhandled-rejections=strict',
+                    run_e2e_tests.PROTRACTOR_BIN_PATH,
+                    'commands',
+                ],),
+            ],
+        )
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
@@ -831,13 +859,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_skip_build(self):
 
+        mock_process = MockProcessClass()
+
         def mock_is_oppia_server_already_running(*unused_args):
             return False
 
         def mock_setup_and_install_dependencies(unused_arg):
             return
 
-        def mock_register(unused_func):
+        def mock_register(unused_func, unused_arg=None):
             return
 
         def mock_cleanup():
@@ -865,7 +895,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_commands):
             def mock_communicate():
                 return
-            result = MockProcessClass()
+            result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
@@ -887,7 +917,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'setup_and_install_dependencies',
             mock_setup_and_install_dependencies, expected_args=[(True,)])
         register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[(mock_cleanup,)])
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup,),
+                (run_e2e_tests.cleanup_portserver, mock_process),
+            ])
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
         modify_constants_swap = self.swap_with_checks(
             build, 'modify_constants', mock_modify_constants,
@@ -913,10 +946,21 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[([
-                common.NODE_BIN_PATH, '--unhandled-rejections=strict',
-                run_e2e_tests.PROTRACTOR_BIN_PATH,
-                'commands'],)])
+            subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    'python',
+                    'scripts/run_portserver.py',
+                    '--portserver_unix_socket_address',
+                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                ],),
+                ([
+                    common.NODE_BIN_PATH,
+                    '--unhandled-rejections=strict',
+                    run_e2e_tests.PROTRACTOR_BIN_PATH,
+                    'commands'
+                ],),
+            ],
+        )
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
@@ -950,13 +994,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_in_debug_mode(self):
 
+        mock_process = MockProcessClass()
+
         def mock_is_oppia_server_already_running(*unused_args):
             return False
 
         def mock_setup_and_install_dependencies(unused_arg):
             return
 
-        def mock_register(unused_func):
+        def mock_register(unused_func, unused_arg=None):
             return
 
         def mock_cleanup():
@@ -984,7 +1030,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_commands):
             def mock_communicate():
                 return
-            result = MockProcessClass()
+            result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
@@ -1008,7 +1054,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_setup_and_install_dependencies, expected_args=[(False,)])
 
         register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[(mock_cleanup,)])
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup,),
+                (run_e2e_tests.cleanup_portserver, mock_process),
+            ])
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
         build_swap = self.swap_with_checks(
@@ -1035,10 +1084,22 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[([
-                common.NODE_BIN_PATH, '--inspect-brk',
-                '--unhandled-rejections=strict',
-                run_e2e_tests.PROTRACTOR_BIN_PATH, 'commands'],)])
+            subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    'python',
+                    'scripts/run_portserver.py',
+                    '--portserver_unix_socket_address',
+                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                ],),
+                ([
+                    common.NODE_BIN_PATH,
+                    '--inspect-brk',
+                    '--unhandled-rejections=strict',
+                    run_e2e_tests.PROTRACTOR_BIN_PATH,
+                    'commands',
+                ],),
+            ],
+        )
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
@@ -1051,13 +1112,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_in_with_chromedriver_flag(self):
 
+        mock_process = MockProcessClass()
+
         def mock_is_oppia_server_already_running(*unused_args):
             return False
 
         def mock_setup_and_install_dependencies(unused_arg):
             return
 
-        def mock_register(unused_func):
+        def mock_register(unused_func, unused_arg=None):
             return
 
         def mock_cleanup():
@@ -1085,7 +1148,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_commands):
             def mock_communicate():
                 return
-            result = MockProcessClass()
+            result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
@@ -1109,7 +1172,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_setup_and_install_dependencies, expected_args=[(False,)])
 
         register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[(mock_cleanup,)])
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup,),
+                (run_e2e_tests.cleanup_portserver, mock_process),
+            ])
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
         build_swap = self.swap_with_checks(
@@ -1136,9 +1202,21 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[([
-                common.NODE_BIN_PATH, '--unhandled-rejections=strict',
-                run_e2e_tests.PROTRACTOR_BIN_PATH, 'commands'],)])
+            subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    'python',
+                    'scripts/run_portserver.py',
+                    '--portserver_unix_socket_address',
+                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                ],),
+                ([
+                    common.NODE_BIN_PATH,
+                    '--unhandled-rejections=strict',
+                    run_e2e_tests.PROTRACTOR_BIN_PATH,
+                    'commands',
+                ],),
+            ],
+        )
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
