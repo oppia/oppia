@@ -24,7 +24,8 @@ var until = protractor.ExpectedConditions;
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 
-var toastSuccessElement = element(by.css('.toast-info'));
+var toastInfoElement = element(by.css('.toast-info'));
+var toastSuccessElement = element(by.css('.toast-success'));
 
 var alertToBePresent = async function() {
   await browser.wait(
@@ -120,10 +121,14 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
-  await visibilityOf(toastSuccessElement, errorMessage);
+  await visibilityOf(toastInfoElement, errorMessage);
 };
 
 var invisibilityOfInfoToast = async function(errorMessage) {
+  await invisibilityOf(toastInfoElement, errorMessage);
+};
+
+var visibilityOfSuccessToast = async function(errorMessage) {
   await invisibilityOf(toastSuccessElement, errorMessage);
 };
 
@@ -135,5 +140,6 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
-exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
+exports.visibilityOfInfoToast = visibilityOfInfoToast;
+exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
