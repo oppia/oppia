@@ -111,6 +111,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.objectUndoStack = [];
       ctrl.objectRedoStack = [];
       ctrl.canvasObjects = [];
+      ctrl.undoFlag = false;
       ctrl.isRedo = false;
       ctrl.undoLimit = 5;
       ctrl.savedSVGDiagram = '';
@@ -729,8 +730,10 @@ angular.module('oppia').component('svgFilenameEditor', {
               action: 'remove',
               object: undoObj.object
             });
-            // Not adding the shape to canvasObjects because it is added by the
-            // event function.
+            // Adding the object in the correct position according to initial
+            // order.
+            ctrl.undoFlag = true;
+            ctrl.canvasObjects.splice(undoObj.index, 0, undoObj.object);
             ctrl.canvas.add(undoObj.object);
           }
           ctrl.canvas.renderAll();
@@ -753,8 +756,10 @@ angular.module('oppia').component('svgFilenameEditor', {
             // event function.
             ctrl.canvas.add(redoObj.object);
           } else {
-            var shape = ctrl.canvasObjects.pop();
-            var index = ctrl.canvas._objects.indexOf(shape);
+            var shape = redoObj.object;
+            var index = ctrl.canvasObjects.indexOf(shape);
+            ctrl.canvasObjects.splice(index, 1);
+            index = ctrl.canvas._objects.indexOf(shape);
             ctrl.canvas._objects.splice(index, 1);
           }
         }
@@ -772,7 +777,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         if (shape) {
           undoStackPush({
             action: 'remove',
-            object: shape
+            object: shape,
+            index: index
           });
           ctrl.objectRedoStack = [];
           ctrl.canvasObjects.splice(index, 1);
@@ -1020,7 +1026,10 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.drawMode === DRAW_MODE_NONE ||
             ctrl.drawMode === DRAW_MODE_PENCIL) {
             var shape = ctrl.canvas._objects[ctrl.canvas._objects.length - 1];
-            ctrl.canvasObjects.push(shape);
+            if (!ctrl.undoFlag) {
+              ctrl.canvasObjects.push(shape);
+            }
+            ctrl.undoFlag = false;
             if (!ctrl.isRedo) {
               undoStackPush({
                 action: 'add',
