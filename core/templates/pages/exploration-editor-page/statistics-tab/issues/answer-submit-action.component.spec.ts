@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for answerSubmitAction directive.
+ * @fileoverview Unit tests for answerSubmitAction component.
  */
 
 import { TestBed } from '@angular/core/testing';

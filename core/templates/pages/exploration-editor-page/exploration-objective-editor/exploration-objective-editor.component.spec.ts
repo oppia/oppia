@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for explorationObjectiveEditor directive.
+ * @fileoverview Unit tests for explorationObjectiveEditor component.
  */
 
 require(
