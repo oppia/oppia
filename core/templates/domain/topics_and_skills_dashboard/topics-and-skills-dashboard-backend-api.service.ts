@@ -103,7 +103,7 @@ interface SkillsDashboardData {
 }
 
 interface AssignedSkillDataBackendDict {
-  'topic_assignments_dict': AssignedSkillBackendDict[];
+  'topic_assignment_dicts': AssignedSkillBackendDict[];
 }
 
 @Injectable({
@@ -168,7 +168,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
       });
     return this.http.get<AssignedSkillDataBackendDict>(
       assignSkillDataUrl).toPromise().then(dict => {
-      return dict.topic_assignments_dict.map(
+      return dict.topic_assignment_dicts.map(
         backendDict => this.assignedSkillObjectFactory
           .createFromBackendDict(backendDict));
     });
