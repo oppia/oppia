@@ -1359,7 +1359,7 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
                 job_id))
-        print(actual_output)
+
         expected_output = [
             u'[u\'MathEquationInput\', '
             u'[u\'exp_id0 State2: x=y\', u\'exp_id0 State2: x+y=c\', '
