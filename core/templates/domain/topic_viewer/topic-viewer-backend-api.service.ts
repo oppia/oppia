@@ -21,9 +21,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  ReadOnlyTopicObjectFactory,
   ReadOnlyTopic,
-  ReadOnlyTopicBackendDict
+  ReadOnlyTopicBackendDict,
+  ReadOnlyTopicObjectFactory
 } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';

@@ -30,13 +30,13 @@ interface StateTopAnswers {
   [state: string]: AnswerStats[];
 }
 
-interface StateTopAnswerBackendDicts {
+interface StateTopAnswersBackendDict {
   [state: string]: AnswerStatsBackendDict[];
 }
 
 export interface StateTopAnswersStatsBackendDict {
+  'answers': StateTopAnswersBackendDict;
   'interaction_ids': StateInteractionIds;
-  'answers': StateTopAnswerBackendDicts;
 }
 
 export class StateTopAnswersStats {
@@ -57,7 +57,7 @@ export class StateTopAnswersStatsObjectFactory {
       backendDict: StateTopAnswersStatsBackendDict): StateTopAnswersStats {
     let stateTopAnswers: StateTopAnswers = {};
 
-    for (var stateName in backendDict.answers) {
+    for (let stateName in backendDict.answers) {
       stateTopAnswers[stateName] = backendDict.answers[stateName].map(
         answerStatsDict => this.answerStatsObjectFactory
           .createFromBackendDict(answerStatsDict));

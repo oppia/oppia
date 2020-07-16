@@ -201,7 +201,7 @@ export class Topic {
     }
     let topicSkillIds = cloneDeep(
       this._uncategorizedSkillSummaries.map((
-          skillSummary: ShortSkillSummary) =>{
+          skillSummary: ShortSkillSummary) => {
         return skillSummary.getId();
       }));
     for (let i = 0; i < subtopics.length; i++) {
@@ -443,7 +443,7 @@ export class Topic {
     this._uncategorizedSkillSummaries.length = 0;
   }
 
-  getUncategorizedSkillSummaries(): Array<ShortSkillSummary> {
+  getUncategorizedSkillSummaries(): ShortSkillSummary[] {
     return this._uncategorizedSkillSummaries.slice();
   }
 

@@ -21,9 +21,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  SubtopicDataBackendDict,
   ReadOnlySubtopicPageData,
-  ReadOnlySubtopicPageObjectFactory
+  ReadOnlySubtopicPageObjectFactory,
+  SubtopicDataBackendDict
 } from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';

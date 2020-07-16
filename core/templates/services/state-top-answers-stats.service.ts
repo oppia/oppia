@@ -105,7 +105,7 @@ angular.module('oppia').factory('StateTopAnswersStatsService', [
           return;
         }
         workingStateTopAnswersStats = {};
-        for (var stateName in stateTopAnswersStats.answers) {
+        for (let stateName in stateTopAnswersStats.answers) {
           workingStateTopAnswersStats[stateName] = {
             answers: stateTopAnswersStats.answers[stateName],
             interactionId: (

@@ -22,21 +22,21 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  AssignedSkillObjectFactory,
   AssignedSkill,
-  AssignedSkillBackendDict
+  AssignedSkillBackendDict,
+  AssignedSkillObjectFactory
 } from 'domain/skill/assigned-skill-object.factory';
 import {
-  AugmentedSkillSummaryObjectFactory,
+  AugmentedSkillSummary,
   AugmentedSkillSummaryBackendDict,
-  AugmentedSkillSummary
+  AugmentedSkillSummaryObjectFactory
 } from 'domain/skill/augmented-skill-summary-object.factory';
 import {
-  ShortSkillSummaryBackendDict,
   ShortSkillSummary,
+  ShortSkillSummaryBackendDict,
   ShortSkillSummaryObjectFactory
 } from 'domain/skill/ShortSkillSummaryObjectFactory';
-import { SkillSummaryObjectFactory, SkillSummary, SkillSummaryBackendDict } from
+import { SkillSummary, SkillSummaryBackendDict, SkillSummaryObjectFactory } from
   'domain/skill/skill-summary-object.factory';
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
@@ -45,7 +45,7 @@ import {
   TopicsAndSkillsDashboardFilter
 // eslint-disable-next-line max-len
 } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
-import { TopicSummaryObjectFactory, TopicSummary, TopicSummaryBackendDict } from
+import { TopicSummary, TopicSummaryBackendDict, TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';

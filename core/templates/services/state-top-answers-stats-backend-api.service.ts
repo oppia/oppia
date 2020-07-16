@@ -22,8 +22,8 @@ import { Injectable } from '@angular/core';
 
 import { ServicesConstants } from 'services/services.constants';
 import {
-  StateTopAnswersStatsBackendDict,
   StateTopAnswersStats,
+  StateTopAnswersStatsBackendDict,
   StateTopAnswersStatsObjectFactory
 } from 'domain/statistics/state-top-answers-stats-object.factory';
 import { UrlInterpolationService } from

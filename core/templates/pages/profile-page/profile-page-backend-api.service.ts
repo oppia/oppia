@@ -26,7 +26,7 @@ import { ProfilePageDomainConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service.ts';
-import { UserProfileObjectFactory, UserProfile, UserProfileBackendDict } from
+import { UserProfile, UserProfileBackendDict, UserProfileObjectFactory } from
   'domain/user/user-profile-object.factory';
 
 @Injectable({

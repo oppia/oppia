@@ -31,8 +31,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
   FeaturedTranslationLanguage,
-  FeaturedTranslationLanguageObjectFactory,
   FeaturedTranslationLanguageBackendDict,
+  FeaturedTranslationLanguageObjectFactory
 } from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 const constants = require('constants.ts');
