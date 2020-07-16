@@ -88,7 +88,7 @@ var customizeComponent = async function(modal, shapes) {
     await waitFor.elementToBeClickable(
       shapeTool,
       'Could not click on the required tool');
-    if(shape === 'bezier') {
+    if (shape === 'bezier') {
       await shapeTool.click();
     }
     await shapeTool.click();

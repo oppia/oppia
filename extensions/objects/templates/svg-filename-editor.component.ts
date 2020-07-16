@@ -599,7 +599,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         createPolygon();
       };
 
-      function makeCurveCircle(left, top) {
+      var makeCurveCircle = function(left, top) {
         var size = ctrl.fabricjsOptions.size;
         var circle = new fabric.Circle({
           left: left,
@@ -613,7 +613,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         return circle;
       };
 
-      function drawQuadratic() {
+      var drawQuadratic = function() {
         var size = ctrl.fabricjsOptions.size;
         var curve = new fabric.Path('M 40 40 Q 95, 100, 150, 40', {
           stroke: ctrl.fabricjsOptions.stroke,
@@ -624,21 +624,21 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
         ctrl.canvas.add(curve);
 
-        var p1 = makeCurveCircle(95, 100)
-        p1.name = "p1";
+        var p1 = makeCurveCircle(95, 100);
+        p1.name = 'p1';
         p1.set({
           radius: 12,
           fill: '#ffffff',
           strokeWidth: 5
-        })
+        });
         ctrl.canvas.add(p1);
 
         var p0 = makeCurveCircle(40, 40);
-        p0.name = "p0";
+        p0.name = 'p0';
         ctrl.canvas.add(p0);
 
         var p2 = makeCurveCircle(150, 40);
-        p2.name = "p2";
+        p2.name = 'p2';
         ctrl.canvas.add(p2);
       };
 
@@ -671,7 +671,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.drawMode = DRAW_MODE_NONE;
           // Adding a new path so that the bbox is computed correctly.
           var size = ctrl.fabricjsOptions.size;
-          var curve = new fabric.Path(path , {
+          var curve = new fabric.Path(path, {
             stroke: ctrl.fabricjsOptions.stroke,
             fill: ctrl.fabricjsOptions.fill,
             strokeWidth: parseInt(size.substring(0, size.length - 2)),
@@ -796,7 +796,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
           ctrl.canvas.getObjects().slice(-4, -3)[0].set({
             stroke: ctrl.fabricjsOptions.stroke
-          })
+          });
           ctrl.canvas.renderAll();
         } else {
           var shape = ctrl.canvas.getActiveObject();
@@ -815,7 +815,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
           ctrl.canvas.getObjects().slice(-4, -3)[0].set({
             fill: ctrl.fabricjsOptions.fill
-          })
+          });
           ctrl.canvas.renderAll();
         } else {
           var shape = ctrl.canvas.getActiveObject();
@@ -871,18 +871,19 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.canvas.getObjects().slice(-2).forEach(function(object) {
             object.set({
               radius: actualSize + 2
-            })
-          })
+            });
+          });
           ctrl.canvas.getObjects().slice(-4, -3)[0].set({
             strokeWidth: actualSize
-          })
+          });
           ctrl.canvas.renderAll();
         } else {
           var shape = ctrl.canvas.getActiveObject();
           var size = ctrl.fabricjsOptions.size;
           ctrl.canvas.freeDrawingBrush.width = parseInt(
             size.substring(0, size.length - 2));
-          var strokeWidthShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
+          var strokeWidthShapes = [
+            'rect', 'circle', 'path', 'line', 'polyline'];
           if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
             shape.set({
               strokeWidth: parseInt(size.substring(0, size.length - 2))
@@ -999,14 +1000,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.canvas.on('object:moving', function(e) {
           if (ctrl.drawMode === DRAW_MODE_BEZIER) {
             var pt = e.target;
-            var curve = ctrl.canvas.getObjects().slice(-4,-3)[0];
-            if (e.target.name == 'p0') {
+            var curve = ctrl.canvas.getObjects().slice(-4, -3)[0];
+            if (e.target.name === 'p0') {
               curve.path[0][1] = pt.left;
               curve.path[0][2] = pt.top;
-            } else if (e.target.name == 'p1') {
+            } else if (e.target.name === 'p1') {
               curve.path[1][1] = pt.left;
               curve.path[1][2] = pt.top;
-            } else if (e.target.name == 'p2') {
+            } else if (e.target.name === 'p2') {
               curve.path[1][3] = pt.left;
               curve.path[1][4] = pt.top;
             }
@@ -1106,7 +1107,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         createColorPicker('stroke');
         createColorPicker('fill');
         createColorPicker('bg');
-        fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+        fabric.Object.prototype.originX = 'center';
+        fabric.Object.prototype.originY = 'center';
       };
 
       ctrl.$onInit = function() {
