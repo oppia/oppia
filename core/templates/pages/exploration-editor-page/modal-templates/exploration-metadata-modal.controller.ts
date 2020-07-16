@@ -29,6 +29,12 @@ require(
   'pages/exploration-editor-page/services/exploration-objective.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-title-editor/' +
+  'exploration-title-editor.component.ts');
+require(
+  'pages/exploration-editor-page/exploration-objective-editor/' +
+  'exploration-objective-editor.component.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require('services/alerts.service.ts');
 
