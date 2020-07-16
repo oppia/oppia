@@ -54,7 +54,7 @@ class MockI18nLanguageCodeService {
 let component: ErrorPageComponent;
 let fixture: ComponentFixture<ErrorPageComponent>;
 
-fdescribe('Error page', () => {
+describe('Error page', () => {
   let pageTitle = null;
   let i18n = null;
   let translate = null;
