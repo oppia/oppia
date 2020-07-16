@@ -15,39 +15,94 @@
 /**
  * @fileoverview Unit tests for error page.
  */
+import { Pipe, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { ErrorPageComponent } from './error-page.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PageTitleService } from 'services/page-title.service';
+import { TranslateService } from 'services/translate.service';
 
-describe('Error page', function() {
-  var ctrl = null;
-  var Title = null;
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+class MockTranslateService {
+  languageCode = 'es';
+  use(newLanguageCode: string): string {
+    this.languageCode = newLanguageCode;
+    return this.languageCode;
+  }
+}
+
+class MockI18nLanguageCodeService {
+  codeChangeEventEmiiter = new EventEmitter<string>();
+  getCurrentI18nLanguageCode() {
+    return 'en';
+  }
+
+  get onI18nLanguageCodeChange() {
+    return this.codeChangeEventEmiiter;
+  }
+}
+
+class MockPageTitleRef {
+  _title = '';
+  setPageTitle(val) {
+    this._title = val;
+  }
+  getPageTitle() {
+    return this._title;
+  }
+}
+
+let component: ErrorPageComponent;
+let fixture: ComponentFixture<ErrorPageComponent>;
+
+describe('Error page', () => {
+  let pageTitle: MockPageTitleRef;
+  let i18n = null;
+  let translate = null;
+
+  beforeEach(async(() => {
+    pageTitle = new MockPageTitleRef();
+    TestBed.configureTestingModule({
+      declarations: [ErrorPageComponent],
+      providers: [
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
+        { provide: TranslateService, useClass: MockTranslateService },
+        UrlInterpolationService,
+        {provide: PageTitleService, useValue: MockPageTitleRef}
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    i18n = TestBed.get(I18nLanguageCodeService);
+    translate = TestBed.get(TranslateService);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    Title = $injector.get('Title');
-    ctrl = $componentController('errorPage', {}, {
-      statusCode: '404'
-    });
-  }));
-
-  it('should check if status code is a number', function() {
-    expect(ctrl.getStatusCode()).toBe(404);
-    expect(ctrl.getStatusCode()).toBeInstanceOf(Number);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ErrorPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should set images and page title when $onInit triggers', function() {
-    ctrl.$onInit();
-    expect(ctrl.getStaticImageUrl('/general/oops_mint.webp'))
+  it('should check if status code is a number', () => {
+    expect(component.getStatusCode()).toBe(404);
+    expect(component.getStatusCode()).toBeInstanceOf(Number);
+  });
+
+  it('should set images and page title when $onInit triggers', () => {
+    component.ngOnInit();
+    expect(component.getStaticImageUrl('/general/oops_mint.webp'))
       .toBe('/assets/images/general/oops_mint.webp');
-    expect(Title.getTitle()).toBe('Error 404 - Oppia');
+    expect(pageTitle.getPageTitle()).toBe('Error 404 - Oppia');
   });
 });

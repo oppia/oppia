@@ -16,31 +16,63 @@
  * @fileoverview Component for the error page.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/page-title.service.ts');
+// require('domain/utilities/url-interpolation.service.ts');
+// require('services/page-title.service.ts');
 
-angular.module('oppia').component('errorPage', {
-  bindings: {
-    statusCode: '@'
-  },
-  template: require('./error-page.component.html'),
-  controller: [
-    'PageTitleService', 'UrlInterpolationService',
-    function(
-        PageTitleService, UrlInterpolationService) {
-      var ctrl = this;
-      ctrl.getStatusCode = function() {
-        return Number(ctrl.statusCode);
-      };
+// angular.module('oppia').component('errorPage', {
+//   bindings: {
+//     statusCode: '@'
+//   },
+//   template: require('./error-page.component.html'),
+//   controller: [
+//     'PageTitleService', 'UrlInterpolationService',
+//     function(
+//         PageTitleService, UrlInterpolationService) {
+//       var ctrl = this;
+//       ctrl.getStatusCode = function() {
+//         return Number(ctrl.statusCode);
+//       };
 
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
+//       ctrl.getStaticImageUrl = function(imagePath) {
+//         return UrlInterpolationService.getStaticImageUrl(imagePath);
+//       };
 
-      ctrl.$onInit = function() {
-        PageTitleService.setPageTitle(
-          'Error ' + ctrl.statusCode + ' - Oppia');
-      };
-    }
-  ]
-});
+//       ctrl.$onInit = function() {
+//         PageTitleService.setPageTitle(
+//           'Error ' + ctrl.statusCode + ' - Oppia');
+//       };
+//     }
+//   ]
+// });
+
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { PageTitleService } from 'services/page-title.service';
+
+@Component({
+  selector: 'error-page',
+  templateUrl: './error-page.component.html',
+  styleUrls: []
+})
+export class ErrorPageComponent implements OnInit {
+  @Input() statusCode: string;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private pageTitleService: PageTitleService) {}
+  ngOnInit(): void {
+    this.pageTitleService.setPageTitle('Error ' + this.statusCode + ' - Oppia');
+  }
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+  getStatusCode(): number {
+    return Number(this.statusCode);
+  }
+}
+
+angular.module('oppia').directive(
+  'errorPage', downgradeComponent(
+    {component: ErrorPageComponent}));
