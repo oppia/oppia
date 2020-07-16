@@ -612,7 +612,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
-            'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
         }
 
         # Perform export and compare.
@@ -1020,7 +1021,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
-            'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
         }
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)

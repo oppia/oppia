@@ -15053,6 +15053,7 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                     playthrough.id, exp_issues_id, exp_issues_id)]
         run_job_and_check_output(self, expected_output)
 
+
 class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -15063,7 +15064,7 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
         self.parameter_model = parameter_models.PlatformParameterModel.create(
             name='parameter_model_1',
             rule_dicts=[
-                { 'filters': [], 'value_when_matched': True }
+                {'filters': [], 'value_when_matched': True}
             ])
         self.parameter_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
@@ -15148,7 +15149,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
         self.parameter_model = parameter_models.PlatformParameterModel.create(
             name='parameter_model_1',
             rule_dicts=[
-                { 'filters': [], 'value_when_matched': True }
+                {'filters': [], 'value_when_matched': True}
             ])
         self.parameter_model.commit(self.admin_id, [])
 
@@ -15284,7 +15285,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
         self.parameter_model = parameter_models.PlatformParameterModel.create(
             name='parameter_model_1',
             rule_dicts=[
-                { 'filters': [], 'value_when_matched': True }
+                {'filters': [], 'value_when_matched': True}
             ])
         self.parameter_model.commit(self.admin_id, [])
 

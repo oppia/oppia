@@ -548,6 +548,11 @@
 /core/templates/services/services.constants.ajs.ts @vojtechjelinek
 /core/templates/services/services.constants.ts @vojtechjelinek
 
+
+# Dynamic Feature Gating project
+/core/storage/platform_parameter/ @MegrezZhu
+
+
 # Frontend unit tests
 /core/templates/**/*.spec.ts @nithusha21
 /core/templates/**/*Spec.ts @nithusha21

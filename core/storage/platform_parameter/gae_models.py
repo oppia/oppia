@@ -60,11 +60,6 @@ class PlatformParameterModel(base_models.VersionedModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """PlatformParameterModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def create(cls, name, rule_dicts):
         """Creates a PlatformParameterModel instance."""
