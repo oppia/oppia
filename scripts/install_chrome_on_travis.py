@@ -52,8 +52,8 @@ def main(args=None):
 
     if not os.path.isfile(travis_chrome_path):
         os.chdir(os.path.join(home_directory, '.cache/TravisChrome/'))
-        python_utils.url_retrieve(
-            chrome_source_url, os.path.basename(chrome_source_url))
+        python_utils.url_retrieve(  # pylint:disable=arg-name-for-non-keyword-arg
+            chrome_source_url, filename=os.path.basename(chrome_source_url))
         os.chdir(oppia_dir)
 
     python_utils.PRINT('Installing %s' % travis_chrome_path)

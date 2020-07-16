@@ -174,7 +174,6 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                             func_name))
                     num_positional_args_unused -= 1
 
-
         for arg in keyword_args:
             # If there is *args and **kwargs in the functin definition skip the
             # check because we can use keywords arguments in function call even
