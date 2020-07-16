@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, async, tick} from
+import { ComponentFixture, fakeAsync, TestBed, async } from
   '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
