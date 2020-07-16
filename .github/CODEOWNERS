@@ -551,6 +551,7 @@
 
 # Dynamic Feature Gating project
 /core/storage/platform_parameter/ @MegrezZhu
+/core/domain/platform_parameter_domain*.py @MegrezZhu
 
 
 # Frontend unit tests
