@@ -33,7 +33,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
     return {
       // Note: This directive is used as attribute because pannability does not
       //    work when directive is used as element. (Convention in the codebase
-      //    is to use directive as element.)
+      //    is to use directive as element).
       restrict: 'A',
       scope: {
         allowPanning: '@',
@@ -53,17 +53,15 @@ angular.module('oppia').directive('stateGraphVisualization', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
         graphData: '&',
-        // Object whose keys are ids of nodes to display a warning tooltip over
-        highlightStates: '=',
         // Id of a second initial state, which will be styled as an initial
-        // state
+        // state.
         initStateId2: '=',
         isEditable: '=',
-        // Object which maps linkProperty to a style
+        // Object which maps linkProperty to a style.
         linkPropertyMapping: '=',
-        // Object whose keys are node ids and whose values are node colors
+        // Object whose keys are node ids and whose values are node colors.
         getNodeColors: '&nodeColors',
-        // A value which is the color of all nodes
+        // A value which is the color of all nodes.
         nodeFill: '@',
         // Object whose keys are node ids with secondary labels and whose
         // values are secondary labels. If this is undefined, it means no nodes
@@ -257,7 +255,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
             for (var i = 0; i < $scope.augmentedLinks.length; i++) {
               // Style links if link properties and style mappings are
-              // provided
+              // provided.
               if (links[i].hasOwnProperty('linkProperty') &&
                   $scope.linkPropertyMapping) {
                 if ($scope.linkPropertyMapping.hasOwnProperty(
@@ -279,11 +277,6 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
             var getNodeFillOpacity = function(nodeId) {
               return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
-            };
-
-            $scope.isStateFlagged = function(nodeId) {
-              return $scope.highlightStates &&
-                $scope.highlightStates.hasOwnProperty(nodeId);
             };
 
             $scope.getNodeTitle = function(node) {
@@ -341,14 +334,14 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 nodeData[nodeId].style += ('fill: ' + $scope.nodeFill + '; ');
               }
 
-              // Color nodes
+              // ---- Color nodes ----
               var nodeColors = $scope.getNodeColors();
               if (nodeColors) {
                 nodeData[nodeId].style += (
                   'fill: ' + nodeColors[nodeId] + '; ');
               }
 
-              // Add secondary label if it exists
+              // Add secondary label if it exists.
               if ($scope.nodeSecondaryLabels) {
                 if ($scope.nodeSecondaryLabels.hasOwnProperty(nodeId)) {
                   nodeData[nodeId].secondaryLabel = (

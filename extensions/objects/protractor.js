@@ -21,6 +21,43 @@
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
 
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
+
+var MathEditor = function(elem) {
+  return {
+    setValue: async function(text) {
+      await waitFor.elementToBeClickable(
+        elem, `"${elem.getTagName()}" takes too long to be clickable`);
+      await elem.click();
+      // The active guppy div will be the one that is created last which is why
+      // we fetch the last element.
+      var mathInputElem = element.all(by.css(
+        '.protractor-test-guppy-div')).last();
+      var present = await mathInputElem.isPresent();
+      if (present) {
+        await mathInputElem.sendKeys(text);
+      }
+    },
+    getValue: async function() {
+      await waitFor.elementToBeClickable(
+        elem, `"${elem.getTagName()}" takes too long to be clickable`);
+      // The active guppy div will be the one that is created last which is why
+      // we fetch the last element.
+      var mathInputElem = element.all(by.css(
+        '.protractor-test-guppy-div')).last();
+      var present = await mathInputElem.isPresent();
+      if (present) {
+        var contentElem = mathInputElem.element(by.tagName('annotation'));
+        present = await contentElem.isPresent();
+        if (present) {
+          return contentElem.getText();
+        }
+      }
+    }
+  };
+};
+
 var BooleanEditor = function(elem) {
   return {
     setValue: async function(value) {
@@ -86,7 +123,7 @@ var IntEditor = function(elem) {
   };
 };
 
-var MathLatexStringEditor = function(elem) {
+var MathExpressionContentEditor = function(elem) {
   return {
     setValue: async function(rawLatex) {
       await elem.element(by.tagName('textarea')).clear();
@@ -180,27 +217,32 @@ var UnicodeStringEditor = function(elem) {
 };
 
 var OBJECT_EDITORS = {
+  AlgebraicExpression: MathEditor,
   Boolean: BooleanEditor,
   CoordTwoDim: CoordTwoDim,
   Filepath: FilepathEditor,
   Fraction: FractionEditor,
   Int: IntEditor,
-  MathLatexString: MathLatexStringEditor,
+  MathEquation: MathEditor,
+  MathExpressionContent: MathExpressionContentEditor,
   NonnegativeInt: NonnegativeIntEditor,
   NormalizedString: NormalizedStringEditor,
   NumberWithUnits: NumberWithUnitsEditor,
+  NumericExpression: MathEditor,
   ParameterName: ParameterNameEditor,
+  PositionOfTerms: ParameterNameEditor,
   SanitizedUrl: SanitizedUrlEditor,
   SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor
 };
 
+exports.MathEditor = MathEditor;
 exports.BooleanEditor = BooleanEditor;
 exports.CoordTwoDim = CoordTwoDim;
 exports.FractionEditor = FractionEditor;
 exports.FilepathEditor = FilepathEditor;
 exports.IntEditor = IntEditor;
-exports.MathLatexStringEditor = MathLatexStringEditor;
+exports.MathExpressionContentEditor = MathExpressionContentEditor;
 exports.NonnegativeIntEditor = NonnegativeIntEditor;
 exports.NormalizedStringEditor = NormalizedStringEditor;
 exports.NumberWithUnitsEditor = NumberWithUnitsEditor;

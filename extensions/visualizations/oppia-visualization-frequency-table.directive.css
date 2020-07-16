@@ -1,0 +1,19 @@
+oppia-visualization-frequency-table table {
+  margin-top: 12px;
+  padding: 12px 0;
+}
+oppia-visualization-frequency-table table th {
+  padding: 12px 0;
+  text-align: center;
+}
+oppia-visualization-frequency-table table th:first-child {
+  text-align: left;
+  width: 100%;
+}
+oppia-visualization-frequency-table table td {
+  text-align: center;
+}
+oppia-visualization-frequency-table table td:first-child {
+  text-align: left;
+  word-wrap: break-word;
+}

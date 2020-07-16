@@ -51,7 +51,8 @@ describe('Cache Slugs', function() {
     async function() {
       await browser.get('/console_errors');
       var expectedErrors = [
-        'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
+        'http://localhost:9001/build/fail/logo/288x128_logo_white.png',
+        'http://localhost:9001/build/fail/logo/288x128_logo_white.webp'
       ];
       await general.checkForConsoleErrors(expectedErrors);
     });

@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import atexit
-import fileinput
 import os
 import re
 import subprocess
@@ -54,8 +53,20 @@ _PARSER.add_argument(
     help='optional; if specified, enables console.',
     action='store_true')
 _PARSER.add_argument(
+    '--disable_host_checking',
+    help=(
+        'optional; if specified, disables host checking so that the dev '
+        'server can be accessed by any device on the same network using the '
+        'host device\'s IP address. DO NOT use this flag if you\'re running '
+        'on an untrusted network.'),
+    action='store_true')
+_PARSER.add_argument(
     '--prod_env',
     help='optional; if specified, runs Oppia in a production environment.',
+    action='store_true')
+_PARSER.add_argument(
+    '--maintenance_mode',
+    help='optional; if specified, puts Oppia into maintenance mode.',
     action='store_true')
 _PARSER.add_argument(
     '--no_browser',
@@ -72,12 +83,15 @@ PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
 def cleanup():
-    """Function for waiting for the servers to go down."""
+    """Wait for the servers to go down and set constants back to default
+    values.
+    """
     common.print_each_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
     while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
+    build.set_constants_to_default()
 
 
 def main(args=None):
@@ -99,34 +113,20 @@ def main(args=None):
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
         '--enable_console=true' if parsed_args.enable_console else '')
+    disable_host_checking_arg = (
+        '--enable_host_checking=false'
+        if parsed_args.disable_host_checking else '')
     no_auto_restart = (
         '--automatic_restart=no' if parsed_args.no_auto_restart else '')
 
-    if parsed_args.prod_env:
-        constants_env_variable = '"DEV_MODE": false'
-        for line in fileinput.input(
-                files=[os.path.join('assets', 'constants.ts')], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file,
-            # constants.ts. The end='' is needed to avoid double line breaks.
-            python_utils.PRINT(
-                re.sub(
-                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=['--prod_env'])
-        app_yaml_filepath = 'app.yaml'
-    else:
-        constants_env_variable = '"DEV_MODE": true'
-        for line in fileinput.input(
-                files=[os.path.join('assets', 'constants.ts')], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file,
-            # constants.ts. The end='' is needed to avoid double line breaks.
-            python_utils.PRINT(
-                re.sub(
-                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=[])
-        app_yaml_filepath = 'app_dev.yaml'
+    build_args = ['--prod_env'] if parsed_args.prod_env else []
+    if parsed_args.maintenance_mode:
+        build_args.append('--maintenance_mode')
+    build.main(args=build_args)
+    app_yaml_filepath = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
 
     # Set up a local dev instance.
-    # TODO(sll): do this in a new shell.
+    # TODO(sll): Do this in a new shell.
     # To turn emailing on, add the option '--enable_sendmail=yes' and change the
     # relevant settings in feconf.py. Be careful with this -- you do not want to
     # spam people accidentally.
@@ -145,9 +145,9 @@ def main(args=None):
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port %s --skip_sdk_update_check true %s' % (
+        '8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check true %s' % (
             common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg, no_auto_restart,
+            enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True))
 

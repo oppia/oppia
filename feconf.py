@@ -88,7 +88,9 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
-
+HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'html_field_types_to_rule_specs.json')
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
@@ -114,6 +116,20 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_PENDING
 ]
 
+# Allowed formats of how HTML is present in rule specs.
+HTML_RULE_VARIABLE_FORMAT_SET = 'set'
+HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
+HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
+
+ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
+    HTML_RULE_VARIABLE_FORMAT_SET,
+    HTML_RULE_VARIABLE_FORMAT_STRING,
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+]
+
+ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
+ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
+
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
@@ -125,13 +141,29 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+# Allowed formats of how HTML is present in rule specs.
+HTML_RULE_VARIABLE_FORMAT_SET = 'set'
+HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
+HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
+
+ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
+    HTML_RULE_VARIABLE_FORMAT_SET,
+    HTML_RULE_VARIABLE_FORMAT_STRING,
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+]
+
+ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
+ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
+
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
-ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
+
+MAX_TASK_MODELS_PER_FETCH = 25
+MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -174,7 +206,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 33
+CURRENT_STATE_SCHEMA_VERSION = 34
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -183,16 +215,16 @@ CURRENT_STATE_SCHEMA_VERSION = 33
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 2
+CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
@@ -201,7 +233,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 2
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -346,7 +378,7 @@ def get_empty_ratings():
 
     Returns:
         dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
-            ratings.
+        ratings.
     """
     return copy.deepcopy(_EMPTY_RATINGS)
 
@@ -421,6 +453,9 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
+
+# Whether community dashboard is ready to use for contributors.
+COMMUNITY_DASHBOARD_ENABLED = False
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
@@ -550,8 +585,8 @@ ALLOWED_RTE_EXTENSIONS = {
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
     },
-    'Svgeditor': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgeditor')
+    'Svgdiagram': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgdiagram')
     },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
@@ -646,9 +681,10 @@ COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
+COMMUNITY_DASHBOARD_URL = '/community-dashboard'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
-CREATOR_DASHBOARD_URL = '/creator_dashboard'
+CREATOR_DASHBOARD_URL = '/creator-dashboard'
 CSRF_HANDLER_URL = '/csrfhandler'
 CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
 CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
@@ -678,22 +714,24 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+IMPROVEMENTS_URL_PREFIX = '/improvements'
+IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
-LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
-LIBRARY_INDEX_URL = '/library'
+LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
-LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
+LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
-LIBRARY_TOP_RATED_URL = '/library/top_rated'
+LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -702,7 +740,7 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
+NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -710,6 +748,7 @@ PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
+QUESTION_COUNT_URL_PREFIX = '/question_count_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
@@ -723,6 +762,7 @@ ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SKILL_DASHBOARD_DATA_URL = '/skills_dashboard/data'
 SKILL_DATA_URL_PREFIX = '/skill_data_handler'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
@@ -750,7 +790,8 @@ TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
-TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+UNASSIGN_SKILL_DATA_HANDLER_URL = '/topics_and_skills_dashboard/unassign_skill'
+TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
@@ -849,9 +890,9 @@ LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # The group name that appears at the end of the url for the recently published
 # page.
-LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently-published'
 # The group name that appears at the end of the url for the top rated page.
-LIBRARY_GROUP_TOP_RATED = 'top_rated'
+LIBRARY_GROUP_TOP_RATED = 'top-rated'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
@@ -908,7 +949,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-svgeditor': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-svgdiagram': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -927,7 +968,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
             'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgeditor'
+            'oppia-noninteractive-svgdiagram'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -945,7 +986,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-svgeditor': [
+            'oppia-noninteractive-svgdiagram': [
                 'blockquote', 'li', '[document]'
             ],
             'oppia-noninteractive-collapsible': [
@@ -971,7 +1012,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
             'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgeditor'
+            'oppia-noninteractive-svgdiagram'
         ]
 
     }

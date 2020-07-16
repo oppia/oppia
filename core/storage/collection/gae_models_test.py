@@ -53,11 +53,6 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionModel
             .has_reference_to_user_id('x_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            collection_models.CollectionModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
@@ -71,6 +66,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionRightsModel class."""
+
     COLLECTION_ID_1 = '1'
     COLLECTION_ID_2 = '2'
     COLLECTION_ID_3 = '3'
@@ -206,133 +202,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            collection_models.CollectionRightsModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        collection_models.CollectionRightsModel(
-            id=self.COLLECTION_ID_1,
-            owner_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            editor_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            voice_artist_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            viewer_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        ).save(
-            self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        collection_models.CollectionRightsModel(
-            id=self.COLLECTION_ID_2,
-            owner_ids=[self.USER_ID_4_OLD],
-            editor_ids=[self.USER_ID_4_OLD],
-            voice_artist_ids=[self.USER_ID_5_OLD],
-            viewer_ids=[self.USER_ID_6_OLD],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        ).save(
-            self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        collection_models.CollectionRightsModel(
-            id=self.COLLECTION_ID_3,
-            owner_ids=[self.USER_ID_4_OLD, self.USER_ID_5_OLD],
-            editor_ids=[self.USER_ID_5_OLD],
-            voice_artist_ids=[self.USER_ID_6_OLD],
-            viewer_ids=[],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        ).save(
-            self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-
-        collection_models.CollectionRightsModel.migrate_model(
-            self.USER_ID_4_OLD, self.USER_ID_4_NEW)
-        collection_models.CollectionRightsModel.migrate_model(
-            self.USER_ID_5_OLD, self.USER_ID_5_NEW)
-        collection_models.CollectionRightsModel.migrate_model(
-            self.USER_ID_6_OLD, self.USER_ID_6_NEW)
-
-        migrated_model_1 = collection_models.CollectionRightsModel.get_by_id(
-            self.COLLECTION_ID_1)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.owner_ids)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.voice_artist_ids)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.viewer_ids)
-
-        migrated_model_2 = collection_models.CollectionRightsModel.get_by_id(
-            self.COLLECTION_ID_2)
-        self.assertEqual([self.USER_ID_4_NEW], migrated_model_2.owner_ids)
-        self.assertEqual([self.USER_ID_4_NEW], migrated_model_2.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_5_NEW], migrated_model_2.voice_artist_ids)
-        self.assertEqual([self.USER_ID_6_NEW], migrated_model_2.viewer_ids)
-
-        migrated_model_3 = collection_models.CollectionRightsModel.get_by_id(
-            self.COLLECTION_ID_3)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW],
-            migrated_model_3.owner_ids)
-        self.assertEqual([self.USER_ID_5_NEW], migrated_model_3.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_6_NEW], migrated_model_3.voice_artist_ids)
-        self.assertEqual([], migrated_model_3.viewer_ids)
-
-    def test_verify_model_user_ids_exist(self):
-        model = collection_models.CollectionRightsModel(
-            id=self.COLLECTION_ID_1,
-            owner_ids=[self.USER_ID_1, self.USER_ID_2],
-            editor_ids=[self.USER_ID_1, self.USER_ID_2],
-            voice_artist_ids=[self.USER_ID_1, self.USER_ID_2],
-            viewer_ids=[self.USER_ID_1, self.USER_ID_2],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        )
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1, self.USER_ID_2]
-        model.editor_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.editor_ids = [self.USER_ID_1, self.USER_ID_2]
-        model.voice_artist_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.voice_artist_ids = [self.USER_ID_1, self.USER_ID_2]
-        model.viewer_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
     def test_save(self):
         collection_models.CollectionRightsModel(
             id='id',
@@ -411,73 +280,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(expected_collection_ids, collection_ids)
 
 
-class CollectionRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
-    """Test the CollectionRightsModel class."""
-    COLLECTION_ID_1 = '1'
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_3 = 'id_3'
-
-    def setUp(self):
-        super(CollectionRightsAllUsersModelUnitTest, self).setUp()
-        user_models.UserSettingsModel(
-            id=self.USER_ID_1,
-            gae_id='gae_1_id',
-            email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        user_models.UserSettingsModel(
-            id=self.USER_ID_2,
-            gae_id='gae_2_id',
-            email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        collection_models.CollectionRightsAllUsersModel(
-            id=self.COLLECTION_ID_1,
-            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
-        ).put()
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            collection_models.CollectionRightsAllUsersModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertTrue(
-            collection_models.CollectionRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_1))
-        self.assertTrue(
-            collection_models.CollectionRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_2))
-        self.assertFalse(
-            collection_models.CollectionRightsAllUsersModel
-            .has_reference_to_user_id(self.USER_ID_3))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            collection_models.CollectionRightsAllUsersModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_verify_model_user_ids_exist(self):
-        model = collection_models.CollectionRightsAllUsersModel(
-            id=self.COLLECTION_ID_1,
-            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
-        )
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.all_user_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.all_user_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.all_user_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.all_user_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionCommitLogEntryModel class."""
 
@@ -489,7 +291,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = collection_models.CollectionCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
         commit.put()
@@ -502,12 +304,10 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_all_non_private_commits(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
-            'a', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'a', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
         public_commit = collection_models.CollectionCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
@@ -530,12 +330,10 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_all_non_private_commits_with_max_age(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
-            'a', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'a', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
         public_commit = collection_models.CollectionCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         # We need to manually set collection_id as it is a property of
         # CollectionCommitLogEntryModel only and create() does not accept
@@ -616,105 +414,6 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             collection_models.CollectionSummaryModel
             .has_reference_to_user_id('x_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            collection_models.CollectionSummaryModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        collection_models.CollectionSummaryModel(
-            id=self.COLLECTION_ID_1,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            editor_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            viewer_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            contributor_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            contributors_summary={
-                self.USER_ID_2_OLD: 2,
-                self.USER_ID_3_OLD: 3,
-            },
-        ).put()
-        collection_models.CollectionSummaryModel(
-            id=self.COLLECTION_ID_2,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[self.USER_ID_1_OLD],
-            editor_ids=[self.USER_ID_1_OLD],
-            viewer_ids=[self.USER_ID_2_OLD],
-            contributor_ids=[self.USER_ID_3_OLD],
-            contributors_summary={self.USER_ID_3_OLD: 4},
-        ).put()
-        collection_models.CollectionSummaryModel(
-            id=self.COLLECTION_ID_3,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[self.USER_ID_1_OLD, self.USER_ID_2_OLD],
-            editor_ids=[self.USER_ID_2_OLD],
-            viewer_ids=[],
-            contributor_ids=[self.USER_ID_3_OLD],
-            contributors_summary={self.USER_ID_3_OLD: 5},
-        ).put()
-
-        collection_models.CollectionSummaryModel.migrate_model(
-            self.USER_ID_1_OLD, self.USER_ID_1_NEW)
-        collection_models.CollectionSummaryModel.migrate_model(
-            self.USER_ID_2_OLD, self.USER_ID_2_NEW)
-        collection_models.CollectionSummaryModel.migrate_model(
-            self.USER_ID_3_OLD, self.USER_ID_3_NEW)
-
-        migrated_model_1 = collection_models.CollectionSummaryModel.get_by_id(
-            self.COLLECTION_ID_1)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.owner_ids)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.viewer_ids)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.contributor_ids)
-        self.assertEqual(
-            {self.USER_ID_2_NEW: 2, self.USER_ID_3_NEW: 3},
-            migrated_model_1.contributors_summary)
-
-        migrated_model_2 = collection_models.CollectionSummaryModel.get_by_id(
-            self.COLLECTION_ID_2)
-        self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.owner_ids)
-        self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.editor_ids)
-        self.assertEqual([self.USER_ID_2_NEW], migrated_model_2.viewer_ids)
-        self.assertEqual([self.USER_ID_3_NEW], migrated_model_2.contributor_ids)
-        self.assertEqual(
-            {self.USER_ID_3_NEW: 4}, migrated_model_2.contributors_summary)
-
-        migrated_model_3 = collection_models.CollectionSummaryModel.get_by_id(
-            self.COLLECTION_ID_3)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            migrated_model_3.owner_ids)
-        self.assertEqual([self.USER_ID_2_NEW], migrated_model_3.editor_ids)
-        self.assertEqual([], migrated_model_3.viewer_ids)
-        self.assertEqual([self.USER_ID_3_NEW], migrated_model_3.contributor_ids)
-        self.assertEqual(
-            {self.USER_ID_3_NEW: 5}, migrated_model_3.contributors_summary)
 
     def test_get_non_private(self):
         public_collection_summary_model = (
@@ -867,40 +566,3 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel
             .get_at_least_editable('viewer_ids'))
         self.assertEqual(0, len(collection_summary_models))
-
-    def test_verify_model_user_ids_exist(self):
-        model = collection_models.CollectionSummaryModel(
-            id=self.COLLECTION_ID_1,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            editor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            viewer_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            contributor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-        )
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
-        model.editor_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.editor_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
-        model.viewer_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.viewer_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
-        model.contributor_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())

@@ -61,7 +61,7 @@ describe('Editable story backend API service', function() {
       return deferred.promise;
     });
 
-    // Sample story object returnable from the backend
+    // Sample story object returnable from the backend.
     sampleDataResults = {
       story: {
         id: 'storyId',
@@ -180,7 +180,7 @@ describe('Editable story backend API service', function() {
         'PUT', '/story_editor_handler/data/storyId').respond(
         storyWrapper);
 
-      // Send a request to update story
+      // Send a request to update story.
       EditableStoryBackendApiService.updateStory(
         story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
@@ -219,7 +219,7 @@ describe('Editable story backend API service', function() {
     $httpBackend.expect(
       'PUT', '/story_publish_handler/storyId').respond();
 
-    // Send a request to update story
+    // Send a request to update story.
     EditableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true
     ).then(successHandler, failHandler);

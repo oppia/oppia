@@ -85,7 +85,7 @@ describe('Meta Tags', function() {
     expect(await getStartedPage.getMetaTagContent('description', 'og')).toEqual(
       EXPECTED_META_DESCRIPTION);
     expect(await getStartedPage.getMetaTagContent('url', 'og')).toEqual(
-      'http://localhost:9001/get_started');
+      'http://localhost:9001/get-started');
   });
 
   it('should set the correct application name', async function() {
@@ -149,7 +149,7 @@ describe('Static Pages Tour', function() {
   });
 
   it('visits the Privacy page', async function() {
-    await browser.get('/privacy');
+    await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);

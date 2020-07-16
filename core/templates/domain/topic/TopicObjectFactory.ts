@@ -103,7 +103,7 @@ export class Topic {
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
   }
 
-  // Instance methods
+  // ---- Instance methods ----
   getId(): string {
     return this._id;
   }
@@ -344,6 +344,21 @@ export class Topic {
         'Given story id not present in canonical story ids.');
     }
     this._canonicalStoryReferences.splice(index, 1);
+  }
+
+  rearrangeCanonicalStory(fromIndex: number, toIndex: number): void {
+    const canonicalStoryToMove = cloneDeep(
+      this._canonicalStoryReferences[fromIndex]);
+    this._canonicalStoryReferences.splice(fromIndex, 1);
+    this._canonicalStoryReferences.splice(toIndex, 0, canonicalStoryToMove);
+  }
+
+  rearrangeSkillInSubtopic(subtopicId, fromIndex, toIndex) {
+    const subtopic = this.getSubtopicById(subtopicId);
+    const skillToMove = cloneDeep(
+      subtopic.getSkillSummaries()[fromIndex]);
+    subtopic._skillSummaries.splice(fromIndex, 1);
+    subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
   }
 
   clearCanonicalStoryReferences(): void {

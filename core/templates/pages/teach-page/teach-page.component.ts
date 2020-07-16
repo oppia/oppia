@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the teach page.
+ * @fileoverview Component for the teach page.
  */
 
 require('base-components/base-content.directive.ts');
@@ -35,16 +35,16 @@ angular.module('oppia').component('teachPage', {
       const ctrl = this;
       // Define constant for each tab on the page.
       ctrl.TAB_ID_TEACH = 'teach';
-      ctrl.TAB_ID_PLAYBOOK = 'playbook';
+      ctrl.TAB_ID_PARTICIPATION = 'participation';
       ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
 
       const ALLOWED_TABS = [
-        ctrl.TAB_ID_TEACH, ctrl.TAB_ID_PLAYBOOK];
+        ctrl.TAB_ID_TEACH, ctrl.TAB_ID_PARTICIPATION];
 
       ctrl.activeTabName = ctrl.TAB_ID_TEACH;
 
       ctrl.onTabClick = function(tabName) {
-        // Update hash
+        // ---- Update hash ----
         WindowRef.nativeWindow.location.hash = '#' + tabName;
         ctrl.activeTabName = tabName;
       };

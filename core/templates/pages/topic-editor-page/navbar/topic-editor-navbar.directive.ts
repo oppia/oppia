@@ -21,7 +21,10 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'topic-editor-save-modal.controller.ts');
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -126,7 +129,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             ).then(function() {
               var successToast = 'Topic published.';
               if (redirectToDashboard) {
-                $window.location = '/topics_and_skills_dashboard';
+                $window.location = '/topics-and-skills-dashboard';
               }
               AlertsService.addSuccessMessage(
                 successToast, 1000);
@@ -135,6 +138,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
+            $scope.discardChangesButtonIsShown = false;
             TopicEditorStateService.loadTopic($scope.topicId);
           };
 
@@ -163,6 +167,11 @@ angular.module('oppia').directive('topicEditorNavbar', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
+          $scope.toggleDiscardChangeButton = function() {
+            $scope.discardChangesButtonIsShown = (
+              !$scope.discardChangesButtonIsShown);
+          };
+
           $scope.saveChanges = function() {
             var topicIsPublished = $scope.topicRights.isPublished();
             $uibModal.open({
@@ -170,16 +179,10 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'topic-editor-save-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.isTopicPublished = topicIsPublished;
-                }
-              ]
+              resolve: {
+                topicIsPublished: () => topicIsPublished
+              },
+              controller: 'TopicEditorSaveModalController'
             }).result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
             }, function() {}).then(function() {
@@ -204,6 +207,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $scope.topicId = UrlService.getTopicIdFromUrl();
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicSkillIds = $scope.topic.getSkillIds();
+            $scope.discardChangesButtonIsShown = false;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             $scope.topicRights = TopicEditorStateService.getTopicRights();

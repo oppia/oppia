@@ -124,13 +124,16 @@ export = {
     "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
-      "name": "raw_latex",
-      "description": "The raw string to be displayed as LaTeX.",
+      "name": "math_content",
+      "description": "The Math Expression to be displayed.",
       "schema": {
         "type": "custom",
-        "obj_type": "MathLatexString"
+        "obj_type": "MathExpressionContent"
       },
-      "default_value": ""
+      "default_value": {
+        "raw_latex": "",
+        "svg_filename": ""
+      }
     }]
   },
   "Skillreview": {
@@ -161,13 +164,13 @@ export = {
       "default_value": ""
     }]
   },
-  "Svgeditor": {
-    "backend_id": "svgeditor",
+  "Svgdiagram": {
+    "backend_id": "svgdiagram",
     "category": "Basic Input",
-    "description": "A SVG diagram editor.",
-    "frontend_id": "svgeditor",
+    "description": "A custom SVG diagram.",
+    "frontend_id": "svgdiagram",
     "tooltip": "Insert diagram",
-    "icon_data_url": "/rich_text_components/Svgeditor/Svgeditor.png",
+    "icon_data_url": "/rich_text_components/Svgdiagram/Svgdiagram.png",
     "is_complex": false,
     "requires_fs": true,
     "is_lesson_related": false,

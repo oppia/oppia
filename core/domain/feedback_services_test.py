@@ -128,6 +128,7 @@ class MockFeedbackAnalyticsAggregator(
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockFeedbackAnalyticsMRJobManager
@@ -1092,7 +1093,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             '<ul><li>some text<br></li>'
             '</ul></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/creator-dashboard">dashboard</a>.'
             '<br>'
             '<br>Thanks, and happy teaching!<br>'
             '<br>'
@@ -1150,7 +1151,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             '<li>more text<br></li>'
             '</ul></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/creator-dashboard">dashboard</a>.'
             '<br>'
             '<br>Thanks, and happy teaching!<br>'
             '<br>'

@@ -1,9 +1,9 @@
 /* The following is needed so that the radio button does not show. */
 .item-selection-info-text {
-  font-weight: bold;
-  font-size: 1em;
-  padding-bottom: 10px;
   display: block;
+  font-size: 1em;
+  font-weight: bold;
+  padding-bottom: 10px;
 }
 
 .item-selection-input-radio-button {
@@ -49,6 +49,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
 
 .item-selection-input-container img {
   max-height: 200px;
+  object-fit: contain;
 }
 
 .multiple-choice-option-container {

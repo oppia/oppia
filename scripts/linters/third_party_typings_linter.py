@@ -58,12 +58,6 @@ THIRD_PARTY_LIBS = [
         'type_defs_filename_prefix': 'midi-defs-'
     },
     {
-        'name': 'Wavesurfer',
-        'dependency_key': 'wavesurfer.js',
-        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
-        'type_defs_filename_prefix': 'wavesurfer-defs-'
-    },
-    {
         'name': 'Nerdamer',
         'dependency_key': 'nerdamer',
         'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
@@ -145,11 +139,11 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
 
         if failed:
             summary_message = (
-                '%s  Third party type defs check failed, see messages '
-                'above for more detail.' % linter_utils.MESSAGE_TYPE_FAILED)
+                '%s Third party type defs check failed, see messages '
+                'above for more detail.' % linter_utils.FAILED_MESSAGE_PREFIX)
         else:
-            summary_message = '%s  Third party type defs check passed' % (
-                linter_utils.MESSAGE_TYPE_SUCCESS)
+            summary_message = '%s Third party type defs check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)
             python_utils.PRINT(summary_message)
 
         summary_messages.append(summary_message)

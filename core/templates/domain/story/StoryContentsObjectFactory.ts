@@ -25,7 +25,7 @@ import { StoryEditorPageConstants } from
 import { IStoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 
-interface IStoryContentsBackendDict {
+export interface IStoryContentsBackendDict {
   'initial_node_id': string;
   'next_node_id': string;
   'nodes': IStoryNodeBackendDict[];
@@ -190,7 +190,7 @@ export class StoryContents {
         return issues;
       }
 
-      // nodesQueue stores the pending nodes to visit in a queue form.
+      // Variable nodesQueue stores the pending nodes to visit in a queue form.
       var nodesQueue = [];
       var nodeIsVisited = new Array(nodeIds.length).fill(false);
       var startingNode = nodes[this.getNodeIndex(this._initialNodeId)];

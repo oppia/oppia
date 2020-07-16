@@ -24,9 +24,9 @@ export class CreatorDashboardConstants {
   public static EXPLORATIONS_SORT_BY_KEYS = {
     TITLE: 'title',
     RATING: 'ratings',
-    NUM_VIEWS: 'num_views',
-    OPEN_FEEDBACK: 'num_open_threads',
-    LAST_UPDATED: 'last_updated_msec'
+    NUM_VIEWS: 'numViews',
+    OPEN_FEEDBACK: 'numOpenThreads',
+    LAST_UPDATED: 'lastUpdatedMsec'
   };
 
   public static HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = {
@@ -38,8 +38,8 @@ export class CreatorDashboardConstants {
   };
 
   public static SUBSCRIPTION_SORT_BY_KEYS = {
-    USERNAME: 'subscriber_username',
-    IMPACT: 'subscriber_impact'
+    USERNAME: 'username',
+    IMPACT: 'impact'
   };
 
   public static HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = {

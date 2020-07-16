@@ -13,23 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the 'thanks' page.
+ * @fileoverview Component for the 'thanks' page.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('domain/utilities/url-interpolation.service.ts');
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
 
-angular.module('oppia').component('thanksPage', {
-  template: require('./thanks-page.component.html'),
-  controller: ['UrlInterpolationService', function(
-      UrlInterpolationService) {
-    var ctrl = this;
-    ctrl.$onInit = function() {
-      ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
-        '/general/donate.png');
-    };
-  }]
-});
+@Component({
+  selector: 'thanks-page',
+  templateUrl: './thanks-page.component.html',
+  styleUrls: []
+})
+export class ThanksPageComponent {
+  constructor(private urlInterpolationService: UrlInterpolationService) {}
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+}
+angular.module('oppia').directive(
+  'thanksPage', downgradeComponent({component: ThanksPageComponent}));

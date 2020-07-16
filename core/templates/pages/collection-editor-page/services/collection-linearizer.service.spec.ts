@@ -21,9 +21,11 @@
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
+import { CollectionPlaythroughObjectFactory } from
+  'domain/collection/CollectionPlaythroughObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -47,7 +49,8 @@ describe('Collection linearizer service', function() {
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
     $provide.value(
       'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionNodeObjectFactory()));
+        new CollectionNodeObjectFactory(),
+        new CollectionPlaythroughObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -95,7 +98,7 @@ describe('Collection linearizer service', function() {
       thirdCollectionNodeBackendObject);
   }));
 
-  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2
+  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2.
   var createLinearCollection = function() {
     var collection = collectionObjectFactory.createEmptyCollection();
 

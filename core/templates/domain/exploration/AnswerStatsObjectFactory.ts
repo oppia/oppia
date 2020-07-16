@@ -22,19 +22,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IInteractionAnswer } from
+  'interactions/answer-defs';
+
 export interface IAnswerStatsBackendDict {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'answer' is a dict with underscore_cased keys which gives
-  // tslint errors against underscore_casing in favor of camelCasing.
-  answer: any;
+  answer: IInteractionAnswer;
   frequency: number;
 }
 
 export class AnswerStats {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'answer' is a dict with underscore_cased keys which gives
-  // tslint errors against underscore_casing in favor of camelCasing.
-  answer: any;
+  answer: IInteractionAnswer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
@@ -48,7 +45,7 @@ export class AnswerStats {
    *    associated state's answer groups.
    */
   constructor(
-      answer: any, answerHtml: string, frequency: number,
+      answer: IInteractionAnswer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
     this.answer = cloneDeep(answer);

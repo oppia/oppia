@@ -17,92 +17,116 @@
  * about the concept card of a skill from the backend.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/skill/skill-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-angular.module('oppia').factory('ConceptCardBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'CONCEPT_CARD_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, CONCEPT_CARD_DATA_URL_TEMPLATE) {
-    // Maps previously loaded concept cards to their IDs.
-    var _conceptCardCache = [];
+import cloneDeep from 'lodash/cloneDeep';
 
-    var _fetchConceptCards = function(
-        skillIds, successCallback, errorCallback) {
-      var conceptCardDataUrl = UrlInterpolationService.interpolateUrl(
-        CONCEPT_CARD_DATA_URL_TEMPLATE, {
-          comma_separated_skill_ids: skillIds.join(',')
-        });
+import { ConceptCard, IConceptCardBackendDict, ConceptCardObjectFactory} from
+  'domain/skill/ConceptCardObjectFactory';
+import { SkillDomainConstants } from
+  'domain/skill/skill-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-      $http.get(conceptCardDataUrl).then(function(response) {
-        var conceptCards = angular.copy(response.data.concept_card_dicts);
+interface IConceptCardBackendDicts {
+  'concept_card_dicts': IConceptCardBackendDict[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ConceptCardBackendApiService {
+  constructor(
+    private conceptCardObjectFactory: ConceptCardObjectFactory,
+    private http: HttpClient,
+    private urlInterpolation: UrlInterpolationService) {}
+
+  // Maps previously loaded concept cards to their IDs.
+  private _conceptCardCache = [];
+
+  private _fetchConceptCards(
+      skillIds: string[],
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: string) => void): void {
+    var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
+      SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
+        comma_separated_skill_ids: skillIds.join(',')
+      });
+
+    var conceptCardObjects = [];
+
+    this.http.get<IConceptCardBackendDicts>(conceptCardDataUrl).toPromise()
+      .then(response => {
         if (successCallback) {
-          successCallback(conceptCards);
+          var conceptCardDicts = response.concept_card_dicts;
+          conceptCardDicts.forEach(conceptCardDict => {
+            conceptCardObjects.push(
+              this.conceptCardObjectFactory.createFromBackendDict(
+                conceptCardDict));
+          });
+          successCallback(conceptCardObjects);
         }
-      }, function(errorResponse) {
+      }, errorResponse => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.error);
         }
       });
-    };
+  }
 
-    var _isCached = function(skillId) {
-      return _conceptCardCache.hasOwnProperty(skillId);
-    };
+  private _isCached(skillId: string): boolean {
+    return this._conceptCardCache.hasOwnProperty(skillId);
+  }
 
-    var _getUncachedSkillIds = function(skillIds) {
-      var uncachedSkillIds = [];
-      skillIds.forEach(function(skillId) {
-        if (!_isCached(skillId)) {
-          uncachedSkillIds.push(skillId);
-        }
-      });
-      return uncachedSkillIds;
-    };
+  private _getUncachedSkillIds(skillIds: string[]): string[] {
+    var uncachedSkillIds = [];
+    skillIds.forEach(skillId => {
+      if (!this._isCached(skillId)) {
+        uncachedSkillIds.push(skillId);
+      }
+    });
+    return uncachedSkillIds;
+  }
 
-    return {
-      /**
-       * This function will fetch concept cards from the backend, as well as
-       * attempt to see whether the given concept cards have already been
-       * loaded. If they have not yet been loaded, it will fetch the concept
-       * cards from the backend. If it successfully retrieves the concept cards
-       * from the backend, it will store them in the cache to avoid requests
-       * from the backend in further function calls.
-       */
-      loadConceptCards: function(skillIds) {
-        return $q(function(resolve, reject) {
-          var uncachedSkillIds = _getUncachedSkillIds(skillIds);
-          var conceptCards = [];
-          if (uncachedSkillIds.length !== 0) {
-            // Case where only part (or none) of the concept cards are cached
-            // locally.
-            _fetchConceptCards(
-              uncachedSkillIds, function(uncachedConceptCards) {
-                skillIds.forEach(function(skillId) {
-                  if (uncachedSkillIds.includes(skillId)) {
-                    conceptCards.push(
-                      uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
-                    // Save the fetched conceptCards to avoid future fetches.
-                    _conceptCardCache[skillId] = angular.copy(
-                      uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
-                  } else {
-                    conceptCards.push(angular.copy(_conceptCardCache[skillId]));
-                  }
-                });
-                if (resolve) {
-                  resolve(angular.copy(conceptCards));
-                }
-              }, reject);
-          } else {
-            // Case where all of the concept cards are cached locally.
-            skillIds.forEach(function(skillId) {
-              conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+  loadConceptCards(skillIds: string[]): Promise<ConceptCard[]> {
+    return new Promise((resolve, reject) => {
+      var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
+      var conceptCards = [];
+
+      if (uncachedSkillIds.length !== 0) {
+        // Case where only part (or none) of the concept cards are cached
+        // locally.
+        this._fetchConceptCards(
+          uncachedSkillIds, (uncachedConceptCards) => {
+            skillIds.forEach(skillId => {
+              if (uncachedSkillIds.includes(skillId)) {
+                conceptCards.push(
+                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
+                // Save the fetched conceptCards to avoid future fetches.
+                this._conceptCardCache[skillId] = cloneDeep(
+                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
+              } else {
+                conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
+              }
             });
             if (resolve) {
-              resolve(conceptCards);
+              resolve(cloneDeep(conceptCards));
             }
-          }
+          }, reject);
+      } else {
+        // Case where all of the concept cards are cached locally.
+        skillIds.forEach(skillId => {
+          conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
         });
+        if (resolve) {
+          resolve(cloneDeep(conceptCards));
+        }
       }
-    };
+    });
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'ConceptCardBackendApiService',
+  downgradeInjectable(ConceptCardBackendApiService));

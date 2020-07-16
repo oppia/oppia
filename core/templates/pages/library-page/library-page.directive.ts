@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.directive.ts');
@@ -73,7 +73,7 @@ angular.module('oppia').directive('libraryPage', [
           // If the value below is changed, the following CSS values in
           // oppia.css must be changed:
           // - .oppia-exp-summary-tiles-container: max-width
-          // - .oppia-library-carousel: max-width
+          // - .oppia-library-carousel: max-width.
           var MAX_NUM_TILES_PER_ROW = 4;
           var isAnyCarouselCurrentlyScrolling = false;
 
@@ -233,7 +233,7 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
             ctrl.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
-            var title = 'Exploration Library - Oppia';
+            var title = 'Community Library Lessons | Oppia';
             if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP ||
                 ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
               title = 'Find explorations to learn from - Oppia';
@@ -345,7 +345,7 @@ angular.module('oppia').directive('libraryPage', [
                 }, 3000);
                 // The following initializes the tracker to have all
                 // elements flush left.
-                // Transforms the group names into translation ids
+                // Transforms the group names into translation ids.
                 ctrl.leftmostCardIndices = [];
                 for (var i = 0; i < ctrl.libraryGroups.length; i++) {
                   ctrl.leftmostCardIndices.push(0);
@@ -368,11 +368,17 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              ctrl.libraryWindowIsNarrow = (
-                WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-              $scope.$applyAsync();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                ctrl.libraryWindowIsNarrow = (
+                  WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+                $scope.$applyAsync();
+              });
+          };
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]

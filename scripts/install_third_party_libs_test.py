@@ -54,6 +54,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.check_function_calls['check_call_is_called'] = True
             class Ret(python_utils.OBJECT):
                 """Return object with required attributes."""
+
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
@@ -63,6 +64,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):
             class Ret(python_utils.OBJECT):
                 """Return object that gives user-prefix error."""
+
                 def __init__(self):
                     self.returncode = 1
                 def communicate(self):

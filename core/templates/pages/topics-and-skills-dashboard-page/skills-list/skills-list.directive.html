@@ -1,95 +1,241 @@
 <md-card layout="row" class="list-view-item">
-  Search By Skill
-  <input type="text" class="form-control protractor-test-search-skill-input" placeholder="Enter a skill name" ng-model="skillFilterText">
-</md-card>
-<md-card layout="row" class="list-view-item">
-  <table class="dashboard-table text-break">
+  <table class="dashboard-table protractor-test-skills-table">
     <colgroup>
-      <col style="width: 50%;">
-      <col style="width: 25%;">
-      <col style="width: 25%;">
+      <col class="dashboard-table-index-column">
+      <col class="dashboard-table-description-column">
+      <col class="dashboard-table-examples-column">
+      <col class="dashboard-table-misconception-column">
+      <col class="dashboard-table-status-column">
+      <col class="dashboard-table-options-column">
     </colgroup>
     <tr>
-      <th ng-repeat="key in SKILL_HEADINGS"
+      <th ng-repeat="key in $ctrl.SKILL_HEADINGS"
           class="dashboard-table-headings">
-        <p ng-if="key === 'description'"> Skill Description </p>
-        <p ng-if="key === 'worked_examples_count'"> Worked Examples </p>
-        <p ng-if="key === 'misconception_count'"> Misconceptions </p>
+        <p ng-if="key === 'index'" class="text-center"></p>
+        <p ng-if="key === 'description'" class="text-left">Skill Description</p>
+        <p ng-if="key === 'worked_examples_count'" class="text-center">Worked Examples</p>
+        <p ng-if="key === 'misconception_count'" class="text-center">Misconceptions</p>
+        <p ng-if="key === 'status'" class="text-right skill-status-heading">Status</p>
       </th>
     </tr>
-    <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
+    <tr ng-repeat="skill in getSkillSummaries() track by $index"
         ng-click="selectSkill(skill)"
-        class="list-item protractor-test-skills-list-item">
-      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
-          ng-mouseover="highlightColumns($index)"
-          ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
-          <span class="protractor-test-skill-description"> <[skill.description]> </span>
+        class="list-item">
+      <td>
+        <[$ctrl.getSerialNumberForSkill($index)]>.
+      </td>
+      <td class="protractor-test-skills-list-item">
+        <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>" class="list-summary">
+          <div class="skill-description protractor-test-skill-description"><[skill.description]></div>
+          <div class="skill-topic">
+            <span ng-if="!skill.topic_name">
+              Unassigned
+              <i class="fa fa-exclamation-triangle"></i>
+            </span>
+            <span ng-if="skill.topic_name">
+              <[skill.topic_name]>
+            </span>
+          </div>
         </a>
       </td>
-      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
-          ng-mouseover="highlightColumns($index)"
-          ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+      <td>
+        <span class="list-summary text-center">
           <span> <[skill.worked_examples_count]> </span>
-        </a>
+        </span>
       </td>
-      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
-          ng-mouseover="highlightColumns($index)"
-          ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+      <td>
+        <span class="list-summary text-center">
           <span> <[skill.misconception_count]> </span>
-        </a>
+        </span>
       </td>
-      <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-        <button class="btn btn-secondary skills-list-action-button
-        protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
-          <span> Assign to Topic </span>
-        </button>
-      </td>
-      <td class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
-        <div class="protractor-test-merge-skills-button merge-skill-icon"
-             ng-click="mergeSkill(skill)">
-          <span class="material-icons" title="Merge Skill">
-            merge_type
+      <td class="text-right">
+        <span>
+          <span ng-if="skill.topic_name">
+            Assigned
           </span>
+          <span ng-if="!skill.topic_name" class="skill-topic-unassigned protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+            Unassigned
+          </span>
+        </span>
+        <div class="skill-list-options-container">
+          <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
+          <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
+            <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+              <span class="skills-list-action-button">
+                <i class="fa fa-wrench"></i>
+                <span> Assign to Topic </span>
+              </span>
+            </div>
+            <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0" ng-click="$ctrl.mergeSkill(skill)">
+              <div class="protractor-test-merge-skills-button">
+                <i class="fa fa-plus"></i>
+                <span>Merge Skill</span>
+              </div>
+            </div>
+            <div class="unassign-skill-box protractor-test-unassign-skill-button" ng-if="skill.topic_name" ng-click="$ctrl.unassignSkill(skill.id)">
+              <div>
+                <i class="fa fa-minus"></i>
+                <span>Unassign Skill</span>
+              </div>
+            </div>
+            <div class="delete-icon-box protractor-test-delete-skill-button" ng-click="$ctrl.deleteSkill(skill.id)">
+              <a ng-if="canDeleteSkill()">
+                <span class="fa fa-trash-alt"></span>
+                <span>Delete</span>
+              </a>
+            </div>
+          </div>
         </div>
-      </td>
-      <td class="delete-icon">
-        <a ng-if="canDeleteSkill()" ng-click="deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
-          <span class="fas fa-trash-alt list-summary"></span>
-        </a>
       </td>
     </tr>
   </table>
+  <div class="skills-list-mobile">
+    <div ng-repeat="skill in getSkillSummaries() track by $index" class="skill-item">
+      <div class="skill-item-header">
+        <div class="skill-item-description-box">
+          <div class="skill-item-description-name">
+            <div class="skill-item-description-mobile">
+              <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>">
+                <span><[$ctrl.getSerialNumberForSkill($index)]>.</span>
+                <span><[skill.description]></span>
+              </a>
+            </div>
+            <div class="skill-list-options-container">
+              <p class="fas fa-ellipsis-v skill-edit-box-icon" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
+              <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
+                <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
+                  <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+                    <i class="fa fa-wrench"></i>
+                    <span> Assign to Topic </span>
+                  </span>
+                </div>
+                <div class="merge-skill-box" ng-if="getMergeableSkillSummaries().length > 0" ng-click="$ctrl.mergeSkill(skill)">
+                  <div class="protractor-test-merge-skills-button">
+                    <i class="fa fa-plus"></i>
+                    <span>Merge Skill</span>
+                  </div>
+                </div>
+                <div class="delete-icon-box" ng-click="$ctrl.deleteSkill(skill.id)">
+                  <span ng-if="canDeleteSkill()" >
+                    <i class="fa fa-trash-alt"></i>
+                    <span>Delete</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="skill-topic">
+              <span ng-if="!skill.topic_name">
+                Unassigned
+                <i class="fa fa-exclamation-triangle"></i>
+              </span>
+              <span ng-if="skill.topic_name">
+              <[skill.topic_name]>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="skill-item-entities">
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Worked Examples</span></div>
+          <div class="skill-item-value"><span> <[skill.worked_examples_count]></span></div>
+        </div>
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Misconceptions</span></div>
+          <div class="skill-item-value"><span> <[skill.misconception_count]></span></div>
+        </div>
+        <div class="skill-item-entity">
+          <div class="skill-item-key"><span>Status</span></div>
+          <div ng-if="skill.topic_name" class="skill-item-value"><span> <[skill.topic_name]></span></div>
+          <div ng-if="!skill.topic_name" class="skill-item-value"><span>Not Assigned</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </md-card>
-<span ng-if="!canCreateSkill()" style="margin-left: 12.5%;">
+<span ng-if="!canCreateSkill()">
   <em>To create new skills, please talk to one of the lesson creation admins.</em>
 </span>
 
 <style>
   skills-list .list-view-item {
     background: #fff;
-    margin: 20px 7.5px 0 12.5%;
-    padding: 10px 20px;
-    width: 75%;
+    box-shadow: none;
+    margin-top: 50px;
+  }
+
+  skills-list .list-item {
+    height: 140px;
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  skills-list .skills-list-mobile {
+    display: none;
+  }
+
+  skills-list .dashboard-table-index-column {
+    width: 5%;
+  }
+
+  skills-list .dashboard-table-description-column {
+    width: 25%;
+  }
+
+  skills-list .dashboard-table-examples-column {
+    width: 12%;
+  }
+
+  skills-list .dashboard-table-misconception-column {
+    width: 12%;
+  }
+
+  skills-list .dashboard-table-status-column {
+    width: 12%;
+  }
+
+  skills-list .skill-status-heading {
+    margin-right: 5%;
+  }
+
+  skills-list .skill-topic-unassigned {
+    color: #00645C;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  skills-list .skill-edit-box-icon {
+    cursor: pointer;
+  }
+
+  skills-list .list-item td {
+    padding-top: 15px;
+  }
+
+  skills-list .skill-description {
+    font-size: 17px;
+    font-weight: bold;
+  }
+
+  skills-list .skill-topic {
+    font-size: 15px;
+    margin: 4px 0;
+    text-transform: uppercase;
+  }
+
+  skills-list .skill-topic i {
+    color: #D57B00;
   }
 
   skills-list .dashboard-table {
-    display: block;
     font-size: 15px;
-    max-height: 700px;
-    overflow-y: auto;
     width: 100%;
   }
 
   skills-list .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid #bbb;
     padding-bottom: 0.7em;
-  }
-
-  skills-list .dashboard-table .dashboard-table-headings p {
-    display: inline;
+    text-align: center;
   }
 
   skills-list .list-summary,
@@ -98,10 +244,6 @@
     color: inherit;
     display: block;
     text-decoration: none;
-  }
-
-  skills-list .list-item {
-    height: 2.5em;
   }
 
   skills-list .list-item:not(:last-child) {
@@ -121,16 +263,8 @@
   }
 
   skills-list .merge-skill .merge-skill-icon {
-    width: 20px;
     cursor: pointer;
-  }
-
-  skills-list tr td:nth-child(4) {
-    border-bottom: 1px solid #fff;
-  }
-
-  skills-list tr td:nth-child(5) {
-    border-bottom: 1px solid #fff;
+    width: 20px;
   }
 
   skills-list .list-summary span {
@@ -139,14 +273,100 @@
     vertical-align: middle;
   }
 
-  skills-list .skills-list-action-button {
-    min-width: 125px;
+  skills-list .skill-list-options-container {
+    display: inline;
+    position: relative;
+  }
+
+  skills-list .skill-edit-options {
+    background-color: #fff;
+    border: 1px solid #000;
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    right: 0;
+    text-align: left;
+    top: 0;
+    width: 140px;
+  }
+
+  skills-list .assign-skill-box,
+  skills-list .merge-skill-box,
+  skills-list .unassign-skill-box,
+  skills-list .delete-icon-box {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 4px 0 4px 4px;
+    width: 100%;
+  }
+
+  skills-list .delete-icon-box {
+    border-bottom: none;
+  }
+
+  skills-list .skill-edit-options div:hover,
+  skills-list .skill-edit-options div:active,
+  skills-list .skill-edit-options div:visited {
+    background-color: #e6e6e6;
   }
 
   @media (max-width: 768px) {
-    skills-list .list-view-item {
+    skills-list .dashboard-table {
+      display: none;
+    }
+    skills-list .skills-list-mobile {
+      display: block;
       width: 100%;
-      margin: 0 0 0 0;
+    }
+    skills-list .skill-item-description-name a {
+      color: inherit;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    skills-list .skill-item {
+      border-bottom: 1px solid #c0bebe;
+    }
+    skills-list .skill-item:not(:first-child) {
+      padding-top: 18px;
+    }
+    skills-list .skill-item-entities {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 10px auto;
+      width: 80%;
+    }
+    skills-list .skill-item-entity {
+      display: flex;
+      font-size: 15px;
+      justify-content: space-between;
+      width: 100%;
+    }
+    skills-list .skill-item-actions {
+      align-items: center;
+      display: flex;
+      justify-content: space-evenly;
+      margin: 7px 0;
+    }
+    skills-list .assign-btn {
+      border: 2px solid #00645C;
+    }
+
+    skills-list .skill-item-description-mobile {
+      display: inline-block;
+      width: 90%;
+    }
+
+    skills-list .skill-edit-options {
+      right: 15px;
+      text-align: left;
+      top: -5px;
+      width: 140px;
+    }
+
+    skills-list .skill-edit-box-icon {
+      margin: 0;
     }
   }
 </style>

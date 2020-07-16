@@ -313,7 +313,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'id': self.STORY_ID,
             'title': 'Title',
             'description': 'Description',
-            'node_count': 0
+            'node_titles': [],
+            'thumbnail_bg_color': None,
+            'thumbnail_filename': None
         }
 
         self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
@@ -1163,8 +1165,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_story_summary_creation(self):
         curr_time = datetime.datetime.utcnow()
         story_summary = story_domain.StorySummary(
-            'story_id', 'title', 'description', 'en', 1, 1, curr_time,
-            curr_time)
+            'story_id', 'title', 'description', 'en', 1, ['Title 1'], '#F8BF74',
+            'image.svg', curr_time, curr_time)
 
         expected_dict = {
             'id': 'story_id',
@@ -1172,7 +1174,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'description': 'description',
             'language_code': 'en',
             'version': 1,
-            'node_count': 1,
+            'node_titles': ['Title 1'],
+            'thumbnail_bg_color': '#F8BF74',
+            'thumbnail_filename': 'image.svg',
             'story_model_created_on': utils.get_time_in_millisecs(curr_time),
             'story_model_last_updated': utils.get_time_in_millisecs(curr_time),
         }
@@ -1192,18 +1196,51 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'story_model_last_updated': time_in_millisecs,
             'description': 'description',
             'title': 'title',
-            'node_count': 10,
+            'node_titles': ['Title 1', 'Title 2'],
+            'thumbnail_bg_color': '#F8BF74',
+            'thumbnail_filename': 'image.svg',
             'language_code': 'en',
             'id': 'story_id'
         }
 
         self.story_summary = story_domain.StorySummary(
-            'story_id', 'title', 'description', 'en', 1, 10,
-            current_time, current_time)
+            'story_id', 'title', 'description', 'en', 1, ['Title 1', 'Title 2'],
+            '#F8BF74', 'image.svg', current_time, current_time)
 
     def test_story_summary_gets_created(self):
         self.assertEqual(
             self.story_summary.to_dict(), self.story_summary_dict)
+
+    def _assert_validation_error(self, expected_error_substring):
+        """Checks that the story summary passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.story_summary.validate()
+
+    def test_thumbnail_filename_validation(self):
+        self.story_summary.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received')
+
+    def test_thumbnail_bg_validation(self):
+        self.story_summary.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Story thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.story_summary.thumbnail_bg_color = '#F8BF74'
+        self.story_summary.thumbnail_filename = None
+        self._assert_validation_error(
+            'Story thumbnail image is not provided.')
+        self.story_summary.thumbnail_bg_color = None
+        self.story_summary.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Story thumbnail background color is not specified.')
 
     def test_validation_passes_with_valid_properties(self):
         self.story_summary.validate()
@@ -1227,19 +1264,17 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'Expected description to be a string, received 0'):
             self.story_summary.validate()
 
-    def test_validation_fails_with_invalid_node_count(self):
-        self.story_summary.node_count = '10'
+    def test_validation_fails_with_invalid_node_titles(self):
+        self.story_summary.node_titles = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected node_count to be an int, received \'10\''):
+            'Expected node_titles to be a list, received \'10\''):
             self.story_summary.validate()
 
-    def test_validation_fails_with_negative_node_count(self):
-        self.story_summary.node_count = -1
+        self.story_summary.node_titles = [5]
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected node_count to be non-negative, '
-                'received \'-1\'')):
+            utils.ValidationError,
+            'Expected each chapter title to be a string, received 5'):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):

@@ -66,7 +66,10 @@ describe('Outcome object factory', () => {
     () => {
       const testOutcome = oof.createFromBackendDict({
         dest: 'A',
-        feedback: 'feedback_1',
+        feedback: {
+          html: '<p>Hey</p>',
+          content_id: 'feedback_1'
+        },
         labelled_as_correct: true,
         param_changes: [],
         refresher_exploration_id: '1',
@@ -76,8 +79,8 @@ describe('Outcome object factory', () => {
       expect(testOutcome.toBackendDict()).toEqual({
         dest: 'A',
         feedback: {
-          html: undefined,
-          content_id: undefined
+          html: '<p>Hey</p>',
+          content_id: 'feedback_1'
         },
         labelled_as_correct: true,
         param_changes: [],

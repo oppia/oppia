@@ -175,7 +175,7 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
 
     Raises:
         Exception: The difference between two continuous hotfix numbers
-             is not one.
+            is not one.
     """
     all_branches = subprocess.check_output([
         'git', 'branch', '-a'])[:-1].split('\n')
@@ -257,28 +257,25 @@ def execute_branch_cut(target_version, hotfix_number):
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
 
-    # The release coordinator should verify that tests are passing on the parent
-    # branch before checking out the new branch.
+    if not hotfix_number:
+        branch_to_check = 'develop'
+    elif hotfix_number == 1:
+        branch_to_check = 'release-%s' % target_version
+    else:
+        branch_to_check = 'release-%s-hotfix-%s' % (
+            target_version, hotfix_number - 1)
+    # The release coordinator should verify that tests are passing on
+    # the parent branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://travis-ci.org/oppia/oppia/branches')
-    while True:
-        if not hotfix_number:
-            branch_to_check = 'develop'
-        elif hotfix_number == 1:
-            branch_to_check = 'release-%s' % target_version
-        else:
-            branch_to_check = 'release-%s-hotfix-%s' % (
-                target_version, hotfix_number - 1)
-        python_utils.PRINT(
-            'Please confirm: are Travis checks passing on %s? (y/n) ' % (
+        'https://travis-ci.com/oppia/oppia/branches')
+    python_utils.PRINT(
+        'Please confirm: are Travis checks passing on %s? (y/n) ' % (
+            branch_to_check))
+    answer = python_utils.INPUT().lower()
+    if answer not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        raise Exception(
+            'Tests should pass on %s before this script is run.' % (
                 branch_to_check))
-        answer = python_utils.INPUT().lower()
-        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
-            break
-        elif answer:
-            raise Exception(
-                'Tests should pass on %s before this script is run.' % (
-                    branch_to_check))
 
     # Cut a new release or hotfix branch.
     if new_branch_type == release_constants.BRANCH_TYPE_HOTFIX:
@@ -299,14 +296,13 @@ def execute_branch_cut(target_version, hotfix_number):
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
     # Push the new release branch to GitHub.
-    python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
-    subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
-
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'New %s branch successfully cut. You are now on branch %s' % (
-            new_branch_type, new_branch_name))
-    python_utils.PRINT('Done!')
+    if new_branch_type == release_constants.BRANCH_TYPE_RELEASE:
+        python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
+        subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
+    else:
+        python_utils.PRINT(
+            'Please cherrypick the required PRs and push the branch '
+            'to Github once this script is done.')
 
     common.ask_user_to_confirm(
         'Ask Sean (or Ben, if Sean isn\'t available) to create '
@@ -317,6 +313,12 @@ def execute_branch_cut(target_version, hotfix_number):
         '3. Checking the box: Restrict who can push to matching '
         'branches (then add the oppia/release-coordinators team)\n' % (
             new_branch_name))
+
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'New %s branch successfully cut. You are now on branch %s' % (
+            new_branch_type, new_branch_name))
+    python_utils.PRINT('Done!')
 
 
 def main(args=None):

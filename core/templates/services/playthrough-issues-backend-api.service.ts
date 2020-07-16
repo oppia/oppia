@@ -17,11 +17,14 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { PlaythroughIssue, PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory.ts';
+import {
+  IPlaythroughIssueBackendDict,
+  PlaythroughIssue,
+  PlaythroughIssueObjectFactory
+} from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
@@ -41,30 +44,23 @@ export class PlaythroughIssuesBackendApiService {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     }
-    return this.httpClient.get(this.getFetchIssuesUrl(explorationId), {
-      params: { exp_version: explorationVersion.toString() },
-      observe: 'response'
-    }).toPromise()
-      // TODO(#7165): Change `any` to a type describing the dict.
-      .then((response: HttpResponse<any[]>) => {
-        let unresolvedIssueBackendDicts = response.body;
-        return this.cachedIssues = unresolvedIssueBackendDicts.map(
+    return this.httpClient.get<IPlaythroughIssueBackendDict[]>(
+      this.getFetchIssuesUrl(explorationId), {
+        params: { exp_version: explorationVersion.toString() }}).toPromise()
+      .then(response => {
+        return this.cachedIssues = response.map(
           this.playthroughIssueObjectFactory.createFromBackendDict);
       });
   }
 
   fetchPlaythrough(
-      explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
-    return this.httpClient.get(
-      this.getFetchPlaythroughUrl(explorationId, playthroughId), {
-        observe: 'response'
-      }
-    ).toPromise()
-      // TODO(#7165): Change `any` to a type describing the dict.
-      .then((response: HttpResponse<any>) => {
-        let playthroughBackendDict = response.body;
+      explorationId: string,
+      playthroughId: string): Promise<PlaythroughIssue> {
+    return this.httpClient.get<IPlaythroughIssueBackendDict>(
+      this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
+      .then(response => {
         return this.playthroughIssueObjectFactory.createFromBackendDict(
-          playthroughBackendDict);
+          response);
       });
   }
 

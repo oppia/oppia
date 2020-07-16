@@ -48,6 +48,12 @@ var ExplorationEditorHistoryTab = function() {
     by.css('.protractor-test-confirm-revert'));
 
   /*
+   * Display
+   */
+  var datesCommitsWereSaved = element.all(
+    by.css('.protractor-test-history-tab-commit-date'));
+
+  /*
    * Links
    */
   var historyGraphLink = historyGraph.all(by.css('.protractor-test-link'));
@@ -55,6 +61,22 @@ var ExplorationEditorHistoryTab = function() {
   /*
    * Workflows
    */
+
+  /*
+   * This method checks if the commit dates are being displayed in
+   * the "List of Changes" section of the history tab.
+  */
+  this.expectCommitDatesToBeDisplayed = async function() {
+    var numCommitDates = await datesCommitsWereSaved.count();
+    for (var i = 0; i < numCommitDates; i++) {
+      var date = await datesCommitsWereSaved.get(i).getText();
+      // The dates can be of varying format
+      // (see getLocaleAbbreviatedDatetimeString). To play it
+      // safe and to keep it simple, we will just check if the
+      // date string contains a digit.
+      expect(date).toMatch(/\d/);
+    }
+  };
 
   this.getHistoryGraph = function() {
     return {
@@ -108,7 +130,7 @@ var ExplorationEditorHistoryTab = function() {
        *        versionNumber2 (int) : history version # 2
        */
       selectTwoVersions: async function(versionNumber1, versionNumber2) {
-        // Array starts at 0
+        // Array starts at 0.
         var totalVersionNumber = await historyCheckboxSelector.count();
         var v1Position = totalVersionNumber - versionNumber1;
         var v2Position = totalVersionNumber - versionNumber2;
@@ -242,7 +264,7 @@ var ExplorationEditorHistoryTab = function() {
   this.revertToVersion = async function(version) {
     var versionPosition = null;
     var versionNumber = await historyCheckboxSelector.count();
-    // Note: there is no 'revert' link next to the current version
+    // Note: there is no 'revert' link next to the current version.
     versionPosition = versionNumber - version - 1;
     var revertVersionButtonForSelectedPosition = revertVersionButton.get(
       versionPosition);

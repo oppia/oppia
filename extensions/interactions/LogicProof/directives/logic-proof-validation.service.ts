@@ -23,6 +23,8 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { ILogicCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -34,18 +36,15 @@ export class LogicProofValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): any[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: ILogicCustomizationArgs): IWarning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string, customizationArgs: ILogicCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     // We do not require a default rule for this interaction, since the
     // feedback is mostly provided from within the interaction itself.
     return this.getCustomizationArgsWarnings(customizationArgs).concat(

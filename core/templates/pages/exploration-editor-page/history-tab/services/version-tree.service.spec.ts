@@ -16,15 +16,19 @@
  * @fileoverview Unit tests for the Versions Tree Service.
  */
 
-import { VersionTreeService } from
+import { IExplorationSnapshot, VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
 
 describe('Versions tree service', () => {
   describe('versions tree service', () => {
     let vts: VersionTreeService = null;
-    var snapshots = [{
+    var snapshots: IExplorationSnapshot[] = [{
       commit_type: 'create',
-      version_number: 1
+      version_number: 1,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
+      commit_cmds: []
     }, {
       commit_type: 'edit',
       commit_cmds: [{
@@ -35,7 +39,10 @@ describe('Versions tree service', () => {
         new_state_name: 'A',
         old_state_name: 'First State'
       }],
-      version_number: 2
+      version_number: 2,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
     }, {
       commit_type: 'edit',
       commit_cmds: [{
@@ -43,14 +50,20 @@ describe('Versions tree service', () => {
         new_state_name: 'C',
         old_state_name: 'B'
       }],
-      version_number: 3
+      version_number: 3,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
     }, {
       commit_type: 'revert',
       commit_cmds: [{
         version_number: 2,
         cmd: 'AUTO_revert_version_number'
       }],
-      version_number: 4
+      version_number: 4,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
     }, {
       commit_type: 'edit',
       commit_cmds: [{
@@ -61,21 +74,30 @@ describe('Versions tree service', () => {
         new_state_name: 'D',
         old_state_name: 'A'
       }],
-      version_number: 5
+      version_number: 5,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
     }, {
       commit_type: 'revert',
       commit_cmds: [{
         version_number: 3,
         cmd: 'AUTO_revert_version_number'
       }],
-      version_number: 6
+      version_number: 6,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
     }, {
       commit_type: 'edit',
       commit_cmds: [{
         cmd: 'add_state',
         state_name: 'D'
       }],
-      version_number: 7
+      version_number: 7,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
     }, {
       commit_type: 'edit',
       commit_cmds: [{
@@ -88,9 +110,13 @@ describe('Versions tree service', () => {
         old_value: {
           html: '',
           audio_translations: {}
-        }
+        },
+        property_name: 'property'
       }],
-      version_number: 8
+      version_number: 8,
+      committer_id: 'admin',
+      commit_message: 'Commit message',
+      created_on_ms: 1592229964515.148,
     }];
 
     beforeEach(() => {
@@ -157,7 +183,8 @@ describe('Versions tree service', () => {
         old_value: {
           html: '',
           audio_translations: {}
-        }
+        },
+        property_name: 'property'
       }]);
     });
   });

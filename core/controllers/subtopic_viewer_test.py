@@ -63,11 +63,15 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')
         subtopic.skill_ids = ['skill_id_1']
+        subtopic2 = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Subtopic Title 2')
+        subtopic2.skill_ids = ['skill_id_2']
+
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic], next_subtopic_id=2)
+            subtopics=[subtopic, subtopic2], next_subtopic_id=3)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_topic(
             'topic_id_2', self.admin_id, name='Private_Name',
@@ -155,9 +159,19 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 },
                 'written_translations': self.written_translations_dict
             }
+            expected_next_subtopic_dict = {
+                'thumbnail_bg_color': None,
+                'skill_ids': ['skill_id_2'],
+                'id': 2,
+                'thumbnail_filename': None,
+                'title': 'Subtopic Title 2'
+            }
+
             expected_dict = {
+                'topic_id': 'topic_id',
                 'page_contents': expected_page_contents_dict,
-                'subtopic_title': 'Subtopic Title'
+                'subtopic_title': 'Subtopic Title',
+                'next_subtopic_dict': expected_next_subtopic_dict
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 

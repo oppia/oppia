@@ -20,27 +20,26 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/community-dashboard-page/services/' +
   'question-suggestion.service.ts');
 require('services/alerts.service.ts');
+require('services/question-validation.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
-  'MisconceptionObjectFactory', 'QuestionSuggestionService',
-  'QuestionUndoRedoService', 'StateEditorService', 'UrlInterpolationService',
+  'QuestionSuggestionService', 'QuestionUndoRedoService',
+  'QuestionValidationService', 'UrlInterpolationService',
   'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService,
-      MisconceptionObjectFactory, QuestionSuggestionService,
-      QuestionUndoRedoService, StateEditorService, UrlInterpolationService,
-      question, questionId, questionStateData, skill, skillDifficulty) {
+      QuestionSuggestionService, QuestionUndoRedoService,
+      QuestionValidationService, UrlInterpolationService,
+      question, questionId, questionStateData, skill, skillDifficulty,
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;
@@ -48,29 +47,14 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.questionId = questionId;
     $scope.skill = skill;
     $scope.skillDifficulty = skillDifficulty;
+    $scope.skillDifficultyString = Object.entries(
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
+      entry => entry[1] === skillDifficulty)[0];
     $scope.misconceptionsBySkill = {};
-    $scope.misconceptionsBySkill[$scope.skill.getId()] =
-      $scope.skill.getMisconceptions().map(
-        function(misconceptionsBackendDict) {
-          return MisconceptionObjectFactory
-            .createFromBackendDict(misconceptionsBackendDict);
-        });
-    $scope.removeErrors = function() {
-      $scope.validationError = null;
-    };
-    $scope.questionChanged = function() {
-      $scope.removeErrors();
-    };
+    $scope.misconceptionsBySkill[$scope.skill.getId()] = (
+      $scope.skill.getMisconceptions());
     $scope.done = function() {
-      $scope.validationError = $scope.question.validate(
-        $scope.misconceptionsBySkill);
-      if ($scope.validationError) {
-        return;
-      }
-      if (!StateEditorService.isCurrentSolutionValid()) {
-        $scope.validationError =
-          'The solution is invalid and does not ' +
-          'correspond to a correct answer';
+      if (!$scope.isQuestionValid()) {
         return;
       }
       QuestionSuggestionService.submitSuggestion(
@@ -80,10 +64,10 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       $uibModalInstance.close();
     };
     // Checking if Question contains all requirements to enable
-    // Save and Publish Question
-    $scope.isSaveButtonDisabled = function() {
-      return $scope.question.validate(
-        $scope.misconceptionsBySkill);
+    // Save and Publish Question.
+    $scope.isQuestionValid = function() {
+      return QuestionValidationService.isQuestionValid(
+        $scope.question, $scope.misconceptionsBySkill);
     };
 
     $scope.cancel = function() {
@@ -99,8 +83,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
           $uibModalInstance.dismiss('cancel');
         }, function() {
           // Note to developers:
-          // This callback is triggered when the Cancel button
-          // is clicked.
+          // This callback is triggered when the cancel button is clicked.
           // No further action is needed.
         });
       } else {
@@ -109,4 +92,3 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
   }
 ]);
-

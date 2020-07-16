@@ -30,6 +30,27 @@ memcache_services = models.Registry.import_memcache_services()
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
+LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'dict',
+        'properties': [{
+            'name': 'language_code',
+            'schema': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code',
+                }]
+            },
+        }, {
+            'name': 'explanation',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
+}
+
 SET_OF_STRINGS_SCHEMA = {
     'type': 'list',
     'items': {
@@ -345,3 +366,9 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
 CLASSROOM_PAGE_IS_SHOWN = ConfigProperty(
     'classroom_page_is_shown', BOOL_SCHEMA,
     'Show classroom components.', False)
+
+FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
+    'featured_translation_languages',
+    LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
+    'Featured Translation Languages', []
+)

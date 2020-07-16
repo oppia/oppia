@@ -18,7 +18,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 import re
+import zipfile
 
 from constants import constants
 from core.domain import exp_domain
@@ -29,6 +31,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -130,7 +133,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn('{"title": "Preferences - Oppia"})', response.body)
+        self.assertIn('{"title": "Preferences | Oppia"})', response.body)
 
         self.logout()
 
@@ -289,9 +292,8 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertTrue(
-            user_settings.profile_picture_data_url.startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            user_settings.profile_picture_data_url))
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             payload={'update_type': 'profile_picture_data_url',
@@ -854,89 +856,41 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             user_services, 'record_user_logged_in', lambda *args: None)
 
         with constants_swap, time_swap:
-            data = self.get_json('/export-account-handler')
-            expected_data = {
-                u'topic_rights_data': {
-                    u'managed_topic_ids': []
-                },
-                u'subtopic_page_snapshot_metadata_data': {},
-                u'general_voiceover_application_data': {},
-                u'collection_progress_data': {},
-                u'story_snapshot_metadata_data': {},
-                u'user_community_rights_data': {},
-                u'user_contributions_data': {
-                    u'edited_exploration_ids': [],
-                    u'created_exploration_ids': []
-                },
-                u'general_feedback_thread_user_data': {},
-                u'question_snapshot_metadata_data': {},
-                u'general_feedback_message_data': {},
-                u'story_progress_data': {},
-                u'learner_playlist_data': {},
-                u'collection_rights_data': {
-                    u'voiced_collection_ids': [],
-                    u'owned_collection_ids': [],
-                    u'viewable_collection_ids': [],
-                    u'editable_collection_ids': []
-                },
-                u'skill_snapshot_metadata_data': {},
-                u'exploration_user_data_data': {},
-                u'collection_snapshot_metadata_data': {},
-                u'exploration_rights_data': {
-                    u'viewable_exploration_ids': [],
-                    u'owned_exploration_ids': [],
-                    u'voiced_exploration_ids': [],
-                    u'editable_exploration_ids': []
-                },
-                u'topic_snapshot_metadata_data': {},
-                u'completed_activities_data': {},
-                u'general_feedback_thread_data': {},
-                u'topic_rights_snapshot_metadata_data': {},
-                u'user_stats_data': {},
-                u'exploration_rights_snapshot_metadata_data': {},
-                u'user_subscriptions_data': {
-                    u'creator_ids': [],
-                    u'collection_ids': [],
-                    u'activity_ids': [],
-                    u'general_feedback_thread_ids': [],
-                    u'last_checked': None
-                },
-                u'config_property_snapshot_metadata_data': {},
-                u'exploration_snapshot_metadata_data': {},
-                u'incomplete_activities_data': {},
-                u'user_skill_mastery_data': {},
-                u'exp_user_last_playthrough_data': {},
-                u'user_settings_data': {
-                    u'username': u'editor',
-                    u'last_agreed_to_terms': self.GENERIC_EPOCH,
-                    u'last_started_state_translation_tutorial': None,
-                    u'last_started_state_editor_tutorial': None,
-                    u'normalized_username': u'editor',
-                    u'first_contribution_msec': None,
-                    u'preferred_language_codes': [
-                        u'en'
-                    ],
-                    u'creator_dashboard_display_pref': u'card',
-                    u'subject_interests': [],
-                    u'default_dashboard': None,
-                    u'preferred_site_language_code': None,
-                    u'user_bio': u'',
-                    u'profile_picture_data_url':
-                        user_services.DEFAULT_IDENTICON_DATA_URL,
-                    u'role': u'EXPLORATION_EDITOR',
-                    u'last_edited_an_exploration': None,
-                    u'email': u'editor@example.com',
-                    u'preferred_audio_language_code': None,
-                    u'last_logged_in': self.GENERIC_EPOCH
-                },
-                u'general_suggestion_data': {},
-                u'user_contribution_scoring_data': {},
-                u'general_feedback_email_reply_to_id_data': {},
-                u'collection_rights_snapshot_metadata_data': {}
-            }
+            data = self.get_custom_response(
+                '/export-account-handler', 'text/plain')
+
+            # Check downloaded zip file.
+            filename = 'oppia_takeout_data.zip'
+            self.assertEqual(data.headers['Content-Disposition'],
+                             'attachment; filename=%s' % filename)
+            zf_saved = zipfile.ZipFile(
+                python_utils.string_io(buffer_value=data.body))
             self.assertEqual(
-                data,
-                expected_data
+                zf_saved.namelist(),
+                [
+                    'oppia_takeout_data.json',
+                    'images/user_settings_profile_picture.png'
+                ]
+            )
+
+            # Load golden zip file.
+            golden_zip_filepath = os.path.join(
+                feconf.TESTS_DATA_DIR,
+                'oppia_takeout_data.zip')
+            with python_utils.open_file(
+                golden_zip_filepath, 'rb', encoding=None) as f:
+                golden_zipfile = f.read()
+            zf_gold = zipfile.ZipFile(
+                python_utils.string_io(buffer_value=golden_zipfile))
+
+            self.assertEqual(
+                zf_saved.open('oppia_takeout_data.json').read(),
+                zf_gold.open('oppia_takeout_data.json').read()
+            )
+            self.assertEqual(
+                zf_saved.open(
+                    'images/user_settings_profile_picture.png').read(),
+                zf_gold.open('images/user_settings_profile_picture.png').read()
             )
 
     def test_export_account_handler_disabled_logged_in(self):

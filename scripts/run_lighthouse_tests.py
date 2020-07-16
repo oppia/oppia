@@ -17,13 +17,19 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import atexit
 import os
 import shutil
 import subprocess
 
 import python_utils
 from scripts import common
+
 from . import install_third_party_libs
+
+
+FECONF_FILE_PATH = os.path.join('feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
 
 
 def setup_and_install_dependencies():
@@ -31,11 +37,17 @@ def setup_and_install_dependencies():
     install_third_party_libs.main()
 
 
-def delete_reports():
-    """Deletes the .lighthouse ci folder to handle a bug where
-    lighthouse html reports are never deleted.
-    """
+def cleanup():
+    """Deactivates webpages and deletes html lighthouse reports."""
     shutil.rmtree('.lighthouseci')
+
+    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
+    replace = 'COMMUNITY_DASHBOARD_ENABLED = False'
+    common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
+
+    pattern = '"ENABLE_ACCOUNT_DELETION": .*'
+    replace = '"ENABLE_ACCOUNT_DELETION": false,'
+    common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
 
 def run_lighthouse_checks():
@@ -50,11 +62,23 @@ def run_lighthouse_checks():
         python_utils.PRINT(line[:-1])
 
 
+def enable_webpages():
+    """Enables deactivated webpages for testing."""
+    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
+    replace = 'COMMUNITY_DASHBOARD_ENABLED = True'
+    common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
+
+    pattern = '"ENABLE_ACCOUNT_DELETION": .*'
+    replace = '"ENABLE_ACCOUNT_DELETION": true,'
+    common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
+
+
 def main():
     """Runs lighthouse checks and deletes reports."""
     setup_and_install_dependencies()
+    enable_webpages()
+    atexit.register(cleanup)
     run_lighthouse_checks()
-    delete_reports()
 
 
 if __name__ == '__main__':

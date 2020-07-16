@@ -23,8 +23,12 @@
       </h1>
 
       <br>
+      <picture>
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/oops_mint.webp')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/oops_mint.png')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/general/oops_mint.png')]>" alt="Oops!" width="299" height="142">
+      </picture>
 
-      <img ng-src="<[$ctrl.oopsMintImgUrl]>" alt="Oops!" width="299" height="142">
       <p>
         <h2 ng-if="$ctrl.statusCode === 400" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
         <h2 ng-if="$ctrl.statusCode === 401" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>

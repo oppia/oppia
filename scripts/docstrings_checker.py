@@ -61,7 +61,7 @@ def get_setters_property_name(node):
 
     Returns:
         str|None. The name of the property that the node is a setter for,
-            or None if one could not be found.
+        or None if one could not be found.
     """
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
@@ -80,9 +80,9 @@ def get_setters_property(node):
 
     Returns:
         astroid.FunctionDef|None. The node relating to the property of
-            the given setter node, or None if one could not be found.
+        the given setter node, or None if one could not be found.
     """
-    property_ = None
+    setters_property = None
 
     property_name = get_setters_property_name(node)
     class_node = utils.node_frame_class(node)
@@ -90,10 +90,10 @@ def get_setters_property(node):
         class_attrs = class_node.getattr(node.name)
         for attr in class_attrs:
             if utils.decorated_with_property(attr):
-                property_ = attr
+                setters_property = attr
                 break
 
-    return property_
+    return setters_property
 
 
 def returns_something(return_node):
@@ -103,8 +103,8 @@ def returns_something(return_node):
         return_node: astroid.Return. The return node to check.
 
     Returns:
-        bool. True if the return node returns a value
-            other than None, False otherwise.
+        bool. True if the return node returns a value other than None, False
+        otherwise.
     """
     returns = return_node.value
 
@@ -173,7 +173,7 @@ def docstringify(docstring):
 
     Returns:
         Docstring. Pylint Docstring class instance representing
-            a node's docstring.
+        a node's docstring.
     """
     for docstring_type in [GoogleDocstring]:
         instance = docstring_type(docstring)
@@ -187,6 +187,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """Class for checking whether docstrings follow the Google Python Style
     Guide.
     """
+
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
     re_param_line = re.compile(r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
@@ -267,7 +268,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
 
         Returns:
             list(str). Each str contains an error message. If no linting
-                errors were found, the list will be empty.
+            errors were found, the list will be empty.
         """
         results = []
 

@@ -21,9 +21,15 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { IImageData } from 'domain/skill/skill-creation-backend-api.service';
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+
 export interface ITopicCreationBackend {
-  'abbreviated_name': string;
   name: string;
+  thumbnailBgColor: string;
+  description: string;
+  filename: string;
 }
 
 @Injectable({
@@ -35,13 +41,21 @@ export class TopicCreationBackendApiService {
   _createTopic(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
-      topicName, abbreviatedTopicName): void {
+      topic: NewlyCreatedTopic, imagesData: IImageData[],
+      bgColor: string): void {
     let postData: ITopicCreationBackend = {
-      name: topicName,
-      abbreviated_name: abbreviatedTopicName
+      name: topic.name,
+      description: topic.description,
+      thumbnailBgColor: bgColor,
+      filename: imagesData[0].filename
     };
+
+    let body = new FormData();
+    body.append('payload', JSON.stringify(postData));
+    body.append('image', imagesData[0].imageBlob);
+
     this.http.post(
-      '/topic_editor_handler/create_new', postData).toPromise()
+      '/topic_editor_handler/create_new', body).toPromise()
       .then((response: { topicId: string }) => {
         if (successCallback) {
           successCallback({
@@ -56,9 +70,10 @@ export class TopicCreationBackendApiService {
   }
 
   createTopic(
-      topicName: string, abbreviatedTopicName: string): PromiseLike<Object> {
+      topic: NewlyCreatedTopic, imagesData: IImageData[],
+      bgColor: string): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
-      this._createTopic(resolve, reject, topicName, abbreviatedTopicName);
+      this._createTopic(resolve, reject, topic, imagesData, bgColor);
     });
   }
 }

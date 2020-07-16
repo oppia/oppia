@@ -43,18 +43,24 @@ describe('Story object factory', () => {
         nodes: [{
           id: 'node_1',
           title: 'Title 1',
+          description: 'Description',
           prerequisite_skill_ids: [],
           acquired_skill_ids: [],
           destination_node_ids: [],
           outline: 'Outline',
           exploration_id: null,
-          outline_is_finalized: false
+          outline_is_finalized: false,
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
         }],
         next_node_id: 'node_3'
       },
       language_code: 'en'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
+      // TS ignore is used because sample story doesn't have thumbail to test
+      // validations.
+      // @ts-ignore
       sampleStoryBackendDict);
   });
 
@@ -108,11 +114,16 @@ describe('Story object factory', () => {
           destination_node_ids: [],
           outline: 'Outline',
           exploration_id: null,
-          outline_is_finalized: false
+          outline_is_finalized: false,
+          description: 'Description',
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
         }],
         next_node_id: 'node_3'
       },
-      language_code: 'en'
+      language_code: 'en',
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40'
     });
 
     expect(_sampleStory).not.toBe(secondStory);

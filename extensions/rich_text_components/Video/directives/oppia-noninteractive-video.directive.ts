@@ -51,7 +51,7 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
             ctrl.autoplaySuffix = '&autoplay=0';
 
             $timeout(function() {
-              // Check whether creator wants to autoplay this video or not
+              // Check whether creator wants to autoplay this video or not.
               var autoplayVal = HtmlEscaperService.escapedJsonToObj(
                 $attrs.autoplayWithValue);
 

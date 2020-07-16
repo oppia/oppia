@@ -19,9 +19,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from constants import constants
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (base_models, skill_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.skill])
@@ -42,11 +45,6 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             skill_models.SkillModel.has_reference_to_user_id('x_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            skill_models.SkillModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
@@ -58,8 +56,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = skill_models.SkillCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False
         )
         commit.skill_id = 'b'
@@ -84,7 +81,54 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            skill_models.SkillSummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+    def test_fetch_page(self):
+        skill_models.SkillSummaryModel(
+            id='skill_id1',
+            description='description1',
+            misconception_count=1,
+            version=1,
+            worked_examples_count=1,
+            language_code='en',
+            skill_model_last_updated=datetime.datetime.utcnow(),
+            skill_model_created_on=datetime.datetime.utcnow()
+        ).put()
+        skill_models.SkillSummaryModel(
+            id='skill_id2',
+            description='description2',
+            misconception_count=1,
+            worked_examples_count=1,
+            version=1,
+            language_code='en',
+            skill_model_last_updated=datetime.datetime.utcnow(),
+            skill_model_created_on=datetime.datetime.utcnow()
+        ).put()
+
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(1, None, None))
+        self.assertEqual(skill_summaries[0].id, 'skill_id2')
+        self.assertTrue(more)
+        self.assertTrue(isinstance(next_cursor, python_utils.BASESTRING))
+
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(10, None, None))
+        self.assertEqual(skill_summaries[0].id, 'skill_id2')
+        self.assertFalse(more)
+        self.assertEqual(next_cursor, None)
+
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(
+                10, None, 'Oldest Created'))
+        self.assertEqual(skill_summaries[0].id, 'skill_id1')
+        self.assertEqual(skill_summaries[1].id, 'skill_id2')
+
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(
+                10, None, 'Most Recently Updated'))
+        self.assertEqual(skill_summaries[0].id, 'skill_id2')
+        self.assertEqual(skill_summaries[1].id, 'skill_id1')
+
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(
+                10, None, 'Least Recently Updated'))
+        self.assertEqual(skill_summaries[0].id, 'skill_id1')
+        self.assertEqual(skill_summaries[1].id, 'skill_id2')

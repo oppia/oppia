@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia splash page.
+ * @fileoverview Component for the Oppia splash page.
  */
 
 require('base-components/base-content.directive.ts');
@@ -50,7 +50,7 @@ angular.module('oppia').component('splashPage', {
       ctrl.onClickBrowseLibraryButton = function() {
         SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
         $timeout(function() {
-          WindowRef.nativeWindow.location = '/library';
+          WindowRef.nativeWindow.location = '/community-library';
         }, 150);
         return false;
       };
@@ -58,7 +58,7 @@ angular.module('oppia').component('splashPage', {
       ctrl.onClickCreateExplorationButton = function() {
         SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
         $timeout(function() {
-          WindowRef.nativeWindow.location = '/creator_dashboard?mode=create';
+          WindowRef.nativeWindow.location = '/creator-dashboard?mode=create';
         }, 150);
         return false;
       };

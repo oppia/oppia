@@ -24,6 +24,9 @@ require(
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
+require(
+  'pages/story-editor-page/modal-templates/' +
+  'new-chapter-title-modal.controller.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
@@ -156,36 +159,10 @@ angular.module('oppia').directive('storyEditor', [
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.nodeTitle = '';
-                  $scope.nodeTitles = nodeTitles;
-                  $scope.errorMsg = null;
-                  $scope.MAX_CHARS_IN_CHAPTER_TITLE =
-                    MAX_CHARS_IN_CHAPTER_TITLE;
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-                  $scope.isNodeTitleEmpty = function(nodeTitle) {
-                    return (nodeTitle === '');
-                  };
-                  $scope.save = function(title) {
-                    if ($scope.nodeTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A chapter with this title already exists';
-                      return;
-                    }
-                    $uibModalInstance.close(title);
-                  };
-                }
-              ]
+              resolve: {
+                nodeTitles: () => nodeTitles
+              },
+              controller: 'NewChapterTitleModalController'
             }).result.then(function(title) {
               StoryUpdateService.addStoryNode($scope.story, title);
               _initEditor();

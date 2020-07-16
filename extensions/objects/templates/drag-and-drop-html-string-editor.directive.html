@@ -13,8 +13,7 @@
       <div class="row">
         <label class="container">
           <div class="col-sm-1">
-            <input type="radio" ng-model="$ctrl.selectedItem" ng-click="$ctrl.selection($ctrl.selectedItem)"
-                   ng-value="choice.id" name="<[$ctrl.name]>">
+            <input type="radio" ng-model="$ctrl.value" ng-value="choice.id" name="<[$ctrl.name]>">
           </div>
           <div class="col-sm-10">
             <angular-html-bind html-data="choice.id" ></angular-html-bind>

@@ -17,18 +17,22 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require('components/skill-selector/select-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
+require(
+  'pages/story-editor-page/modal-templates/' +
+  'new-chapter-title-modal.controller.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -57,12 +61,14 @@ angular.module('oppia').directive('storyNodeEditor', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'StoryEditorStateService', 'ExplorationIdValidationService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             StoryEditorStateService, ExplorationIdValidationService,
+            TopicsAndSkillsDashboardBackendApiService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
@@ -95,7 +101,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               }
             }
           };
-
+          var categorizedSkills = null;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
@@ -107,6 +113,10 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.allowedBgColors = (
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+              function(response) {
+                categorizedSkills = response.categorized_skills_dict;
+              });
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
                 skillSummaries[idx].description;
@@ -239,32 +249,27 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.addPrerequisiteSkillId = function() {
-            var skillSummaries =
-              StoryEditorStateService.getSkillSummaries();
+            var sortedSkillSummaries = (
+              StoryEditorStateService.getSkillSummaries());
+            var allowSkillsFromOtherTopics = true;
+            var skillsInSameTopicCount = 0;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.skillSummaries = skillSummaries;
-                  $scope.selectedSkillId = null;
-                  $scope.save = function() {
-                    $scope.confirm($scope.selectedSkillId);
-                  };
-                  $scope.countOfSkillsToPrioritize = 0;
-                }
-              ]
-            }).result.then(function(skillId) {
+              resolve: {
+                skillsInSameTopicCount: () => skillsInSameTopicCount,
+                sortedSkillSummaries: () => sortedSkillSummaries,
+                categorizedSkills: () => categorizedSkills,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+              },
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
+            }).result.then(function(summary) {
               try {
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
-                  $scope.story, $scope.getId(), skillId);
+                  $scope.story, $scope.getId(), summary.id);
               } catch (err) {
                 AlertsService.addInfoMessage(
                   'Given skill is already a prerequisite skill', 5000);
@@ -277,32 +282,30 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.addAcquiredSkillId = function() {
-            var skillSummaries =
-              StoryEditorStateService.getSkillSummaries();
-            var modalInstance = $uibModal.open({
+            var sortedSkillSummaries = (
+              StoryEditorStateService.getSkillSummaries());
+            var allowSkillsFromOtherTopics = false;
+            var skillsInSameTopicCount = 0;
+            var topicName = StoryEditorStateService.getTopicName();
+            var categorizedSkillsInTopic = {};
+            categorizedSkillsInTopic[topicName] = categorizedSkills[topicName];
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.skillSummaries = skillSummaries;
-                  $scope.selectedSkillId = null;
-                  $scope.save = function() {
-                    $scope.confirm($scope.selectedSkillId);
-                  };
-                  $scope.countOfSkillsToPrioritize = 0;
-                }
-              ]
-            }).result.then(function(skillId) {
+              resolve: {
+                skillsInSameTopicCount: () => skillsInSameTopicCount,
+                sortedSkillSummaries: () => sortedSkillSummaries,
+                categorizedSkills: () => categorizedSkillsInTopic,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+              },
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
+            }).result.then(function(summary) {
               try {
                 StoryUpdateService.addAcquiredSkillIdToNode(
-                  $scope.story, $scope.getId(), skillId);
+                  $scope.story, $scope.getId(), summary.id);
               } catch (err) {
                 AlertsService.addInfoMessage(
                   'Given skill is already an acquired skill', 5000);
@@ -334,36 +337,10 @@ angular.module('oppia').directive('storyNodeEditor', [
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.MAX_CHARS_IN_CHAPTER_TITLE = (
-                    MAX_CHARS_IN_CHAPTER_TITLE);
-                  $scope.nodeTitle = '';
-                  $scope.nodeTitles = nodeTitles;
-                  $scope.errorMsg = null;
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-                  $scope.isNodeTitleEmpty = function(nodeTitle) {
-                    return (nodeTitle === '');
-                  };
-                  $scope.save = function(title) {
-                    if ($scope.nodeTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A chapter with this title already exists';
-                      return;
-                    }
-                    $uibModalInstance.close(title);
-                  };
-                }
-              ]
+              resolve: {
+                nodeTitles: () => nodeTitles
+              },
+              controller: 'NewChapterTitleModalController'
             }).result.then(function(title) {
               var nextNodeId =
                 $scope.story.getStoryContents().getNextNodeId();
