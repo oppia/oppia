@@ -13,27 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for profile page
+ * @fileoverview Component for profile page
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/url.service.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { UrlService } from 'services/contextual/url.service';
 
-angular.module('oppia').directive('profilePageNavbar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/profile-page/profile-page-navbar.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['UrlService', function(UrlService) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.username = UrlService.getUsernameFromProfileUrl();
-        };
-      }]
-    };
+@Component({
+  selector: 'profile-page-navbar',
+  templateUrl: './profile-page-navbar.directive.html',
+  styleUrls: []
+})
+export class ProfilePageNavbarComponent implements OnInit {
+  constructor(
+    private urlService: UrlService
+  ) {}
+  username: string = '';
+  ngOnInit(): void {
+    this.username = this.urlService.getUsernameFromProfileUrl();
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'profilePageNavbar', downgradeComponent(
+    {component: ProfilePageNavbarComponent}));

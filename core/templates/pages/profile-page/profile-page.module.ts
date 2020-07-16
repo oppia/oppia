@@ -49,9 +49,11 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
+    ProfilePageNavbarComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    ProfilePageNavbarComponent,
     OppiaAngularRootComponent
   ],
   providers: [
@@ -76,6 +78,7 @@ export class ProfilePageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ProfilePageNavbarComponent } from './profile-page-navbar.directive';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
