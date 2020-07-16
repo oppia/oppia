@@ -16,297 +16,10 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-// // TODO(#7222): Remove the following block of unnnecessary imports once
-// // UserService.ts is upgraded to Angular 8.
-// import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-// import { UpgradedServices } from 'services/UpgradedServices';
-// // ^^^ This block is to be removed.
-
-// require('domain/utilities/url-interpolation.service.ts');
-// require('services/user.service.ts');
-
-// describe('User Service', function() {
-//   var UserService, $httpBackend, UrlInterpolationService;
-//   var userInfoObjectFactory;
-//   var CsrfService = null;
-//   var UrlService = null;
-
-//   beforeEach(angular.mock.module('oppia'));
-//   beforeEach(angular.mock.module('oppia', function($provide) {
-//     $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-//     $provide.value('$window', {
-//       location: {
-//         pathname: 'home'
-//       }
-//     });
-//   }));
-//   beforeEach(angular.mock.module('oppia', function($provide) {
-//     var ugs = new UpgradedServices();
-//     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-//       $provide.value(key, value);
-//     }
-//   }));
-
-//   beforeEach(angular.mock.inject(function($injector, $q) {
-//     UserService = $injector.get('UserService');
-//     UrlInterpolationService = $injector.get(
-//       'UrlInterpolationService');
-//     UrlService = $injector.get(
-//       'UrlService');
-//     // The injector is required because this service is directly used in this
-//     // spec, therefore even though UserInfoObjectFactory is upgraded to
-//     // Angular, it cannot be used just by instantiating it by its class but
-//     // instead needs to be injected. Note that 'userInfoObjectFactory' is
-//     // the injected service instance whereas 'UserInfoObjectFactory' is the
-//     // service class itself. Therefore, use the instance instead of the class in
-//     // the specs.
-//     userInfoObjectFactory = $injector.get(
-//       'UserInfoObjectFactory');
-//     $httpBackend = $injector.get('$httpBackend');
-
-//     CsrfService = $injector.get('CsrfTokenService');
-
-//     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-//       var deferred = $q.defer();
-//       deferred.resolve('sample-csrf-token');
-//       return deferred.promise;
-//     });
-//   }));
-
-//   afterEach(function() {
-//     $httpBackend.verifyNoOutstandingExpectation();
-//     $httpBackend.verifyNoOutstandingRequest();
-//   });
-
-//   it('should return userInfo data', function() {
-//     // Creating a test user for checking profile picture of user.
-//     var sampleUserInfoBackendObject = {
-//       is_moderator: false,
-//       is_admin: false,
-//       is_super_admin: false,
-//       is_topic_manager: false,
-//       can_create_collections: true,
-//       preferred_site_language_code: null,
-//       username: 'tester',
-//       user_is_logged_in: true
-//     };
-//     $httpBackend.expect('GET', '/userinfohandler').respond(
-//       200, sampleUserInfoBackendObject);
-//     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
-//       sampleUserInfoBackendObject);
-
-//     UserService.getUserInfoAsync().then(function(userInfo) {
-//       expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
-//       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
-//       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
-//       expect(userInfo.isTopicManager()).toBe(sampleUserInfo.isTopicManager());
-//       expect(userInfo.isLoggedIn()).toBe(
-//         sampleUserInfo.isLoggedIn());
-//       expect(userInfo.canCreateCollections()).toBe(
-//         sampleUserInfo.canCreateCollections());
-//       expect(userInfo.getUsername()).toBe(sampleUserInfo.getUsername());
-//       expect(userInfo.getPreferredSiteLanguageCode()).toBe(
-//         sampleUserInfo.getPreferredSiteLanguageCode());
-//     });
-
-//     $httpBackend.flush();
-//   });
-
-//   it('should return new userInfo data when url path is signup', function() {
-//     spyOn(UrlService, 'getPathname').and.returnValue('/signup');
-//     var sampleUserInfo = userInfoObjectFactory.createDefault();
-
-//     UserService.getUserInfoAsync().then(function(userInfo) {
-//       expect(userInfo).toEqual(sampleUserInfo);
-//     });
-//   });
-
-//   it('should not fetch userInfo if it is was fetched before', function() {
-//     var sampleUserInfoBackendObject = {
-//       is_moderator: false,
-//       is_admin: false,
-//       is_super_admin: false,
-//       is_topic_manager: false,
-//       can_create_collections: true,
-//       preferred_site_language_code: null,
-//       username: 'tester',
-//       user_is_logged_in: true
-//     };
-//     $httpBackend.expect('GET', '/userinfohandler').respond(
-//       200, sampleUserInfoBackendObject);
-//     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
-//       sampleUserInfoBackendObject);
-
-//     UserService.getUserInfoAsync().then(function(userInfo) {
-//       expect(userInfo).toEqual(sampleUserInfo);
-//       // Fetch userInfo again.
-//       UserService.getUserInfoAsync().then(function(sameUserInfo) {
-//         expect(sameUserInfo).toEqual(userInfo);
-//       });
-//     });
-//     $httpBackend.flush(1);
-//   });
-
-//   it('should return new userInfo data if user is not logged', function() {
-//     var sampleUserInfoBackendObject = {
-//       is_moderator: false,
-//       is_admin: false,
-//       is_super_admin: false,
-//       is_topic_manager: false,
-//       can_create_collections: true,
-//       preferred_site_language_code: null,
-//       username: 'tester',
-//       user_is_logged_in: false
-//     };
-//     $httpBackend.expect('GET', '/userinfohandler').respond(
-//       200, sampleUserInfoBackendObject);
-//     var sampleUserInfo = userInfoObjectFactory.createDefault();
-
-//     UserService.getUserInfoAsync().then(function(userInfo) {
-//       expect(userInfo).toEqual(sampleUserInfo);
-//     });
-//     $httpBackend.flush();
-//   });
-
-//   it('should return image data', function() {
-//     var requestUrl = '/preferenceshandler/profile_picture';
-//     // Create a test user for checking profile picture of user.
-//     var sampleUserInfoBackendObject = {
-//       is_moderator: false,
-//       is_admin: false,
-//       is_super_admin: false,
-//       is_topic_manager: false,
-//       can_create_collections: true,
-//       preferred_site_language_code: null,
-//       username: 'tester',
-//       user_is_logged_in: true
-//     };
-//     $httpBackend.expect('GET', '/userinfohandler').respond(
-//       200, sampleUserInfoBackendObject);
-//     $httpBackend.expect('GET', requestUrl).respond(
-//       200, {profile_picture_data_url: 'image data'});
-
-//     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-//       expect(dataUrl).toBe('image data');
-//     });
-//     $httpBackend.flush();
-
-//     $httpBackend.when('GET', '/userinfohandler').respond(
-//       200, sampleUserInfoBackendObject);
-//     $httpBackend.when('GET', requestUrl).respond(404);
-
-//     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-//       expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-//         '/avatar/user_blue_72px.webp'));
-//     });
-//     $httpBackend.flush();
-//   });
-
-//   it('should return the default profile image path when user is not logged',
-//     function() {
-//       var sampleUserInfoBackendObject = {
-//         is_moderator: false,
-//         is_admin: false,
-//         is_super_admin: false,
-//         is_topic_manager: false,
-//         can_create_collections: true,
-//         preferred_site_language_code: null,
-//         username: 'tester',
-//         user_is_logged_in: false
-//       };
-//       $httpBackend.expect('GET', '/userinfohandler').respond(
-//         200, sampleUserInfoBackendObject);
-
-//       UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-//         expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-//           '/avatar/user_blue_72px.webp'));
-//       });
-//       $httpBackend.flush();
-//     });
-
-//   it('should return the login url', function() {
-//     var loginUrl = '/login';
-//     var currentUrl = 'home';
-//     $httpBackend.expect('GET', '/url_handler?current_url=' + currentUrl)
-//       .respond({login_url: loginUrl});
-
-//     UserService.getLoginUrlAsync().then(function(dataUrl) {
-//       expect(dataUrl).toBe(loginUrl);
-//     });
-//     $httpBackend.flush();
-//   });
-
-//   it('should set a profile image data url', function() {
-//     var newProfileImageDataurl = '/avatar/x.png';
-//     $httpBackend.expect('PUT', '/preferenceshandler/data')
-//       .respond({profile_picture_data_url: newProfileImageDataurl});
-
-//     UserService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
-//       function(response) {
-//         expect(response.data.profile_picture_data_url).toBe(
-//           newProfileImageDataurl);
-//       }
-//     );
-//     $httpBackend.flush();
-//   });
-
-//   it('should handle when set profile image data url is reject', function() {
-//     var newProfileImageDataurl = '/avatar/x.png';
-//     var errorMessage = 'It\'s not possible to set a new profile image data';
-//     $httpBackend.expect('PUT', '/preferenceshandler/data')
-//       .respond(500, errorMessage);
-
-//     UserService.setProfileImageDataUrlAsync(newProfileImageDataurl)
-//       /* eslint-disable dot-notation */
-//       .catch(function(error) {
-//       /* eslint-enable dot-notation */
-//         expect(error.data).toEqual(errorMessage);
-//       });
-//     $httpBackend.flush();
-//   });
-
-//   it('should return user community rights data', function() {
-//     var sampleUserCommunityRightsDict = {
-//       translation: ['hi'],
-//       voiceover: [],
-//       question: true
-//     };
-//     $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
-//       200, sampleUserCommunityRightsDict);
-
-//     UserService.getUserCommunityRightsData().then(function(
-//         userCommunityRights) {
-//       expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
-//     });
-//     $httpBackend.flush();
-//   });
-
-//   it('should not fetch userCommunityRights if it is was fetched before',
-//     function() {
-//       var sampleUserCommunityRightsDict = {
-//         translation: ['hi'],
-//         voiceover: [],
-//         question: true
-//       };
-//       $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
-//         200, sampleUserCommunityRightsDict);
-
-//       UserService.getUserCommunityRightsData().then(
-//         function(userCommunityRights) {
-//           expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
-//           // Fetch userCommunityRightsInfo again.
-//           UserService.getUserCommunityRightsData().then(function(
-//               sameUserCommunityRights) {
-//             expect(sameUserCommunityRights).toEqual(
-//               sampleUserCommunityRightsDict);
-//           });
-//         });
-//       $httpBackend.flush(1);
-//     });
-// });
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -314,10 +27,12 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UrlService } from './contextual/url.service';
 
 describe('User Service', () => {
-  let userService, urlInterpolationService, userInfoObjectFactory = null;
-  let csrfService = null;
-  let urlService = null;
-  var httpTestingController: HttpTestingController;
+  let userService: UserService = null;
+  let urlInterpolationService: UrlInterpolationService = null;
+  let userInfoObjectFactory: UserInfoObjectFactory = null;
+  let urlService: UrlService = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService: CsrfTokenService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -328,6 +43,12 @@ describe('User Service', () => {
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     userInfoObjectFactory = TestBed.get(UserInfoObjectFactory);
     urlService = TestBed.get(UrlService);
+    csrfService = TestBed.get(CsrfTokenService);
+    //check below
+    spyOn(csrfService, 'getTokenAsync').and.callFake(
+      () =>{
+        return Promise.resolve('sample-csrf-token');
+    });
   });
 
   afterEach(() => {
@@ -344,6 +65,7 @@ describe('User Service', () => {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: true
     };
     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
@@ -359,6 +81,7 @@ describe('User Service', () => {
       expect(userInfo.canCreateCollections()).toBe(
         sampleUserInfo.canCreateCollections());
       expect(userInfo.getUsername()).toBe(sampleUserInfo.getUsername());
+      expect(userInfo.getEmail()).toBe(sampleUserInfo.getEmail());
       expect(userInfo.getPreferredSiteLanguageCode()).toBe(
         sampleUserInfo.getPreferredSiteLanguageCode());
     });
@@ -376,10 +99,10 @@ describe('User Service', () => {
     userService.getUserInfoAsync().then((userInfo) => {
       expect(userInfo).toEqual(sampleUserInfo);
     });
-    //need to add anything here?
   }));
 
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
+    // creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -388,6 +111,7 @@ describe('User Service', () => {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: true
     };
     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
@@ -408,6 +132,7 @@ describe('User Service', () => {
   }));
 
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
+      // creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -416,6 +141,7 @@ describe('User Service', () => {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: false
     };
     var sampleUserInfo = userInfoObjectFactory.createDefault();
@@ -432,7 +158,7 @@ describe('User Service', () => {
 
   it('should return image data', fakeAsync(() => {
     var requestUrl = '/preferenceshandler/profile_picture';
-    // Create a test user for checking profile picture of user.
+    // creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -441,6 +167,7 @@ describe('User Service', () => {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: true
     };
 
@@ -448,7 +175,6 @@ describe('User Service', () => {
       expect(dataUrl).toBe('image data');
     });
 
-    //???
     var req = httpTestingController.expectOne('/userinfohandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserInfoBackendObject);
@@ -456,14 +182,14 @@ describe('User Service', () => {
     req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
     req.flush({profile_picture_data_url: 'image data'});
-    //
+    
     flushMicrotasks();
 
     userService.getProfileImageDataUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.png'));
     });
-    //???
+    
     req = httpTestingController.expectOne('/userinfohandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserInfoBackendObject);
@@ -471,12 +197,13 @@ describe('User Service', () => {
     req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
     req.flush(404);
-    //
+    
     flushMicrotasks();
   }));
 
   it('should return the default profile image path when user is not logged',
     fakeAsync(() => {
+      // creating a test user for checking profile picture of user.
       var sampleUserInfoBackendObject = {
         is_moderator: false,
         is_admin: false,
@@ -485,6 +212,7 @@ describe('User Service', () => {
         can_create_collections: true,
         preferred_site_language_code: null,
         username: 'tester',
+        email: 'test@test.com',
         user_is_logged_in: false
       };
 
@@ -506,7 +234,8 @@ describe('User Service', () => {
     userService.getLoginUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(loginUrl);
     });
-    var req = httpTestingController.expectOne('/url_handler?current_url=' + currentUrl);
+    var req = httpTestingController.expectOne(
+      '/url_handler?current_url=' + currentUrl);
     expect(req.request.method).toEqual('GET');
     req.flush({login_url: loginUrl});
 
@@ -515,10 +244,10 @@ describe('User Service', () => {
 
   it('should set a profile image data url', fakeAsync(() => {
     var newProfileImageDataurl = '/avatar/x.png';
-    //need to check this
+    //return types here might cause problems
     userService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
       (response) => {
-        expect(response.data.profile_picture_data_url).toBe(
+        expect(response.profile_picture_data_url).toBe(
           newProfileImageDataurl);
       }
     );
@@ -547,17 +276,19 @@ describe('User Service', () => {
   }));
 
   it('should return user community rights data', fakeAsync(() => {
+    //need to check return type
     var sampleUserCommunityRightsDict = {
       translation: ['hi'],
       voiceover: [],
       question: true
     };
 
-    userService.getUserCommunityRightsData().then((
-        userCommunityRights) => {
-      expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
+    userService.getUserCommunityRightsData().then(
+      (userCommunityRights) => {
+        expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
     });
-    var req = httpTestingController.expectOne('/usercommunityrightsdatahandler');
+    var req = httpTestingController.expectOne(
+      '/usercommunityrightsdatahandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserCommunityRightsDict);
 
@@ -582,7 +313,8 @@ describe('User Service', () => {
               sampleUserCommunityRightsDict);
           });
         });
-      var req = httpTestingController.expectOne('/usercommunityrightsdatahandler');
+      var req = httpTestingController.expectOne(
+        '/usercommunityrightsdatahandler');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleUserCommunityRightsDict);
   

@@ -118,12 +118,14 @@ export class UserService{
           }
         });
     }
-    setProfileImageDataUrlAsync(newProfileImageDataUrl: string): Promise<{}> {
+    setProfileImageDataUrlAsync(newProfileImageDataUrl: string): 
+      Promise<IPreferencesBackendDict> {
       let putData = {
         update_type: 'profile_picture_data_url',
         data: newProfileImageDataUrl
       }
-      return this.http.put<{}>(this.PREFERENCES_DATA_URL, putData).toPromise();
+      return this.http.put<IPreferencesBackendDict>(
+        this.PREFERENCES_DATA_URL, putData).toPromise();
     }
     getLoginUrlAsync(): Promise<string> {
       let urlParameters = {
