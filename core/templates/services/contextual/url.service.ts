@@ -59,16 +59,29 @@ export class UrlService {
     return params;
   }
 
+  /**
+   * Returns whether the url is framed.
+   * @return {boolean} whether the url is framed.
+   */
   isIframed(): boolean {
     let pathname = this.getPathname();
     let urlParts = pathname.split('/');
     return urlParts[1] === 'embed';
   }
 
+  /**
+   * Returns the current path name.
+   * @return {string} the current path name.
+   */
   getPathname(): string {
     return this.getCurrentLocation().pathname;
   }
 
+  /**
+   * Gets the topic id from url.
+   * @return {string} the topic id.
+   * @throws throws the error if the url is invalid.
+   */
   getTopicIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/topic_editor\/(\w|-){12}/g)) {
@@ -77,6 +90,11 @@ export class UrlService {
     throw new Error('Invalid topic id url');
   }
 
+  /**
+   * Gets the topic name from the learner's url.
+   * @return {string} the topic name.
+   * @throws throws an error if the url is invalid.
+   */
   getTopicNameFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
@@ -85,6 +103,11 @@ export class UrlService {
     throw new Error('Invalid URL for topic');
   }
 
+  /**
+   * Gets the classroom name from the learner's url.
+   * @return {string} the classroom name.
+   * @throws throws an error if the url is invalid.
+   */
   getClassroomNameFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
@@ -94,6 +117,11 @@ export class UrlService {
     throw new Error('Invalid URL for classroom');
   }
 
+  /**
+   * Gets the subtopic id from the learner's url.
+   * @return {string} the subtopic id.
+   * @throws throws an error if the url is invalid.
+   */
   getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
@@ -103,6 +131,11 @@ export class UrlService {
     throw new Error('Invalid URL for subtopic');
   }
 
+  /**
+   * Gets the story id from the learner's url.
+   * @return {string} the story id.
+   * @throws throws an error if the url is invalid.
+   */
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
@@ -111,6 +144,11 @@ export class UrlService {
     throw new Error('Invalid story id url');
   }
 
+  /**
+   * Gets the story id from the viewer's url.
+   * @return {string} the story id.
+   * @throws throws an error if the url is invalid.
+   */
   getStoryIdFromViewerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/story\/(\w|-){12}/g)) {
@@ -119,6 +157,11 @@ export class UrlService {
     throw new Error('Invalid story id url');
   }
 
+
+  /**
+   * Gets the story id from the player.
+   * @return {string} the story id.
+   */
   getStoryIdInPlayer(): string | null {
     let query = this.getCurrentQueryString();
     let queryItems = query.split('&');
@@ -131,6 +174,11 @@ export class UrlService {
     return null;
   }
 
+  /**
+   * Gets the skill id from the url.
+   * @return {string} the skill id.
+   * @throws throws an error if the skill Id is invalid.
+   */
   getSkillIdFromUrl(): string {
     let pathname = this.getPathname();
     let skillId = pathname.split('/')[2];
@@ -140,6 +188,11 @@ export class UrlService {
     return skillId;
   }
 
+  /**
+   * Gets the query values as a list.
+   * @param {string} fieldName - the name of the field.
+   * @return {Array<string>} the list of query field values.
+   */
   getQueryFieldValuesAsList(fieldName: string): Array<string> {
     let fieldValues = [];
     if (this.getCurrentQueryString().indexOf('?') > -1) {
@@ -159,6 +212,13 @@ export class UrlService {
     return fieldValues;
   }
 
+  /**
+   * Adds the url, the field name, and the field value together.
+   * @param {string} url - the url.
+   * @param {string} fieldName - the field name.
+   * @param {string} fieldValue - the field value.
+   * @return {Array<string>} the list of query field values.
+   */
   addField(url: string, fieldName: string, fieldValue: string): string {
     let encodedFieldValue = encodeURIComponent(fieldValue);
     let encodedFieldName = encodeURIComponent(fieldName);
@@ -166,14 +226,25 @@ export class UrlService {
         '=' + encodedFieldValue;
   }
 
+  /**
+   * Gets the hashed value from the current location.
+   */
   getHash(): string {
     return this.getCurrentLocation().hash;
   }
 
+  /**
+   * Gets the origin from the current location.
+   */
   getOrigin(): string {
     return this.getCurrentLocation().origin;
   }
 
+  /**
+   * Gets the collection id from the exploration url.
+   * @return {string} a collection id if the url parameter doesn't have a 'parent' property but have a 'collection_id' property;
+   * @return {null} if otherwise.
+   */
   getCollectionIdFromExplorationUrl(): string | null {
     let urlParams: UrlParamsType = this.getUrlParams();
     if (urlParams.hasOwnProperty('parent')) {
@@ -185,6 +256,11 @@ export class UrlService {
     return null;
   }
 
+  /**
+   * Gets the username from the profile url.
+   * @return {string} the username.
+   * @throws Will throw exception if the profile URL is invalid.
+   */
   getUsernameFromProfileUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(profile)/g)) {
@@ -193,6 +269,11 @@ export class UrlService {
     throw new Error('Invalid profile URL');
   }
 
+  /**
+   * Gets the username from the url.
+   * @return {string} the username.
+   * @throws Will throw exception if the profile URL is invalid.
+   */
   getCollectionIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(collection)/g)) {
@@ -201,6 +282,11 @@ export class UrlService {
     throw new Error('Invalid collection URL');
   }
 
+  /**
+   * Gets the collection id from the editor url.
+   * @return {string} the collection id.
+   * @throws Will throw exception if the editor URL is invalid.
+   */
   getCollectionIdFromEditorUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(collection_editor\/create)/g)) {
@@ -209,6 +295,12 @@ export class UrlService {
     throw new Error('Invalid collection editor URL');
   }
 
+  /**
+   * Gets the exploration version id from the url.
+   * @return {string} the collection id.
+   * @return {number} the exploration version from Url if an exploration version can be extracted;
+   * @return {null} if otherwise.
+   */
   getExplorationVersionFromUrl(): number | null {
     let urlParams: UrlParamsType = this.getUrlParams();
     if (urlParams.hasOwnProperty('v')) {

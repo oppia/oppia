@@ -40,6 +40,11 @@ export class PlayerPositionService {
     this.onChangeCallback = callback;
   }
 
+  /**
+   * Get the name of the current state.
+   * @return {object} a string that shows the name of the current state.
+   * @throws Will throw error if the index of card is out of the range of the transcript.
+   */
   getCurrentStateName(): string {
     try {
       return (
@@ -58,6 +63,10 @@ export class PlayerPositionService {
     }
   }
 
+  /**
+   * Set the index of the displayed card.
+   * @param {object} index - A number which represents the index of card.
+   */
   setDisplayedCardIndex(index: number): void {
     let oldIndex = this.displayedCardIndex;
     this.displayedCardIndex = index;
@@ -67,18 +76,32 @@ export class PlayerPositionService {
     }
   }
 
+  /**
+   * Get the index of the displayed card.
+   * @return {object} a number which represents the index of displayed card.
+   */
   getDisplayedCardIndex(): number {
     return this.displayedCardIndex;
   }
 
+  /**
+   * record that the user has submitted an answer.
+   */
   recordAnswerSubmission(): void {
     this.learnerJustSubmittedAnAnswer = true;
   }
 
+  /**
+   * Record that the user has clicked on the navigation button.
+   */
   recordNavigationButtonClick(): void {
     this.learnerJustSubmittedAnAnswer = false;
   }
 
+  /**
+   * Gets whether the learner has just submitted an answer.
+   * @return {boolean} a boolean that shows if the learner has just submitted an answer.
+   */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
   }
