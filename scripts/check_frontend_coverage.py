@@ -443,7 +443,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'TopicObjectFactory.ts',
     'topics-and-skills-dashboard-backend-api.service.ts',
     'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts',
-    'training-panel.directive.ts',
     'translate-text.service.ts',
     'translation-file-hash-loader.service.ts',
     'translation-opportunities.directive.ts',
