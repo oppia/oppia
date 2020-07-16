@@ -61,6 +61,29 @@
       "IsEquivalentTo": "is equivalent to {{f|NumberWithUnits}}"
     }
   },
+  "NumericExpressionInput": {
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
+    "instructions": null,
+    "is_trainable": false,
+    "narrow_instructions": null,
+    "description": "Allows learners to enter numeric expressions.",
+    "needs_summary": false,
+    "name": "Numeric Expression Input",
+    "answer_type": "NumericExpression",
+    "is_linear": false,
+    "display_mode": "inline",
+    "id": "NumericExpressionInput",
+    "customization_arg_specs": [],
+    "is_terminal": false,
+    "default_outcome_heading": null,
+    "rule_descriptions": {
+      "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
+      "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
+      "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
+    }
+  },
   "NumericInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
