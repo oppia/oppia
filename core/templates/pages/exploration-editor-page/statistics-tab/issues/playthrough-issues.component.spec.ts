@@ -16,10 +16,6 @@
  * @fileoverview Unit tests for playthroughIssues.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
-
 describe('Playthrough Issues Component', function() {
   var $q = null;
   var $scope = null;
