@@ -175,14 +175,13 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                     num_positional_args_unused -= 1
 
         for arg in keyword_args:
-            # If there is *args and **kwargs in the functin definition skip the
+            # If there is *args and **kwargs in the function definition skip the
             # check because we can use keywords arguments in function call even
             # if **kwargs is present in the function definition.
             if not called.args.kwarg and callable_name != 'constructor':
                 if not arg in keyword_args_in_funcdef:
                     # This try/except block tries to get the function
-                    # name. Since each node may differ, multiple
-                    # blocks have been used.
+                    # name.
                     try:
                         func_name = node.func.attrname
                     except AttributeError:
