@@ -44,7 +44,7 @@ export class AlgebraicExpressionInputValidationService {
       customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     let warningsList = [];
-    let aeirs = (
+    let algebraicRulesService = (
       new AlgebraicExpressionInputRulesService());
 
     warningsList = warningsList.concat(
@@ -71,7 +71,8 @@ export class AlgebraicExpressionInputValidationService {
           let seenRuleType = <string> seenRule.type;
 
           if (seenRuleType === 'IsEquivalentTo' && (
-            aeirs.IsEquivalentTo(seenInput, {x: currentInput}))) {
+            algebraicRulesService.IsEquivalentTo(
+              seenInput, {x: currentInput}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -82,7 +83,8 @@ export class AlgebraicExpressionInputValidationService {
                 'by an \'IsEquivalentTo\' rule with a matching input.')
             });
           } else if (currentRuleType === 'MatchesExactlyWith' && (
-            aeirs.MatchesExactlyWith(seenInput, {x: currentInput}))) {
+            algebraicRulesService.MatchesExactlyWith(
+              seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with MatchesExactlyWith
             // rule obsolete.
             warningsList.push({
