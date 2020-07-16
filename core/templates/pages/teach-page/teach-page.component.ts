@@ -56,7 +56,7 @@ export class TeachPageComponent implements OnInit {
   }
 
   onTabClick(tabName: string): Window {
-    // ---- Update hash ----
+    // Update URL hash.
     this.windowRef.nativeWindow.location.hash = '#' + tabName;
     this.activeTabName = tabName;
     return this.windowRef.nativeWindow;
