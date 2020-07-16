@@ -64,7 +64,7 @@ class MockPageTitleRef {
 let component: ErrorPageComponent;
 let fixture: ComponentFixture<ErrorPageComponent>;
 
-describe('Error page', () => {
+fdescribe('Error page', () => {
   let pageTitle: MockPageTitleRef;
   let i18n = null;
   let translate = null;
