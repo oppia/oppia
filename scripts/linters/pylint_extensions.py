@@ -1803,9 +1803,30 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
         file_content = read_from_node(node)
+
         for line_num, line in enumerate(file_content):
             line = file_content[line_num].lstrip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
             # Ignore line that is enabling this check.
             # Example: # pylint: enable:single-line-pragma
             # else that line will raise warning.
