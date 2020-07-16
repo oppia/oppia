@@ -17,7 +17,7 @@
   <div ng-if="$ctrl.selectedRubricIndex != null">
     <div ng-repeat="explanation in $ctrl.rubric.getExplanations() track by $index">
       <div ng-if="!$ctrl.explanationEditorIsOpen[$ctrl.rubric.getDifficulty()][$index]">
-        <div class="oppia-readonly-rule-title"
+        <div class="oppia-readonly-rule-tile"
              ng-class="{'oppia-editable-section': $ctrl.isEditable()}">
           <div class="oppia-rule-preview">
             <div class="oppia-click-to-start-editing" ng-click="$ctrl.openExplanationEditor($ctrl.rubric.getDifficulty(), $index)">

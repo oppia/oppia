@@ -22,8 +22,19 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 import feconf
+import utils
+
+
+def _require_valid_skill_ids(skill_ids):
+    """Checks whether the given skill ids are valid.
+
+    Args:
+        skill_ids: list(str). The skill ids to validate.
+    """
+    for skill_id in skill_ids:
+        skill_domain.Skill.require_valid_skill_id(skill_id)
 
 
 class QuestionsListHandler(base.BaseHandler):
@@ -38,15 +49,15 @@ class QuestionsListHandler(base.BaseHandler):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
         skill_ids = comma_separated_skill_ids.split(',')
-
-        for skill_id in skill_ids:
-            try:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-            except Exception:
-                raise self.PageNotFoundException(Exception('Invalid skill id'))
+        skill_ids = list(set(skill_ids))
 
         try:
-            skill_services.get_multi_skills(skill_ids)
+            _require_valid_skill_ids(skill_ids)
+        except utils.ValidationError:
+            raise self.InvalidInputException('Invalid skill id')
+
+        try:
+            skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -88,4 +99,32 @@ class QuestionsListHandler(base.BaseHandler):
             'question_summary_dicts': return_dicts,
             'next_start_cursor': next_start_cursor
         })
+        self.render_json(self.values)
+
+
+class QuestionCountDataHandler(base.BaseHandler):
+    """Provides data regarding the number of questions assigned to the given
+    skill ids.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, comma_separated_skill_ids):
+        """Handles GET requests."""
+        skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = list(set(skill_ids))
+
+        try:
+            _require_valid_skill_ids(skill_ids)
+        except utils.ValidationError:
+            raise self.InvalidInputException('Invalid skill id')
+
+        total_question_count = (
+            question_services.get_total_question_count_for_skill_ids(skill_ids))
+
+        self.values.update({
+            'total_question_count': total_question_count
+        })
+
         self.render_json(self.values)

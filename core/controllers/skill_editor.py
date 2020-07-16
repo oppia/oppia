@@ -21,6 +21,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -61,7 +62,7 @@ class SkillEditorPage(base.BaseHandler):
         """Handles GET requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
             raise self.PageNotFoundException(
@@ -122,7 +123,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException(Exception('Invalid skill id.'))
 
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
             raise self.PageNotFoundException(
@@ -166,7 +167,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     def put(self, skill_id):
         """Updates properties of the given skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
@@ -186,7 +187,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        skill_dict = skill_services.get_skill_by_id(skill_id).to_dict()
+        skill_dict = skill_fetchers.get_skill_by_id(skill_id).to_dict()
 
         self.values.update({
             'skill': skill_dict
@@ -198,11 +199,9 @@ class EditableSkillDataHandler(base.BaseHandler):
     def delete(self, skill_id):
         """Handles Delete requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill_ids_assigned_to_some_topic = (
-            topic_services.get_all_skill_ids_assigned_to_some_topic())
-        if skill_id in skill_ids_assigned_to_some_topic:
-            raise self.InvalidInputException(
-                'Cannot delete skill that is assigned to a topic.')
+
+        skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
+
         if skill_services.skill_has_associated_questions(skill_id):
             raise self.InvalidInputException(
                 'Please delete all questions associated with this skill '
@@ -230,7 +229,7 @@ class SkillDataHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException('Invalid skill id.')
         try:
-            skills = skill_services.get_multi_skills(skill_ids)
+            skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -254,7 +253,7 @@ class FetchSkillsHandler(base.BaseHandler):
         skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
 
         try:
-            skills = skill_services.get_multi_skills(skill_ids)
+            skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 

@@ -281,6 +281,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
         questions_list.QuestionsListHandler),
     get_redirect_route(
+        r'%s/<comma_separated_skill_ids>' % feconf.QUESTION_COUNT_URL_PREFIX,
+        questions_list.QuestionCountDataHandler),
+    get_redirect_route(
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
@@ -351,6 +354,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.UNASSIGN_SKILL_DATA_HANDLER_URL,
+        topics_and_skills_dashboard.TopicAssignmentsHandler),
     get_redirect_route(
         r'%s' % feconf.SKILL_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.SkillsDashboardPageDataHandler),

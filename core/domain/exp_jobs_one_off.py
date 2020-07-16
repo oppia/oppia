@@ -41,7 +41,6 @@ from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
-gae_image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
@@ -93,7 +92,9 @@ class DragAndDropSortInputInteractionOneOffJob(
     def map(item):
         if item.deleted:
             return
-
+        exp_status = rights_manager.get_exploration_rights(item.id).status
+        if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            return
         exploration = exp_fetchers.get_exploration_from_model(item)
         validation_errors = []
         for state_name, state in exploration.states.items():
@@ -354,6 +355,11 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationJobManager, cls).enqueue(
+            job_id, shard_count=64)
 
     @staticmethod
     def map(item):

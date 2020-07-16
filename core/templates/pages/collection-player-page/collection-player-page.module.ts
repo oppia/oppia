@@ -26,7 +26,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -35,6 +35,12 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { CollectionFooterComponent } from
+  'pages/collection-player-page/collection-footer/collection-footer.component';
+import { CollectionNodeListComponent } from
+// eslint-disable-next-line max-len
+  'pages/collection-player-page/collection-node-list/collection-node-list.component';
+
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -49,10 +55,14 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionFooterComponent,
+    CollectionNodeListComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionFooterComponent,
+    CollectionNodeListComponent
   ],
   providers: [
     AppConstants,
