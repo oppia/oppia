@@ -1806,7 +1806,12 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
         file_content = read_from_node(node)
         for line_num, line in enumerate(file_content):
             line = file_content[line_num].lstrip()
+            # Ignore line that is enabling this check.
+            # Example: # pylint: enable:single-line-pragma
+            # else that line will raise warning.
             if line.startswith(b'# pylint:'):
+                if 'enable' in line and 'single-line-pragma' in line:
+                    continue
                 self.add_message(
                     'single-line-pragma', line=line_num + 1)
 
