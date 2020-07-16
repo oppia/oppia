@@ -16,35 +16,6 @@
  * @fileoverview Component for the error page.
  */
 
-// require('domain/utilities/url-interpolation.service.ts');
-// require('services/page-title.service.ts');
-
-// angular.module('oppia').component('errorPage', {
-//   bindings: {
-//     statusCode: '@'
-//   },
-//   template: require('./error-page.component.html'),
-//   controller: [
-//     'PageTitleService', 'UrlInterpolationService',
-//     function(
-//         PageTitleService, UrlInterpolationService) {
-//       var ctrl = this;
-//       ctrl.getStatusCode = function() {
-//         return Number(ctrl.statusCode);
-//       };
-
-//       ctrl.getStaticImageUrl = function(imagePath) {
-//         return UrlInterpolationService.getStaticImageUrl(imagePath);
-//       };
-
-//       ctrl.$onInit = function() {
-//         PageTitleService.setPageTitle(
-//           'Error ' + ctrl.statusCode + ' - Oppia');
-//       };
-//     }
-//   ]
-// });
-
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -62,12 +33,15 @@ export class ErrorPageComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService) {}
+
   ngOnInit(): void {
     this.pageTitleService.setPageTitle('Error ' + this.statusCode + ' - Oppia');
   }
+
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
+
   getStatusCode(): number {
     return Number(this.statusCode);
   }

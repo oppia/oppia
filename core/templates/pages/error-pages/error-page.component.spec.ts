@@ -18,9 +18,9 @@
 import { Pipe, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 
+import { ErrorPageComponent } from './error-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ErrorPageComponent } from './error-page.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 import { TranslateService } from 'services/translate.service';
@@ -51,28 +51,17 @@ class MockI18nLanguageCodeService {
   }
 }
 
-class MockPageTitleRef {
-  _title = '';
-  setPageTitle(val) {
-    this._title = val;
-  }
-  getPageTitle() {
-    return this._title;
-  }
-}
-
 let component: ErrorPageComponent;
 let fixture: ComponentFixture<ErrorPageComponent>;
 
 fdescribe('Error page', () => {
-  let pageTitle: MockPageTitleRef;
+  let pageTitle = null;
   let i18n = null;
   let translate = null;
 
   beforeEach(async(() => {
-    pageTitle = new MockPageTitleRef();
     TestBed.configureTestingModule({
-      declarations: [ErrorPageComponent],
+      declarations: [ErrorPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
@@ -80,17 +69,19 @@ fdescribe('Error page', () => {
         },
         { provide: TranslateService, useClass: MockTranslateService },
         UrlInterpolationService,
-        {provide: PageTitleService, useValue: MockPageTitleRef}
+        PageTitleService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     i18n = TestBed.get(I18nLanguageCodeService);
     translate = TestBed.get(TranslateService);
+    pageTitle = TestBed.get(PageTitleService);
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ErrorPageComponent);
     component = fixture.componentInstance;
+    component.statusCode = '404';
     fixture.detectChanges();
   });
 
