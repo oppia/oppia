@@ -29,6 +29,8 @@ require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require(
+  'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -121,6 +123,32 @@ angular.module('oppia').directive('topicEditorTab', [
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
 
+          $scope.toggleSubtopicCard = function(index) {
+            if ($scope.subtopicCardSelectedIndexes[index]) {
+              $scope.subtopicCardSelectedIndexes[index] = false;
+              return;
+            }
+            $scope.subtopicCardSelectedIndexes[index] = true;
+          };
+
+          $scope.reassignSkillsInSubtopics = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic-editor-page/modal-templates/' +
+                  'rearrange-skills-in-subtopics-modal.template.html'),
+              backdrop: true,
+              windowClass: 'rearrange-skills-modal',
+              controller: 'RearrangeSkillsInSubtopicsModalController',
+              size: 'xl'
+            }).result.then(function() {
+              _initEditor();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
+          };
+
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
@@ -204,6 +232,20 @@ angular.module('oppia').directive('topicEditorTab', [
             _initEditor();
           };
 
+          $scope.removeSkillFromSubtopic = function(subtopicId, skillSummary) {
+            $scope.selectedSkillEditOptionsIndex = {};
+            TopicUpdateService.removeSkillFromSubtopic(
+              $scope.topic, subtopicId, skillSummary);
+            _initEditor();
+          };
+
+          $scope.removeSkillFromTopic = function(subtopicId, skillSummary) {
+            $scope.selectedSkillEditOptionsIndex = {};
+            TopicUpdateService.removeSkillFromSubtopic(
+              $scope.topic, subtopicId, skillSummary);
+            $scope.deleteUncategorizedSkillFromTopic(skillSummary);
+          };
+
           $scope.togglePreview = function() {
             $scope.topicPreviewCardIsShown = !($scope.topicPreviewCardIsShown);
           };
@@ -246,12 +288,23 @@ angular.module('oppia').directive('topicEditorTab', [
             if (listType === $scope.SUBTOPIC_LIST) {
               $scope.subtopicsListIsShown = !$scope.subtopicsListIsShown;
             }
-            if (listType === $scope.SKILL_LIST) {
-              $scope.skillsListIsShown = !$scope.skillsListIsShown;
-            }
             if (listType === $scope.STORY_LIST) {
               $scope.storiesListIsShown = !$scope.storiesListIsShown;
             }
+          };
+
+          $scope.showSubtopicEditOptions = function(index) {
+            $scope.subtopicEditOptionsAreShown = index;
+          };
+
+          $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
+            if (Object.keys($scope.selectedSkillEditOptionsIndex).length) {
+              $scope.selectedSkillEditOptionsIndex = {};
+              return;
+            }
+            $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {};
+            $scope.selectedSkillEditOptionsIndex[subtopicIndex][skillIndex] = (
+              true);
           };
 
           ctrl.$onInit = function() {
@@ -259,9 +312,9 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';
             $scope.STORY_LIST = 'story';
+            $scope.subtopicCardSelectedIndexes = {};
+            $scope.selectedSkillEditOptionsIndex = {};
             $scope.subtopicsListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.skillsListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());

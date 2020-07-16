@@ -89,9 +89,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             ['skill_id_1', 'skill_id_2'])
 
     def test_get_all_subtopics(self):
-        self.topic.subtopics = [topic_domain.Subtopic(
-            1, 'Title', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
             subtopics, [{
@@ -142,21 +139,25 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.rearrange_canonical_story(1, 'a')
 
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         with self.assertRaisesRegexp(
-            Exception, 'Expected index values to be with-in bounds.'):
-            self.topic.rearrange_canonical_story(1, 10)
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected index values to be with-in bounds.'):
-            self.topic.rearrange_canonical_story(-1, 0)
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected index values to be with-in bounds.'):
+            Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(10, 0)
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected index values to be with-in bounds.'):
-            self.topic.rearrange_canonical_story(-1, -10)
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(-1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(0, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(0, -1)
 
     def test_rearrange_canonical_story_fail_with_identical_index_values(self):
         with self.assertRaisesRegexp(
@@ -196,6 +197,81 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(canonical_story_ids[0], 'story_id_1')
         self.assertEqual(canonical_story_ids[1], 'story_id_2')
         self.assertEqual(canonical_story_ids[2], 'story_id_3')
+
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_from_index(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_skill_in_subtopic(1, None, 2)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_skill_in_subtopic(1, 'a', 2)
+
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_skill_in_subtopic(1, 1, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_skill_in_subtopic(1, 1, 'a')
+
+    def test_rearrange_skill_in_subtopic_fail_with_out_of_bound_indexes(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, 10, 1)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, -1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, 0, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, 0, -10)
+
+    def test_rearrange_skill_in_subtopic_fail_with_identical_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index and to_index values to be '
+                       'different.'):
+            self.topic.rearrange_skill_in_subtopic(1, 1, 1)
+
+    def test_rearrange_skill_in_subtopic(self):
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+
+        skill_ids = self.topic.subtopics[0].skill_ids
+
+        self.assertEqual(skill_ids[0], 'skill_id_1')
+        self.assertEqual(skill_ids[1], 'skill_id_2')
+        self.assertEqual(skill_ids[2], 'skill_id_3')
+
+        self.topic.rearrange_skill_in_subtopic(1, 1, 0)
+        skill_ids = self.topic.subtopics[0].skill_ids
+        self.assertEqual(skill_ids[0], 'skill_id_2')
+        self.assertEqual(skill_ids[1], 'skill_id_1')
+        self.assertEqual(skill_ids[2], 'skill_id_3')
+
+        self.topic.rearrange_skill_in_subtopic(1, 2, 1)
+        skill_ids = self.topic.subtopics[0].skill_ids
+        self.assertEqual(skill_ids[0], 'skill_id_2')
+        self.assertEqual(skill_ids[1], 'skill_id_3')
+        self.assertEqual(skill_ids[2], 'skill_id_1')
+
+        self.topic.rearrange_skill_in_subtopic(1, 2, 0)
+        self.assertEqual(skill_ids[0], 'skill_id_1')
+        self.assertEqual(skill_ids[1], 'skill_id_2')
+        self.assertEqual(skill_ids[2], 'skill_id_3')
 
     def test_get_all_story_references(self):
         self.topic.canonical_story_references = [

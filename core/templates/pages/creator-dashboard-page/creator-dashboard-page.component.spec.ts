@@ -22,17 +22,46 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
+var _getSuggestionThreads = (
+    feedbackDicts, suggestionDicts, suggestionsService,
+    suggestionThreadObjectFactory) => {
+  var numberOfSuggestions = feedbackDicts.length;
+  var suggestionThreads = [];
+
+  for (var i = 0; i < numberOfSuggestions; i++) {
+    for (var j = 0; j < numberOfSuggestions; j++) {
+      var suggestionThreadId = suggestionsService
+        .getThreadIdFromSuggestionBackendDict(suggestionDicts[j]);
+      var threadDict = feedbackDicts[i];
+      if (threadDict.thread_id === suggestionThreadId) {
+        var suggestionThread = (
+          suggestionThreadObjectFactory.createFromBackendDicts(
+            threadDict, suggestionDicts[j]));
+        suggestionThreads.push(suggestionThread);
+      }
+    }
+  }
+
+  return suggestionThreads;
+};
+
 describe('Creator dashboard controller', () => {
   var ctrl = null;
   var $httpBackend = null;
-  var $log = null;
   var $q = null;
   var $rootScope = null;
   var $window = null;
   var AlertsService = null;
+  var collectionSummaryObjectFactory = null;
   var CreatorDashboardBackendApiService = null;
+  var creatorDashboardStatsObjectFactory = null;
+  var creatorExplorationSummaryObjectFactory = null;
   var CsrfService = null;
+  var feedbackThreadObjectFactory = null;
+  var profileSummaryObjectFactory = null;
   var SuggestionModalForCreatorDashboardService = null;
+  var suggestionObjectFactory = null;
+  var suggestionsService = null;
   var SuggestionThreadObjectFactory = null;
   var ThreadMessageObjectFactory = null;
   var UserService = null;
@@ -49,17 +78,30 @@ describe('Creator dashboard controller', () => {
 
   beforeEach(angular.mock.inject(($injector, $componentController) => {
     $httpBackend = $injector.get('$httpBackend');
-    $log = $injector.get('$log');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $window = $injector.get('$window');
 
     AlertsService = $injector.get('AlertsService');
+    collectionSummaryObjectFactory = $injector.get(
+      'CollectionSummaryObjectFactory');
     CreatorDashboardBackendApiService = $injector.get(
       'CreatorDashboardBackendApiService');
+    creatorDashboardStatsObjectFactory = $injector.get(
+      'CreatorDashboardStatsObjectFactory');
+    creatorExplorationSummaryObjectFactory = $injector.get(
+      'CreatorExplorationSummaryObjectFactory');
     CsrfService = $injector.get('CsrfTokenService');
+    feedbackThreadObjectFactory = $injector.get(
+      'FeedbackThreadObjectFactory');
+    profileSummaryObjectFactory = $injector.get(
+      'ProfileSummaryObjectFactory');
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
+    suggestionObjectFactory = $injector.get(
+      'SuggestionObjectFactory');
+    suggestionsService = $injector.get(
+      'SuggestionsService');
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
     ThreadMessageObjectFactory = $injector.get('ThreadMessageObjectFactory');
@@ -108,13 +150,50 @@ describe('Creator dashboard controller', () => {
   describe('when fetching dashboard successfully and on explorations tab',
     function() {
       var dashboardData = {
-        explorations_list: [{}],
+        explorations_list: [
+          {
+            human_readable_contributors_summary: {
+              username: {
+                num_commits: 3
+              }
+            },
+            category: 'Algebra',
+            community_owned: false,
+            tags: [],
+            title: 'Testing Exploration',
+            created_on_msec: 1593786508029.501,
+            num_total_threads: 0,
+            num_views: 1,
+            last_updated_msec: 1593786607552.753,
+            status: 'public',
+            num_open_threads: 0,
+            thumbnail_icon_url: '/subjects/Algebra.svg',
+            language_code: 'en',
+            objective: 'To test exploration recommendations',
+            id: 'hi27Jix1QGbT',
+            thumbnail_bg_color: '#cd672b',
+            activity_type: 'exploration',
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0
+            }
+          }
+        ],
         collections_list: [],
         subscribers_list: [],
         dashboard_stats: {
+          average_ratings: null,
+          num_ratings: 0,
+          total_open_feedback: 0,
           total_plays: 10
         },
         last_week_stats: {
+          average_ratings: null,
+          num_ratings: 0,
+          total_open_feedback: 0,
           total_plays: 5
         },
         display_preference: 'card',
@@ -195,15 +274,55 @@ describe('Creator dashboard controller', () => {
           last_updated_msecs: 0
         }]
       };
-      var logErrorSpy = null;
 
       beforeEach(function() {
         spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
-          .and.returnValue($q.resolve(dashboardData));
+          .and.returnValue($q.resolve({
+            dashboardStats: creatorDashboardStatsObjectFactory
+              .createFromBackendDict(dashboardData.dashboard_stats),
+            // Because lastWeekStats may be null.
+            lastWeekStats: dashboardData.last_week_stats ? (
+              creatorDashboardStatsObjectFactory
+                .createFromBackendDict(dashboardData.last_week_stats)) : null,
+            displayPreference: dashboardData.display_preference,
+            subscribersList: dashboardData.subscribers_list.map(
+              subscriber => profileSummaryObjectFactory
+                .createFromSubscriberBackendDict(subscriber)),
+            threadsForCreatedSuggestionsList: (
+              dashboardData.threads_for_created_suggestions_list.map(
+                feedbackThread => feedbackThreadObjectFactory
+                  .createFromBackendDict(feedbackThread))),
+            threadsForSuggestionsToReviewList: (
+              dashboardData.threads_for_suggestions_to_review_list.map(
+                feedbackThread => feedbackThreadObjectFactory
+                  .createFromBackendDict(feedbackThread))),
+            createdSuggestionsList: (
+              dashboardData.created_suggestions_list.map(
+                suggestionDict => suggestionObjectFactory
+                  .createFromBackendDict(suggestionDict))),
+            suggestionsToReviewList: (
+              dashboardData.suggestions_to_review_list.map(
+                suggestionDict => suggestionObjectFactory
+                  .createFromBackendDict(suggestionDict))),
+            createdSuggestionThreadsList: _getSuggestionThreads(
+              dashboardData.threads_for_created_suggestions_list,
+              dashboardData.created_suggestions_list,
+              suggestionsService,
+              SuggestionThreadObjectFactory),
+            suggestionThreadsToReviewList: _getSuggestionThreads(
+              dashboardData.threads_for_suggestions_to_review_list,
+              dashboardData.suggestions_to_review_list,
+              suggestionsService,
+              SuggestionThreadObjectFactory),
+            explorationsList: dashboardData.explorations_list.map(
+              expSummary => creatorExplorationSummaryObjectFactory
+                .createFromBackendDict(expSummary)),
+            collectionsList: dashboardData.collections_list.map(
+              collectionSummary => collectionSummaryObjectFactory
+                .createFromBackendDict(collectionSummary))
+          }));
         spyOn(UserService, 'getUserInfoAsync').and.returnValue(
           $q.resolve(userInfo));
-        logErrorSpy = (
-          spyOn($log, 'error').and.callThrough());
 
         ctrl.$onInit();
         $rootScope.$apply();
@@ -219,8 +338,6 @@ describe('Creator dashboard controller', () => {
             dashboardData.threads_for_suggestions_to_review_list[0],
             dashboardData.suggestions_to_review_list[0]));
 
-        expect(logErrorSpy).toHaveBeenCalledWith(
-          'Number of suggestions does not match number of suggestion threads');
         expect(ctrl.canCreateCollections).toBe(true);
         expect(ctrl.mySuggestionsList).toEqual([suggestionThreadObject]);
         expect(ctrl.suggestionsToReviewList).toEqual(
@@ -245,8 +362,8 @@ describe('Creator dashboard controller', () => {
 
       it('should set explorations sorting options', function() {
         expect(ctrl.isCurrentSortDescending).toBe(true);
-        expect(ctrl.currentSortType).toBe('num_open_threads');
-        ctrl.setExplorationsSortingOptions('num_open_threads');
+        expect(ctrl.currentSortType).toBe('numOpenThreads');
+        ctrl.setExplorationsSortingOptions('numOpenThreads');
         expect(ctrl.isCurrentSortDescending).toBe(false);
 
         ctrl.setExplorationsSortingOptions('new_open');
@@ -255,8 +372,8 @@ describe('Creator dashboard controller', () => {
 
       it('should set subscription sorting options', function() {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
-        expect(ctrl.currentSubscribersSortType).toBe('subscriber_username');
-        ctrl.setSubscriptionSortingOptions('subscriber_username');
+        expect(ctrl.currentSubscribersSortType).toBe('username');
+        ctrl.setSubscriptionSortingOptions('username');
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
 
         ctrl.setSubscriptionSortingOptions('new_subscriber');
@@ -265,17 +382,17 @@ describe('Creator dashboard controller', () => {
 
       it('should sort subscription function', function() {
         var entity = {
-          subscriber_username: 'subscriber_username'
+          username: 'username'
         };
         expect(ctrl.sortSubscriptionFunction(entity)).toBe(
-          'subscriber_username');
+          'username');
 
-        ctrl.setSubscriptionSortingOptions('subscriber_impact');
+        ctrl.setSubscriptionSortingOptions('impact');
         expect(ctrl.sortSubscriptionFunction({})).toBe(0);
       });
 
       it('should sort by function', function() {
-        expect(ctrl.currentSortType).toBe('num_open_threads');
+        expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('title');
         expect(ctrl.currentSortType).toBe('title');
 
@@ -284,11 +401,11 @@ describe('Creator dashboard controller', () => {
           status: 'private'
         })).toBe('Untitled');
 
-        ctrl.setExplorationsSortingOptions('num_views');
-        expect(ctrl.currentSortType).toBe('num_views');
+        ctrl.setExplorationsSortingOptions('numViews');
+        expect(ctrl.currentSortType).toBe('numViews');
 
         expect(ctrl.sortByFunction({
-          num_views: '',
+          numViews: '',
           status: 'private'
         })).toBe(0);
 
@@ -297,11 +414,11 @@ describe('Creator dashboard controller', () => {
 
         expect(ctrl.sortByFunction({})).toBe(0);
 
-        ctrl.setExplorationsSortingOptions('last_updated_msec');
-        expect(ctrl.currentSortType).toBe('last_updated_msec');
+        ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
+        expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
 
         expect(ctrl.sortByFunction({
-          last_updated_msec: 1
+          lastUpdatedMsec: 1
         })).toBe(1);
       });
 
@@ -402,10 +519,28 @@ describe('Creator dashboard controller', () => {
   describe('when on collections tab', function() {
     var dashboardData = {
       explorations_list: [],
-      collections_list: [{}],
+      collections_list: [{
+        last_updated: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on: 1591296635736.666,
+        status: 'public',
+        category: 'Algebra',
+        title: 'Test Title',
+        node_count: 0
+      }],
       subscribers_list: [],
-      dashboard_stats: {},
-      last_week_stats: {},
+      dashboard_stats: {
+        average_ratings: null,
+        num_ratings: 0,
+        total_open_feedback: 0,
+        total_plays: 10
+      },
+      last_week_stats: null,
       display_preference: [],
       threads_for_created_suggestions_list: [],
       created_suggestions_list: [],
@@ -415,7 +550,50 @@ describe('Creator dashboard controller', () => {
 
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
-        .and.returnValue($q.resolve(dashboardData));
+        .and.returnValue($q.resolve({
+          dashboardStats: creatorDashboardStatsObjectFactory
+            .createFromBackendDict(dashboardData.dashboard_stats),
+          // Because lastWeekStats may be null.
+          lastWeekStats: dashboardData.last_week_stats ? (
+            creatorDashboardStatsObjectFactory
+              .createFromBackendDict(dashboardData.last_week_stats)) : null,
+          displayPreference: dashboardData.display_preference,
+          subscribersList: dashboardData.subscribers_list.map(
+            subscriber => profileSummaryObjectFactory
+              .createFromSubscriberBackendDict(subscriber)),
+          threadsForCreatedSuggestionsList: (
+            dashboardData.threads_for_created_suggestions_list.map(
+              feedbackThread => feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          threadsForSuggestionsToReviewList: (
+            dashboardData.threads_for_suggestions_to_review_list.map(
+              feedbackThread => feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          createdSuggestionsList: (
+            dashboardData.created_suggestions_list.map(
+              suggestionDict => suggestionObjectFactory
+                .createFromBackendDict(suggestionDict))),
+          suggestionsToReviewList: (
+            dashboardData.suggestions_to_review_list.map(
+              suggestionDict => suggestionObjectFactory
+                .createFromBackendDict(suggestionDict))),
+          createdSuggestionThreadsList: _getSuggestionThreads(
+            dashboardData.threads_for_created_suggestions_list,
+            dashboardData.created_suggestions_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          suggestionThreadsToReviewList: _getSuggestionThreads(
+            dashboardData.threads_for_suggestions_to_review_list,
+            dashboardData.suggestions_to_review_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          explorationsList: dashboardData.explorations_list.map(
+            expSummary => creatorExplorationSummaryObjectFactory
+              .createFromBackendDict(expSummary)),
+          collectionsList: dashboardData.collections_list.map(
+            collectionSummary => collectionSummaryObjectFactory
+              .createFromBackendDict(collectionSummary))
+        }));
 
       ctrl.$onInit();
       $rootScope.$apply();
@@ -431,9 +609,14 @@ describe('Creator dashboard controller', () => {
       explorations_list: [],
       collections_list: [],
       subscribers_list: [],
-      dashboard_stats: {},
-      last_week_stats: {},
-      display_preference: [],
+      dashboard_stats: {
+        average_ratings: null,
+        num_ratings: 0,
+        total_open_feedback: 0,
+        total_plays: 10
+      },
+      last_week_stats: null,
+      display_preference: '',
       threads_for_created_suggestions_list: [{
         status: '',
         subject: '',
@@ -452,9 +635,11 @@ describe('Creator dashboard controller', () => {
         target_id: '',
         status: '',
         author_name: '',
-        state_name: '',
-        new_value: '',
-        old_value: '',
+        change: {
+          state_name: '',
+          new_value: '',
+          old_value: '',
+        },
         last_updated_msecs: 0
       }],
       threads_for_suggestions_to_review_list: [],
@@ -463,7 +648,50 @@ describe('Creator dashboard controller', () => {
 
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
-        .and.returnValue($q.resolve(dashboardData));
+        .and.returnValue($q.resolve({
+          dashboardStats: creatorDashboardStatsObjectFactory
+            .createFromBackendDict(dashboardData.dashboard_stats),
+          // Because lastWeekStats may be null.
+          lastWeekStats: dashboardData.last_week_stats ? (
+            creatorDashboardStatsObjectFactory
+              .createFromBackendDict(dashboardData.last_week_stats)) : null,
+          displayPreference: dashboardData.display_preference,
+          subscribersList: dashboardData.subscribers_list.map(
+            subscriber => profileSummaryObjectFactory
+              .createFromSubscriberBackendDict(subscriber)),
+          threadsForCreatedSuggestionsList: (
+            dashboardData.threads_for_created_suggestions_list.map(
+              feedbackThread => feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          threadsForSuggestionsToReviewList: (
+            dashboardData.threads_for_suggestions_to_review_list.map(
+              feedbackThread => feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          createdSuggestionsList: (
+            dashboardData.created_suggestions_list.map(
+              suggestionDict => suggestionObjectFactory
+                .createFromBackendDict(suggestionDict))),
+          suggestionsToReviewList: (
+            dashboardData.suggestions_to_review_list.map(
+              suggestionDict => suggestionObjectFactory
+                .createFromBackendDict(suggestionDict))),
+          createdSuggestionThreadsList: _getSuggestionThreads(
+            dashboardData.threads_for_created_suggestions_list,
+            dashboardData.created_suggestions_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          suggestionThreadsToReviewList: _getSuggestionThreads(
+            dashboardData.threads_for_suggestions_to_review_list,
+            dashboardData.suggestions_to_review_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          explorationsList: dashboardData.explorations_list.map(
+            expSummary => creatorExplorationSummaryObjectFactory
+              .createFromBackendDict(expSummary)),
+          collectionsList: dashboardData.collections_list.map(
+            collectionSummary => collectionSummaryObjectFactory
+              .createFromBackendDict(collectionSummary))
+        }));
 
       ctrl.$onInit();
       $rootScope.$apply();
