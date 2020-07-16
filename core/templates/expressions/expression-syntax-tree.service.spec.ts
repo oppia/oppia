@@ -39,23 +39,9 @@ describe('Expression syntax tree service', () => {
     });
 
     it('should return the correct environment if exists', () => {
-      const expected = {
-        getType(args: string[]): string {
-          return 'test';
-        },
-        eval(args: string[]): boolean {
-          return true;
-        }
-      };
+      const expected = 'bar';
       const actual = expressionSyntaxTreeService.lookupEnvs('foo', [
-        {foo: {
-          getType(args: string[]): string {
-            return 'test';
-          },
-          eval(args: string[]): boolean {
-            return true;
-          }
-        }}
+        {foo: 'bar'}
       ]);
 
       expect(expected).toBe(actual);

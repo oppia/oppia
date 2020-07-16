@@ -24,12 +24,7 @@ import { ExpressionParserService } from
   'expressions/expression-parser.service.ts';
 
 interface Env {
-  eval: (args: string[]) => number | boolean | string;
-  getType: (args: string[]) => string;
-}
-
-interface EnvDict {
-  [param: string]: Env;
+  [param: string]: Object;
 }
 
 export class ExpressionError extends Error {
@@ -44,7 +39,7 @@ export class ExpressionError extends Error {
 }
 
 export class ExprUndefinedVarError extends ExpressionError {
-  constructor(public varname: string, public envs: EnvDict[]) {
+  constructor(public varname: string, public envs: Env[]) {
     super(varname + ' not found in ' + angular.toJson(envs));
   }
 }
@@ -84,17 +79,17 @@ export class ExpressionSyntaxTreeService {
   }
 
   public applyFunctionToParseTree(
-      parsed: string, envs: EnvDict[],
-      func: (parsed: string, envs: EnvDict[]) => string): string {
+      parsed: string, envs: Env[],
+      func: (parsed: string, envs: Env[]) => string): string {
     return func(parsed, envs.concat(this.system));
   }
 
   // Looks up a variable of the given name in the env. Here the variable can be
   // system or user-defined functions or parameters, including system operators.
-  public lookupEnvs(name: string, envs: EnvDict[]): Env {
+  public lookupEnvs(name: string, envs: Env[]): string {
     for (const env of envs) {
       if (env.hasOwnProperty(name)) {
-        return env[name];
+        return <string> env[name];
       }
     }
     throw new ExprUndefinedVarError(name, envs);
