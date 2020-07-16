@@ -42,7 +42,6 @@ from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
-gae_image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'

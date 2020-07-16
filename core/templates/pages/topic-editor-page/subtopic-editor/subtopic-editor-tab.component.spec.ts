@@ -151,42 +151,17 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.schemaEditorIsShown).toEqual(true);
   });
 
-  it('should call TopicUpdateService to delete uncategorized skill',
-    function() {
-      var uncategorizedSkillSpy = (
-        spyOn(TopicUpdateService, 'removeUncategorizedSkill'));
-      var skillSummary = SkillSummaryObjectFactory.create(
-        '1', 'Skill description');
-      ctrl.deleteUncategorizedSkillFromTopic(skillSummary);
-      expect(uncategorizedSkillSpy).toHaveBeenCalled();
-    });
-
   it('should return if skill is deleted', function() {
     var skillSummary = SkillSummaryObjectFactory.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
 
-  it('should record skill summary to move and subtopic Id', function() {
-    var skillSummary = SkillSummaryObjectFactory.create(
-      '1', 'Skill description');
-    ctrl.onMoveSkillStart(1, skillSummary);
-    expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
-    expect(ctrl.oldSubtopicId).toEqual(1);
+  it('should call SkillCreationService to create skill', function() {
+    var skillSpy = spyOn(EntityCreationService, 'createSkill');
+    ctrl.createSkill();
+    expect(skillSpy).toHaveBeenCalled();
   });
-
-  it('should call TopicUpdateService when skill is moved', function() {
-    var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
-    ctrl.onMoveSkillFinish(1);
-    expect(moveSkillSpy).toHaveBeenCalled();
-  });
-
-  it('should call TopicUpdateService when skill is removed from subtopic',
-    function() {
-      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      ctrl.onMoveSkillFinish(null);
-      expect(removeSkillSpy).toHaveBeenCalled();
-    });
 
   it('should call TopicUpdateService when skill is rearranged',
     function() {
@@ -208,20 +183,6 @@ describe('Subtopic editor tab', function() {
   it('should record the index of the skill to move', function() {
     ctrl.onRearrangeMoveSkillStart(10);
     expect(ctrl.fromIndex).toEqual(10);
-  });
-
-  it('should not call TopicUpdateService when skill is moved to same subtopic',
-    function() {
-      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      ctrl.oldSubtopicId = null;
-      ctrl.onMoveSkillFinish(null);
-      expect(removeSkillSpy).not.toHaveBeenCalled();
-    });
-
-  it('should call SkillCreationService to create skill', function() {
-    var skillSpy = spyOn(EntityCreationService, 'createSkill');
-    ctrl.createSkill();
-    expect(skillSpy).toHaveBeenCalled();
   });
 
   it('should set the error message if subtopic title is invalid', function() {

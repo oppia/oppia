@@ -1115,6 +1115,23 @@ class MathEquation(BaseObject):
     }
 
 
+class NumericExpression(BaseObject):
+    """Class for numeric expressions. Stores a unicode string representing a
+    valid numeric expression.
+    """
+
+    description = 'A unicode string for an numeric expression.'
+    default_value = '1'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_math_expression',
+            'algebraic': False
+        }]
+    }
+
+
 class PositionOfTerms(BaseObject):
     """Class for position of terms. Denotes the position of terms relative to
     the equals sign in a math equation.
