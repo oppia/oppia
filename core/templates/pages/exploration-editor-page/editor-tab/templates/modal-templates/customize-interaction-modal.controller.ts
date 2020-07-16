@@ -188,10 +188,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.isSaveInteractionButtonEnabled = function() {
-      return !!$scope.hasCustomizationArgs &&
-        !!$scope.StateInteractionIdService.displayed &&
-        !!$scope.form.schemaForm.$valid &&
-        !!($scope.getCustomizationArgsWarningsList().length === 0);
+      return !!($scope.hasCustomizationArgs &&
+        $scope.StateInteractionIdService.displayed &&
+        $scope.form.schemaForm.$valid &&
+        ($scope.getCustomizationArgsWarningsList().length === 0));
     };
 
     $scope.getSaveInteractionButtonTooltip = function() {

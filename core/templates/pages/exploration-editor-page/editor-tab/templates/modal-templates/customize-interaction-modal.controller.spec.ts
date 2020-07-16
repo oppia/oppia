@@ -35,7 +35,7 @@ import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 
-describe('Customize Interaction Modal Controller', function() {
+fdescribe('Customize Interaction Modal Controller', function() {
   var $injector = null;
   var $scope = null;
   var $uibModalInstance = null;
