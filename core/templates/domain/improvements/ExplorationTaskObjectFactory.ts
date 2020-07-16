@@ -50,16 +50,11 @@ export type ExplorationTaskBackendDict = (
   ITaskEntryBackendDict<'needs_guiding_responses'> |
   ITaskEntryBackendDict<'successive_incorrect_answers'>);
 
-export type ExplorationTask<
-    T extends ExplorationTaskType = ExplorationTaskType> = (
-  T extends 'high_bounce_rate' ? HighBounceRateTask :
-  T extends 'ineffective_feedback_loop' ? IneffectiveFeedbackLoopTask :
-  T extends 'needs_guiding_responses' ? NeedsGuidingResponsesTask :
-  T extends 'successive_incorrect_answers' ? SuccessiveIncorrectAnswersTask : (
-    HighBounceRateTask |
-    IneffectiveFeedbackLoopTask |
-    NeedsGuidingResponsesTask |
-    SuccessiveIncorrectAnswersTask));
+export type ExplorationTask = (
+  HighBounceRateTask |
+  IneffectiveFeedbackLoopTask |
+  NeedsGuidingResponsesTask |
+  SuccessiveIncorrectAnswersTask);
 
 @Injectable({
   providedIn: 'root'
