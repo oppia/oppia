@@ -32,7 +32,7 @@ require(
   'answer-submit-action.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'multiple-incorrect-submissions-issue.directive.ts');
+  'multiple-incorrect-submissions-issue.component.ts');
 require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
