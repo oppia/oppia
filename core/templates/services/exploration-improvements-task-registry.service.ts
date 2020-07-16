@@ -233,6 +233,8 @@ export class ExplorationImprovementsTaskRegistryService {
       oldTask.markAsObsolete();
     }
 
+    // Map uses the reserved keyword delete as a method name.
+    // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
     this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
   }
@@ -257,6 +259,8 @@ export class ExplorationImprovementsTaskRegistryService {
     }
 
     this.tasksByState.set(newStateName, newStateTasks);
+    // Map uses the reserved keyword delete as a method name.
+    // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
     this.expStats = this.expStats.createNewWithStateRenamed(
       oldStateName, newStateName);
