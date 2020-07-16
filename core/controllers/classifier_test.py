@@ -28,7 +28,6 @@ from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
-from core.domain import email_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
@@ -38,6 +37,7 @@ import feconf
 import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+email_services = models.Registry.import_email_services()
 
 
 class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
@@ -153,14 +153,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         config_property.set_value(
             'committer_id', ['moderator@example.com'])
 
-        with can_send_emails_ctx, can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_mail)):
-            with fail_training_job, (
-                self.swap(
-                    email_services, 'send_mail',
-                    self.email_services_mock.mock_send_mail)):
+        with can_send_emails_ctx, can_send_feedback_email_ctx:
+            with fail_training_job:
                 # Adding moderator email to admin config page
                 # for sending emails for failed training jobs.
                 self.login(self.ADMIN_EMAIL, is_super_admin=True)
