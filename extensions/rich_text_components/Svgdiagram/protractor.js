@@ -62,7 +62,7 @@ const SVGTAGS = {
   '">Enter</tspan><tspan x="-21.51" y="17.45">Text</tspan></text></g></svg>')
 };
 
-var customizeComponent = async function(modal, shape) {
+var customizeComponent = async function(modal, shape, altText) {
   var shapeClass = '.protractor-test-create-' + shape;
   var shapeTool = modal.element(by.css(shapeClass));
   await waitFor.elementToBeClickable(
@@ -77,11 +77,17 @@ var customizeComponent = async function(modal, shape) {
   await waitFor.visibilityOf(
     modal.element(by.css('.protractor-test-saved-diagram-container')),
     'Diagram container not visible');
+  var altTextInputElement = (
+    element(by.css('[placeholder = "Description of the diagram"]')));
+  await altTextInputElement.sendKeys(altText);
 };
 
-var expectComponentDetailsToMatch = async function(elem, shapeName) {
+var expectComponentDetailsToMatch = async function(elem, shapeName, altText) {
   var src = await elem.element(by.css(
     '.protractor-test-svg-diagram')).getAttribute('src');
+  var alt = await elem.element(by.css(
+    '.protractor-test-svg-diagram')).getAttribute('alt');
+  expect(alt).toEqual(altText);
   await request(src, function(error, response, body) {
     expect(body.replace(/(\r\n|\n|\r)/gm, '')).toBe(SVGTAGS[shapeName]);
   });

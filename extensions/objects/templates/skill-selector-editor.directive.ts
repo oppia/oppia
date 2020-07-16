@@ -15,9 +15,7 @@
 /**
  * @fileoverview Directive for the skill selector editor.
  */
-require(
-  'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require('components/forms/validators/is-nonempty.filter.ts');
+
 require(
   'components/skill-selector/skill-selector.directive.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
