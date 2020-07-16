@@ -71,6 +71,10 @@ describe('User Service', () => {
     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
+    var req = httpTestingController.expectOne('/userinfohandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfo);    
+
     userService.getUserInfoAsync().then((userInfo) => {
       expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
@@ -85,9 +89,6 @@ describe('User Service', () => {
       expect(userInfo.getPreferredSiteLanguageCode()).toBe(
         sampleUserInfo.getPreferredSiteLanguageCode());
     });
-    var req = httpTestingController.expectOne('/userinfohandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleUserInfo);
 
     flushMicrotasks();
   }));
