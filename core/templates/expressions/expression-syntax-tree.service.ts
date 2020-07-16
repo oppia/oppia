@@ -23,10 +23,12 @@ import { AppConstants } from 'app.constants';
 import { ExpressionParserService } from
   'expressions/expression-parser.service.ts';
 
-interface Env {
+interface SystemEnv {
   eval: (args: string[]) => number | boolean | string;
   getType: (args: string[]) => string;
 }
+
+type Env = SystemEnv | string | number;
 
 interface EnvDict {
   [param: string]: Env;
@@ -84,8 +86,9 @@ export class ExpressionSyntaxTreeService {
   }
 
   public applyFunctionToParseTree(
-      parsed: string, envs: EnvDict[],
-      func: (parsed: string, envs: EnvDict[]) => string): string {
+      parsed: (string | string[])[], envs: EnvDict[],
+      func: (
+        parsed: (string | string[])[], envs: EnvDict[]) => string): string {
     return func(parsed, envs.concat(this.system));
   }
 
