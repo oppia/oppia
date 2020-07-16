@@ -132,7 +132,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-engine.service.ts',
     'exploration-footer.directive.ts',
     'exploration-graph-modal.controller.ts',
-    'exploration-graph.directive.ts',
     'exploration-metadata-modal.controller.ts',
     'exploration-objective-editor.directive.ts',
     'exploration-player-state.service.ts',
