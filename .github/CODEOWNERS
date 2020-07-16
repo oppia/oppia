@@ -236,6 +236,7 @@
 
 # Global stylesheet.
 /core/templates/css/oppia.css @ankita240796
+/core/templates/css/oppia-material.css @srijanreddy98 @bansalnitish
 
 
 # Interaction project.
