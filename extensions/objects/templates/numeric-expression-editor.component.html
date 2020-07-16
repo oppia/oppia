@@ -1,0 +1,18 @@
+<div class="guppy-div-creator protractor-test-guppy-div"></div>
+
+<span ng-model="$ctrl.value" ui-validate="'$ctrl.isCurrentAnswerValid()'"></span>
+
+<div ng-show="!$ctrl.isCurrentAnswerValid()" class="alert alert-danger mt-2 mb-4">
+  <[$ctrl.warningText]>
+</div>
+
+<style>
+  .guppy-div-creator.guppy_active, .guppy-div-creator.guppy_inactive {
+    width: 550px;
+  }
+  @media only screen and (max-width: 767px) {
+    .guppy-div-creator.guppy_active, .guppy-div-creator.guppy_inactive {
+      width: 460px;
+    }
+  }
+</style>

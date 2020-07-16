@@ -101,45 +101,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.py_filepaths
 
-    def _check_import_order(self):
-        """This function is used to check that each file
-        has imports placed in alphabetical order.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting import-order checks')
-            python_utils.PRINT('----------------------------------------')
-        summary_messages = []
-        files_to_check = self.py_filepaths
-        failed = False
-        stdout = sys.stdout
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in files_to_check:
-                # This line prints the error message along with file path
-                # and returns True if it finds an error else returns False
-                # If check is set to True, isort simply checks the file and
-                # if check is set to False, it autocorrects import-order errors.
-                if (isort.SortImports(
-                        filepath, check=True, show_diff=(
-                            True)).incorrectly_sorted):
-                    failed = True
-                    python_utils.PRINT('')
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s Import order checks failed, file imports should be '
-                    'alphabetized, see affect files above.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s Import order checks passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-        return summary_messages
-
     def _check_non_test_files(self):
         """This function is used to check that function
            with test_only in their names are in test files.
@@ -310,12 +271,11 @@ class PythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('There are no Python files to lint.')
             return []
 
-        import_order_check_message = self._check_import_order()
         job_registry_check_message = (
             self._check_that_all_jobs_are_listed_in_the_job_registry_file())
         test_function_check_message = self._check_non_test_files()
-        all_messages = import_order_check_message + job_registry_check_message
-        all_messages = all_messages + test_function_check_message
+        all_messages = (
+            job_registry_check_message + test_function_check_message)
         return all_messages
 
 
@@ -390,7 +350,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """
         files_to_lint = self.all_filepaths
         start_time = time.time()
-        are_there_errors = False
+        errors_found = False
         summary_messages = []
 
         num_py_files = len(files_to_lint)
@@ -413,14 +373,23 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT('Linting Python files %s to %s...' % (
                     current_batch_start_index + 1, current_batch_end_index))
 
+            # This line invokes Pylint and redirect its output
+            # to the StringMessageStream.
+            pylint_report = StringMessageStream()
+            pylinter = lint.Run(
+                current_files_to_lint + [config_pylint],
+                reporter=text.TextReporter(pylint_report),
+                exit=False).linter
+
+            if pylinter.msg_status != 0:
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
+                pylint_error_messages = (
+                    self._get_trimmed_error_output(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
+                errors_found = True
+
             with linter_utils.redirect_stdout(stdout):
-                # This line invokes Pylint and prints its output
-                # to the target stdout.
-                pylint_report = StringMessageStream()
-                pylinter = lint.Run(
-                    current_files_to_lint + [config_pylint],
-                    reporter=text.TextReporter(pylint_report),
-                    exit=False).linter
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
                 style_guide = pycodestyle.StyleGuide(
@@ -428,19 +397,15 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pycodestyle_report = style_guide.check_files(
                     paths=current_files_to_lint)
 
-            if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+            if pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
-                for message in pylint_report.read():
-                    python_utils.PRINT(message)
-                pylint_error_messages = (
-                    self._get_trimmed_error_output(pylint_report.read()))
-                summary_messages.append(pylint_error_messages)
                 python_utils.PRINT(summary_message)
-                are_there_errors = True
+                summary_messages.append(summary_message)
+                errors_found = True
 
             current_batch_start_index = current_batch_end_index
 
-        if are_there_errors:
+        if errors_found:
             summary_message = (
                 '%s Python linting failed' % (
                     linter_utils.FAILED_MESSAGE_PREFIX))
@@ -466,7 +431,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         start_time = time.time()
         any_errors = False
-        stdout = python_utils.string_io()
         summary_messages = []
 
         files_to_lint_for_python3_compatibility = [
@@ -501,21 +465,19 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     'Linting Python files for Python 3 compatibility %s to %s..'
                     % (current_batch_start_index + 1, current_batch_end_index))
 
-            with linter_utils.redirect_stdout(stdout):
-                # This line invokes Pylint and prints its output
-                # to the target stdout.
-                python_utils.PRINT('Messages for Python 3 support:')
-                pylint_report = StringMessageStream()
-                pylinter_for_python3 = lint.Run(
-                    current_files_to_lint + ['--py3k'],
-                    reporter=text.TextReporter(pylint_report),
-                    exit=False).linter
+            # This line invokes Pylint and redirect its output
+            # to the StringMessageStream.
+            pylint_report = StringMessageStream()
+            pylinter_for_python3 = lint.Run(
+                current_files_to_lint + ['--py3k'],
+                reporter=text.TextReporter(pylint_report),
+                exit=False).linter
 
             if pylinter_for_python3.msg_status != 0:
-                summary_message = stdout.getvalue()
                 pylint_error_messages = (
                     self._get_trimmed_error_output(pylint_report.read()))
                 summary_messages.append(pylint_error_messages)
+                python_utils.PRINT('Messages for Python 3 support:')
                 for message in pylint_report.read():
                     python_utils.PRINT(message)
                 any_errors = True
@@ -538,6 +500,47 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         python_utils.PRINT(
             'Python linting for Python 3 compatibility finished.')
+        return summary_messages
+
+    def _check_import_order(self):
+        """This function is used to check that each file
+        has imports placed in alphabetical order.
+        """
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting import-order checks')
+            python_utils.PRINT('----------------------------------------')
+        summary_messages = []
+        files_to_check = self.all_filepaths
+        failed = False
+        stdout = python_utils.string_io()
+        with linter_utils.redirect_stdout(stdout):
+            for filepath in files_to_check:
+                # This line prints the error message along with file path
+                # and returns True if it finds an error else returns False
+                # If check is set to True, isort simply checks the file and
+                # if check is set to False, it autocorrects import-order errors.
+                if (isort.SortImports(
+                        filepath, check=True, show_diff=(
+                            True)).incorrectly_sorted):
+                    failed = True
+                    python_utils.PRINT('')
+
+            python_utils.PRINT('')
+            if failed:
+                summary_message = stdout.getvalue()
+                summary_messages.append(summary_message)
+                summary_message = (
+                    '%s Import order checks failed, file imports should be '
+                    'alphabetized, see affect files above.' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s Import order checks passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
         return summary_messages
 
     def perform_all_lint_checks(self):
@@ -563,6 +566,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             self._lint_py_files(config_pylint, config_pycodestyle))
 
         all_messages.extend(self._lint_py_files_for_python3_compatibility())
+
+        all_messages.extend(self._check_import_order())
 
         return all_messages
 
