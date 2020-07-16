@@ -38,7 +38,8 @@ export class ExplorationSummaryBackendApiService {
       includePrivateExplorations: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    if (!explorationIds.every(this.validatorsService.isValidExplorationId)) {
+    if (!explorationIds.every(expId =>
+      this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
 
       var returnValue = [];
