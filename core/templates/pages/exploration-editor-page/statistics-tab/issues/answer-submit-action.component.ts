@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Answer Submit Learner Action.
+ * @fileoverview Component for the Answer Submit Learner Action.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
 

@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the exploration title field in forms.
+ * @fileoverview Component for the exploration title field in forms.
  */
-
-require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').component('explorationTitleEditor', {
   bindings: {

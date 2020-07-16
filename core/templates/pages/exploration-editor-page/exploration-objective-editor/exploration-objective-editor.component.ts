@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the exploration objective/goal field in forms.
+ * @fileoverview Component for the exploration objective/goal field in forms.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-objective.service.ts');
 
