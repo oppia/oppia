@@ -32,7 +32,7 @@ transaction_services = models.Registry.import_transaction_services()
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
 # method to find the location of this delimiter.
-_VERSION_DELIMITER = '-'
+VERSION_DELIMITER = '-'
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
@@ -619,7 +619,7 @@ class VersionedModel(BaseModel):
             version.
         """
         return '%s%s%s' % (
-            instance_id, _VERSION_DELIMITER, version_number)
+            instance_id, VERSION_DELIMITER, version_number)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -1127,7 +1127,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(_VERSION_DELIMITER)]
+        return self.id[:self.id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self):
         """Gets the version number from the snapshot id.
@@ -1135,7 +1135,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
+        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
 
     @classmethod
     def export_data(cls, user_id):
@@ -1191,7 +1191,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(_VERSION_DELIMITER)]
+        return self.id[:self.id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self):
         """Gets the version number from the snapshot id.
@@ -1199,7 +1199,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
+        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
 
 
 class BaseMapReduceBatchResultsModel(BaseModel):
