@@ -43,6 +43,12 @@ angular.module('oppia').directive('angularHtmlBind', [
           // replaced.
           if (newValue) {
             newValue = newValue.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
+            // The following line is required since blank newlines in between
+            // paragraphs are treated as <p>&nbsp;</p> by ckedior. So, these
+            // have to be restored, as this will get reduced to <p></p> above.
+            // There is no other via user input to get <p></p>, so this wouldn't
+            // affect any other data.
+            newValue = newValue.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
           }
           elm.html(<string>newValue);
           $compile(elm.contents())(newScope);
