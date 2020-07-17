@@ -101,8 +101,8 @@ export class UserService{
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
       return this.getUserInfoAsync().then(
-        (info) => {
-          if (info.isLoggedIn()){
+        (userInfo) => {
+          if (userInfo.isLoggedIn()){
             return this.http.get<IPreferencesBackendDict>(
               '/preferenceshandler/profile_picture'
             ).toPromise().then(
