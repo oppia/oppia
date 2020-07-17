@@ -140,8 +140,8 @@ class EmailTests(test_utils.GenericTestBase):
             'https://api.mailgun.net/v3/domain/messages',
             ('from=a%40a.com&text=plaintext_body+%F0%9F%98%82&' +
              'recipient_variables=%7B%7D&to=%5Bu%27b%40b.com%27%2C+u%27c%40c' +
-             '.com%27%2C+u%27d%40d.com%27%5D&html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%' +
-             '82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
+             '.com%27%2C+u%27d%40d.com%27%5D&html=Hi+abc%2C%3Cbr%3E+%F0%9F%' +
+             '98%82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
