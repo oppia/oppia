@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Injectable } from '@angular/core';
-import { UserInfo, UserInfoObjectFactory, IUserInfoBackendDict } from
-  'domain/user/UserInfoObjectFactory';
-import { UrlService } from './contextual/url.service';
-import { HttpClient } from '@angular/common/http';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
-import { AppConstants } from 'app.constants';
-import { WindowRef } from './contextual/window-ref.service';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 /**
  * @fileoverview Service for user data.
  */
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { UserInfo, UserInfoObjectFactory, IUserInfoBackendDict } from
+  'domain/user/UserInfoObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+import { AppConstants } from 'app.constants';
 
 interface IProfilePictureDataUrl {
   'profile_picture_data_url': string

@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { UserService } from './user-backend-api.service';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
-import { CsrfTokenService } from './csrf-token.service';
-import { UserInfoObjectFactory, UserInfo } from
-  'domain/user/UserInfoObjectFactory';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UrlService } from './contextual/url.service';
-import { WindowRef } from './contextual/window-ref.service';
+import { UserInfoObjectFactory, UserInfo } from
+  'domain/user/UserInfoObjectFactory';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user-backend-api.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 /**
  * @fileoverview Tests that the user service is working as expected.
