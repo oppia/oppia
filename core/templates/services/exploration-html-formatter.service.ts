@@ -24,6 +24,7 @@ import { CamelCaseToHyphensPipe } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { IInteractionAnswer } from 'interactions/answer-defs';
 import { IInteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { SubtitledHtml } from
@@ -137,14 +138,14 @@ export class ExplorationHtmlFormatterService {
   }
 
   getShortAnswerHtml(
-      answer: string, interactionId: string,
+      answer: IInteractionAnswer, interactionId: string,
       interactionCustomizationArgs: IInteractionCustomizationArgs) : string {
-    // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
 
     interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
     this.unwrapInteractionCustArgsContent(interactionCustomizationArgs);
 
+    // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value;
     }

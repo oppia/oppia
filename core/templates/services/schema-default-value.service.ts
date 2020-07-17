@@ -27,6 +27,64 @@ import { SubtitledUnicodeObjectFactory } from
 
 const OBJECT_DEFAULTS = require('objects/object_defaults.json');
 
+interface BoolSchema {
+  type: 'bool';
+}
+
+interface UnicodeSchema {
+  type: 'unicode';
+  choices?: string[];
+}
+
+interface HtmlSchema {
+  type: 'html';
+  choices?: string[];
+}
+
+interface IntSchema {
+  type: 'int';
+  choices?: number[];
+}
+
+interface FloatSchema {
+  type: 'float';
+  choices?: number[];
+}
+
+interface ListSchema {
+  type: 'list';
+  items: Schema | Schema[];
+}
+
+interface DictSchema {
+  type: 'dict';
+  properties: {
+    name: string;
+    schema: Schema;
+  }[];
+}
+
+export type Schema = (
+  BoolSchema |
+  UnicodeSchema |
+  HtmlSchema |
+  IntSchema |
+  FloatSchema |
+  ListSchema |
+  DictSchema
+);
+
+interface DictSchemaDefaultValue {
+  [property: string]: SchemaDefaultValue;
+}
+
+type SchemaDefaultValue = (
+  string |
+  number |
+  boolean |
+  SchemaDefaultValue[] |
+  DictSchemaDefaultValue);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,11 +97,8 @@ export class SchemaDefaultValueService {
 
   // TODO(sll): Rewrite this to take validators into account, so that
   // we always start with a valid value.
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'schema' is a complex dict requiring very careful
-  // backtracking.
-  getDefaultValue(schema: any): any {
-    if (schema.choices) {
+  getDefaultValue(schema: Schema): SchemaDefaultValue {
+    if ('choices' in schema) {
       return schema.choices[0];
     } else if (schema.type === 'bool') {
       return false;
@@ -79,6 +134,9 @@ export class SchemaDefaultValueService {
 
       return defaultValue;
     } else {
+      // TS Ignore is used here to log an error in case of a
+      // invalid schema.
+      // @ts-ignore
       this.logger.error('Invalid schema type: ' + schema.type);
     }
   }

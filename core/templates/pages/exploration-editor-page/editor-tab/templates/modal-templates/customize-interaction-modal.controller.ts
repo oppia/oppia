@@ -155,11 +155,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         INTERACTION_SPECS[
           $scope.StateInteractionIdService.displayed].id +
         'ValidationService';
-      var validationService = $injector.get(
-        validationServiceName);
-      var warningsList =
-        validationService.getCustomizationArgsWarnings(
-          StateCustomizationArgsService.displayed);
+      var validationService = $injector.get(validationServiceName);
+      var warningsList = validationService.getCustomizationArgsWarnings(
+        StateCustomizationArgsService.displayed);
       return warningsList;
     };
 
@@ -230,10 +228,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.isSaveInteractionButtonEnabled = function() {
-      return $scope.hasCustomizationArgs &&
+      return !!($scope.hasCustomizationArgs &&
         $scope.StateInteractionIdService.displayed &&
         $scope.form.schemaForm.$valid &&
-        $scope.getCustomizationArgsWarningsList().length === 0;
+        ($scope.getCustomizationArgsWarningsList().length === 0));
     };
 
     $scope.getSaveInteractionButtonTooltip = function() {

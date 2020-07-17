@@ -35,6 +35,7 @@ import {
 import {
   SubtitledHtml, ISubtitledHtmlBackendDict, SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { IInteractionAnswer } from 'interactions/answer-defs';
 import {
   IInteractionCustomizationArgsBackendDict,
   IInteractionCustomizationArgs
@@ -50,10 +51,12 @@ type SubtitledBackendDicts = ISubtitledHtmlBackendDict |
   ISubtitledUnicodeBackendDict;
 type Subtitled = SubtitledHtml | SubtitledUnicode;
 
+
+
 export interface IInteractionBackendDict {
   'default_outcome': IOutcomeBackendDict;
   'answer_groups': IAnswerGroupBackendDict[];
-  'confirmed_unclassified_answers': any;
+  'confirmed_unclassified_answers': IInteractionAnswer[];
   'customization_args': IInteractionCustomizationArgsBackendDict;
   'hints': IHintBackendDict[];
   'id': string;
@@ -123,14 +126,15 @@ const convertInteractionCustArgsContent = function<T, S>(
 
 export class Interaction {
   answerGroups: AnswerGroup[];
-  confirmedUnclassifiedAnswers: any;
+  confirmedUnclassifiedAnswers: IInteractionAnswer[];
   customizationArgs: IInteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
   id: string;
   solution: Solution;
   constructor(
-      answerGroups: AnswerGroup[], confirmedUnclassifiedAnswers: any,
+      answerGroups: AnswerGroup[],
+      confirmedUnclassifiedAnswers: IInteractionAnswer[],
       customizationArgs: IInteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
