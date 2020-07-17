@@ -425,11 +425,13 @@ class TestUtilsTests(test_utils.GenericTestBase):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
 
+
 class EmailMockTests(test_utils.EmailTestBase):
+    """Class for testing EmailTestBase, EmailMessageMock and EmailServiceMock.
+    """
 
     def test_override_run_context_swaps_works(self):
-        """ Assert that the feconf context swaps correctly swap the contexts.
-        """
+        """Assert that the feconf context swaps correctly swap the contexts."""
         self.assertEqual(feconf.MAILGUN_API_KEY, 'key')
         self.assertEqual(feconf.MAILGUN_DOMAIN_NAME, 'name')
 
@@ -460,7 +462,10 @@ class EmailMockTests(test_utils.EmailTestBase):
             'Hi abc,<br> 😂'.encode(encoding='utf-8'))
         self.assertEqual(messages[0].bcc, 'c@c.com')
 
+
 class MockLoggingHandlerTests(test_utils.GenericTestBase):
+    """Class for testing MockLoggingHandler."""
+
     def setUp(self):
         super(MockLoggingHandlerTests, self).setUp()
         self._log_handler = test_utils.MockLoggingHandler()

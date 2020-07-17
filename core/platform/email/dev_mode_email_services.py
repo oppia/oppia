@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 import textwrap
 
-import feconf
 import python_utils
 
 
