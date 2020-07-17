@@ -450,7 +450,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
     'unicode-string-editor.directive.ts',
-    'unresolved-answers-overview.directive.ts',
     'url-interpolation.service.ts',
     'utils.service.ts',
     'value-generator-editor.directive.ts',
