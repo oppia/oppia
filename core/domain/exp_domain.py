@@ -2503,9 +2503,11 @@ class Exploration(python_utils.OBJECT):
                         x['description'],
                         x['schema'],
                         x['default_value']
-                    ) for x in (interaction_registry.Registry
+                    ) for x in (
+                        interaction_registry.Registry
                         .get_all_specs_for_state_version(35)[
-                        interaction_id]['customization_arg_specs'])
+                            interaction_id]['customization_arg_specs']
+                    )
                 ]
 
                 if (interaction_id == 'PencilCodeEditor' and
@@ -2553,9 +2555,9 @@ class Exploration(python_utils.OBJECT):
                     elif (
                         schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
                         (schema['items']['type'] ==
-                            schema_utils.SCHEMA_TYPE_CUSTOM) and
+                         schema_utils.SCHEMA_TYPE_CUSTOM) and
                         (schema['items']['obj_type'] ==
-                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+                         schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
                     ):
                         # Case where cust arg value is a list of strings, and
                         # needs to be migrated to a list of SubtitledHtml dicts.
@@ -2580,12 +2582,11 @@ class Exploration(python_utils.OBJECT):
                     all_new_content_ids.extend(new_content_ids)
 
                 (customization_args_util
-                    .validate_customization_args_and_values(
-                        'interaction',
-                        interaction_id,
-                        ca,
-                        ca_specs
-                    )
+                 .validate_customization_args_and_values(
+                    'interaction',
+                    interaction_id,
+                    ca,
+                    ca_specs)
                 )
 
             state_dict['next_content_id_index'] = next_content_id_index

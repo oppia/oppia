@@ -1142,25 +1142,34 @@ tags: []
             'value': state.next_content_id_index
         }
 
-        def populate_content_ids(value, schema, contentId):
+        def traverse_schema_and_assign_content_ids(value, schema, contentId):
+            """Generates content_id from recursively traversing the schema, and
+            assigning to the current value.
+
+            Args:
+                value: *. The current traversed value in customization arguments.
+                schema: dict. The current traversed schema.
+                contentId: str. The content_id generated so far.
+            """
             schema_type = schema['type']
             schema_obj_type = schema.get('obj_type')
 
             if (
                 (schema_obj_type ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
+                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
                 (schema_obj_type ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
             ):
                 value['content_id'] = '%s_%i' % (
                     contentId, next_content_id_index_dict['value'])
                 next_content_id_index_dict['value'] += 1
             elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
-                    populate_content_ids(x, schema['items'], contentId)
+                    traverse_schema_and_assign_content_ids(
+                        x, schema['items'], contentId)
             elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
-                    populate_content_ids(
+                    traverse_schema_and_assign_content_ids(
                         x[schema_property.name],
                         schema_property['schema'],
                         '%s_%s' % (contentId, schema_property.name)
@@ -1174,7 +1183,7 @@ tags: []
         for ca_spec in ca_specs:
             ca_name = ca_spec.name
             ca_value = ca_spec.default_value
-            populate_content_ids(
+            traverse_schema_and_assign_content_ids(
                 ca_value,
                 ca_spec.schema,
                 'custarg_%s' % ca_name

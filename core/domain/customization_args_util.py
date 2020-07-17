@@ -79,8 +79,6 @@ def validate_customization_args_and_values(
                 - description: str. The customization variable description.
                 - default_value: *. The default value of the customization
                     variable.
-        populate_missing_keys: bool. Whether or not to populate missing keys
-            in the customization args.
 
     Raises:
         ValidationError: The given 'customization_args' is not valid.

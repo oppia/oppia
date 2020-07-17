@@ -5,6 +5,7 @@
     "core/templates/domain/collection/read-only-collection-backend-api.service.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
     "core/templates/domain/exploration/ExplorationMetadataObjectFactory.ts",
+    "core/templates/domain/exploration/InteractionObjectFactory.ts",
     "core/templates/domain/question/pretest-question-backend-api.service.ts",
     "core/templates/domain/question/question-backend-api.service.ts",
     "core/templates/domain/skill/skill-creation-backend-api.service.ts",
@@ -15,5 +16,6 @@
     "core/templates/domain/topic/topic-creation-backend-api.service.ts",
     "core/templates/domain/utilities/FileDownloadRequestObjectFactory.ts",
     "core/templates/pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts",
+    "core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.controller.ts",
     "core/templates/services/suggestion-modal.service.ts"
 ]

@@ -542,7 +542,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(
-          exploration.states[exploration.init_state_name], 'TextInput')
+            exploration.states[exploration.init_state_name], 'TextInput')
         answer_group.outcome.dest = exploration.init_state_name
         exploration.validate()
 
@@ -815,7 +815,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     exploration.init_state_name))
         }
         self.set_interaction_for_state(
-          exploration.states[exploration.init_state_name], 'TextInput')
+            exploration.states[exploration.init_state_name], 'TextInput')
         exploration.validate()
 
         exploration.language_code = 'fake_code'

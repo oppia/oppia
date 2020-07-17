@@ -34,8 +34,8 @@ class Registry(python_utils.OBJECT):
 
     # Dict mapping interaction ids to instances of the interactions.
     _interactions = {}
-    # Dict mapping State schema version (XX) to interaction specs dict,\
-    # retrieved from interaction_specs_vXX.json
+    # Dict mapping State schema version (XX) to interaction specs dict,
+    # retrieved from interaction_specs_vXX.json.
     _state_version_to_interaction_specs = {}
 
     @classmethod
@@ -112,6 +112,12 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def get_all_specs_for_state_version(cls, state_version):
+        """Returns a dict containing the full specs of each interaction for the
+        given state version, if available.
+
+        Raises:
+            Exception: No interaction specs json file found for state version.
+        """
         if state_version not in cls._state_version_to_interaction_specs:
             file_name = 'interaction_specs_stateV%i.json' % state_version
             spec_file = os.path.join(

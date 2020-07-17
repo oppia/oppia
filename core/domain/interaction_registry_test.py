@@ -132,17 +132,21 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         all_specs = interaction_registry.Registry.get_all_specs()
         names_in_schema = []
 
-        # Recursively find all schema.name fields.
         def traverse_schema_to_find_names(schema):
-            if "name" in schema:
-                names_in_schema.append(schema["name"])
+            """Recursively traverses the schema to find all name fields.
 
-            schema_type = schema["type"]
-            if schema_type == "list":
-                traverse_schema_to_find_names(schema["items"])
-            elif schema_type == "dict":
+            Args:
+                schema: dict. The schema to traverse.
+            """
+            if 'name' in schema:
+                names_in_schema.append(schema['name'])
+
+            schema_type = schema['type']
+            if schema_type == schema_utils.SCHEMA_TYPE_LIST:
+                traverse_schema_to_find_names(schema['items'])
+            elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
-                    names_in_schema.append(schema_property["name"])
+                    names_in_schema.append(schema_property['name'])
                     traverse_schema_to_find_names(schema_property['schema'])
 
         for interaction_id in all_specs:
@@ -161,14 +165,21 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         all_specs = interaction_registry.Registry.get_all_specs()
 
         def traverse_schema_and_find_subtitled_content(value, schema):
+            """Recursively traverse the schema to find SubtitledHtml or
+            SubtitledUnicode in value.
+
+            Args:
+                value: *. The value of the customization argument.
+                schema: dict. The customization argument schema.
+            """
             schema_type = schema['type']
             schema_obj_type = schema.get('obj_type')
 
             if (
                 (schema_obj_type ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
+                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
                 (schema_obj_type ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
             ):
                 self.assertIsNone(value['content_id'])
             elif schema_type == schema_utils.SCHEMA_TYPE_LIST:

@@ -916,7 +916,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         Args:
             ca_dict: dict. The customization argument dictionary. A dict of the
                 single key 'value' to the value of the customization argument.
-            ca_schema: The schema that defines the customization argument
+            ca_schema: dict. The schema that defines the customization argument
                 value.
 
         Returns:
@@ -1013,10 +1013,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         schema_type = schema['type']
         schema_obj_type = schema.get('obj_type', None)
 
-        if (
-            schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE or
-            schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
-        ):
+        if (schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE or
+                schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML):
             value = conversion_fn(value, schema_obj_type)
         elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
             for i in python_utils.RANGE(len(value)):
@@ -1089,6 +1087,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 )
 
         return result
+
 
 class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
@@ -2549,7 +2548,7 @@ class State(python_utils.OBJECT):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args: dict. The new customization_args to set.
+            customization_args_dict: dict. The new customization_args to set.
         """
         customization_args = (
             InteractionInstance.
@@ -2948,11 +2947,12 @@ class State(python_utils.OBJECT):
 
         if old_interaction_customization_args_schema:
             interaction_id = state_dict['interaction']['id']
-            ca_specs = (interaction_registry.Registry
+            ca_specs = (
+                interaction_registry.Registry
                 .get_all_specs_for_state_version(34)[
                     interaction_id]['customization_arg_specs']
             )
-            
+
             interaction_customization_arg_has_html = False
             for customization_arg_spec in ca_specs:
                 schema = customization_arg_spec['schema']

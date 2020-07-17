@@ -2649,7 +2649,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
-            })] + 
+            })] +
             _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,

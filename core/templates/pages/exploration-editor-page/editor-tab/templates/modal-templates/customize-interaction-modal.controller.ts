@@ -124,8 +124,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             )
           );
         } else {
-          customizationArgsBackendDict[argName] = angular.copy(
-            $scope.customizationArgSpecs[i].default_value);
+          customizationArgsBackendDict[argName] = {
+            value: angular.copy($scope.customizationArgSpecs[i].default_value)
+          };
         }
       }
 
