@@ -42,13 +42,13 @@ angular.module('oppia').directive('topNavigationBar', [
         '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$scope', '$timeout', '$translate', '$window',
+        '$http', '$rootScope', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
         'I18nLanguageCodeService', 'NavigationService', 'SidebarStatusService',
         'SiteAnalyticsService', 'UserService', 'WindowDimensionsService',
         'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
-            $http, $scope, $timeout, $translate, $window,
+            $http, $rootScope, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
             I18nLanguageCodeService, NavigationService, SidebarStatusService,
             SiteAnalyticsService, UserService, WindowDimensionsService,
@@ -84,6 +84,7 @@ angular.module('oppia').directive('topNavigationBar', [
                 } else {
                   $window.location.reload();
                 }
+                $rootScope.$apply();
               }
             );
           };
@@ -279,9 +280,11 @@ angular.module('oppia').directive('topNavigationBar', [
                   }
                 });
               }
+              $rootScope.$apply();
             });
             UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
+              $rootScope.$apply();
             });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {

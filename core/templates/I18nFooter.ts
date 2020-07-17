@@ -29,11 +29,11 @@ angular.module('oppia').directive('i18nFooter', [
       template: require('./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$timeout', '$translate', 'I18nLanguageCodeService',
-        'UserService', 'SUPPORTED_SITE_LANGUAGES',
+        '$http', '$rootScope', '$timeout', '$translate',
+        'I18nLanguageCodeService', 'UserService', 'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $timeout, $translate, I18nLanguageCodeService,
-            UserService, SUPPORTED_SITE_LANGUAGES) {
+            $http, $rootScope, $timeout, $translate,
+            I18nLanguageCodeService, UserService, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           // Changes the language of the translations.
           var preferencesDataUrl = '/preferenceshandler/data';
@@ -48,6 +48,7 @@ angular.module('oppia').directive('i18nFooter', [
                   site_language_code: ctrl.currentLanguageCode
                 });
               }
+              $rootScope.$apply();
             });
           };
           ctrl.$onInit = function() {

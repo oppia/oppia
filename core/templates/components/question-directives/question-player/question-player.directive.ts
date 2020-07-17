@@ -567,6 +567,7 @@ angular.module('oppia').directive('questionPlayer', [
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              $rootScope.$apply();
             });
             // The initResults function is written separately since it is also
             // called in $scope.$on when some external events are triggered.

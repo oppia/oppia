@@ -38,10 +38,10 @@ angular.module('oppia').directive('skillsMasteryList', [
         '/components/skills-mastery-list/skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'UserService',
+        '$rootScope', '$scope', '$uibModal', 'UserService',
         'MASTERY_CUTOFF', 'MASTERY_COLORS',
         function(
-            $scope, $uibModal, UserService,
+            $roorScope, $scope, $uibModal, UserService,
             MASTERY_CUTOFF, MASTERY_COLORS) {
           var ctrl = this;
           ctrl.getMasteryPercentage = function(degreeOfMastery) {
@@ -89,6 +89,7 @@ angular.module('oppia').directive('skillsMasteryList', [
             ctrl.userIsLoggedIn = null;
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              $rootScope.$apply();
             });
             ctrl.sortedSkillIds = [];
 
