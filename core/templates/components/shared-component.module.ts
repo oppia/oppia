@@ -23,6 +23,12 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { AttributionGuideComponent } from
+  './common-layout-directives/common-elements/attribution-guide.component';
+import { LazyLoadingComponent } from
+  './common-layout-directives/common-elements/lazy-loading.component';
+import { LoadingDotsComponent } from
+  './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SkillMasteryViewerComponent } from
@@ -38,8 +44,10 @@ import { SubtopicSummaryTileDirective } from
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-
-
+import { ExplorationSummaryTileDirective } from
+  './summary-tile/exploration-summary-tile.directive';
+import { TopicSummaryTileComponent } from
+  './summary-tile/topic-summary-tile.component';
 
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule],
@@ -52,12 +60,18 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
+    AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent,
+    TopicSummaryTileComponent, ExplorationSummaryTileDirective
   ],
 
   entryComponents: [
     BackgroundBannerComponent,
-    SharingLinksComponent,
+    SharingLinksComponent, BackgroundBannerComponent, SharingLinksComponent,
+    SkillMasteryViewerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    TopicSummaryTileComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent,
@@ -70,7 +84,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    MaterialModule
+    MaterialModule,
+    ExplorationSummaryTileDirective
   ],
 })
 

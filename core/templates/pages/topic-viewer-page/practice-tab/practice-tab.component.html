@@ -5,10 +5,12 @@
     </h2>
     <span class="practice-content">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate"></span>
-    </span>
-    <mat-checkbox *ngFor="let subtopic of availableSubtopics; let i = index">
-      {{ subtopic.getTitle() }}
-    </mat-checkbox>
+    </span> <br>
+    <div *ngFor="let subtopic of availableSubtopics; let i = index">
+      <mat-checkbox>
+        {{ subtopic.getTitle() }}
+      </mat-checkbox>
+    </div>
     <button mat-raised-button color="accent" [disabled]="isStartButtonDisabled()"
                (click)="openNewPracticeSession()"
                class="practice-session-button mat-accent mat-raised">
@@ -33,27 +35,8 @@
     }
   }
 
-  practice-tab .mat-button {
-    align-self: center;
-    border-radius: 0.4em;
-    color: white;
-    font-family: "Roboto", Arial, sans-serif;
-    margin-top: 20px;
-    text-transform: uppercase;
-    width: 200px;
-  }
-
-  practice-tab mat-checkbox .mat-label {
-    margin-top: -1px;
-    vertical-align: top;
-  }
-
   practice-tab .mat-button.mat-raised.mat-accent.practice-session-button:not([disabled]) {
     background-color: #00645C;
-  }
-
-  practice-tab mat-checkbox {
-    margin-top: 1vh;
   }
 
   practice-tab .practice-content {
