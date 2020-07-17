@@ -39,6 +39,7 @@ describe('Subtopic editor tab', function() {
   var EntityCreationService = null;
   var SubtopicValidationService = null;
   var TopicEditorRoutingService = null;
+  var WindowDimensionsService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var QuestionBackendApiService = null;
@@ -56,6 +57,7 @@ describe('Subtopic editor tab', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
     ShortSkillSummaryObjectFactory = $injector.get(
       'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
@@ -80,9 +82,12 @@ describe('Subtopic editor tab', function() {
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
-
+    var MockWindowDimensionsService = {
+      isWindowNarrow: () => false
+    };
     ctrl = $componentController('subtopicEditorTab', {
-      QuestionBackendApiService: MockQuestionBackendApiService
+      QuestionBackendApiService: MockQuestionBackendApiService,
+      WindowDimensionsService: MockWindowDimensionsService
     });
     ctrl.$onInit();
   }));
@@ -120,7 +125,6 @@ describe('Subtopic editor tab', function() {
       ctrl.updateSubtopicThumbnailFilename('img.svg');
       expect(thubmnailSpy).not.toHaveBeenCalled();
     });
-
 
   it('should call TopicUpdateService if subtopic thumbnail bg color updates',
     function() {
@@ -213,4 +217,22 @@ describe('Subtopic editor tab', function() {
       ctrl.updateHtmlData();
       expect(updateSubtopicSpy).toHaveBeenCalled();
     });
+
+  it('should toggle skills list preview', function() {
+    expect(ctrl.skillsListIsShown).toEqual(true);
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(false);
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(true);
+    ctrl.togglePreviewSkillCard();
+  });
+
+  it('should toggle subtopic preview', function() {
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicPreview();
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicPreview();
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicPreview();
+  });
 });
