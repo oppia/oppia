@@ -22,6 +22,15 @@ import { Injectable } from '@angular/core';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
+/**
+ * Encodes the back-end response of a task entry. This interface is intended to
+ * be extended with a stronger "TaskType" to help the compiler enforce that the
+ * fields are set correctly.
+ *
+ * When the task type is excluded, it is assumed to be a simple string that can
+ * match any task. This is used when, for example, rendering the list of tasks
+ * as a table (where the type doesn't matter).
+ */
 export interface ITaskEntryBackendDict<TaskType = string> {
   'entity_type': string;
   'entity_id': string;
@@ -36,6 +45,15 @@ export interface ITaskEntryBackendDict<TaskType = string> {
   'resolved_on_msecs': number;
 }
 
+/**
+ * Encodes the minimal details required to store a task to the back-end. This
+ * interface is intended to be extended with a stronger "TaskType" to help the
+ * compiler enforce that the fields are set correctly.
+ *
+ * When the task type is excluded, it is assumed to be a simple string that can
+ * match any task. This is used when, for example, rendering the list of tasks
+ * as a table (where the type doesn't matter).
+ */
 export interface ITaskEntryPayloadDict<TaskType = string> {
   'entity_version': number;
   'task_type': TaskType;
@@ -44,6 +62,15 @@ export interface ITaskEntryPayloadDict<TaskType = string> {
   'status': string;
 }
 
+/**
+ * Encodes a task's management details. This class is intended to be extended
+ * with a stronger "TaskType" to help the compiler enforce that the fields are
+ * set correctly.
+ *
+ * When the task type is excluded, it is assumed to be a simple string that can
+ * match any task. This is used when, for example, rendering the list of tasks
+ * as a table (where the type doesn't matter).
+ */
 export class TaskEntry<TaskType = string> {
   public readonly entityType: string;
   public readonly entityId: string;
