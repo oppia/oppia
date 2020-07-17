@@ -13,43 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for WelcomeModalController.
+ * @fileoverview Unit tests for ConfirmDeleteStateModalController.
  */
 
-describe('Welcome Modal Controller', function() {
+describe('Confirm Delete State Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
-  var ContextService = null;
-  var SiteAnalyticsService = null;
 
-  var explorationId = 'exp1';
+  var deleteStateName = 'Introduction';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
-    ContextService = $injector.get('ContextService');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-
-    spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    spyOn(SiteAnalyticsService, 'registerTutorialModalOpenEvent').and
-      .callThrough();
-
     $scope = $rootScope.$new();
-    $controller('WelcomeModalController', {
+    $controller('ConfirmDeleteStateModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
+      deleteStateName: deleteStateName
     });
   }));
 
-  it('should evaluate scope variables values correctly', function() {
-    expect($scope.explorationId).toBe(explorationId);
-    expect($scope.editorWelcomeImgUrl).toBe(
-      '/assets/images/general/editor_welcome.svg');
-    expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
-      .toHaveBeenCalled();
+  it('should evaluate scope variable values correctly', function() {
+    expect($scope.deleteStateWarningText).toBe(
+      'Are you sure you want to delete the card "Introduction"?');
   });
 });
