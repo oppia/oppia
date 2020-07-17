@@ -20,9 +20,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
-import { SubtitledHtmlObjectFactory } from
+import { SubtitledHtmlObjectFactory, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicodeObjectFactory } from
+import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 const OBJECT_DEFAULTS = require('objects/object_defaults.json');
@@ -64,6 +64,11 @@ interface DictSchema {
   }[];
 }
 
+interface CustomSchema {
+  'type': 'custom',
+  'obj_type': string;
+}
+
 export type Schema = (
   BoolSchema |
   UnicodeSchema |
@@ -71,7 +76,8 @@ export type Schema = (
   IntSchema |
   FloatSchema |
   ListSchema |
-  DictSchema
+  DictSchema |
+  CustomSchema
 );
 
 interface DictSchemaDefaultValue {
@@ -82,6 +88,8 @@ type SchemaDefaultValue = (
   string |
   number |
   boolean |
+  SubtitledUnicode |
+  SubtitledHtml |
   SchemaDefaultValue[] |
   DictSchemaDefaultValue);
 
