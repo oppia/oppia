@@ -393,9 +393,25 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                 item.id, state_name,
                                 ', '.join(list(types_of_inputs)))))
                     else:
+                        # This changelist is supposed to mimic this change if
+                        # it were done via the frontend. Since there is no way
+                        # to directly change the interaction ID of a state
+                        # in the frontend, we will have to delete the state,
+                        # and replace it with a copy that contains the necessary
+                        # changes.
                         exp_services.update_exploration(
                             feconf.MIGRATION_BOT_USER_ID, item.id, [
                                 exp_domain.ExplorationChange({
+                                    'cmd': 'edit_state_property',
+                                    'state_name': state_name,
+                                    'property_name': 'widget_id',
+                                    'new_value': None
+                                }), exp_domain.ExplorationChange({
+                                    'cmd': 'edit_state_property',
+                                    'state_name': state_name,
+                                    'property_name': 'answer_groups',
+                                    'new_value': []
+                                }), exp_domain.ExplorationChange({
                                     'cmd': 'edit_state_property',
                                     'state_name': state_name,
                                     'property_name': 'widget_id',
