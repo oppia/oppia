@@ -142,54 +142,49 @@ angular.module('oppia').controller('TeachOppiaModalController', [
 
     $scope.confirmAnswerAssignment = function(answerIndex) {
       var unresolvedAnswer = $scope.unresolvedAnswers[answerIndex];
+      $scope.unresolvedAnswers.splice(answerIndex, 1);
 
-      if (unresolvedAnswer) {
-        $scope.unresolvedAnswers.splice(answerIndex, 1);
+      var classificationType = (
+        unresolvedAnswer.classificationResult.classificationCategorization);
+      var truncatedAnswer = $filter(
+        'truncateInputBasedOnInteractionAnswerType')(
+        unresolvedAnswer.answer, interactionId, 12);
+      var successToast = (
+        'The answer ' + truncatedAnswer +
+        ' has been successfully trained.');
 
-        var classificationType = (
-          unresolvedAnswer.classificationResult.classificationCategorization);
-        var truncatedAnswer = $filter(
-          'truncateInputBasedOnInteractionAnswerType')(
-          unresolvedAnswer.answer, interactionId, 12);
-        var successToast = (
-          'The answer ' + truncatedAnswer +
-          ' has been successfully trained.');
-
-        if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
-          TrainingDataService.associateWithDefaultResponse(
-            unresolvedAnswer.answer);
-          AlertsService.addSuccessMessage(
-            successToast, TOAST_TIMEOUT);
-          return;
-        }
-
-        TrainingDataService.associateWithAnswerGroup(
-          unresolvedAnswer.classificationResult.answerGroupIndex,
+      if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
+        TrainingDataService.associateWithDefaultResponse(
           unresolvedAnswer.answer);
         AlertsService.addSuccessMessage(
           successToast, TOAST_TIMEOUT);
+        return;
       }
+
+      TrainingDataService.associateWithAnswerGroup(
+        unresolvedAnswer.classificationResult.answerGroupIndex,
+        unresolvedAnswer.answer);
+      AlertsService.addSuccessMessage(
+        successToast, TOAST_TIMEOUT);
     };
 
     $scope.openTrainUnresolvedAnswerModal = function(
         answerIndex) {
       var unresolvedAnswer = (
         $scope.unresolvedAnswers[answerIndex]);
-      if (unresolvedAnswer) {
-        var answer = unresolvedAnswer.answer;
-        return TrainingModalService.openTrainUnresolvedAnswerModal(
-          answer, function() {
-            $scope.unresolvedAnswers.splice(answerIndex, 1);
-            var truncatedAnswer = $filter(
-              'truncateInputBasedOnInteractionAnswerType')(
-              answer, interactionId, 12);
-            var successToast = (
-              'The response for ' + truncatedAnswer +
-              ' has been fixed.');
-            AlertsService.addSuccessMessage(
-              successToast, TOAST_TIMEOUT);
-          });
-      }
+      var answer = unresolvedAnswer.answer;
+      return TrainingModalService.openTrainUnresolvedAnswerModal(
+        answer, function() {
+          $scope.unresolvedAnswers.splice(answerIndex, 1);
+          var truncatedAnswer = $filter(
+            'truncateInputBasedOnInteractionAnswerType')(
+            answer, interactionId, 12);
+          var successToast = (
+            'The response for ' + truncatedAnswer +
+            ' has been fixed.');
+          AlertsService.addSuccessMessage(
+            successToast, TOAST_TIMEOUT);
+        });
     };
 
     $scope.loadingDotsAreShown = true;

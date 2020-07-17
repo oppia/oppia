@@ -319,21 +319,5 @@ describe('Teach Oppia Modal Controller', function() {
         expect($scope.loadingDotsAreShown).toBe(false);
         expect($scope.unresolvedAnswers).toEqual([]);
       });
-
-    it('should not confirm answer assignment', function() {
-      spyOn(alertsService, 'addSuccessMessage');
-
-      $scope.confirmAnswerAssignment(0);
-
-      expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
-    });
-
-    it('should not open train unresolved answer modal', function() {
-      spyOn(alertsService, 'addSuccessMessage');
-
-      $scope.openTrainUnresolvedAnswerModal(0);
-
-      expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
-    });
   });
 });
