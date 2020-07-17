@@ -15,7 +15,7 @@
                                 form-style="{'font-weight': 'normal'}">
   </exploration-objective-editor>
   <p ng-if="requireCategoryToBeSpecified">
-    <label ng-style="{'font-weight':'normal'}"> Add a category: how would you categorize your exploration?
+    <label ng-style="{'font-weight':'normal'}"> Add a category: How would you categorize your exploration?
       <select2-dropdown item="explorationCategoryService.displayed"
                         choices="CATEGORY_LIST_FOR_SELECT2"
                         placeholder="Choose or type a new category"
@@ -26,8 +26,11 @@
     </label>
   </p>
   <p ng-if="askForLanguageCheck">
-    <label ng-style="{'font-weight':'normal'}"> Verify the language: is your exploration written in this language
-      <select class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
+    <label ng-style="{'font-weight':'normal'}"> Verify the language: Is your exploration written in this language
+      <select class="form-control protractor-test-exploration-language-select" 
+              ng-model="explorationLanguageCodeService.displayed" 
+              ng-change="saveExplorationLanguageCode()" 
+              ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
               width="100%">
       </select>
     </label>
