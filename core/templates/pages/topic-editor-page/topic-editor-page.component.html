@@ -1,49 +1,51 @@
-<div class="topic-editor-main">
-  <div class="navbar-helper">
-    <div class="navbar-tabs">
-      <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getTotalWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>" class="nav-item icon">
-        <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="$ctrl.selectMainTab()"
-           class="nav-link navbar-tab protractor-test-edit-topic-tab">
-          <i class="material-icons">&#xE254;</i> <span>Topic</span>
-        </a>
-        <div ng-show="$ctrl.getTotalWarningsCount()"
-             class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-             ng-mouseover="$ctrl.warningsAreShown=true"
-             ng-mouseleave="$ctrl.warningsAreShown=false"
-             ng-click="$ctrl.selectMainTab()">
+<div class="navbar-helper">
+  <div class="navbar-tabs">
+    Topic Editor: <[$ctrl.topic.getName()]> (v<[$ctrl.topic.getVersion()]>)
+    <[$ctrl.getActiveTabName()]>
+    <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getTotalWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>" class="nav-item icon">
+      <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="$ctrl.selectMainTab()"
+         class="nav-link navbar-tab protractor-test-edit-topic-tab">
+        <i class="material-icons">&#xE254;</i> <span>Topic</span>
+      </a>
+      <div ng-show="$ctrl.getTotalWarningsCount()"
+           class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+           ng-mouseover="$ctrl.warningsAreShown=true"
+           ng-mouseleave="$ctrl.warningsAreShown=false"
+           ng-click="$ctrl.selectMainTab()">
           <span class="oppia-editor-warnings-count">
             <[$ctrl.getTotalWarningsCount()]>
           </span>
-          <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu oppia-editor-warnings-box oppia-editor-warnings-box-block">
-            <span class="oppia-editor-warnings-header">Warnings</span>
-            <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.validationIssues track by $index">
-              <hr class="oppia-editor-warnings-separator">
-              <[issue]>
-            </li>
-            <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
-              <hr class="oppia-editor-warnings-separator">
-              <[issue]>
-            </li>
-          </ul>
-        </div>
+        <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu oppia-editor-warnings-box oppia-editor-warnings-box-block">
+          <span class="oppia-editor-warnings-header">Warnings</span>
+          <li class="oppia-editor-warnings-text"
+              ng-repeat="issue in $ctrl.validationIssues track by $index">
+            <hr class="oppia-editor-warnings-separator">
+            <[issue]>
+          </li>
+          <li class="oppia-editor-warnings-text"
+              ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
+            <hr class="oppia-editor-warnings-separator">
+            <[issue]>
+          </li>
+        </ul>
+      </div>
 
-      </li>
+    </li>
 
-      <li ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon">
-        <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="$ctrl.selectQuestionsTab()">
-          <i class="material-icons">&#xE254;</i><span>Questions</span>
-        </a>
-      </li>
+    <li ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon">
+      <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="$ctrl.selectQuestionsTab()">
+        <i class="material-icons">&#xE254;</i><span>Questions</span>
+      </a>
+    </li>
 
-      <li class="nav-item icon">
-        <a ng-click="$ctrl.openTopicViewer()" class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
-          <i class="material-icons">&#xE037;</i><span>Preview</span>
-        </a>
-      </li>
-    </div>
+    <li class="nav-item icon">
+      <a ng-click="$ctrl.openTopicViewer()" class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
+        <i class="material-icons">&#xE037;</i><span>Preview</span>
+      </a>
+    </li>
   </div>
+</div>
+<div class="topic-editor-main">
   <div ng-if="$ctrl.getActiveTabName() === 'main' && $ctrl.getEntityType() === 'topic'">
     <topic-editor-tab></topic-editor-tab>
   </div>
@@ -66,16 +68,23 @@
     display: block;
   }
 
-  .topic-editor-main .navbar-helper {
+  .topic-editor-main {
+    margin-top: 110px;
+  }
+
+  topic-editor-page .navbar-helper {
     background-color: #00609C;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     height: 70px;
     margin-bottom: 20px;
+    position: fixed;
+    top: 56px;
     text-align: center;
     width: 100%;
+    z-index: 10;
   }
 
-  .topic-editor-main .navbar-tabs {
+  topic-editor-page .navbar-tabs {
     display: flex;
     flex-wrap: wrap;
     height: 100%;
@@ -83,23 +92,23 @@
     text-align: center;
   }
 
-  .topic-editor-main .navbar-tab {
+  topic-editor-page .navbar-tab {
     margin: 8px 25px 0;
   }
 
-  .topic-editor-main .navbar-tab i {
+  topic-editor-page .navbar-tab i {
     color: #FFFFFF;
     display: block;
     font-size: 30px;
     width: 100%;
   }
 
-  .topic-editor-main .navbar-tab span {
+  topic-editor-page .navbar-tab span {
     color: #FFFFFF;
     font-size: 12px;
   }
 
-  .topic-editor-main .oppia-editor-warnings-box {
+  topic-editor-page .oppia-editor-warnings-box {
     max-width: none;
   }
 </style>

@@ -139,6 +139,7 @@ angular.module('oppia').directive('topicEditorTab', [
               backdrop: true,
               windowClass: 'rearrange-skills-modal',
               controller: 'RearrangeSkillsInSubtopicsModalController',
+              controllerAs: '$ctrl',
               size: 'xl'
             }).result.then(function() {
               _initEditor();
