@@ -474,7 +474,7 @@ def get_chrome_driver_version():
         except OSError:
             raise Exception(
                 'Failed to execute "google-chrome --version" command. This is '
-                'used to determine which chromedriver version to use. Please '
+                'used to determine the chromedriver version to use. Please '
                 'set the chromedriver version manually using '
                 '--chrome_driver_version flag. To determine the chromedriver '
                 'version to be used, please follow the instructions mentioned '
