@@ -28,6 +28,9 @@ import { WindowRef } from './contextual/window-ref.service';
  * @fileoverview Tests that the user service is working as expected.
  */
 
+interface IProfilePictureDataUrl {
+  'profile_picture_data_url': string
+}
 
 class MockWindwRef {
   _window = {
@@ -259,7 +262,7 @@ describe('User Service', () => {
     let newProfileImageDataurl = '/avatar/x.png';
 
     userService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
-      (response: any) => {
+      (response: IProfilePictureDataUrl) => {
         expect(response.profile_picture_data_url).toBe(
           newProfileImageDataurl);
       }
