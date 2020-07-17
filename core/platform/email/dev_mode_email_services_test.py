@@ -41,7 +41,6 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_send_mail_logs_to_terminal(self):
         """In DEV Mode, email services logs email info to terminal."""
-        # pylint: disable=division-operator-used
         msg_body = (
             """
             EmailService.SendMail
@@ -62,7 +61,6 @@ class EmailTests(test_utils.GenericTestBase):
             """ % (
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 4, 4))
-        # pylint: enable=division-operator-used
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real emails since this is a ' +
@@ -93,7 +91,6 @@ class EmailTests(test_utils.GenericTestBase):
                 'c@c.com': {'first': 'Rob', 'id': 3},
                 'd@d.com': {'first': 'Emily', 'id': 4},
             })
-        # pylint: disable=division-operator-used
         msg_body = (
             """
             EmailService.SendMail
@@ -115,7 +112,6 @@ class EmailTests(test_utils.GenericTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, recipient_email_list_str,
                 'subject', 4, 4, bcc_email_list_str, '123',
                 len(recipient_variables)))
-        # pylint: enable=division-operator-used
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real emails since this is a ' +

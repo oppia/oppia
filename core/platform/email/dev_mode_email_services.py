@@ -81,7 +81,6 @@ def send_email_to_recipients(
             bcc_email_list_str += (
                 '... Total: ' +
                 python_utils.convert_to_bytes(len(bcc)) + ' emails.')
-    # pylint: disable=division-operator-used
 
     msg = (
         """
@@ -108,7 +107,6 @@ def send_email_to_recipients(
             bcc_email_list_str if bcc else 'None',
             reply_to if reply_to else 'None',
             len(recipient_variables) if recipient_variables else 0))
-    # pylint: enable=division-operator-used
     logging.info(
         textwrap.dedent(msg) + textwrap.dedent(optional_msg_description))
     logging.info(
