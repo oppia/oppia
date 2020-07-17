@@ -29,7 +29,7 @@ import feconf
 import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
-platform_email_services = models.Registry.import_email_services()
+email_services = models.Registry.import_email_services()
 
 
 def get_feedback_thread_reply_info_from_model(model):
@@ -170,41 +170,16 @@ def send_mail(
     if not is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
-
-    bcc = feconf.ADMIN_EMAIL_ADDRESS if (bcc_admin) else ''
+    print("in")
+    bcc = [feconf.ADMIN_EMAIL_ADDRESS] if (bcc_admin) else None
     reply_to = (
         get_incoming_email_address(reply_to_id)
         if reply_to_id else '')
-
-    if not constants.DEV_MODE:
-        platform_email_services.send_email_to_recipients(
-            sender_email, [recipient_email], subject.encode(encoding='utf-8'),
-            plaintext_body.encode(encoding='utf-8'),
-            html_body.encode(encoding='utf-8'), bcc=[bcc], reply_to=reply_to)
-    else:
-        msg_title = 'MailgunService.SendMail'
-        # pylint: disable=division-operator-used
-        msg_body = (
-            """
-            From: %s
-            To: %s
-            Subject: %s
-            Body:
-                Content-type: text/plain
-                Data length: %d
-            Body
-                Content-type: text/html
-                Data length: %d
-            """ % (
-                sender_email, recipient_email, subject, len(plaintext_body),
-                len(html_body)))
-        # pylint: enable=division-operator-used
-        msg = msg_title + dedent(msg_body)
-        logging.info(msg)
-        logging.info(
-            'You are not currently sending out real email since this is a' +
-            ' dev environment. Emails are sent out in the production' +
-            ' environment.')
+    print("sending emails")
+    email_services.send_email_to_recipients(
+        sender_email, [recipient_email], subject.encode(encoding='utf-8'),
+        plaintext_body.encode(encoding='utf-8'),
+        html_body.encode(encoding='utf-8'), bcc=bcc, reply_to=reply_to)
 
 
 def send_bulk_mail(
@@ -251,46 +226,12 @@ def send_bulk_mail(
         recipient_emails[i:i + 1000]
         for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
 
-    if constants.DEV_MODE:
-        logging.info('MailgunService.SendBulkMail')
     for email_list in recipient_email_lists:
         # 'recipient-variable' in post data forces mailgun to send individual
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
-        if not constants.DEV_MODE:
-            platform_email_services.send_email_to_recipients(
-                sender_email, email_list, subject.encode(encoding='utf-8'),
-                plaintext_body.encode(encoding='utf-8'),
-                html_body.encode(encoding='utf-8'),
-                recipient_variables={})
-        else:
-            recipient_email_list_str = ' '.join(
-                ['%s' %
-                 (recipient_email,) for recipient_email in email_list[:3]])
-            # Show the first 3 emails in the list for up to 1000 emails.
-            if len(email_list) > 3:
-                recipient_email_list_str += (
-                    '... Total: ' +
-                    python_utils.convert_to_bytes(len(email_list)) + ' emails.')
-            # pylint: disable=division-operator-used
-            msg = (
-                """
-                From: %s
-                To: %s
-                Subject: %s
-                Body:
-                    Content-type: text/plain
-                    Data length: %d
-                Body
-                    Content-type: text/html
-                    Data length: %d
-                """ % (
-                    sender_email, recipient_email_list_str, subject,
-                    len(plaintext_body), len(html_body)))
-            # pylint: enable=division-operator-used
-            logging.info(dedent(msg))
-    if constants.DEV_MODE:
-        logging.info(
-            'You are not currently sending out real email since this is a' +
-            ' dev environment. Emails are sent out in the production' +
-            ' environment.')
+        email_services.send_email_to_recipients(
+            sender_email, email_list, subject.encode(encoding='utf-8'),
+            plaintext_body.encode(encoding='utf-8'),
+            html_body.encode(encoding='utf-8'),
+            recipient_variables={})

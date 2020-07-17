@@ -227,8 +227,7 @@ class EmailServicesMock(python_utils.OBJECT):
                     latest/user_manual.html#batch-sending
 
         Returns:
-            Response from the server. The object is a file-like object.
-            https://docs.python.org/2/library/urllib2.html
+            bool. Whether the email is sent succesfully.
         """
         bcc_emails = None
         if not feconf.MAILGUN_API_KEY:
@@ -259,6 +258,7 @@ class EmailServicesMock(python_utils.OBJECT):
             if(recipient_email not in self.emails_dict):
                 self.emails_dict[recipient_email] = []
             self.emails_dict[recipient_email].append(new_email)
+        return True
 
     def mock_send_mail(
             self, sender_email='', recipient_email='', subject='',
@@ -2487,8 +2487,7 @@ class GenericEmailTestBase(GenericTestBase):
             self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'name')), (
                 self.swap(
                     email_services, 'send_email_to_recipients',
-                    self.email_services_mock.mock_send_email_to_recipients)), (
-                        self.swap(feconf, 'EMAIL_TEST_MODE', True)):
+                    self.email_services_mock.mock_send_email_to_recipients)):
             super(EmailTestBase, self).run(result)
     @classmethod
     def setUpClass(cls):
@@ -2498,7 +2497,6 @@ class GenericEmailTestBase(GenericTestBase):
     def setUp(self):
         super(GenericEmailTestBase, self).setUp()
         self.email_services_mock.wipe_emails_dict()
-
 
 EmailTestBase = GenericEmailTestBase
 

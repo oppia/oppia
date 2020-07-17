@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
+from constants import constants
 import feconf
 import python_utils
 import utils
@@ -225,6 +226,9 @@ class _Gae(Platform):
             Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
                 to a valid email_services module.
         """
+        if constants.DEV_MODE:
+            from core.platform.email import dev_mode_email_services
+            return dev_mode_email_services
         if (feconf.EMAIL_SERVICE_PROVIDER ==
                 feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services

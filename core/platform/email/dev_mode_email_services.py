@@ -19,11 +19,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import base64
+import logging
+import re
+import textwrap
 
 import feconf
 import python_utils
-
 
 def send_email_to_recipients(
         sender_email, recipient_emails, subject,
@@ -67,36 +68,34 @@ def send_email_to_recipients(
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')
 
-    data = {
-        'from': sender_email,
-        'subject': subject,
-        'text': plaintext_body,
-        'html': html_body
-    }
-
-    if len(recipient_emails) == 1:
-        data['to'] = recipient_emails[0]
-    else:
-        data['to'] = recipient_emails
-
-    if bcc:
-        if len(bcc) == 1:
-            data['bcc'] = bcc[0]
-        else:
-            data['bcc'] = bcc
-
-    if reply_to:
-        data['h:Reply-To'] = reply_to
-
-    if recipient_variables:
-        data['recipient_variables'] = recipient_variables
-
-    encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
-    auth_str = 'Basic %s' % encoded
-    header = {'Authorization': auth_str}
-    server = (
-        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-    encoded_url = python_utils.url_encode(data)
-    req = python_utils.url_request(server, encoded_url, header)
-    resp = python_utils.url_open(req)
-    return resp.getcode() == 200
+    recipient_email_list_str = ' '.join(
+        ['%s' %
+            (recipient_email,) for recipient_email in recipient_emails[:3]])
+        # Show the first 3å emails in the list for up to 1000 emails.
+    if len(recipient_emails) > 3:
+        recipient_email_list_str += (
+            '... Total: ' +
+            python_utils.convert_to_bytes(len(recipient_emails)) + ' emails.')
+        # pylint: disable=division-operator-used
+    msg = (
+        """
+        EmailService.SendMail
+        From: %s
+        To: %s
+        Subject: %s
+        Body:
+            Content-type: text/plain
+            Data length: %d
+        Body
+            Content-type: text/html
+            Data length: %d
+        """ % (
+            sender_email, recipient_email_list_str, subject,
+            len(plaintext_body), len(html_body)))
+    # pylint: enable=division-operator-used
+    logging.info(textwrap.dedent(msg))
+    logging.info(
+        'You are not currently sending out real email since this is a' +
+        ' dev environment. Emails are sent out in the production' +
+        ' environment.')
+    return True
