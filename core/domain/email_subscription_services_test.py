@@ -77,44 +77,41 @@ class InformSubscribersTest(test_utils.EmailTestBase):
 
         email_preferences_model.subscription_notifications = False
         email_preferences_model.put()
-        with self.swap(
-            email_services, 'send_mail',
-            self.email_services_mock.mock_send_mail):
-            with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
-                email_subscription_services.inform_subscribers(
-                    self.editor_id, 'A', 'Title')
+        with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
+            email_subscription_services.inform_subscribers(
+                self.editor_id, 'A', 'Title')
 
-                # Make sure correct number of emails is sent and no email is
-                # sent to the person who has unsubscribed from subscription
-                # emails.
-                messages = (
-                    self.email_services_mock.mock_get_sent_messages(
-                        to=self.NEW_USER_EMAIL))
-                self.assertEqual(len(messages), 1)
-                messages = (
-                    self.email_services_mock.mock_get_sent_messages(
-                        to=self.NEW_USER_EMAIL))
-                self.assertEqual(len(messages), 1)
-                messages = (
-                    self.email_services_mock.mock_get_sent_messages(
-                        to=self.USER_EMAIL_2))
-                self.assertEqual(len(messages), 0)
+            # Make sure correct number of emails is sent and no email is
+            # sent to the person who has unsubscribed from subscription
+            # emails.
+            messages = (
+                self.email_services_mock.mock_get_sent_messages(
+                    to=self.NEW_USER_EMAIL))
+            self.assertEqual(len(messages), 1)
+            messages = (
+                self.email_services_mock.mock_get_sent_messages(
+                    to=self.NEW_USER_EMAIL))
+            self.assertEqual(len(messages), 1)
+            messages = (
+                self.email_services_mock.mock_get_sent_messages(
+                    to=self.USER_EMAIL_2))
+            self.assertEqual(len(messages), 0)
 
-                # Make sure correct email models are stored.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(True, any(
-                    model.recipient_id == self.user_id for model in all_models))
-                self.assertEqual(True, any(
-                    model.recipient_email == self.USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
+            # Make sure correct email models are stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(True, any(
+                model.recipient_id == self.user_id for model in all_models))
+            self.assertEqual(True, any(
+                model.recipient_email == self.USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
 
-                self.assertEqual(True, any(
-                    model.recipient_id == self.new_user_id for model in all_models)) # pylint: disable=line-too-long
-                self.assertEqual(True, any(
-                    model.recipient_email == self.NEW_USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
+            self.assertEqual(True, any(
+                model.recipient_id == self.new_user_id for model in all_models)) # pylint: disable=line-too-long
+            self.assertEqual(True, any(
+                model.recipient_email == self.NEW_USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
 
-                # No email model is stored for the user who has unsubscribed
-                # from subscription emails.
-                self.assertEqual(False, any(
-                    model.recipient_id == self.user_id_2 for model in all_models)) # pylint: disable=line-too-long
-                self.assertEqual(False, any(
-                    model.recipient_email == self.USER_EMAIL_2 for model in all_models)) # pylint: disable=line-too-long
+            # No email model is stored for the user who has unsubscribed
+            # from subscription emails.
+            self.assertEqual(False, any(
+                model.recipient_id == self.user_id_2 for model in all_models)) # pylint: disable=line-too-long
+            self.assertEqual(False, any(
+                model.recipient_email == self.USER_EMAIL_2 for model in all_models)) # pylint: disable=line-too-long

@@ -65,10 +65,7 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_email_sent_when_feedback_in_thread(self):
         # Create feedback thread.
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -159,10 +156,7 @@ class TasksTests(test_utils.EmailTestBase):
 
         email_user_b = self.swap(
             rights_manager, 'ActivityRights', MockActivityRights)
-        with email_user_b, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with email_user_b, self.can_send_feedback_email_ctx:
             with self.can_send_emails_ctx:
                 change = {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -208,10 +202,7 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_instant_feedback_reply_email(self):
         """Tests Instant feedback message handler."""
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -252,10 +243,7 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_email_sent_when_status_changed(self):
         """Tests Feedback Thread Status Change Email Handler."""
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             # Create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
@@ -305,10 +293,7 @@ class TasksTests(test_utils.EmailTestBase):
             user_services, 'get_user_ids_by_role',
             fake_get_user_ids_by_role)
 
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
             with get_moderator_id_as_list:
 
                 # Create thread.

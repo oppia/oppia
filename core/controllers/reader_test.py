@@ -1154,10 +1154,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             self.process_and_flush_pending_tasks()
 
             messages = self.email_services_mock.mock_get_sent_messages(

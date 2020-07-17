@@ -182,10 +182,7 @@ class TopicPageDataHandlerTests(
 
     def test_get_with_user_logged_in(self):
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True), (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.login(self.NEW_USER_EMAIL)
             with self.swap(feconf, 'CAN_SEND_EMAILS', True):
                 messages = self.email_services_mock.mock_get_sent_messages(

@@ -81,10 +81,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             moderator_services.enqueue_flag_exploration_email_task(
                 self.exploration.id, self.report_text, self.new_user_id)
 

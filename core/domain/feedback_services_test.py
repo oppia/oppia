@@ -810,10 +810,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.editor_id, True, False, False, False)
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -833,10 +830,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.editor_id, self.exploration.id,
             mute_feedback_notifications=True)
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -852,10 +846,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_emails_are_not_sent_for_anonymous_user(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id, None,
                 'a subject', 'some text')
@@ -871,10 +862,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_emails_are_sent_for_registered_user(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -904,10 +892,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
         cannot_send_feedback_message_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
-        with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -923,10 +908,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_emails_are_not_sent_for_thread_status_changes(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', '')
@@ -942,10 +924,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_email_are_not_sent_to_author_himself(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.editor_id, 'a subject', 'A message')
@@ -961,10 +940,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_email_is_sent_for_reply_on_feedback(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -994,10 +970,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_changing_status_of_thread(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1031,10 +1004,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_each_feedback_message(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1073,10 +1043,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.process_and_flush_pending_tasks()
 
     def test_that_reply_to_id_is_created(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1158,10 +1125,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1221,10 +1185,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1251,10 +1212,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
                 messages[0].body.decode(), expected_email_text_body)
 
     def test_that_emails_are_not_sent_if_already_seen(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1320,14 +1278,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)), (
-                    self.swap(
-                        email_services, 'send_bulk_mail',
-                        self.email_services_mock.mock_send_bulk_mail)
-                ):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1375,10 +1326,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team\n'
             '\n'
             'You can change your email preferences via the Preferences page.')
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1453,10 +1401,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team\n'
             '\n'
             'You can change your email preferences via the Preferences page.')
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1485,10 +1430,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 messages[1].body.decode(), expected_email_text_body_message)
 
     def test_that_emails_are_not_sent_to_anonymous_user(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Create thread as anonoymous user.
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
