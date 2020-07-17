@@ -20,9 +20,9 @@ require('services/user-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'RegistrationSessionExpiredModalController', [
-    '$scope', '$timeout', '$uibModalInstance', '$window',
+    '$rootScope', '$scope', '$timeout', '$uibModalInstance', '$window',
     'UserService',
-    function($scope, $timeout, $uibModalInstance, $window,
+    function($rootScope, $scope, $timeout, $uibModalInstance, $window,
         UserService) {
       $scope.continueRegistration = function() {
         UserService.getLoginUrlAsync().then(
@@ -34,6 +34,7 @@ angular.module('oppia').controller(
             } else {
               $window.location.reload();
             }
+            $rootScope.$apply();
           }
         );
         $uibModalInstance.dismiss('cancel');

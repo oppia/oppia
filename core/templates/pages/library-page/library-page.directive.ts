@@ -321,6 +321,7 @@ angular.module('oppia').directive('libraryPage', [
                   } else {
                     LoaderService.hideLoadingScreen();
                   }
+                  $rootScope.$apply();
                 });
 
                 $rootScope.$broadcast(

@@ -50,12 +50,12 @@ require(
 angular.module('oppia').component('communityDashboardPage', {
   template: require('./community-dashboard-page.component.html'),
   controller: [
-    'LanguageUtilService', 'LocalStorageService',
+    '$rootScope', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService', 'UserService',
     'COMMUNITY_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
     function(
-        LanguageUtilService, LocalStorageService,
+        $rootScope, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService, UserService,
         COMMUNITY_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
@@ -103,6 +103,7 @@ angular.module('oppia').component('communityDashboardPage', {
 
         UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
           ctrl.profilePictureDataUrl = dataUrl;
+          $rootScope.$apply();
         });
 
         UserService.getUserCommunityRightsData().then(
@@ -126,6 +127,7 @@ angular.module('oppia').component('communityDashboardPage', {
               ctrl.userCanReviewVoiceoverSuggestionsInLanguages
                 .length > 0 ||
               ctrl.userCanReviewQuestions);
+            $rootScope.$apply();
           });
 
         UserService.getUserInfoAsync().then(function(userInfo) {
@@ -137,6 +139,7 @@ angular.module('oppia').component('communityDashboardPage', {
             ctrl.userIsLoggedIn = false;
             ctrl.username = '';
           }
+          $rootScope.$apply();
         });
 
         ctrl.languageCode = (

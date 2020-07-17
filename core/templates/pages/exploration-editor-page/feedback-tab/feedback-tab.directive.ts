@@ -49,13 +49,13 @@ angular.module('oppia').directive('feedbackTab', [
         'feedback-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$q', '$uibModal', 'AlertsService', 'ChangeListService',
+        '$rootScope', '$q', '$uibModal', 'AlertsService', 'ChangeListService',
         'DateTimeFormatService', 'EditabilityService', 'LoaderService',
         'ExplorationStatesService',
         'SuggestionModalForExplorationEditorService', 'ThreadDataService',
         'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         function(
-            $q, $uibModal, AlertsService, ChangeListService,
+            $rootScope, $q, $uibModal, AlertsService, ChangeListService,
             DateTimeFormatService, EditabilityService, LoaderService,
             ExplorationStatesService,
             SuggestionModalForExplorationEditorService, ThreadDataService,
@@ -229,7 +229,10 @@ angular.module('oppia').directive('feedbackTab', [
 
             return $q.all([
               UserService.getUserInfoAsync().then(
-                userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
+                (userInfo) => {
+                  ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+                  $rootScope.$apply();
+                }),
               ctrl.fetchUpdatedThreads()
             ]).then(() => LoaderService.hideLoadingScreen());
           };

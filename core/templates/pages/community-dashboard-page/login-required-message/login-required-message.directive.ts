@@ -33,8 +33,10 @@ angular.module('oppia').directive('loginRequiredMessage', [
         'login-required-message.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'SiteAnalyticsService', 'UserService',
-        function($scope, $window, SiteAnalyticsService, UserService) {
+        '$rootScope', '$scope', '$window', 'SiteAnalyticsService',
+        'UserService',
+        function($rootScope, $scope, $window, SiteAnalyticsService,
+            UserService) {
           var ctrl = this;
           ctrl.onLoginButtonClicked = function() {
             UserService.getLoginUrlAsync().then(
@@ -47,6 +49,7 @@ angular.module('oppia').directive('loginRequiredMessage', [
                 } else {
                   $window.location.reload();
                 }
+                $rootScope.$apply();
               }
             );
           };

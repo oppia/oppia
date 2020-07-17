@@ -22,13 +22,14 @@ require('services/user-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').controller('CreateActivityModalController', [
-  '$scope', '$uibModalInstance', 'CollectionCreationService',
+  '$rootScope', '$scope', '$uibModalInstance', 'CollectionCreationService',
   'ExplorationCreationService', 'UrlInterpolationService', 'UserService',
-  function($scope, $uibModalInstance, CollectionCreationService,
+  function($rootScope, $scope, $uibModalInstance, CollectionCreationService,
       ExplorationCreationService, UrlInterpolationService, UserService) {
     UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.canCreateCollections = (
         userInfo.canCreateCollections());
+      $rootScope.$apply();
     });
 
     $scope.chooseExploration = function() {

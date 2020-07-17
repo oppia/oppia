@@ -348,6 +348,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       ctrl.collectionPlaythrough.getCompletedExplorationIds());
                     return completedExplorationIds.indexOf(explorationId) > -1;
                   };
+                  $rootScope.$apply();
                 });
               },
               function() {

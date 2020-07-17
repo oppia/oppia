@@ -28,7 +28,7 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/date-time-format.service.ts');
 require('pages/profile-page/profile-page-backend-api.service');
 
@@ -54,6 +54,7 @@ angular.module('oppia').component('profilePage', {
         let fetchProfileData = () =>
           ProfilePageBackendApiService.fetchProfileData();
         fetchProfileData().then(function(data) {
+          LoaderService.hideLoadingScreen();
           ctrl.username = {
             title: 'Username',
             value: data.profile_username,
@@ -118,6 +119,7 @@ angular.module('oppia').component('profilePage', {
                   } else {
                     WindowRef.nativeWindow.location.reload();
                   }
+                  $rootScope.$apply();
                 }
               );
             } else {

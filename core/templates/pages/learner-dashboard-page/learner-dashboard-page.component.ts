@@ -49,8 +49,8 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$scope', '$uibModal', '$window', 'AlertsService',
-    'LoaderService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+    '$rootScope', '$http', '$q', '$scope', '$uibModal', '$window',
+    'AlertsService', 'LoaderService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
     'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
     'LearnerDashboardBackendApiService', 'UrlInterpolationService',
@@ -61,8 +61,8 @@ angular.module('oppia').component('learnerDashboardPage', {
     'FeedbackMessageSummaryObjectFactory',
     'SuggestionModalForLearnerDashboardService', 'UserService',
     function(
-        $http, $q, $scope, $uibModal, $window, AlertsService,
-        LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+        $rootScope, $http, $q, $scope, $uibModal, $window,
+        AlertsService, LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
         ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
         SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
         LearnerDashboardBackendApiService, UrlInterpolationService,
@@ -432,6 +432,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         ctrl.Math = window.Math;
         UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
           ctrl.profilePictureDataUrl = dataUrl;
+          $rootScope.$apply();
         });
 
         LoaderService.showLoadingScreen('Loading');
@@ -439,6 +440,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
+          $rootScope.$apply();
         });
 
         var dashboardDataPromise = (

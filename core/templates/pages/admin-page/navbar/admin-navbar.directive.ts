@@ -23,11 +23,11 @@ require('services/user-backend-api.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminNavbar', [
-  'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
-  'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',
+  '$rootScope', 'AdminRouterService', 'UrlInterpolationService',
+  'ADMIN_TAB_URLS', 'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',
   function(
-      AdminRouterService, UrlInterpolationService, ADMIN_TAB_URLS,
-      LOGOUT_URL, PROFILE_URL_TEMPLATE) {
+      $rootScope, AdminRouterService, UrlInterpolationService,
+      ADMIN_TAB_URLS, LOGOUT_URL, PROFILE_URL_TEMPLATE) {
     return {
       restrict: 'E',
       scope: {},
@@ -80,6 +80,7 @@ angular.module('oppia').directive('adminNavbar', [
           ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
+            $rootScope.$apply();
           });
 
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -100,6 +101,7 @@ angular.module('oppia').directive('adminNavbar', [
                 username: ctrl.username
               })
             );
+            $rootScope.$apply();
           });
 
           ctrl.logoutUrl = LOGOUT_URL;

@@ -25,9 +25,9 @@ require('services/user-backend-api.service.ts');
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$timeout', 'SiteAnalyticsService', 'LoaderService',
+    '$rootScope', '$timeout', 'SiteAnalyticsService', 'LoaderService',
     'UrlInterpolationService', 'UserService', 'WindowRef',
-    function($timeout, SiteAnalyticsService, LoaderService,
+    function($rootScope, $timeout, SiteAnalyticsService, LoaderService,
         UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
@@ -68,6 +68,7 @@ angular.module('oppia').component('splashPage', {
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
+          $rootScope.$apply();
         });
       };
     }

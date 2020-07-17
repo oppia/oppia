@@ -140,6 +140,7 @@ angular.module('oppia').directive(
 
             UserService.getUserInfoAsync().then(function(userInfo) {
               userIsLoggedIn = userInfo.isLoggedIn();
+              $rootScope.$apply();
             });
             ContributionOpportunitiesService.getTranslationOpportunities(
               TranslationLanguageService.getActiveLanguageCode(),

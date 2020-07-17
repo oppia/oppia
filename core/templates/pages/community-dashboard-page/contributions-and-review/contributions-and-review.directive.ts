@@ -58,12 +58,12 @@ angular.module('oppia').directive('contributionsAndReview', [
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$uibModal', 'AlertsService', 'ContextService',
+        '$filter', '$uibModal', '$rootScope', 'AlertsService', 'ContextService',
         'ContributionAndReviewService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillBackendApiService', 'UserService',
         'ENTITY_TYPE',
         function(
-            $filter, $uibModal, AlertsService, ContextService,
+            $filter, $uibModal, $rootScope, AlertsService, ContextService,
             ContributionAndReviewService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillBackendApiService, UserService,
             ENTITY_TYPE) {
@@ -380,8 +380,10 @@ angular.module('oppia').directive('contributionsAndReview', [
                       ctrl.switchToContributionsTab(
                         ctrl.SUGGESTION_TYPE_QUESTION);
                     }
+                    $rootScope.$apply();
                   });
               }
+              $rootScope.$apply();
             });
           };
         }

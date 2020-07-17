@@ -227,6 +227,7 @@ angular.module('oppia').directive('tutorCard', [
               UserService.getProfileImageDataUrlAsync()
                 .then(function(dataUrl) {
                   $scope.profilePicture = dataUrl;
+                  $rootScope.$apply();
                 });
             } else {
               $scope.profilePicture = (

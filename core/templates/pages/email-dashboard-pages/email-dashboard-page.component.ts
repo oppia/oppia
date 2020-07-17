@@ -108,6 +108,7 @@ angular.module('oppia').component('emailDashboardPage', {
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           LoaderService.hideLoadingScreen();
+          $rootScope.$apply();
         });
 
         ctrl.currentPageOfQueries = [];

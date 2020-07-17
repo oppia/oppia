@@ -50,10 +50,10 @@ angular.module('oppia').directive('collectionSummaryTile', [
         '/components/summary-tile/collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'DateTimeFormatService', 'UserService',
+        '$rootScope', 'DateTimeFormatService', 'UserService',
         'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_VIEWER_URL',
         'COLLECTION_EDITOR_URL', function(
-            DateTimeFormatService, UserService,
+            $rootScope, DateTimeFormatService, UserService,
             ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL,
             COLLECTION_EDITOR_URL) {
           var ctrl = this;
@@ -89,6 +89,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
             ctrl.userIsLoggedIn = null;
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              $rootScope.$apply();
             });
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
             ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;

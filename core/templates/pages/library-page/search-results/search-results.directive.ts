@@ -34,9 +34,9 @@ angular.module('oppia').directive('searchResults', [
         '/pages/library-page/search-results/search-results.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$q', '$timeout', '$window', 'LoaderService',
+        '$rootScope', '$scope', '$q', '$timeout', '$window', 'LoaderService',
         'SiteAnalyticsService', 'UserService',
-        function($scope, $q, $timeout, $window, LoaderService,
+        function($rootScope, $scope, $q, $timeout, $window, LoaderService,
             SiteAnalyticsService, UserService) {
           var ctrl = this;
 
@@ -59,6 +59,7 @@ angular.module('oppia').directive('searchResults', [
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              $rootScope.$apply();
             });
 
             // Called when the first batch of search results is retrieved from

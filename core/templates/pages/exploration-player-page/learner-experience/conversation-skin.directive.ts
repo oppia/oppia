@@ -1241,6 +1241,7 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.inStoryMode = false;
             UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.isLoggedIn = userInfo.isLoggedIn();
+              $rootScope.$apply();
             });
 
             $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl(

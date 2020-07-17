@@ -259,6 +259,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.canCreateCollections = userInfo.canCreateCollections();
+          $rootScope.$apply();
         });
 
         var dashboardDataPromise = (

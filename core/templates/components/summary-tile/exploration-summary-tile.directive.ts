@@ -94,11 +94,11 @@ angular.module('oppia').directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http', '$window', 'DateTimeFormatService',
+        '$rootScope', '$scope', '$http', '$window', 'DateTimeFormatService',
         'RatingComputationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
-            $scope, $http, $window, DateTimeFormatService,
+            $rootScope, $scope, $http, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           var ctrl = this;
@@ -181,6 +181,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
             $scope.userIsLoggedIn = null;
             UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.userIsLoggedIn = userInfo.isLoggedIn();
+              $rootScope.$apply();
             });
             $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
             var contributorsSummary = $scope.getContributorsSummary() || {};

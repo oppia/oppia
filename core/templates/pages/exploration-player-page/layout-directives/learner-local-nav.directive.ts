@@ -53,14 +53,14 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$uibModal', 'AlertsService', 'LoaderService',
+        '$rootScope', '$http', '$uibModal', 'AlertsService', 'LoaderService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
         'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $uibModal, AlertsService, LoaderService,
+            $rootScope, $http, $uibModal, AlertsService, LoaderService,
             ExplorationEngineService, ExplorationPlayerStateService,
             FocusManagerService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
@@ -126,6 +126,7 @@ angular.module('oppia').directive('learnerLocalNav', [
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
               LoaderService.hideLoadingScreen();
+              $rootScope.$apply();
             });
           };
         }

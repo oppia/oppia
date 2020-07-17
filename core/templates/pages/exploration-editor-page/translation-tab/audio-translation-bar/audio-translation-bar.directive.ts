@@ -73,10 +73,10 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
-  'UrlInterpolationService', 'UserExplorationPermissionsService',
+  '$rootScope', 'UrlInterpolationService', 'UserExplorationPermissionsService',
   'UserService',
   function(
-      UrlInterpolationService, UserExplorationPermissionsService,
+      $rootScope, UrlInterpolationService, UserExplorationPermissionsService,
       UserService) {
     return {
       restrict: 'E',
@@ -89,6 +89,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         var userIsLoggedIn;
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
+          $rootScope.$apply();
           return UserExplorationPermissionsService.getPermissionsAsync();
         }).then(function(permissions) {
           $('.oppia-translation-tab').on('dragover', function(evt) {

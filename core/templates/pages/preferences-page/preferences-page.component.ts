@@ -45,14 +45,14 @@ angular.module('oppia').component('preferencesPage', {
   },
   template: require('./preferences-page.component.html'),
   controller: [
-    '$http', '$q', '$translate', '$timeout', '$window',
+    '$rootScope', '$http', '$q', '$translate', '$timeout', '$window',
     '$uibModal', 'AlertsService', 'I18nLanguageCodeService',
     'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
     'UserService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
     'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
     'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
     function(
-        $http, $q, $translate, $timeout, $window,
+        $rootScope, $http, $q, $translate, $timeout, $window,
         $uibModal, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, UrlInterpolationService,
         UserService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
@@ -162,6 +162,7 @@ angular.module('oppia').component('preferencesPage', {
               // The reload is needed in order to update the profile picture
               // in the top-right corner.
               $window.location.reload();
+              $rootScope.$apply();
             });
         }, function() {
           // Note to developers:
@@ -180,6 +181,7 @@ angular.module('oppia').component('preferencesPage', {
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           ctrl.email = userInfo.getEmail();
+          $rootScope.$apply();
         });
 
         ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
