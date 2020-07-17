@@ -323,15 +323,15 @@ var AdminPage = function() {
     await viewReviewerRoleButton.click();
   };
 
-this.expectReviewerUsernamesStrToMatch = async function(
-  expectedUsernamesArrayStr) {
-  // The usernames are displayed as a '[username1, username2]' string.
-  // This method will be updated after the ng-show works properly for this
-  // feature.
-  var reviewerUsernamesArrayStr = await element(
-    by.css('.protractor-test-reviewer-roles-result')).getText();
-  expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
-};
+  this.expectReviewerUsernamesStrToMatch = async function(
+      expectedUsernamesArrayStr) {
+    // The usernames are displayed as a '[username1, username2]' string.
+    // This method will be updated after the ng-show works properly for this
+    // feature.
+    var reviewerUsernamesArrayStr = await element(
+      by.css('.protractor-test-reviewer-roles-result')).getText();
+    expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
+  };
 };
 
 exports.AdminPage = AdminPage;
