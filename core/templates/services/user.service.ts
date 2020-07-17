@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -128,11 +128,9 @@ export class UserService{
         this.PREFERENCES_DATA_URL, putData).toPromise();
     }
     getLoginUrlAsync(): Promise<string> {
-      // let urlParameters = {
-      //   current_url: this.windowRef.nativeWindow.location.pathname
-      // };
-      const urlParameters = new HttpParams().set('current_url', 
-        this.windowRef.nativeWindow.location.pathname);
+      let urlParameters = {
+        current_url: this.windowRef.nativeWindow.location.pathname
+      }
       return this.http.get<IUrlBackendDict>('/url_handler', 
         { params: urlParameters }).toPromise().then(
           (backendDict) => {

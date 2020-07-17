@@ -225,7 +225,7 @@ fdescribe('User Service', () => {
       expect(req.request.method).toEqual('GET');
       req.flush(sampleUserInfoBackendObject);
 
-      flushMicrotasks()
+      flushMicrotasks();
     }));
 
   it('should return the login url', fakeAsync(() => {
@@ -240,7 +240,7 @@ fdescribe('User Service', () => {
     expect(req.request.method).toEqual('GET');
     req.flush({login_url: loginUrl});
 
-    flushMicrotasks()
+    flushMicrotasks();
   }));
 
   it('should set a profile image data url', fakeAsync(() => {
