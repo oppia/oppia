@@ -184,8 +184,9 @@ def send_mail(
         plaintext_body.encode(encoding='utf-8'),
         html_body.encode(encoding='utf-8'), bcc=bcc, reply_to=reply_to)
     if not resp:
-        raise Exception(('Email to %s failed to send. Please check your ' +
-            'email service provider.') % recipient_email)
+        raise Exception(
+            ('Email to %s failed to send. Please check your email service ' +
+             'provider.') % recipient_email)
 
 
 def send_bulk_mail(
@@ -245,5 +246,6 @@ def send_bulk_mail(
             plaintext_body.encode(encoding='utf-8'),
             html_body.encode(encoding='utf-8'))
         if not resp:
-            raise Exception('Bulk email failed to send. Please check your ' +
-                'email service provider.')
+            raise Exception(
+                'Bulk email failed to send. Please check your email' +
+                ' service provider.')
