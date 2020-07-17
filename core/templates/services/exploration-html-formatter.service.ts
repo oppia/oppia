@@ -24,12 +24,9 @@ import { CamelCaseToHyphensPipe } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-
-interface InteractionArgs {
-  choices: {
-    value: string;
-  };
-}
+import { IInteractionAnswer } from 'interactions/answer-defs';
+import { IInteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -75,10 +72,10 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs): string {
+      interactionCustomizationArgs: IInteractionCustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
-    if (interactionCustomizationArgs.choices) {
+    if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value;
     }
 
@@ -94,11 +91,11 @@ export class ExplorationHtmlFormatterService {
   }
 
   getShortAnswerHtml(
-      answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs) : string {
+      answer: IInteractionAnswer, interactionId: string,
+      interactionCustomizationArgs: IInteractionCustomizationArgs) : string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
-    if (interactionCustomizationArgs.choices) {
+    if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value;
     }
 

@@ -28,14 +28,21 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestions.service.ts');
 
-import { FeedbackThread } from
+import { FeedbackThread, FeedbackThreadBackendDict } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionThread } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
+import { SuggestionBackendDict } from
+  'domain/suggestion/SuggestionObjectFactory';
 
 type AnyThread = FeedbackThread | SuggestionThread;
+
+interface SuggestionAndFeedbackThreads {
+  feedbackThreads: FeedbackThread[];
+  suggestionThreads: SuggestionThread[];
+}
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ContextService',
@@ -93,9 +100,8 @@ angular.module('oppia').factory('ThreadDataService', [
         });
     };
 
-    // TODO(#7165): Replace 'any' with the exact type.
     let setFeedbackThreadFromBackendDict = function(
-        threadBackendDict: any): FeedbackThread {
+        threadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
       if (!threadBackendDict) {
         throw new Error('Missing input backend dict');
       }
@@ -105,9 +111,9 @@ angular.module('oppia').factory('ThreadDataService', [
       return thread;
     };
 
-    // TODO(#7165): Replace 'any' with the exact type.
     let setSuggestionThreadFromBackendDicts = function(
-        threadBackendDict: any, suggestionBackendDict: any): SuggestionThread {
+        threadBackendDict: FeedbackThreadBackendDict,
+        suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
       if (!threadBackendDict || !suggestionBackendDict) {
         throw new Error('Missing input backend dicts');
       }
@@ -122,8 +128,7 @@ angular.module('oppia').factory('ThreadDataService', [
         return threadsById.get(threadId) || null;
       },
 
-      // TODO(#7165): Replace 'any' with the exact type.
-      getThreadsAsync: function(): Promise<any> {
+      getThreadsAsync: function(): Promise<SuggestionAndFeedbackThreads> {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
@@ -138,7 +143,8 @@ angular.module('oppia').factory('ThreadDataService', [
 
         return $q.all([suggestionsPromise, threadsPromise]).then(response => {
           let [suggestionData, threadData] = response.map(r => r.data);
-          let suggestionBackendDicts = suggestionData.suggestions;
+          let suggestionBackendDicts: SuggestionBackendDict[] = (
+            suggestionData.suggestions);
           let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
           let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
