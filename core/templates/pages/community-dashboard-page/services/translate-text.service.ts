@@ -19,24 +19,24 @@
 
 angular.module('oppia').factory('TranslateTextService', [
   '$http', function($http) {
-    var stateWiseContents = null;
-    var stateWiseContentIds = {};
-    var activeStateName = null;
-    var activeContentId = null;
-    var stateNamesList = [];
-    var activeExpId = null;
-    var activeExpVersion = null;
+    let stateWiseContents = null;
+    let stateWiseContentIds = {};
+    let activeStateName = null;
+    let activeContentId = null;
+    let stateNamesList = [];
+    let activeExpId = null;
+    let activeExpVersion = null;
 
-    var getNextContentId = function() {
+    const getNextContentId = function() {
       return stateWiseContentIds[activeStateName].pop();
     };
 
-    var getNextState = function() {
-      var currentIndex = stateNamesList.indexOf(activeStateName);
+    const getNextState = function() {
+      const currentIndex = stateNamesList.indexOf(activeStateName);
       return stateNamesList[currentIndex + 1];
     };
 
-    var getNextText = function() {
+    const getNextText = function() {
       activeContentId = getNextContentId();
       if (!activeContentId) {
         activeStateName = getNextState();
@@ -48,7 +48,7 @@ angular.module('oppia').factory('TranslateTextService', [
       return stateWiseContents[activeStateName][activeContentId];
     };
 
-    var isMoreTextAvailableForTranslation = function() {
+    const isMoreTextAvailableForTranslation = function() {
       return !(
         stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
           stateWiseContentIds[activeStateName].length === 0);
@@ -73,12 +73,12 @@ angular.module('oppia').factory('TranslateTextService', [
           function(response) {
             stateWiseContents = response.data.state_names_to_content_id_mapping;
             activeExpVersion = response.data.version;
-            for (var stateName in stateWiseContents) {
+            for (const stateName in stateWiseContents) {
               let stateHasText = false;
               const contentIds = [];
               for (const [contentId, text] of Object.entries(
                 stateWiseContents[stateName])) {
-                if (text !== "") {
+                if (text !== '') {
                   contentIds.push(contentId);
                   stateHasText = true;
                 }
@@ -100,8 +100,8 @@ angular.module('oppia').factory('TranslateTextService', [
       },
       suggestTranslatedText: function(
           translationHtml, languageCode, successCallback) {
-        var url = '/suggestionhandler/';
-        var data = {
+        const url = '/suggestionhandler/';
+        const data = {
           suggestion_type: 'translate_content',
           target_type: 'exploration',
           description: 'Adds translation',
