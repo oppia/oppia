@@ -89,7 +89,8 @@ export class UserService{
               this.userInfo = 
                 this.userInfoObjectFactory.createFromBackendDict(
                   backendDict);
-              return Promise.resolve(this.userInfo);
+              return Promise.resolve(this.userInfoObjectFactory.createFromBackendDict(
+                backendDict));
             } else {
               return Promise.resolve(
                 this.userInfoObjectFactory.createDefault());
