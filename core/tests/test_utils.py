@@ -166,9 +166,7 @@ def check_image_png_or_webp(image_string):
 
 
 class EmailMessageMock(python_utils.OBJECT):
-    """Mock for core.domain.email_services message that is sent to mailgun
-    API.
-    """
+    """Mock for core.platform.models email services messages."""
 
     def __init__(
             self, sender_email, recipient_email, subject, plaintext_body,
@@ -184,7 +182,7 @@ class EmailMessageMock(python_utils.OBJECT):
 
 
 class EmailServicesMock(python_utils.OBJECT):
-    """Mock for core.domain.email_services API."""
+    """Mock for core.platform.models email services API."""
 
     def __init__(self):
         self.emails_dict = {}
@@ -193,30 +191,29 @@ class EmailServicesMock(python_utils.OBJECT):
         """Reset email dictionary for a new test."""
         self.emails_dict = {}
 
-    def mock_send_email_to_recipients(self,
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, bcc=None, reply_to=None,
-        recipient_variables=None):
-        """Send POST HTTP request to mailgun api. This method is adopted from
-        the requests library's post method.
+    def mock_send_email_to_recipients(
+            self, sender_email, recipient_emails, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Mocks sending an email to each email in recipient_emails.
 
         Args:
-            sender_email: str. the email address of the sender. This should be in
-                the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'. Must be utf-8.
+            sender_email: str. the email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
             recipient_emails: list(str). The email addresses of the recipients.
                 Must be utf-8.
             subject: str. The subject line of the email, Must be utf-8.
             plaintext_body: str. The plaintext body of the email. Must be utf-8
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. List of bcc emails.
+            bcc: list(str)|None. List of bcc emails. Must be utf-8.
             reply_to: str|None. Reply address formatted like
                 “reply+<reply_id>@<incoming_email_domain_name>
                 reply_id is the unique id of the sender.
             recipient_variables: dict|None. If batch sending requires
                 differentiating each email based on the recipient, we assign a
                 unique id to each recipient, including info relevant to that
-                recipient so that was can reference it when composing the email
+                recipient so that we can reference it when composing the email
                 like so:
                     recipient_variables =
                         {"bob@example.com": {"first":"Bob", "id":1},
@@ -225,6 +222,14 @@ class EmailServicesMock(python_utils.OBJECT):
                 More info at:
                 https://documentation.mailgun.com/en/
                     latest/user_manual.html#batch-sending
+
+        Raises:
+            Exception: If mailgun api key is not stored in
+                feconf.MAILGUN_API_KEY.
+            Exception: If mailgun domain name is not stored in
+                feconf.MAILGUN_DOMAIN_NAME.
+                (and possibly other exceptions, due to mail.send_mail()
+                failures)
 
         Returns:
             bool. Whether the email is sent succesfully.
@@ -236,128 +241,34 @@ class EmailServicesMock(python_utils.OBJECT):
         if not feconf.MAILGUN_DOMAIN_NAME:
             raise Exception('Mailgun domain name is not set.')
 
-        data = {
-            'from': sender_email,
-            'subject': subject,
-            'text': plaintext_body,
-            'html': html_body
-        }
-
         if bcc:
             bcc_emails = bcc[0] if len(bcc) == 1 else bcc
 
-        if recipient_emails:
-            to = (recipient_emails[0] if len(recipient_emails) == 1
-                else recipient_emails)
         new_email = EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
-            recipient_variables= (
+            recipient_variables=(
                 recipient_variables if (recipient_variables) else None))
         for recipient_email in recipient_emails:
-            if(recipient_email not in self.emails_dict):
+            if recipient_email not in self.emails_dict:
                 self.emails_dict[recipient_email] = []
             self.emails_dict[recipient_email].append(new_email)
         return True
 
-    def mock_send_mail(
-            self, sender_email='', recipient_email='', subject='',
-            plaintext_body='', html_body='', bcc_admin=False, reply_to_id=None):
-        """Sends a mock email. Replaces email_services.send_mail during
-        testing.
-
-        Args:
-            sender_email: str. The email address of the sender. This should be
-                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'
-                or just 'SENDER_EMAIL_ADDRESS'.
-            recipient_email: str. The email address of the recipient.
-            subject: str. The subject line of the email.
-            plaintext_body: str. The plaintext body of the email.
-            html_body: str. The HTML body of the email. Must fit in a datastore
-                entity.
-            bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the
-                email.
-            reply_to_id: str or None. The unique reply-to id used in reply-to
-                email sent to recipient.
-
-        Raises:
-            ValueError: If 'sender_email' or 'recipient_email' is invalid,
-                according to App Engine.
-            Exception: If the configuration in feconf.py forbids emails from
-                being sent.
-        """
-        bcc = []
-        reply_to = ''
-
-        if not feconf.CAN_SEND_EMAILS:
-            raise Exception('This app cannot send emails.')
-
-        if not email_services.is_email_valid(recipient_email):
-            raise ValueError(
-                'Malformed recipient email address: %s' % recipient_email)
-
-        if not email_services.is_sender_email_valid(sender_email):
-            raise ValueError(
-                'Malformed sender email address: %s' % sender_email)
-
-        if bcc_admin:
-            bcc = [feconf.ADMIN_EMAIL_ADDRESS]
-        if reply_to_id:
-            reply_to = (
-                email_services.get_incoming_email_address(reply_to_id))
-        if recipient_email not in self.emails_dict:
-            self.emails_dict[recipient_email] = []
-        new_email = EmailMessageMock(
-            sender_email, recipient_email, subject, plaintext_body, html_body,
-            bcc, reply_to)
-        self.emails_dict[recipient_email].append(new_email)
-
-    def mock_send_bulk_mail(
-            self, sender_email, recipient_emails, subject, plaintext_body,
-            html_body):
-        """Sends mock bulk emails. Replaces email_services.send_bulk_mail
-        during testing.
-
-        Args:
-            sender_email: str. The email address of the sender. This should be
-                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-            recipient_emails: list(str). The list of recipients' email
-                addresses.
-            subject: str. The subject line of the email.
-            plaintext_body: str. The plaintext body of the email.
-            html_body: str. The HTML body of the email. Must fit in a datastore
-                entity.
-
-        Raises:
-            ValueError: If 'sender_email' or 'recipient_email' is invalid,
-                according to App Engine.
-            Exception: If the configuration in feconf.py forbids emails from
-                being sent.
-        """
-        if not feconf.CAN_SEND_EMAILS:
-            raise Exception('This app cannot send emails.')
-
-        for recipient_email in recipient_emails:
-            if not email_services.is_email_valid(recipient_email):
-                raise ValueError(
-                    'Malformed recipient email address: %s' % recipient_email)
-
-        if not email_services.is_sender_email_valid(sender_email):
-            raise ValueError(
-                'Malformed sender email address: %s' % sender_email)
-
-        for recipient_email in recipient_emails:
-            if recipient_email not in self.emails_dict:
-                self.emails_dict[recipient_email] = []
-            new_email = EmailMessageMock(
-                sender_email, recipient_email, subject, plaintext_body,
-                html_body)
-            self.emails_dict[recipient_email].append(new_email)
-
     def mock_get_sent_messages(self, to, *_):
+        """Gets messages to a single recipient email.
+
+        Args:
+            to: str. The recipient email address.
+
+        Returns:
+            list(EmailMessageMock). Returns the list of email messages
+            corresponding to that recipient email.
+        """
         return self.emails_dict[to] if to in self.emails_dict else []
 
     def mock_get_all_messages(self):
+        """Gets the entire messages dictionary."""
         return self.emails_dict
 
 
@@ -2482,13 +2393,20 @@ GenericTestBase = AppEngineTestBase
 
 class GenericEmailTestBase(GenericTestBase):
     """Base class for tests requiring email services."""
+
     def run(self, result=None):
+        """Adds a context swap on top of the test_utils.run() method so that
+        test classes extending GenericEmailTestBase will automatically have
+        a mailgun api key, mailgun domain name and mocked version of
+        send_email_to_recipients().
+        """
         with self.swap(feconf, 'MAILGUN_API_KEY', 'key'), (
             self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'name')), (
                 self.swap(
                     email_services, 'send_email_to_recipients',
                     self.email_services_mock.mock_send_email_to_recipients)):
-            super(EmailTestBase, self).run(result)
+            super(EmailTestBase, self).run(result=result)
+
     @classmethod
     def setUpClass(cls):
         super(GenericEmailTestBase, cls).setUpClass()
@@ -2497,6 +2415,7 @@ class GenericEmailTestBase(GenericTestBase):
     def setUp(self):
         super(GenericEmailTestBase, self).setUp()
         self.email_services_mock.wipe_emails_dict()
+
 
 EmailTestBase = GenericEmailTestBase
 

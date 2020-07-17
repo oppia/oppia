@@ -33,8 +33,9 @@ def send_email_to_recipients(
     the requests library's post method.
 
     Args:
-        sender_email: str. the email address of the sender. This should be in
-            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'. Must be utf-8.
+        sender_email: str. The email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+            'SENDER_EMAIL_ADDRESS'. Must be utf-8.
         recipient_emails: list(str). The email addresses of the recipients.
             Must be utf-8.
         subject: str. The subject line of the email, Must be utf-8.
@@ -48,7 +49,7 @@ def send_email_to_recipients(
         recipient_variables: dict|None. If batch sending requires
             differentiating each email based on the recipient, we assign a
             unique id to each recipient, including info relevant to that
-            recipient so that was can reference it when composing the email
+            recipient so that we can reference it when composing the email
             like so:
                 recipient_variables =
                     {"bob@example.com": {"first":"Bob", "id":1},
@@ -58,8 +59,15 @@ def send_email_to_recipients(
             https://documentation.mailgun.com/en/
                 latest/user_manual.html#batch-sending
 
+    Raises:
+        Exception: If mailgun api key is not stored in feconf.MAILGUN_API_KEY.
+        Exception: If mailgun domain name is not stored in
+            feconf.MAILGUN_DOMAIN_NAME.
+            (and possibly other exceptions, due to mail.send_mail() failures)
+
     Returns:
-        bool. Whether the email is sent succesfully.
+        bool. Whether the email is sent succesfully, contingent on the mailgun
+        API returning a status code of 200.
     """
     if not feconf.MAILGUN_API_KEY:
         raise Exception('Mailgun API key is not available.')

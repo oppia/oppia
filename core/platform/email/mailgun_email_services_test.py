@@ -29,10 +29,17 @@ class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     class Response(python_utils.OBJECT):
+        """Class to mock python_utils.url_open responses."""
+
         def __init__(self, url, expected_url):
             self.url = url
             self.expected_url = expected_url
+
         def getcode(self):
+            """Gets the status code of this url_open mock.
+
+            Returns:
+                int. 200 to signify status is OK. 500 otherwise."""
             return 200 if self.url == self.expected_url else 500
 
     def test_send_email_to_mailgun(self):
@@ -42,8 +49,8 @@ class EmailTests(test_utils.GenericTestBase):
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             ('text=plaintext_body+%F0%9F%98%82&html=Hi+abc%2C%3Cbr%3E+' +
-                '%F0%9F%98%82&from=a%40a.com&to=b%40b.com&subject=Hola+%F0'
-                '%9F%98%82+-+invitation+to+collaborate'),
+             '%F0%9F%98%82&from=a%40a.com&to=b%40b.com&subject=Hola+%F0' +
+             '%9F%98%82+-+invitation+to+collaborate'),
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
@@ -66,13 +73,13 @@ class EmailTests(test_utils.GenericTestBase):
 
         # Test send mail with single bcc and single recipient email.
         expected_query_url = (
-                'https://api.mailgun.net/v3/domain/messages',
-                ('from=a%40a.com&h%3AReply-To=abc&text=plaintext_body' +
-                 '+%F0%9F%98%82&bcc=c%40c.com&recipient_variables=%7Bu' +
-                 '%27b%40b.com%27%3A+%7Bu%27id%27%3A+1%2C+u%27first%27%3A+u%' +
-                 '27Bob%27%7D%7D&to=b%40b.com&html=Hi+abc%2C%3Cbr%3E+%F0%9F%9' +
-                 '8%82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
-                {'Authorization': 'Basic YXBpOmtleQ=='})
+            'https://api.mailgun.net/v3/domain/messages',
+            ('from=a%40a.com&h%3AReply-To=abc&text=plaintext_body' +
+             '+%F0%9F%98%82&bcc=c%40c.com&recipient_variables=%7Bu' +
+             '%27b%40b.com%27%3A+%7Bu%27id%27%3A+1%2C+u%27first%27%3A+u%' +
+             '27Bob%27%7D%7D&to=b%40b.com&html=Hi+abc%2C%3Cbr%3E+%F0%9F%9' +
+             '8%82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
+            {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
             python_utils, 'url_open', swapped_urlopen)
@@ -97,14 +104,14 @@ class EmailTests(test_utils.GenericTestBase):
         # Test send mail with single bcc, and multiple recipient emails
         # differentiated by recipient_variables ids.
         expected_query_url = (
-                'https://api.mailgun.net/v3/domain/messages',
-                ('from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F' +
-                 '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&' +
-                 'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+' +
-                 '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html=' +
-                 'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82' +
-                 '+-+invitation+to+collaborate'),
-                {'Authorization': 'Basic YXBpOmtleQ=='})
+            'https://api.mailgun.net/v3/domain/messages',
+            ('from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F' +
+             '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&' +
+             'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+' +
+             '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html=' +
+             'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82' +
+             '+-+invitation+to+collaborate'),
+            {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
             python_utils, 'url_open', swapped_urlopen)
@@ -129,12 +136,12 @@ class EmailTests(test_utils.GenericTestBase):
     def test_batch_send_to_mailgun(self):
         """Test for sending HTTP POST request."""
         expected_query_url = (
-                'https://api.mailgun.net/v3/domain/messages',
-                ('text=plaintext_body+%F0%9F%98%82&html=Hi+abc%2C%3Cbr%3E+' +
-                 '%F0%9F%98%82&from=a%40a.com&to=%5Bu%27b%40b.com%27%2C+u' +
-                 '%27c%40c.com%27%2C+u%27d%40d.com%27%5D&subject=Hola+%F0'
-                 '%9F%98%82+-+invitation+to+collaborate'),
-                {'Authorization': 'Basic YXBpOmtleQ=='})
+            'https://api.mailgun.net/v3/domain/messages',
+            ('text=plaintext_body+%F0%9F%98%82&html=Hi+abc%2C%3Cbr%3E+' +
+             '%F0%9F%98%82&from=a%40a.com&to=%5Bu%27b%40b.com%27%2C+u' +
+             '%27c%40c.com%27%2C+u%27d%40d.com%27%5D&subject=Hola+%F0'
+             '%9F%98%82+-+invitation+to+collaborate'),
+            {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(

@@ -27,7 +27,6 @@ import zipfile
 from constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
-from core.domain import email_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services

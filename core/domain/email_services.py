@@ -17,11 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import re
-from textwrap import dedent # pylint: disable=import-only-modules
 
-from constants import constants
 from core.domain import email_domain
 from core.platform import models
 
@@ -108,6 +105,7 @@ def is_email_valid(email_address):
     stripped_address = email_address.strip()
     if not stripped_address:
         return False
+    # Regex for a valid email.
     regex = r'^.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$'
     return re.search(regex, email_address)
 
@@ -122,9 +120,11 @@ def is_sender_email_valid(sender_email):
     Returns:
         bool. Whether the sender_email is valid.
     """
+    # Checks the case where sender_email is of the form 'Jane <EMAIL>'.
     sender_email_with_only_first_name_regex = (
         r'^[a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})' +
         '(]?)>$')
+    # Checks the case where sender_email is of the form 'Jane Doe <EMAIL>'
     sender_email_with_full_name_regex = (
         r'^[a-zA-Z._]+ [a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}' +
         r'|[0-9]{1,3})(]?)>$')
@@ -136,29 +136,31 @@ def is_sender_email_valid(sender_email):
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body,
         html_body, bcc_admin=False, reply_to_id=None):
-    """Sends an email using mailgun api.
+    """Sends an email.
 
     In general this function should only be called from
     email_manager._send_email().
 
     Args:
-        sender_email: str. the email address of the sender. This should be in
-            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-        recipient_email: str. the email address of the recipient.
-        subject: str. The subject line of the email.
-        plaintext_body: str. The plaintext body of the email.
+        sender_email: str. The email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+            'SENDER_EMAIL_ADDRESS'. Format must be utf-8.
+        recipient_email: str. the email address of the recipient. Format must
+            be utf-8.
+        subject: str. The subject line of the email. Format must be utf-8.
+        plaintext_body: str. The plaintext body of the email. Format must be
+            utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
-            entity.
+            entity. Format must be utf-8.
         bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
-        reply_to_id: str. The unique id of the sender.
+        reply_to_id: str|None. The unique id of the sender.
+            Format must be utf-8.
 
     Raises:
-        Exception: if the configuration in feconf.py forbids emails from being
+        Exception: The configuration in feconf.py forbids emails from being
             sent.
-        Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
-        Exception: if mailgun domain name is not stored in
-            feconf.MAILGUN_DOMAIN_NAME.
-            (and possibly other exceptions, due to mail.send_mail() failures)
+        Exception: If any recipient email addresses are malformed.
+        Exception: If any sender email addresses are malformed.
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
@@ -182,27 +184,27 @@ def send_mail(
 
 def send_bulk_mail(
         sender_email, recipient_emails, subject, plaintext_body, html_body):
-    """Sends an email using mailgun api.
+    """Sends emails to all recipients in recipient_emails.
 
     In general this function should only be called from
-    email_manager._send_email().
+    email_manager._send_bulk_mail().
 
     Args:
-        sender_email: str. the email address of the sender. This should be in
-            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-        recipient_emails: list(str). list of the email addresses of recipients.
-        subject: str. The subject line of the email.
-        plaintext_body: str. The plaintext body of the email.
+        sender_email: str. The email address of the sender. This should be in
+            the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+            'SENDER_EMAIL_ADDRESS'. Format must be utf-8.
+        recipient_emails: list(str). List of the email addresses of recipients.
+            Format must be utf-8.
+        subject: str. The subject line of the email. Format must be utf-8.
+        plaintext_body: str. The plaintext body of the email. Format must be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
-            entity.
+            entity. Format must be utf-8.
 
     Raises:
-        Exception: if the configuration in feconf.py forbids emails from being
+        Exception: The configuration in feconf.py forbids emails from being
             sent.
-        Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
-        Exception: if mailgun domain name is not stored in
-            feconf.MAILGUN_DOMAIN_NAME.
-            (and possibly other exceptions, due to mail.send_mail() failures)
+        Exception: If any recipient email addresses are malformed.
+        Exception: If any sender email addresses are malformed.
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')

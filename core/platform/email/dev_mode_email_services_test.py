@@ -25,7 +25,6 @@ import textwrap
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 import feconf
-import python_utils
 
 
 class EmailTests(test_utils.GenericTestBase):

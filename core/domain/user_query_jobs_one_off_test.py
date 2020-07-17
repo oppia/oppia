@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.domain import email_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import user_query_jobs_one_off
