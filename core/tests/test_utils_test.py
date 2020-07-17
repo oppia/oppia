@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
 import os
 
 from constants import constants
@@ -423,6 +424,79 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.assertRaises(ValueError):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
+
+class EmailMockTests(test_utils.EmailTestBase):
+
+    def test_override_run_context_swaps_works(self):
+        """ Assert that the feconf context swaps correctly swap the contexts.
+        """
+        self.assertEqual(feconf.MAILGUN_API_KEY, 'key')
+        self.assertEqual(feconf.MAILGUN_DOMAIN_NAME, 'name')
+
+    def test_mock_send_email_to_recipients(self):
+        self.email_services_mock.mock_send_email_to_recipients(
+            sender_email='a@a.com',
+            recipient_emails=['b@b.com'],
+            subject=(
+                'Hola 😂 - invitation to collaborate'
+                .encode(encoding='utf-8')),
+            plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
+            html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+            bcc=['c@c.com'],
+            reply_to='abc',
+            recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
+        messages = self.email_services_mock.mock_get_sent_messages(
+            to='b@b.com')
+        all_messages = self.email_services_mock.mock_get_all_messages()
+        self.assertEqual(len(messages), len(all_messages))
+        self.assertEqual(
+            messages[0].subject,
+            'Hola 😂 - invitation to collaborate'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].body,
+            'plaintext_body 😂'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].html,
+            'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+        self.assertEqual(messages[0].bcc, 'c@c.com')
+
+class MockLoggingHandlerTests(test_utils.GenericTestBase):
+    def setUp(self):
+        super(MockLoggingHandlerTests, self).setUp()
+        self._log_handler = test_utils.MockLoggingHandler()
+
+    def test_logging_produces_correct_logs(self):
+        with self.swap(logging, 'info', self._log_handler.info):
+            logging.info('Info Message')
+        with self.swap(logging, 'debug', self._log_handler.debug):
+            logging.debug('Debug Message')
+        with self.swap(logging, 'warning', self._log_handler.warning):
+            logging.warning('Warning Message')
+        with self.swap(logging, 'error', self._log_handler.error):
+            logging.error('Error Message')
+        with self.swap(logging, 'critical', self._log_handler.critical):
+            logging.critical('Critical Message')
+
+        self.assertEqual(
+            self._log_handler.messages['info'],
+            ['Info Message'])
+        self.assertEqual(
+            self._log_handler.messages['debug'],
+            ['Debug Message'])
+        self.assertEqual(
+            self._log_handler.messages['warning'],
+            ['Warning Message'])
+        self.assertEqual(
+            self._log_handler.messages['error'],
+            ['Error Message'])
+        self.assertEqual(
+            self._log_handler.messages['critical'],
+            ['Critical Message'])
+        self._log_handler.reset()
+        self.assertEqual(
+            self._log_handler.messages,
+            {'debug': [], 'info': [], 'warning': [], 'error': [],
+             'critical': []})
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):
