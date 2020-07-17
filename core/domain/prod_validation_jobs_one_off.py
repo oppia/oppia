@@ -6189,7 +6189,7 @@ class PlatformParameterModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*$'
+        return r'^[A-Za-z0-9_]+$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -6218,7 +6218,7 @@ class PlatformParameterSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]+-\d+$'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -6248,7 +6248,7 @@ class PlatformParameterSnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]+-\d+$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
