@@ -182,7 +182,7 @@ def send_mail(
     resp = platform_email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject.encode(encoding='utf-8'),
         plaintext_body.encode(encoding='utf-8'),
-        html_body.encode(encoding='utf-8'), bcc=bcc, reply_to=reply_to)
+        html_body.encode(encoding='utf-8'), bcc, reply_to, None)
     if not resp:
         raise Exception(
             ('Email to %s failed to send. Please check your email service ' +

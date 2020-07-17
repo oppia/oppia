@@ -223,11 +223,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'subject', 'body', 'html')
 
     def test_unsuccessful_status_codes_raises_exception(self):
-        def mock_send_email_to_recipients(
-                sender_email, recipient_emails, subject,
-                plaintext_body, html_body, bcc=None, reply_to=None,
-                recipient_variables=None):
-            return False
         email_exception = self.assertRaisesRegexp(
             Exception, 'Bulk email failed to send. Please check your ' +
             'email service provider.')
@@ -239,15 +234,15 @@ class EmailServicesTest(test_utils.EmailTestBase):
         with mailgun_api, mailgun_domain, allow_emailing, email_exception, (
             self.swap(
                 platform_email_services, 'send_email_to_recipients',
-                mock_send_email_to_recipients)):
+                lambda *_: False)):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
 
         email_exception = self.assertRaisesRegexp(
             Exception, (
-            'Email to %s failed to send. Please check your ' +
-            'email service provider.') % feconf.ADMIN_EMAIL_ADDRESS)
+                'Email to %s failed to send. Please check your ' +
+                'email service provider.') % feconf.ADMIN_EMAIL_ADDRESS)
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -255,7 +250,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         with mailgun_api, mailgun_domain, allow_emailing, email_exception, (
             self.swap(
                 platform_email_services, 'send_email_to_recipients',
-                mock_send_email_to_recipients)):
+                lambda *_: False)):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)

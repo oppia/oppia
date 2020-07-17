@@ -117,7 +117,7 @@ def send_email_to_recipients(
         header = {'Authorization': auth_str}
         server = (
             ('https://api.mailgun.net/v3/%s/messages')
-             % feconf.MAILGUN_DOMAIN_NAME)
+            % feconf.MAILGUN_DOMAIN_NAME)
         encoded_url = python_utils.url_encode(data)
         req = python_utils.url_request(server, encoded_url, header)
         resp = python_utils.url_open(req)
