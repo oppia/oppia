@@ -121,3 +121,34 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             specs_from_json = json.loads(f.read())
 
         self.assertDictEqual(all_specs, specs_from_json)
+
+    def test_interaction_specs_customization_arg_specs_names_are_valid(self):
+        """Test to ensure that the all customization argument names are in
+        interaction specs only include alphabetic letters and are
+        lowerCamelCase. This is because these properties are involved in the
+        generation of content_id's for customization arguments.
+        """
+        all_specs = interaction_registry.Registry.get_all_specs()
+        names_in_schema = []
+
+        # Recursively find all schema.name fields.
+        def traverse_schema_to_find_names(schema):
+            if "name" in schema:
+                names_in_schema.append(schema["name"])
+
+            schema_type = schema["type"]
+            if schema_type == "list":
+                traverse_schema_to_find_names(schema["items"])
+            elif schema_type == "dict":
+                for schema_property in schema['properties']:
+                    names_in_schema.append(schema_property["name"])
+                    traverse_schema_to_find_names(schema_property['schema'])
+
+        for interaction_id in all_specs:
+            for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
+                names_in_schema.append(ca_spec['name'])
+                traverse_schema_to_find_names(ca_spec['schema'])
+
+        for name in names_in_schema:
+            self.assertTrue(name.isalpha())
+            self.assertTrue(name[0].islower())

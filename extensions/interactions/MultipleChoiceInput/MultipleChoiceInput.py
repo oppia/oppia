@@ -61,8 +61,8 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [{
-            'html': '',
-            'content_id': ''
+            'content_id': '',
+            'html': ''
         }],
     }, {
         'name': 'showChoicesInShuffledOrder',

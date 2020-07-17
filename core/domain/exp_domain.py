@@ -32,6 +32,7 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import customization_args_util
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -568,8 +569,12 @@ class Exploration(python_utils.OBJECT):
                 if idict['solution'] else None)
 
             customization_args = (
-                state_domain.InteractionInstance.convert_cust_args_from_dict(
-                    idict['id'], idict['customization_args'])
+                state_domain.
+                InteractionInstance.
+                convert_customization_args_dict_to_customization_args(
+                    idict['id'],
+                    idict['customization_args']
+                )
             )
             state.interaction = state_domain.InteractionInstance(
                 idict['id'], customization_args,
@@ -2447,7 +2452,8 @@ class Exploration(python_utils.OBJECT):
         """Converts from version 34 to 35. Version 35 adds translation support
         for interaction customization arguments. This migration converts
         customization arguments whose schemas have been changed from unicode to
-        SubtitledUnicode or html to SubtitledHtml.
+        SubtitledUnicode or html to SubtitledHtml. It also populates missing
+        customization argument keys on all interactions.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2457,37 +2463,6 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-
-        def convert_ca_html_list_to_subtitled_html_dict_list(
-                ca_value, content_id_prefix, next_content_id_index):
-            """Convert a customization argument value of type html list to
-            list of subtitled html dict.
-
-            Args:
-                ca_value: list(str)|None. Customization argument value.
-                content_id_prefix: str. The content id prefix.
-                next_content_id_index: int. The next content_id index.
-
-            Returns:
-                list(dict). A list of SubtitledHtml dicts.
-            """
-            new_value = []
-            new_content_ids = []
-
-            for value in ca_value:
-                content_id = (
-                    content_id_prefix +
-                    python_utils.UNICODE(next_content_id_index))
-                new_content_ids.append(content_id)
-                new_value.append({
-                    'content_id': content_id,
-                    'html': value
-                })
-                next_content_id_index += 1
-
-            return new_value, new_content_ids
-
-
         for state_dict in states_dict.values():
             # Find maximum existing content_id index.
             max_existing_content_id_index = -1
@@ -2502,19 +2477,23 @@ class Exploration(python_utils.OBJECT):
                     )
                 for lang_code in translations_mapping[content_id]:
                     translations_mapping[
-                        content_id][lang_code]['type'] = 'html'
+                        content_id][lang_code]['data_format'] = 'html'
 
             next_content_id_index = max_existing_content_id_index + 1
 
             all_new_content_ids = []
             interaction_id = state_dict['interaction']['id']
-            if interaction_id:
+            if interaction_id is not None:
                 ca = state_dict['interaction']['customization_args']
-                ca_specs = (interaction_registry.Registry.get_interaction_by_id(
+                ca_specs = interaction_registry.Registry.get_interaction_by_id(
                     interaction_id
-                ).customization_arg_specs)
+                ).customization_arg_specs
 
-                obj_type_to_subtitled_key = {
+                if (interaction_id == 'PencilCodeEditor' and
+                        'initial_code' in ca):
+                    ca['initialCode'] = ca['initial_code']
+
+                obj_type_to_subtitled_dict_key = {
                     'SubtitledUnicode': 'unicode_str',
                     'SubtitledHtml': 'html'
                 }
@@ -2525,48 +2504,71 @@ class Exploration(python_utils.OBJECT):
                     schema = ca_spec.schema
                     schema_obj_type = schema.get('obj_type')
                     ca_name = ca_spec.name
-                    content_id_prefix = 'custarg_' + ca_name + '_'
+                    content_id_prefix = 'custarg_%s_' % ca_name
 
-                    if schema_obj_type in obj_type_to_subtitled_key:
-                        content_id = (
-                            content_id_prefix +
-                            python_utils.UNICODE(next_content_id_index))
-                        next_content_id_index += 1
+                    if schema_obj_type in obj_type_to_subtitled_dict_key:
+                        # Case where cust arg value is a string, and needs to be
+                        # migrated to SubtitledHtml or SubtitledUnicode.
+                        content_id = '%s%i' % (
+                            content_id_prefix,
+                            next_content_id_index)
                         new_content_ids.append(content_id)
-                        new_value = {'content_id': content_id}
+                        next_content_id_index += 1
 
-                        subtitled_key = (
-                            obj_type_to_subtitled_key[schema_obj_type])
+                        subtitled_dict_key = (
+                            obj_type_to_subtitled_dict_key[schema_obj_type])
                         if ca_name in ca:
-                            new_value[subtitled_key] = ca[ca_name]['value']
+                            ca[ca_name]['value'] = {
+                                'content_id': content_id,
+                                subtitled_dict_key: ca[ca_name]['value']
+                            }
                         else:
-                            ca[ca_name] = {'value': None}
-                            new_value[subtitled_key] = (
-                                ca_spec.default_value[subtitled_key])
-
-                        ca[ca_name]['value'] = new_value
+                            default_value = ca_spec.default_value[
+                                subtitled_dict_key]
+                            ca[ca_name] = {
+                                'value': {
+                                    'content_id': content_id,
+                                    subtitled_dict_key: default_value
+                                }
+                            }
                     elif (schema['type'] == 'list' and
                           schema['items']['type'] == 'custom' and
                           schema['items']['obj_type'] == 'SubtitledHtml'):
+                        # Case where cust arg value is a list of strings, and
+                        # needs to be migrated to a list of SubtitledHtml dicts.
                         value = ca[ca_name]['value'] if ca_name in ca else ['']
-                        ca[ca_name]['value'], new_content_ids = (
-                            convert_ca_html_list_to_subtitled_html_dict_list(
-                                value,
+                        new_value = []
+
+                        for html in value:
+                            content_id = '%s%i' % (
                                 content_id_prefix,
                                 next_content_id_index)
-                        )
-                        next_content_id_index += len(new_content_ids)
+                            new_content_ids.append(content_id)
+                            next_content_id_index += 1
+                            new_value.append({
+                                'content_id': content_id,
+                                'html': html
+                            })
+
+                        ca[ca_name]['value'] = new_value
                     elif ca_name not in ca:
                         ca[ca_name] = {'value': ca_spec.default_value}
 
                     all_new_content_ids.extend(new_content_ids)
+                    (customization_args_util
+                        .validate_customization_args_and_values(
+                            'interaction',
+                            interaction_id,
+                            ca,
+                            ca_specs
+                        )
+                    )
 
             state_dict['next_content_id_index'] = next_content_id_index
             for new_content_id in all_new_content_ids:
                 state_dict[
                     'written_translations'][
                         'translations_mapping'][new_content_id] = {}
-
                 state_dict[
                     'recorded_voiceovers'][
                         'voiceovers_mapping'][new_content_id] = {}

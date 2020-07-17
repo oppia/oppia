@@ -2764,7 +2764,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Test!</p>',
                         'needs_update': True
                     }

@@ -35,6 +35,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -1127,6 +1128,58 @@ tags: []
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
+    def set_interaction_for_state(self, state, interaction_id):
+        """Sets the interaction_id, sets the fully populated default
+        interaction customization arguments, and increments
+        next_content_id_index as needed.
+        """
+
+        # Since nonlocal is not available in python2, we wrap
+        # next_content_id_index in a dict so that modifying it in the
+        # inner function modifies the value.
+        next_content_id_index_dict = {
+            'value': state.next_content_id_index
+        }
+
+        def populateBlankContentIds(value, schema, contentId):
+            schema_type = schema['type']
+            schema_obj_type = schema.get('obj_type')
+
+            if (schema_obj_type == 'SubtitledUnicode' or
+                    schema_obj_type == 'SubtitledHtml'):
+                value['content_id'] = '%s_%i' % (
+                    contentId, next_content_id_index_dict['value'])
+                next_content_id_index_dict['value'] += 1
+            elif schema_type == 'list':
+                for x in value:
+                    populateBlankContentIds(x, schema['items'], contentId)
+            elif schema_type == 'dict':
+                for schema_property in schema['properties']:
+                    populateBlankContentIds(
+                        x[schema_property.name],
+                        schema_property['schema'],
+                        '%s_%s' % (contentId, schema_property.name)
+                    )
+
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id)
+        ca_specs = interaction.customization_arg_specs
+        customization_args = {}
+
+        for ca_spec in ca_specs:
+            ca_name = ca_spec.name
+            ca_value = ca_spec.default_value
+            populateBlankContentIds(
+                ca_value,
+                ca_spec.schema,
+                'custarg_%s' % ca_name
+            )
+            customization_args[ca_name] = {'value': ca_value}
+
+        state.update_interaction_id(interaction_id)
+        state.update_interaction_customization_args(customization_args)
+        state.update_next_content_id_index(next_content_id_index_dict['value'])
+
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
@@ -1151,15 +1204,16 @@ tags: []
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
             language_code=language_code)
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            interaction_id)
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], interaction_id)
+
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
-            end_state.update_interaction_id('EndExploration')
+            self.set_interaction_for_state(end_state, 'EndExploration')
             end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
@@ -1208,10 +1262,11 @@ tags: []
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
+            self.set_interaction_for_state(
+                from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)

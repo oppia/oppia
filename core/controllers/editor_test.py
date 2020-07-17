@@ -401,7 +401,13 @@ content:
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
-  customization_args: {}
+  customization_args:
+    placeholder:
+      value:
+        content_id: custarg_placeholder_0
+        unicode_str: ''
+    rows:
+      value: 1
   default_outcome:
     dest: %s
     feedback:
@@ -414,16 +420,18 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-next_content_id_index: 0
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -435,7 +443,13 @@ content:
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
-  customization_args: {}
+  customization_args:
+    placeholder:
+      value:
+        content_id: custarg_placeholder_0
+        unicode_str: ''
+    rows:
+      value: 1
   default_outcome:
     dest: State A
     feedback:
@@ -448,16 +462,18 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-next_content_id_index: 0
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 """)
 
@@ -636,6 +652,7 @@ written_translations:
             '/createhandler/download/%s?output_format=%s&width=50' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
+
         # Check downloaded dict.
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
 
@@ -726,7 +743,8 @@ written_translations:
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
@@ -1425,9 +1443,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exploration.states['State 3'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
 
         csrf_token = self.get_new_csrf_token()
 
@@ -1482,11 +1503,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
-                }, {
-                    'cmd': 'edit_state_property',
-                    'state_name': 'State 4',
-                    'property_name': 'widget_id',
-                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,
@@ -1523,11 +1539,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 5'
-                }, {
-                    'cmd': 'edit_state_property',
-                    'state_name': 'State 5',
-                    'property_name': 'widget_id',
-                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,

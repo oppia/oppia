@@ -455,7 +455,12 @@ class InteractionInstance(python_utils.OBJECT):
         """
         customization_args_dict = {}
         if self.id:
-            customization_args_dict = self.convert_cust_args_to_dict()
+            customization_args_dict = {}
+            for ca_name in self.customization_args:
+                customization_args_dict[ca_name] = (
+                    self.customization_args[
+                        ca_name].to_customization_arg_dict()
+                )
 
         return {
             'id': self.id,
@@ -492,9 +497,13 @@ class InteractionInstance(python_utils.OBJECT):
             if (interaction_dict['solution'] and interaction_dict['id'])
             else None)
 
-        customization_args = InteractionInstance.convert_cust_args_from_dict(
-            interaction_dict['id'],
-            interaction_dict['customization_args'])
+        customization_args = (
+            InteractionInstance
+            .convert_customization_args_dict_to_customization_args(
+                interaction_dict['id'],
+                interaction_dict['customization_args']
+            )
+        )
 
         return cls(
             interaction_dict['id'],
@@ -640,7 +649,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         customization_args_util.validate_customization_args_and_values(
             'interaction', self.id, self.customization_args,
-            interaction.customization_arg_specs, populate_missing_keys=False)
+            interaction.customization_arg_specs)
 
         if not isinstance(self.answer_groups, list):
             raise utils.ValidationError(
@@ -748,13 +757,14 @@ class InteractionInstance(python_utils.OBJECT):
                                 'The solution does not have a valid '
                                 'correct_answer type.')
 
-        html_list += self.get_all_html_in_cust_args()
+        for ca_name in self.customization_args:
+            html_list += self.customization_args[ca_name].get_html()
 
         return html_list
 
     @staticmethod
     def convert_html_in_interaction(interaction_dict, conversion_fn):
-        """Checks for HTML fields in the outcome and converts it
+        """Checks for HTML fields in the interaction and converts it
         according to the conversion function.
 
         Args:
@@ -791,14 +801,14 @@ class InteractionInstance(python_utils.OBJECT):
 
             return ca_value
 
-        InteractionInstance.convert_content_in_cust_args(
+        InteractionInstance.convert_subtitled_content_in_cust_args(
             interaction_dict['id'],
             interaction_dict['customization_args'],
             convert_cust_args)
         return interaction_dict
 
     @staticmethod
-    def convert_content_in_cust_args(
+    def convert_subtitled_content_in_cust_args(
             interaction_id, customization_args, conversion_fn):
         """Converts all html of SubtitledHtml or unicode of SubtitledUnicode in
         customization arguments.
@@ -814,6 +824,55 @@ class InteractionInstance(python_utils.OBJECT):
                 content_id prefix generated from schema, and the customization
                 argument name, if availible.
         """
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+        if interaction_id not in all_interaction_ids:
+            return
+
+        def traverse_by_schema_and_apply_conversion_fn(
+                value, schema, conversion_fn):
+            """Helper function that recursively traverses an interaction
+            customization argument spec to locate any SubtitledHtml or
+            SubtitledUnicode objects, and applies a conversion function to the
+            customization argument value.
+
+            Args:
+                schema: dict. The customization dict to be modified: dict
+                    with a single key, 'value', whose corresponding value is the
+                    value of the customization arg.
+                value: dict. The current nested customization argument value to
+                    be modified.
+                conversion_fn: function. The function to be used for converting
+                    the content. It is passed the customization argument value
+                    and obj_type.
+
+            Returns:
+                dict. The converted customization dict.
+            """
+            schema_type = schema['type']
+            schema_obj_type = schema.get('obj_type', None)
+
+            if (schema_obj_type == 'SubtitledUnicode' or
+                    schema_obj_type == 'SubtitledHtml'):
+                value = conversion_fn(value, schema_obj_type)
+            elif schema_type == 'list':
+                for i in python_utils.RANGE(len(value)):
+                    value[i] = traverse_by_schema_and_apply_conversion_fn(
+                        value[i],
+                        schema['items'],
+                        conversion_fn)
+            elif schema_type == 'dict':
+                for property_spec in schema['properties']:
+                    name = property_spec['name']
+                    value[name] = (
+                        traverse_by_schema_and_apply_conversion_fn(
+                            value[name],
+                            property_spec['schema'],
+                            conversion_fn)
+                    )
+
+            return value
+
         ca_specs = interaction_registry.Registry.get_interaction_by_id(
             interaction_id).customization_arg_specs
 
@@ -821,65 +880,64 @@ class InteractionInstance(python_utils.OBJECT):
             ca_spec_name = ca_spec.name
             if ca_spec_name in customization_args:
                 customization_args[ca_spec_name]['value'] = (
-                    InteractionInstance.apply_conversion_fn_on_content(
+                    traverse_by_schema_and_apply_conversion_fn(
                         customization_args[ca_spec_name]['value'],
                         ca_spec.to_dict()['schema'],
                         conversion_fn))
 
     @staticmethod
-    def apply_conversion_fn_on_content(value, schema, conversion_fn):
-        """Helper function that recursively traverses an interaction
-        customization argument spec to locate any SubtitledHtml or
-        SubtitledUnicode objects, and applies a conversion function to the
-        customization argument value.
+    def convert_customization_args_dict_to_customization_args(
+            interaction_id, customization_args_dict):
+        """Converts customization arguments dictionary to customization
+        arguments. This is done by converting each customization argument to a
+        InteractionCustomizationArg domain object.
 
         Args:
-            schema: dict. The customization dict to be modified: dict
-                with a single key, 'value', whose corresponding value is the
-                value of the customization arg.
-            value: dict. The current nested customization argument value to be
-                modifed.
-            conversion_fn: function. The function to be used for converting the
-                content. It is passed the customization argument value and
-                obj_type.
+            interaction_id: str. The interaction id.
+            customization_args_dict: dict. A dictionary of customization
+                argument name to a customization argument dict, which is a dict
+                of the single key 'value' to the value of the customization
+                argument.
 
         Returns:
-            dict. The converted customization dict.
+            dict. A dictionary of customization argument names to the
+            InteractionCustomizationArg domain object's.
         """
-        schema_type = schema['type']
-        schema_obj_type = schema.get('obj_type', None)
+        if interaction_id is None:
+            return {}
 
-        if (schema_obj_type == 'SubtitledUnicode' or
-                schema_obj_type == 'SubtitledHtml'):
-            value = conversion_fn(value, schema_obj_type)
-        elif schema_type == 'list':
-            for i in python_utils.RANGE(len(value)):
-                value[i] = InteractionInstance.apply_conversion_fn_on_content(
-                    value[i],
-                    schema['items'],
-                    conversion_fn)
-        elif schema_type == 'dict':
-            for property_spec in schema['properties']:
-                name = property_spec['name']
-                value[name] = (
-                    InteractionInstance.apply_conversion_fn_on_content(
-                        value[name],
-                        property_spec['schema'],
-                        conversion_fn)
+        customization_args = {}
+        ca_specs = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).customization_arg_specs
+
+        for ca_spec in ca_specs:
+            ca_name = ca_spec.name
+            customization_args[ca_name] = (
+                InteractionCustomizationArg.from_customization_arg_dict(
+                    customization_args_dict[ca_name],
+                    ca_spec.schema
                 )
+            )
 
-        return value
+        return customization_args
 
-    def get_all_content_ids_in_cust_args(self):
-        """Extracts all content_id's from interaction customization arguments.
 
-        Returns:
-            list(str). List of all content_id's in customization arguments.
+class InteractionCustomizationArg(python_utils.OBJECT):
+    """Object representing an interaction's customization argument.
+    Any SubtitledHtml or SubtitledUnicode values in the customization argument
+    value are represented as their respective domain objects here, rather than a
+    SubtitledHtml dict or SubtitledUnicode dict. 
+    """
+
+    def to_customization_arg_dict(self):
+        """Converts a InteractionCustomizationArgument domain object to a
+        a customization argument dictionary. This is done by
+        traversing the customization argument schema, and converting
+        SubtitledUnicode to unicode and SubtitledHtml to html where appropriate.
         """
-        content_ids = []
-        def extract_content_ids(ca_value, unused_obj_type):
-            """Conversion function used to extract all content_ids.
-            Customization argument is returned unmodified.
+        def convert_content_to_dict(ca_value, unused_obj_type):
+            """Conversion function used to convert SubtitledHtml to
+            SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
 
             Args:
                 ca_value: dict. Dictionary of key 'value' to
@@ -888,64 +946,35 @@ class InteractionInstance(python_utils.OBJECT):
                     the customization arguments schema.
 
             Returns:
-                str. The unmodified customization argument value.
+                dict. The unmodified customization argument value.
             """
-            content_ids.append(ca_value.content_id)
+            return ca_value.to_dict()
 
-            return ca_value
+        return {
+            'value': InteractionCustomizationArg.traverse_by_schema_and_convert(
+                self.schema,
+                copy.deepcopy(self.value),
+                convert_content_to_dict
+            )
+        }
 
-        self.convert_content_in_cust_args(
-            self.id, self.customization_args, extract_content_ids)
-        return content_ids
-
-    def get_all_html_in_cust_args(self):
-        """Extracts all html from interaction customization arguments.
-
-        Returns:
-            list(str). List of all html in customization arguments.
-        """
-        html = []
-        def extract_html(ca_value, obj_type):
-            """Conversion function used to extract all html. Customization
-            argument is returned unmodified.
-
-            Args:
-                obj_type: str. Indicates the obj_type found in
-                    the customization arguments schema.
-                ca_value: str. Dictionary of key 'value' to
-                    original value of customization argument.
-
-            Returns:
-                str. The unmodified customization argument value.
-            """
-            if obj_type == 'SubtitledUnicode':
-                return ca_value
-
-            html.append(ca_value.html)
-
-            return ca_value
-
-        self.convert_content_in_cust_args(
-            self.id, self.customization_args, extract_html)
-        return html
-
-    @staticmethod
-    def convert_cust_args_from_dict(interaction_id, customization_args):
-        """Converts values of customization arguments from SubtitledHtml dicts
-        and SubtitledUnicode dicts to their corresponding domain object.
+    @classmethod
+    def from_customization_arg_dict(cls, ca_dict, ca_schema):
+        """Converts a customization argument dictionary to a
+        InteractionCustomizationArgument domain object. This is done by
+        traversing the customization argument schema, and converting
+        unicode to SubtitledUnicode and html to SubtitledHtml where appropriate.
 
         Args:
-            interaction_id: str. The interaction id.
-            customization_args: dict. The values of the customization arguments.
-                A dict of name to dict of value to the value.
+            ca_dict: dict. The customization argument dictionary. A dict of the
+                single key 'value' to the value of the customization argument.
+            ca_schema: The schema that defines the customization argument
+                value.
 
         Returns:
-            dict. The customization arguments with the content converted to
-            the proper domain objects.
+            InteractionCustomizationArg. The customization argument domain
+            object.
         """
-        if not interaction_id:
-            return {}
-
         def convert_content_to_domain_obj(ca_value, obj_type):
             """Conversion function used to convert SubtitledHtml dicts to
             SubtitledHtml and SubtitledUnicode dicts to SubtitledUnicode.
@@ -967,39 +996,149 @@ class InteractionInstance(python_utils.OBJECT):
                 return SubtitledHtml(
                     ca_value['content_id'], ca_value['html'])
 
-        customization_args = copy.deepcopy(customization_args)
-        InteractionInstance.convert_content_in_cust_args(
-            interaction_id, customization_args, convert_content_to_domain_obj)
-        return customization_args
+        ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
+            ca_schema,
+            copy.deepcopy(ca_dict['value']),
+            convert_content_to_domain_obj
+        )
 
-    def convert_cust_args_to_dict(self):
-        """Converts customization arguments values from SubtitledHtml
-        and SubtitledUnicode to their dictionaries.
+        return cls(ca_value, ca_schema)
+
+    def __init__(self, value, schema):
+        """Initializes a InteractionCustomizationArg domain object.
+
+        Args:
+            value: *. The value of the interaction customization argument.
+            schema: dict. The schema defining the specification of the value.
+        """
+        self.value = value
+        self.schema = schema
+
+    def get_content_ids(self):
+        """Get all content_id's from SubtitledHtml and SubtitledUnicode in the
+        customization argument.
 
         Returns:
-            dict. The customization arguments with the content converted to
-            dictionaries.
+            list(str). A list of content_id's.
         """
-        def convert_content_to_dict(ca_value, unused_obj_type):
-            """Conversion function used to convert SubtitledHtml to
-            SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            ('SubtitledHtml', 'SubtitledUnicode'),
+            lambda x: x.content_id
+        )
 
-            Args:
-                ca_value: dict. Dictionary of key 'value' to
-                    original value of customization argument.
-                unused_obj_type: str. Indicates the obj_type found in
-                    the customization arguments schema.
+    def get_html(self):
+        """Get all html from SubtitledHtml in the customization argument.
 
-            Returns:
-                dict. The unmodified customization argument value.
-            """
-            return ca_value.to_dict()
+        Returns:
+            list(str). A list of html.
+        """
 
-        customization_args = copy.deepcopy(self.customization_args)
-        self.convert_content_in_cust_args(
-            self.id, customization_args, convert_content_to_dict)
-        return customization_args
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            ('SubtitledHtml'),
+            lambda x: x.html
+        )
 
+    @staticmethod
+    def traverse_by_schema_and_convert(schema, value, conversion_fn):
+        """Helper function that recursively traverses an interaction
+        customization argument spec to locate any SubtitledHtml or
+        SubtitledUnicode objects, and applies a conversion function to the
+        customization argument value.
+
+        Args:
+            schema: dict. The customization dict to be modified: dict
+                with a single key, 'value', whose corresponding value is the
+                value of the customization arg.
+            value: dict. The current nested customization argument value to be
+                modified.
+            conversion_fn: function. The function to be used for converting the
+                content. It is passed the customization argument value and
+                obj_type.
+
+        Returns:
+            dict. The converted customization dict.
+        """
+        schema_type = schema['type']
+        schema_obj_type = schema.get('obj_type', None)
+
+        if (schema_obj_type == 'SubtitledUnicode' or
+                schema_obj_type == 'SubtitledHtml'):
+            value = conversion_fn(value, schema_obj_type)
+        elif schema_type == 'list':
+            for i in python_utils.RANGE(len(value)):
+                value[i] = (
+                    InteractionCustomizationArg.traverse_by_schema_and_convert(
+                        schema['items'],
+                        value[i],
+                        conversion_fn
+                    )
+                )
+        elif schema_type == 'dict':
+            for property_spec in schema['properties']:
+                name = property_spec['name']
+                value[name] = (
+                    InteractionCustomizationArg.traverse_by_schema_and_convert(
+                        property_spec['schema'],
+                        value[name],
+                        conversion_fn)
+                )
+
+        return value
+
+    @staticmethod
+    def traverse_by_schema_and_get(
+            schema, value, search_obj_types, value_extractor):
+        """Recursively traverses an interaction customization argument spec to
+        locate values with obj_type in search_obj_types, and extracting the
+        value using a value_extractor function.
+
+        Args:
+            schema: dict. The customization dict to be modified: dict
+                with a single key, 'value', whose corresponding value is the
+                value of the customization arg.
+            value: dict. The current nested customization argument value to be
+                modified.
+            search_obj_types: tuple|Set|list. The specified obj_types to extract
+                values from.
+            value_extractor: function. The function that extracts the wanted
+                value from each value that matches the obj_type's.
+
+        Returns:
+            list(*). The extracted values of the matched obj_type's.
+        """
+        result = []
+        schema_type = schema['type']
+        schema_obj_type = schema.get('obj_type')
+
+        if schema_obj_type is not None and schema_obj_type in search_obj_types:
+            result.append(value_extractor(value))
+        elif schema_type == 'list':
+            for i in python_utils.RANGE(len(value)):
+                result.extend(
+                    InteractionCustomizationArg
+                    .traverse_by_schema_and_get(
+                        schema['items'],
+                        value[i],
+                        search_obj_types,
+                        value_extractor)
+                )
+        elif schema_type == 'dict':
+            for property_spec in schema['properties']:
+                name = property_spec['name']
+                result.extend(
+                    InteractionCustomizationArg
+                    .traverse_by_schema_and_get(
+                        property_spec['schema'],
+                        value[name],
+                        search_obj_types,
+                        value_extractor)
+                )
+
+        return result
 
 class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
@@ -1244,23 +1383,23 @@ class Voiceover(python_utils.OBJECT):
 class WrittenTranslation(python_utils.OBJECT):
     """Value object representing a written translation for a content."""
 
-    def __init__(self, translation_type, translation, needs_update):
+    def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            translation_type: str. 'unicode' or 'html'. Indicates if translation
-                field is html or unicode
+            data_format: str. 'unicode' or 'html'. Indicates if translation
+                field is html or unicode.
             translation: str. A piece of user submitted HTML or unicode. If
                 html, this is cleaned in such a way as to contain a restricted
                 set of HTML tags.
-            needs_update: bool. Whether translation is marked for needing
+            needs_update: bool. Whether translation is marked as needing
                 review.
         """
-        self.type = translation_type
+        self.data_format = data_format
         self.translation = translation
         self.needs_update = needs_update
 
-        if translation_type == 'html':
+        if data_format == 'html':
             self.translation = html_cleaner.clean(self.translation)
 
     def to_dict(self):
@@ -1270,7 +1409,7 @@ class WrittenTranslation(python_utils.OBJECT):
             dict. A dict, mapping all fields of WrittenTranslation instance.
         """
         return {
-            'type': self.type,
+            'data_format': self.data_format,
             'translation': self.translation,
             'needs_update': self.needs_update,
         }
@@ -1288,7 +1427,7 @@ class WrittenTranslation(python_utils.OBJECT):
             object.
         """
         return cls(
-            written_translation_dict['type'],
+            written_translation_dict['data_format'],
             written_translation_dict['translation'],
             written_translation_dict['needs_update'])
 
@@ -1299,12 +1438,13 @@ class WrittenTranslation(python_utils.OBJECT):
             ValidationError: One or more attributes of the WrittenTranslation
                 are invalid.
         """
-        if not isinstance(self.type, python_utils.BASESTRING):
+        if not isinstance(self.data_format, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid type: %s' % self.type)
+                'Invalid type: %s' % self.data_format)
 
-        if not (self.type == 'unicode' or self.type == 'html'):
-            raise utils.ValidationError('Invalid type: %s' % self.type)
+        if not (self.data_format == 'unicode' or self.data_format == 'html'):
+            raise utils.ValidationError(
+                'Invalid data_format: %s' % self.data_format)
 
         if not isinstance(self.translation, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1551,7 +1691,7 @@ class WrittenTranslations(python_utils.OBJECT):
         html_string_list = []
         for translations in self.translations_mapping.values():
             for written_translation in translations.values():
-                if written_translation.type == 'html':
+                if written_translation.data_format == 'html':
                     html_string_list.append(written_translation.translation)
         return html_string_list
 
@@ -2105,7 +2245,7 @@ class State(python_utils.OBJECT):
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
             next_content_id_index: int. The next content_id index to use for
-                new content_id's of content in lists.
+                generation of new content_id's.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -2188,9 +2328,12 @@ class State(python_utils.OBJECT):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
-        if self.interaction.id:
-            content_id_list.extend(
-                self.interaction.get_all_content_ids_in_cust_args())
+        if self.interaction.id is not None:
+            for ca_name in self.interaction.customization_args:
+                content_id_list.extend(
+                    self.interaction.customization_args[ca_name]
+                    .get_content_ids()
+                )
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
@@ -2423,15 +2566,17 @@ class State(python_utils.OBJECT):
         Args:
             interaction_id: str. The new interaction id to set.
         """
-        old_content_id_list = []
+        if self.interaction.id is not None:
+            old_content_id_list = []
+            for ca_name in self.interaction.customization_args:
+                old_content_id_list.extend(
+                    self.interaction.customization_args[ca_name]
+                    .get_content_ids()
+                )
 
-        if self.interaction.id:
-            old_content_id_list.extend(
-                self.interaction.get_all_content_ids_in_cust_args())
+            self._update_content_ids_in_assets(old_content_id_list, [])
+
         self.interaction.id = interaction_id
-
-        self._update_content_ids_in_assets(
-            old_content_id_list, [])
 
         # TODO(sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
@@ -2442,32 +2587,41 @@ class State(python_utils.OBJECT):
         """Update the interaction id attribute.
 
         Args:
-            next_content_id_index: number. The new next content id index to set.
+            next_content_id_index: int. The new next content id index to set.
         """
         self.next_content_id_index = next_content_id_index
 
-    def update_interaction_customization_args(self, customization_args):
+    def update_interaction_customization_args(self, customization_args_dict):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
             customization_args: dict. The new customization_args to set.
         """
-        customization_args = InteractionInstance.convert_cust_args_from_dict(
-            self.interaction.id, customization_args)
+        customization_args = (
+            InteractionInstance.
+            convert_customization_args_dict_to_customization_args(
+                self.interaction.id,
+                customization_args_dict
+            )
+        )
 
-        if self.interaction.id:
+        if self.interaction.id is not None:
             # If interaction id is None, content_id's have already been removed
             # in update_interaction_id.
             old_content_id_list = []
             new_content_id_list = []
 
-            old_content_id_list.extend(
-                self.interaction.get_all_content_ids_in_cust_args())
+            for ca_name in self.interaction.customization_args:
+                old_content_id_list.extend(
+                    self.interaction.customization_args[
+                        ca_name].get_content_ids()
+                )
+
+            for ca_name in customization_args:
+                new_content_id_list.extend(
+                    customization_args[ca_name].get_content_ids())
 
             self.interaction.customization_args = customization_args
-            new_content_id_list.extend(
-                self.interaction.get_all_content_ids_in_cust_args())
-
             self._update_content_ids_in_assets(
                 old_content_id_list, new_content_id_list)
         else:

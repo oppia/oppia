@@ -669,9 +669,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
 
-        # Make sure previous interaction is valid before calling
-        #   update_interaction_id.
-        interaction.id = 'TextInput'
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
@@ -1054,14 +1051,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1083,14 +1080,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1106,14 +1103,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>New state translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>New State translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1134,14 +1131,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': True
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1163,19 +1160,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi-en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     },
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
@@ -1193,12 +1190,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_get_content_count(self):
-        # Adds 2 to content count to exploration.
+        # Adds 2 to content count to exploration (content, default_outcome).
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_content_count(), 2)
 
-        # Adds 2 to content count to exploration.
+        # Adds 2 to content count to exploration (content default_outcome).
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
 
@@ -1225,7 +1222,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-        # Adds 1 to content count to exploration.
+        # Adds 1 to content count to exploration (feedback_1).
         init_state.update_interaction_answer_groups([answer_group_dict])
 
         hints_list = [
@@ -1233,7 +1230,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
             )
         ]
-        # Adds 1 to content count to exploration.
+        # Adds 1 to content count to exploration (hint_1).
         init_state.update_interaction_hints(hints_list)
 
         solution_dict = {
@@ -1246,7 +1243,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
-        # Adds 1 to content count to exploration.
+        # Adds 1 to content count to exploration (solution).
         init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 7)

@@ -136,13 +136,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation content-en</p>',
                         'needs_update': True
                     },
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation content-hi</p>',
                         'needs_update': False
@@ -150,14 +150,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'custarg_choices_0': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_0-hi'
                              '</p>'),
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_0'
                              '-en</p>'),
@@ -166,14 +166,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'custarg_choices_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_1-hi'
                              '</p>'),
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_1-en'
                              '</p>'),
@@ -182,14 +182,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'custarg_choices_2': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_2-hi'
                              '</p>'),
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_2-en'
                              '</p>'),
@@ -198,14 +198,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'custarg_choices_3': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_3-hi'
                              '</p>'),
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             ('<p>state written_translation custarg_choices_3-en'
                              '</p>'),
@@ -214,13 +214,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation outcome-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation outcome-en</p>',
                         'needs_update': False
@@ -228,13 +228,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'feedback_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation feedback-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation feedback-en</p>',
                         'needs_update': False
@@ -242,13 +242,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'hint_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation hint_1-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation hint_1-en</p>',
                         'needs_update': False
@@ -256,13 +256,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'solution': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation solution-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation':
                             '<p>state written_translation solution-en</p>',
                         'needs_update': False
@@ -412,10 +412,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'custarg_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        }
 
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
         state.update_interaction_answer_groups(
             [state_answer_group_dict])
         state.update_interaction_default_outcome(state_default_outcome)
@@ -1193,7 +1203,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
@@ -3093,7 +3103,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
@@ -3175,14 +3185,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'hint_2': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
                 'hint_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>Test1!</p>',
                         'needs_update': True
                     }
@@ -3496,24 +3506,24 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'hello',
                         'needs_update': True
                     },
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'Testing!',
                         'needs_update': False
                     },
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3544,7 +3554,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
@@ -3565,7 +3575,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
@@ -3614,7 +3624,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'feedback_1': {
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3635,7 +3645,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3706,7 +3716,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     123: {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3726,7 +3736,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'ed': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': 'hello!',
                         'needs_update': False
                     }
@@ -3745,7 +3755,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
@@ -3783,7 +3793,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
@@ -3803,7 +3813,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'type': 'html',
+                        'data_format': 'html',
                         'translation': '<p>hello!</p>',
                         'needs_update': True
                     }

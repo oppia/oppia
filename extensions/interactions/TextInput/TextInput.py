@@ -51,8 +51,7 @@ class TextInput(base.BaseInteraction):
             'type': 'custom',
             'obj_type': 'SubtitledUnicode'
         },
-        'default_value': {
-            'content_id': '', 'unicode_str': ''}
+        'default_value': {'content_id': '', 'unicode_str': ''}
     }, {
         'name': 'rows',
         'description': 'Height (in rows)',

@@ -231,9 +231,7 @@
             "add_element_text": "Add item for selection"
           }
         },
-        "default_value": [
-          {"content_id": "", "html": ""}
-        ]
+        "default_value": [{"content_id": "", "html": ""}]
       }
     ],
     "is_terminal": false,
@@ -451,7 +449,7 @@
         },
         "default_value": {
           "content_id": "",
-          "unicode_str": "Add item"
+          "unicode_str": "Add Item"
         }
       }
     ],
@@ -681,7 +679,7 @@
     "customization_arg_specs": [
       {
         "description": "The initial code",
-        "name": "initial_code",
+        "name": "initialCode",
         "schema": {
           "type": "unicode",
           "ui_config": {

@@ -122,6 +122,26 @@ class UnicodeString(BaseObject):
     }
 
 
+class SubtitledUnicode(BaseObject):
+    """SubtitledUnicode class."""
+
+    description = 'An Subtitled string.'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'unicode_str',
+            'schema': UnicodeString.SCHEMA,
+        }, {
+            'name': 'content_id',
+            'schema': UnicodeString.SCHEMA,
+            'validators': [{
+                'id': 'is_nonempty'
+            }]
+        }]
+    }
+
+
 class Html(BaseObject):
     """HTML string class."""
 
@@ -129,6 +149,26 @@ class Html(BaseObject):
 
     SCHEMA = {
         'type': 'html',
+    }
+
+
+class SubtitledHtml(BaseObject):
+    """SubtitledHtml class."""
+
+    description = 'An subtitled html string.'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'html',
+            'schema': Html.SCHEMA,
+        }, {
+            'name': 'unicode_str',
+            'schema': UnicodeString.SCHEMA,
+            'validators': [{
+                'id': 'is_nonempty'
+            }]
+        }]
     }
 
 

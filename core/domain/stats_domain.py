@@ -608,6 +608,12 @@ class Playthrough(python_utils.OBJECT):
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type))
 
+        self.issue_customization_args = (
+            customization_args_util.get_full_customization_args(
+                self.issue_customization_args,
+                issue.customization_arg_specs
+            )
+        )
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
@@ -738,6 +744,12 @@ class ExplorationIssue(python_utils.OBJECT):
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type))
 
+        self.issue_customization_args = (
+            customization_args_util.get_full_customization_args(
+                self.issue_customization_args,
+                issue.customization_arg_specs
+            )
+        )
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
@@ -847,6 +859,12 @@ class LearnerAction(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid action type: %s' % self.action_type)
 
+        self.action_customization_args = (
+            customization_args_util.get_full_customization_args(
+                self.action_customization_args,
+                action.customization_arg_specs
+            )
+        )
         customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)

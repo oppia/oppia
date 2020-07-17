@@ -57,12 +57,12 @@ def get_full_customization_args(customization_args, ca_specs):
 
 def validate_customization_args_and_values(
         item_name, item_type, customization_args,
-        ca_specs_to_validate_against, populate_missing_keys=True):
+        ca_specs_to_validate_against):
     """Validates the given `customization_args` dict against the specs set
     out in 'ca_specs_to_validate_against'. 'item_name' and 'item_type' are
     used to populate any error messages that arise during validation.
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys. It also normalizes any HTML in the
+    extra keys. It also normalizes any HTML in the
     customization_args dict.
 
     Args:
@@ -94,12 +94,6 @@ def validate_customization_args_and_values(
             % customization_args)
 
     # Validate and clean up the customization args.
-
-    # Populate missing keys with the default values.
-    if populate_missing_keys:
-        customization_args = get_full_customization_args(
-            customization_args, ca_specs_to_validate_against)
-
     # Remove extra keys.
     extra_args = []
     for arg_name in customization_args.keys():
@@ -116,11 +110,17 @@ def validate_customization_args_and_values(
 
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
+        if ca_spec.name not in customization_args:
+            raise Exception(
+                'Customization argument is missing key: %s' % ca_spec.name)
         try:
+            # Use apply_custom_validators=False here so that SubtitledHtml's
+            # html properly gets validated.
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
                     customization_args[ca_spec.name]['value'],
-                    ca_spec.schema))
+                    ca_spec.schema,
+                    apply_custom_validators=False))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are
             # not involved (If they are, can we get sample values for the
