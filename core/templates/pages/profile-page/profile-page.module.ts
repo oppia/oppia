@@ -78,7 +78,7 @@ export class ProfilePageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ProfilePageNavbarComponent } from './profile-page-navbar.directive';
+import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
