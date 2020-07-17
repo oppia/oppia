@@ -31,11 +31,11 @@ describe('Registration Session Expired Modal Controller', function() {
   };
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+    $provide.value('$window', mockWindow);
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $q = $injector.get('$q');
