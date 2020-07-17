@@ -35,6 +35,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
+
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -78,7 +80,6 @@ export class ProfilePageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
