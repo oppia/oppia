@@ -115,6 +115,10 @@ class Registry(python_utils.OBJECT):
         """Returns a dict containing the full specs of each interaction for the
         given state version, if available.
 
+        Returns:
+            dict. The full specs of each interaction for the given state
+            version.
+
         Raises:
             Exception: No interaction specs json file found for state version.
         """

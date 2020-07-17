@@ -2552,13 +2552,11 @@ class Exploration(python_utils.OBJECT):
                                     subtitled_dict_key: default_value
                                 }
                             }
-                    elif (
-                        schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                        (schema['items']['type'] ==
-                         schema_utils.SCHEMA_TYPE_CUSTOM) and
-                        (schema['items']['obj_type'] ==
-                         schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
-                    ):
+                    elif (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                            (schema['items']['type'] ==
+                            schema_utils.SCHEMA_TYPE_CUSTOM) and
+                            (schema['items']['obj_type'] ==
+                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
                         # Case where cust arg value is a list of strings, and
                         # needs to be migrated to a list of SubtitledHtml dicts.
                         value = ca[ca_name]['value'] if ca_name in ca else ['']
@@ -2583,10 +2581,10 @@ class Exploration(python_utils.OBJECT):
 
                 (customization_args_util
                  .validate_customization_args_and_values(
-                    'interaction',
-                    interaction_id,
-                    ca,
-                    ca_specs)
+                     'interaction',
+                     interaction_id,
+                     ca,
+                     ca_specs)
                 )
 
             state_dict['next_content_id_index'] = next_content_id_index

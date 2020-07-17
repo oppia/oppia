@@ -176,10 +176,10 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             schema_obj_type = schema.get('obj_type')
 
             if (
-                (schema_obj_type ==
-                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
-                (schema_obj_type ==
-                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                    (schema_obj_type ==
+                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
+                    (schema_obj_type ==
+                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
             ):
                 self.assertIsNone(value['content_id'])
             elif schema_type == schema_utils.SCHEMA_TYPE_LIST:

@@ -874,7 +874,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
     """Object representing an interaction's customization argument.
     Any SubtitledHtml or SubtitledUnicode values in the customization argument
     value are represented as their respective domain objects here, rather than a
-    SubtitledHtml dict or SubtitledUnicode dict. 
+    SubtitledHtml dict or SubtitledUnicode dict.
     """
 
     def to_customization_arg_dict(self):

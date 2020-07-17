@@ -1147,7 +1147,8 @@ tags: []
             assigning to the current value.
 
             Args:
-                value: *. The current traversed value in customization arguments.
+                value: *. The current traversed value in customization
+                    arguments.
                 schema: dict. The current traversed schema.
                 contentId: str. The content_id generated so far.
             """
@@ -1155,10 +1156,10 @@ tags: []
             schema_obj_type = schema.get('obj_type')
 
             if (
-                (schema_obj_type ==
-                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
-                (schema_obj_type ==
-                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                    (schema_obj_type ==
+                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
+                    (schema_obj_type ==
+                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
             ):
                 value['content_id'] = '%s_%i' % (
                     contentId, next_content_id_index_dict['value'])
