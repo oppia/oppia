@@ -17,7 +17,7 @@
  */
 
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').directive('loginRequiredMessage', [
   '$timeout', 'UrlInterpolationService', function(

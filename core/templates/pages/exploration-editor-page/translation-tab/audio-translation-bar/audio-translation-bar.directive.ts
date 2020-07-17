@@ -57,7 +57,7 @@ require('services/audio-player.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/id-generation.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 import WaveSurfer from 'wavesurfer.js';
 

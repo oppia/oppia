@@ -42,7 +42,7 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 

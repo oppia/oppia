@@ -45,7 +45,7 @@ require(
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/suggestions.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 

@@ -97,7 +97,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/messenger.service.ts');
 require('services/playthrough.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

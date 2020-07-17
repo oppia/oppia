@@ -28,6 +28,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
  * @fileoverview Service for user data.
  */
 
+interface IProfilePictureDataUrl {
+  'profile_picture_data_url': string
+}
+
+interface ILoginUrl {
+  'login_url': string
+}
+
  @Injectable({
    providedIn: 'root'
  })
@@ -72,8 +80,8 @@ export class UserService {
       this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
     if (userInfo.isLoggedIn()) {
-      this.http.get('/preferenceshandler/profile_picture').toPromise().then(
-        (response: any) => {
+      this.http.get<IProfilePictureDataUrl>('/preferenceshandler/profile_picture').toPromise().then(
+        (response) => {
           if (response.profile_picture_data_url) {
             profilePictureDataUrl = response.profile_picture_data_url;
           }
@@ -100,8 +108,8 @@ export class UserService {
     var urlParameters = {
       current_url: this.windowRef.nativeWindow.location.pathname
     };
-    this.http.get('/url_handler', {params: urlParameters}).toPromise().then(
-      (response: any) => {
+    this.http.get<ILoginUrl>('/url_handler', {params: urlParameters}).toPromise().then(
+      (response) => {
         successCallback(response.login_url);
       }
     );
@@ -113,7 +121,7 @@ export class UserService {
       successCallback(this.userCommunityRightsInfo);
     } else {
       this.http.get(this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
-        (response: any) => {
+        (response) => {
           this.userCommunityRightsInfo = response;
           successCallback(this.userCommunityRightsInfo);
         }

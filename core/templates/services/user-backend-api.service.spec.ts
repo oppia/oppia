@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { UserService } from './user.service';
+import { UserService } from './user-backend-api.service';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { CsrfTokenService } from './csrf-token.service';
@@ -243,7 +243,6 @@ describe('User Service', () => {
         pathname: 'home'
       }
     });
-    // Needs mock window object
     let loginUrl = '/login';
     let currentUrl = 'home';
     userService.getLoginUrlAsync().then((dataUrl: string) => {

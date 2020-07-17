@@ -33,7 +33,7 @@ require(
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

@@ -18,7 +18,7 @@
 
 require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').controller('CreateActivityModalController', [

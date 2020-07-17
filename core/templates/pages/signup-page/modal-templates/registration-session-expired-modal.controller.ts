@@ -16,7 +16,7 @@
  * @fileoverview Controller for registration session expired modal.
  */
 
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'RegistrationSessionExpiredModalController', [

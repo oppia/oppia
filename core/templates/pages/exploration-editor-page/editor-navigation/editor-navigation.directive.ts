@@ -33,7 +33,7 @@ require(
 require('services/context.service.ts');
 require('services/exploration-features.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('editorNavigation', [

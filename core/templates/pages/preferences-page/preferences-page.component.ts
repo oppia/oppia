@@ -33,7 +33,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/utils.service.ts');
 
 angular.module('oppia').component('preferencesPage', {

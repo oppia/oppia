@@ -20,7 +20,7 @@ require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),

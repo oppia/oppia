@@ -24,7 +24,7 @@ require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/utilities/browser-checker.service.ts');
 require('services/contextual/url.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {

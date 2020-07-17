@@ -25,7 +25,7 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 

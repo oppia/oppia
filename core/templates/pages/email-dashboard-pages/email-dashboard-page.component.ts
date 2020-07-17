@@ -18,7 +18,7 @@
 
 require('base-components/base-content.directive.ts');
 
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').component('emailDashboardPage', {
   template: require('./email-dashboard-page.component.html'),

@@ -21,7 +21,7 @@ require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require('components/summary-tile/collection-summary-tile.constants.ajs.ts');
 
