@@ -89,11 +89,12 @@ export class UserService{
               this.userInfo = 
                 this.userInfoObjectFactory.createFromBackendDict(
                   backendDict);
-              return Promise.resolve(this.userInfoObjectFactory.createFromBackendDict(
-                backendDict));
+              return Promise.resolve(this.userInfo);
             } else {
               return Promise.resolve(
-                this.userInfoObjectFactory.createDefault());
+                this.userInfoObjectFactory.createFromBackendDict(
+                  backendDict));
+                //this.userInfoObjectFactory.createDefault());
             }
       });
     }
