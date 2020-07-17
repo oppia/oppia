@@ -26,7 +26,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UrlService } from './contextual/url.service';
 
-describe('User Service', () => {
+fdescribe('User Service', () => {
   let userService: UserService = null;
   let urlInterpolationService: UrlInterpolationService = null;
   let userInfoObjectFactory: UserInfoObjectFactory = null;
