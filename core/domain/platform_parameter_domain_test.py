@@ -717,6 +717,26 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [],
+                    'value_when_matched': '111'
+                }
+            ],
+            'metadata': {
+                'is_feature': True,
+                'stage': 'dev',
+            }
+        })
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'must be bool'):
+            parameter.validate()
+
+    def test_validate_feature_flags_with_invalid_stage(self):
+        parameter = parameter_domain.PlatformParameter.create_from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
             'data_type': 'bool',
             'rules': [
                 {
@@ -914,6 +934,15 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
+    def test_create_platform_parameter_with_invalid_type(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Unsupported data type'):
+            parameter = parameter_domain.Registry.create_platform_parameter(
+                name='parameter_a',
+                description='test',
+                data_type='Invalid'
+            )
+
     def test_default_value_of_bool_platform_parameter(self):
         parameter = parameter_domain.Registry.create_platform_parameter(
             name='parameter_a',
@@ -948,6 +977,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             parameter_name)
         self.assertIsNotNone(parameter)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
+        # Get from memcache.
+        self.assertIsNotNone(
+            parameter_domain.Registry.get_platform_parameter(
+                parameter_name))
 
     def test_create_platform_parameter_with_the_same_name(self):
         parameter_name = 'parameter_a'

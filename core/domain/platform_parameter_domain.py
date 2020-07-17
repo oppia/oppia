@@ -733,7 +733,7 @@ class Registry(python_utils.OBJECT):
         elif data_type == 'string':
             default = ''
         else:
-            raise Exception('Unsupported data_type %s.' % data_type)
+            raise Exception('Unsupported data type %s.' % data_type)
         parameter_dict = {
             'name': name,
             'description': description,
