@@ -20,7 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
@@ -35,7 +35,6 @@ import { IInteractionRules, LearnerAnswerInfoService } from
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { State, StateObjectFactory } from 'domain/state/StateObjectFactory.ts';
-import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Learner answer info service', () => {
   let sof: StateObjectFactory = null;
