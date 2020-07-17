@@ -1295,8 +1295,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.states['State 2'].interaction.default_outcome.dest = 'END'
 
         # Ensure the other states have interactions.
-        exploration.states['Renamed state'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['Renamed state'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
 
         # Other miscellaneous requirements for validation.
         exploration.title = 'Title'
@@ -1313,7 +1315,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # default outcome or answer groups.
         exploration.rename_state('END', 'AnotherEnd')
         another_end_state = exploration.states['AnotherEnd']
-        another_end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(another_end_state, 'EndExploration')
         another_end_state.update_interaction_default_outcome(None)
         exploration.validate(strict=True)
 
@@ -1374,7 +1376,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'html': 'hello',
-                            'content_id': ''
+                            'content_id': None
                         }]
                     }
                 },
@@ -1414,7 +1416,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'html': '<p>hello</p>',
-                            'content_id': ''
+                            'content_id': None
                         }]
                     }
                 },
@@ -1455,7 +1457,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'html': '<p>hello</p>',
-                            'content_id': ''
+                            'content_id': None
                         }]
                     }
                 },
@@ -1496,7 +1498,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'html': '<p>hello</p>',
-                            'content_id': ''
+                            'content_id': None
                         }]
                     }
                 },
@@ -2167,7 +2169,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'placeholder': {
-                        'value': ''
+                        'value': {
+                            'content_id': 'custarg_placeholder_0',
+                            'unicode_str': ''
+                        }
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2223,7 +2228,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'placeholder': {
-                        'value': ''
+                        'value': {
+                            'content_id': 'custarg_placeholder_0',
+                            'unicode_str': ''
+                        }
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2788,7 +2796,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         hints_list = [
@@ -2842,7 +2850,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         # Solution should be set to None as default.
@@ -2893,7 +2901,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
-        init_state.update_interaction_id('Continue')
+        self.set_interaction_for_state(init_state, 'Continue')
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegexp(
@@ -2901,7 +2909,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'support soliciting answer details from learners.'):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         self.assertEqual(init_state.interaction.id, 'TextInput')
         self.assertEqual(init_state.solicit_answer_details, False)
         exploration.validate()

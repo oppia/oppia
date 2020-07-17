@@ -55,6 +55,8 @@ SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 
+SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
+SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
     """Validate the given object using the schema, normalizing if necessary.

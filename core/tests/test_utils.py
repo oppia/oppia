@@ -53,6 +53,7 @@ import main
 import main_mail
 import main_taskqueue
 import python_utils
+import schema_utils
 import utils
 
 from google.appengine.api import apiproxy_stub
@@ -1141,21 +1142,25 @@ tags: []
             'value': state.next_content_id_index
         }
 
-        def populateBlankContentIds(value, schema, contentId):
+        def populate_content_ids(value, schema, contentId):
             schema_type = schema['type']
             schema_obj_type = schema.get('obj_type')
 
-            if (schema_obj_type == 'SubtitledUnicode' or
-                    schema_obj_type == 'SubtitledHtml'):
+            if (
+                (schema_obj_type ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
+                (schema_obj_type ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+            ):
                 value['content_id'] = '%s_%i' % (
                     contentId, next_content_id_index_dict['value'])
                 next_content_id_index_dict['value'] += 1
-            elif schema_type == 'list':
+            elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
-                    populateBlankContentIds(x, schema['items'], contentId)
-            elif schema_type == 'dict':
+                    populate_content_ids(x, schema['items'], contentId)
+            elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
-                    populateBlankContentIds(
+                    populate_content_ids(
                         x[schema_property.name],
                         schema_property['schema'],
                         '%s_%s' % (contentId, schema_property.name)
@@ -1169,7 +1174,7 @@ tags: []
         for ca_spec in ca_specs:
             ca_name = ca_spec.name
             ca_value = ca_spec.default_value
-            populateBlankContentIds(
+            populate_content_ids(
                 ca_value,
                 ca_spec.schema,
                 'custarg_%s' % ca_name

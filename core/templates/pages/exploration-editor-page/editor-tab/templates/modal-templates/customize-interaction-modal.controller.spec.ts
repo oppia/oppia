@@ -20,6 +20,7 @@ import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { TestBed } from '@angular/core/testing';
+
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
@@ -29,22 +30,29 @@ import { StateCustomizationArgsService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
 
-describe('Customize Interaction Modal Controller', function() {
+fdescribe('Customize Interaction Modal Controller', function() {
   var $injector = null;
   var $scope = null;
   var $uibModalInstance = null;
   var imageClickInputValidationService = null;
   var editorFirstTimeEventsService = null;
   var interactionDetailsCacheService = null;
+  var interactionObjectFactory = null;
   var stateCustomizationArgsService = null;
   var stateEditorService = null;
   var stateInteractionIdService = null;
+  var stateNextContentIdIndexService = null;
 
   var stateName = 'Introduction';
 
@@ -56,9 +64,12 @@ describe('Customize Interaction Modal Controller', function() {
       ImageClickInputValidationService);
     interactionDetailsCacheService = TestBed.get(
       InteractionDetailsCacheService);
+    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateEditorService = TestBed.get(StateEditorService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
+    stateNextContentIdIndexService = TestBed.get(
+      StateNextContentIdIndexService);
   });
 
   describe('when state editor is in question mode', function() {
@@ -83,9 +94,11 @@ describe('Customize Interaction Modal Controller', function() {
         EditorFirstTimeEventsService: editorFirstTimeEventsService,
         imageClickInputValidationService: imageClickInputValidationService,
         InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
-        StateInteractionIdService: stateInteractionIdService
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService
       });
     }));
 
@@ -308,6 +321,7 @@ describe('Customize Interaction Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService

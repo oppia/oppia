@@ -227,9 +227,28 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp.has_state_name('Introduction'), True)
         self.assertEqual(exp.has_state_name('Fake state name'), False)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
+            self.owner_id,
+            self.EXP_0_ID,
+            _get_change_list(
                 'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput') +
+            _get_change_list(
+                'Introduction',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'custarg_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'custarg_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }),
+            ''
+        )
         self.assertEqual(exp_services.get_interaction_id_for_state(
             self.EXP_0_ID, 'Introduction'), 'MultipleChoiceInput')
         with self.assertRaisesRegexp(
@@ -1413,9 +1432,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_content(
             state_domain.SubtitledHtml.from_dict(content3_dict))
 
-        state1.update_interaction_id('ImageClickInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-        state3.update_interaction_id('ItemSelectionInput')
+        self.set_interaction_for_state(state1, 'ImageClickInput')
+        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
+        self.set_interaction_for_state(state3, 'ItemSelectionInput')
 
         customization_args_dict1 = {
             'highlightRegionsOnHover': {'value': True},
@@ -1454,7 +1473,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
-            }]}
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
             'choices': {'value': [{
@@ -1484,7 +1504,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
-            }]}
+            }]},
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 5}
         }
         state1.update_interaction_customization_args(customization_args_dict1)
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -1639,7 +1661,13 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value:
+            content_id: custarg_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: %s
         feedback:
@@ -1652,16 +1680,18 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
   New state:
     classifier_model_id: null
@@ -1733,7 +1763,13 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value:
+            content_id: custarg_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: %s
         feedback:
@@ -1746,16 +1782,18 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 0
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
+        custarg_placeholder_0: {}
         default_outcome: {}
   Renamed state:
     classifier_model_id: null
@@ -2046,7 +2084,13 @@ content:
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
-  customization_args: {}
+  customization_args:
+    placeholder:
+      value:
+        content_id: custarg_placeholder_0
+        unicode_str: ''
+    rows:
+      value: 1
   default_outcome:
     dest: %s
     feedback:
@@ -2059,16 +2103,18 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-next_content_id_index: 0
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
     content: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
+    custarg_placeholder_0: {}
     default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -2493,9 +2539,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
+            self.owner_id,
+            self.EXP_0_ID,
+            _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'custarg_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'custarg_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }),
+            '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
@@ -2511,21 +2575,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {'choices': {'value': [
-                    {
-                        'content_id': 'custarg_choices_0',
-                        'html': '<p>Option A</p>'
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'custarg_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'custarg_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
                     },
-                    {
-                        'content_id': 'custarg_choices_1',
-                        'html': '<p>Option B</p>'
-                    }
-                ]}}),
+                    'showChoicesInShuffledOrder': {'value': False}
+                }),
             '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         choices = exploration.init_state.interaction.customization_args[
-            'choices']['value']
+            'choices'].value
         self.assertEqual(choices[0].html, '<p>Option A</p>')
         self.assertEqual(choices[0].content_id, 'custarg_choices_0')
         self.assertEqual(choices[1].html, '<p>Option B</p>')
@@ -2538,10 +2604,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
-            })] + _get_change_list(
+            })] +
+            _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'TextInput'),
+                'TextInput') +
+            _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'custarg_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                }),
             'Add state name')
 
         self.interaction_default_outcome['dest'] = 'State 2'
@@ -2570,10 +2649,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
-            })] + _get_change_list(
+            })] + 
+            _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'TextInput'),
+                'TextInput') +
+            _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'custarg_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                }),
             'Add state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -2583,6 +2675,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'custarg_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'custarg_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }) +
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -2617,6 +2724,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'custarg_choices_0',
+                                'html': '<p>Option A</p>'
+                            }, {
+                                'content_id': 'custarg_choices_1',
+                                'html': '<p>Option B</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': False}
+                    }) +
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -2769,7 +2891,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'needs_update': True
                     }
                 },
-                'default_outcome': {}
+                'default_outcome': {},
+                'custarg_placeholder_0': {}
             }
         }
         exp_services.update_exploration(
@@ -3080,6 +3203,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'custarg_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
         })]
         exp_services.update_exploration(
             'second_committer_id', exploration.id, change_list,
@@ -3155,6 +3292,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'custarg_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
         })]
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Added new state')

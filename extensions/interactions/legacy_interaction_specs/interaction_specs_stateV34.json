@@ -129,8 +129,7 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "custom",
-            "obj_type": "SubtitledHtml",
+            "type": "html",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to drag and drop."
@@ -148,10 +147,7 @@
           }
         },
         "default_value": [
-          {
-            "content_id": null,
-            "html": ""
-          }
+          ""
         ]
       },
       {
@@ -219,8 +215,7 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "custom",
-            "obj_type": "SubtitledHtml",
+            "type": "html",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Sample item answer"
@@ -231,7 +226,9 @@
             "add_element_text": "Add item for selection"
           }
         },
-        "default_value": [{"content_id": null, "html": ""}]
+        "default_value": [
+          ""
+        ]
       }
     ],
     "is_terminal": false,
@@ -261,13 +258,9 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": "Continue"
-        }
+        "default_value": "Continue"
       }
     ],
     "is_terminal": false,
@@ -444,13 +437,9 @@
         "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": "Add Item"
-        }
+        "default_value": "Add item"
       }
     ],
     "is_terminal": false,
@@ -626,8 +615,7 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "custom",
-            "obj_type": "SubtitledHtml",
+            "type": "html",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to select"
@@ -644,10 +632,9 @@
             "add_element_text": "Add multiple choice option"
           }
         },
-        "default_value": [{
-          "content_id": null,
-          "html": ""
-        }]
+        "default_value": [
+          ""
+        ]
       }, {
         "name": "showChoicesInShuffledOrder",
         "description": "Shuffle answer choices",
@@ -679,7 +666,7 @@
     "customization_arg_specs": [
       {
         "description": "The initial code",
-        "name": "initialCode",
+        "name": "initial_code",
         "schema": {
           "type": "unicode",
           "ui_config": {
@@ -719,13 +706,9 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": ""
-        }
+        "default_value": ""
       },
       {
         "description": "Height (in rows)",
@@ -949,13 +932,9 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": ""
-        }
+        "default_value": ""
       }
     ],
     "is_terminal": false,

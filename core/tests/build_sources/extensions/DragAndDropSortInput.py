@@ -64,7 +64,10 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'add_element_text': 'Add a new item',
             }
         },
-        'default_value': [{'content_id': '', 'html': ''}],
+        'default_value': [{
+            'content_id': None,
+            'html': ''
+        }],
     }]
 
     _answer_visualization_specs = []

@@ -38,7 +38,7 @@ describe('Written Translations Object Factory', () => {
         translations_mapping: {
           content_1: {
             'hi-en': {
-              type: 'html',
+              data_format: 'html',
               translation: '',
               needs_update: false
             }
@@ -53,7 +53,7 @@ describe('Written Translations Object Factory', () => {
         translations_mapping: {
           content_1: {
             'hi-en': {
-              type: 'html',
+              data_format: 'html',
               translation: '',
               needs_update: false
             }
@@ -110,7 +110,7 @@ describe('Written Translations Object Factory', () => {
           translations_mapping: {
             content_1: {
               'hi-en': {
-                type: 'html',
+                data_format: 'html',
                 translation: '<p>This is the old HTML</p>',
                 needs_update: false
               }
@@ -125,7 +125,7 @@ describe('Written Translations Object Factory', () => {
       expect(writtenTranslationsBackendDict.getWrittenTranslation(
         'content_1', 'hi-en')).toEqual(
         writtenTranslationObjectFactory.createFromBackendDict({
-          type: 'html',
+          data_format: 'html',
           translation: '<p>This is the new HTML</p>',
           needs_update: false
         }));
@@ -144,7 +144,7 @@ describe('Written Translations Object Factory', () => {
     expect(writtenTranslationsBackendDict.getWrittenTranslation(
       'content_1', 'hi-en')).toEqual(
       writtenTranslationObjectFactory.createFromBackendDict({
-        type: 'html',
+        data_format: 'html',
         translation: '',
         needs_update: true
       }));
@@ -156,7 +156,7 @@ describe('Written Translations Object Factory', () => {
     expect(writtenTranslationsBackendDict.getWrittenTranslation(
       'content_1', 'hi-en')).toEqual(
       writtenTranslationObjectFactory.createFromBackendDict({
-        type: 'html',
+        data_format: 'html',
         translation: '',
         needs_update: false
       }));
@@ -171,12 +171,12 @@ describe('Written Translations Object Factory', () => {
           translations_mapping: {
             content_1: {
               'hi-en': {
-                type: 'html',
+                data_format: 'html',
                 translation: 'This is the old HTML',
                 needs_update: false
               },
               en: {
-                type: 'html',
+                data_format: 'html',
                 translation: '',
                 needs_update: false
               }
@@ -189,14 +189,14 @@ describe('Written Translations Object Factory', () => {
       expect(writtenTranslationsBackendDict.getWrittenTranslation(
         'content_1', 'hi-en')).toEqual(
         writtenTranslationObjectFactory.createFromBackendDict({
-          type: 'html',
+          data_format: 'html',
           translation: 'This is the old HTML',
           needs_update: true
         }));
       expect(writtenTranslationsBackendDict.getWrittenTranslation(
         'content_1', 'en')).toEqual(
         writtenTranslationObjectFactory.createFromBackendDict({
-          type: 'html',
+          data_format: 'html',
           translation: '',
           needs_update: true
         }));

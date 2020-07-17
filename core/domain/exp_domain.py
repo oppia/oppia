@@ -38,8 +38,10 @@ from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
+from extensions import domain
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -2118,7 +2120,9 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.convert_to_textangular)
+                state_dict,
+                html_validation_service.convert_to_textangular,
+                old_interaction_customization_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2136,7 +2140,9 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.add_caption_attr_to_image)
+                state_dict,
+                html_validation_service.add_caption_attr_to_image,
+                old_interaction_customization_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2154,7 +2160,8 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.convert_to_ckeditor)
+                state_dict, html_validation_service.convert_to_ckeditor,
+                old_interaction_customization_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2177,7 +2184,8 @@ class Exploration(python_utils.OBJECT):
                 exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
-                add_dimensions_to_image_tags)
+                add_dimensions_to_image_tags,
+                old_interaction_customization_args_schema=True)
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
@@ -2443,7 +2451,8 @@ class Exploration(python_utils.OBJECT):
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_validation_service.add_math_content_to_math_rte_components)
+                html_validation_service.add_math_content_to_math_rte_components,
+                old_interaction_customization_args_schema=True)
 
         return states_dict
 
@@ -2453,7 +2462,10 @@ class Exploration(python_utils.OBJECT):
         for interaction customization arguments. This migration converts
         customization arguments whose schemas have been changed from unicode to
         SubtitledUnicode or html to SubtitledHtml. It also populates missing
-        customization argument keys on all interactions.
+        customization argument keys on all interactions, removes extra
+        customization arguments, normalizes customization arguments against
+        its schema, and changes PencilCodeEditor's customization argument
+        name from initial_code to initialCode.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2485,9 +2497,16 @@ class Exploration(python_utils.OBJECT):
             interaction_id = state_dict['interaction']['id']
             if interaction_id is not None:
                 ca = state_dict['interaction']['customization_args']
-                ca_specs = interaction_registry.Registry.get_interaction_by_id(
-                    interaction_id
-                ).customization_arg_specs
+                ca_specs = [
+                    domain.CustomizationArgSpec(
+                        x['name'],
+                        x['description'],
+                        x['schema'],
+                        x['default_value']
+                    ) for x in (interaction_registry.Registry
+                        .get_all_specs_for_state_version(35)[
+                        interaction_id]['customization_arg_specs'])
+                ]
 
                 if (interaction_id == 'PencilCodeEditor' and
                         'initial_code' in ca):
@@ -2531,9 +2550,13 @@ class Exploration(python_utils.OBJECT):
                                     subtitled_dict_key: default_value
                                 }
                             }
-                    elif (schema['type'] == 'list' and
-                          schema['items']['type'] == 'custom' and
-                          schema['items']['obj_type'] == 'SubtitledHtml'):
+                    elif (
+                        schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                        (schema['items']['type'] ==
+                            schema_utils.SCHEMA_TYPE_CUSTOM) and
+                        (schema['items']['obj_type'] ==
+                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+                    ):
                         # Case where cust arg value is a list of strings, and
                         # needs to be migrated to a list of SubtitledHtml dicts.
                         value = ca[ca_name]['value'] if ca_name in ca else ['']
@@ -2555,14 +2578,15 @@ class Exploration(python_utils.OBJECT):
                         ca[ca_name] = {'value': ca_spec.default_value}
 
                     all_new_content_ids.extend(new_content_ids)
-                    (customization_args_util
-                        .validate_customization_args_and_values(
-                            'interaction',
-                            interaction_id,
-                            ca,
-                            ca_specs
-                        )
+
+                (customization_args_util
+                    .validate_customization_args_and_values(
+                        'interaction',
+                        interaction_id,
+                        ca,
+                        ca_specs
                     )
+                )
 
             state_dict['next_content_id_index'] = next_content_id_index
             for new_content_id in all_new_content_ids:

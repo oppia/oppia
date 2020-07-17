@@ -461,7 +461,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid character / in a state name')
 
         new_state = state_domain.State.create_default_state('ABC')
-        new_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(new_state, 'TextInput')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -541,8 +541,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'destination DEF is not a valid')
 
         # Restore a valid exploration.
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+          exploration.states[exploration.init_state_name], 'TextInput')
         answer_group.outcome.dest = exploration.init_state_name
         exploration.validate()
 
@@ -669,7 +669,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
 
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
+        valid_text_input_cust_args = init_state.interaction.customization_args
         exploration.validate()
 
         interaction.customization_args = []
@@ -680,12 +681,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
-        init_state.update_interaction_customization_args({'placeholder': {
-            'value': {
-                'content_id': 'custarg_placeholder',
-                'unicode_str': ''
-            }
-        }})
+        interaction.customization_args = valid_text_input_cust_args
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         interaction.answer_groups = {}
@@ -693,18 +690,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected answer groups to be a list')
 
         interaction.answer_groups = answer_groups
-        init_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
-        init_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
@@ -715,7 +712,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Restore a valid exploration.
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         answer_groups_list = [
             answer_group.to_dict() for answer_group in answer_groups]
         init_state.update_interaction_answer_groups(answer_groups_list)
@@ -817,8 +814,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.State.create_default_state(
                     exploration.init_state_name))
         }
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+          exploration.states[exploration.init_state_name], 'TextInput')
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -850,7 +847,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
@@ -1199,7 +1196,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
 
-        init_state.update_interaction_id('TextInput')
+        # Adds 1 to content count to exploration (custarg_placeholder_0)
+        self.set_interaction_for_state(init_state, 'TextInput')
 
         answer_group_dict = {
             'outcome': {
@@ -1246,13 +1244,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Adds 1 to content count to exploration (solution).
         init_state.update_interaction_solution(solution)
 
-        self.assertEqual(exploration.get_content_count(), 7)
+        self.assertEqual(exploration.get_content_count(), 8)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1275,7 +1273,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1614,7 +1612,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['End'])
         end_state = exploration.states['End']
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         with self.assertRaisesRegexp(
@@ -6426,8 +6424,6 @@ states:
           value: ''
         preCode:
           value: ''
-        rows:
-          value: 1
       default_outcome:
         dest: END
         feedback:
@@ -6928,12 +6924,8 @@ states:
           value:
             content_id: custarg_customPlaceholder_0
             unicode_str: ''
-        placeholder:
-          value: ''
         requireSimplestForm:
           value: false
-        rows:
-          value: 1
       default_outcome:
         dest: END
         feedback:
@@ -7118,10 +7110,6 @@ states:
         imageAndRegions:
           value:
             imagePath: s1ImagePath_height_120_width_120.png
-        placeholder:
-          value: ''
-        rows:
-          value: 1
       default_outcome:
         dest: END
         feedback:
@@ -8281,15 +8269,15 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_content(
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
-        state1.update_interaction_id('TextInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-        state3.update_interaction_id('ItemSelectionInput')
-        state4.update_interaction_id('DragAndDropSortInput')
+        self.set_interaction_for_state(state1, 'TextInput')
+        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
+        self.set_interaction_for_state(state3, 'ItemSelectionInput')
+        self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
         customization_args_dict1 = {
             'placeholder': {
                 'value': {
-                    'content_id': '',
+                    'content_id': None,
                     'unicode_str': '<p>This is value1 for MultipleChoice</p>'
                 }
             },
@@ -8298,11 +8286,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict2 = {
             'choices': {'value': [
                 {
-                    'content_id': '',
+                    'content_id': None,
                     'html': '<p>This is value1 for MultipleChoice</p>'
                 },
                 {
-                    'content_id': '',
+                    'content_id': None,
                     'html': '<p>This is value2 for MultipleChoice</p>'
                 }
             ]},
@@ -8311,30 +8299,33 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict3 = {
             'choices': {'value': [
                 {
-                    'content_id': '',
+                    'content_id': None,
                     'html': '<p>This is value1 for ItemSelection</p>'
                 },
                 {
-                    'content_id': '',
+                    'content_id': None,
                     'html': '<p>This is value2 for ItemSelection</p>'
                 },
                 {
-                    'content_id': '',
+                    'content_id': None,
                     'html': '<p>This is value3 for ItemSelection</p>'
                 }
-            ]}
+            ]},
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 2}
         }
         customization_args_dict4 = {
             'choices': {'value': [
                 {
-                    'content_id': '',
+                    'content_id': None,
                     'html': '<p>This is value1 for DragAndDropSortInput</p>'
                 },
                 {
-                    'content_id': '',
+                    'content_id': None,
                     'html': '<p>This is value2 for DragAndDropSortInput</p>'
                 }
-            ]}
+            ]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         state1.update_interaction_customization_args(customization_args_dict1)

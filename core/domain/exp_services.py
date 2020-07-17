@@ -1445,7 +1445,7 @@ def get_image_filenames_from_exploration(exploration):
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
-                'imageAndRegions']['value']['imagePath'])
+                'imageAndRegions'].value['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
     filenames.extend(

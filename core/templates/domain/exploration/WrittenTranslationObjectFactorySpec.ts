@@ -26,7 +26,7 @@ describe('WrittenTranslation object factory', () => {
   beforeEach(() => {
     wtof = new WrittenTranslationObjectFactory();
     writtenTranslation = wtof.createFromBackendDict({
-      type: 'html',
+      data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
     });
@@ -34,7 +34,7 @@ describe('WrittenTranslation object factory', () => {
 
   it('should set and get translation value correctly', () => {
     expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-      type: 'html',
+      data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
     }));
@@ -42,7 +42,7 @@ describe('WrittenTranslation object factory', () => {
     writtenTranslation.setHtml('<p>New HTML</p>');
     expect(writtenTranslation.getHtml()).toEqual('<p>New HTML</p>');
     expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-      type: 'html',
+      data_format: 'html',
       translation: '<p>New HTML</p>',
       needs_update: false
     }));
@@ -50,7 +50,7 @@ describe('WrittenTranslation object factory', () => {
 
   it('should throw error if the wrong getter is used', () => {
     writtenTranslation = wtof.createFromBackendDict({
-      type: 'unicode',
+      data_format: 'unicode',
       translation: 'unicode',
       needs_update: false
     });
@@ -61,7 +61,7 @@ describe('WrittenTranslation object factory', () => {
 
   it('should throw error if the wrong setter is used', () => {
     writtenTranslation = wtof.createFromBackendDict({
-      type: 'unicode',
+      data_format: 'unicode',
       translation: 'unicode',
       needs_update: false
     });
@@ -73,13 +73,13 @@ describe('WrittenTranslation object factory', () => {
   it('should correctly mark written translation as needing update',
     () => {
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-        type: 'html',
+        data_format: 'html',
         translation: '<p>HTML</p>',
         needs_update: false
       }));
       writtenTranslation.markAsNeedingUpdate();
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-        type: 'html',
+        data_format: 'html',
         translation: '<p>HTML</p>',
         needs_update: true
       }));
@@ -87,20 +87,20 @@ describe('WrittenTranslation object factory', () => {
 
   it('should toggle needs update attribute correctly', () => {
     expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-      type: 'html',
+      data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
     }));
     writtenTranslation.toggleNeedsUpdateAttribute();
     expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-      type: 'html',
+      data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: true
     }));
 
     writtenTranslation.toggleNeedsUpdateAttribute();
     expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-      type: 'html',
+      data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
     }));
@@ -108,7 +108,7 @@ describe('WrittenTranslation object factory', () => {
 
   it('should convert to backend dict correctly', () => {
     expect(writtenTranslation.toBackendDict()).toEqual({
-      type: 'html',
+      data_format: 'html',
       translation: '<p>HTML</p>',
       needs_update: false
     });
@@ -117,7 +117,7 @@ describe('WrittenTranslation object factory', () => {
   it('should create a new written translation translation', () => {
     expect(wtof.createNewHtml('New')).toEqual(
       wtof.createFromBackendDict({
-        type: 'html',
+        data_format: 'html',
         translation: 'New',
         needs_update: false
       })
