@@ -185,8 +185,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
           });
         TopicRightsBackendApiService.fetchTopicRights(
           topicId).then(function(TopicRightsObject) {
-          _updateTopicRights(TopicRightsObject);
           _topicIsLoading = false;
+          _updateTopicRights(TopicRightsObject);
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the service is migrated to angular.
           $rootScope.$apply();
