@@ -46,6 +46,21 @@ var AdminPage = function() {
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
 
+  // Adding a new community reviewer.
+  var addReviewerName = element(by.css('.protractor-add-reviewer-name'));
+  var selectReviewerRole = element(by.css('.protractor-select-reviewer-role'));
+  var addReviewerFormSubmit = element(by.css(
+    '.protractor-add-reviewer-form-submit'));
+
+  // Viewing community reviewers by role.
+  var reviewerRoleDropdown = element(by.css(
+    '.protractor-test-reviewer-role-method'));
+  var reviewerRoleValueOption = element(by.css(
+    '.protractor-test-reviewer-role-value'));
+  var viewReviewerRoleButton = element(by.css(
+    '.protractor-test-reviewer-role-success'));
+
+
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
@@ -272,6 +287,51 @@ var AdminPage = function() {
       expect(name).toEqual(expectedUsernamesArray[j]);
     }
   };
+
+  this.addReviewer = async function(name, newRole) {
+    await waitFor.elementToBeClickable(
+      adminRolesTab, 'Admin Roles tab is not clickable');
+    await adminRolesTab.click();
+
+    // Change values for "add reviewer for community" form, and submit it.
+    await waitFor.visibilityOf(
+      addReviewerName, 'Add reviewer name is not visible');
+    await addReviewerName.sendKeys(name);
+
+    var roleOption = selectReviewerRole.element(
+      by.cssContainingText('option', newRole));
+    await waitFor.visibilityOf(
+      roleOption, 'Reviewer role option is not visible');
+    await roleOption.click();
+
+    await addReviewerFormSubmit.click();
+    await waitFor.visibilityOf(
+      statusMessage, 'Confirmation message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, 'Successfully added ',
+      'Could not add reviewer successfully');
+  };
+
+  this.getReviewersAssignedToRole = async function(role) {
+    await waitFor.visibilityOf(reviewerRoleDropdown,
+      'Reviewer role dropdown taking too long to be visible');
+    await reviewerRoleDropdown.sendKeys('By Role');
+
+    await reviewerRoleValueOption.click();
+    await reviewerRoleValueOption.sendKeys(role);
+
+    await viewReviewerRoleButton.click();
+  };
+
+this.expectReviewerUsernamesStrToMatch = async function(
+  expectedUsernamesArrayStr) {
+  // The usernames are displayed as a '[username1, username2]' string.
+  // This method will be updated after the ng-show works properly for this
+  // feature.
+  var reviewerUsernamesArrayStr = await element(
+    by.css('.protractor-test-reviewer-roles-result')).getText();
+  expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
+};
 };
 
 exports.AdminPage = AdminPage;
