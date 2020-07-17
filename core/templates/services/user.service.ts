@@ -101,8 +101,8 @@ export class UserService{
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
       return this.getUserInfoAsync().then(
-        (userInfo) => {
-          if (userInfo.isLoggedIn()){
+        (info) => {
+          if (info.isLoggedIn()){
             return this.http.get<IPreferencesBackendDict>(
               '/preferenceshandler/profile_picture'
             ).toPromise().then(
@@ -128,13 +128,11 @@ export class UserService{
         this.PREFERENCES_DATA_URL, putData).toPromise();
     }
     getLoginUrlAsync(): Promise<string> {
-      // let urlParameters = {
-      //   current_url: this.windowRef.nativeWindow.location.pathname
-      // };
-      const params = new HttpParams().set('current_url', 
-        this.windowRef.nativeWindow.location.pathname);
+      let urlParameters = {
+        current_url: this.windowRef.nativeWindow.location.pathname
+      };
       return this.http.get<IUrlBackendDict>('/url_handler', 
-        { params }).toPromise().then(
+        { params: urlParameters }).toPromise().then(
           (backendDict) => {
             return backendDict.login_url;
         });
