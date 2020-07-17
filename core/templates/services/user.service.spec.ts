@@ -12,75 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { TestBed, fakeAsync } from '@angular/core/testing';
+import { UserService } from './user.service';
+import { HttpTestingController, HttpClientTestingModule } from
+  '@angular/common/http/testing';
+import { CsrfTokenService } from './csrf-token.service';
+import { UserInfoObjectFactory, UserInfo } from
+  'domain/user/UserInfoObjectFactory';
+
 /**
  * @fileoverview Tests that the user service is working as expected.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// UserService.ts is upgraded to Angular 8.
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+describe('User Service', () => {
+  let userService: UserService = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService: CsrfTokenService;
+  let userInfoObjectFactory: UserInfoObjectFactory = null;
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/user.service.ts');
-
-describe('User Service', function() {
-  var UserService, $httpBackend, UrlInterpolationService;
-  var userInfoObjectFactory;
-  var CsrfService = null;
-  var UrlService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-    $provide.value('$window', {
-      location: {
-        pathname: 'home'
-      }
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
     });
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    UserService = $injector.get('UserService');
-    UrlInterpolationService = $injector.get(
-      'UrlInterpolationService');
-    UrlService = $injector.get(
-      'UrlService');
-    // The injector is required because this service is directly used in this
-    // spec, therefore even though UserInfoObjectFactory is upgraded to
-    // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected. Note that 'userInfoObjectFactory' is
-    // the injected service instance whereas 'UserInfoObjectFactory' is the
-    // service class itself. Therefore, use the instance instead of the class in
-    // the specs.
-    userInfoObjectFactory = $injector.get(
-      'UserInfoObjectFactory');
-    $httpBackend = $injector.get('$httpBackend');
-
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+    httpTestingController = TestBed.get(HttpTestingController);
+    userService = TestBed.get(UserService);
+    userInfoObjectFactory = TestBed.get(UserInfoObjectFactory);
+    csrfService = TestBed.get(CsrfTokenService);
+    spyOn(csrfService, 'getTokenAsync').and.callFake(function() {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
+      });
     });
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should return userInfo data', function() {
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should return userInfo data', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
+    let sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -90,12 +61,30 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: true
     };
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
+
+    let sampleUserInfo = this.userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
-    UserService.getUserInfoAsync().then(function(userInfo) {
+
+    // $httpBackend.expect('GET', '/userinfohandler').respond(
+    //   200, sampleUserInfoBackendObject);
+
+    // UserService.getUserInfoAsync().then(function(userInfo) {
+    // expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
+    // expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
+    // expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
+    // expect(userInfo.isTopicManager()).toBe(sampleUserInfo.isTopicManager());
+    // expect(userInfo.isLoggedIn()).toBe(
+    //   sampleUserInfo.isLoggedIn());
+    // expect(userInfo.canCreateCollections()).toBe(
+    //   sampleUserInfo.canCreateCollections());
+    // expect(userInfo.getUsername()).toBe(sampleUserInfo.getUsername());
+    // expect(userInfo.getPreferredSiteLanguageCode()).toBe(
+    //   sampleUserInfo.getPreferredSiteLanguageCode());
+    // });
+
+    // $httpBackend.flush();
+    userService.getUserInfoAsync().then((userInfo: UserInfo) => {
       expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
@@ -109,8 +98,10 @@ describe('User Service', function() {
         sampleUserInfo.getPreferredSiteLanguageCode());
     });
 
-    $httpBackend.flush();
-  });
+    let req = httpTestingController.expectOne('/userinfohandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfoBackendObject);
+  }));
 
   it('should return new userInfo data when url path is signup', function() {
     spyOn(UrlService, 'getPathname').and.returnValue('/signup');
