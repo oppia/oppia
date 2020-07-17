@@ -72,7 +72,7 @@ fdescribe('Customize Interaction Modal Controller', function() {
       StateNextContentIdIndexService);
   });
 
-  describe('when state editor is in question mode', function() {
+  fdescribe('when state editor is in question mode', function() {
     beforeEach(angular.mock.inject(function(_$injector_, $controller) {
       $injector = _$injector_;
       var $rootScope = $injector.get('$rootScope');
@@ -102,10 +102,11 @@ fdescribe('Customize Interaction Modal Controller', function() {
       });
     }));
 
-    it('should evaluate scope variable values correctly', function() {
+    fit('should evaluate scope variable values correctly', function() {
       expect($scope.customizationModalReopened).toBe(true);
       // Image Click Input has 2 arg specs.
       expect($scope.customizationArgSpecs.length).toBe(2);
+      console.log(stateCustomizationArgsService.displayed)
       expect(stateCustomizationArgsService.displayed).toEqual({
         imageAndRegions: {
           value: {
@@ -324,7 +325,8 @@ fdescribe('Customize Interaction Modal Controller', function() {
         InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
-        StateInteractionIdService: stateInteractionIdService
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService
       });
     }));
 
