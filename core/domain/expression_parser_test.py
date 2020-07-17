@@ -282,10 +282,11 @@ class TokenUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expression_parser.Token('123').category, 'number')
         self.assertEqual(expression_parser.Token('12.34').category, 'number')
         self.assertEqual(expression_parser.Token('0.004').category, 'number')
+        self.assertEqual(expression_parser.Token('pi').category, 'number')
+        self.assertEqual(expression_parser.Token('e').category, 'number')
 
         with self.assertRaisesRegexp(Exception, 'Invalid token: 8.4.3.'):
             expression_parser.Token('8.4.3')
-        self.assertNotEqual(expression_parser.Token('pi').category, 'number')
 
     def test_is_operator(self):
         """Tests for is_operator method."""
@@ -517,6 +518,9 @@ class ParserUnitTests(test_utils.GenericTestBase):
 
 
         self.assertFalse(expression_parser.is_valid_expression('a+b/'))
+        self.assertFalse(expression_parser.is_valid_expression('|x|'))
+        self.assertFalse(expression_parser.is_valid_expression('||'))
+        self.assertFalse(expression_parser.is_valid_expression('|x+y|-z'))
         self.assertFalse(expression_parser.is_valid_expression('a^2.'))
         self.assertFalse(expression_parser.is_valid_expression('(352+)-3*x'))
         self.assertFalse(expression_parser.is_valid_expression('(a-2^34-)'))

@@ -215,16 +215,6 @@ class _Gae(Platform):
         return gae_app_identity_services
 
     @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        from core.platform.image import gae_image_services
-        return gae_image_services
-
-    @classmethod
     def import_email_services(cls):
         """Imports and returns the email services module specified in feconf.py.
 
@@ -372,15 +362,6 @@ class Registry(python_utils.OBJECT):
             module. The app_identity_services module.
         """
         return cls._get().import_app_identity_services()
-
-    @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        return cls._get().import_gae_image_services()
 
     @classmethod
     def import_email_services(cls):

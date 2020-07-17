@@ -35,9 +35,9 @@ require('pages/profile-page/profile-page-backend-api.service');
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
-    '$scope', '$log', 'DateTimeFormatService', 'LoaderService',
+    '$scope', '$log', '$rootScope', 'DateTimeFormatService', 'LoaderService',
     'UrlInterpolationService', 'UserService', 'WindowRef',
-    function($scope, $log, DateTimeFormatService, LoaderService,
+    function($scope, $log, $rootScope, DateTimeFormatService, LoaderService,
         UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       const ProfilePageBackendApiService = (
@@ -214,6 +214,7 @@ angular.module('oppia').component('profilePage', {
           ctrl.profilePictureDataUrl = (
             data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
           LoaderService.hideLoadingScreen();
+          $rootScope.$apply();
         });
       };
     }
