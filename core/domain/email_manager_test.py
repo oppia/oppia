@@ -67,13 +67,7 @@ class FailedMLTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
-            with self.swap(
-                email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_mail), (
-                    self.swap(
-                        email_services, 'send_mail',
-                        self.email_services_mock.mock_send_mail)):
-                email_manager.send_job_failure_email('123ABC')
+            email_manager.send_job_failure_email('123ABC')
 
             # Make sure emails are sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -110,13 +104,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
             # Send an email to admin.
-            with self.swap(
-                email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_mail), (
-                    self.swap(
-                        email_services, 'send_mail',
-                        self.email_services_mock.mock_send_mail)):
-                email_manager.send_mail_to_admin('Dummy Subject', 'Dummy Body')
+            email_manager.send_mail_to_admin('Dummy Subject', 'Dummy Body')
 
             # Make sure emails are sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -124,7 +112,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
-            self.assertEqual(messages[0].to, 'admin@system.com')
+            self.assertEqual(messages[0].to, ['admin@system.com'])
             self.assertEqual(messages[0].subject, 'Dummy Subject')
             self.assertIn('Dummy Body', messages[0].html)
 
@@ -152,13 +140,7 @@ class DummyMailTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
             # Send an email.
-            with self.swap(
-                email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_mail), (
-                    self.swap(
-                        email_services, 'send_mail',
-                        self.email_services_mock.mock_send_mail)):
-                email_manager.send_dummy_mail_to_admin(dummy_system_name)
+            email_manager.send_dummy_mail_to_admin(dummy_system_name)
 
             # Make sure emails are sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -166,7 +148,7 @@ class DummyMailTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
-            self.assertEqual(messages[0].to, dummy_receiver_address)
+            self.assertEqual(messages[0].to, [dummy_receiver_address])
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
             self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
@@ -262,10 +244,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EDITOR_ROLE_EMAILS', False)
 
     def test_role_email_is_sent_when_editor_assigns_role(self):
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             self.login(self.EDITOR_EMAIL)
 
             csrf_token = self.get_new_csrf_token()
@@ -284,10 +263,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.new_user_id, True, False, False, False)
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
@@ -297,10 +273,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
@@ -311,22 +284,16 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     def test_that_email_not_sent_if_can_send_editor_role_emails_is_false(self):
         with self.can_send_emails_ctx, (
             self.can_not_send_editor_role_email_ctx):
-            with self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail):
-                email_manager.send_role_notification_email(
-                    self.editor_id, self.new_user_id,
-                    rights_manager.ROLE_EDITOR, self.exploration.id,
-                    self.exploration.title)
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id,
+                rights_manager.ROLE_EDITOR, self.exploration.id,
+                self.exploration.title)
             messages = self.email_services_mock.mock_get_sent_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_role_emails_sent_are_correct(self):
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
@@ -404,10 +371,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Manager.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
@@ -467,10 +431,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Editor.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
@@ -530,10 +491,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Voice Artist.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id,
@@ -592,10 +550,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Playtester.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
@@ -613,16 +568,10 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 expected_email_text_body)
 
     def test_correct_undefined_role_raises_an_exception(self):
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that an exception is raised when an invalid
             # role is supplied.
-            with self.assertRaisesRegexp(Exception, 'Invalid role'), (
-                self.swap(
-                    email_services, 'send_mail',
-                    self.email_services_mock.mock_send_mail)):
+            with self.assertRaisesRegexp(Exception, 'Invalid role'):
                 email_manager.send_role_notification_email(
                     self.editor_id, self.new_user_id, rights_manager.ROLE_NONE,
                     self.exploration.id, self.exploration.title)
@@ -667,10 +616,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             '<a href="https://www.site.com/prefs">Preferences page</a>.')
 
     def test_email_not_sent_if_config_does_not_permit_it(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False), (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -706,10 +652,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
         log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', log_new_error_counter)
 
-        with can_send_emails_ctx, log_new_error_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with can_send_emails_ctx, log_new_error_ctx:
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
@@ -757,10 +700,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
         log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', log_new_error_counter)
 
-        with can_send_emails_ctx, log_new_error_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with can_send_emails_ctx, log_new_error_ctx:
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
@@ -806,10 +746,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
         log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', log_new_error_counter)
 
-        with can_send_emails_ctx, log_new_error_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with can_send_emails_ctx, log_new_error_ctx:
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
@@ -833,10 +770,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(0, len(messages))
 
     def test_contents_of_signup_email_are_correct(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -864,7 +798,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 messages[0].sender,
                 'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertEqual(messages[0].subject, 'Welcome!')
             self.assertEqual(
                 messages[0].body.decode(), self.expected_text_email_content)
@@ -872,10 +806,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 messages[0].html.decode(), self.expected_html_email_content)
 
     def test_email_only_sent_once_for_repeated_signups_by_same_user(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -910,10 +841,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(1, len(messages))
 
     def test_email_only_sent_if_signup_was_successful(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -950,10 +878,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(1, len(messages))
 
     def test_record_of_sent_email_is_written_to_datastore(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -1122,12 +1047,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(all_models), 0)
 
             # pylint: disable=protected-access
-            with self.swap(email_services, 'send_mail', (
-                self.email_services_mock.mock_send_mail)):
-                email_manager._send_email(
-                    self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                    feconf.SYSTEM_EMAIL_ADDRESS)
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
 
             # Check that a new email was sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -1185,10 +1108,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            with self.swap(email_services, 'send_mail', (
-                self.email_services_mock.mock_send_mail)):
-                email_manager.send_post_signup_email(
-                    self.new_user_id, test_for_duplicate_email=True)
+            email_manager.send_post_signup_email(
+                self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -1237,10 +1158,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            with self.swap(email_services, 'send_mail', (
-                self.email_services_mock.mock_send_mail)):
-                email_manager.send_post_signup_email(
-                    self.new_user_id, test_for_duplicate_email=True)
+            email_manager.send_post_signup_email(
+                self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -1289,10 +1208,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            with self.swap(email_services, 'send_mail', (
-                self.email_services_mock.mock_send_mail)):
-                email_manager.send_post_signup_email(
-                    self.new_user_id, test_for_duplicate_email=True)
+            email_manager.send_post_signup_email(
+                self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -1356,10 +1273,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 2)
 
-            with self.swap(email_services, 'send_mail', (
-                self.email_services_mock.mock_send_mail)):
-                email_manager.send_post_signup_email(
-                    self.new_user_id, test_for_duplicate_email=True)
+            email_manager.send_post_signup_email(
+                self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
             messages = self.email_services_mock.mock_get_sent_messages(
@@ -1411,10 +1326,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
@@ -1429,10 +1341,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
-        with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
@@ -1443,10 +1352,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     def test_that_email_not_sent_if_feedback_messages_are_empty(self):
         feedback_messages = {}
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
@@ -1501,10 +1407,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
@@ -1564,13 +1467,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)), (
-                    self.swap(
-                        email_services, 'send_mail',
-                        self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
@@ -1622,10 +1519,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
@@ -1685,10 +1579,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
@@ -1700,11 +1591,8 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
         with self.can_send_emails_ctx, (
             self.can_not_send_subscription_email_ctx):
-            with self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail):
-                email_manager.send_emails_to_subscribers(
-                    self.editor_id, self.exploration.id, self.exploration.title)
+            email_manager.send_emails_to_subscribers(
+                self.editor_id, self.exploration.id, self.exploration.title)
 
         messages = self.email_services_mock.mock_get_sent_messages(
             to=self.NEW_USER_EMAIL)
@@ -1740,10 +1628,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_subscription_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
@@ -1801,10 +1686,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id, self.editor_id, 'editor message',
                 'New Oppia message in "a subject"', self.exploration.title,
@@ -1816,10 +1698,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
-        with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id, self.editor_id, 'editor message',
                 'New Oppia message in "a subject"', self.exploration.title,
@@ -1859,10 +1738,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id, self.editor_id, 'editor message',
                 'New Oppia message in "a subject"', self.exploration.title,
@@ -1933,10 +1809,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_flag_exploration_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.report_text)
@@ -1976,10 +1849,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_flag_exploration_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.report_text)
@@ -2055,10 +1925,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_mail_to_onboard_new_reviewers(
                 self.reviewer_id, 'Algebra')
 
@@ -2091,10 +1958,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             'You can change your email preferences via the '
             '<a href="https://www.example.com">Preferences</a> page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_mail_to_onboard_new_reviewers(
                 self.reviewer_id, 'Algebra')
 
@@ -2141,10 +2005,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra')
 
@@ -2168,10 +2029,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             'You can change your email preferences via the '
             '<a href="https://www.example.com">Preferences</a> page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra')
 
@@ -2260,10 +2118,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_query_completion_email(
                 self.submitter_id, query_id)
 
@@ -2335,10 +2190,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             'key1: val1\n'
             'key2: val2\n')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_query_failure_email(
                 self.submitter_id, query_id, query_params)
 
@@ -2380,17 +2232,12 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
         email_subject = 'Bulk Email User Query Subject'
         email_body = 'Bulk Email User Query Body'
         email_intent = feconf.BULK_EMAIL_INTENT_MARKETING
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
-            with self.swap(email_services, 'send_bulk_mail', (
-                self.email_services_mock.mock_send_bulk_mail)):
-                email_manager.send_user_query_email(
-                    self.sender_id, self.recipient_ids,
-                    email_subject,
-                    email_body,
-                    email_intent)
+        with self.can_send_emails_ctx:
+            email_manager.send_user_query_email(
+                self.sender_id, self.recipient_ids,
+                email_subject,
+                email_body,
+                email_intent)
             messages_a = self.email_services_mock.mock_get_sent_messages(
                 to=self.RECIPIENT_A_EMAIL)
             self.assertEqual(len(messages_a), 1)
@@ -2441,10 +2288,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_accepted_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en')
 
@@ -2472,10 +2316,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             'You can change your email preferences via the '
             '<a href="https://www.example.com">Preferences</a> page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_accepted_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en')
 
@@ -2519,10 +2360,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             'You can change your email preferences via the '
             '<a href="https://www.example.com">Preferences</a> page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_rejected_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en',
                 'A rejection message!')
@@ -2578,10 +2416,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_account_deleted_email(
                 self.applicant_id, self.APPLICANT_EMAIL)
 
@@ -2599,10 +2434,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             'You can change your email preferences via the '
             '<a href="https://www.example.com">Preferences</a> page.')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_account_deleted_email(
                 self.applicant_id, self.APPLICANT_EMAIL)
 
@@ -2667,10 +2499,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         email_html_body = 'Dummy email body.<br>'
         email_text_body = 'Dummy email body.\n'
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids, email_subject,
                 email_html_body, feconf.BULK_EMAIL_INTENT_MARKETING)
@@ -2714,10 +2543,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         email_subject = 'Dummy Email Subject'
         email_html_body = 'Dummy email body.<td>'
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids,
                 email_subject, email_html_body,
@@ -2736,12 +2562,9 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, (
             self.assertRaisesRegexp(
                 Exception, 'Invalid sender_id for email')):
-            with self.swap(
-                email_services, 'send_bulk_mail',
-                self.email_services_mock.mock_send_bulk_mail):
-                email_manager.send_user_query_email(
-                    self.fake_sender_id, self.recipient_ids, 'email_subject',
-                    'email_html_body', feconf.BULK_EMAIL_INTENT_MARKETING)
+            email_manager.send_user_query_email(
+                self.fake_sender_id, self.recipient_ids, 'email_subject',
+                'email_html_body', feconf.BULK_EMAIL_INTENT_MARKETING)
 
         messages_a = self.email_services_mock.mock_get_sent_messages(
             to=self.RECIPIENT_A_EMAIL)
@@ -2757,10 +2580,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
     def test_that_test_email_is_sent_for_bulk_emails(self):
         email_subject = 'Test Subject'
         email_body = 'Test Body'
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_test_email_for_bulk_emails(
                 self.sender_id, email_subject, email_body
             )
@@ -2899,12 +2719,9 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         email_html_body = 'Dummy email body.<br>'
         with self.can_send_emails_ctx, (
             self.can_send_email_moderator_action_ctx):
-            with self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail):
-                email_manager.send_moderator_action_email(
-                    self.moderator_id, self.recipient_id,
-                    email_intent, exploration_title, email_html_body)
+            email_manager.send_moderator_action_email(
+                self.moderator_id, self.recipient_id,
+                email_intent, exploration_title, email_html_body)
         messages = self.email_services_mock.mock_get_sent_messages(
             to=self.RECIPIENT_EMAIL)
         self.assertEqual(len(messages), 1)
@@ -2944,10 +2761,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
             self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_email_to_new_community_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
@@ -2994,10 +2808,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_email_to_new_community_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
@@ -3043,10 +2854,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_email_to_new_community_reviewer(
                 self.voiceover_reviewer_id,
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
@@ -3091,10 +2899,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_email_to_new_community_reviewer(
                 self.question_reviewer_id,
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
@@ -3124,10 +2929,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
     def test_email_is_not_sent_can_send_emails_is_false(self):
-        with self.can_not_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_not_send_emails_ctx:
             email_manager.send_email_to_removed_community_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
@@ -3138,10 +2940,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_remove_translation_reviewer_email_for_invalid_review_category(
             self):
-        with self.assertRaisesRegexp(Exception, 'Invalid review_category'), (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
             email_manager.send_email_to_removed_community_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
@@ -3179,10 +2978,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_community_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
@@ -3228,10 +3024,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_community_reviewer(
                 self.voiceover_reviewer_id,
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
@@ -3275,10 +3068,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
 
-        with self.can_send_emails_ctx, (
-            self.swap(
-                email_services, 'send_mail',
-                self.email_services_mock.mock_send_mail)):
+        with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_community_reviewer(
                 self.question_reviewer_id, constants.REVIEW_CATEGORY_QUESTION,
                 language_code='hi')

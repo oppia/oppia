@@ -130,7 +130,6 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
     def test_email_sent_on_failed_job(self):
-
         class FakeTrainingJob(python_utils.OBJECT):
             """Fake training class to invoke failed job functions."""
 

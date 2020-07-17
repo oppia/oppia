@@ -1788,11 +1788,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
     def test_email_is_sent_correctly_when_unpublishing(self):
         with self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True), (
-                self.swap(
-                    feconf, 'CAN_SEND_EMAILS', True)), (
-                        self.swap(
-                            email_services, 'send_mail',
-                            self.email_services_mock.mock_send_mail)):
+                self.swap(feconf, 'CAN_SEND_EMAILS', True)):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -1819,9 +1815,9 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.assertEqual(
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertFalse(hasattr(messages[0], 'cc'))
-            self.assertEqual(messages[0].bcc, [feconf.ADMIN_EMAIL_ADDRESS])
+            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
                 messages[0].subject,
                 'Your Oppia exploration "My Exploration" has been unpublished')
