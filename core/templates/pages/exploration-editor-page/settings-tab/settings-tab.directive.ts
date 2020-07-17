@@ -23,10 +23,10 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.directive.ts');
+  'exploration-title-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.directive.ts');
+  'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.directive.ts');
