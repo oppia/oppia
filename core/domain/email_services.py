@@ -26,7 +26,7 @@ import feconf
 import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
-email_services = models.Registry.import_email_services()
+platform_email_services = models.Registry.import_email_services()
 
 
 def get_feedback_thread_reply_info_from_model(model):
@@ -161,6 +161,9 @@ def send_mail(
             sent.
         Exception: If any recipient email addresses are malformed.
         Exception: If any sender email addresses are malformed.
+        Exception: If the email was not sent correctly and the
+            send_email_to_recipients() function returned False
+            (signifying API returned bad status code).
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
@@ -176,10 +179,13 @@ def send_mail(
     reply_to = (
         get_incoming_email_address(reply_to_id)
         if reply_to_id else '')
-    email_services.send_email_to_recipients(
+    resp = platform_email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject.encode(encoding='utf-8'),
         plaintext_body.encode(encoding='utf-8'),
         html_body.encode(encoding='utf-8'), bcc=bcc, reply_to=reply_to)
+    if not resp:
+        raise Exception(('Email to %s failed to send. Please check your ' +
+            'email service provider.') % recipient_email)
 
 
 def send_bulk_mail(
@@ -206,6 +212,9 @@ def send_bulk_mail(
             sent.
         Exception: If any recipient email addresses are malformed.
         Exception: If any sender email addresses are malformed.
+        Exception: If the email was not sent correctly and the
+            send_email_to_recipients() function returned False
+            (signifying API returned bad status code).
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
@@ -231,8 +240,10 @@ def send_bulk_mail(
         # 'recipient-variable' in post data forces mailgun to send individual
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
-        email_services.send_email_to_recipients(
+        resp = platform_email_services.send_email_to_recipients(
             sender_email, email_list, subject.encode(encoding='utf-8'),
             plaintext_body.encode(encoding='utf-8'),
-            html_body.encode(encoding='utf-8'),
-            recipient_variables={})
+            html_body.encode(encoding='utf-8'))
+        if not resp:
+            raise Exception('Bulk email failed to send. Please check your ' +
+                'email service provider.')
