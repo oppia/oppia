@@ -35,6 +35,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
@@ -6074,18 +6075,21 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             exp_models.ExplorationMathRichTextInfoModel(
                 id='0',
                 latex_values=['+,+,+,+'],
+                math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_0.put()
         self.model_instance_1 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='1',
                 latex_values=['+,+,+,+'],
+                math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_1.put()
         self.model_instance_2 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='2',
                 latex_values=['+,+,+,+'],
+                math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_2.put()
 
@@ -6104,6 +6108,7 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             exp_models.ExplorationMathRichTextInfoModel(
                 id='2',
                 latex_values=['+,+,+,+', 'x^2'],
+                math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_2.put()
         expected_output = [
@@ -6133,17 +6138,50 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_wrong_status_of_image_generation_requirement(self):
-        self.model_instance_2.math_images_generation_required = False
-        self.model_instance_2.put()
+
+        exploration = (
+            exp_domain.Exploration.create_default_exploration(
+                '3', title='title4', category='category4'))
+        exploration.add_states(['FirstState'])
+        exploration_state = exploration.states['FirstState']
+        valid_html_content = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;math.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        exploration_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        model_instance = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='3',
+                latex_values=['+,+,+,+'],
+                math_images_generation_required=False,
+                estimated_max_size_of_images_in_bytes=7000))
+        model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for image generation requirement'
                 ' check of ExplorationMathRichTextInfoModel\', '
                 '[u\'Entity id %s: status of image generation does not match '
                 'the image generation requirement for the exploration'
-                ' model\']]') % (self.model_instance_2.id),
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+                ' model\']]') % (model_instance.id),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
+
+        # We need to swap the return value of the method
+        # extract_latex_values_from_math_rich_text_without_filename because
+        # normally this method returns latex values from math-tags without
+        # filenames.
+        with self.swap(
+            html_validation_service,
+            'extract_latex_values_from_math_rich_text_without_filename',
+            lambda html: ['+,+,+,+']):
+            run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (

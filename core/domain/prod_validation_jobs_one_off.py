@@ -35,6 +35,8 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
@@ -3020,13 +3022,13 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
                 'exp_ids', exp_models.ExplorationModel, [item.id])]
 
     @classmethod
-    def _validate_latex_values(
+    def _validate_latex_values_info(
             cls, item, field_name_to_external_model_references):
-        """Validate that question_content model is equal to
-        QuestionModel.question_state_data.content.html.
+        """Validate that latex values and other related information in the
+        model is valid and matches the corresponding exploration.
 
         Args:
-            item: ndb.Model. QuestionSummaryModel to validate.
+            item: ndb.Model. ExplorationMathRichTextInfoModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3045,54 +3047,56 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             list_of_latex_values = []
-            size_of_math_svg = 0
-            html_string_in_exploration = ''
-            for state in exploration_model.states.values():
-                state_object = state_domain.State.from_dict(state)
-                html_string = (
-                    ''.join(state_object.get_all_html_content_strings()))
-                html_string_in_exploration = (
-                    html_string_in_exploration + html_string)
-                (
-                    size_of_math_svg_in_state, _,
-                    list_of_latex_values_in_state) = (
-                        html_validation_service.
-                        extract_math_rich_text_related_information_from_html(
-                            html_string))
-                list_of_latex_values.extend(list_of_latex_values_in_state)
+            html_strings_in_exploration = ''
+            for state_dict in exploration_model.states.values():
+                state = state_domain.State.from_dict(state_dict)
+                html_strings_in_exploration += (
+                    ''.join(state.get_all_html_content_strings()))
 
-                size_of_math_svg = size_of_math_svg + size_of_math_svg_in_state
+            list_of_latex_values = (
+                html_validation_service.
+                extract_latex_values_from_math_rich_text_without_filename(
+                    html_strings_in_exploration))
+            math_rich_text_info = (
+                exp_domain.ExplorationMathRichTextInfo(list_of_latex_values))
+            approx_size_of_math_svgs_bytes = (
+                math_rich_text_info.get_svg_size_in_bytes())
 
-            unique_latex_values = list(set(list_of_latex_values))
-            if unique_latex_values != item.latex_values:
+            if list_of_latex_values != item.latex_values:
                 cls._add_error(
                     'latex values check',
                     'Entity id %s: Latex values in the model does not match '
                     'latex values in the exploration model' % (
                         item.id))
-            if size_of_math_svg != item.estimated_max_size_of_images_in_bytes:
+            if (approx_size_of_math_svgs_bytes !=
+                    item.estimated_max_size_of_images_in_bytes):
                 cls._add_error(
                     'svg size check',
                     'Entity id %s: estimated svg size in the model does not'
                     ' match estimated svg size in the exploration model' % (
                         item.id))
             if not item.math_images_generation_required:
-                error_list = (
+                filenames = (
                     html_validation_service.
-                    validate_svg_image_filenames_in_math_rte_components(
-                        html_string_in_exploration,
+                    extract_svg_filenames_in_math_rte_components(
+                        html_strings_in_exploration))
+                for filename in filenames:
+                    file_system_class = (
+                        fs_services.get_entity_file_system_class())
+                    fs = fs_domain.AbstractFileSystem(file_system_class(
                         feconf.ENTITY_TYPE_EXPLORATION, exploration_model.id))
-                if len(error_list) > 0:
-                    cls._add_error(
-                        'image generation requirement check',
-                        'Entity id %s: status of image generation does not'
-                        ' match the image generation requirement for the'
-                        ' exploration model' % (
-                            item.id))
+                    filepath = 'image/%s' % filename
+                    if not fs.isfile(filepath):
+                        cls._add_error(
+                            'image generation requirement check',
+                            'Entity id %s: status of image generation does not'
+                            ' match the image generation requirement for the'
+                            ' exploration model' % (
+                                item.id))
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
-        return [cls._validate_latex_values]
+        return [cls._validate_latex_values_info]
 
 
 class QuestionSkillLinkModelValidator(BaseModelValidator):
