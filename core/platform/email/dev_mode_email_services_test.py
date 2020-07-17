@@ -51,17 +51,23 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/plain
                 Data length: %d
-            Body
+            Body:
                 Content-type: text/html
                 Data length: %d
+
+            Bcc: None
+            Reply_to: None
+            Recipient Variables:
+                Length: 0
             """ % (
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 4, 4))
         # pylint: enable=division-operator-used
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
-            'You are not currently sending out real email since this is a dev' +
-            ' environment. Emails are sent out in the production environment.')
+            'You are not currently sending out real emails since this is a ' +
+            'dev environment. Emails are sent out in the production' +
+            ' environment.')
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
@@ -79,6 +85,14 @@ class EmailTests(test_utils.GenericTestBase):
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self):
         """In DEV Mode, email services logs email info to terminal."""
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
+        bcc_email_list_str = 'e@e.com f@f.com'
+        recipient_variables = (
+            {
+                'a@a.com': {'first': 'Bob', 'id': 1},
+                'b@b.com': {'first': 'Jane', 'id': 2},
+                'c@c.com': {'first': 'Rob', 'id': 3},
+                'd@d.com': {'first': 'Emily', 'id': 4},
+            })
         # pylint: disable=division-operator-used
         msg_body = (
             """
@@ -89,17 +103,24 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/plain
                 Data length: %d
-            Body
+            Body:
                 Content-type: text/html
                 Data length: %d
+
+            Bcc: %s
+            Reply_to: %s
+            Recipient Variables:
+                Length: %d
             """ % (
                 feconf.SYSTEM_EMAIL_ADDRESS, recipient_email_list_str,
-                'subject', 4, 4))
+                'subject', 4, 4, bcc_email_list_str, '123',
+                len(recipient_variables)))
         # pylint: enable=division-operator-used
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
-            'You are not currently sending out real email since this is a dev' +
-            ' environment. Emails are sent out in the production environment.')
+            'You are not currently sending out real emails since this is a ' +
+            'dev environment. Emails are sent out in the production' +
+            ' environment.')
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
@@ -109,7 +130,10 @@ class EmailTests(test_utils.GenericTestBase):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],
-                'subject', 'body', 'html')
+                'subject', 'body', 'html',
+                bcc=['e@e.com', 'f@f.com'],
+                reply_to='123',
+                recipient_variables=recipient_variables)
         self.assertEqual(len(self._log_handler.messages['info']), 2)
         self.assertEqual(
             self._log_handler.messages['info'],

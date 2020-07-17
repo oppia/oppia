@@ -76,7 +76,7 @@ def send_email_to_recipients(
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')
 
-    # Show the first 3 emails in the list for up to 1000 emails.
+    # Show the first 3 emails in the recipient list for up to 1000 emails.
     recipient_email_list_str = ' '.join(
         ['%s' %
          (recipient_email,) for recipient_email in recipient_emails[:3]])
@@ -84,7 +84,18 @@ def send_email_to_recipients(
         recipient_email_list_str += (
             '... Total: ' +
             python_utils.convert_to_bytes(len(recipient_emails)) + ' emails.')
+
+    # Show the first 3 emails in bcc email list.
+    if bcc:
+        bcc_email_list_str = ' '.join(
+            ['%s' %
+            (bcc_email,) for bcc_email in bcc[:3]])
+        if len(bcc) > 3:
+            bcc_email_list_str += (
+                '... Total: ' +
+                python_utils.convert_to_bytes(len(bcc)) + ' emails.')
     # pylint: disable=division-operator-used
+
     msg = (
         """
         EmailService.SendMail
@@ -94,14 +105,25 @@ def send_email_to_recipients(
         Body:
             Content-type: text/plain
             Data length: %d
-        Body
+        Body:
             Content-type: text/html
             Data length: %d
         """ % (
             sender_email, recipient_email_list_str, subject,
             len(plaintext_body), len(html_body)))
+    optional_msg_description = (
+        """
+        Bcc: %s
+        Reply_to: %s
+        Recipient Variables:
+            Length: %d
+        """ % (
+            bcc_email_list_str if bcc else 'None',
+            reply_to if reply_to else 'None',
+            len(recipient_variables) if recipient_variables else 0))
     # pylint: enable=division-operator-used
-    logging.info(textwrap.dedent(msg))
+    logging.info(
+        textwrap.dedent(msg) + textwrap.dedent(optional_msg_description))
     logging.info(
         'You are not currently sending out real emails since this is a' +
         ' dev environment. Emails are sent out in the production' +
