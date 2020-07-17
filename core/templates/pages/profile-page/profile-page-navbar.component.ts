@@ -22,7 +22,7 @@ import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'profile-page-navbar',
-  templateUrl: './profile-page-navbar.directive.html',
+  templateUrl: './profile-page-navbar.component.html',
   styleUrls: []
 })
 export class ProfilePageNavbarComponent implements OnInit {

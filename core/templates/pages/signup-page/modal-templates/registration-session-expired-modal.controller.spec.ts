@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { UpgradedServices } from 'services/UpgradedServices';
+
 /**
  * @fileoverview Unit tests for RegistrationSessionExpiredModalController.
  */
@@ -30,6 +32,10 @@ describe('Registration Session Expired Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $q = $injector.get('$q');

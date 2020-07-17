@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { UpgradedServices } from 'services/UpgradedServices';
+
 /**
  * @fileoverview Unit tests for the splash page.
  */
@@ -38,6 +40,10 @@ describe('Splash Page', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRefMock);
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');

@@ -601,6 +601,7 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
@@ -1421,6 +1422,11 @@ export class UpgradedServices {
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
         upgradedServices['HttpClient']);
+    upgradedServices['UserService'] = new UserService(
+      upgradedServices['HttpClient'],
+      upgradedServices['UrlInterpolationService'],
+      upgradedServices['UrlService'],
+      new WindowRef());
 
     // Topological level: 4.
 

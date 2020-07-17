@@ -635,6 +635,7 @@ import { UrlInterpolationService } from
 import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { UserService } from 'services/user.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -957,6 +958,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static urlInterpolationService: UrlInterpolationService;
   static urlService: UrlService;
   static userExplorationPermissionsService: UserExplorationPermissionsService;
+  static userService: UserService;
   static userInfoObjectFactory: UserInfoObjectFactory;
   static utilsService: UtilsService;
   static validatorsService: ValidatorsService;
@@ -1263,6 +1265,7 @@ private unitsObjectFactory: UnitsObjectFactory,
 private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
 private userExplorationPermissionsService: UserExplorationPermissionsService,
+private userService: UserService,
 private userInfoObjectFactory: UserInfoObjectFactory,
 private utilsService: UtilsService,
 private validatorsService: ValidatorsService,
@@ -1570,6 +1573,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.urlInterpolationService = this.urlInterpolationService;
     OppiaAngularRootComponent.urlService = this.urlService;
     OppiaAngularRootComponent.userExplorationPermissionsService = this.userExplorationPermissionsService;
+    OppiaAngularRootComponent.userService = this.userService;
     OppiaAngularRootComponent.userInfoObjectFactory = this.userInfoObjectFactory;
     OppiaAngularRootComponent.utilsService = this.utilsService;
     OppiaAngularRootComponent.validatorsService = this.validatorsService;

@@ -22,6 +22,7 @@ import { UrlInterpolationService } from
 
 import { AppConstants } from 'app.constants';
 import { WindowRef } from './contextual/window-ref.service';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 /**
  * @fileoverview Service for user data.
@@ -32,13 +33,14 @@ import { WindowRef } from './contextual/window-ref.service';
  })
 export class UserService {
   constructor(
-    private urlService: UrlService,
-    private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
     private windowRef: WindowRef
   ) {}
-  private PREFERENCES_DATA_URL: string = 'preferenceshandler/data';
-  private USER_COMMUNITY_RIGHTS_DATA_URL: string = '/usercommunityrightsdatahandler';
+  private PREFERENCES_DATA_URL: string = '/preferenceshandler/data';
+  private USER_COMMUNITY_RIGHTS_DATA_URL: string =
+    '/usercommunityrightsdatahandler';
   private userInfo: UserInfo = null;
   private userCommunityRightsInfo = null;
 
@@ -47,6 +49,11 @@ export class UserService {
     let userInfoObjectFactory = new UserInfoObjectFactory();
     if (this.urlService.getPathname() === '/signup') {
       successCallback(userInfoObjectFactory.createDefault());
+      return;
+    }
+    if (this.userInfo) {
+      successCallback(this.userInfo);
+      return;
     }
     this.http.get<IUserInfoBackendDict>('/userinfohandler').toPromise().
       then((response) => {
@@ -56,6 +63,7 @@ export class UserService {
         } else {
           successCallback(userInfoObjectFactory.createDefault());
         }
+      }, (errorRespnonse) => {
       });
   }
 
@@ -84,7 +92,7 @@ export class UserService {
       update_type: 'profile_picture_data_url',
       data: newProfileImageDataUrl
     }).toPromise().then((response) => {
-      successCallback();
+      successCallback(response);
     });
   }
 
@@ -107,7 +115,7 @@ export class UserService {
     } else {
       this.http.get(this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
         (response: any) => {
-          this.userCommunityRightsInfo = response.data;
+          this.userCommunityRightsInfo = response;
           successCallback(this.userCommunityRightsInfo);
         }
       );
@@ -147,4 +155,5 @@ export class UserService {
   }
 }
 
-
+angular.module('oppia').factory(
+  'UserService', downgradeInjectable(UserService));
