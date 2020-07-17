@@ -25,7 +25,6 @@ from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
-from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import subscription_services

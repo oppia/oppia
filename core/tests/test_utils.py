@@ -255,7 +255,7 @@ class EmailServicesMock(python_utils.OBJECT):
             self.emails_dict[recipient_email].append(new_email)
         return True
 
-    def mock_get_sent_messages(self, to, *_):
+    def mock_get_sent_messages(self, to):
         """Gets messages to a single recipient email.
 
         Args:

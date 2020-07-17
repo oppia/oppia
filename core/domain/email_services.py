@@ -124,7 +124,7 @@ def is_sender_email_valid(sender_email):
     sender_email_with_only_first_name_regex = (
         r'^[a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})' +
         '(]?)>$')
-    # Checks the case where sender_email is of the form 'Jane Doe <EMAIL>'
+    # Checks the case where sender_email is of the form 'Jane Doe <EMAIL>'.
     sender_email_with_full_name_regex = (
         r'^[a-zA-Z._]+ [a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}' +
         r'|[0-9]{1,3})(]?)>$')
@@ -196,7 +196,8 @@ def send_bulk_mail(
         recipient_emails: list(str). List of the email addresses of recipients.
             Format must be utf-8.
         subject: str. The subject line of the email. Format must be utf-8.
-        plaintext_body: str. The plaintext body of the email. Format must be utf-8.
+        plaintext_body: str. The plaintext body of the email. Format must be
+            utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
 

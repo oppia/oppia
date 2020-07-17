@@ -39,7 +39,8 @@ class EmailTests(test_utils.GenericTestBase):
             """Gets the status code of this url_open mock.
 
             Returns:
-                int. 200 to signify status is OK. 500 otherwise."""
+                int. 200 to signify status is OK. 500 otherwise.
+            """
             return 200 if self.url == self.expected_url else 500
 
     def test_send_email_to_mailgun(self):

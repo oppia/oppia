@@ -17,9 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-from textwrap import dedent # pylint: disable=import-only-modules
-
 from constants import constants
 from core.domain import email_services
 from core.platform import models
@@ -162,13 +159,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
-
-        # Data that we expect to have been sent in the
-        # send_email_to_recipients().
-        expected = (
-            {'from': feconf.SYSTEM_EMAIL_ADDRESS, 'to': recipients,
-             'subject': 'subject', 'text': 'body', 'html': 'html',
-             'recipient-variables': '{}'})
 
         with mailgun_api, mailgun_domain, allow_emailing:
             email_services.send_bulk_mail(
