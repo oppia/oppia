@@ -138,32 +138,3 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._log_handler.messages['info'],
             [logging_info_email_body, logging_info_notification])
-
-    def test_mailgun_key_or_domain_name_not_set(self):
-        """Test that exceptions are raised when API key or domain name are
-        unset.
-        """
-        # Testing no mailgun api key.
-        mailgun_exception = self.assertRaisesRegexp(
-            Exception, 'Mailgun API key is not available.')
-        with mailgun_exception:
-            dev_mode_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com', 'c@c.com', 'd@d.com'],
-                subject='Hola 😂 - invitation to collaborate'.encode(
-                    encoding='utf-8'),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
-
-        # Testing no mailgun domain name.
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        mailgun_exception = self.assertRaisesRegexp(
-            Exception, 'Mailgun domain name is not set.')
-        with swap_api, mailgun_exception:
-            dev_mode_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com', 'c@c.com', 'd@d.com'],
-                subject='Hola 😂 - invitation to collaborate'.encode(
-                    encoding='utf-8'),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))

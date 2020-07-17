@@ -60,20 +60,9 @@ def send_email_to_recipients(
             https://documentation.mailgun.com/en/
                 latest/user_manual.html#batch-sending
 
-    Raises:
-        Exception: If mailgun api key is not stored in feconf.MAILGUN_API_KEY.
-        Exception: If mailgun domain name is not stored in
-            feconf.MAILGUN_DOMAIN_NAME.
-            (and possibly other exceptions, due to mail.send_mail() failures)
-
     Returns:
         bool. Whether the email is logged successfully.
     """
-    if not feconf.MAILGUN_API_KEY:
-        raise Exception('Mailgun API key is not available.')
-
-    if not feconf.MAILGUN_DOMAIN_NAME:
-        raise Exception('Mailgun domain name is not set.')
 
     # Show the first 3 emails in the recipient list for up to 1000 emails.
     recipient_email_list_str = ' '.join(
@@ -88,7 +77,7 @@ def send_email_to_recipients(
     if bcc:
         bcc_email_list_str = ' '.join(
             ['%s' %
-            (bcc_email,) for bcc_email in bcc[:3]])
+             (bcc_email,) for bcc_email in bcc[:3]])
         if len(bcc) > 3:
             bcc_email_list_str += (
                 '... Total: ' +
