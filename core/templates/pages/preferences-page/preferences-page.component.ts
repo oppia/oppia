@@ -68,7 +68,7 @@ angular.module('oppia').component('preferencesPage', {
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
-        });
+        }).then(() => AlertsService.addInfoMessage('Saved!', 1000));
       };
 
       // Select2 dropdown cannot automatically refresh its display

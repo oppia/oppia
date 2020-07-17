@@ -435,7 +435,8 @@ var TopicEditorPage = function() {
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
     await closeSaveModalButton.click();
-    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for saving topic takes too long to appear.');
   };
 };
 
