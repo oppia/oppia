@@ -325,9 +325,8 @@ var AdminPage = function() {
 
   this.expectReviewerUsernamesStrToMatch = async function(
       expectedUsernamesArrayStr) {
-    // The usernames are displayed as a '[username1, username2]' string.
-    // This method will be updated after the ng-show works properly for this
-    // feature.
+    // The usernames are displayed as a
+    // 'Usernames: ["username1", "username2"]' string.
     var reviewerUsernamesArrayStr = await element(
       by.css('.protractor-test-reviewer-roles-result')).getText();
     expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
