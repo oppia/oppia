@@ -49,6 +49,7 @@ import { AdminProdModeActivitiesTabComponent } from
 import { AdminDevModeActivitiesTabComponent } from
   './activities-tab/admin-dev-mode-activities-tab.component';
 
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -56,6 +57,7 @@ import { AdminDevModeActivitiesTabComponent } from
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
+    FormsModule
   ],
   declarations: [
     OppiaAngularRootComponent, AdminProdModeActivitiesTabComponent,

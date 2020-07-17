@@ -10,7 +10,7 @@
 
 <div style="padding-top: 16px;">
   <admin-dev-mode-activities-tab ng-if="$ctrl.isActivitiesTabOpen() && $ctrl.inDevMode"
-                                 [set-status-message]="$ctrl.setStatusMessage">
+                                 (send-message)="$ctrl.setStatusMessage($event)">
   </admin-dev-mode-activities-tab>
   <admin-prod-mode-activities-tab ng-if="$ctrl.isActivitiesTabOpen() && !$ctrl.inDevMode">
   </admin-prod-mode-activities-tab>

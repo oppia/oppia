@@ -32,7 +32,7 @@
     <span class="row">
       <label for="explorations-to-generate">Number of explorations to generate</label>
       <input class="form-control form-inline" style="margin-bottom: 5px"
-             ng-model="numDummyExpsToGenerate"
+             [(ngModel)]="numDummyExpsToGenerate"
              placeholder="Explorations to generate" type="number" min="0"
              id="explorations-to-generate">
       <label for="explorations-to-publish">Number of explorations to publish</label>
@@ -41,7 +41,7 @@
         (Publish {{ numDummyExpsToPublish }} out of {{ numDummyExpsToGenerate }} explorations)
       </em>
       <input class="form-control form-inline"
-             ng-model="numDummyExpsToPublish"
+             [(ngModel)]="numDummyExpsToPublish"
              placeholder="Explorations to Publish"
              *ngIf="numDummyExpsToGenerate" type="number" min="0"
              id="explorations-to-publish">

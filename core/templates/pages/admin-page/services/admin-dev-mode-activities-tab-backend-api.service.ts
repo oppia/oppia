@@ -16,11 +16,12 @@
 /**
  * @fileoverview Service to change admin-dev-mode-activities tab properties
  */
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const constants = require('pages/admin-page/admin-page.constants.ts');
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -30,32 +31,32 @@ export class AdminDevModeActivitiesTabBackendApiService {
     private httpClient: HttpClient
   ) {}
   private _reloadExploration(explorationId: string): Promise<Object> {
-    return this.httpClient.post('/adminhandler', {
-      action: 'reload_exploration',
+    return this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'reload exploration',
       exploration_id: explorationId
     }).toPromise();
   }
   private _generateDummyExplorations(
       numDummyExpsToGenerate: number, numDummyExpsToPublish: number):
     Promise<Object> {
-    return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
+    return this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_explorations',
       num_dummy_exps_to_generate: numDummyExpsToGenerate,
       num_dummy_exps_to_publish: numDummyExpsToPublish
     }).toPromise();
   }
   private _generateDummyStructures(): Promise<Object> {
-    return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
+    return this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_structures_data'
     }).toPromise();
   }
   private _generateDummySkillData(): Promise<Object> {
-    return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
+    return this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_skill_data'
     }).toPromise();
   }
   private _reloadCollection(collectionId: string): Promise<Object> {
-    return this.httpClient.post(constants.ADMIN_HANDLER_URL, {
+    return this.httpClient.post(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
       collection_id: String(collectionId)
     }).toPromise();

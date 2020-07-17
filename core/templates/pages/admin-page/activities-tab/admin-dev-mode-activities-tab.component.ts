@@ -17,7 +17,7 @@
  * is in developer mode.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -34,7 +34,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   styleUrls: []
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
-  @Input() setStatusMessage;
+  @Output() sendMessage = new EventEmitter<string>();
   constructor(
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
@@ -42,6 +42,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     private adminDevModeActivitiesTabBackendApiService:
       AdminDevModeActivitiesTabBackendApiService
   ) {}
+
+  setStatusMessage(statusMessage: string) {
+    this.sendMessage.emit(statusMessage);
+  }
+
   numDummyExpsToPublish: number = 0;
   numDummyExpsToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][];
@@ -142,7 +147,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     ).then(() => {
       this.setStatusMessage('Dummy explorations generated succesfully.');
     }, (errorResponse) => {
-      this.setStatusMessage('Server error: ' + errorResponse.data.error);
+      this.setStatusMessage('Server error: ' + errorResponse.error.error);
     });
     this.adminTaskManagerService.finishTask();
   }
@@ -154,7 +159,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     ).then(() => {
       this.setStatusMessage('Dummy new structures data generated successfully');
     }, (errorResponse) => {
-      this.setStatusMessage('Server error: ' + errorResponse.data.error);
+      this.setStatusMessage('Server error: ' + errorResponse.error.error);
     });
     this.adminTaskManagerService.finishTask();
   }
