@@ -170,12 +170,10 @@ def send_mail(
     if not is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
-    print("in")
     bcc = [feconf.ADMIN_EMAIL_ADDRESS] if (bcc_admin) else None
     reply_to = (
         get_incoming_email_address(reply_to_id)
         if reply_to_id else '')
-    print("sending emails")
     email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject.encode(encoding='utf-8'),
         plaintext_body.encode(encoding='utf-8'),
