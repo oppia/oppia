@@ -88,7 +88,7 @@ fdescribe('User Service', () => {
 
     var req = httpTestingController.expectOne('/userinfohandler');
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleUserInfo);      
+    req.flush(sampleUserInfoBackendObject);      
 
     flushMicrotasks();
   }));
