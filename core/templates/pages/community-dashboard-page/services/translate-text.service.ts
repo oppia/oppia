@@ -30,6 +30,7 @@ angular.module('oppia').factory('TranslateTextService', [
     var getNextContentId = function() {
       return stateWiseContentIds[activeStateName].pop();
     };
+
     var getNextState = function() {
       var currentIndex = stateNamesList.indexOf(activeStateName);
       return stateNamesList[currentIndex + 1];
@@ -73,12 +74,19 @@ angular.module('oppia').factory('TranslateTextService', [
             stateWiseContents = response.data.state_names_to_content_id_mapping;
             activeExpVersion = response.data.version;
             for (var stateName in stateWiseContents) {
-              stateNamesList.push(stateName);
-              var contentIds = [];
-              for (var contentId in stateWiseContents[stateName]) {
-                contentIds.push(contentId);
+              let stateHasText = false;
+              const contentIds = [];
+              for (const [contentId, text] of Object.entries(
+                stateWiseContents[stateName])) {
+                if (text !== "") {
+                  contentIds.push(contentId);
+                  stateHasText = true;
+                }
               }
-              stateWiseContentIds[stateName] = contentIds;
+              if (stateHasText) {
+                stateNamesList.push(stateName);
+                stateWiseContentIds[stateName] = contentIds;
+              }
             }
             activeStateName = stateNamesList[0];
             successCallback();
