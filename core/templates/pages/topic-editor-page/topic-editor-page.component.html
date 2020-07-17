@@ -1,7 +1,9 @@
 <div class="navbar-helper">
   <div class="navbar-tabs">
-    Topic Editor: <[$ctrl.topic.getName()]> (v<[$ctrl.topic.getVersion()]>)
-    <[$ctrl.getActiveTabName()]>
+    <div class="navbar-text">
+      <[$ctrl.getNavbarText()]>
+    </div>
+    <div class="navbar-icons">
     <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getTotalWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>" class="nav-item icon">
       <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="$ctrl.selectMainTab()"
          class="nav-link navbar-tab protractor-test-edit-topic-tab">
@@ -43,6 +45,7 @@
         <i class="material-icons">&#xE037;</i><span>Preview</span>
       </a>
     </li>
+    </div>
   </div>
 </div>
 <div class="topic-editor-main">
@@ -88,7 +91,7 @@
     display: flex;
     flex-wrap: wrap;
     height: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     text-align: center;
   }
 
@@ -110,5 +113,24 @@
 
   topic-editor-page .oppia-editor-warnings-box {
     max-width: none;
+  }
+  .navbar-text {
+    width: 40%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 25px;
+  }
+  .navbar-icons {
+    display: flex;
+  }
+
+  .topic-editor .skill-option-box {
+    right: 21px;
+  }
+  .topic-editor .subtopic-edit-options {
+    right: 13px;
   }
 </style>

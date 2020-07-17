@@ -125,19 +125,24 @@
                 </div>
               </div>
               <div ng-if="subtopicCardSelectedIndexes[subtopicIndex]">
-                <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skill-description-container">
-                  <span class="clickable-item"><[skillSummary.getDescription()]></span>
-                  <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
-                  <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)">
-                    <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
-                      <i class="fa fa-trash"></i>
-                      <span>Remove from subtopic</span>
-                    </div>
-                    <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
-                      <i class="fa fa-trash"></i>
-                      <span>Remove from topic</span>
+                <div ng-if="subtopic.getSkillSummaries().length">
+                  <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skill-description-container">
+                    <span class="clickable-item"><[skillSummary.getDescription()]></span>
+                    <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
+                    <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)" ng-click="showSkillEditOptions(null)">
+                      <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-trash"></i>
+                        <span>Remove from subtopic</span>
+                      </div>
+                      <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-trash"></i>
+                        <span>Remove from topic</span>
+                      </div>
                     </div>
                   </div>
+                </div>
+                <div ng-if="!subtopic.getSkillSummaries().length">
+                  <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
                 </div>
               </div>
             </div>
@@ -454,6 +459,13 @@
     .topic-editor .topic-info-container {
       margin-top: 34px;
       width: 45%;
+    }
+
+    .topic-editor .navbar-text {
+      display: none;
+    }
+    .topic-editor .navbar-tabs {
+      justify-content: center;
     }
   }
 

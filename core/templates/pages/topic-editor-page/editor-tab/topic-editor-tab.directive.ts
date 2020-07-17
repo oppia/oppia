@@ -295,6 +295,10 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.showSubtopicEditOptions = function(index) {
+            if ($scope.subtopicEditOptionsAreShown) {
+              $scope.subtopicEditOptionsAreShown = null;
+              return;
+            }
             $scope.subtopicEditOptionsAreShown = index;
           };
 

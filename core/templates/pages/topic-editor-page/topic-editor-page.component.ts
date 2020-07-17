@@ -111,6 +111,16 @@ angular.module('oppia').directive('topicEditorPage', [
           ctrl.selectQuestionsTab = function() {
             TopicEditorRoutingService.navigateToQuestionsTab();
           };
+          ctrl.getNavbarText = function() {
+            const activeTab = ctrl.getActiveTabName();
+            if (activeTab === 'main') {
+              return (
+                `Topic Editor: ${ctrl.topic.getName()}(v${ctrl.topic.getVersion()})`);
+            }
+            if (activeTab.startsWith('subtopic')) {
+              return 'Subtopic Editor';
+            }
+          };
           ctrl._validateTopic = function() {
             ctrl.validationIssues = ctrl.topic.validate();
             var prepublishTopicValidationIssues = (
