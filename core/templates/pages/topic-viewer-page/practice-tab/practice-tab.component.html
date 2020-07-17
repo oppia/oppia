@@ -1,20 +1,20 @@
 <div class="oppia-practice-tab-container">
-  <md-card class="oppia-page-card oppia-long-text">
+  <mat-card class="oppia-page-card oppia-long-text">
     <h2 class="tab-title">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate"></span>
     </h2>
     <span class="practice-content">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate"></span>
     </span>
-    <md-checkbox *ngFor="let subtopic of availableSubtopics" ng-model="selectedSubtopicIndices[$index]">
+    <mat-checkbox *ngFor="let subtopic of availableSubtopics; let i = index">
       {{ subtopic.getTitle() }}
-    </md-checkbox>
-    <md-button ng-disabled="isStartButtonDisabled()"
+    </mat-checkbox>
+    <button mat-raised-button color="accent" [disabled]="isStartButtonDisabled()"
                (click)="openNewPracticeSession()"
-               class="practice-session-button md-accent md-raised">
+               class="practice-session-button mat-accent mat-raised">
       <span translate="I18N_TOPIC_VIEWER_START_PRACTICE"></span>
-    </md-button>
-  </md-card>
+    </button>
+  </mat-card>
 </div>
 <style>
   practice-tab .oppia-practice-tab-container .oppia-page-card {
@@ -33,7 +33,7 @@
     }
   }
 
-  practice-tab .md-button {
+  practice-tab .mat-button {
     align-self: center;
     border-radius: 0.4em;
     color: white;
@@ -43,16 +43,16 @@
     width: 200px;
   }
 
-  practice-tab md-checkbox .md-label {
+  practice-tab mat-checkbox .mat-label {
     margin-top: -1px;
     vertical-align: top;
   }
 
-  practice-tab .md-button.md-raised.md-accent.practice-session-button:not([disabled]) {
+  practice-tab .mat-button.mat-raised.mat-accent.practice-session-button:not([disabled]) {
     background-color: #00645C;
   }
 
-  practice-tab md-checkbox {
+  practice-tab mat-checkbox {
     margin-top: 1vh;
   }
 

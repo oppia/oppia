@@ -20,12 +20,21 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  imports: [CommonModule, BrowserAnimationsModule,
-    MatButtonModule, MatCardModule
+  imports: [
+    CommonModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatCardModule
   ],
-  exports: [BrowserAnimationsModule, MatButtonModule, MatCardModule]
+  exports: [
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatCardModule]
 })
 export class MaterialModule {}

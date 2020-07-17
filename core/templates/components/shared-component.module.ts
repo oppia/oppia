@@ -27,10 +27,14 @@ import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
-import { SharingLinksComponent } from
-  './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
+import { SharingLinksComponent } from
+  './common-layout-directives/common-elements/sharing-links.component';
+import { StorySummaryTileDirective } from
+  './summary-tile/story-summary-tile.directive';
+import { SubtopicSummaryTileDirective } from
+  './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
@@ -39,17 +43,34 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, ExplorationEmbedButtonModalComponent,
-    SkillMasteryViewerComponent, SocialButtonsComponent],
-  entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+
+  declarations: [
+    BackgroundBannerComponent,
+    ExplorationEmbedButtonModalComponent,
+    SharingLinksComponent,
+    SkillMasteryViewerComponent,
+    StorySummaryTileDirective,
+    SocialButtonsComponent,
+    SubtopicSummaryTileDirective,
+    TranslatePipe
+  ],
+
+  entryComponents: [
+    BackgroundBannerComponent,
+    SharingLinksComponent,
     // These elements will remain here even after migration.
-    ExplorationEmbedButtonModalComponent, SkillMasteryViewerComponent,
+    ExplorationEmbedButtonModalComponent,
+    SkillMasteryViewerComponent,
     SocialButtonsComponent
   ],
+
   exports: [
-    BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, MaterialModule
+    BackgroundBannerComponent,
+    TranslatePipe,
+    SharingLinksComponent,
+    StorySummaryTileDirective,
+    SubtopicSummaryTileDirective,
+    MaterialModule
   ],
 })
 

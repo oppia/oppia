@@ -1,12 +1,12 @@
 <div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()">
   <div class="subtopic-thumbnail"
-       ng-style="{background: $ctrl.getSubtopic().getThumbnailBgColor()}">
+       ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
     <img ng-src="<[$ctrl.thumbnailUrl]>"
          class="img-thumbnail"
-         ng-style="{background: $ctrl.getSubtopic().getThumbnailBgColor()}">
+         ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
   </div>
   <div class="subtopic-title">
-    <[$ctrl.getSubtopic().getTitle()]>
+    <[$ctrl.subtopic.getTitle()]>
   </div>
 </div>
 <style>

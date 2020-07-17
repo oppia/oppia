@@ -27,10 +27,9 @@ angular.module('oppia').directive('storySummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getStorySummary: '&storySummary'
+        storySummary: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/story-summary-tile.directive.html'),
+      template: require('./story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'AssetsBackendApiService', 'WindowDimensionsService',
@@ -42,7 +41,7 @@ angular.module('oppia').directive('storySummaryTile', [
           ctrl.getStoryLink = function() {
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
-                story_id: ctrl.getStorySummary().getId()
+                story_id: ctrl.storySummary.getId()
               });
           };
 
@@ -56,7 +55,7 @@ angular.module('oppia').directive('storySummaryTile', [
           };
 
           ctrl.$onInit = function() {
-            ctrl.nodeCount = ctrl.getStorySummary().getNodeTitles().length;
+            ctrl.nodeCount = ctrl.storySummary.getNodeTitles().length;
             ctrl.chaptersDisplayed = 3;
             if (WindowDimensionsService.getWidth() <= 800) {
               ctrl.chaptersDisplayed = 2;
@@ -66,11 +65,11 @@ angular.module('oppia').directive('storySummaryTile', [
               ctrl.showButton = true;
             }
 
-            if (ctrl.getStorySummary().getThumbnailFilename()) {
+            if (ctrl.storySummary.getThumbnailFilename()) {
               ctrl.thumbnailUrl = (
                 AssetsBackendApiService.getThumbnailUrlForPreview(
-                  ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),
-                  ctrl.getStorySummary().getThumbnailFilename()));
+                  ENTITY_TYPE.STORY, ctrl.storySummary.getId(),
+                  ctrl.storySummary.getThumbnailFilename()));
             } else {
               ctrl.thumbnailUrl = null;
             }
@@ -79,3 +78,16 @@ angular.module('oppia').directive('storySummaryTile', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'story-summary-tile'
+})
+export class StorySummaryTileDirective extends UpgradeComponent {
+  @Input() storySummary;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('storySummaryTile', elementRef, injector);
+  }
+}
