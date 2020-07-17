@@ -3,7 +3,7 @@
     <div class="navbar-tabs">
       <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getTotalWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>" class="nav-item icon">
         <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="$ctrl.selectMainTab()"
-           class="nav-link navbar-tab protractor-test-edit-topic-tab">
+           class="nav-link navbar-tab protractor-test-edit-topic-tab" tabindex="0">
           <i class="material-icons">&#xE254;</i> <span>Topic</span>
         </a>
         <div ng-show="$ctrl.getTotalWarningsCount()"
@@ -32,13 +32,13 @@
       </li>
 
       <li ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon">
-        <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="$ctrl.selectQuestionsTab()">
+        <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="$ctrl.selectQuestionsTab()" tabindex="0">
           <i class="material-icons">&#xE254;</i><span>Questions</span>
         </a>
       </li>
 
       <li class="nav-item icon">
-        <a ng-click="$ctrl.openTopicViewer()" class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
+        <a ng-click="$ctrl.openTopicViewer()" class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons">&#xE037;</i><span>Preview</span>
         </a>
       </li>
