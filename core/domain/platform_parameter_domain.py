@@ -335,14 +335,10 @@ class PlatformParameterRule(python_utils.OBJECT):
 
     @property
     def filters(self):
-        """Tries to match the given context with the filter against its
-        value(s).
-
-        Args:
-            context: EvaluationContext. The context for evaluation.
+        """Returns the filters of the rule.
 
         Returns:
-            bool. True if the filter is matched.
+            list(PlatformParameterFilter). the filters of the rule.
         """
         return self._filters
 
@@ -388,11 +384,11 @@ class PlatformParameterRule(python_utils.OBJECT):
                 for filter_domain in self._filters))
 
     def to_dict(self):
-        """Returns a dict representation of the PlatformParameterFilter domain
+        """Returns a dict representation of the PlatformParameterRule domain
         object.
 
         Returns:
-            dict. A dict mapping of all fields of PlatformParameterFilter
+            dict. A dict mapping of all fields of PlatformParameterRule
             object.
         """
         return {
@@ -402,13 +398,22 @@ class PlatformParameterRule(python_utils.OBJECT):
         }
 
     def validate(self):
-        """not ready."""
+        """Validates the PlatformParameterRule domain object."""
         for filter_domain_object in self._filters:
             filter_domain_object.validate()
 
     @classmethod
     def create_from_dict(cls, rule_dict):
-        """not ready."""
+        """Returns an PlatformParameterRule object from a dict.
+
+        Args:
+            rule_dict: dict. A dict mapping of all fields of
+                PlatformParameterRule object.
+
+        Returns:
+            PlatformParameterRule. The corresponding PlatformParameterRule
+            domain object.
+        """
         return cls(
             filters=[
                 PlatformParameterFilter.create_from_dict(filter_dict)
@@ -418,7 +423,7 @@ class PlatformParameterRule(python_utils.OBJECT):
 
 
 class PlatformParameterMetadata(python_utils.OBJECT):
-    """not ready."""
+    """Domain object for metadatas of platform parameters."""
 
     def __init__(self, is_feature, stage):
         """not ready."""
@@ -427,16 +432,32 @@ class PlatformParameterMetadata(python_utils.OBJECT):
 
     @property
     def is_feature(self):
-        """not ready."""
+        """Returns True if the corresponding platform parameter is a feature
+        flag.
+
+        Returns:
+            bool. True if the corresponding platform parameter is a feature
+            flag.
+        """
         return self._is_feature
 
     @property
     def stage(self):
-        """not ready."""
+        """Returns the stage of the feature flag.
+
+        Returns:
+            str. the stage of the feature flag.
+        """
         return self._stage
 
     def to_dict(self):
-        """not ready."""
+        """Returns a dict representation of the PlatformParameterMetadata
+        domain object.
+
+        Returns:
+            dict. A dict mapping of all fields of PlatformParameterMetadata
+            object.
+        """
         return {
             'is_feature': self._is_feature,
             'stage': self.stage,
@@ -444,7 +465,16 @@ class PlatformParameterMetadata(python_utils.OBJECT):
 
     @classmethod
     def create_from_dict(cls, metadata_dict):
-        """not ready."""
+        """Returns an PlatformParameterMetadata object from a dict.
+
+        Args:
+            metadata_dict: dict. A dict mapping of all fields of
+                PlatformParameterMetadata object.
+
+        Returns:
+            PlatformParameterMetadata. The corresponding
+            PlatformParameterMetadata domain object.
+        """
         return cls(
             is_feature=metadata_dict.get('is_feature', False),
             stage=metadata_dict.get('stage', None),
@@ -452,7 +482,7 @@ class PlatformParameterMetadata(python_utils.OBJECT):
 
 
 class PlatformParameter(python_utils.OBJECT):
-    """not ready."""
+    """Domain object for platform parameters."""
 
     CMD_CHANGE_VARIABLE_SETTING = 'change_variable_setting'
 
@@ -473,31 +503,61 @@ class PlatformParameter(python_utils.OBJECT):
 
     @property
     def name(self):
-        """not ready."""
+        """Returns the name of the platform parameter.
+
+        Returns:
+            str. the name of the platform parameter.
+        """
         return self._name
 
     @property
     def description(self):
-        """not ready."""
+        """Returns the description of the platform parameter.
+
+        Returns:
+            str. the description of the platform parameter.
+        """
         return self._description
 
     @property
     def data_type(self):
-        """not ready."""
+        """Returns the data type of the platform parameter.
+
+        Returns:
+            str. the data type of the platform parameter.
+        """
         return self._data_type
 
     @property
     def rules(self):
-        """not ready."""
+        """Returns the rules of the platform parameter.
+
+        Returns:
+            list(PlatformParameterRules). the rules of the platform parameter.
+        """
         return self._rules
 
     @property
     def metadata(self):
-        """not ready."""
+        """Returns the metadata of the platform parameter.
+
+        Returns:
+            PlatformParameterMetadata. the metadata of the platform parameter.
+        """
         return self._metadata
 
     def update(self, committer_id, new_rule_dicts):
-        """not ready."""
+        """Updates the rules of the platform parameter instance.
+
+        Args:
+            committer_id: str. ID of the committer.
+            new_rule_dicts: list(dist). A list of dict mappings of all fields
+                of PlatformParameterRule object, used for creating
+                PlatformParameterRule instances.
+
+        Returns:
+            PlatformParameter. the instance with updated rules.
+        """
         # Set value in datastore.
         model_instance = parameter_models.PlatformParameterModel.get(
             self._name, strict=False)
@@ -528,7 +588,7 @@ class PlatformParameter(python_utils.OBJECT):
             }])
 
     def validate(self):
-        """not ready."""
+        """Validates the PlatformParameter domain object."""
         default_rule = self._rules[-1]
         if len(default_rule.filters) != 0:
             raise utils.ValidationError(
@@ -549,16 +609,28 @@ class PlatformParameter(python_utils.OBJECT):
         if self._metadata.is_feature:
             self._validate_feature_flag()
 
-
     def evaluate(self, context):
-        """not ready."""
+        """Evaluates the value of the platform parameter in the given context.
+        The value of first matched rule is returned as the result.
+
+        Args:
+            context: EvaluationContext. The context for evaluation.
+
+        Returns:
+            *. The evaluate result of the platform parameter.
+        """
         for rule in self._rules:
             matched, value = rule.evaluate(context)
             if matched:
                 return value
 
     def to_dict(self):
-        """not ready."""
+        """Returns a dict representation of the PlatformParameter domain
+        object.
+
+        Returns:
+            dict. A dict mapping of all fields of PlatformParameter object.
+        """
         return {
             'name': self._name,
             'description': self._description,
@@ -568,7 +640,9 @@ class PlatformParameter(python_utils.OBJECT):
         }
 
     def _validate_feature_flag(self):
-        """not ready."""
+        """Validates the PlatformParameter domain object that is a feature
+        flag.
+        """
         if self._data_type != 'bool':
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got %s '
@@ -604,7 +678,16 @@ class PlatformParameter(python_utils.OBJECT):
 
     @classmethod
     def create_from_dict(cls, para_dict):
-        """not ready."""
+        """Returns an PlatformParameter object from a dict.
+
+        Args:
+            para_dict: dict. A dict mapping of all fields of
+                PlatformParameter object.
+
+        Returns:
+            PlatformParameter. The corresponding PlatformParameter domain
+            object.
+        """
         return cls(
             name=para_dict['name'],
             description=para_dict['description'],
@@ -618,7 +701,14 @@ class PlatformParameter(python_utils.OBJECT):
 
     @staticmethod
     def get_memcache_key(name):
-        """not ready."""
+        """Returns the key for the platform parameter in memcache service.
+
+        Args:
+            name: str. The name of the platform parameter.
+
+        Returns:
+            str. The key for memcache service.
+        """
         return 'PLATFORM_PARAMETER:%s' % name
 
 
