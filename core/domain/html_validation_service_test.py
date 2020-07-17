@@ -1672,11 +1672,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertTrue(
                 python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
 
-    def test_extract_math_rich_text_related_information_from_html(self):
-        """Test that the estimate_size_of_svg_for_math_expressions_in_html
-        extracts the required information from all the math tags.
+    def test_extract_latex_values_when_all_math_tags_have_empty_svg_filename(
+            self):
+        """Test that extract_latex_values_from_math_rich_text_without_filename
+        extracts filenames when all math tags have empty filename field.
         """
-        html_string1 = (
+        html_string = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
@@ -1692,42 +1693,45 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         expected_list_of_latex = [
             '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
-        expected_size = 45000
-        expected_largest_expression = '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
-        size, largest_expression, list_of_latex = (
+        list_of_latex = (
             html_validation_service.
-            extract_math_rich_text_related_information_from_html(html_string1))
-        self.assertEqual(expected_size, size)
-        self.assertEqual(largest_expression, expected_largest_expression)
+            extract_latex_values_from_math_rich_text_without_filename(
+                html_string))
         self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
 
-        html_string2 = (
+    def test_extract_latex_values_when_math_tags_have_non_empty_svg_filename(
+            self):
+        """Test that extract_latex_values_from_math_rich_text_without_filename
+        extracts filenames when some math tags have non emoty filename field.
+        """
+
+        html_string = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}'
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
             ';quot;}"></oppia-noninteractive-math>'
             '<oppia-noninteractive-math math_content-with-value="{&amp;'
             'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+(x^2)&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            'quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}"></oppia'
             '-noninteractive-math>'
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'
             'uot;raw_latex&amp;quot;: &amp;quot;\\\\sqrt{x}&amp;quot;, &am'
             'p;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></opp'
             'ia-noninteractive-math>')
 
-        expected_list_of_latex = [
-            '\\sqrt{x}', '\\frac{x}{y}', '+,+,+,+(x^2)']
-        expected_size = 23000
-        expected_largest_expression = '+,+,+,+(x^2)'
-        size, largest_expression, list_of_latex = (
+        # Here '+,+,+,+(x^2)' won't be extracted because the corresponding
+        # math tag has a non-empty svg_filename field.
+        expected_list_of_latex = ['\\sqrt{x}', '\\frac{x}{y}']
+        list_of_latex = (
             html_validation_service.
-            extract_math_rich_text_related_information_from_html(html_string2))
-        self.assertEqual(expected_size, size)
-        self.assertEqual(largest_expression, expected_largest_expression)
+            extract_latex_values_from_math_rich_text_without_filename(
+                html_string))
         self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
 
-
-
+    def test_extract_latex_values_when_no_math_tags_are_present(self):
+        """Test that extract_latex_values_from_math_rich_text_without_filename
+        when there are no math tags present in the HTML.
+        """
         html_string_with_no_math = (
             '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
             '</oppia-noninteractive-image>Hello this is test case to check that'
@@ -1735,47 +1739,26 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             html_validation_service.
-            extract_math_rich_text_related_information_from_html(
-                html_string_with_no_math), (0, '', []))
+            extract_latex_values_from_math_rich_text_without_filename(
+                html_string_with_no_math), [])
 
-    def test_validate_svg_image_filenames_in_math_rte_components(self):
-        """Test that the validate_svg_image_filenames_in_math_rte_components
-        method checks all the filenames in the math-tag to have images saved in
-        gcs.
+    def test_extract_svg_filenames_in_math_rte_components(self):
+        """Test that the extract_svg_filenames_in_math_rte_components
+        method extracts all the filenames from math rich-text components in
+        html.
         """
-        html_string_with_filename_having_image_saved = (
+        html_string_with_filename_having_filename = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-            ';img.png&amp;quot;}"></oppia-noninteractive-math>'
+            ';img.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1'))
-        fs.commit('image/img.png', raw_image, mimetype='image/png')
-        self.assertEqual(
-            len(
-                html_validation_service.
-                validate_svg_image_filenames_in_math_rte_components(
-                    html_string_with_filename_having_image_saved,
-                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1')), 0)
 
-        html_string_with_filename_having_no_image_saved = (
-            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
-            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
-            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-            ';invalid.png&amp;quot;}"></oppia-noninteractive-math>'
-        )
         self.assertEqual(
-            len(
-                html_validation_service.
-                validate_svg_image_filenames_in_math_rte_components(
-                    html_string_with_filename_having_no_image_saved,
-                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1')), 1)
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(
+                html_string_with_filename_having_filename), ['img.svg'])
+
         html_string_with_no_filename = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
@@ -1783,11 +1766,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ';&amp;quot;}"></oppia-noninteractive-math>'
         )
         self.assertEqual(
-            len(
-                html_validation_service.
-                validate_svg_image_filenames_in_math_rte_components(
-                    html_string_with_no_filename,
-                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1')), 1)
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(
+                html_string_with_no_filename), [])
 
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for

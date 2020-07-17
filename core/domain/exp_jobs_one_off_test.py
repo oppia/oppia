@@ -2750,7 +2750,8 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         self.assertEqual(len(actual_output), 0)
 
 
-class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
+class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
+        test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -2760,7 +2761,8 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(
-            MathExplorationsImageGenerationAuditJobTests, self).setUp()
+            ExplorationMathRichTextInfoModelGenerationOneOffJobTests,
+            self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -2930,27 +2932,30 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration2)
         exp_services.save_new_exploration(self.albert_id, exploration3)
 
-        mock_max_size_of_math_svg_batch = 0.06 * 1024 * 1024
+        mock_max_size_of_math_svgs_batch = 0.06 * 1024 * 1024
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.
-            get_math_exploration_count(), 0)
+            get_count_of_exploration_with_math_rich_text(), 0)
         with self.swap(
-            feconf, 'MAX_SIZE_OF_MATH_SVG_BATCH_BYTES',
-            mock_max_size_of_math_svg_batch):
+            feconf, 'MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES',
+            mock_max_size_of_math_svgs_batch):
             job_id = (
                 exp_jobs_one_off
-                .MathExplorationsImageGenerationAuditJob.create_new())
-            exp_jobs_one_off.MathExplorationsImageGenerationAuditJob.enqueue(
-                job_id)
+                .ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                create_new())
+            (
+                exp_jobs_one_off.
+                ExplorationMathRichTextInfoModelGenerationOneOffJob.enqueue(
+                    job_id))
             self.process_and_flush_pending_tasks()
-
             actual_output = (
                 exp_jobs_one_off
-                .MathExplorationsImageGenerationAuditJob.get_output(job_id))
+                .ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                get_output(job_id))
 
         actual_output_list = ast.literal_eval(actual_output[0])
         self.assertEqual(
-            actual_output_list[1]['largest_math_expression'],
+            actual_output_list[1]['longest_raw_latex_string'],
             '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)')
         self.assertEqual(
             actual_output_list[1]['number_of_explorations_having_math'], 3)
@@ -2989,7 +2994,7 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
             sorted(expected_latex_values_1))
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.
-            get_math_exploration_count(), 3)
+            get_count_of_exploration_with_math_rich_text(), 3)
 
     def test_one_off_job_fails_with_invalid_exploration(self):
         """Test the audit job fails when there is an invalid exploration."""
@@ -3012,18 +3017,21 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
 
         job_id = (
             exp_jobs_one_off
-            .MathExplorationsImageGenerationAuditJob.create_new())
-        exp_jobs_one_off.MathExplorationsImageGenerationAuditJob.enqueue(
-            job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
-            self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            observed_log_messages,
-            ['Exploration %s failed non-strict validation: '
-             'Invalid language_code: invalid_language_code'
-             % (self.VALID_EXP_ID)])
-
+            .ExplorationMathRichTextInfoModelGenerationOneOffJob.create_new())
+        (
+            exp_jobs_one_off.
+            ExplorationMathRichTextInfoModelGenerationOneOffJob.enqueue(
+                job_id))
+        self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMathRichTextInfoModelGenerationOneOffJob.
+            get_output(job_id))
+        expected_output = (
+            [u'[u\'validation_error\', [u\'Exploration exp_id0 failed non-' +
+             'strict validation: Invalid language_code: invalid_language_' +
+             'code\']]'])
+        self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
@@ -3049,4 +3057,51 @@ class MathExplorationsImageGenerationAuditJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, 'exp_id1')
         run_job_for_deleted_exp(
             self,
-            exp_jobs_one_off.MathExplorationsImageGenerationAuditJob)
+            exp_jobs_one_off.
+            ExplorationMathRichTextInfoModelGenerationOneOffJob)
+
+
+class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(
+            ExplorationMathRichTextInfoModelDeletionOneOffJobTests,
+            self).setUp()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='user_id.exp_id',
+            math_images_generation_required=True,
+            estimated_max_size_of_images_in_bytes=1000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='user_id1.exp_id1',
+            math_images_generation_required=True,
+            estimated_max_size_of_images_in_bytes=2000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='user_id2.exp_id2',
+            math_images_generation_required=True,
+            estimated_max_size_of_images_in_bytes=3000).put()
+
+    def test_that_all_the_models_are_deleted(self):
+        no_of_models_before_job_is_run = (
+            exp_models.ExplorationMathRichTextInfoModel.
+            get_count_of_exploration_with_math_rich_text())
+        self.assertEqual(no_of_models_before_job_is_run, 3)
+
+        job = (
+            exp_jobs_one_off.
+            ExplorationMathRichTextInfoModelDeletionOneOffJob)
+        job_id = job.create_new()
+        job.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        actual_output = job.get_output(job_id)
+        no_of_models_after_job_is_run = (
+            exp_models.ExplorationMathRichTextInfoModel.
+            get_count_of_exploration_with_math_rich_text())
+        self.assertEqual(no_of_models_after_job_is_run, 0)
+
+        expected_output = (
+            [u'[u\'model_deleted\', [u\'3 models successfully delelted.\']]'])
+        self.assertEqual(actual_output, expected_output)

@@ -532,7 +532,7 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # We Generate Images for existing math rich text components in batches. This
 # gives the maximum size for a batch of Math SVGs in bytes.
-MAX_SIZE_OF_MATH_SVG_BATCH_BYTES = 31 * 1024 * 1024
+MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576

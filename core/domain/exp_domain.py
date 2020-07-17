@@ -316,6 +316,82 @@ class ExpVersionReference(python_utils.OBJECT):
                 'Expected version to be an int, received %s' % self.version)
 
 
+class ExplorationMathRichTextInfo(python_utils.OBJECT):
+    """Value object representing all the information related to math rich
+    text components in an exploration's HTML.
+    """
+
+    def __init__(self, latex_values):
+        """Initializes an ExplorationMathRichTextInfo domain object.
+
+        Args:
+            latex_values: list(str). list of unique latex values.
+        """
+        self.latex_values = latex_values
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this ExplorationMathRichTextInfo domain
+        object.
+
+        Returns:
+            dict. A dict, mapping all fields of ExplorationMathRichTextInfo
+            instance.
+        """
+        return {
+            'latex_values': self.latex_values,
+        }
+
+    def validate(self):
+        """Validates properties of the ExplorationMathRichTextInfo.
+
+        Raises:
+            ValidationError: attributes of the ExplorationMathRichTextInfo
+                are invalid.
+        """
+        if not isinstance(self.latex_values, list):
+            raise utils.ValidationError('Expected latex_values to be a list')
+        for latex_value in self.latex_values:
+            if not isinstance(latex_value, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each element in the list of latex values to be'
+                    ' a str')
+
+    def get_svg_size_in_bytes(self):
+        """Returns the approximate size of SVG images for the latex values in
+        bytes.
+
+        Returns:
+            int. The approximate size of Math SVGs in bytes.
+        """
+
+        # The approximate size for an SVG image for a Latex with one character
+        # is around 1000 Kb. But, when the number of characters increase the
+        # size of SVG per character reduces. For example: If the size of SVG
+        # for the character 'a' is 1000 bytes, the size of SVG for 'abc' will
+        # be lesser than 3000 bytes. So the below approximation to find the
+        # size will give us the maximum size.
+        size_in_bytes = 0
+        for latex_value in self.latex_values:
+            # The characters in special Latex keywords like 'frac' and 'sqrt'
+            #  don't add up to the total size of SVG.
+            length_of_expression = (
+                len(
+                    latex_value.replace('frac', '').replace('sqrt', '').replace(
+                        ' ', '')))
+            size_in_bytes += (length_of_expression * 1000)
+        return size_in_bytes
+
+    def get_largest_latex_value(self):
+        """Returns the largest latex value by length among the latex values in
+        the object.
+
+        Returns:
+            str. The largest latex value.
+        """
+        return max(self.latex_values, key=len)
+
+
 class ExplorationVersionsDiff(python_utils.OBJECT):
     """Domain object for the difference between two versions of an Oppia
     exploration.

@@ -252,15 +252,15 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     # exploration. The field will be true only if for each math rich-text
     # components there is a valid image stored in the datastore.
     math_images_generation_required = ndb.BooleanProperty(
-        indexed=True, default=True)
+        indexed=True, required=True)
     # Approximate maximum size of Math rich-text components SVG images that
     # would be generated for the exploration according to the length of
     # raw_latex value.
     estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
-        indexed=True, default=0)
+        indexed=True, required=True)
     # Set of latex values from all the math-rich text components of the
     # exploration.
-    latex_values = ndb.JsonProperty(default=None)
+    latex_values = ndb.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -275,8 +275,10 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_math_exploration_count(cls):
-        """Returns the total number of math explorations."""
+    def get_count_of_exploration_with_math_rich_text(cls):
+        """Returns the total number of explorations having math rich-text
+        components.
+        """
         return cls.get_all().count()
 
     @classmethod

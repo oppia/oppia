@@ -528,7 +528,7 @@ class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class MathExplorationsImageGenerationAuditJob(
+class ExplorationMathRichTextInfoModelGenerationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that finds all the explorations with math rich text components and
     creates a temporary storage model with all the information required for
@@ -551,70 +551,101 @@ class MathExplorationsImageGenerationAuditJob(
             logging.error(
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
-            return
-        size_of_math_svg = 0
-        largest_math_expression = ''
-        list_of_latex_values = []
-        for state in exploration.states.values():
-            html_string = ''.join(state.get_all_html_content_strings())
-            (
-                size_of_math_svg_in_state, largest_math_expression_in_state,
-                list_of_latex_values_in_state) = (
-                    html_validation_service.
-                    extract_math_rich_text_related_information_from_html(
-                        html_string))
-            list_of_latex_values.extend(list_of_latex_values_in_state)
-            largest_math_expression = (
-                max(
-                    largest_math_expression,
-                    largest_math_expression_in_state, key=len)
-            )
-            size_of_math_svg = size_of_math_svg + size_of_math_svg_in_state
-
-        if size_of_math_svg > 0:
-            value_dict = {
-                'exploration_id': item.id,
-                'size_of_math_svgs': size_of_math_svg,
-                'largest_math_expression': largest_math_expression,
-                'latex_values': list(set(list_of_latex_values))
-            }
             yield (
-                'Information about math-expressions in explorations',
-                value_dict)
+                'validation_error',
+                'Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            return
+        longest_raw_latex_string = ''
+        html_strings_in_exploration = ''
+        for state in exploration.states.values():
+            html_strings_in_exploration += (
+                ''.join(state.get_all_html_content_strings()))
+        list_of_latex_values = (
+            html_validation_service.
+            extract_latex_values_from_math_rich_text_without_filename(
+                html_strings_in_exploration))
+        if len(list_of_latex_values) > 0:
+            math_rich_text_info = (
+                exp_domain.ExplorationMathRichTextInfo(list_of_latex_values))
+            approx_size_of_math_svgs_bytes = (
+                math_rich_text_info.get_svg_size_in_bytes())
+            longest_raw_latex_string = (
+                math_rich_text_info.get_largest_latex_value())
+            yield (
+                'Found exploration with math-tags', {
+                    'exploration_id': item.id,
+                    'approx_size_of_math_svgs_bytes': (
+                        approx_size_of_math_svgs_bytes),
+                    'longest_raw_latex_string': longest_raw_latex_string,
+                    'latex_values': list_of_latex_values
+                })
 
     @staticmethod
     def reduce(key, values):
-        final_values = [ast.literal_eval(value) for value in values]
-        number_of_explorations_having_math = 0
-        largest_math_expression = ''
-        estimated_no_of_batches = 1
-        size_of_math_svgs_in_a_batch = 0
-        for value in final_values:
-            exp_models.ExplorationMathRichTextInfoModel(
-                id=value['exploration_id'],
-                latex_values=value['latex_values'],
-                estimated_max_size_of_images_in_bytes=int(
-                    value['size_of_math_svgs'])).put()
-            number_of_explorations_having_math = (
-                number_of_explorations_having_math + 1)
-            largest_math_expression = (
-                max(
-                    value['largest_math_expression'], largest_math_expression,
-                    key=len))
-            size_of_math_svgs_in_a_batch = (
-                size_of_math_svgs_in_a_batch +
-                int(value['size_of_math_svgs']))
-            if (size_of_math_svgs_in_a_batch >
-                    feconf.MAX_SIZE_OF_MATH_SVG_BATCH_BYTES):
-                size_of_math_svgs_in_a_batch = 0
-                estimated_no_of_batches = estimated_no_of_batches + 1
-        final_value_dict = {
-            'estimated_no_of_batches': estimated_no_of_batches,
-            'largest_math_expression': largest_math_expression,
-            'number_of_explorations_having_math': (
-                number_of_explorations_having_math)
-        }
-        yield (key, final_value_dict)
+        if key == 'Found exploration with math-tags':
+            final_values = [ast.literal_eval(value) for value in values]
+            number_of_explorations_having_math = 0
+            longest_raw_latex_string = ''
+            estimated_no_of_batches = 1
+            approx_size_of_math_svgs_bytes_in_a_batch = 0
+            exploration_math_rich_text_info_models = []
+            total_number_of_svgs_required = 0
+            for value in final_values:
+                exploration_math_rich_text_info_models.append(
+                    exp_models.ExplorationMathRichTextInfoModel(
+                        id=value['exploration_id'],
+                        math_images_generation_required=True,
+                        latex_values=value['latex_values'],
+                        estimated_max_size_of_images_in_bytes=int(
+                            value['approx_size_of_math_svgs_bytes'])))
+                total_number_of_svgs_required += len(value['latex_values'])
+                number_of_explorations_having_math += 1
+                longest_raw_latex_string = (
+                    max(
+                        value['longest_raw_latex_string'],
+                        longest_raw_latex_string, key=len))
+                approx_size_of_math_svgs_bytes_in_a_batch += (
+                    int(value['approx_size_of_math_svgs_bytes']))
+                if (approx_size_of_math_svgs_bytes_in_a_batch >
+                        feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
+                    approx_size_of_math_svgs_bytes_in_a_batch = 0
+                    estimated_no_of_batches += 1
+            exp_models.ExplorationMathRichTextInfoModel.put_multi(
+                exploration_math_rich_text_info_models)
+            final_value_dict = {
+                'estimated_no_of_batches': estimated_no_of_batches,
+                'longest_raw_latex_string': longest_raw_latex_string,
+                'number_of_explorations_having_math': (
+                    number_of_explorations_having_math),
+                'total_number_of_svgs_required': total_number_of_svgs_required
+            }
+            yield (key, final_value_dict)
+        else:
+            yield (key, values)
+
+
+class ExplorationMathRichTextInfoModelDeletionOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes all instances of the ExplorationMathRichTextInfoModel
+    from the datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationMathRichTextInfoModel]
+
+    @staticmethod
+    def map(item):
+        item.delete()
+        yield ('model_deleted', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        no_of_models_deleted = (
+            sum(ast.literal_eval(v) for v in values))
+        yield (key, ['%d models successfully delelted.' % (
+            no_of_models_deleted)])
 
 
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):

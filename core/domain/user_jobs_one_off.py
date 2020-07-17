@@ -18,9 +18,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import logging
 
 from core import jobs
+from core.domain import draft_upgrade_services
+from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -358,6 +362,130 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_model.last_edited_an_exploration = user_commits[0].created_on
 
         user_model.put()
+
+
+class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that finds all the valid exploration draft changes with math rich
+    text components and creates a temporary storage model with all the
+    information required for generating math rich text component SVG images.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationUserDataModel]
+
+    @staticmethod
+    def map(item):
+        exp_id = item.exploration_id
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        draft_change_list = [
+            exp_domain.ExplorationChange(change)
+            for change in item.draft_change_list]
+        draft_change_list_version = item.draft_change_list_exp_version
+        exploration_version = exploration.version
+        final_draft_change_list = None
+
+        if exploration_version == draft_change_list_version:
+            final_draft_change_list = draft_change_list
+        elif exploration_version > draft_change_list_version:
+            updated_draft_change_list = (
+                draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                    draft_change_list, draft_change_list_version,
+                    exploration_version, exp_id))
+            final_draft_change_list = updated_draft_change_list
+
+
+        if final_draft_change_list is not None:
+            try:
+                html_string = ''.join(
+                    draft_upgrade_services.
+                    extract_html_from_draft_change_list(
+                        final_draft_change_list))
+                latex_values = (
+                    html_validation_service.
+                    extract_latex_values_from_math_rich_text_without_filename(
+                        html_string))
+                if len(latex_values) > 0:
+                    math_rich_text_info = (
+                        exp_domain.ExplorationMathRichTextInfo(
+                            latex_values))
+                    approx_size_of_math_svgs_bytes = (
+                        math_rich_text_info.get_svg_size_in_bytes())
+                    longest_raw_latex_string = (
+                        math_rich_text_info.get_largest_latex_value())
+                    yield (
+                        'Found draft changes with math-tags', {
+                            'draft_change_id': item.id,
+                            'approx_size_of_math_svgs_bytes': (
+                                approx_size_of_math_svgs_bytes),
+                            'longest_raw_latex_string': (
+                                longest_raw_latex_string),
+                            'latex_values': latex_values
+                        })
+
+            except Exception as e:
+                logging.error(
+                    'Draft change %s parsing failed: %s' %
+                    (item.id, e))
+                yield (
+                    'failed to parse draft change list.',
+                    'Draft change %s parsing failed: %s' % (item.id, e))
+                return
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'Found draft changes with math-tags':
+            final_values = [ast.literal_eval(value) for value in values]
+            longest_raw_latex_string = ''
+            number_of_drafts_having_math = 0
+            exploration_draft_math_rich_text_info_models = []
+            for value in final_values:
+                exploration_draft_math_rich_text_info_models.append(
+                    user_models.ExplorationDraftChangesMathRichTextInfoModel(
+                        id=value['draft_change_id'],
+                        math_images_generation_required=True,
+                        latex_values=value['latex_values'],
+                        estimated_max_size_of_images_in_bytes=int(
+                            value['approx_size_of_math_svgs_bytes'])))
+                number_of_drafts_having_math += 1
+                longest_raw_latex_string = (
+                    max(
+                        value['longest_raw_latex_string'],
+                        longest_raw_latex_string, key=len))
+            user_models.ExplorationDraftChangesMathRichTextInfoModel.put_multi(
+                exploration_draft_math_rich_text_info_models)
+            final_value_dict = {
+                'longest_raw_latex_string': longest_raw_latex_string,
+                'number_of_drafts_having_math': (
+                    number_of_drafts_having_math)
+            }
+            yield (key, final_value_dict)
+        else:
+            yield (key, values)
+
+
+class DraftChangesMathRichTextInfoModelDeletionOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes all instances of the DraftChangesMathRichTextInfoModel
+    from the datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationDraftChangesMathRichTextInfoModel]
+
+    @staticmethod
+    def map(item):
+        item.delete()
+        yield ('model_deleted', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        no_of_models_deleted = (
+            sum(ast.literal_eval(v) for v in values))
+        yield (key, ['%d models successfully delelted.' % (
+            no_of_models_deleted)])
 
 
 class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(

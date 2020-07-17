@@ -92,7 +92,10 @@ class ExplorationMathRichTextInfoModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExplorationMathRichTextInfoModelUnitTests, self).setUp()
-        exp_models.ExplorationMathRichTextInfoModel(id='exp_id').put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id',
+            math_images_generation_required=True,
+            estimated_max_size_of_images_in_bytes=1000).put()
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -104,10 +107,10 @@ class ExplorationMathRichTextInfoModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationMathRichTextInfoModel.get_export_policy(),
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
-    def test_get_math_exploration_count(self):
+    def test_get_count_of_exploration_with_math_rich_text(self):
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.
-            get_math_exploration_count(), 1)
+            get_count_of_exploration_with_math_rich_text(), 1)
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(

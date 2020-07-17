@@ -8373,6 +8373,33 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.delete_state('fake state')
 
 
+class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
+
+    def test_create_html_math_rich_text_info(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(['abc', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.to_dict(), {
+                'latex_values': ['abc', 'x']
+            })
+
+    def test_get_svg_size_in_bytes(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_svg_size_in_bytes(), 8000)
+
+    def test_get_largest_latex_value(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_largest_latex_value(),
+            'x^2 + 2ax')
+
+
 class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 

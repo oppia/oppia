@@ -923,31 +923,20 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
-def extract_math_rich_text_related_information_from_html(html_string):
-    """Extract information from the math rich-text components from an HTML
-    string. This information will be useful for generating SVG images for these
-    math tags.
+def extract_latex_values_from_math_rich_text_without_filename(html_string):
+    """Extract latex values from math rich-text components whose svg_filename
+    field is empty.
 
     Args:
         html_string: str. The HTML string.
 
     Returns:
-        tuple(int, str, list). A 3-tuple whose elements are as follows:
-        - int. The approximate size of Math SVGs in bytes.
-        - str. The largest raw_latex value in the html string by length.
-        - list. All unique raw_latex values in the math tags.
+        list(str). list of unique latex values of math-tags without svg
+        filenames.
     """
 
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    size_in_bytes = 0
-    largest_math_expression = ''
-    # The approximate size for an SVG image for a Latex with one character
-    # is around 1000 Kb. But, when the number of characters increase the
-    # size of SVG per character reduces. For example: If the size of SVG
-    # for the character 'a' is 1000 bytes, the size of SVG for 'abc' will
-    # be lesser than 3000 bytes. So the below approximation to find the
-    # size will give us the maximum size.
     latex_values = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
@@ -955,53 +944,39 @@ def extract_math_rich_text_related_information_from_html(html_string):
                 math_tag['math_content-with-value'])))
         raw_latex = (
             objects.UnicodeString.normalize(math_content_dict['raw_latex']))
-        latex_values.append(raw_latex)
+        svg_filename = (
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+        if svg_filename == '':
+            latex_values.append(raw_latex)
+
     unique_latex_values = list(set(latex_values))
-    for latex_value in unique_latex_values:
-        # The characters in special Latex keywords like 'frac' and 'sqrt' don't
-        # add up to the total size of SVG.
-        length_of_expression = (
-            len(
-                latex_value.replace('frac', '').replace('sqrt', '').replace(
-                    ' ', '')))
-        size_in_bytes = size_in_bytes + (length_of_expression * 1000)
-        largest_math_expression = (
-            max(latex_value, largest_math_expression, key=len))
-    return (size_in_bytes, largest_math_expression, unique_latex_values)
+    return unique_latex_values
 
 
-def validate_svg_image_filenames_in_math_rte_components(
-        html_string, entity_type, entity_id):
-    """Validates whether all the svg_filenames in a math rich-text component
-    have a corresponding image saved in the gcs.
+def extract_svg_filenames_in_math_rte_components(html_string):
+    """Extracts the svg_filenames from all the math-rich text components in
+    an HTML string.
 
     Args:
         html_string: str. The HTML string.
-        entity_type: str. The type of the entity.
-        entity_id: str. The id of the entity.
 
     Returns:
-        list(str). A list of math tags failing the validation in the HTML
-        string.
+        list(str). A list of svg_filenames present in the HTML.
     """
 
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    error_list = []
+    filenames = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
             json.loads(unescape_html(
                 math_tag['math_content-with-value'])))
         svg_filename = math_content_dict['svg_filename']
-        normalized_svg_filename = (
-            objects.UnicodeString.normalize(svg_filename))
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            entity_type, entity_id))
-        filepath = 'image/%s' % normalized_svg_filename
-        if not fs.isfile(filepath):
-            error_list.append(math_tag)
-    return error_list
+        if svg_filename != '':
+            normalized_svg_filename = (
+                objects.UnicodeString.normalize(svg_filename))
+            filenames.append(normalized_svg_filename)
+    return filenames
 
 
 def add_math_content_to_math_rte_components(html_string):
