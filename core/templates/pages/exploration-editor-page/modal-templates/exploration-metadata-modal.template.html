@@ -18,18 +18,16 @@
     <label ng-style="{'font-weight':'normal'}"> Add a category: how would you categorize your exploration?
       <select2-dropdown item="explorationCategoryService.displayed"
                         choices="CATEGORY_LIST_FOR_SELECT2"
-                        placeholder="Choose or type new"
+                        placeholder="Choose or type a new category"
                         new-choice-regex="^[A-Z a-z]+$"
                         width="100%"
-                        invalid-search-term-message="Invalid category name"
-                        aria-label="Add a category: how would you categorize your exploration?">
+                        invalid-search-term-message="Invalid category name">
       </select2-dropdown>
     </label>
   </p>
-
   <p ng-if="askForLanguageCheck">
-    <label ng-style="{'font-weight':'normal'}"> Verify the language: is your exploration written in this language?
-      <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
+    <label ng-style="{'font-weight':'normal'}"> Verify the language: is your exploration written in this language
+      <select class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
               width="100%">
       </select>
     </label>
