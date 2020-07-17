@@ -83,7 +83,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
 var visibilityOf = async function(element, errorMessage) {
   await browser.wait(
     await until.visibilityOf(element),
-    20000, errorMessage);
+    DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
