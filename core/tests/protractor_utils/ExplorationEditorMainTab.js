@@ -160,10 +160,10 @@ var ExplorationEditorMainTab = function() {
    * Actions
    */
 
-   /*
+  /*
    * Divs
    */
-  
+
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
@@ -511,14 +511,14 @@ var ExplorationEditorMainTab = function() {
       'stateEditorTag not showing up');
     var stateContentEditor = stateEditorTag.element(
       by.css('.protractor-test-state-content-editor'));
-    /*
+    /* Taken out
     await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
     */
-   await waitFor.textToBePresentInElement(
-     stateContentEditor, '',
-     'something is wrong with the state content editor');
+    await waitFor.textToBePresentInElement(
+      stateContentEditor, '',
+      'something is wrong with the state content editor');
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
