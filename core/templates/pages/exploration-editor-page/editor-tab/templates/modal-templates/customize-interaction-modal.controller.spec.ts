@@ -41,7 +41,7 @@ import { ImageClickInputValidationService } from
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 
-fdescribe('Customize Interaction Modal Controller', function() {
+describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
   var $scope = null;
   var $uibModalInstance = null;
@@ -72,7 +72,7 @@ fdescribe('Customize Interaction Modal Controller', function() {
       StateNextContentIdIndexService);
   });
 
-  fdescribe('when state editor is in question mode', function() {
+  describe('when state editor is in question mode', function() {
     beforeEach(angular.mock.inject(function(_$injector_, $controller) {
       $injector = _$injector_;
       var $rootScope = $injector.get('$rootScope');
@@ -102,11 +102,10 @@ fdescribe('Customize Interaction Modal Controller', function() {
       });
     }));
 
-    fit('should evaluate scope variable values correctly', function() {
+    it('should evaluate scope variable values correctly', function() {
       expect($scope.customizationModalReopened).toBe(true);
       // Image Click Input has 2 arg specs.
       expect($scope.customizationArgSpecs.length).toBe(2);
-      console.log(stateCustomizationArgsService.displayed)
       expect(stateCustomizationArgsService.displayed).toEqual({
         imageAndRegions: {
           value: {
