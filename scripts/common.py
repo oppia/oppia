@@ -594,8 +594,9 @@ def wait_for_port_to_be_open(port_number):
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_open(port_number)):
-        python_utils.PRINT('Failed to start server on port %s, exiting ...' %
-                           port_number)
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' %
+            port_number)
         sys.exit(1)
 
 
