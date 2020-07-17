@@ -62,6 +62,7 @@ var createExploration = async function() {
   await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await waitFor.pageToFullyLoad();
   await explorationEditorMainTab.exitTutorial();
 };
 

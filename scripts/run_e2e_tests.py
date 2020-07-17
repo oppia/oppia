@@ -32,7 +32,7 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
-CHROME_DRIVER_VERSION = '77.0.3865.40'
+CHROME_DRIVER_VERSION = '83.0.4103.39'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001

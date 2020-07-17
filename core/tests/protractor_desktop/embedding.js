@@ -39,6 +39,7 @@ describe('Embedding', function() {
   var createCountingExploration = async function() {
     // Intro.
     await explorationEditorMainTab.setStateName('Intro');
+    debugger;
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Given three balls of different colors. How many ways are there ' +
       'to arrange them in a straight line?')
@@ -56,6 +57,7 @@ describe('Embedding', function() {
 
     // Correct but why.
     await explorationEditorMainTab.moveToState('correct but why');
+    debugger;
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Right! Why do you think it is 6?'));
     await explorationEditorMainTab.setInteraction(
@@ -76,6 +78,7 @@ describe('Embedding', function() {
 
     // Not 6.
     await explorationEditorMainTab.moveToState('Not 6');
+    debugger;
     await explorationEditorMainTab.setContent(
       await forms.toRichText('List the different ways?'));
     await explorationEditorMainTab.setInteraction('Continue', 'try again');
@@ -85,6 +88,7 @@ describe('Embedding', function() {
 
     // END.
     await explorationEditorMainTab.moveToState('END');
+    debugger;
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Congratulations, you have finished!'));
     await explorationEditorMainTab.setInteraction('EndExploration');
@@ -156,6 +160,7 @@ describe('Embedding', function() {
     await createCountingExploration();
 
     await general.openEditor(explorationId);
+    debugger;
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Version 3'));
     await explorationEditorPage.saveChanges('demonstration edit');
@@ -281,7 +286,7 @@ describe('Embedding', function() {
       // Create an exploration.
       await workflow.createExploration();
       explorationId = await general.getExplorationIdFromEditor();
-
+      debugger;
       await explorationEditorMainTab.setContent(
         await forms.toRichText('Language Test'));
       await explorationEditorMainTab.setInteraction('NumericInput');
@@ -296,6 +301,7 @@ describe('Embedding', function() {
       await responseEditor.setDestination('(try again)', null, false);
 
       await explorationEditorMainTab.moveToState('END');
+      debugger;
       await explorationEditorMainTab.setContent(await forms.toRichText('END'));
       await explorationEditorMainTab.setInteraction('EndExploration');
 
