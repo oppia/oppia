@@ -70,11 +70,38 @@
     width: 30%;
   }
   subtopic-preview-tab .content {
-    padding: 30px;
+    padding: 30px 16px;
     width: 65%;
   }
   subtopic-preview-tab .content-active {
     background-color: #F0FFFF;
     border: 1px solid #707070;
+  }
+
+  @media screen and (max-width: 1000px) {
+    subtopic-preview-tab .content-box {
+      width: 80%;
+    }
+    subtopic-preview-tab .left-menu {
+      width: 32%;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    subtopic-preview-tab .back-to-subtopic-container {
+      margin-bottom: 20px;
+      margin-left: 1%;
+      margin-top: 40px;
+    }
+    subtopic-preview-tab .left-menu {
+      display: none;
+    }
+    subtopic-preview-tab .content,
+    subtopic-preview-tab .content-box {
+      width: 100%;
+    }
+    subtopic-preview-tab .content {
+      padding: 30px;
+    }
   }
 </style>
