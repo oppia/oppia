@@ -116,7 +116,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'editable-collection-backend-api.service.ts',
     'editable-story-backend-api.service.ts',
     'editor-navbar-breadcrumb.directive.ts',
-    'editor-navigation.directive.ts',
     'editor-reloading-modal.controller.ts',
     'email-dashboard-data.service.ts',
     'entity-creation.service.ts',
