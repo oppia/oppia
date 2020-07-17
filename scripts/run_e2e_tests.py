@@ -446,18 +446,40 @@ def get_chrome_driver_version():
     This method follows the steps mentioned here:
     https://chromedriver.chromium.org/downloads/version-selection
     """
-    try:
-        proc = subprocess.Popen(
-            ['google-chrome', '--version'], stdout=subprocess.PIPE)
-        output = proc.stdout.readline()
-    except OSError:
-        raise Exception(
-            'Failed to execute "google-chrome --version" command. This is '
-            'used to determine the chromedriver version to use. Please set '
-            'the chromedriver version manually using --chrome_driver_version '
-            'flag. To determine the chromedriver version to be used, please '
-            'follow the instructions mentioned in the following URL:\n'
-            'https://chromedriver.chromium.org/downloads/version-selection')
+    if common.is_mac_os():
+        try:
+            # Since the command below includes file names that have spaces,
+            # the arg shell=True was used and the command was not separated
+            # by its arguments. r is used here because we want the \ to be
+            # treated as a \ and not an escape character.
+            proc = subprocess.Popen(
+                [r'/Applications/Google\ Chrome.app/Contents/MacOS/Google\ '
+                 'Chrome --version'], stdout=subprocess.PIPE, shell=True)
+            output = proc.stdout.readline()
+        except OSError:
+            raise Exception(
+                r'Failed to execute "/Applications/Google\ '
+                r'Chrome.app/Contents/MacOS/Google\ Chrome --version" command. '
+                'This is used to determine which chromedriver version to use. '
+                'Please set the chromedriver version manually using '
+                '--chrome_driver_version flag. To determine the chromedriver '
+                'version to be used, please follow the instructions mentioned '
+                'in the following URL:\n'
+                'https://chromedriver.chromium.org/downloads/version-selection')
+    else:
+        try:
+            proc = subprocess.Popen(
+                ['google-chrome', '--version'], stdout=subprocess.PIPE)
+            output = proc.stdout.readline()
+        except OSError:
+            raise Exception(
+                'Failed to execute "google-chrome --version" command. This is '
+                'used to determine which chromedriver version to use. Please '
+                'set the chromedriver version manually using '
+                '--chrome_driver_version flag. To determine the chromedriver '
+                'version to be used, please follow the instructions mentioned '
+                'in the following URL:\n'
+                'https://chromedriver.chromium.org/downloads/version-selection')
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     chrome_version = '.'.join(chrome_version.split('.')[:-1])
     response = python_utils.url_open(
