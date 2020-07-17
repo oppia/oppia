@@ -80,7 +80,8 @@ export class UserService {
       this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
     if (userInfo.isLoggedIn()) {
-      this.http.get<IProfilePictureDataUrl>('/preferenceshandler/profile_picture').toPromise().then(
+      this.http.get<IProfilePictureDataUrl>(
+        '/preferenceshandler/profile_picture').toPromise().then(
         (response) => {
           if (response.profile_picture_data_url) {
             profilePictureDataUrl = response.profile_picture_data_url;
@@ -108,11 +109,12 @@ export class UserService {
     var urlParameters = {
       current_url: this.windowRef.nativeWindow.location.pathname
     };
-    this.http.get<ILoginUrl>('/url_handler', {params: urlParameters}).toPromise().then(
-      (response) => {
-        successCallback(response.login_url);
-      }
-    );
+    this.http.get<ILoginUrl>('/url_handler', {params: urlParameters}).
+      toPromise().then(
+        (response) => {
+          successCallback(response.login_url);
+        }
+      );
   }
 
   private _getUserCommunityRightsData(
