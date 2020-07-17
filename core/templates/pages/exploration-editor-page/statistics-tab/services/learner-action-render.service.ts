@@ -29,7 +29,7 @@
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'answer-submit-action.directive.ts');
+  'answer-submit-action.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'multiple-incorrect-submissions-issue.component.ts');
