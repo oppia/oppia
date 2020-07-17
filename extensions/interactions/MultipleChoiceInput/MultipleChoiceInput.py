@@ -70,15 +70,8 @@ class MultipleChoiceInput(base.BaseInteraction):
     }]
 
     _answer_visualization_specs = [{
-        # Bar chart with answer counts.
-        'id': 'BarChart',
-        'options': {
-            'x_axis_label': 'Answer',
-            'y_axis_label': 'Count',
-        },
+        'id': 'SortedTiles',
+        'options': {'header': 'Top answers', 'use_percentages': True},
         'calculation_id': 'AnswerFrequencies',
-        # Bar charts don't have any useful way to display which answers are
-        # addressed yet. By setting this option to False, we consequentially
-        # avoid doing extra computation.
-        'addressed_info_is_supported': False,
+        'addressed_info_is_supported': True,
     }]

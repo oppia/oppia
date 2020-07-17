@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
@@ -36,6 +37,7 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
+from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -46,7 +48,7 @@ import utils
 
 (exp_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
-gae_image_services = models.Registry.import_gae_image_services()
+memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -187,7 +189,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -196,25 +198,25 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'B']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA',
                 },
                 'B': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleB',
                 },
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'C']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -1873,16 +1875,23 @@ title: A title
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
-        fs.commit('abc.png', raw_image)
+        fs.commit('image/abc.png', raw_image)
+        # Audio files should not be included in asset downloads.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+        fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
         zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
 
-        self.assertEqual(zf.namelist(), ['A title.yaml', 'assets/abc.png'])
+        self.assertEqual(
+            zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
-        self.assertEqual(zf.open('assets/abc.png').read(), raw_image)
+        self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image)
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
@@ -3810,7 +3819,7 @@ title: Old Title
         exploration = self.save_new_default_exploration('exp_id', 'user_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -3821,7 +3830,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -3873,6 +3882,55 @@ title: Old Title
                     'property_name': 'title',
                     'new_value': 'new title'
                 })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
+
+    def test_update_exploration_does_nothing_if_create_stats_model_fails(self):
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
+
+        self.save_new_valid_exploration('exp_id', 'user_id')
+        with swap_create_stats_model, assert_raises_regexp:
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'})],
+                'Changed language code.')
+
+        self.assertIsNone(
+            exp_fetchers.get_exploration_by_id(
+                'exp_id', strict=False, version=2))
+
+    def test_memcache_does_not_persist_even_if_create_stats_model_fails(self):
+        self.save_new_valid_exploration('exp_id', 'user_id')
+
+        memcache_key = exp_fetchers.get_exploration_memcache_key('exp_id')
+        memcached_exploration = (
+            memcache_services.get_multi([memcache_key]).get(memcache_key))
+        actual_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        self.assertEqual(
+            memcached_exploration.to_dict(), actual_exploration.to_dict())
+
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
+
+        with swap_create_stats_model, assert_raises_regexp:
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'})],
+                'Changed language code.')
+
+        memcache_key = exp_fetchers.get_exploration_memcache_key('exp_id')
+        memcached_exploration = (
+            memcache_services.get_multi([memcache_key]).get(memcache_key))
+        self.assertIsNone(memcached_exploration)
 
     def test_update_language_code(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -4171,6 +4229,26 @@ title: Old Title
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):
             exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
+
+    def test_revert_exploration_does_nothing_if_create_stats_model_fails(self):
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
+
+        self.save_new_valid_exploration('exp_id', 'user_id')
+        exp_services.update_exploration(
+            'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'})], 'Changed interaction_solutions.')
+        with swap_create_stats_model, assert_raises_regexp:
+            exp_services.revert_exploration('user_id', 'exp_id', 2, 1)
+
+        self.assertIsNone(
+            exp_fetchers.get_exploration_by_id(
+                'exp_id', strict=False, version=3))
 
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):

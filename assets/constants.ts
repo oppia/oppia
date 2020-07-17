@@ -5125,6 +5125,7 @@ export = {
       "LogicProof",
       "NumericInput",
       "SetInput",
+      "NumericExpressionInput",
       "AlgebraicExpressionInput",
       "MathEquationInput",
       "MathExpressionInput",
@@ -5204,7 +5205,6 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
-  "ENABLE_SVG_EDITOR_RTE": false,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
@@ -5298,6 +5298,12 @@ export = {
     "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
+  ],
+
+  // Functions allowed in math interactions.
+  "MATH_FUNCTION_NAMES": [
+    "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
+    "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
 
   // Unfinished features.

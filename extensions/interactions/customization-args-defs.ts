@@ -196,6 +196,8 @@ export interface ITextInputCustomizationArgs {
 
 export interface IMathExpressionCustomizationArgs { }
 
+export interface INumericExpressionInputCustomizationArgs { }
+
 export interface INumericInputCustomizationArgs { }
 
 export interface INumberWithUnitsCustomizationArgs { }
@@ -221,6 +223,7 @@ export type IInteractionCustomizationArgs = (
   IMultipleChoiceInputCustomizationArgs |
   IMusicNotesInputCustomizationArgs |
   INumberWithUnitsCustomizationArgs |
+  INumericExpressionInputCustomizationArgs |
   INumericInputCustomizationArgs |
   IPencilCodeCustomizationArgs |
   ISetInputCustomizationArgs |

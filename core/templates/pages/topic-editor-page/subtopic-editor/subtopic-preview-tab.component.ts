@@ -31,6 +31,7 @@ require('services/contextual/url.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').component('subtopicPreviewTab', {
   template: require('./subtopic-preview-tab.component.html'),
@@ -39,6 +40,7 @@ angular.module('oppia').component('subtopicPreviewTab', {
     'EntityCreationService', 'TopicEditorStateService',
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService',
+    'WindowDimensionsService',
     'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
     'EVENT_SUBTOPIC_PAGE_LOADED',
     function(
@@ -46,6 +48,7 @@ angular.module('oppia').component('subtopicPreviewTab', {
         EntityCreationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService, UrlInterpolationService, UrlService,
+        WindowDimensionsService,
         EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
         EVENT_SUBTOPIC_PAGE_LOADED) {
       var ctrl = this;
@@ -57,7 +60,6 @@ angular.module('oppia').component('subtopicPreviewTab', {
           $scope.topic.getSubtopicById(parseInt($scope.subtopicId)));
 
         if ($scope.topic.getId() && $scope.subtopic) {
-          $scope.thumbnailIsShown = true;
           TopicEditorStateService.loadSubtopicPage(
             $scope.topic.getId(), $scope.subtopicId);
           $scope.editableTitle = $scope.subtopic.getTitle();
@@ -68,6 +70,9 @@ angular.module('oppia').component('subtopicPreviewTab', {
           $scope.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           $scope.pageContents = $scope.subtopicPage.getPageContents();
+          if ($scope.pageContents) {
+            $scope.htmlData = $scope.pageContents.getHtml();
+          }
         }
       };
 
@@ -78,8 +83,8 @@ angular.module('oppia').component('subtopicPreviewTab', {
 
       $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
         $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
-        var pageContents = $scope.subtopicPage.getPageContents();
-        $scope.htmlData = pageContents.getHtml();
+        $scope.pageContents = $scope.subtopicPage.getPageContents();
+        $scope.htmlData = $scope.pageContents.getHtml();
       });
 
       $scope.changeContent = function(itemToDisplay) {
@@ -95,6 +100,8 @@ angular.module('oppia').component('subtopicPreviewTab', {
       ctrl.$onInit = function() {
         $scope.THUMBNAIL = 'thumbnail';
         $scope.CONTENT = 'content';
+        $scope.thumbnailIsShown = (
+          !WindowDimensionsService.isWindowNarrow());
         _initEditor();
       };
     }

@@ -32,7 +32,7 @@ transaction_services = models.Registry.import_transaction_services()
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
 # method to find the location of this delimiter.
-_VERSION_DELIMITER = '-'
+VERSION_DELIMITER = '-'
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
@@ -49,26 +49,6 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'CONTAINS_USER_DATA',
     'NOT_APPLICABLE',
-)
-
-# Types of user id migration policies. The pragma comment is needed because
-# Enums are evaluated as classes in Python and they should use PascalCase,
-# but using UPPER_CASE seems more appropriate here.
-# COPY - User ID is used as model ID thus the model needs to be recreated.
-# COPY_AND_UPDATE_ONE_FIELD - User ID is used as some part of the model ID and
-#                             also in user_id field thus the model needs to be
-#                             recreated and the field changed.
-# ONE_FIELD - One field in the model contains user ID thus the value in that
-#             field needs to be changed.
-# CUSTOM - Multiple fields in the model contain user ID, values in all these
-#          fields need to be changed.
-# NOT_APPLICABLE - The model doesn't contain any field with user ID.
-USER_ID_MIGRATION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'COPY',
-    'COPY_AND_UPDATE_ONE_FIELD',
-    'ONE_FIELD',
-    'CUSTOM',
-    'NOT_APPLICABLE'
 )
 
 # Constant used when retrieving big number of models.
@@ -122,27 +102,6 @@ class BaseModel(ndb.Model):
         Raises:
             NotImplementedError: The method is not overwritten in a derived
                 class.
-        """
-        raise NotImplementedError
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError: The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError: This method is needed when the migration
-                policy is ONE_FIELD, it is only overwritten in classes that have
-                that policy.
         """
         raise NotImplementedError
 
@@ -441,16 +400,6 @@ class BaseCommitLogEntryModel(BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BaseCommitLogEntryModel has one field that contains user ID."""
-        return USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
-
     @classmethod
     def create(
             cls, entity_id, version, committer_id, commit_type, commit_message,
@@ -670,7 +619,7 @@ class VersionedModel(BaseModel):
             version.
         """
         return '%s%s%s' % (
-            instance_id, _VERSION_DELIMITER, version_number)
+            instance_id, VERSION_DELIMITER, version_number)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -1128,16 +1077,6 @@ class BaseSnapshotMetadataModel(BaseModel):
         """Snapshot Metadata is relevant to the user for Takeout."""
         return EXPORT_POLICY.CONTAINS_USER_DATA
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BaseSnapshotMetadataModel has one field that contains user ID."""
-        return USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.committer_id
-
     @classmethod
     def exists_for_user_id(cls, user_id):
         """Check whether BaseSnapshotMetadataModel references the given user.
@@ -1187,7 +1126,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(_VERSION_DELIMITER)]
+        return self.id[:self.id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self):
         """Gets the version number from the snapshot id.
@@ -1195,7 +1134,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
+        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
 
     @classmethod
     def export_data(cls, user_id):
@@ -1228,11 +1167,6 @@ class BaseSnapshotContentModel(BaseModel):
         """
         return EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BaseSnapshotContentModel doesn't have any field with user ID."""
-        return USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def create(cls, snapshot_id, content):
         """This method returns an instance of the BaseSnapshotContentModel for
@@ -1256,7 +1190,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(_VERSION_DELIMITER)]
+        return self.id[:self.id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self):
         """Gets the version number from the snapshot id.
@@ -1264,7 +1198,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
+        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
 
 
 class BaseMapReduceBatchResultsModel(BaseModel):

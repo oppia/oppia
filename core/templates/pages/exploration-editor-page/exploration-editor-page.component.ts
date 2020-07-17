@@ -22,7 +22,7 @@ require(
   'version-diff-visualization.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
@@ -36,13 +36,13 @@ require(
   'editor-navigation.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.directive.ts');
+  'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.directive.ts');
+  'exploration-title-editor.component.ts');
 require(
   'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(

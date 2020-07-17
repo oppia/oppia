@@ -39,12 +39,12 @@ angular.module('oppia').component('svgFilenameEditor', {
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'UrlInterpolationService',
-    'WindowDimensionsService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     function($http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, UrlInterpolationService,
-        WindowDimensionsService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
       const ctrl = this;
       // These max width and height paramameters were determined by manual
       // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
@@ -59,8 +59,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       const DRAW_MODE_NONE = 'none';
       const OPEN_POLYGON_MODE = 'open';
       const CLOSED_POLYGON_MODE = 'closed';
-      ctrl.canvasMaxWidth = 0;
-      ctrl.canvasMaxHeight = 0;
+      // The canvas height and width were determined based on the initial
+      // modal dimensions.
+      const CANVAS_WIDTH = 494;
+      const CANVAS_HEIGHT = 338;
       ctrl.drawMode = DRAW_MODE_NONE;
       ctrl.polygonMode = CLOSED_POLYGON_MODE;
       ctrl.isTouchDevice = DeviceInfoService.hasTouchEvents();
@@ -95,7 +97,6 @@ angular.module('oppia').component('svgFilenameEditor', {
       // when there are multiple RTEs in the same page.
       var randomId = Math.floor(Math.random() * 100000).toString();
       ctrl.canvasID = 'canvas' + randomId;
-      ctrl.canvasContainerId = 'canvasContainer' + randomId;
       ctrl.canvasElement = null;
       ctrl.fillPicker = null;
       ctrl.strokePicker = null;
@@ -108,6 +109,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.displayFontStyles = false;
       ctrl.objectUndoStack = [];
       ctrl.objectRedoStack = [];
+      ctrl.canvasObjects = [];
       ctrl.isRedo = false;
       ctrl.undoLimit = 5;
       ctrl.savedSVGDiagram = '';
@@ -115,26 +117,32 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.entityType = ContextService.getEntityType();
       ctrl.imageSaveDestination = ContextService.getImageSaveDestination();
       ctrl.svgContainerStyle = {};
+      ctrl.layerNum = 0;
       ctrl.fabricjsOptions = {
         stroke: 'rgba(0, 0, 0, 1)',
         fill: 'rgba(0, 0, 0, 0)',
         bg: 'rgba(0, 0, 0, 0)',
         fontFamily: 'helvetica',
-        size: '9px',
+        size: '3px',
         bold: false,
         italic: false
       };
-      ctrl.enableRemoveButton = false;
-      ctrl.resizeSubscription = null;
+      ctrl.objectIsSelected = false;
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
+          ctrl.currentDiagramWidth = ctrl.diagramWidth;
+        } else {
+          ctrl.diagramWidth = MAX_DIAGRAM_WIDTH;
           ctrl.currentDiagramWidth = ctrl.diagramWidth;
         }
       };
 
       ctrl.onHeightInputBlur = function() {
         if (ctrl.diagramHeight < MAX_DIAGRAM_HEIGHT) {
+          ctrl.currentDiagramHeight = ctrl.diagramHeight;
+        } else {
+          ctrl.diagramHeight = MAX_DIAGRAM_HEIGHT;
           ctrl.currentDiagramHeight = ctrl.diagramHeight;
         }
       };
@@ -181,6 +189,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         };
         ctrl.value = filename;
         if (setData) {
+          var dimensions = (
+            ImagePreloaderService.getDimensionsOfImage(filename));
+          ctrl.svgContainerStyle = {
+            height: dimensions.height + 'px',
+            width: dimensions.width + 'px'
+          };
+          ctrl.diagramWidth = dimensions.width;
+          ctrl.diagramHeight = dimensions.height;
           $http.get(ctrl.data.savedSVGUrl).then(function(response) {
             ctrl.savedSVGDiagram = response.data;
           });
@@ -256,7 +272,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var getSVGString = function() {
-        var svgString = ctrl.canvas.toSVG();
+        var svgString = ctrl.canvas.toSVG().replace('\t\t', '');
         var domParser = new DOMParser();
         var doc = domParser.parseFromString(svgString, 'text/xml');
         var svg = doc.querySelector('svg');
@@ -582,6 +598,20 @@ angular.module('oppia').component('svgFilenameEditor', {
         createPolygon();
       };
 
+      ctrl.bringObjectForward = function() {
+        ctrl.canvas.bringForward(ctrl.canvas.getActiveObject());
+        if (ctrl.layerNum < ctrl.canvas._objects.length) {
+          ctrl.layerNum += 1;
+        }
+      };
+
+      ctrl.sendObjectBackward = function() {
+        ctrl.canvas.sendBackwards(ctrl.canvas.getActiveObject());
+        if (ctrl.layerNum > 1) {
+          ctrl.layerNum -= 1;
+        }
+      };
+
       var undoStackPush = function(object) {
         if (ctrl.objectUndoStack.length === ctrl.undoLimit) {
           ctrl.objectUndoStack.shift();
@@ -594,9 +624,12 @@ angular.module('oppia').component('svgFilenameEditor', {
         if (ctrl.objectUndoStack.length > 0) {
           var undoObj = ctrl.objectUndoStack.pop();
           if (undoObj.action === 'add') {
+            var shape = ctrl.canvasObjects.pop();
+            var index = ctrl.canvas._objects.indexOf(shape);
+            ctrl.canvas._objects.splice(index, 1);
             ctrl.objectRedoStack.push({
               action: 'add',
-              object: ctrl.canvas._objects.pop()
+              object: shape
             });
           } else {
             ctrl.isRedo = true;
@@ -604,6 +637,8 @@ angular.module('oppia').component('svgFilenameEditor', {
               action: 'remove',
               object: undoObj.object
             });
+            // Not adding the shape to canvasObjects because it is added by the
+            // event function.
             ctrl.canvas.add(undoObj.object);
           }
           ctrl.canvas.renderAll();
@@ -617,9 +652,13 @@ angular.module('oppia').component('svgFilenameEditor', {
           undoStackPush(redoObj);
           if (redoObj.action === 'add') {
             ctrl.isRedo = true;
+            // Not adding the shape to canvasObjects because it is added by the
+            // event function.
             ctrl.canvas.add(redoObj.object);
           } else {
-            ctrl.canvas._objects.pop();
+            var shape = ctrl.canvasObjects.pop();
+            var index = ctrl.canvas._objects.indexOf(shape);
+            ctrl.canvas._objects.splice(index, 1);
           }
         }
         ctrl.canvas.renderAll();
@@ -627,12 +666,14 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.removeShape = function() {
         var shape = ctrl.canvas.getActiveObject();
+        var index = ctrl.canvasObjects.indexOf(shape);
         if (shape) {
           undoStackPush({
             action: 'remove',
             object: shape
           });
           ctrl.objectRedoStack = [];
+          ctrl.canvasObjects.splice(index, 1);
           ctrl.canvas.remove(shape);
         }
       };
@@ -640,12 +681,14 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.onClear = function() {
         ctrl.objectUndoStack = [];
         ctrl.objectRedoStack = [];
+        ctrl.canvasObjects = [];
         ctrl.canvas.clear();
       };
 
       ctrl.onStrokeChange = function() {
         var shape = ctrl.canvas.getActiveObject();
         var strokeShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
+        ctrl.canvas.freeDrawingBrush.color = ctrl.fabricjsOptions.stroke;
         if (shape && strokeShapes.indexOf(shape.get('type')) !== -1) {
           shape.set({
             stroke: ctrl.fabricjsOptions.stroke
@@ -703,6 +746,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.onSizeChange = function() {
         var shape = ctrl.canvas.getActiveObject();
         var size = ctrl.fabricjsOptions.size;
+        ctrl.canvas.freeDrawingBrush.width = parseInt(
+          size.substring(0, size.length - 2));
         var strokeWidthShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
         if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
           shape.set({
@@ -715,6 +760,11 @@ angular.module('oppia').component('svgFilenameEditor', {
           });
           ctrl.canvas.renderAll();
         }
+      };
+
+      ctrl.isSizeVisible = function() {
+        return Boolean(
+          ctrl.objectIsSelected || ctrl.drawMode !== DRAW_MODE_NONE);
       };
 
       var createColorPicker = function(value) {
@@ -734,6 +784,13 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
         picker.onChange = function(color) {
           parent.style.background = color.rgbaString;
+          var topAlphaSquare = document.getElementById(
+            'top-' + value + '-alpha');
+          var bottomAlphaSquare = document.getElementById(
+            'bottom-' + value + '-alpha');
+          var opacity = 1 - color.rgba[3];
+          topAlphaSquare.style.opacity = opacity.toString();
+          bottomAlphaSquare.style.opacity = opacity.toString();
           ctrl.fabricjsOptions[value] = color.rgbaString;
           onChangeFunc[value]();
         };
@@ -759,10 +816,14 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.polyOptions.bboxPoints.push(new polyPoint(x, y));
             var points = [x, y, x, y];
             var size = ctrl.fabricjsOptions.size;
+            var stroke = ctrl.fabricjsOptions.stroke;
+            // This is to ensure that the polygon lines are visible when
+            // creating the polygon.
+            stroke = stroke.slice(0, -2) + '1)';
             var line = new fabric.Line(points, {
               strokeWidth: parseInt(size.substring(0, size.length - 2)),
               selectable: false,
-              stroke: ctrl.fabricjsOptions.stroke,
+              stroke: stroke,
               strokeLineCap: 'round'
             });
             // This function is for drawing a polygon in a device with touch
@@ -801,78 +862,86 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:added', function() {
-          if (!ctrl.isRedo) {
-            undoStackPush({
-              action: 'add',
-              object: ctrl.canvas._objects[ctrl.canvas._objects.length - 1]
-            });
-            ctrl.objectRedoStack = [];
+          if (ctrl.drawMode !== DRAW_MODE_POLY) {
+            var shape = ctrl.canvas._objects[ctrl.canvas._objects.length - 1];
+            ctrl.canvasObjects.push(shape);
+            if (!ctrl.isRedo) {
+              undoStackPush({
+                action: 'add',
+                object: shape
+              });
+              ctrl.objectRedoStack = [];
+            }
+            ctrl.isRedo = false;
           }
-          ctrl.isRedo = false;
         });
 
-        ctrl.canvas.on('selection:created', function() {
+        ctrl.canvas.on('object:scaling', function() {
+          if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
+            var text = ctrl.canvas.getActiveObject();
+            var scaleX = text.get('scaleX');
+            var scaleY = text.get('scaleY');
+            var width = text.get('width');
+            var height = text.get('height');
+            ctrl.canvas.getActiveObject().set({
+              width: width * scaleX,
+              height: height * scaleY,
+              scaleX: 1,
+              scaleY: 1
+            });
+          }
+        });
+
+        var onSelection = function() {
+          var shape = ctrl.canvas.getActiveObject();
+          ctrl.layerNum = ctrl.canvas._objects.indexOf(shape) + 1;
           ctrl.fillPicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('fill')
+            color: shape.get('fill')
           });
           ctrl.strokePicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('stroke')
+            color: shape.get('stroke')
           });
-          ctrl.enableRemoveButton = true;
-          if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
+          ctrl.objectIsSelected = true;
+          var strokeWidthShapes = [
+            'rect', 'circle', 'path', 'line', 'polyline'];
+          if (strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
+            ctrl.fabricjsOptions.size = (
+              shape.get('strokeWidth').toString() + 'px');
+          } else if (shape.get('type') === 'textbox') {
             ctrl.displayFontStyles = true;
+            ctrl.fabricjsOptions.size = (
+              shape.get('fontSize').toString() + 'px');
+            ctrl.fabricjsOptions.fontFamily = shape.get('fontFamily');
+            ctrl.fabricjsOptions.italic = shape.get('fontStyle') === 'italic';
+            ctrl.fabricjsOptions.bold = shape.get('fontWeight') === 'bold';
           }
           $scope.$applyAsync();
+        };
+
+        ctrl.canvas.on('selection:created', function() {
+          onSelection();
         });
 
         ctrl.canvas.on('selection:updated', function() {
-          ctrl.fillPicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('fill')
-          });
-          ctrl.strokePicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('stroke')
-          });
-          if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
-            ctrl.displayFontStyles = true;
-          }
-          $scope.$applyAsync();
+          onSelection();
         });
 
         ctrl.canvas.on('selection:cleared', function() {
-          ctrl.enableRemoveButton = false;
+          ctrl.objectIsSelected = false;
           ctrl.displayFontStyles = false;
         });
         $scope.$applyAsync();
       };
 
       ctrl.setCanvasDimensions = function() {
-        ctrl.canvasContainer = document.getElementById(ctrl.canvasContainerId);
-        var width = ctrl.canvasContainer.offsetWidth;
-        var height = ctrl.canvasContainer.offsetHeight;
-        // Set the size of the canvas to be equal to that of the
-        // parent element only if it is greater than the current
-        // canvas size.
-        if (ctrl.canvasMaxHeight < height) {
-          ctrl.canvas.setHeight(height);
-          ctrl.canvasMaxHeight = height;
-        }
-        if (ctrl.canvasMaxWidth < width) {
-          ctrl.canvas.setWidth(width);
-          ctrl.canvasMaxWidth = width;
-        }
+        ctrl.canvas.setHeight(CANVAS_HEIGHT);
+        ctrl.canvas.setWidth(CANVAS_WIDTH);
         ctrl.canvas.renderAll();
       };
 
       var initializeFabricJs = function() {
         ctrl.canvas = new fabric.Canvas(ctrl.canvasID);
         ctrl.setCanvasDimensions();
-
-        ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-          subscribe(evt => {
-            ctrl.setCanvasDimensions();
-            $scope.$applyAsync();
-          });
-
         ctrl.canvas.selection = false;
         ctrl.initializeMouseEvents();
         createColorPicker('stroke');
@@ -893,12 +962,6 @@ angular.module('oppia').component('svgFilenameEditor', {
           angular.element(document).ready(function() {
             initializeFabricJs();
           });
-        }
-      };
-
-      ctrl.$onDestroy = function() {
-        if (ctrl.resizeSubscription) {
-          ctrl.resizeSubscription.unsubscribe();
         }
       };
     }
