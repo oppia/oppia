@@ -75,36 +75,52 @@ def send_email_to_recipients(
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')
 
-    data = {
-        'from': sender_email,
-        'subject': subject,
-        'text': plaintext_body,
-        'html': html_body
-    }
+    # To send bulk emails we pass list of recipients in 'to' paarameter of
+    # post data. Maximum limit of recipients per request is 1000.
+    # For more detail check following link:
+    # https://documentation.mailgun.com/user_manual.html#batch-sending
+    recipient_email_lists = [
+        recipient_emails[i:i + 1000]
+        for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
+    for email_list in recipient_email_lists:
+        data = {
+            'from': sender_email,
+            'subject': subject,
+            'text': plaintext_body,
+            'html': html_body
+        }
 
-    if len(recipient_emails) == 1:
-        data['to'] = recipient_emails[0]
-    else:
-        data['to'] = recipient_emails
-
-    if bcc:
-        if len(bcc) == 1:
-            data['bcc'] = bcc[0]
+        if len(email_list) == 1:
+            data['to'] = email_list[0]
         else:
-            data['bcc'] = bcc
+            data['to'] = email_list
 
-    if reply_to:
-        data['h:Reply-To'] = reply_to
+        if bcc:
+            if len(bcc) == 1:
+                data['bcc'] = bcc[0]
+            else:
+                data['bcc'] = bcc
 
-    if recipient_variables:
-        data['recipient_variables'] = recipient_variables
+        if reply_to:
+            data['h:Reply-To'] = reply_to
 
-    encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
-    auth_str = 'Basic %s' % encoded
-    header = {'Authorization': auth_str}
-    server = (
-        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-    encoded_url = python_utils.url_encode(data)
-    req = python_utils.url_request(server, encoded_url, header)
-    resp = python_utils.url_open(req)
-    return resp.getcode() == 200
+        if recipient_variables:
+            data['recipient_variables'] = recipient_variables
+        else:
+            data['recipient_variables'] = {}
+
+        # 'recipient-variable' in post data forces mailgun to send individual
+        # email to each recipient (This is intended to be a workaround for
+        # sending individual emails).
+        encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
+        auth_str = 'Basic %s' % encoded
+        header = {'Authorization': auth_str}
+        server = (
+            ('https://api.mailgun.net/v3/%s/messages')
+             % feconf.MAILGUN_DOMAIN_NAME)
+        encoded_url = python_utils.url_encode(data)
+        req = python_utils.url_request(server, encoded_url, header)
+        resp = python_utils.url_open(req)
+        if resp.getcode() != 200:
+            return False
+    return True

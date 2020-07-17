@@ -41,6 +41,7 @@ class EmailTests(test_utils.GenericTestBase):
             Returns:
                 int. 200 to signify status is OK. 500 otherwise.
             """
+            print(self.url)
             return 200 if self.url == self.expected_url else 500
 
     def test_send_email_to_mailgun(self):
@@ -49,9 +50,9 @@ class EmailTests(test_utils.GenericTestBase):
         # Test send mail without bcc, reply_to or recipient_variables.
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
-            ('text=plaintext_body+%F0%9F%98%82&html=Hi+abc%2C%3Cbr%3E+' +
-             '%F0%9F%98%82&from=a%40a.com&to=b%40b.com&subject=Hola+%F0' +
-             '%9F%98%82+-+invitation+to+collaborate'),
+            ('from=a%40a.com&text=plaintext_body+%F0%9F%98%82&recipient_' +
+            'variables=%7B%7D&to=b%40b.com&html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%' +
+            '82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
@@ -138,10 +139,10 @@ class EmailTests(test_utils.GenericTestBase):
         """Test for sending HTTP POST request."""
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
-            ('text=plaintext_body+%F0%9F%98%82&html=Hi+abc%2C%3Cbr%3E+' +
-             '%F0%9F%98%82&from=a%40a.com&to=%5Bu%27b%40b.com%27%2C+u' +
-             '%27c%40c.com%27%2C+u%27d%40d.com%27%5D&subject=Hola+%F0'
-             '%9F%98%82+-+invitation+to+collaborate'),
+            ('from=a%40a.com&text=plaintext_body+%F0%9F%98%82&' +
+            'recipient_variables=%7B%7D&to=%5Bu%27b%40b.com%27%2C+u%27c%40c' +
+            '.com%27%2C+u%27d%40d.com%27%5D&html=Hi+abc%2C%3Cbr%3E+%F0%9F%98%'+
+            '82&subject=Hola+%F0%9F%98%82+-+invitation+to+collaborate'),
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
@@ -189,3 +190,35 @@ class EmailTests(test_utils.GenericTestBase):
                     encoding='utf-8'),
                 plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
                 html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
+
+    def test_invalid_status_code_returns_false(self):
+        expected_query_url = (
+            'https://api.mailgun.net/v3/domain/messages',
+            ('from=a%40a.com&h%3AReply-To=abc&text=plaintext_body+%F0%9F' +
+             '%98%82&bcc=%5Bu%27c%40c.com%27%2C+u%27d%40d.com%27%5D&' +
+             'recipient_variables=%7Bu%27b%40b.com%27%3A+%7Bu%27id%27%3A+' +
+             '1%2C+u%27first%27%3A+u%27Bob%27%7D%7D&to=b%40b.com&html=' +
+             'Hi+abc%2C%3Cbr%3E+%F0%9F%98%82&subject=Hola+%F0%9F%98%82' +
+             '+-+invitation+to+collaborate'),
+            {'Authorization': 'Basic'})
+        swapped_request = lambda *args: args
+        swapped_urlopen = lambda x: self.Response(x, expected_query_url)
+        swap_urlopen_context = self.swap(
+            python_utils, 'url_open', swapped_urlopen)
+        swap_request_context = self.swap(
+            python_utils, 'url_request', swapped_request)
+        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
+        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
+            resp = mailgun_email_services.send_email_to_recipients(
+                sender_email='a@a.com',
+                recipient_emails=['b@b.com'],
+                subject=(
+                    'Hola 😂 - invitation to collaborate'
+                    .encode(encoding='utf-8')),
+                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
+                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+                bcc=['c@c.com', 'd@d.com'],
+                reply_to='abc',
+                recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))
+            self.assertFalse(resp)

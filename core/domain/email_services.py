@@ -229,23 +229,11 @@ def send_bulk_mail(
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
 
-    # To send bulk emails we pass list of recipients in 'to' paarameter of
-    # post data. Maximum limit of recipients per request is 1000.
-    # For more detail check following link:
-    # https://documentation.mailgun.com/user_manual.html#batch-sending
-    recipient_email_lists = [
-        recipient_emails[i:i + 1000]
-        for i in python_utils.RANGE(0, len(recipient_emails), 1000)]
-
-    for email_list in recipient_email_lists:
-        # 'recipient-variable' in post data forces mailgun to send individual
-        # email to each recipient (This is intended to be a workaround for
-        # sending individual emails).
-        resp = platform_email_services.send_email_to_recipients(
-            sender_email, email_list, subject.encode(encoding='utf-8'),
-            plaintext_body.encode(encoding='utf-8'),
-            html_body.encode(encoding='utf-8'))
-        if not resp:
-            raise Exception(
-                'Bulk email failed to send. Please check your email' +
-                ' service provider.')
+    resp = platform_email_services.send_email_to_recipients(
+        sender_email, recipient_emails, subject.encode(encoding='utf-8'),
+        plaintext_body.encode(encoding='utf-8'),
+        html_body.encode(encoding='utf-8'))
+    if not resp:
+        raise Exception(
+            'Bulk email failed to send. Please check your email' +
+            ' service provider.')
