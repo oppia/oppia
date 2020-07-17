@@ -63,7 +63,6 @@ export class UserService {
         } else {
           successCallback(userInfoObjectFactory.createDefault());
         }
-      }, (errorRespnonse) => {
       });
   }
 
