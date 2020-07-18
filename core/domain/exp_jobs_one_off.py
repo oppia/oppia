@@ -563,7 +563,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
                 ''.join(state.get_all_html_content_strings()))
         list_of_latex_values_without_svgs = (
             html_validation_service.
-            extract_latex_values_from_math_rich_text_without_filename(
+            get_latext_values_without_svg_from_html(
                 html_strings_in_exploration))
         if len(list_of_latex_values_without_svgs) > 0:
             yield (
@@ -599,7 +599,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
                         longest_raw_latex_string, key=len))
                 approx_size_of_math_svgs_bytes_in_a_batch += (
                     int(approx_size_of_math_svgs_bytes))
-                if (approx_size_of_math_svgs_bytes_in_a_batch >
+                if approx_size_of_math_svgs_bytes_in_a_batch > (
                         feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
                     approx_size_of_math_svgs_bytes_in_a_batch = 0
                     estimated_no_of_batches += 1

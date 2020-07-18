@@ -6174,12 +6174,12 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
 
         # We need to swap the return value of the method
-        # extract_latex_values_from_math_rich_text_without_filename because
+        # get_latext_values_without_svg_from_html because
         # normally this method returns latex values from math-tags without
         # filenames.
         with self.swap(
             html_validation_service,
-            'extract_latex_values_from_math_rich_text_without_filename',
+            'get_latext_values_without_svg_from_html',
             lambda html: ['+,+,+,+']):
             run_job_and_check_output(self, expected_output, sort=True)
 

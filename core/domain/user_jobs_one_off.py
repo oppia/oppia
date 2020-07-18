@@ -405,7 +405,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
                         final_draft_change_list))
                 latex_values = (
                     html_validation_service.
-                    extract_latex_values_from_math_rich_text_without_filename(
+                    get_latext_values_without_svg_from_html(
                         html_string))
                 if len(latex_values) > 0:
                     yield (

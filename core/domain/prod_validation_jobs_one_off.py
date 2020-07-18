@@ -3055,7 +3055,7 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
 
             list_of_latex_values = (
                 html_validation_service.
-                extract_latex_values_from_math_rich_text_without_filename(
+                get_latext_values_without_svg_from_html(
                     html_strings_in_exploration))
             math_rich_text_info = (
                 exp_domain.ExplorationMathRichTextInfo(list_of_latex_values))
