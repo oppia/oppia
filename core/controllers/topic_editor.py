@@ -70,10 +70,12 @@ class TopicEditorStoryHandler(base.BaseHandler):
         for summary in canonical_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
+            summary['completed_node_titles'] = []
 
         for summary in additional_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
+            summary['completed_node_titles'] = []
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
