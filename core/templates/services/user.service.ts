@@ -117,17 +117,7 @@ export class UserService{
                 return profilePictureDataUrl;
             });
           } else {
-            return this.http.get<IProfilePictureBackendDict>(
-              '/preferenceshandler/profile_picture'
-            ).toPromise().then(
-              (backendDict) => {
-                if (backendDict.profile_picture_data_url){
-                  profilePictureDataUrl = 
-                    backendDict.profile_picture_data_url;
-                }
-                return profilePictureDataUrl;
-            });
-            //return Promise.resolve(profilePictureDataUrl);
+            return Promise.resolve(profilePictureDataUrl);
           }
         });
     }
@@ -140,15 +130,16 @@ export class UserService{
       return this.http.put<IPreferencesBackendDict>(
         this.PREFERENCES_DATA_URL, putData).toPromise();
     }
-    getLoginUrlAsync(): Promise<string> {
-      let urlParameters = {
-        current_url: this.windowRef.nativeWindow.location.pathname
-      }
-      return this.http.get<IUrlBackendDict>('/url_handler', 
-        { params: urlParameters }).toPromise().then(
-          (backendDict) => {
-            return backendDict.login_url;
-        });
+    getLoginUrlAsync(): string/*Promise<string>*/ {
+      // let urlParameters = {
+      //   current_url: this.windowRef.nativeWindow.location.pathname
+      // }
+      return this.windowRef.nativeWindow.location.pathname;
+      // return this.http.get<IUrlBackendDict>('/url_handler', 
+      //   { params: urlParameters }).toPromise().then(
+      //     (backendDict) => {
+      //       return backendDict.login_url;
+      //   });
     }
     getUserCommunityRightsData(): Promise<IUserCommunityRightsDataBackendDict>{
       if (this.userCommunityRightsInfo) {
