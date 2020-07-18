@@ -19,6 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { UserService } from 'services/user.service';
@@ -29,7 +30,7 @@ import { UrlService } from './contextual/url.service';
 class MockWindowRef {
   _window = {
     location: {
-      pathname: 'home'
+      _pathname: 'home'
     }
   };
   get nativeWindow() {
@@ -49,7 +50,9 @@ fdescribe('User Service', () => {
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [UrlInterpolationService, 
+        { provide: WindowRef, useValue: windowRef }]
     });
     httpTestingController = TestBed.get(HttpTestingController);
     userService = TestBed.get(UserService);
