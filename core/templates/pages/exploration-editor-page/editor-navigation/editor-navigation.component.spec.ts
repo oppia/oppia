@@ -25,6 +25,7 @@ describe('Editor Navigation Component', function() {
   var $uibModal = null;
   var $verifyNoPendingTasks = null;
   var ContextService = null;
+  var ExplorationFeaturesService = null;
   var ExplorationWarningsService = null;
   var ThreadDataService = null;
   var UserService = null;
@@ -44,6 +45,7 @@ describe('Editor Navigation Component', function() {
     $uibModal = $injector.get('$uibModal');
     $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
     ContextService = $injector.get('ContextService');
+    ExplorationFeaturesService = $injector.get('ExplorationFeaturesService');
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
     UserService = $injector.get('UserService');
     ThreadDataService = $injector.get('ThreadDataService');
@@ -54,7 +56,6 @@ describe('Editor Navigation Component', function() {
       $q.resolve(userInfo));
 
     widthSpy = spyOn(WindowDimensionsService, 'getWidth');
-
     widthSpy.and.returnValue(1200);
 
     $scope = $rootScope.$new();
@@ -78,6 +79,8 @@ describe('Editor Navigation Component', function() {
   });
 
   it('should check if improvements tab is enabled', function() {
+    spyOn(ExplorationFeaturesService, 'isImprovementsTabEnabled')
+      .and.returnValue(false);
     expect($scope.isImprovementsTabEnabled()).toBe(false);
   });
 
@@ -169,9 +172,12 @@ describe('Editor Navigation Component', function() {
   });
 
   it('should navigate to improvements tab', function() {
+    spyOn(ExplorationFeaturesService, 'isInitialized').and.returnValue(true);
+    spyOn(ExplorationFeaturesService, 'isImprovementsTabEnabled')
+      .and.returnValue(true);
     $scope.selectImprovementsTab();
     $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('main');
+    expect($scope.getActiveTabName()).toBe('improvements');
   });
 
   it('should navigate to history tab', function() {
@@ -191,33 +197,40 @@ describe('Editor Navigation Component', function() {
     expect($scope.getOpenThreadsCount()).toBe(5);
   });
 
-  it('should change isLargeScreen variable when resizing page', function() {
-    expect($scope.isLargeScreen).toBe(true);
-    expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
-      .toBe(false);
-    $rootScope.$broadcast('openPostTutorialHelpPopover');
+  it('should change isLargeScreen variable to true when resizing page',
+    function() {
+      widthSpy.and.returnValue(1200);
 
-    expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
-      .toBe(true);
+      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+        .toBe(false);
 
-    $flushPendingTasks();
-    $verifyNoPendingTasks('timeout');
+      window.dispatchEvent(new Event('resize'));
+      $rootScope.$broadcast('openPostTutorialHelpPopover');
 
-    expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
-      .toBe(false);
-  });
+      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+        .toBe(true);
+      expect($scope.isLargeScreen).toBe(true);
 
-  it('should change isLargeScreen variable when resizing page', function() {
-    expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
-      .toBe(false);
+      $flushPendingTasks();
+      $verifyNoPendingTasks('timeout');
 
-    widthSpy.and.returnValue(false);
-    window.dispatchEvent(new Event('resize'));
-    $rootScope.$broadcast('openPostTutorialHelpPopover');
+      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+        .toBe(false);
+    });
 
-    expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
-      .toBe(false);
-  });
+  it('should change isLargeScreen variable to false when resizing page',
+    function() {
+      widthSpy.and.returnValue(768);
+
+      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+        .toBe(false);
+
+      window.dispatchEvent(new Event('resize'));
+      $rootScope.$broadcast('openPostTutorialHelpPopover');
+
+      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+        .toBe(false);
+    });
 
   it('should unsubscribe resize subscription on destroy hook', function() {
     expect(ctrl.resizeSubscription.closed).toBe(false);
