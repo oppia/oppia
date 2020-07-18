@@ -1,7 +1,7 @@
 <div class="topic-card" ng-click="$ctrl.openTopicPage()" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
   <div class="topic-thumbnail">
     <picture>
-      <img [src]="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+      <img [src]="$ctrl.thumbnailUrl" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
     </picture>
   </div>
   <div class="topic-details" ng-style="{background: $ctrl.getDarkerThumbnailBgColor()}">

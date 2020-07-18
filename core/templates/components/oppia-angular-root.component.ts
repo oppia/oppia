@@ -122,6 +122,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
+import { ClassroomDataObjectFactory } from
+  'domain/classroom/ClassroomDataObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -695,6 +697,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static changeObjectFactory: ChangeObjectFactory;
   static classifierObjectFactory: ClassifierObjectFactory;
   static classroomBackendApiService: ClassroomBackendApiService;
+  static classroomDataObjectFactory: ClassroomDataObjectFactory;
   static codeNormalizerService: CodeNormalizerService;
   static codeReplPredictionService: CodeReplPredictionService;
   static codeReplRulesService: CodeReplRulesService;
@@ -1001,6 +1004,7 @@ private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
 private changeObjectFactory: ChangeObjectFactory,
 private classifierObjectFactory: ClassifierObjectFactory,
 private classroomBackendApiService: ClassroomBackendApiService,
+private classroomDataObjectFactory: ClassroomDataObjectFactory,
 private codeNormalizerService: CodeNormalizerService,
 private codeReplPredictionService: CodeReplPredictionService,
 private codeReplRulesService: CodeReplRulesService,
@@ -1308,6 +1312,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.changeObjectFactory = this.changeObjectFactory;
     OppiaAngularRootComponent.classifierObjectFactory = this.classifierObjectFactory;
     OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
+    OppiaAngularRootComponent.classroomDataObjectFactory = this.classroomDataObjectFactory;
     OppiaAngularRootComponent.codeNormalizerService = this.codeNormalizerService;
     OppiaAngularRootComponent.codeReplPredictionService = this.codeReplPredictionService;
     OppiaAngularRootComponent.codeReplRulesService = this.codeReplRulesService;
