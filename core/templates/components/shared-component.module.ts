@@ -44,10 +44,10 @@ import { SchemaBasedBoolEditorComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SchemaBasedExpressionEditorComponent } from
   './forms/schema-based-editors/schema-based-expression-editor.component';
+import { ExplorationSummaryTileDirective } from
+  './summary-tile/exploration-summary-tile.directive';
 import { TopicSummaryTileComponent } from
   './summary-tile/topic-summary-tile.component';
-
-
 
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule],
@@ -55,8 +55,8 @@ import { TopicSummaryTileComponent } from
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    SchemaBasedBoolEditorComponent, SchemaBasedExpressionEditorComponent,
-    TopicSummaryTileComponent],
+    SchemaBasedExpressionEditorComponent, SchemaBasedExpressionEditorComponent,
+    TopicSummaryTileComponent, ExplorationSummaryTileDirective],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
@@ -67,7 +67,7 @@ import { TopicSummaryTileComponent } from
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, MaterialModule
+    SharingLinksComponent, MaterialModule, ExplorationSummaryTileDirective
   ],
 })
 
