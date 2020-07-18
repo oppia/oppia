@@ -24,17 +24,22 @@ require('services/contextual/url.service.ts');
 angular.module('oppia').component('storyViewerNavbarPreLogoAction', {
   template: require('./story-viewer-navbar-pre-logo-action.component.html'),
   controller: [
-    'UrlInterpolationService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
-    function(UrlInterpolationService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
+    '$rootScope', 'UrlInterpolationService', 'UrlService',
+    'TOPIC_VIEWER_URL_TEMPLATE', function(
+        $rootScope, UrlInterpolationService, UrlService,
+        TOPIC_VIEWER_URL_TEMPLATE) {
       var ctrl = this;
-
-      ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-
-        ctrl.topicUrl = UrlInterpolationService.interpolateUrl(
+      ctrl.getTopicUrl = function() {
+        return UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_URL_TEMPLATE, {
             topic_name: ctrl.topicName
           });
+      };
+
+      ctrl.$onInit = function() {
+        $rootScope.$on('storyData', function(evt, data) {
+          ctrl.topicName = data.topicName;
+        });
       };
     }]
 });

@@ -127,6 +127,11 @@ angular.module('oppia').directive('storyViewerPage', [
                 ctrl.storyTitle = storyDataDict.title;
                 ctrl.storyDescription = storyDataDict.description;
 
+                $rootScope.$broadcast('storyData', {
+                  topicName: ctrl.storyPlaythroughObject.topicName,
+                  storyTitle: ctrl.storyTitle
+                });
+
                 LoaderService.hideLoadingScreen();
                 ctrl.pathIconParameters = ctrl.generatePathIconParameters();
                 // TODO(#8521): Remove the use of $rootScope.$apply()

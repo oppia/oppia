@@ -148,7 +148,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'node_titles': self.story_1.node_titles,
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
-                    'story_is_published': True
+                    'story_is_published': True,
+                    'completed_node_titles': []
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
@@ -157,7 +158,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'node_titles': self.story_2.node_titles,
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
-                    'story_is_published': True
+                    'story_is_published': True,
+                    'completed_node_titles': []
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
@@ -208,7 +210,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                         'node_titles': self.story_1.node_titles,
                         'thumbnail_filename': None,
                         'thumbnail_bg_color': None,
-                        'story_is_published': True
+                        'story_is_published': True,
+                        'completed_node_titles': []
                     }],
                     'additional_story_dicts': [{
                         'id': self.story_2.id,
@@ -217,7 +220,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                         'node_titles': self.story_2.node_titles,
                         'thumbnail_filename': None,
                         'thumbnail_bg_color': None,
-                        'story_is_published': True
+                        'story_is_published': True,
+                        'completed_node_titles': []
                     }],
                     'uncategorized_skill_ids': [self.skill_id_1],
                     'subtopics': [{

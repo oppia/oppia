@@ -75,7 +75,8 @@ describe('Topic viewer backend API service', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       additional_story_dicts: [{
         id: '1',
@@ -84,7 +85,8 @@ describe('Topic viewer backend API service', () => {
         node_count: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
