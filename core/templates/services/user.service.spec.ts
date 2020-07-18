@@ -30,7 +30,7 @@ import { UrlService } from './contextual/url.service';
 class MockWindowRef {
   _window = {
     location: {
-      _pathname: 'home'
+      pathname: 'home'
     }
   };
   get nativeWindow() {
@@ -51,8 +51,7 @@ fdescribe('User Service', () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [UrlInterpolationService, 
-        { provide: WindowRef, useValue: windowRef }]
+      providers: [{ provide: WindowRef, useValue: windowRef }]
     });
     httpTestingController = TestBed.get(HttpTestingController);
     userService = TestBed.get(UserService);
@@ -204,7 +203,7 @@ fdescribe('User Service', () => {
 
     userService.getProfileImageDataUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.png'));
+        '/avatar/user_blue_72px.webp'));
     });
     
     req = httpTestingController.expectOne('/userinfohandler');
@@ -235,7 +234,7 @@ fdescribe('User Service', () => {
 
       userService.getProfileImageDataUrlAsync().then((dataUrl) => {
         expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.png'));
+          '/avatar/user_blue_72px.webp'));
       });
       var req = httpTestingController.expectOne('/userinfohandler');
       expect(req.request.method).toEqual('GET');
