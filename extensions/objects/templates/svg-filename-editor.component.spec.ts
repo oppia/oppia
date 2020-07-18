@@ -333,8 +333,7 @@ describe('SvgFilenameEditor', function() {
 
   it('should create a bezier curve', function() {
     svgFilenameCtrl.createRect();
-    svgFilenameCtrl.createBezier();
-    expect(svgFilenameCtrl.isBezierEnabled()).toBe(true);
+    svgFilenameCtrl.createQuadraticBezier();
     expect(svgFilenameCtrl.isDrawModeBezier()).toBe(true);
     svgFilenameCtrl.canvas.trigger('object:moving', {
       target: {
@@ -360,7 +359,7 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.onStrokeChange();
     svgFilenameCtrl.onFillChange();
     svgFilenameCtrl.onSizeChange();
-    svgFilenameCtrl.createBezier();
+    svgFilenameCtrl.createQuadraticBezier();
     expect(svgFilenameCtrl.isDrawModeBezier()).toBe(false);
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('path')).toEqual(
       [['M', 100, 100], ['Q', 200, 200, 300, 300]]

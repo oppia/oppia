@@ -48,9 +48,9 @@
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-bezier"
-                ng-class="{'disabled' : !$ctrl.isBezierEnabled()}" ng-click="$ctrl.createBezier()"
-                tooltip-placement="right" uib-tooltip="Bezier curve" ng-disabled="!$ctrl.isBezierEnabled()">
-          <i class="fas fa-bezier-curve" style="font-size: 21px;"></i>
+                ng-class="{'disabled' : !($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())}" ng-click="$ctrl.createQuadraticBezier()"
+                tooltip-placement="right" uib-tooltip="Quadratic Bezier curve" ng-disabled="!($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())">
+          <i class="fas fa-bezier-curve bezier-curve"></i>
         </button>
         <div class="vert-bottom-toolbar">
           <div>
@@ -304,6 +304,10 @@
     margin: 2px;
     padding: 0;
     text-align: center;
+  }
+
+  .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
+    font-size: 21px;
   }
 
   .svg-editor .vertical-toolbar .tooltip-inner {

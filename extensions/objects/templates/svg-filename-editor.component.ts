@@ -600,7 +600,9 @@ angular.module('oppia').component('svgFilenameEditor', {
         createPolygon();
       };
 
-      var makeCurveCircle = function(left, top) {
+      var createBezierControlPoints = function(left, top) {
+        // This function is used to add the control points for the quadratic
+        // bezier curve which is used to control the position of the curve.
         var size = ctrl.fabricjsOptions.size;
         var circle = new fabric.Circle({
           left: left,
@@ -614,7 +616,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         return circle;
       };
 
-      var drawQuadratic = function() {
+      var drawQuadraticCurve = function() {
         var size = ctrl.fabricjsOptions.size;
         var curve = new fabric.Path('M 40 40 Q 95, 100, 150, 40', {
           stroke: ctrl.fabricjsOptions.stroke,
@@ -625,7 +627,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
         ctrl.canvas.add(curve);
 
-        var p1 = makeCurveCircle(95, 100);
+        var p1 = createBezierControlPoints(95, 100);
         p1.name = 'p1';
         p1.set({
           radius: 12,
@@ -634,16 +636,25 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
         ctrl.canvas.add(p1);
 
-        var p0 = makeCurveCircle(40, 40);
+        var p0 = createBezierControlPoints(40, 40);
         p0.name = 'p0';
         ctrl.canvas.add(p0);
 
-        var p2 = makeCurveCircle(150, 40);
+        var p2 = createBezierControlPoints(150, 40);
         p2.name = 'p2';
         ctrl.canvas.add(p2);
       };
 
-      ctrl.createBezier = function() {
+      var getQuadraticBezierCurve = function() {
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          // The order of objects being added are the path followed by
+          // three control points. Therefore the 4th from the last is the
+          // quadratic curve.
+          return ctrl.canvas.getObjects().slice(-4, -3)[0];
+        }
+      };
+
+      ctrl.createQuadraticBezier = function() {
         if (ctrl.drawMode === DRAW_MODE_NONE) {
           ctrl.canvas.discardActiveObject();
           ctrl.drawMode = DRAW_MODE_BEZIER;
@@ -653,9 +664,11 @@ angular.module('oppia').component('svgFilenameEditor', {
               selectable: false
             });
           });
-          drawQuadratic();
+          drawQuadraticCurve();
         } else {
-          // Remove the circles and the current path.
+          // This is the case when the user clicks the tool after drawing the
+          // curve. The current path and the circles are removed and new path
+          // is added.
           ctrl.canvas.getObjects().slice(-3).forEach(function(item) {
             ctrl.canvas.remove(item);
           });
@@ -681,14 +694,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
       };
 
-      ctrl.isBezierEnabled = function() {
-        return Boolean(
-          ctrl.areAllToolsEnabled() ||
-          ctrl.drawMode === DRAW_MODE_BEZIER);
-      };
-
       ctrl.isDrawModeBezier = function() {
-        return Boolean(ctrl.drawMode === DRAW_MODE_BEZIER);
+        return ctrl.drawMode === DRAW_MODE_BEZIER;
       };
 
       ctrl.bringObjectForward = function() {
@@ -741,8 +748,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.isUndoEnabled = function() {
-        return Boolean(
-          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectUndoStack.length);
+        return (
+          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectUndoStack.length > 0);
       };
 
       ctrl.onRedo = function() {
@@ -767,8 +774,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.isRedoEnabled = function() {
-        return Boolean(
-          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectRedoStack.length);
+        return (
+          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectRedoStack.length > 0);
       };
 
       ctrl.removeShape = function() {
@@ -794,13 +801,13 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.isClearEnabled = function() {
-        return Boolean(
+        return (
           ctrl.canvasObjects.length > 0 && ctrl.drawMode === DRAW_MODE_NONE);
       };
 
       ctrl.onStrokeChange = function() {
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
-          ctrl.canvas.getObjects().slice(-4, -3)[0].set({
+          getQuadraticBezierCurve().set({
             stroke: ctrl.fabricjsOptions.stroke
           });
           ctrl.canvas.renderAll();
@@ -819,7 +826,7 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.onFillChange = function() {
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
-          ctrl.canvas.getObjects().slice(-4, -3)[0].set({
+          getQuadraticBezierCurve().set({
             fill: ctrl.fabricjsOptions.fill
           });
           ctrl.canvas.renderAll();
@@ -871,6 +878,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.onSizeChange = function() {
+        // This if condition is required to ensure that the size change is
+        // applied only to the curve and not to all the control points.
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
           var size = ctrl.fabricjsOptions.size;
           var actualSize = parseInt(size.substring(0, size.length - 2));
@@ -879,7 +888,7 @@ angular.module('oppia').component('svgFilenameEditor', {
               radius: actualSize + 2
             });
           });
-          ctrl.canvas.getObjects().slice(-4, -3)[0].set({
+          getQuadraticBezierCurve().set({
             strokeWidth: actualSize
           });
           ctrl.canvas.renderAll();
@@ -1006,7 +1015,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.canvas.on('object:moving', function(e) {
           if (ctrl.drawMode === DRAW_MODE_BEZIER) {
             var pt = e.target;
-            var curve = ctrl.canvas.getObjects().slice(-4, -3)[0];
+            var curve = getQuadraticBezierCurve();
             if (e.target.name === 'p0') {
               curve.path[0][1] = pt.left;
               curve.path[0][2] = pt.top;
@@ -1022,6 +1031,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:added', function() {
+          // This if condition is to ensure that the quadratic bezier control
+          // points are not added to the undoStack.
           if (
             ctrl.drawMode === DRAW_MODE_NONE ||
             ctrl.drawMode === DRAW_MODE_PENCIL) {
@@ -1058,6 +1069,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         var onSelection = function() {
+          // This if condition is to ensure that the fabricjsOptions doesn't
+          // change when the user selects the quadratic bezier control points.
           if (
             ctrl.drawMode === DRAW_MODE_NONE ||
             ctrl.drawMode === DRAW_MODE_PENCIL) {
@@ -1116,6 +1129,9 @@ angular.module('oppia').component('svgFilenameEditor', {
         createColorPicker('stroke');
         createColorPicker('fill');
         createColorPicker('bg');
+        // This is used to change the origin of shapes from top left corner
+        // to center of the shape. This is used to align the quadratic bezier
+        // control points correctly to the curve.
         fabric.Object.prototype.originX = 'center';
         fabric.Object.prototype.originY = 'center';
       };
