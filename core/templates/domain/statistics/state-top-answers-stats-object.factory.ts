@@ -23,15 +23,15 @@ import { AnswerStatsObjectFactory, AnswerStats, AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
 
 interface StateInteractionIds {
-  [state: string]: string;
+  [stateName: string]: string;
 }
 
 interface StateTopAnswers {
-  [state: string]: AnswerStats[];
+  [stateName: string]: AnswerStats[];
 }
 
 interface StateTopAnswersBackendDict {
-  [state: string]: AnswerStatsBackendDict[];
+  [stateName: string]: AnswerStatsBackendDict[];
 }
 
 export interface StateTopAnswersStatsBackendDict {

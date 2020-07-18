@@ -214,129 +214,54 @@ describe('Profile page', function() {
         category: 'Algebra',
         title: 'Test Title'
       }),
-      edited_exp_summary_dicts: new Array(7).fill({
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 10,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 1,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      })
+      edited_exp_summary_dicts: []
     };
 
     beforeEach(function() {
-      profileData.edited_exp_summary_dicts.push({
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 5,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 1,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      });
-      profileData.edited_exp_summary_dicts.push({
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 5,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 1,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      });
-      profileData.edited_exp_summary_dicts.push({
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 5,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 1,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      });
-      profileData.edited_exp_summary_dicts.push({
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 15,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 1,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      });
+      for (let i = 0; i<11; i++) {
+        profileData.edited_exp_summary_dicts.push({
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 10,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 1,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        });
+      }
+
+      profileData.edited_exp_summary_dicts[7].ratings = {
+        1: 1,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0
+      };
+      profileData.edited_exp_summary_dicts[8].ratings = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 1,
+        5: 0
+      };
+      profileData.edited_exp_summary_dicts[9].num_views = 5;
+      profileData.edited_exp_summary_dicts[10].num_views = 15;
+
       spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
         'fetchProfileData').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
