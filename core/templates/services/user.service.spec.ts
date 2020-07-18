@@ -148,7 +148,7 @@ fdescribe('User Service', () => {
   }));
 
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
-      // creating a test user for checking profile picture of user.
+    // creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -260,7 +260,6 @@ fdescribe('User Service', () => {
 
   it('should set a profile image data url', fakeAsync(() => {
     var newProfileImageDataurl = '/avatar/x.png';
-    //return types here might cause problems
     userService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
       (response) => {
         expect(response.profile_picture_data_url).toBe(
@@ -277,7 +276,6 @@ fdescribe('User Service', () => {
   it('should handle when set profile image data url is reject', fakeAsync(() => {
     var newProfileImageDataurl = '/avatar/x.png';
     var errorMessage = 'It\'s not possible to set a new profile image data';
-    //check this too
     userService.setProfileImageDataUrlAsync(newProfileImageDataurl)
       /* eslint-disable dot-notation */
       .catch((error) => {
@@ -292,7 +290,6 @@ fdescribe('User Service', () => {
   }));
 
   it('should return user community rights data', fakeAsync(() => {
-    //need to check return type
     var sampleUserCommunityRightsDict = {
       translation: ['hi'],
       voiceover: [],
