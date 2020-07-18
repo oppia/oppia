@@ -64,7 +64,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
     var _skillIdToRubricsObject = {};
-    var _skillQuestionCountDict = {};
     var _groupedSkillSummaries = {
       current: [],
       others: []

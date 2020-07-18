@@ -364,8 +364,8 @@ describe('Topic editor tab directive', function() {
     expect(moveSubtopicSpy).toHaveBeenCalled();
   });
 
-  it('should not call the TopicUpdateService to rearrange subtopic if subtopic' +
-      ' is moved to the same position', function() {
+  it('should not call the TopicUpdateService to rearrange subtopic if ' +
+      'subtopic is moved to the same position', function() {
     $scope.fromIndex = 0;
     var moveSubtopicSpy = (
       spyOn(TopicUpdateService, 'rearrangeSubtopic'));
