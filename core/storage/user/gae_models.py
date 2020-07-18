@@ -1258,6 +1258,9 @@ class ExplorationDraftChangesMathRichTextInfoModel(base_models.BaseModel):
     """Temporary Storage model for storing information useful while generating
     images for math rich-text components in exploration draft changes.
 
+    TODO (#9952): This model needs to removed once we generate SVG images for
+    all the math rich text componets in old draft changes.
+
     The id of each instance is the id of the corresponding draft change.
     """
 
