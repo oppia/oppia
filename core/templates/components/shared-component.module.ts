@@ -48,9 +48,10 @@ import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { TopicSummaryTileComponent } from
   './summary-tile/topic-summary-tile.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule],
+  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
