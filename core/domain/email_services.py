@@ -145,7 +145,7 @@ def send_mail(
         sender_email: str. The email address of the sender. This should be in
             the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
             'SENDER_EMAIL_ADDRESS'. Format must be utf-8.
-        recipient_email: str. the email address of the recipient. Format must
+        recipient_email: str. The email address of the recipient. Format must
             be utf-8.
         subject: str. The subject line of the email. Format must be utf-8.
         plaintext_body: str. The plaintext body of the email. Format must be
@@ -153,8 +153,8 @@ def send_mail(
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
         bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
-        reply_to_id: str|None. The unique id of the sender.
-            Format must be utf-8.
+        reply_to_id: str|None. The unique id of the sender. Format must be
+            utf-8.
 
     Raises:
         Exception: The configuration in feconf.py forbids emails from being

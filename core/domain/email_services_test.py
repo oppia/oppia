@@ -98,10 +98,10 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the bcc admin flag is working properly in send_mail.
 
         Note that we replace the
-        email_services.send_email_to_recipients() function in send_mail
+        platform_email_services.send_email_to_recipients() function in send_mail
         with an alternate lambda that asserts the correct
         values were placed in the data dictionary that is then passed to the
-        mailgun api.
+        platform api.
         """
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
@@ -170,8 +170,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
             self.assertEqual(messages[0].to, recipients)
 
     def test_email_not_sent_if_email_addresses_are_malformed(self):
-        # Tests that email is not sent if recipient email address is malformed.
-
+        """Tests that email is not sent if recipient email address is
+        malformed.
+        """
         # Case when malformed_recipient_email is None for send_mail.
         malformed_recipient_email = None
         email_exception = self.assertRaisesRegexp(
@@ -192,7 +193,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'sender@example.com', malformed_recipient_email,
                 'subject', 'body', 'html')
 
-        # Case when sender is an malformed for send_mail.
+        # Case when sender is malformed for send_mail.
         malformed_sender_email = 'x@x@x'
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
@@ -202,7 +203,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 malformed_sender_email, 'recipient@example.com',
                 'subject', 'body', 'html')
 
-        # Case when sender is an malformed for send_bulk_mail.
+        # Case when sender is malformed for send_bulk_mail.
         malformed_sender_email = 'email'
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
@@ -212,7 +213,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 malformed_sender_email, ['recipient@example.com'],
                 'subject', 'body', 'html')
 
-        # Case when sender is an malformed for send_bulk_mail.
+        # Case when sender is malformed for send_bulk_mail.
         malformed_recipient_emails = ['a@a.com', 'email.com']
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
@@ -223,6 +224,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'subject', 'body', 'html')
 
     def test_unsuccessful_status_codes_raises_exception(self):
+        """Test that unsuccessful status codes raises an exception."""
+
         email_exception = self.assertRaisesRegexp(
             Exception, 'Bulk email failed to send. Please check your ' +
             'email service provider.')

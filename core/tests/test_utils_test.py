@@ -431,12 +431,17 @@ class EmailMockTests(test_utils.EmailTestBase):
     EmailServiceMock.
     """
 
-    def test_override_run_context_swaps_works(self):
-        """Assert that the feconf context swaps correctly swap the contexts."""
+    def test_override_run_swaps_contexts(self):
+        """Assert that the feconf context swaps that wrap the default run
+        function correctly swaps the contexts.
+        """
         self.assertEqual(feconf.MAILGUN_API_KEY, 'key')
         self.assertEqual(feconf.MAILGUN_DOMAIN_NAME, 'name')
 
-    def test_mock_send_email_to_recipients(self):
+    def test_mock_send_email_to_recipients_sends_correct_emails(self):
+        """Test sending email to recipients using mock adds the correct objects
+        to emails_dict.
+        """
         self.email_services_mock.mock_send_email_to_recipients(
             sender_email='a@a.com',
             recipient_emails=['b@b.com'],
@@ -471,7 +476,8 @@ class MockLoggingHandlerTests(test_utils.GenericTestBase):
         super(MockLoggingHandlerTests, self).setUp()
         self._log_handler = test_utils.MockLoggingHandler()
 
-    def test_logging_produces_correct_logs(self):
+    def test_swapping_logging_produces_correct_logs(self):
+        """Test all of the swaps correctly replace logging methods."""
         with self.swap(logging, 'info', self._log_handler.info):
             logging.info('Info Message')
         with self.swap(logging, 'debug', self._log_handler.debug):

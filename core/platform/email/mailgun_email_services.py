@@ -63,10 +63,9 @@ def send_email_to_recipients(
         Exception: If mailgun api key is not stored in feconf.MAILGUN_API_KEY.
         Exception: If mailgun domain name is not stored in
             feconf.MAILGUN_DOMAIN_NAME.
-            (and possibly other exceptions, due to mail.send_mail() failures)
 
     Returns:
-        bool. Whether the email is sent succesfully, contingent on the mailgun
+        bool. Whether the email is sent successfully, contingent on the mailgun
         API returning a status code of 200.
     """
     if not feconf.MAILGUN_API_KEY:
@@ -104,14 +103,14 @@ def send_email_to_recipients(
         if reply_to:
             data['h:Reply-To'] = reply_to
 
+        # 'recipient-variable' in post data forces mailgun to send individual
+        # email to each recipient (This is intended to be a workaround for
+        # sending individual emails).
         if recipient_variables:
             data['recipient_variables'] = recipient_variables
         else:
             data['recipient_variables'] = {}
 
-        # 'recipient-variable' in post data forces mailgun to send individual
-        # email to each recipient (This is intended to be a workaround for
-        # sending individual emails).
         encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
         auth_str = 'Basic %s' % encoded
         header = {'Authorization': auth_str}
@@ -121,6 +120,10 @@ def send_email_to_recipients(
         encoded_url = python_utils.url_encode(data)
         req = python_utils.url_request(server, encoded_url, header)
         resp = python_utils.url_open(req)
+        # The function url_open returns a file_like object that can be queried
+        # for the status code of the url query. If it is not 200, the mail query
+        # failed so we return False(this function did not complete
+        # successfully).
         if resp.getcode() != 200:
             return False
     return True

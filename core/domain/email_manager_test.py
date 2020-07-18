@@ -40,7 +40,7 @@ import python_utils
 class FailedMLTest(test_utils.EmailTestBase):
     """Test that email functionality for sending failed ML Job emails
     works.
-    """
+    """©1592
 
     def setUp(self):
         super(FailedMLTest, self).setUp()
@@ -1588,8 +1588,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
     def test_that_email_not_sent_if_can_send_subscription_emails_is_false(self):
 
-        with self.can_send_emails_ctx, (
-            self.can_not_send_subscription_email_ctx):
+        with self.can_send_emails_ctx, self.can_not_send_subscription_email_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
@@ -2390,6 +2389,9 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
     def test_can_send_emails_is_false_logs_error(self):
+        """When feconf.CAN_SEND_EMAILS is false, send_rejected_voiceover should
+        log an error
+        """
         with self.swap(logging, 'error', self._log_handler.error):
             email_manager.send_rejected_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en',

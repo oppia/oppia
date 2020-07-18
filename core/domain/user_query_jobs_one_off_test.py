@@ -336,7 +336,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'Hi submit,<br>'
             'Your query with id %s has failed due to error '
             'during execution. '
-            'Please check the query parameters and submit query again.<br><br>' # pylint: disable=line-too-long
+            'Please check the query parameters and submit query again.<br><br>'
             'Thanks!<br>'
             '<br>'
             'Best wishes,<br>'
@@ -356,7 +356,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'Best wishes,\n'
             'The Oppia Team\n'
             '\n'
-            'You can change your email preferences via the Preferences page.' # pylint: disable=line-too-long
+            'You can change your email preferences via the Preferences page.'
         ) % query_id
 
         messages = self.email_services_mock.mock_get_sent_messages(

@@ -1786,8 +1786,9 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     def test_email_is_sent_correctly_when_unpublishing(self):
         with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True), (
-                self.swap(feconf, 'CAN_SEND_EMAILS', True)):
+            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            ), self.swap(
+                feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 

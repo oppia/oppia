@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides mailgun api to send emails."""
+"""Provides email services api to log emails in DEV_MODE."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -29,7 +29,8 @@ def send_email_to_recipients(
         sender_email, recipient_emails, subject,
         plaintext_body, html_body, bcc=None, reply_to=None,
         recipient_variables=None):
-    """Logs out an email details to terminal console in DEV_MODE.
+    """Logs out sent email details to terminal console in DEV_MODE, to model
+    sending out an email.
 
     Args:
         sender_email: str. The email address of the sender. This should be in
@@ -41,7 +42,7 @@ def send_email_to_recipients(
         plaintext_body: str. The plaintext body of the email. Format must
             be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
-            entity.Format must be utf-8.
+            entity. Format must be utf-8.
         bcc: list(str)|None. List of bcc emails. Format must be utf-8.
         reply_to: str|None. Reply address formatted like
             “reply+<reply_id>@<incoming_email_domain_name>
@@ -63,7 +64,7 @@ def send_email_to_recipients(
         bool. Whether the email is logged successfully.
     """
 
-    # Show the first 3 emails in the recipient list for up to 1000 emails.
+    # Show the first 3 emails in the recipient list.
     recipient_email_list_str = ' '.join(
         ['%s' %
          (recipient_email,) for recipient_email in recipient_emails[:3]])
@@ -113,4 +114,6 @@ def send_email_to_recipients(
         'You are not currently sending out real emails since this is a' +
         ' dev environment. Emails are sent out in the production' +
         ' environment.')
+    # Returns True signifying that the "send_email_to_recipients" action was
+    # successful.
     return True

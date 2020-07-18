@@ -80,9 +80,8 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             email_subscription_services.inform_subscribers(
                 self.editor_id, 'A', 'Title')
 
-            # Make sure correct number of emails is sent and no email is
-            # sent to the person who has unsubscribed from subscription
-            # emails.
+            # Make sure correct number of emails is sent and no email is sent
+            # to the person who has unsubscribed from subscription emails.
             messages = (
                 self.email_services_mock.mock_get_sent_messages(
                     to=self.NEW_USER_EMAIL))
@@ -108,9 +107,9 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             self.assertEqual(True, any(
                 model.recipient_email == self.NEW_USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
 
-            # No email model is stored for the user who has unsubscribed
-            # from subscription emails.
+            # No email model is stored for the user who has unsubscribed from
+            # subscription emails.
             self.assertEqual(False, any(
-                model.recipient_id == self.user_id_2 for model in all_models)) # pylint: disable=line-too-long
+                model.recipient_id == self.user_id_2 for model in all_models))
             self.assertEqual(False, any(
                 model.recipient_email == self.USER_EMAIL_2 for model in all_models)) # pylint: disable=line-too-long

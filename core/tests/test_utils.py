@@ -32,7 +32,6 @@ from constants import constants
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import email_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -48,7 +47,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-
 
 import feconf
 import main
@@ -939,7 +937,6 @@ tags: []
         expect_errors = False
         if expected_status_int >= 400:
             expect_errors = True
-
         json_response = self._send_post_request(
             self.testapp, url, data,
             expect_errors=expect_errors,

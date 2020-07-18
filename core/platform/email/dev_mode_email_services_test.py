@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the Mailgun API wrapper."""
+"""Tests for the email services API wrapper in DEV_MODE."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -40,7 +40,9 @@ class EmailTests(test_utils.GenericTestBase):
         self._log_handler.reset()
 
     def test_send_mail_logs_to_terminal(self):
-        """In DEV Mode, email services logs email info to terminal."""
+        """In DEV Mode, platforms email_service API that sends a singular email
+        logs the correct email info to terminal.
+        """
         msg_body = (
             """
             EmailService.SendMail
@@ -81,7 +83,9 @@ class EmailTests(test_utils.GenericTestBase):
             [logging_info_email_body, logging_info_notification])
 
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self):
-        """In DEV Mode, email services logs email info to terminal."""
+        """In DEV Mode, platform email_services that sends mail to multiple
+        recipients logs the correct info to terminal.
+        """
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
         bcc_email_list_str = 'e@e.com f@f.com'
         recipient_variables = (
