@@ -130,7 +130,7 @@
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
     "hammerjs": "^2.0.8",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.19",
     "mathjs": "^7.0.0",
     "moment": "^2.24.0",
     "nerdamer": "^1.1.4",
