@@ -118,7 +118,7 @@
                 <i class="fa fa-trash"></i>
                 <span>Delete skill</span>
               </div>
-              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSkillAssignment(null, skillSummary)">
+              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSubtopicAssignment(null, skillSummary)">
                 <i class="fa fa-trash"></i>
                 <span>Assign to Subtopic</span>
               </div>
@@ -147,7 +147,7 @@
                         <i class="fa fa-trash"></i>
                         <span>Remove from subtopic</span>
                       </div>
-                      <div class="skill-edit-option" ng-click="changeSkillAssignment(subtopic.getId(), skillSummary)">
+                      <div class="skill-edit-option" ng-click="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
                         <i class="fa fa-trash"></i>
                         <span>Change Subtopic</span>
                       </div>
@@ -287,8 +287,8 @@
     align-items: center;
     display: flex;
     flex-wrap: wrap;
-    position: relative;
     justify-content: space-between;
+    position: relative;
   }
 
   .topic-editor .skills-list-item a {
@@ -539,7 +539,7 @@
       width: 50%;
     }
 
-    .reassign-button {
+    .topic-editor .reassign-button {
       display: none;
     }
 
@@ -550,9 +550,11 @@
     .topic-editor .skill-option-box {
       right: 21px;
     }
+
     .topic-editor .subtopic-edit-options {
       right: 13px;
     }
+
     .topic-editor .uncategorized-skill-option-box {
       right: 23px;
     }

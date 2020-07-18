@@ -415,7 +415,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'thumbnail-uploader.directive.ts',
     'top-navigation-bar.directive.ts',
     'topic-creation.service.ts',
-    'topic-editor-navbar-breadcrumb.directive.ts',
     'topic-editor-navbar.directive.ts',
     'topic-editor-page.component.ts',
     'topic-editor-state.service.ts',

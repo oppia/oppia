@@ -32,7 +32,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
 require(
-  'pages/topic-editor-page/modal-templates/change-subtopic-assignment-modal.template.controller.ts');
+  'pages/topic-editor-page/modal-templates/' +
+    'change-subtopic-assignment-modal.template.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -304,7 +305,6 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.subtopicEditOptionsAreShown = index;
           };
 
-
           $scope.toggleUncategorizedSkillOptions = function(index) {
             if ($scope.uncategorizedEditOptionsIndex !== undefined) {
               $scope.uncategorizedEditOptionsIndex = undefined;
@@ -313,7 +313,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.uncategorizedEditOptionsIndex = index;
           };
 
-          $scope.changeSkillAssignment = function(oldSubtopicId, skillSummary) {
+          $scope.changeSubtopicAssignment = function(
+              oldSubtopicId, skillSummary) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
@@ -322,7 +323,7 @@ angular.module('oppia').directive('topicEditorTab', [
               resolve: {
                 subtopics: () => $scope.subtopics
               },
-              controller: 'ChangeSubtopicAssignmentModal'
+              controller: 'ChangeSubtopicAssignmentModalController'
             }).result.then(function(newSubtopicId) {
               if (oldSubtopicId === newSubtopicId) {
                 return;
@@ -343,8 +344,9 @@ angular.module('oppia').directive('topicEditorTab', [
               return;
             }
             $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {};
-            $scope.selectedSkillEditOptionsIndex[subtopicIndex][skillIndex] = (
-              true);
+            $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {
+              [skillIndex]: true
+            };
           };
 
           ctrl.$onInit = function() {

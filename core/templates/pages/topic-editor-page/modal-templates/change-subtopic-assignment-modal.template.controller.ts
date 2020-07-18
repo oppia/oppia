@@ -13,21 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for create new subtopic modal controller.
+ * @fileoverview Controller for change subtopic assignment modal controller.
  */
-
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
     'confirm-or-cancel-modal.controller.ts');
-require('domain/topic/topic-update.service.ts');
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/subtopic-validation-service.ts');
-require('domain/topic/SubtopicPageObjectFactory.ts');
 
-
-angular.module('oppia').controller('ChangeSubtopicAssignmentModal', [
+angular.module('oppia').controller('ChangeSubtopicAssignmentModalController', [
   '$controller', '$scope', '$uibModalInstance', 'subtopics',
   function(
       $controller, $scope, $uibModalInstance, subtopics) {

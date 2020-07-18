@@ -104,15 +104,15 @@ angular.module('oppia').controller(
         TopicUpdateService.setSubtopicTitle(
           ctrl.topic, subtopicId, ctrl.editableName);
         ctrl.editableName = '';
-        ctrl.editNameOfSubtopic(null);
+        ctrl.editNameOfSubtopicWithId(null);
       };
 
-      ctrl.editNameOfSubtopic = function(subtopicIndex) {
-        if (!subtopicIndex) {
+      ctrl.editNameOfSubtopicWithId = function(subtopicId) {
+        if (!subtopicId) {
           ctrl.editableName = '';
-          ctrl.selectedSubtopicIndex = 0;
+          ctrl.selectedSubtopicId = 0;
         }
-        ctrl.selectedSubtopicIndex = subtopicIndex;
+        ctrl.selectedSubtopicId = subtopicId;
       };
 
       ctrl.init = function() {

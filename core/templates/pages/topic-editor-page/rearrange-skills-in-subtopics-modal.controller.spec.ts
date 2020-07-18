@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for RearrangeSkillsInSubtopicsModalController.
  */
 
+
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
@@ -83,4 +84,36 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
       ctrl.onMoveSkillEnd(null);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
+
+  it('should not call TopicUpdateService when skill is moved to same subtopic',
+    function() {
+      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
+      ctrl.oldSubtopicId = null;
+      ctrl.onMoveSkillEnd(null);
+      expect(removeSkillSpy).not.toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService if subtopic name validation fails',
+    function() {
+      ctrl.editableName = 'subtopic1';
+      var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
+      ctrl.updateSubtopicTitle(1);
+      expect(subtopicTitleSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call TopicUpdateService to update subtopic title', function() {
+    var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
+    ctrl.updateSubtopicTitle(1);
+    expect(subtopicTitleSpy).toHaveBeenCalled();
+  });
+
+  it('should call set and reset the selected subtopic index', function() {
+    ctrl.editNameOfSubtopicWithId(1);
+    expect(ctrl.selectedSubtopicId).toEqual(1);
+    ctrl.editNameOfSubtopicWithId(10);
+    expect(ctrl.selectedSubtopicId).toEqual(10);
+    ctrl.editNameOfSubtopicWithId(0);
+    expect(ctrl.editableName).toEqual('');
+    expect(ctrl.selectedSubtopicId).toEqual(0);
+  });
 });

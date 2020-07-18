@@ -20,7 +20,6 @@ describe('Change subtopic assignment modal', function() {
   beforeEach(angular.mock.module('oppia'));
 
   var $scope = null;
-  var ctrl = null;
   var $uibModalInstance = null;
   var subtopics = [];
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -29,7 +28,7 @@ describe('Change subtopic assignment modal', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     $scope = $rootScope.$new();
-    $controller('ChangeSubtopicAssignmentModal', {
+    $controller('ChangeSubtopicAssignmentModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
       subtopics: subtopics
@@ -40,6 +39,7 @@ describe('Change subtopic assignment modal', function() {
     expect($scope.subtopics).toEqual(subtopics);
     expect($scope.selectedSubtopicId).toEqual(null);
   });
+
   it('should change the selected subtopic index', function() {
     $scope.changeSelectedSubtopic(10);
     expect($scope.selectedSubtopicId).toEqual(10);
