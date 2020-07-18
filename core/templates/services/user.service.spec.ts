@@ -235,12 +235,9 @@ fdescribe('User Service', () => {
     userService.getLoginUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(loginUrl);
     });
-    // var req = httpTestingController.expectOne(
-    //   '/url_handler?current_url=' + currentUrl);
     var req = httpTestingController.expectOne(
-      '/url_handler');
+      '/url_handler?current_url=' + currentUrl);
     expect(req.request.method).toEqual('GET');
-    expect(req.request.params).toEqual(currentUrl);
     req.flush({login_url: loginUrl});
 
     flushMicrotasks();

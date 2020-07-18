@@ -48,6 +48,9 @@ interface IPreferencesBackendDict {
   'can_receive_subscription_email': boolean;
   'subscription_list': List<subscription_summary>;
 }
+interface IProfilePictureBackendDict{
+  'profile_picture_data_url': string;
+}
 interface IUrlBackendDict {
   'login_url': string;
 }
@@ -103,7 +106,7 @@ export class UserService{
       return this.getUserInfoAsync().then(
         (userInfo) => {
           if (userInfo.isLoggedIn()){
-            return this.http.get<IPreferencesBackendDict>(
+            return this.http.get<IProfilePictureBackendDict>(
               '/preferenceshandler/profile_picture'
             ).toPromise().then(
               (backendDict) => {
