@@ -83,7 +83,7 @@ describe('ContributionAndReviewService', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  describe('getUserCreatedQuestionSuggestions', function() {
+  fdescribe('getUserCreatedQuestionSuggestions', function() {
     it('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(

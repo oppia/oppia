@@ -19,13 +19,13 @@
 
 angular.module('oppia').factory('TranslateTextService', [
   '$http', function($http) {
-    let stateWiseContents = null;
-    let stateWiseContentIds = {};
-    let activeStateName = null;
-    let activeContentId = null;
-    let stateNamesList = [];
-    let activeExpId = null;
-    let activeExpVersion = null;
+    var stateWiseContents = null;
+    var stateWiseContentIds = {};
+    var activeStateName = null;
+    var activeContentId = null;
+    var stateNamesList = [];
+    var activeExpId = null;
+    var activeExpVersion = null;
 
     const getNextContentId = function() {
       return stateWiseContentIds[activeStateName].pop();
@@ -37,6 +37,9 @@ angular.module('oppia').factory('TranslateTextService', [
     };
 
     const getNextText = function() {
+      if (stateNamesList.length === 0) {
+        return null;
+      }
       activeContentId = getNextContentId();
       if (!activeContentId) {
         activeStateName = getNextState();
@@ -49,6 +52,9 @@ angular.module('oppia').factory('TranslateTextService', [
     };
 
     const isMoreTextAvailableForTranslation = function() {
+      if (stateNamesList.length === 0) {
+        return false;
+      }
       return !(
         stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
           stateWiseContentIds[activeStateName].length === 0);
@@ -63,14 +69,14 @@ angular.module('oppia').factory('TranslateTextService', [
         stateNamesList = [];
         activeExpId = expId;
         activeExpVersion = null;
+
         $http.get(
           '/gettranslatabletexthandler', {
             params: {
               exp_id: expId,
               language_code: languageCode
             }
-          }).then(
-          function(response) {
+          }).then(function(response) {
             stateWiseContents = response.data.state_names_to_content_id_mapping;
             activeExpVersion = response.data.version;
             for (const stateName in stateWiseContents) {
@@ -83,12 +89,16 @@ angular.module('oppia').factory('TranslateTextService', [
                   stateHasText = true;
                 }
               }
+              // If none of the state's texts are non-empty, then don't consider
+              // the state for processing.
               if (stateHasText) {
                 stateNamesList.push(stateName);
                 stateWiseContentIds[stateName] = contentIds;
               }
             }
-            activeStateName = stateNamesList[0];
+            if (stateNamesList.length > 0) {
+              activeStateName = stateNamesList[0];
+            }
             successCallback();
           });
       },
