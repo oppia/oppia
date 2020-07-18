@@ -30,8 +30,8 @@ describe('Story viewer backend API service', () => {
   let sampleDataResults = {
     story_title: 'Story title',
     story_description: 'Story description',
-    completed_nodes: [],
-    pending_nodes: []
+    story_nodes: [],
+    topic_name: 'Topic name'
   };
 
   beforeEach(() => {

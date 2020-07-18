@@ -68,7 +68,10 @@ describe('Story playthrough object factory', () => {
     var storyPlaythroughBackendObject = {
       story_nodes: [
         firstSampleReadOnlyStoryNodeBackendDict,
-        secondSampleReadOnlyStoryNodeBackendDict]
+        secondSampleReadOnlyStoryNodeBackendDict],
+      story_title: 'Story',
+      story_description: 'Description',
+      topic_name: 'Topic 1'
     };
     _samplePlaythroughObject =
       storyPlaythroughObjectFactory.createFromBackendDict(
