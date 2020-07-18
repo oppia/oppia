@@ -173,6 +173,12 @@ interface IRuleTemplates {
     IsEqualTo: IRuleDescription;
     IsEquivalentTo: IRuleDescription;
   };
+  NumericExpressionInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+    ContainsSomeOf: IRuleDescription;
+    OmitsSomeOf: IRuleDescription;
+  };
   NumericInput: {
     Equals: IRuleDescription;
     IsLessThan: IRuleDescription;

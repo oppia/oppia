@@ -26,6 +26,7 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -552,6 +553,76 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(augmented_skill_summaries), 2)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
+
+    def test_get_all_topic_assignments_for_skill(self):
+        topic_id = topic_services.get_new_topic_id()
+        topic_id_1 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID],
+            subtopics=[], next_subtopic_id=1)
+
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None
+        })
+        self.save_new_topic(
+            topic_id_1, self.USER_ID, name='Topic2',
+            description='Description2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        topic_assignments = (
+            skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
+        topic_assignments = sorted(
+            topic_assignments, key=lambda i: i.topic_name)
+        self.assertEqual(len(topic_assignments), 2)
+        self.assertEqual(topic_assignments[0].topic_name, 'Topic1')
+        self.assertEqual(topic_assignments[0].topic_id, topic_id)
+        self.assertEqual(topic_assignments[0].topic_version, 1)
+        self.assertIsNone(topic_assignments[0].subtopic_id)
+
+        self.assertEqual(topic_assignments[1].topic_name, 'Topic2')
+        self.assertEqual(topic_assignments[1].topic_id, topic_id_1)
+        self.assertEqual(topic_assignments[1].topic_version, 1)
+        self.assertEqual(topic_assignments[1].subtopic_id, 1)
+
+    def test_remove_skill_from_all_topics(self):
+        topic_id = topic_services.get_new_topic_id()
+        topic_id_1 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='Topic1',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID],
+            subtopics=[], next_subtopic_id=1)
+
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None
+        })
+        self.save_new_topic(
+            topic_id_1, self.USER_ID, name='Topic2',
+            description='Description2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        skill_services.remove_skill_from_all_topics(self.USER_ID, self.SKILL_ID)
+        topic_assignments_dict = (
+            skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
+        self.assertEqual(len(topic_assignments_dict), 0)
 
     def test_update_skill(self):
         changelist = [

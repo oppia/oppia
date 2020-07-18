@@ -167,6 +167,10 @@ export interface INumberWithUnitsRuleInputs {
   f: INumberWithUnitsAnswer;
 }
 
+export interface INumericExpressionRuleInputs {
+  x: string;
+}
+
 // NumericInput interaction has multiple types of inputs based on
 // rule type.
 export interface INumericInputEqualRuleInputs {
@@ -216,6 +220,7 @@ export type IInteractionRuleInputs = (
   IMathExpressionRuleInputs |
   IMultipleChoiceRuleInputs |
   IMusicNotesRuleInputs |
+  INumericExpressionRuleInputs |
   INumberWithUnitsRuleInputs |
   INumericInputRuleInputs |
   IPencilCodeEditorRuleInputs |

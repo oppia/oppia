@@ -61,6 +61,24 @@ export class QuestionBackendApiService {
     });
   }
 
+  private _fetchTotalQuestionCountForSkillIds(skillIds: Array<string>,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: string) => void): void {
+    var questionsCountUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.QUESTION_COUNT_URL_TEMPLATE, {
+        comma_separated_skill_ids: skillIds.join(','),
+      }
+    );
+    this.http.get(questionsCountUrl).toPromise().then(
+      (response: {'total_question_count': number}) => {
+        if (successCallback) {
+          successCallback(response.total_question_count);
+        }
+      }, (errorResponse) => {
+        errorCallback(errorResponse.error);
+      });
+  }
+
   private _fetchQuestionSummaries(
       skillIds: Array<string>, cursor: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -140,6 +158,12 @@ export class QuestionBackendApiService {
       this._fetchQuestions(
         skillIds, questionCount, questionsSortedByDifficulty,
         resolve, reject);
+    });
+  }
+
+  fetchTotalQuestionCountForSkillIds(skillIds: Array<string>): Promise<number> {
+    return new Promise((resolve, reject) => {
+      this._fetchTotalQuestionCountForSkillIds(skillIds, resolve, reject);
     });
   }
 
