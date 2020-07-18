@@ -38,7 +38,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('User Service', () => {
+describe('User Service', () => {
   let userService: UserService = null;
   let urlInterpolationService: UrlInterpolationService = null;
   let userInfoObjectFactory: UserInfoObjectFactory = null;
@@ -188,9 +188,7 @@ fdescribe('User Service', () => {
     };
 
     userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-      //expect(dataUrl).toBe('image data');
-      expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));      
+      expect(dataUrl).toBe('image data'); 
     });
 
     var req1 = httpTestingController.expectOne('/userinfohandler');
