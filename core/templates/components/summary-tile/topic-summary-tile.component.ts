@@ -19,11 +19,14 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants.ts';
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
 import { TopicSummary } from 'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+const Constants = require('constants.ts');
 
 @Component({
   selector: 'topic-summary-tile',
@@ -35,13 +38,52 @@ export class TopicSummaryTileComponent {
   constructor(
     private urlInterpolationService: UrlInterpolationService) {
   }
-  getTopicLink(): string {
-    return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
-        topic_name: this.topicSummary.getName()});
+  openTopicPage(): string {
+    window.open(
+      this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
+          topic_name: this.topicSummary.getName()}), '_blank');
   }
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  getColorValueInHexForm(colorValue: number): string {
+    colorValue = (colorValue < 0) ? 0 : colorValue;
+    var colorValueString = colorValue.toString(16);
+    return (
+      (colorValueString.length === 1) ?
+      '0' + colorValueString : colorValueString);
+  }
+  getDarkerThumbnailBgColor(): string {
+    var bgColor = this.topicSummary.getThumbnailBgColor();
+    // Remove the '#' from the first position.
+    bgColor = bgColor.slice(1);
+
+    // Get RGB values of new darker color.
+    var newRValue = this.getColorValueInHexForm(
+      parseInt(bgColor.substring(0, 2), 16) - 100);
+    var newGValue = this.getColorValueInHexForm(
+      parseInt(bgColor.substring(2, 4), 16) - 100);
+    var newBValue = this.getColorValueInHexForm(
+      parseInt(bgColor.substring(4, 6), 16) - 100);
+
+    return '#' + newRValue + newGValue + newBValue;
+  }
+  getThumbnailUrl(): string {
+    // Since an Angular8 component cannot depend on an AngularJS service,
+    // the thumbnail URL is manually built here. This can be reverted to use
+    // assets backend api service once that is migrated to Angular 8.
+    // The constants used are copied over from AssetsBackendApiService.
+    let GCS_PREFIX = ('https://storage.googleapis.com/' +
+      Constants.GCS_RESOURCE_BUCKET_NAME);
+    let THUMBNAIL_DOWNLOAD_URL_TEMPLATE = (
+      (Constants.DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
+      '/<entity_type>/<entity_id>/assets/thumbnail/<filename>');
+    return (
+      this.urlInterpolationService.interpolateUrl(
+        THUMBNAIL_DOWNLOAD_URL_TEMPLATE, {
+          entity_id: this.topicSummary.getId(),
+          entity_type: AppConstants.ENTITY_TYPE.TOPIC,
+          filename: this.topicSummary.getThumbnailFilename()
+        })
+    );
   }
 }
 

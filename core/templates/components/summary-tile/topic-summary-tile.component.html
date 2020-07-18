@@ -1,49 +1,51 @@
-<div class="topic-card" ng-click="$ctrl.openTopicPage()" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+<div class="topic-card" (click)="openTopicPage()" [ngStyle]="{background: topicSummary.getThumbnailBgColor()}">
   <div class="topic-thumbnail">
     <picture>
-      <img [src]="$ctrl.thumbnailUrl" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+      <img [src]="getThumbnailUrl()" alt="" class="img-thumbnail" [ngStyle]="{background: topicSummary.getThumbnailBgColor()}">
     </picture>
   </div>
-  <div class="topic-details" ng-style="{background: $ctrl.getDarkerThumbnailBgColor()}">
-    <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
-    <span [innerHTML]="'I18N_TOPIC_SUMMARY_TILE_LESSONS' | translate:{lessonCount: topicSummary.getCanonicalStoryCount()}"
-          translate-interpolation="messageformat">
+  <div class="topic-details" [ngStyle]="{background: getDarkerThumbnailBgColor()}">
+    <span class="topic-name"> {{ topicSummary.getName() }} </span>
+    <span class="topic-story-count">
+      {{ topicSummary.getCanonicalStoryCount() }}
+      <span *ngIf="topicSummary.getCanonicalStoryCount() === 1" [innerHTML]="'I18N_TOPIC_VIEWER_STORY' | translate"></span>
+      <span *ngIf="topicSummary.getCanonicalStoryCount() !== 1" [innerHTML]="'I18N_TOPIC_VIEWER_STORIES' | translate"></span>
     </span>
   </div>
 </div>
 <style>
-  topic-summary-tile .topic-card {
+  .topic-card {
     border-radius: 1.5em;
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     cursor: pointer;
     width: 100%;
   }
 
-  topic-summary-tile .topic-name {
+  .topic-card .topic-name {
     display: block;
     font-size: 1.25em;
     font-weight: 600;
   }
 
-  topic-summary-tile .topic-card:focus {
+  .topic-card .topic-card:focus {
     outline: 0;
   }
 
-  topic-summary-tile .topic-thumbnail {
+  .topic-card .topic-thumbnail {
     height: 120px;
     text-align: center;
     vertical-align: middle;
     width: 100%;
   }
 
-  topic-summary-tile .img-thumbnail {
+  .topic-card .img-thumbnail {
     border: none;
     border-radius: 1.5em 1.5em 0 0;
     max-height: 100%;
     max-width: 100%;
   }
 
-  topic-summary-tile .topic-details {
+  .topic-card .topic-details {
     border-radius: 0 0 1.5em 1.5em;
     color: #ffffff;
     font-family: Roboto, Arial, sans-serif;
@@ -53,34 +55,34 @@
     padding: 10px 5px 5px 15px;
   }
 
-  @media(max-width: 1024px) {
-    topic-summary-tile .topic-name {
+  @media(max-width: 1150px) {
+    .topic-card .topic-name {
       font-size: 1em;
     }
 
-    topic-summary-tile .topic-story-count {
+    .topic-card .topic-story-count {
       font-size: 0.8em;
     }
 
-    topic-summary-tile .topic-details {
+    .topic-card .topic-details {
       height: 85px;
       padding-left: 10px;
     }
   }
 
   @media(max-width: 680px) {
-    topic-summary-tile .topic-nname {
+    .topic-card .topic-nname {
       font-size: 0.8em;
       height: 85px;
     }
   }
 
   @media(max-width: 500px) {
-    topic-summary-tile .topic-title {
+    .topic-card .topic-title {
       height: 75px;
     }
 
-    topic-summary-tile .topic-thumbnail {
+    .topic-card .topic-thumbnail {
       height: 100px;
     }
   }
