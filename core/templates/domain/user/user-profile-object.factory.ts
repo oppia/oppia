@@ -42,9 +42,9 @@ export interface UserProfileBackendDict {
 
 export class UserProfile {
   constructor(
-    public currentUser: string,
+    public username: string,
     public profileIsOfCurrentUser: boolean,
-    public profileUsername: string,
+    public usernameOfViewedProfile: string,
     public userBio: string,
     public subjectInterests: string[],
     public firstContributionMsec: number,

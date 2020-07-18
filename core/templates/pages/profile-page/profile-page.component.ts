@@ -59,10 +59,10 @@ angular.module('oppia').component('profilePage', {
           LoaderService.hideLoadingScreen();
           ctrl.username = {
             title: 'Username',
-            value: data.profileUsername,
-            helpText: (data.profileUsername)
+            value: data.usernameOfViewedProfile,
+            helpText: (data.usernameOfViewedProfile)
           };
-          ctrl.usernameIsLong = data.profileUsername.length > 16;
+          ctrl.usernameIsLong = data.usernameOfViewedProfile.length > 16;
           ctrl.userBio = data.userBio;
           ctrl.userDisplayedStatistics = [{
             title: 'Impact',
@@ -103,7 +103,7 @@ angular.module('oppia').component('profilePage', {
             }
           );
 
-          ctrl.userNotLoggedIn = !data.currentUser;
+          ctrl.userNotLoggedIn = !data.username;
 
           ctrl.isAlreadySubscribed = data.isAlreadySubscribed;
           ctrl.isUserVisitingOwnProfile = data.isUserVisitingOwnProfile;
@@ -130,19 +130,21 @@ angular.module('oppia').component('profilePage', {
               );
             } else {
               if (!ctrl.isAlreadySubscribed) {
-                ProfilePageBackendApiService.subscribe(data.profileUsername)
-                  .then(() => {
-                    ctrl.isAlreadySubscribed = true;
-                    ctrl.updateSubscriptionButtonPopoverText();
-                    $scope.$apply();
-                  });
+                ProfilePageBackendApiService.subscribe(
+                  data.usernameOfViewedProfile
+                ).then(() => {
+                  ctrl.isAlreadySubscribed = true;
+                  ctrl.updateSubscriptionButtonPopoverText();
+                  $scope.$apply();
+                });
               } else {
-                ProfilePageBackendApiService.unsubscribe(data.profileUsername)
-                  .then(() => {
-                    ctrl.isAlreadySubscribed = false;
-                    ctrl.updateSubscriptionButtonPopoverText();
-                    $scope.$apply();
-                  });
+                ProfilePageBackendApiService.unsubscribe(
+                  data.usernameOfViewedProfile
+                ).then(() => {
+                  ctrl.isAlreadySubscribed = false;
+                  ctrl.updateSubscriptionButtonPopoverText();
+                  $scope.$apply();
+                });
               }
             }
           };

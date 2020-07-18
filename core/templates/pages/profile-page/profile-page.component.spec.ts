@@ -218,7 +218,7 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      for (let i = 0; i<11; i++) {
+      for (let i = 0; i < 11; i++) {
         profileData.edited_exp_summary_dicts.push({
           last_updated_msec: 1591296737470.528,
           community_owned: false,
