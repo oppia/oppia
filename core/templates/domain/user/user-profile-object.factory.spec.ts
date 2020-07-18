@@ -96,14 +96,14 @@ describe('User profile object factory', () => {
         backendDict.created_exp_summary_dicts[0]);
 
       expect(userProfile.createdExpSummaries).toEqual([exploration]);
-      expect(userProfile.currentUser).toEqual('user1');
+      expect(userProfile.username).toEqual('user1');
       expect(userProfile.editedExpSummaries).toEqual([exploration]);
       expect(userProfile.firstContributionMsec).toEqual(null),
       expect(userProfile.isAlreadySubscribed).toEqual(false);
       expect(userProfile.isUserVisitingOwnProfile).toEqual(false);
       expect(userProfile.profileIsOfCurrentUser).toEqual(false);
       expect(userProfile.profilePictureDataUrl).toEqual('image');
-      expect(userProfile.profileUsername).toEqual('user2');
+      expect(userProfile.usernameOfViewedProfile).toEqual('user2');
       expect(userProfile.subjectInterests).toEqual([]);
       expect(userProfile.userBio).toEqual('hi');
       expect(userProfile.userImpactScore).toEqual(0);
