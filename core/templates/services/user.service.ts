@@ -117,7 +117,17 @@ export class UserService{
                 return profilePictureDataUrl;
             });
           } else {
-            return Promise.resolve(profilePictureDataUrl);
+            return this.http.get<IProfilePictureBackendDict>(
+              '/preferenceshandler/profile_picture'
+            ).toPromise().then(
+              (backendDict) => {
+                if (backendDict.profile_picture_data_url){
+                  profilePictureDataUrl = 
+                    backendDict.profile_picture_data_url;
+                }
+                return profilePictureDataUrl;
+            });
+            //return Promise.resolve(profilePictureDataUrl);
           }
         });
     }
