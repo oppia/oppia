@@ -163,10 +163,10 @@ describe('Topic editor tab directive', function() {
   it('should show subtopic edit options', function() {
     $scope.showSubtopicEditOptions(1);
     expect($scope.subtopicEditOptionsAreShown).toEqual(1);
+    $scope.showSubtopicEditOptions(1);
+    expect($scope.subtopicEditOptionsAreShown).toEqual(undefined);
     $scope.showSubtopicEditOptions(2);
     expect($scope.subtopicEditOptionsAreShown).toEqual(2);
-    $scope.showSubtopicEditOptions(1);
-    expect($scope.subtopicEditOptionsAreShown).toEqual(1);
   });
 
   it('should show skill edit options', function() {

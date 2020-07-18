@@ -26,7 +26,7 @@
               </a>
             </div>
           </md-card>
-          <p class="intro-card-message protractor-test-no-uncategorized-skills" ng-if="uncategorizedSkillSummaries.length === 0">
+          <p class="intro-card-message protractor-test-no-uncategorized-skills" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
             There are no unassigned skills left in the topic.
           </p>
         </div>
@@ -37,12 +37,16 @@
            dnd-drop="$ctrl.onMoveSkillEnd(subtopic.getId())"
            style="min-height: 200px">
       <md-card class="subtopic item-container protractor-test-subtopic-column">
-        <div class="subtopic-header" ng-click="editNameOfSubtopic(subtopic.getId())">
+        <div class="subtopic-header" ng-click="$ctrl.editNameOfSubtopic(subtopic.getId())">
           <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
           <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
         </div>
-        <input type="text" ng-model="$ctrl.editableName">
-        <button class="btn btn-secondary" ng-click="$ctrl.updateSubtopicTitle(subtopic.getId())">Save</button>
+        <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicIndex">
+          <input type="text" ng-model="$ctrl.editableName">
+          <button class="btn btn-secondary" ng-click="$ctrl.editNameOfSubtopic(null)">Cancel</button>
+          <button class="btn btn-primary" ng-click="$ctrl.updateSubtopicTitle(subtopic.getId())">Save</button>
+        </div>
+
         <div class="subtopic-container">
           <md-card class="skill-id"
                    ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
@@ -72,6 +76,7 @@
   }
   .rearrange-skills-modal .modal-body {
     padding: 40px;
+    height: 55vh;
   }
   .rearrange-skills-modal a {
     color: #666;

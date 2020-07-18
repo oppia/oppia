@@ -78,7 +78,7 @@ angular.module('oppia').controller(
        *    uncategorized section.
        */
       ctrl.onMoveSkillEnd = function(newSubtopicId) {
-        if (newSubtopicId === $scope.oldSubtopicId) {
+        if (newSubtopicId === ctrl.oldSubtopicId) {
           return;
         }
 
@@ -95,22 +95,28 @@ angular.module('oppia').controller(
 
 
       ctrl.updateSubtopicTitle = function(subtopicId) {
-        console.log(ctrl.editableName);
-        if (!SubtopicValidationService.checkValidSubtopicName(ctrl.editableName)) {
+        if (!SubtopicValidationService.checkValidSubtopicName(
+          ctrl.editableName)) {
           ctrl.errorMsg = 'A subtopic with this title already exists';
           return;
         }
 
         TopicUpdateService.setSubtopicTitle(
           ctrl.topic, subtopicId, ctrl.editableName);
+        ctrl.editableName = '';
+        ctrl.editNameOfSubtopic(null);
       };
 
-      $scope.dummyChange = function() {
-        console.log(ctrl.editableName);
+      ctrl.editNameOfSubtopic = function(subtopicIndex) {
+        if (!subtopicIndex) {
+          ctrl.editableName = '';
+          ctrl.selectedSubtopicIndex = 0;
+        }
+        ctrl.selectedSubtopicIndex = subtopicIndex;
       };
 
       ctrl.init = function() {
-        ctrl.editableName = '3';
+        ctrl.editableName = '';
         $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
         $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
         _initEditor();

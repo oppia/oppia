@@ -31,6 +31,8 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
+require(
+  'pages/topic-editor-page/modal-templates/change-subtopic-assignment-modal.template.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -295,11 +297,44 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.showSubtopicEditOptions = function(index) {
-            if ($scope.subtopicEditOptionsAreShown) {
-              $scope.subtopicEditOptionsAreShown = null;
+            if ($scope.subtopicEditOptionsAreShown !== undefined) {
+              $scope.subtopicEditOptionsAreShown = undefined;
               return;
             }
             $scope.subtopicEditOptionsAreShown = index;
+          };
+
+
+          $scope.toggleUncategorizedSkillOptions = function(index) {
+            if ($scope.uncategorizedEditOptionsIndex !== undefined) {
+              $scope.uncategorizedEditOptionsIndex = undefined;
+              return;
+            }
+            $scope.uncategorizedEditOptionsIndex = index;
+          };
+
+          $scope.changeSkillAssignment = function(oldSubtopicId, skillSummary) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic-editor-page/modal-templates/' +
+                      'change-subtopic-assignment-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                subtopics: () => $scope.subtopics
+              },
+              controller: 'ChangeSubtopicAssignmentModal'
+            }).result.then(function(newSubtopicId) {
+              if (oldSubtopicId === newSubtopicId) {
+                return;
+              }
+              TopicUpdateService.moveSkillToSubtopic(
+                $scope.topic, oldSubtopicId, newSubtopicId,
+                skillSummary);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
 
           $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {

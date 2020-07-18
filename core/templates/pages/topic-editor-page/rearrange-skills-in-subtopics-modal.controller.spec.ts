@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for RearrangeSkillsInSubtopicsModalController.
  */
 
-
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var $scope = null;
+  var ctrl = null;
   var topic = null;
   var $uibModalInstance = null;
   var TopicEditorStateService = null;
@@ -47,7 +47,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     topic = TopicObjectFactory.createInterstitialTopic();
     topic._subtopics = [subtopic];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    $controller('RearrangeSkillsInSubtopicsModalController', {
+    ctrl = $controller('RearrangeSkillsInSubtopicsModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
 
@@ -55,41 +55,32 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   }));
 
   it('should initialize the variables', function() {
-    $scope.init();
-    expect($scope.topic).toEqual(topic);
+    ctrl.init();
+    expect(ctrl.topic).toEqual(topic);
   });
 
   it('get skill editor url', function() {
-    expect($scope.getSkillEditorUrl('1')).toBe('/skill_editor/1');
+    expect(ctrl.getSkillEditorUrl('1')).toBe('/skill_editor/1');
   });
-
 
   it('should record skill summary to move and subtopic Id', function() {
     var skillSummary = SkillSummaryObjectFactory.create(
       '1', 'Skill description');
-    $scope.onMoveSkillStart(1, skillSummary);
-    expect($scope.skillSummaryToMove).toEqual(skillSummary);
-    expect($scope.oldSubtopicId).toEqual(1);
+    ctrl.onMoveSkillStart(1, skillSummary);
+    expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
+    expect(ctrl.oldSubtopicId).toEqual(1);
   });
 
   it('should call TopicUpdateService when skill is moved', function() {
     var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
-    $scope.onMoveSkillEnd(1);
+    ctrl.onMoveSkillEnd(1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic',
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      $scope.onMoveSkillEnd(null);
+      ctrl.onMoveSkillEnd(null);
       expect(removeSkillSpy).toHaveBeenCalled();
-    });
-
-  it('should not call TopicUpdateService when skill is moved to same subtopic',
-    function() {
-      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      $scope.oldSubtopicId = null;
-      $scope.onMoveSkillEnd(null);
-      expect(removeSkillSpy).not.toHaveBeenCalled();
     });
 });

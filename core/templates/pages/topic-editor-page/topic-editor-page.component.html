@@ -72,6 +72,7 @@
   }
 
   .topic-editor-main {
+    margin-bottom: 50px;
     margin-top: 110px;
   }
 
@@ -114,23 +115,32 @@
   topic-editor-page .oppia-editor-warnings-box {
     max-width: none;
   }
-  .navbar-text {
+  topic-editor-page .navbar-text {
     width: 40%;
     text-align: center;
     display: flex;
+    font-family: Capriola, Roboto, Arial, sans-serif;
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 25px;
+    font-size: 20px;
   }
   .navbar-icons {
     display: flex;
   }
 
-  .topic-editor .skill-option-box {
-    right: 21px;
-  }
-  .topic-editor .subtopic-edit-options {
-    right: 13px;
+  @media screen and (max-width: 800px) {
+    topic-editor-page .navbar-helper {
+      position: inherit;
+    }
+    topic-editor-page .navbar-tabs {
+      justify-content: center;
+    }
+    topic-editor-page .navbar-text {
+      display: none;
+    }
+    .topic-editor-main {
+      margin-top: 40px;
+    }
   }
 </style>
