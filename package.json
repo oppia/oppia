@@ -90,7 +90,7 @@
     "stylelint-order": "^4.1.0",
     "terser-webpack-plugin": "^3.0.0",
     "thread-loader": "^2.1.2",
-    "ts-loader": "^7.0.0",
+    "ts-loader": "^8.0.0",
     "typescript": "^3.4.5",
     "uglify-js": "^3.5.8",
     "underscore-template-loader": "^1.0.0",
