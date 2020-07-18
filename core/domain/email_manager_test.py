@@ -40,7 +40,7 @@ import python_utils
 class FailedMLTest(test_utils.EmailTestBase):
     """Test that email functionality for sending failed ML Job emails
     works.
-    """©1592
+    """
 
     def setUp(self):
         super(FailedMLTest, self).setUp()
