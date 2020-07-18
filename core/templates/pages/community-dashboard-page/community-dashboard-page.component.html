@@ -54,12 +54,10 @@
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
       </div>
       <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
-        <span class="oppia-dashboard-language-container-label">Translate text to:</span>
-        <select class="oppia-opportunity-language-selector protractor-test-language-selector"
-                ng-change="$ctrl.onChangeLanguage()"
-                ng-model="$ctrl.languageCode"
-                ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
-        </select>
+        <span class="oppia-dashboard-language-container-label">Translate to</span>
+        <translation-language-selector [active-language-code]="$ctrl.languageCode"
+                                       (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+        </translation-language-selector>
       </div>
     </div>
   </div>
@@ -80,13 +78,13 @@
   .oppia-dashboard-language-container-label {
     color: #4a4a4a;
     font-size: 18px;
+    margin-top: 10px;
   }
   .oppia-dashboard-language-container {
     display: flex;
     flex-direction: column;
-    height: 80px;
     margin-left: 10%;
-    width: 15%;
+    width: 250px;
   }
   .oppia-opportunity-language-selector {
     background: white;
@@ -94,9 +92,8 @@
     height: 35px;
   }
   .oppia-opportunities-tabs-explanation {
-    padding-top: 25px;
+    padding-top: 50px;
     position: relative;
-    width: 40%;
   }
   .oppia-opportunities-tabs-explanation::before {
     bottom: 65%;
@@ -116,8 +113,8 @@
     width: 10%;
   }
   .oppia-review-right-details-container {
-    position: relative;
     left: 40%;
+    position: relative;
   }
   .oppia-contributor-username-container::before {
     bottom: 65%;
@@ -159,8 +156,8 @@
   .oppia-opportunities-tab-header {
     align-items: center;
     display: flex;
-    justify-content: flex-start;
     height: 100%;
+    justify-content: flex-start;
     margin: auto;
     max-width: 1200px;
     width: 80%;
@@ -187,9 +184,9 @@
     font-weight: bold;
     padding: 10px;
     text-decoration: none;
-    transition: color 200ms ease-out;
     -webkit-transition: color 200ms ease-out;
     -ms-transition: color 200ms ease-out;
+    transition: color 200ms ease-out;
     width: 100%;
   }
   .oppia-active-opportunities-tab a {

@@ -132,6 +132,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
         class FakeTrainingJob(python_utils.OBJECT):
             """Fake training class to invoke failed job functions."""
+
             def __init__(self):
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
 

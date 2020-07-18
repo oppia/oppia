@@ -103,18 +103,22 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_with_metaclass(self):
         class BaseForm(python_utils.OBJECT):
             """Test baseclass."""
+
             pass
 
         class FormType1(type):
             """Test metaclass."""
+
             pass
 
         class FormType2(type):
             """Test metaclass."""
+
             pass
 
         class Form(python_utils.with_metaclass(FormType1, BaseForm)): # pylint: disable=inherit-non-class
             """Test class."""
+
             pass
 
         self.assertTrue(isinstance(Form, FormType1))

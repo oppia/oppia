@@ -58,7 +58,7 @@ describe('NumericInputValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        audio_translations: {},
+        content_id: '',
         html: ''
       },
       labelled_as_correct: false,
@@ -88,7 +88,7 @@ describe('NumericInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });
@@ -147,30 +147,22 @@ describe('NumericInputValidationService', () => {
     });
 
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString('3.')).toEqual(
-      'Trailing decimals are not allowed.');
-    expect(validatorService.getErrorString('.3.4')).toEqual(
-      'At most 1 decimal point should be present.');
-    expect(validatorService.getErrorString('36a4')).toEqual(
-      'Only use numbers, minus sign (-), and decimal (.).');
-    expect(validatorService.getErrorString('3-4')).toEqual(
-      'Minus (-) sign is only allowed in beginning.');
-    expect(validatorService.getErrorString('-3-4')).toEqual(
-      'At most 1 minus (-) sign should be present.');
-    expect(validatorService.getErrorString('2.2')).toEqual(undefined);
-    expect(validatorService.getErrorString('-2.2')).toEqual(undefined);
-    expect(validatorService.getErrorString('34.56')).toEqual(undefined);
-  });
-
-  it('should validate floats correctly', () => {
-    let filter = validatorService.parseValue;
-    expect(filter('1.23')).toEqual(1.23);
-    expect(filter('-1.23')).toEqual(-1.23);
-    expect(filter('0')).toEqual(0);
-    expect(filter('-1')).toEqual(-1);
-    expect(filter('-1.0')).toEqual(-1);
-    expect(filter('.35')).toEqual(0.35);
-    expect(filter('.3')).toEqual(0.3);
-    expect(filter('0.')).toEqual(0);
+    expect(validatorService.getErrorString(undefined)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(null)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(1200000000E+27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(1200000000E-27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(999999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(99.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(-9.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(-2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(34.56)).toEqual(undefined);
   });
 });

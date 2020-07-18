@@ -17,23 +17,22 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { UtilsService } from 'services/utils.service';
-import { AlertsService } from 'services/alerts.service';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 /* eslint-disable max-len */
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 /* eslint-disable max-len */
 
 describe('State hints service', () => {
   let shs: StateHintsService = null;
-  let alertsService : AlertsService;
-  let utilsService : UtilsService;
+  let hof: HintObjectFactory = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [StateHintsService]
+      providers: [StateHintsService, HintObjectFactory]
     });
 
     shs = TestBed.get(StateHintsService);
+    hof = TestBed.get(HintObjectFactory);
   });
 
   it('should called the constructor', () =>{
@@ -43,11 +42,12 @@ describe('State hints service', () => {
   it('should called setActiveHintIndex after init', () =>{
     spyOn(shs, 'setActiveHintIndex');
     const StateName = 'Introduction';
-    const value = {0: {
-      _html: '<p>math</p>',
-      _contentId: 'hint_1'
-    }
-    };
+    const value = [{
+      hint_content: {
+        html: '<p>math</p>',
+        content_id: 'hint_1'
+      }
+    }].map(item => hof.createFromBackendDict(item));
     shs.init(StateName, value);
     expect(shs.setActiveHintIndex).toHaveBeenCalled();
   });

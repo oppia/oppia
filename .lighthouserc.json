@@ -3,16 +3,22 @@
     "collect": {
       "numberOfRuns": 1,
       "startServerCommand": "python -m scripts.start --no_browser --prod_env",
+      "puppeteerScript": "puppeteer-login-script.js",
       "startServerReadyPattern": "default: \"GET /_ah/warmup HTTP/1.1\"",
       "startServerReadyTimeout": 250000,
       "url": [
         "http://127.0.0.1:8181/",
+        "http://127.0.0.1:8181/admin",
         "http://127.0.0.1:8181/about",
+        "http://127.0.0.1:8181/creator-dashboard",
         "http://127.0.0.1:8181/contact",
+        "http://127.0.0.1:8181/community-dashboard",
+        "http://127.0.0.1:8181/delete-account",
         "http://127.0.0.1:8181/donate",
-        "http://127.0.0.1:8181/get_started",
-        "http://127.0.0.1:8181/library",
-        "http://127.0.0.1:8181/privacy",
+        "http://127.0.0.1:8181/emaildashboard",
+        "http://127.0.0.1:8181/get-started",
+        "http://127.0.0.1:8181/community-library",
+        "http://127.0.0.1:8181/privacy-policy",
         "http://127.0.0.1:8181/teach",
         "http://127.0.0.1:8181/terms",
         "http://127.0.0.1:8181/thanks"
@@ -23,6 +29,7 @@
         {
           "matchingUrlPattern": ".*",
           "assertions": {
+            "categories:accessibility": ["error", {"minScore": 1}],
             "first-contentful-paint": [ "warn", {"maxNumericValue": 1230000}],
             "first-meaningful-paint": ["warn", {"maxNumericValue": 1280000}],
             "first-cpu-idle": ["warn", {"maxNumericValue": 1460000}],
@@ -105,7 +112,7 @@
           }
         },
         {
-          "matchingUrlPattern": "http://[^/]+/get_started$",
+          "matchingUrlPattern": "http://[^/]+/get-started$",
           "assertions": {
             "offscreen-images": ["error", {"minScore": 0}],
             "uses-webp-images": ["error", {"minScore": 1}],
@@ -119,7 +126,7 @@
           }
         },
         {
-          "matchingUrlPattern": "http://[^/]+/library$",
+          "matchingUrlPattern": "http://[^/]+/community-library$",
           "assertions": {
             "offscreen-images": ["error", {"minScore": 1}],
             "uses-webp-images": ["error", {"minScore": 0}],

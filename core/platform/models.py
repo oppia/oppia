@@ -28,7 +28,7 @@ import utils
 # Valid model names.
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'job', 'opportunity',
+    'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
@@ -97,6 +97,9 @@ class _Gae(Platform):
             elif name == NAMES.feedback:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
+            elif name == NAMES.improvements:
+                from core.storage.improvements import gae_models as improvements_models # pylint: disable=line-too-long
+                returned_models.append(improvements_models)
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
@@ -143,6 +146,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
+
         model_classes = []
         for module in cls.import_models(model_names):
             for member_name, member_obj in inspect.getmembers(module):
@@ -210,16 +214,6 @@ class _Gae(Platform):
         return gae_app_identity_services
 
     @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        from core.platform.image import gae_image_services
-        return gae_image_services
-
-    @classmethod
     def import_email_services(cls):
         """Imports and returns the email services module specified in feconf.py.
 
@@ -229,7 +223,7 @@ class _Gae(Platform):
 
         Raises:
             Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
-            to a valid email_services module.
+                to a valid email_services module.
         """
         if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
             from core.platform.email import gae_email_services
@@ -367,15 +361,6 @@ class Registry(python_utils.OBJECT):
             module. The app_identity_services module.
         """
         return cls._get().import_app_identity_services()
-
-    @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        return cls._get().import_gae_image_services()
 
     @classmethod
     def import_email_services(cls):

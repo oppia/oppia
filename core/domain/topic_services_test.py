@@ -40,6 +40,7 @@ import feconf
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic services."""
+
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -47,6 +48,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     subtopic_id = 1
     skill_id_1 = 'skill_1'
     skill_id_2 = 'skill_2'
+    skill_id_3 = 'skill_3'
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
@@ -118,6 +120,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_summaries), 2)
         self.assertEqual(topic_summaries[0].name, 'Name')
+        self.assertEqual(topic_summaries[0].description, 'Description')
         self.assertEqual(topic_summaries[0].canonical_story_count, 0)
         self.assertEqual(topic_summaries[0].additional_story_count, 0)
         self.assertEqual(topic_summaries[0].total_skill_count, 2)
@@ -161,6 +164,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            description='description1',
             canonical_name='canonical_name',
             next_subtopic_id=1,
             language_code='en',
@@ -183,6 +187,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id_2',
             name='name 2',
             abbreviated_name='abbrev',
+            description='description',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -243,7 +248,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopics=[], next_subtopic_id=1)
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
-            set([self.skill_id_1, self.skill_id_2, 'skill_3']))
+            {self.skill_id_1, self.skill_id_2, 'skill_3'})
 
     def test_cannot_create_topic_change_class_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
@@ -254,6 +259,131 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': 'Description',
                 'new_value': 'New Description'
             })
+
+    def test_cannot_rearrange_story_with_missing_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'from_index, to_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+            })
+
+    def test_cannot_rearrange_story_with_missing_from_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'from_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+                'to_index': 1
+            })
+
+    def test_cannot_rearrange_story_with_missing_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, ('The following required attributes are missing: '
+                        'to_index')):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+                'from_index': 1
+            })
+
+    def test_rearrange_canonical_stories_in_topic(self):
+        story_id_new = 'story_id_new'
+        topic_services.add_canonical_story(
+            self.user_id_admin, self.TOPIC_ID, 'story_id_new')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, self.story_id_1)
+        self.assertEqual(
+            topic.canonical_story_references[1].story_id, self.story_id_2)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, story_id_new)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
+            'from_index': 2,
+            'to_index': 0
+        })]
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Rearranged canonical story on index 2 to index 0.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, story_id_new)
+        self.assertEqual(
+            topic.canonical_story_references[1].story_id, self.story_id_1)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, self.story_id_2)
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 4)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Rearranged canonical story on index 2 to index 0.')
+
+    def test_rearrange_skill_in_subtopic(self):
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, self.skill_id_3)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_2
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_3
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Added skills to the subtopic.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics[0].skill_ids), 3)
+        skill_ids = topic.subtopics[0].skill_ids
+        self.assertEqual(skill_ids[0], self.skill_id_1)
+        self.assertEqual(skill_ids[1], self.skill_id_2)
+        self.assertEqual(skill_ids[2], self.skill_id_3)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+            'subtopic_id': 1,
+            'from_index': 2,
+            'to_index': 0
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Rearranged skill from index 2 to index 0 for subtopic with id 1.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics[0].skill_ids), 3)
+        skill_ids = topic.subtopics[0].skill_ids
+        self.assertEqual(skill_ids[0], self.skill_id_3)
+        self.assertEqual(skill_ids[1], self.skill_id_1)
+        self.assertEqual(skill_ids[2], self.skill_id_2)
+
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 5)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Rearranged skill from index 2 to index 0 for subtopic with id 1.')
 
     def test_cannot_update_topic_property_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
@@ -1323,6 +1453,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_v1_dict],
@@ -1366,6 +1497,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[],

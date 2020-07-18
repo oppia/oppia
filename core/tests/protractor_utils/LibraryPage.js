@@ -21,7 +21,7 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var LibraryPage = function() {
-  var LIBRARY_URL_SUFFIX = '/library';
+  var LIBRARY_URL_SUFFIX = '/community-library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
   var allExplorationSummaryTile = element.all(
@@ -71,7 +71,7 @@ var LibraryPage = function() {
     // The second search bar input element is visible when the library
     // page is rendered for mobile device.
 
-    // get function is a zero-based index.
+    // Function get is a zero-based index.
     var searchInput = (
       browser.isMobile ? await searchInputs.get(1) :
       await searchInputs.first());

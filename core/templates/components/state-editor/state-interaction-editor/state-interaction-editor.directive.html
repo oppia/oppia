@@ -10,7 +10,11 @@
   <div ng-if="interactionId">
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body" title="<[getCurrentInteractionName()]>">
-        <img ng-src="<[userBlueImgUrl]>" alt="" class="oppia-editor-card-avatar">
+        <picture>
+          <source type="image/webp" ng-srcset="<[getStaticImageUrl('/avatar/user_blue_72px.webp')]>">
+          <source type="image/png" ng-srcset="<[getStaticImageUrl('/avatar/user_blue_72px.png')]>">
+          <img ng-src="<[getStaticImageUrl('/avatar/user_blue_72px.png')]>" class="oppia-editor-card-avatar" alt="">
+        </picture>
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section" style="height: 100%;">
             <button type="button" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()" ng-if="EditabilityService.isEditable()">

@@ -18,20 +18,12 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-player-page/services/exploration-engine.service.ts');
-require('services/contextual/url.service.ts');
+  'pages/exploration-player-page/templates/' +
+  'refresher-exploration-confirmation-modal.controller.ts');
 
 angular.module('oppia').factory(
   'RefresherExplorationConfirmationModalService', [
-    '$timeout', '$uibModal', 'ExplorationEngineService',
-    'UrlInterpolationService', 'UrlService',
-    function(
-        $timeout, $uibModal, ExplorationEngineService,
-        UrlInterpolationService, UrlService) {
+    '$uibModal', function($uibModal) {
       return {
         displayRedirectConfirmationModal: function(
             refresherExplorationId, redirectConfirmationCallback) {
@@ -40,50 +32,15 @@ angular.module('oppia').factory(
               'pages/exploration-player-page/templates/' +
               'refresher-exploration-confirmation-modal.template.html'),
             backdrop: 'static',
-            controller: [
-              '$controller', '$scope', '$uibModalInstance', '$window',
-              function($controller, $scope, $uibModalInstance, $window) {
-                $controller('ConfirmOrCancelModalController', {
-                  $scope: $scope,
-                  $uibModalInstance: $uibModalInstance
-                });
-
-                $scope.confirmRedirect = function() {
-                  redirectConfirmationCallback();
-
-                  var collectionId = UrlService.getUrlParams().collection_id;
-                  var parentIdList = UrlService.getQueryFieldValuesAsList(
-                    'parent');
-                  var EXPLORATION_URL_TEMPLATE = '/explore/<exploration_id>';
-                  var url = UrlInterpolationService.interpolateUrl(
-                    EXPLORATION_URL_TEMPLATE, {
-                      exploration_id: refresherExplorationId
-                    });
-                  if (collectionId) {
-                    url = UrlService.addField(
-                      url, 'collection_id', collectionId);
-                  }
-                  for (var i = 0; i < parentIdList.length; i++) {
-                    url = UrlService.addField(url, 'parent', parentIdList[i]);
-                  }
-                  url = UrlService.addField(
-                    url, 'parent', ExplorationEngineService.getExplorationId());
-
-                  // Wait a little before redirecting the page to ensure other
-                  // tasks started here (e.g. event recording) have sufficient
-                  // time to complete.
-                  // TODO(bhenning): Find a reliable way to send events that
-                  // does not get interrupted with browser redirection.
-                  $timeout(function() {
-                    $window.open(url, '_self');
-                  }, 150);
-
-                  // Close the dialog to ensure the confirmation cannot be
-                  // called multiple times.
-                  $uibModalInstance.close();
-                };
+            resolve: {
+              redirectConfirmationCallback: function() {
+                return redirectConfirmationCallback;
+              },
+              refresherExplorationId: function() {
+                return refresherExplorationId;
               }
-            ]
+            },
+            controller: 'RefresherExplorationConfirmationModalController'
           }).result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.

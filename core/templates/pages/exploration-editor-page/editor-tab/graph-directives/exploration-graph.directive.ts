@@ -53,8 +53,7 @@ angular.module('oppia').directive('explorationGraph', [
           // We hide the graph at the outset in order not to confuse new
           // exploration creators.
           ctrl.isGraphShown = function() {
-            return Boolean(ExplorationStatesService.isInitialized() &&
-              ExplorationStatesService.getStateNames().length > 1);
+            return Boolean(ExplorationStatesService.isInitialized());
           };
 
           ctrl.deleteState = function(deleteStateName) {

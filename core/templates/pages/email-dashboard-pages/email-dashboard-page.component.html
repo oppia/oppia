@@ -1,0 +1,56 @@
+<div class="oppia-query-form">
+  <form class="form" ng-submit="$ctrl.submitQuery()">
+    <label for="not-logged-n-days">Has not logged in for n days: </label>
+    <input id="not-logged-n-days" type="number" min="0" ng-model="$ctrl.hasNotLoggedInForNDays">
+    <br>
+    <label for="inactive-for-ndays">Inactive in last n days:</label>
+    <input id="inactive-for-ndays" type="number" min="0" ng-model="$ctrl.inactiveInLastNDays">
+    <br>
+    <label for="created-more-n-exps">Has created at least n explorations:</label>
+    <input id="created-more-n-exps" type="number" min="0" ng-model="$ctrl.createdAtLeastNExps">
+    <br>
+    <label for="created-fewer-n-exps">Has created fewer than n explorations:</label>
+    <input id="created-fewer-n-exps" type="number" min="0" ng-model="$ctrl.createdFewerThanNExps">
+    <br>
+    <label for="edited-more-n-exps">Has edited at least n explorations:</label>
+    <input id="edited-more-n-exps" type="number" min="0" ng-model="$ctrl.editedAtLeastNExps">
+    <br>
+    <label for="edited-fewer-n-exps">Has edited fewer than n explorations: </label>
+    <input id="edited-fewer-n-exps" type="number" min="0" ng-model="$ctrl.editedFewerThanNExps">
+    <br>
+    <input type="submit" value="submit query">
+    <input type="reset" value="reset" ng-click="$ctrl.resetForm()">
+  </form>
+  <p class="success" ng-if="$ctrl.showSuccessMessage">Query has been submitted successfully. Check recent queries below.</p>
+  <div class="oppia-recent-queries">
+    <p>Recent queries:</p>
+    <table class="table" ng-if="$ctrl.currentPageOfQueries.length > 0">
+      <thead>
+        <tr>
+          <td>Query id</td>
+          <td>Submitted on</td>
+          <td>Submitted by</td>
+          <td>Status</td>
+          <td>No. of qualified users</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="q in $ctrl.currentPageOfQueries track by $index">
+          <td><[q.id]></td>
+          <td><[q.createdOn]></td>
+          <td><[q.submitterUsername]></td>
+          <td><[q.status]></td>
+          <td><[q.numQualifiedUsers]></td>
+          <td><button ng-click="$ctrl.recheckStatus($index)">Re-check status</button></td>
+          <td ng-if="$ctrl.showLinkToResultPage(q.submitterUsername, q.status)">
+            <a ng-href="/emaildashboardresult/<[q.id]>">
+              <button class="btn btn-link">Result</button>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button ng-if="$ctrl.showPreviousButton()" ng-click="$ctrl.getPreviousPageOfQueries()">Previous</button>
+    <button ng-if="$ctrl.showNextButton()" ng-click="$ctrl.getNextPageOfQueries()">Next</button>
+  </div>
+</div>

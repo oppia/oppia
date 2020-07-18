@@ -27,6 +27,8 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
@@ -83,6 +85,252 @@ def run_job_for_deleted_exp(
 
     else:
         self.assertEqual(job_class.get_output(job_id), [])
+
+
+class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(DragAndDropSortInputInteractionOneOffJobTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks output pairs are produced only for
+        desired interactions.
+        """
+        owner = user_services.UserActionsInfo(self.albert_id)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+
+        state1.update_interaction_id('DragAndDropSortInput')
+        state2.update_interaction_id('DragAndDropSortInput')
+
+        customization_args_dict1 = {
+            'choices': {'value': [
+                '<p>This is value1 for DragAndDropSortInput</p>',
+                '<p>This is value2 for DragAndDropSortInput</p>',
+            ]}
+        }
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [['a'], ['b']]}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback1',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        customization_args_dict2 = {
+            'choices': {'value': [
+                '<p>This is value1 for DragAndDropSortInput</p>',
+                '<p>This is value2 for DragAndDropSortInput</p>',
+            ]}
+        }
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': []
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [['a']]}
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': '',
+                    'y': ''
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }, {
+            'rule_specs': [{
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': '',
+                    'y': 1
+                }
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': 'a',
+                    'y': 2
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback2',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
+        job_id = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
+        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_interaction_answer_groups(answer_group_list2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
+        job_id = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
+        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule '
+            'input x in rule with index 0 is empty. \', u\'State name: State2,'
+            ' AnswerGroup: 0, Rule input y in rule with index 2 is empty. \', '
+            'u\'State name: State2, AnswerGroup: 0, Rule input x in rule with '
+            'index 2 is empty. \', u\'State name: State2, AnswerGroup: 0, Rule'
+            ' input x in rule with index 3 is empty. \', u\'State name: State2'
+            ', AnswerGroup: 1, Rule input x in rule with index 0 is empty. \']'
+            '"]]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+        rights_manager.unpublish_exploration(self.admin, self.VALID_EXP_ID)
+        # Start DragAndDropSortInputInteractionOneOffJob on private
+        # exploration.
+        job_id = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
+        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('DragAndDropSortInput')
+
+        customization_args_dict = {
+            'choices': {'value': [
+                '<p>This is value1 for DragAndDropSortInput</p>',
+                '<p>This is value2 for DragAndDropSortInput</p>',
+            ]}
+        }
+
+        answer_group_list = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_interaction_answer_groups(answer_group_list)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob)
 
 
 class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -265,8 +513,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             self, exp_jobs_one_off.MultipleChoiceInteractionOneOffJob)
 
 
-
-class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
+class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -276,7 +523,7 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(MathExpressionInputInteractionOneOffJobTests, self).setUp()
+        super(MathExpressionValidationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -284,28 +531,34 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks (exp, state) pairs are produced only for
-        desired interactions.
-        """
+        """Checks output is produced only for desired interactions."""
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2', 'State3'])
+        exploration.add_states([
+            'State1', 'State2', 'State3', 'State4', 'State5', 'State6',
+            'State7'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
+        state4 = exploration.states['State4']
+        state5 = exploration.states['State5']
+        state6 = exploration.states['State6']
+        state7 = exploration.states['State7']
 
         state1.update_interaction_id('MathExpressionInput')
         state2.update_interaction_id('MathExpressionInput')
         state3.update_interaction_id('MathExpressionInput')
+        state4.update_interaction_id('MathExpressionInput')
+        state5.update_interaction_id('MathExpressionInput')
+        state6.update_interaction_id('MathExpressionInput')
+        state7.update_interaction_id('MathExpressionInput')
 
-        # This exploration is valid (has no equation/inequalities) therefore
-        # it shouldn't be detected by this audit job.
         answer_group_list1 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'x+y-z\']'}
+                'inputs': {'x': 'x+y-z'}
             }],
             'outcome': {
                 'dest': 'Introduction',
@@ -325,24 +578,10 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start MathExpressionInteractionOneOff job on sample exploration.
-        job_id = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
-            ))
-        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
-                job_id))
-        self.assertEqual(actual_output, [])
-
-        # This exploration is invalid (has an equation) therefore
-        # it should be detected by this audit job.
         answer_group_list2 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'y=mx+c\']'}
+                'inputs': {'x': 'y=m*x+c'}
             }],
             'outcome': {
                 'dest': 'State1',
@@ -362,12 +601,10 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_answer_groups(answer_group_list2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # This exploration is invalid (has inequalities) therefore
-        # it should be detected by this audit job.
         answer_group_list3 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'x<y>z\']'}
+                'inputs': {'x': 'x<y>z'}
             }],
             'outcome': {
                 'dest': 'State2',
@@ -387,19 +624,277 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state3.update_interaction_answer_groups(answer_group_list3)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start MathExpressionInteractionOneOff job on sample exploration.
+        answer_group_list4 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': r'\sqrt{\frac{x}{y}}'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state4</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state4.update_interaction_answer_groups(answer_group_list4)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list5 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'âéîôü'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state5</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state5.update_interaction_answer_groups(answer_group_list5)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list6 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'sin^2(\u03b8) + cos^2(\u03b8) = 1'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state6</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state6.update_interaction_answer_groups(answer_group_list6)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list7 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {
+                    'x': u'(asinA*cosB + cosA*asinB)/(cosA*acosB - asinA*sinB)'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state7</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state7.update_interaction_answer_groups(answer_group_list7)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
         job_id = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
             ))
-        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.MathExpressionValidationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
                 job_id))
-        expected_output = [(
-            u'[u\'exp_id0\', [u"State2: [\'y=mx+c\']", u"State3: [\'x<y>z\']"]]'
-        )]
+        expected_output = [
+            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', '
+            u'u\'exp_id0 State5: \\xe2\\xe9\\xee\\xf4\\xfc\']]',
+            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\', '
+            u'u\'exp_id0 State6: sin(theta)^2 + cos(theta)^2 = 1\']]',
+            u'[u\'Valid Expression\', [u\'exp_id0 State1: x+y-z\', '
+            u'u\'exp_id0 State7: (arcsin(A)*cos(B) + cos(A)*arcsin(B))/'
+            u'(cos(A)*arccos(B) - arcsin(A)*sin(B))\', '
+            u'u\'exp_id0 State4: sqrt(x/y)\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_of_valid_exps_yielded_is_under_limit(self):
+        """Checks that the number of valid explorations yielded is less than
+        the limit mentioned by the VALID_MATH_EXP_YIELD_LIMIT constant.
+        """
+        one_off_job_cls = exp_jobs_one_off.MathExpressionValidationOneOffJob
+        # Resetting the threshold only for testing purposes.
+        one_off_job_cls.VALID_MATH_INPUTS_YIELD_LIMIT = 3
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states([
+            'State1', 'State2', 'State3', 'State4', 'State5'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        state4 = exploration.states['State4']
+        state5 = exploration.states['State5']
+
+        state1.update_interaction_id('MathExpressionInput')
+        state2.update_interaction_id('MathExpressionInput')
+        state3.update_interaction_id('MathExpressionInput')
+        state4.update_interaction_id('MathExpressionInput')
+        state5.update_interaction_id('MathExpressionInput')
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x+y-z'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'y=m*x+c'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state2.update_interaction_answer_groups(answer_group_list2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list3 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': r'\sqrt{\frac{x}{y}}'}
+            }],
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state3</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state3.update_interaction_answer_groups(answer_group_list3)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list4 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': '(a+b+c)^3'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state4</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state4.update_interaction_answer_groups(answer_group_list4)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list5 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': r'\pi \cdot r^2'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state5</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state5.update_interaction_answer_groups(answer_group_list5)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MathExpressionInteractionOneOff job on sample exploration.
+        job_id = (
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
+            ))
+        exp_jobs_one_off.MathExpressionValidationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
+                job_id))
+        # Only 3 exploration details should be yielded since the threshold is 3.
+        expected_output = [
+            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
+            u'[u\'Valid Expression\', [u\'exp_id0 State3: sqrt(x/y)\', '
+            u'u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: pi*r^2\']]']
+
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
@@ -441,7 +936,7 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(
-            self, exp_jobs_one_off.MathExpressionInputInteractionOneOffJob)
+            self, exp_jobs_one_off.MathExpressionValidationOneOffJob)
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
@@ -1693,3 +2188,563 @@ class InteractionCustomizationArgsValidationJobTests(
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            ExplorationMathTagValidationOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_explorations_with_invalid_math_tags_fails_validation(self):
+        """Tests for the case when there are invalid math tags in the
+        explorations.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        invalid_html_content1 = (
+            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
+            'ath>')
+
+        invalid_html_content2 = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="'
+            '+,-,-,+"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': invalid_html_content1
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': invalid_html_content2
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    invalid_html_content1,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    '<p>4</p>'
+                ]
+            }
+        }
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': invalid_html_content2,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[invalid_html_content2]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': invalid_html_content1,
+                    'y': invalid_html_content1
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': invalid_html_content1,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': invalid_html_content2,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': invalid_html_content2,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state2.update_interaction_id('DragAndDropSortInput')
+            state2.update_interaction_customization_args(
+                customization_args_dict)
+            state2.update_interaction_answer_groups([answer_group_dict])
+            state2.update_written_translations(
+                state_domain.WrittenTranslations.from_dict(
+                    written_translations_dict))
+
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMathTagValidationOneOffJob.create_new())
+            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMathTagValidationOneOffJob.get_output(job_id))
+
+        actual_output_list = ast.literal_eval(actual_output[0])
+        invalid_tag1 = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>')
+        invalid_tag2 = (
+            '<oppia-noninteractive-math raw_latex-with-value="+,-,-,+"></oppi'
+            'a-noninteractive-math>')
+        expected_invalid_tags = [invalid_tag1, invalid_tag2]
+
+        no_of_invalid_tags_in_output = 0
+        for output in actual_output_list[1]:
+            list_starting_index = output.find('[')
+            list_finishing_index = output.find(']')
+            stringified_error_list = (
+                output[list_starting_index + 1:list_finishing_index].split(
+                    ', '))
+            no_of_invalid_tags_in_output = (
+                no_of_invalid_tags_in_output + len(stringified_error_list))
+            for invalid_tag in stringified_error_list:
+                self.assertTrue(invalid_tag in expected_invalid_tags)
+
+        self.assertEqual(no_of_invalid_tags_in_output, 12)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+
+        exploration.add_states(['State1'])
+        invalid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
+            'ath>')
+        content_dict = {
+            'html': invalid_html_content,
+            'content_id': 'content'
+        }
+        state1 = exploration.states['State1']
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob)
+
+    def test_explorations_with_valid_math_tags(self):
+        """Tests for the case when there are no invalid math tags in the
+        explorations.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    '<p>4</p>'
+                ]
+            }
+        }
+        # Since the Old math-schema with raw_latex attribute is no longer valid,
+        # it gets cleaned by html_cleaner. We need to prevent this for testing
+        # by swapping it.
+        with self.swap(html_cleaner, 'clean', lambda html: html):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state2.update_interaction_id('DragAndDropSortInput')
+            state2.update_interaction_customization_args(
+                customization_args_dict)
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMathTagValidationOneOffJob.create_new())
+            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMathTagValidationOneOffJob.get_output(job_id))
+        self.assertEqual(len(actual_output), 0)
+
+
+class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            ExplorationMockMathMigrationOneOffJobOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_explorations_with_unconverted_math_tags_after_migration(self):
+        """Tests for the case when the conversion function doesn not convert
+        the math-tags to the new schema. The old schema has the attribute
+        raw_latex-with-value while the new schema has the attribute
+        math-content-with-value which includes a field for storing reference to
+        SVGs.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1'])
+        state1 = exploration.states['State1']
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    '<p>1</p>',
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    '<p>4</p>'
+                ]
+            }
+        }
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[valid_html_content]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': valid_html_content
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': valid_html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': valid_html_content,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': valid_html_content,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        # Since the Old math-schema with raw_latex attribute is no longer valid,
+        # it gets cleaned by html_cleaner. We need to prevent this for testing
+        # by swapping it.
+        with self.swap(html_cleaner, 'clean', lambda html: html):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state1.update_interaction_id('DragAndDropSortInput')
+            state1.update_interaction_customization_args(
+                customization_args_dict)
+            state1.update_interaction_answer_groups([answer_group_dict])
+            state1.update_written_translations(
+                state_domain.WrittenTranslations.from_dict(
+                    written_translations_dict))
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        with self.swap(
+            html_validation_service,
+            'add_math_content_to_math_rte_components', lambda html: html):
+            with self.swap(html_cleaner, 'clean', lambda html: html):
+                job_id = (
+                    exp_jobs_one_off
+                    .ExplorationMockMathMigrationOneOffJob.create_new())
+                exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob.enqueue(
+                    job_id)
+                self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMockMathMigrationOneOffJob.get_output(job_id))
+        actual_output_list = ast.literal_eval(actual_output[0])
+        self.assertEqual(
+            actual_output_list[0],
+            'exp_id: exp_id0, exp_status: private failed validation after mi'
+            'gration')
+        expected_invalid_tag = (
+            '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,'
+            '+&amp;quot;"></oppia-noninteractive-math>')
+
+        expected_invalid_tags = [expected_invalid_tag]
+
+        no_of_invalid_tags_in_output = 0
+        for output in actual_output_list[1]:
+            list_starting_index = output.find('[')
+            list_finishing_index = output.find(']')
+            stringified_error_list = (
+                output[list_starting_index + 1:list_finishing_index].split(
+                    ', '))
+            no_of_invalid_tags_in_output = (
+                no_of_invalid_tags_in_output + len(stringified_error_list))
+            for invalid_tag in stringified_error_list:
+                self.assertTrue(invalid_tag in expected_invalid_tags)
+        self.assertEqual(no_of_invalid_tags_in_output, 10)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+
+        exploration.add_states(['State1'])
+        invalid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
+            'ath>')
+        content_dict = {
+            'html': invalid_html_content,
+            'content_id': 'content'
+        }
+        state1 = exploration.states['State1']
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob)
+
+    def test_explorations_with_valid_math_tags_passes_migration(self):
+        """Tests for the case when there are no invalid math tags in the
+        explorations and the migration converts all the math tags to the new
+        schema. The old schema has the attribute raw_latex-with-value while
+        the new schema has the attribute math-content-with-value which includes
+        a field for storing reference to SVGs.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[valid_html_content]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': valid_html_content
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        with self.swap(html_cleaner, 'clean', lambda html: html):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state2.update_interaction_id('DragAndDropSortInput')
+            state2.update_interaction_answer_groups(
+                [answer_group_dict])
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMockMathMigrationOneOffJob.create_new())
+            exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMockMathMigrationOneOffJob.get_output(job_id))
+        self.assertEqual(len(actual_output), 0)

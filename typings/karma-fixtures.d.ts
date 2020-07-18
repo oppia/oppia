@@ -1,16 +1,15 @@
-/* eslint-disable camelcase */
 interface IKNN {
-  occurrence: number;
-  K: number;
-  T: number;
-  top: number;
-  fingerprint_data: {
+  'occurrence': number;
+  'K': number;
+  'T': number;
+  'top': number;
+  'fingerprint_data': {
     [key: number]: {
       class: number;
       fingerprint: number[][]
     }
   };
-  token_to_id: {
+  'token_to_id': {
     [key: string]: number;
   };
 }
@@ -23,27 +22,27 @@ interface IKernelParams {
 }
 
 interface ISVM {
-  classes: number[];
-  kernel_params: IKernelParams;
-  intercept: number[];
-  n_support: number[];
-  probA: number[];
-  support_vectors: number[][];
-  probB: number[];
-  dual_coef: number[][];
+  'classes': number[];
+  'kernel_params': IKernelParams;
+  'intercept': number[];
+  'n_support': number[];
+  'probA': number[];
+  'support_vectors': number[][];
+  'probB': number[];
+  'dual_coef': number[][];
 }
 
 interface IClassifierData {
-  KNN: IKNN;
-  SVM: ISVM;
-  cv_vocabulary: {
+  'KNN': IKNN;
+  'SVM': ISVM;
+  'cv_vocabulary': {
     [key: string]: number;
   };
 }
 
 type IClassifierAccuracyTest = {
-  answer_group_index: number;
-  answers: {
+  'answer_group_index': number;
+  'answers': {
     code: string
   }[];
 }[];
@@ -69,26 +68,26 @@ interface IInplaceReplaceTest {
 interface ITestCasesRTE {
   RTE_TYPE_TEXTANGULAR: {
     TEST_CASES: {
-      html_content: string;
-      expected_output: string;
-      case: string;
+      'html_content': string;
+      'expected_output': string;
+      'case': string;
     }[];
   };
 }
 
 type ITextClassifierResults = {
-  answer_group_index: number;
-  answers: string[];
+  'answer_group_index': number;
+  'answers': string[];
 }[];
 
 interface ITextInputClassifierData {
-  best_params: {
+  'best_params': {
     kernel: string;
     C: number;
   };
-  best_score: number;
-  SVM: ISVM;
-  cv_vocabulary: {
+  'best_score': number;
+  'SVM': ISVM;
+  'cv_vocabulary': {
     [key: string]: number;
   };
 }
@@ -98,6 +97,10 @@ interface IRuleDescription {
 }
 
 interface IRuleTemplates {
+  AlgebraicExpressionInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+  };
   CodeRepl: {
     CodeEquals: IRuleDescription;
     CodeContains: IRuleDescription;
@@ -148,6 +151,10 @@ interface IRuleTemplates {
     NotCorrect: IRuleDescription;
     NotCorrectByCategory: IRuleDescription;
   };
+  MathEquationInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+  };
   MathExpressionInput: {
     IsMathematicallyEquivalentTo: IRuleDescription;
   };
@@ -165,6 +172,12 @@ interface IRuleTemplates {
   NumberWithUnits: {
     IsEqualTo: IRuleDescription;
     IsEquivalentTo: IRuleDescription;
+  };
+  NumericExpressionInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+    ContainsSomeOf: IRuleDescription;
+    OmitsSomeOf: IRuleDescription;
   };
   NumericInput: {
     Equals: IRuleDescription;

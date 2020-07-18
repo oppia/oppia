@@ -1,0 +1,22 @@
+<!-- This file has mismatched alignment of properties -->
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base-components/header.template.html', {"title": "Oppia"})
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <div ng-controller="Base">
+      <base-content>
+
+        <content
+          style="color:white;">  <!-- alignment should match with previous line alignment -->
+          <classroom-page></classroom-page>
+        </content>
+
+        <page-footer></page-footer>
+      </base-content>
+    </div>
+    @require('../footer_js_libs.html')
+  </body>
+</html>

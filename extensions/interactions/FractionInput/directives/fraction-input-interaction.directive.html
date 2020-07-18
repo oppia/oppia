@@ -1,4 +1,4 @@
-<form ng-disabled="$ctrl.FractionInputForm.$invalid" ng-submit="$ctrl.submitAnswer($ctrl.answer)" role="form" class="form-horizontal fraction-input-interaction">
+<form autocomplete="off" ng-disabled="$ctrl.FractionInputForm.$invalid" ng-submit="$ctrl.submitAnswer($ctrl.answer)" role="form" class="form-horizontal fraction-input-interaction">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <ng-form name="$ctrl.FractionInputForm" class="input">
     <input type="text" name="answer" ng-model="$ctrl.answer" class="form-control"

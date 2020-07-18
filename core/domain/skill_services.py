@@ -17,134 +17,34 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import copy
 import logging
 
+from constants import constants
+from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import state_domain
+from core.domain import suggestion_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
 
-(skill_models, user_models, question_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
+(skill_models, user_models, question_models, topic_models) = (
+    models.Registry.import_models([
+        models.NAMES.skill, models.NAMES.user, models.NAMES.question,
+        models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
 
-def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the skill contents structure based on the schema version of the input
-    skill contents dictionary. If the current skill_contents schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_skill_contents: A dict with two keys:
-          - schema_version: int. The schema version for the skill_contents dict.
-          - skill_contents: dict. The dict comprising the skill contents.
-
-    Raises:
-        Exception: The schema version of the skill_contents is outside of what
-            is supported at present.
-    """
-    skill_contents_schema_version = versioned_skill_contents['schema_version']
-    if not (1 <= skill_contents_schema_version
-            <= feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d skill schemas at '
-            'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
-
-    while (skill_contents_schema_version <
-           feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-        skill_domain.Skill.update_skill_contents_from_model(
-            versioned_skill_contents, skill_contents_schema_version)
-        skill_contents_schema_version += 1
-
-
-def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the misconceptions structure based on the schema version of the input
-    misconceptions dictionary. If the current misconceptions schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_misconceptions: dict. A dict with two keys:
-          - schema_version: int. The schema version for the misconceptions dict.
-          - misconceptions: list(dict). The list of dicts comprising the skill
-              misconceptions.
-
-    Raises:
-        Exception: The schema version of misconceptions is outside of what
-            is supported at present.
-    """
-    misconception_schema_version = versioned_misconceptions['schema_version']
-    if not (1 <= misconception_schema_version
-            <= feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d misconception schemas at '
-            'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
-
-    while (misconception_schema_version <
-           feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-        skill_domain.Skill.update_misconceptions_from_model(
-            versioned_misconceptions, misconception_schema_version)
-        misconception_schema_version += 1
-
-
-def _migrate_rubrics_to_latest_schema(versioned_rubrics):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the rubrics structure based on the schema version of the input
-    rubrics dictionary. If the current rubrics schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_rubrics: dict. A dict with two keys:
-          - schema_version: int. The schema version for the rubrics dict.
-          - rubrics: list(dict). The list of dicts comprising the skill
-              rubrics.
-
-    Raises:
-        Exception: The schema version of rubrics is outside of what
-            is supported at present.
-    """
-    rubric_schema_version = versioned_rubrics['schema_version']
-    if not (1 <= rubric_schema_version
-            <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d rubric schemas at '
-            'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
-
-    while (rubric_schema_version <
-           feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
-        skill_domain.Skill.update_rubrics_from_model(
-            versioned_rubrics, rubric_schema_version)
-        rubric_schema_version += 1
-
-
 # Repository GET methods.
-def _get_skill_memcache_key(skill_id, version=None):
-    """Returns a memcache key for the skill.
-
-    Args:
-        skill_id: str. ID of the skill.
-        version: int or None. Schema version of the skill.
-
-    Returns:
-        str. The memcache key of the skill.
-    """
-    if version:
-        return 'skill-version:%s:%s' % (skill_id, version)
-    else:
-        return 'skill:%s' % skill_id
-
-
 def get_merged_skill_ids():
     """Returns the skill IDs of skills that have been merged.
 
@@ -154,80 +54,253 @@ def get_merged_skill_ids():
     return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
 
 
-def get_skill_from_model(skill_model):
-    """Returns a skill domain object given a skill model loaded
-    from the datastore.
-
-    Args:
-        skill_model: SkillModel. The skill model loaded from the
-            datastore.
-
-    Returns:
-        skill. A Skill domain object corresponding to the given
-        skill model.
-    """
-
-    # Ensure the original skill model does not get altered.
-    versioned_skill_contents = {
-        'schema_version': skill_model.skill_contents_schema_version,
-        'skill_contents': copy.deepcopy(skill_model.skill_contents)
-    }
-
-    versioned_misconceptions = {
-        'schema_version': skill_model.misconceptions_schema_version,
-        'misconceptions': copy.deepcopy(skill_model.misconceptions)
-    }
-
-    versioned_rubrics = {
-        'schema_version': skill_model.rubric_schema_version,
-        'rubrics': copy.deepcopy(skill_model.rubrics)
-    }
-
-    # Migrate the skill if it is not using the latest schema version.
-    if (skill_model.skill_contents_schema_version !=
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-        _migrate_skill_contents_to_latest_schema(versioned_skill_contents)
-
-    if (skill_model.misconceptions_schema_version !=
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-        _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
-
-    if (skill_model.rubric_schema_version !=
-            feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
-        _migrate_rubrics_to_latest_schema(versioned_rubrics)
-
-    return skill_domain.Skill(
-        skill_model.id, skill_model.description,
-        [
-            skill_domain.Misconception.from_dict(misconception)
-            for misconception in versioned_misconceptions['misconceptions']
-        ], [
-            skill_domain.Rubric.from_dict(rubric)
-            for rubric in versioned_rubrics['rubrics']
-        ], skill_domain.SkillContents.from_dict(
-            versioned_skill_contents['skill_contents']),
-        versioned_misconceptions['schema_version'],
-        versioned_rubrics['schema_version'],
-        versioned_skill_contents['schema_version'],
-        skill_model.language_code,
-        skill_model.version, skill_model.next_misconception_id,
-        skill_model.superseding_skill_id, skill_model.all_questions_merged,
-        skill_model.prerequisite_skill_ids, skill_model.created_on,
-        skill_model.last_updated)
-
-
 def get_all_skill_summaries():
     """Returns the summaries of all skills present in the datastore.
 
     Returns:
         list(SkillSummary). The list of summaries of all skills present in the
-            datastore.
+        datastore.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_all()
     skill_summaries = [
         get_skill_summary_from_model(summary)
         for summary in skill_summaries_models]
     return skill_summaries
+
+
+def _get_skill_summaries_in_batches(
+        num_skills_to_fetch, urlsafe_start_cursor, sort_by):
+    """Returns the summaries of skills present in the datastore.
+
+    Args:
+        num_skills_to_fetch: int. Number of skills to fetch.
+        urlsafe_start_cursor: str or None. The cursor to the next page.
+        sort_by: str. A string indicating how to sort the result.
+
+    Returns:
+        3-tuple(skill_summaries, new_urlsafe_start_cursor, more). where:
+            skill_summaries: list(SkillSummary). The list of skill summaries.
+                The number of returned skill summaries might include more than
+                the requested number. Hence, the cursor returned will represent
+                the point to which those results were fetched (and not the
+                "num_skills_to_fetch" point).
+            urlsafe_start_cursor: str or None. A query cursor pointing to the
+                next batch of results. If there are no more results, this might
+                be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
+    """
+    # The fetched skills will be filtered afterwards and filtering may result
+    # in having less number of skills than requested. Hence, fetching twice
+    # the number of requested skills will help reduce the number of datastore
+    # calls.
+    skill_summaries_models, new_urlsafe_start_cursor, more = (
+        skill_models.SkillSummaryModel.fetch_page(
+            2 * num_skills_to_fetch, urlsafe_start_cursor, sort_by))
+
+    skill_summaries = [
+        get_skill_summary_from_model(summary)
+        for summary in skill_summaries_models]
+    return skill_summaries, new_urlsafe_start_cursor, more
+
+
+def get_filtered_skill_summaries(
+        num_skills_to_fetch, status, classroom_name, keywords,
+        sort_by, urlsafe_start_cursor):
+    """Returns all the skill summary dicts after filtering.
+
+    Args:
+        num_skills_to_fetch: int. Number of skills to fetch.
+        status: str. The status of the skill.
+        classroom_name: str. The classroom_name of the topic to which the skill
+            is assigned to.
+        keywords: list(str). The keywords to look for
+            in the skill description.
+        sort_by: str. A string indicating how to sort the result.
+        urlsafe_start_cursor: str or None. The cursor to the next page.
+
+    Returns:
+        3-tuple(augmented_skill_summaries, new_urlsafe_start_cursor, more).
+        Where:
+            augmented_skill_summaries: list(AugmentedSkillSummary). The list of
+                augmented skill summaries. The number of returned skills might
+                include more than the requested number. Hence, the cursor
+                returned will represent the point to which those results were
+                fetched (and not the "num_skills_to_fetch" point).
+            new_urlsafe_start_cursor: str or None. A query cursor pointing to
+                the next batch of results. If there are no more results, this
+                might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
+    """
+    augmented_skill_summaries = []
+    new_urlsafe_start_cursor = urlsafe_start_cursor
+    more = True
+
+    while len(augmented_skill_summaries) < num_skills_to_fetch and more:
+        augmented_skill_summaries_batch, new_urlsafe_start_cursor, more = (
+            _get_augmented_skill_summaries_in_batches(
+                num_skills_to_fetch, new_urlsafe_start_cursor, sort_by))
+
+        filtered_augmented_skill_summaries = _filter_skills_by_status(
+            augmented_skill_summaries_batch, status)
+        filtered_augmented_skill_summaries = _filter_skills_by_classroom(
+            filtered_augmented_skill_summaries, classroom_name)
+        filtered_augmented_skill_summaries = _filter_skills_by_keywords(
+            filtered_augmented_skill_summaries, keywords)
+        augmented_skill_summaries.extend(filtered_augmented_skill_summaries)
+
+    return augmented_skill_summaries, new_urlsafe_start_cursor, more
+
+
+def _get_augmented_skill_summaries_in_batches(
+        num_skills_to_fetch, urlsafe_start_cursor, sort_by):
+    """Returns all the Augmented skill summaries after attaching
+    topic and classroom.
+
+    Returns:
+        3-tuple(augmented_skill_summaries, urlsafe_start_cursor, more). Where:
+            augmented_skill_summaries: list(AugmentedSkillSummary). The list of
+                skill summaries.
+            urlsafe_start_cursor: str or None. A query cursor pointing to the
+                next batch of results. If there are no more results, this might
+                be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
+    """
+    skill_summaries, new_urlsafe_start_cursor, more = (
+        _get_skill_summaries_in_batches(
+            num_skills_to_fetch, urlsafe_start_cursor, sort_by))
+
+    assigned_skill_ids = {}
+
+    all_topic_models = topic_models.TopicModel.get_all()
+    all_topics = [topic_fetchers.get_topic_from_model(topic_model)
+                  if topic_model is not None else None
+                  for topic_model in all_topic_models]
+
+    topic_classroom_dict = {}
+    all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+
+    for classroom in all_classrooms_dict:
+        for topic_id in classroom['topic_ids']:
+            topic_classroom_dict[topic_id] = classroom['name']
+
+    for topic in all_topics:
+        for skill_id in topic.get_all_skill_ids():
+            assigned_skill_ids[skill_id] = {
+                'topic_name': topic.name,
+                'classroom_name': topic_classroom_dict.get(topic.id, None)
+            }
+
+    augmented_skill_summaries = []
+    for skill_summary in skill_summaries:
+        topic_name = None
+        classroom_name = None
+        if skill_summary.id in assigned_skill_ids:
+            topic_name = assigned_skill_ids[skill_summary.id]['topic_name']
+            classroom_name = (
+                assigned_skill_ids[skill_summary.id]['classroom_name'])
+
+        augmented_skill_summary = skill_domain.AugmentedSkillSummary(
+            skill_summary.id,
+            skill_summary.description,
+            skill_summary.language_code,
+            skill_summary.version,
+            skill_summary.misconception_count,
+            skill_summary.worked_examples_count,
+            topic_name,
+            classroom_name,
+            skill_summary.skill_model_created_on,
+            skill_summary.skill_model_last_updated)
+        augmented_skill_summaries.append(augmented_skill_summary)
+
+    return augmented_skill_summaries, new_urlsafe_start_cursor, more
+
+
+def _filter_skills_by_status(augmented_skill_summaries, status):
+    """Returns the skill summary dicts after filtering by status.
+
+    Args:
+        augmented_skill_summaries: list(AugmentedSkillSummary). The list
+            of augmented skill summaries.
+        status: str. The status of the skill.
+
+    Returns:
+        list(AugmentedSkillSummary). The list of AugmentedSkillSummaries
+        matching the given status.
+    """
+
+    if status is None or status == constants.SKILL_STATUS_OPTIONS['ALL']:
+        return augmented_skill_summaries
+
+    elif status == constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
+        unassigned_augmented_skill_summaries = []
+        for augmented_skill_summary in augmented_skill_summaries:
+            if augmented_skill_summary.topic_name is None:
+                unassigned_augmented_skill_summaries.append(
+                    augmented_skill_summary)
+
+        return unassigned_augmented_skill_summaries
+
+    elif status == constants.SKILL_STATUS_OPTIONS['ASSIGNED']:
+        assigned_augmented_skill_summaries = []
+        for augmented_skill_summary in augmented_skill_summaries:
+            if augmented_skill_summary.topic_name is not None:
+                assigned_augmented_skill_summaries.append(
+                    augmented_skill_summary)
+        return assigned_augmented_skill_summaries
+
+
+def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
+    """Returns the skill summary dicts after filtering by classroom_name.
+
+    Args:
+        augmented_skill_summaries: list(AugmentedSkillSummary).
+            The list of augmented skill summaries.
+        classroom_name: str. The classroom_name of the topic to which the skill
+            is assigned to.
+
+    Returns:
+        list(AugmentedSkillSummary). The list of augmented skill summaries with
+        the given classroom name.
+    """
+
+    if classroom_name is None or classroom_name == 'All':
+        return augmented_skill_summaries
+
+    augmented_skill_summaries_with_classroom_name = []
+    for augmented_skill_summary in augmented_skill_summaries:
+        if augmented_skill_summary.classroom_name == classroom_name:
+            augmented_skill_summaries_with_classroom_name.append(
+                augmented_skill_summary)
+
+    return augmented_skill_summaries_with_classroom_name
+
+
+def _filter_skills_by_keywords(augmented_skill_summaries, keywords):
+    """Returns whether the keywords match the skill description.
+
+    Args:
+        augmented_skill_summaries: list(AugmentedSkillSummary). The augmented
+            skill summaries.
+        keywords: list(str). The keywords to match.
+
+    Returns:
+        list(AugmentedSkillSummary). The list of augmented skill summaries
+        matching the given keywords.
+    """
+    if not keywords:
+        return augmented_skill_summaries
+
+    filtered_augmented_skill_summaries = []
+
+    for augmented_skill_summary in augmented_skill_summaries:
+        if any((augmented_skill_summary.description.lower().find(
+                keyword.lower()) != -1) for keyword in keywords):
+            filtered_augmented_skill_summaries.append(augmented_skill_summary)
+
+    return filtered_augmented_skill_summaries
 
 
 def get_multi_skill_summaries(skill_ids):
@@ -238,7 +311,7 @@ def get_multi_skill_summaries(skill_ids):
 
     Returns:
         list(SkillSummary). The list of summaries of skills matching the
-            provided IDs.
+        provided IDs.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
@@ -246,27 +319,6 @@ def get_multi_skill_summaries(skill_ids):
         for skill_summary_model in skill_summaries_models
         if skill_summary_model is not None]
     return skill_summaries
-
-
-def get_multi_skills(skill_ids):
-    """Returns a list of skills matching the skill IDs provided.
-
-    Args:
-        skill_ids: list(str). List of skill IDs to get skills for.
-
-    Returns:
-        list(Skill). The list of skills matching the provided IDs.
-    """
-    local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
-    for skill_id, skill_model in python_utils.ZIP(
-            skill_ids, local_skill_models):
-        if skill_model is None:
-            raise Exception('No skill exists for ID %s' % skill_id)
-    skills = [
-        get_skill_from_model(skill_model)
-        for skill_model in local_skill_models
-        if skill_model is not None]
-    return skills
 
 
 def get_rubrics_of_skills(skill_ids):
@@ -277,14 +329,15 @@ def get_rubrics_of_skills(skill_ids):
 
     Returns:
         dict, list(str). The skill rubrics of skills keyed by their
-            corresponding ids and the list of deleted skill ids, if any.
+        corresponding ids and the list of deleted skill ids, if any.
     """
-    backend_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
     skill_id_to_rubrics_dict = {}
 
-    for skill_model in backend_skill_models:
-        if skill_model is not None:
-            skill_id_to_rubrics_dict[skill_model.id] = skill_model.rubrics
+    for skill in skills:
+        if skill is not None:
+            rubric_dicts = [rubric.to_dict() for rubric in skill.rubrics]
+            skill_id_to_rubrics_dict[skill.id] = rubric_dicts
 
     deleted_skill_ids = []
     for skill_id in skill_ids:
@@ -303,15 +356,15 @@ def get_descriptions_of_skills(skill_ids):
 
     Returns:
         dict, list(str). The skill descriptions of skills keyed by their
-            corresponding ids and the list of deleted skill ids, if any.
+        corresponding ids and the list of deleted skill ids, if any.
     """
-    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_summaries = get_multi_skill_summaries(skill_ids)
     skill_id_to_description_dict = {}
 
-    for skill_summary_model in skill_summary_models:
-        if skill_summary_model is not None:
-            skill_id_to_description_dict[skill_summary_model.id] = (
-                skill_summary_model.description)
+    for skill_summary in skill_summaries:
+        if skill_summary is not None:
+            skill_id_to_description_dict[skill_summary.id] = (
+                skill_summary.description)
 
     deleted_skill_ids = []
     for skill_id in skill_ids:
@@ -350,42 +403,67 @@ def get_image_filenames_from_skill(skill):
         skill: Skill. The skill itself.
 
     Returns:
-       list(str). List containing the name of the image files in skill.
+        list(str). List containing the name of the image files in skill.
     """
     html_list = skill.get_all_html_content_strings()
     return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
-def get_skill_by_id(skill_id, strict=True, version=None):
-    """Returns a domain object representing a skill.
+def get_all_topic_assignments_for_skill(skill_id):
+    """Returns a list containing all the topics to which the given skill is
+    assigned along with topic details.
 
     Args:
         skill_id: str. ID of the skill.
-        strict: bool. Whether to fail noisily if no skill with the given
-            id exists in the datastore.
-        version: int or None. The version number of the skill to be
-            retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
-        Skill or None. The domain object representing a skill with the
-        given id, or None if it does not exist.
+        list(TopicAssignment). A list of TopicAssignment domain objects.
     """
-    skill_memcache_key = _get_skill_memcache_key(
-        skill_id, version=version)
-    memcached_skill = memcache_services.get_multi(
-        [skill_memcache_key]).get(skill_memcache_key)
+    topic_assignments = []
+    topics = topic_fetchers.get_all_topics()
+    for topic in topics:
+        if skill_id in topic.get_all_skill_ids():
+            subtopic_id = None
+            for subtopic in topic.subtopics:
+                if skill_id in subtopic.skill_ids:
+                    subtopic_id = subtopic.id
+                    break
 
-    if memcached_skill is not None:
-        return memcached_skill
-    else:
-        skill_model = skill_models.SkillModel.get(
-            skill_id, strict=strict, version=version)
-        if skill_model:
-            skill = get_skill_from_model(skill_model)
-            memcache_services.set_multi({skill_memcache_key: skill})
-            return skill
-        else:
-            return None
+            topic_assignments.append(skill_domain.TopicAssignment(
+                topic.id, topic.name, topic.version, subtopic_id))
+
+    return topic_assignments
+
+
+def remove_skill_from_all_topics(user_id, skill_id):
+    """Deletes the skill with the given id from all the associated topics.
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        skill_id: str. ID of the skill.
+    """
+    all_topics = topic_fetchers.get_all_topics()
+    for topic in all_topics:
+        change_list = []
+        if skill_id in topic.get_all_skill_ids():
+            for subtopic in topic.subtopics:
+                if skill_id in subtopic.skill_ids:
+                    change_list.append(topic_domain.TopicChange({
+                        'cmd': 'remove_skill_id_from_subtopic',
+                        'subtopic_id': subtopic.id,
+                        'skill_id': skill_id
+                    }))
+                    break
+
+            change_list.append(topic_domain.TopicChange({
+                'cmd': 'remove_uncategorized_skill_id',
+                'uncategorized_skill_id': skill_id
+            }))
+            skill_name = get_skill_summary_by_id(skill_id).description
+            topic_services.update_topic_and_subtopic_pages(
+                user_id, topic.id, change_list,
+                'Removed skill with id %s and name %s from the topic' % (
+                    skill_id, skill_name))
 
 
 def get_skill_summary_by_id(skill_id, strict=True):
@@ -397,8 +475,8 @@ def get_skill_summary_by_id(skill_id, strict=True):
             id exists in the datastore.
 
     Returns:
-        SkillSummary. The skill summary domain object corresponding to
-        a skill with the given skill_id.
+        SkillSummary. The skill summary domain object corresponding to a skill
+        with the given skill_id.
     """
     skill_summary_model = skill_models.SkillSummaryModel.get(
         skill_id, strict=strict)
@@ -486,7 +564,7 @@ def apply_change_list(skill_id, change_list, committer_id):
     Returns:
         Skill. The resulting skill domain object.
     """
-    skill = get_skill_by_id(skill_id)
+    skill = skill_fetchers.get_skill_by_id(skill_id)
     user = user_services.UserActionsInfo(committer_id)
     try:
         for change in change_list:
@@ -589,8 +667,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         change_list: list(SkillChange). List of changes applied to a skill.
 
     Raises:
-        Exception: The skill model and the incoming skill domain
-            object have different version numbers.
+        Exception: The skill model and the incoming skill domain object have
+            different version numbers.
         Exception: Received invalid change list.
     """
     if not change_list:
@@ -636,7 +714,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(_get_skill_memcache_key(skill.id))
+    memcache_services.delete(skill_fetchers.get_skill_memcache_key(skill.id))
     skill.version += 1
 
 
@@ -684,13 +762,15 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.
-    skill_memcache_key = _get_skill_memcache_key(skill_id)
+    skill_memcache_key = skill_fetchers.get_skill_memcache_key(skill_id)
     memcache_services.delete(skill_memcache_key)
 
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
     opportunity_services.delete_skill_opportunity(skill_id)
+    suggestion_services.reject_question_suggestions_with_skill_target_id(
+        skill_id)
 
 
 def delete_skill_summary(skill_id):
@@ -734,7 +814,7 @@ def create_skill_summary(skill_id):
     Args:
         skill_id: str. ID of the skill.
     """
-    skill = get_skill_by_id(skill_id)
+    skill = skill_fetchers.get_skill_by_id(skill_id)
     skill_summary = compute_summary_of_skill(skill)
     save_skill_summary(skill_summary)
 
@@ -828,9 +908,8 @@ def get_user_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        degree_of_mastery: float or None. Mastery degree of the user for the
-            requested skill, or None if UserSkillMasteryModel does not exist
-            for the skill.
+        float or None. Mastery degree of the user for the requested skill, or
+        None if UserSkillMasteryModel does not exist for the skill.
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
@@ -851,10 +930,9 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
             requested.
 
     Returns:
-        degrees_of_mastery: dict(str, float|None). The keys are the requested
-            skill IDs. The values are the corresponding mastery degree of
-            the user or None if UserSkillMasteryModel does not exist for the
-            skill.
+        dict(str, float|None). The keys are the requested skill IDs. The values
+        are the corresponding mastery degree of the user or None if
+        UserSkillMasteryModel does not exist for the skill.
     """
     degrees_of_mastery = {}
     model_ids = []

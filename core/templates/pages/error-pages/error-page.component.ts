@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the error page.
+ * @fileoverview Component for the error page.
  */
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -32,9 +32,12 @@ angular.module('oppia').component('errorPage', {
       ctrl.getStatusCode = function() {
         return Number(ctrl.statusCode);
       };
+
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
+
       ctrl.$onInit = function() {
-        ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/oops_mint.png');
         PageTitleService.setPageTitle(
           'Error ' + ctrl.statusCode + ' - Oppia');
       };

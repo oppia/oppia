@@ -41,14 +41,12 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
             ',\"mathExpressions\":{\"version\": \"0.3\"},\"midiJs\":'
             '{\"version\": \"0.4\"}}}}')
         self.package_file = python_utils.string_io(
-            buffer_value='{\"dependencies\":{\"wavesurfer.js\":\"0.5\",'
-            '\"nerdamer\":\"^0.6\"}}')
+            buffer_value='{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
             'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
-            'wavesurfer-defs-0.5.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
         self.print_arr = []
@@ -69,8 +67,8 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
 
     def test_check_third_party_libs_type_defs(self):
         expected_summary_messages = [
-            '%s  Third party type defs check passed' % (
-                linter_utils.MESSAGE_TYPE_SUCCESS)]
+            '%s Third party type defs check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -80,8 +78,8 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
     def test_check_third_party_libs_type_defs_verbose(self):
         self.verbose_mode_enabled = True
         expected_summary_messages = [
-            '%s  Third party type defs check passed' % (
-                linter_utils.MESSAGE_TYPE_SUCCESS)]
+            '%s Third party type defs check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -91,9 +89,9 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
     def test_check_third_party_libs_type_defs_multiple(self):
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_summary_messages = [
-            '%s  Third party type defs check failed, see messages '
+            '%s Third party type defs check failed, see messages '
             'above for more detail.' % (
-                linter_utils.MESSAGE_TYPE_FAILED)]
+                linter_utils.FAILED_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap, self.print_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -108,13 +106,12 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
             'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
-            'wavesurfer-defs-0.5.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
         expected_summary_messages = [
-            '%s  Third party type defs check failed, see messages '
+            '%s Third party type defs check failed, see messages '
             'above for more detail.' % (
-                linter_utils.MESSAGE_TYPE_FAILED)]
+                linter_utils.FAILED_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap, self.print_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -130,13 +127,12 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
             'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
-            'wavesurfer-defs-0.5.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
         expected_summary_messages = [
-            '%s  Third party type defs check failed, see messages '
+            '%s Third party type defs check failed, see messages '
             'above for more detail.' % (
-                linter_utils.MESSAGE_TYPE_FAILED)]
+                linter_utils.FAILED_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap, self.print_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(

@@ -50,6 +50,24 @@ COLLECTION_ID_KEY = 'collectionId'
 QUESTION_ID_KEY = 'questionId'
 
 
+class OldNotificationsDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old notifications dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
+
+
+class OldCommunityDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old community dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/community-dashboard', permanent=True)
+
+
 class NotificationsDashboardPage(base.BaseHandler):
     """Page with notifications for the user."""
 
@@ -103,6 +121,15 @@ class NotificationsDashboardHandler(base.BaseHandler):
             'recent_notifications': recent_notifications,
         })
         self.render_json(self.values)
+
+
+class OldCreatorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old creator dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
 class CreatorDashboardPage(base.BaseHandler):
@@ -182,7 +209,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                     'category': collection_summary.category,
                     'objective': collection_summary.objective,
                     'language_code': collection_summary.language_code,
-                    'last_updated': utils.get_time_in_millisecs(
+                    'last_updated_msec': utils.get_time_in_millisecs(
                         collection_summary.collection_model_last_updated),
                     'created_on': utils.get_time_in_millisecs(
                         collection_summary.collection_model_created_on),

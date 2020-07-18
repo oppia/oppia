@@ -23,9 +23,7 @@ import datetime
 import hashlib
 import imghdr
 import logging
-import math
 import re
-import time
 
 from constants import constants
 from core.domain import role_services
@@ -119,8 +117,8 @@ class UserSettings(python_utils.OBJECT):
             profile_picture_data_url: str or None. User uploaded profile
                 picture as a dataURI string.
             default_dashboard: str|None. The default dashboard of the user.
-            creator_dashboard_display_pref: str. The creator dashboard
-            dashboard of the user.
+            creator_dashboard_display_pref: str. The creator dashboard of the
+                user.
             user_bio: str. User-specified biography.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.
@@ -293,6 +291,21 @@ class UserSettings(python_utils.OBJECT):
                 if reserved_username in username.lower().strip():
                     raise utils.ValidationError(
                         'This username is not available.')
+
+
+def is_user_id_correct(user_id):
+    """Verify that the user ID is in a correct format.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format, False otherwise.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('uid_'),
+        len(user_id) == user_models.USER_ID_LENGTH))
 
 
 def is_username_taken(username):
@@ -731,7 +744,7 @@ def _transform_user_settings(user_settings_model):
         user_settings_model: UserSettingsModel.
 
     Returns:
-         UserSettings. Domain object for user settings.
+        UserSettings. Domain object for user settings.
     """
     if user_settings_model:
         return UserSettings(
@@ -1128,7 +1141,7 @@ def get_human_readable_user_ids(user_ids):
 
     Raises:
         Exception: At least one of the user_ids does not correspond to a valid
-        UserSettingsModel.
+            UserSettingsModel.
     """
     users_settings = get_users_settings(user_ids)
     usernames = []
@@ -1299,7 +1312,7 @@ def get_users_email_preferences(user_ids):
     """Get email preferences for the list of users.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
 
     Returns:
@@ -1383,7 +1396,7 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     with given user_id.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
         exploration_id: str. The exploration id.
 
@@ -2022,8 +2035,8 @@ def log_username_change(committer_id, old_username, new_username):
         new_username: str. The new username that the current one is being
             changed to.
     """
-    model_id = '%s.%s' % (committer_id, int(math.floor(time.time())))
 
+    model_id = '%s.%d' % (committer_id, utils.get_current_time_in_millisecs())
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()

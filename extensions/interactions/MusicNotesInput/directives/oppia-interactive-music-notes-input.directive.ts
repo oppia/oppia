@@ -562,7 +562,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // If a note position is taken, return true,
-        // otherwise the position is available
+        // otherwise the position is available.
         var checkIfNotePositionTaken = function(leftPos) {
           if (getNoteStartFromLeftPos(leftPos)) {
             var newNoteToCheck = getNoteStartFromLeftPos(leftPos);
@@ -761,7 +761,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // For each note in a sequence, add a noteDuration property.
-        // TODO(wagnerdmike): - add more options for note durations.
+        // TODO(wagnerdmike): - Add more options for note durations.
         var _makeAllNotesHaveDurationOne = function(noteArray) {
           for (var i = 0; i < noteArray.length; i++) {
             noteArray[i].noteDuration = {
@@ -848,7 +848,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(wagnerdmike): - add chord functionality.
+        // TODO(wagnerdmike): - Add chord functionality.
         var convertSequenceToGuessToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {
@@ -862,7 +862,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(wagnerdmike): - add chord functionality.
+        // TODO(wagnerdmike): - Add chord functionality.
         var convertNoteSequenceToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {

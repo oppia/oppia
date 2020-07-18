@@ -47,8 +47,17 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     });
     $scope.feedbackEditorIsOpen = false;
     $scope.addState = addState;
-    $scope.questionModeEnabled =
-      StateEditorService.isInQuestionMode();
+    $scope.questionModeEnabled = (
+      StateEditorService.isInQuestionMode());
+    $scope.updateAnswerGroupFeedback = function(outcome) {
+      $scope.openFeedbackEditor();
+      $scope.tmpOutcome.feedback = outcome.feedback;
+    };
+    $scope.updateTaggedMisconception = function(
+        misconceptionId, skillId) {
+      $scope.tmpTaggedSkillMisconceptionId = (
+        `${skillId}-${misconceptionId}`);
+    };
     $scope.openFeedbackEditor = function() {
       $scope.feedbackEditorIsOpen = true;
     };
@@ -67,6 +76,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.tmpOutcome = OutcomeObjectFactory.createNew(
       $scope.questionModeEnabled ? null : stateName,
       feedbackContentId, '', []);
+    $scope.tmpTaggedSkillMisconceptionId = null;
 
     $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
       return (
@@ -85,6 +95,9 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       $uibModalInstance.close({
         tmpRule: angular.copy($scope.tmpRule),
         tmpOutcome: angular.copy($scope.tmpOutcome),
+        tmpTaggedSkillMisconceptionId: (
+          $scope.tmpOutcome.labelledAsCorrect ? null : (
+            $scope.tmpTaggedSkillMisconceptionId)),
         reopen: reopen
       });
     };

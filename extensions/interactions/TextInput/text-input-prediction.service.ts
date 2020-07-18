@@ -42,7 +42,6 @@ export class TextInputPredictionService {
   }
 
   predict(classifierData: ITextInputClassifierData, textInput: string): number {
-    /* eslint-disable camelcase */
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 

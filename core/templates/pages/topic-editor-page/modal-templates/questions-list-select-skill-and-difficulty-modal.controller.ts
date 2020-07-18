@@ -41,29 +41,27 @@ angular.module('oppia').controller(
         $uibModalInstance: $uibModalInstance
       });
 
-      var init = function() {
-        $scope.countOfSkillsToPrioritize =
+      $scope.countOfSkillsToPrioritize =
           countOfSkillsToPrioritize;
-        $scope.instructionMessage = (
-          'Select the skill(s) to link the question to:');
-        $scope.currentMode = currentMode;
-        $scope.linkedSkillsWithDifficulty =
-          linkedSkillsWithDifficulty;
-        $scope.skillSummaries = allSkillSummaries;
-        $scope.skillSummariesInitial = [];
-        $scope.skillSummariesFinal = [];
+      $scope.instructionMessage = (
+        'Select the skill(s) to link the question to:');
+      $scope.currentMode = currentMode;
+      $scope.linkedSkillsWithDifficulty =
+        linkedSkillsWithDifficulty;
+      $scope.skillSummaries = allSkillSummaries;
+      $scope.skillSummariesInitial = [];
+      $scope.skillSummariesFinal = [];
 
-        for (var idx in allSkillSummaries) {
-          if (idx < countOfSkillsToPrioritize) {
-            $scope.skillSummariesInitial.push(
-              allSkillSummaries[idx]);
-          } else {
-            $scope.skillSummariesFinal.push(
-              allSkillSummaries[idx]);
-          }
+      for (var idx in allSkillSummaries) {
+        if (idx < countOfSkillsToPrioritize) {
+          $scope.skillSummariesInitial.push(
+            allSkillSummaries[idx]);
+        } else {
+          $scope.skillSummariesFinal.push(
+            allSkillSummaries[idx]);
         }
-        $scope.skillIdToRubricsObject = skillIdToRubricsObject;
-      };
+      }
+      $scope.skillIdToRubricsObject = skillIdToRubricsObject;
 
       $scope.selectOrDeselectSkill = function(summary) {
         if (!summary.isSelected) {
@@ -93,8 +91,5 @@ angular.module('oppia').controller(
       $scope.startQuestionCreation = function() {
         $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
       };
-
-      init();
     }
   ]);
-

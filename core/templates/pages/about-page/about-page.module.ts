@@ -26,26 +26,23 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AboutPageComponent } from './about-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+import { AboutPageConstants } from 'pages/about-page/about-page.constants';
 
 @NgModule({
   imports: [
@@ -54,15 +51,18 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    AboutPageComponent,
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    AboutPageComponent,
+    OppiaAngularRootComponent
   ],
   providers: [
     AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
+    AboutPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
@@ -91,7 +91,7 @@ angular.module('oppia').requires.push(downgradedModule);
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  'serviceBootstrap',
+  'oppiaAngularRoot',
   downgradeComponent({
-    component: ServiceBootstrapComponent
+    component: OppiaAngularRootComponent
   }) as angular.IDirectiveFactory);

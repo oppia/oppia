@@ -17,9 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import logging
-import math
 
 from constants import constants
 from core import jobs
@@ -30,6 +28,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -48,6 +47,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import utils
 
 (exp_models, job_models, opportunity_models, audit_models) = (
     models.Registry.import_models(
@@ -277,6 +277,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     skill_summaries[2].id], '')
         )
         self.assertEqual(len(questions), 3)
+        # Testing that there are 3 hindi translation opportunities
+        # available on the Contributor Dashboard. Hindi was picked arbitrarily,
+        # any language code other than english (what the dummy explorations
+        # were written in) can be tested here.
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 
     def test_generate_dummy_skill_and_questions_data(self):
@@ -339,7 +346,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=topic_id, name='topic', abbreviated_name='abbrev')
+            topic_id, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -1127,6 +1134,7 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     """Tests for updating usernames."""
+
     OLD_USERNAME = 'oldUsername'
     NEW_USERNAME = 'newUsername'
 
@@ -1249,11 +1257,18 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        current_datetime = datetime.datetime.utcnow()
-        with self.mock_datetime_utcnow(current_datetime):
-            # To get the current time in seconds.
-            time_of_query = (datetime.datetime.utcnow() - datetime.datetime(
-                1970, 1, 1)).total_seconds()
+        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        # Since the UsernameChangeAuditModel's ID is formed from the user ID and
+        # a millisecond timestamp we need to make sure that
+        # get_current_time_in_millisecs returns the same value as we have saved
+        # into current_time_in_millisecs. If we don't force the same value via
+        # swap flakes can occur, since as the time flows the saved milliseconds
+        # can differ from the milliseconds saved into the
+        # UsernameChangeAuditModel's ID.
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
             self.put_json(
                 '/updateusernamehandler',
                 payload={
@@ -1265,8 +1280,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
                 user_id))
 
-        model_id = '%s.%s' % (user_id, int(math.floor(time_of_query)))
-
+        model_id = '%s.%d' % (user_id, creation_time_in_millisecs)
         username_change_audit_model = (
             audit_models.UsernameChangeAuditModel.get(model_id))
 
@@ -1281,6 +1295,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     """Tests related to add reviewers for contributor's
     suggestion/application.
     """
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
@@ -1495,6 +1510,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
 class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     """Tests related to remove reviewers from community dashboard page."""
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
@@ -1750,6 +1766,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
 class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
     """Tests CommunityReviewersListHandler."""
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
@@ -1840,6 +1857,7 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
 
 class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
     """Tests CommunityReviewerRightsDataHandler."""
+
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):

@@ -18,39 +18,31 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ContextService } from 'services/context.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { ExplorationPermissionsBackendApiService } from
+  'domain/exploration/exploration-permissions-backend-api.service';
+import { ExplorationPermissions } from
+  'domain/exploration/exploration-permissions-object.factory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserExplorationPermissionsService {
   constructor(
-    private contextService: ContextService,
-    private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private explorationPermissionsBackendApiService:
+    ExplorationPermissionsBackendApiService) {}
 
-  static permissionsPromise: Promise<object> = null;
-  getPermissionsAsync(): Promise<object> {
+  static permissionsPromise: Promise<ExplorationPermissions> = null;
+
+  getPermissionsAsync(): Promise<ExplorationPermissions> {
     if (!UserExplorationPermissionsService.permissionsPromise) {
-      let explorationPermissionsUrl = this.urlInterpolationService
-        .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
-          exploration_id: this.contextService.getExplorationId()
-        });
-
       UserExplorationPermissionsService.permissionsPromise = (
-        this.http.get(explorationPermissionsUrl).toPromise().then(
-          (response) => {
-            return response;
-          }
-        ));
+        this.explorationPermissionsBackendApiService.getPermissions());
     }
     return UserExplorationPermissionsService.permissionsPromise;
   }
 }
+
 angular.module('oppia').factory('UserExplorationPermissionsService',
   downgradeInjectable(UserExplorationPermissionsService));

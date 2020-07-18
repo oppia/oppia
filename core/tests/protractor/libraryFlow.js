@@ -43,7 +43,7 @@ describe('Library pages tour', function() {
   });
 
   var visitRecentlyPublishedPage = async function() {
-    await browser.get('library/recently_published');
+    await browser.get('community-library/recently-published');
     await waitFor.pageToFullyLoad();
   };
 
@@ -87,13 +87,14 @@ describe('Library pages tour', function() {
     await libraryPage.get();
     await element(by.css('.protractor-test-library-top-rated')).click();
     await waitFor.pageToFullyLoad();
-    expect(await browser.getCurrentUrl()).toContain('library/top_rated');
+    expect(await browser.getCurrentUrl()).toContain(
+      'community-library/top-rated');
   });
 
   it('visits the recent explorations page', async function() {
     await visitRecentlyPublishedPage();
     expect(await browser.getCurrentUrl()).toContain(
-      'library/recently_published');
+      'community-library/recently-published');
   });
 
   afterEach(async function() {

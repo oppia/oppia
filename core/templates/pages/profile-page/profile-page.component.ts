@@ -13,8 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia profile page.
+ * @fileoverview Component for the Oppia profile page.
  */
+
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 require('base-components/base-content.directive.ts');
 require(
@@ -25,20 +28,21 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/url.service.ts');
 require('services/user.service.ts');
 require('services/date-time-format.service.ts');
+require('pages/profile-page/profile-page-backend-api.service');
 
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
-    '$http', '$log', '$window', 'DateTimeFormatService', 'LoaderService',
-    'UrlInterpolationService', 'UrlService', 'UserService',
-    function($http, $log, $window, DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UrlService, UserService) {
+    '$scope', '$log', 'DateTimeFormatService', 'LoaderService',
+    'UrlInterpolationService', 'UserService', 'WindowRef',
+    function($scope, $log, DateTimeFormatService, LoaderService,
+        UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
-      var profileDataUrl = (
-        '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
+      const ProfilePageBackendApiService = (
+        OppiaAngularRootComponent.profilePageBackendApiService);
+
       var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
         .getStaticImageUrl('/general/no_profile_picture.png');
 
@@ -47,8 +51,9 @@ angular.module('oppia').component('profilePage', {
       };
       ctrl.$onInit = function() {
         LoaderService.showLoadingScreen('Loading');
-        $http.get(profileDataUrl).then(function(response) {
-          var data = response.data;
+        let fetchProfileData = () =>
+          ProfilePageBackendApiService.fetchProfileData();
+        fetchProfileData().then(function(data) {
           LoaderService.hideLoadingScreen();
           ctrl.username = {
             title: 'Username',
@@ -110,23 +115,28 @@ angular.module('oppia').component('profilePage', {
               UserService.getLoginUrlAsync().then(
                 function(loginUrl) {
                   if (loginUrl) {
-                    window.location.href = loginUrl;
+                    WindowRef.nativeWindow.location.href = loginUrl;
                   } else {
-                    $window.location.reload();
+                    WindowRef.nativeWindow.location.reload();
                   }
                 }
               );
             } else {
               if (!ctrl.isAlreadySubscribed) {
-                $http.post('/subscribehandler', {
-                  creator_username: data.profile_username
-                }).then(() => ctrl.isAlreadySubscribed = true);
+                ProfilePageBackendApiService.subscribe(data.profile_username)
+                  .then(() => {
+                    ctrl.isAlreadySubscribed = true;
+                    ctrl.updateSubscriptionButtonPopoverText();
+                    $scope.$apply();
+                  });
               } else {
-                $http.post('/unsubscribehandler', {
-                  creator_username: data.profile_username
-                }).then(() => ctrl.isAlreadySubscribed = false);
+                ProfilePageBackendApiService.unsubscribe(data.profile_username)
+                  .then(() => {
+                    ctrl.isAlreadySubscribed = false;
+                    ctrl.updateSubscriptionButtonPopoverText();
+                    $scope.$apply();
+                  });
               }
-              ctrl.updateSubscriptionButtonPopoverText();
             }
           };
 

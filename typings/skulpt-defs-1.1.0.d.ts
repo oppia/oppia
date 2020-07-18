@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 // Code - third_party/static/skulpt-dist-1.1.0/skulpt.js
 
 interface SkulptOpMap {
@@ -13,22 +12,22 @@ interface SkulptAsserts {
 }
 
 interface SkulptPython {
-  print_function: boolean;
-  division: boolean;
-  absolute_import: null;
-  unicode_literals: boolean;
-  set_repr: boolean;
-  class_repr: boolean;
-  inherit_from_object: boolean;
-  super_args: boolean;
-  octal_number_literal: boolean;
-  bankers_rounding: boolean;
-  python_version: boolean;
-  dunder_next: boolean;
-  dunder_round: boolean;
-  exceptions: boolean;
-  no_long_type: boolean;
-  ceil_floor_int: boolean;
+  'print_function': boolean;
+  'division': boolean;
+  'absolute_import': null;
+  'unicode_literals': boolean;
+  'set_repr': boolean;
+  'class_repr': boolean;
+  'inherit_from_object': boolean;
+  'super_args': boolean;
+  'octal_number_literal': boolean;
+  'bankers_rounding': boolean;
+  'python_version': boolean;
+  'dunder_next': boolean;
+  'dunder_round': boolean;
+  'exceptions': boolean;
+  'no_long_type': boolean;
+  'ceil_floor_int': boolean;
 }
 
 interface SkulptMappings {
@@ -179,55 +178,56 @@ interface Skulpt {
   sysmodules: Object;
   yieldLimit: number;
 
-  astDump: (node: Object) => string;
-  astFromParse: (n: Object, filename: string, c_flags: number) => Object;
-  bool_check: (object: Object, name: string) => void;
-  compile: (
+  'astDump': (node: Object) => string;
+  'astFromParse': (n: Object, filename: string, cFlags: number) => Object;
+  'bool_check': (object: Object, name: string) => void;
+  'compile': (
     source: string, filename: string, mode: string,
     canSuspend: boolean) => SkulptCompiled;
-  configure: (options: Object) => void;
-  debugout: (args: Object) => void;
-  doOneTimeInitialization: (canSuspend: boolean) => undefined;
-  dumpSymtab: (st: Object) => string;
-  exportSymbol: (name: string, object: Object) => Object;
-  fixReservedNames: (name: string) => string;
-  fixReservedWords: (name: string) => string;
-  getSysArgv: () => Array<Object>;
-  importBuiltinWithBody: (
+  'configure': (options: Object) => void;
+  'debugout': (args: Object) => void;
+  'doOneTimeInitialization': (canSuspend: boolean) => undefined;
+  'dumpSymtab': (st: Object) => string;
+  'exportSymbol': (name: string, object: Object) => Object;
+  'fixReservedNames': (name: string) => string;
+  'fixReservedWords': (name: string) => string;
+  'getSysArgv': () => Array<Object>;
+  'importBuiltinWithBody': (
     name: string, dumpJS: boolean, body: string, canSuspend: boolean) => Object;
-  importMain: (name: string, dumpJS: boolean, canSuspend: boolean) => Object;
-  importMainWithBody: (
+  'importMain': (name: string, dumpJS: boolean, canSuspend: boolean) => Object;
+  'importMainWithBody': (
     name: string, dumpJS: boolean, body: string, canSuspend: boolean) => Object;
-  importModule: (name: string, dumpJS: boolean, canSuspend: boolean) => Object;
-  importModuleInternal_: (
+  'importModule': (
+    name: string, dumpJS: boolean, canSuspend: boolean) => Object;
+  'importModuleInternal_': (
     name: string, dumpJS: boolean, modname: string, suppliedPyBody: string,
     relativeToPackage: Object, returnUndefinedOnTopLevelNotFound: boolean,
     canSuspend: boolean) => Object;
-  importSearchPathForName: (
+  'importSearchPathForName': (
     name: string, ext: string, searchPath: Object) => Object;
-  importSetUpPath: (canSuspend: boolean) => void;
-  importStar: (module: Object, loc: Object, global: Object) => void;
-  inputfun: (args: Object) => string;
-  isArrayLike: (object: Object) => boolean;
-  js_beautify: (x: Object) => Object;
-  longFromStr: (s: string, b: number) => Object;
-  mangleName: (priv: Object, ident: Object) => string;
-  output: (x: Object) => void;
-  parse: (filename: string, input: string) => Object;
-  Parser: Function;
-  parseTreeDump: (n: Object, indent: string) => string;
-  resetCompiler: () => void;
-  read: (x: Object) => void;
-  setup_method_mappings: () => SkulptMappings;
-  str2number: (
+  'importSetUpPath': (canSuspend: boolean) => void;
+  'importStar': (module: Object, loc: Object, global: Object) => void;
+  'inputfun': (args: Object) => string;
+  'isArrayLike': (object: Object) => boolean;
+  'js_beautify': (x: Object) => Object;
+  'longFromStr': (s: string, b: number) => Object;
+  'mangleName': (priv: Object, ident: Object) => string;
+  'output': (x: Object) => void;
+  'parse': (filename: string, input: string) => Object;
+  'Parser': Function;
+  'parseTreeDump': (n: Object, indent: string) => string;
+  'resetCompiler': () => void;
+  'read': (x: Object) => void;
+  'setup_method_mappings': () => SkulptMappings;
+  'str2number': (
     s: string, base: number, parser: Function, negater: Function,
     fname: string) => number;
-  switch_version: (method_to_map: string, python3: SkulptPython) => void;
-  symboltable: (ast: Object, filename: string) => Object;
-  timeoutMsg: () => string;
-  Tokenizer: Function;
-  uncaughtException: (err: Error) => never;
-  unfixReserved: (name: string) => string;
+  'switch_version': (methodToMap: string, python3: SkulptPython) => void;
+  'symboltable': (ast: Object, filename: string) => Object;
+  'timeoutMsg': () => string;
+  'Tokenizer': Function;
+  'uncaughtException': (err: Error) => never;
+  'unfixReserved': (name: string) => string;
 }
 
 declare var Sk: Skulpt;

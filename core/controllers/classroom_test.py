@@ -69,10 +69,10 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_id_1 = topic_services.get_new_topic_id()
         topic_id_2 = topic_services.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
-            topic_id_1, 'private_topic_name', 'abbrev')
+            topic_id_1, 'private_topic_name', 'abbrev', 'description')
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
-            topic_id_2, 'public_topic_name', 'abbrev')
+            topic_id_2, 'public_topic_name', 'abbrev', 'description')
         public_topic.thumbnail_filename = 'Topic.svg'
         public_topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -122,6 +122,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
 class ClassroomPageStatusHandlerTests(BaseClassroomControllerTests):
     """Unit test for ClassroomPageStatusHandler."""
+
     def test_get_request_returns_correct_status(self):
         self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, False)
 

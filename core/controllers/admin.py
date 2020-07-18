@@ -60,6 +60,7 @@ current_user_services = models.Registry.import_current_user_services()
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
+
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
@@ -91,12 +92,12 @@ class AdminHandler(base.BaseHandler):
 
         queued_or_running_job_types = set([
             job['job_type'] for job in unfinished_job_data])
-        one_off_job_specs = [{
+        one_off_job_status_summaries = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
         } for klass in jobs_registry.ONE_OFF_JOB_MANAGERS]
-        audit_job_specs = [{
+        audit_job_status_summaries = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
@@ -128,8 +129,8 @@ class AdminHandler(base.BaseHandler):
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
-            'one_off_job_specs': one_off_job_specs,
-            'audit_job_specs': audit_job_specs,
+            'one_off_job_status_summaries': one_off_job_status_summaries,
+            'audit_job_status_summaries': audit_job_status_summaries,
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
             'updatable_roles': {
@@ -293,17 +294,16 @@ class AdminHandler(base.BaseHandler):
 
         state.update_recorded_voiceovers(recorded_voiceovers)
         state.update_written_translations(written_translations)
-        solution_dict = (
-            state_domain.Solution(
-                'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                    'solution', '<p>This is a solution.</p>')).to_dict())
+        solution = state_domain.Solution(
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
             )
         ]
 
-        state.update_interaction_solution(solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.update_interaction_customization_args({
             'placeholder': 'Enter text here',
@@ -393,9 +393,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev')
+                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev')
+                topic_id_2, 'Empty Topic', 'abbrev', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -412,25 +412,61 @@ class AdminHandler(base.BaseHandler):
             # for published stories.
             self._reload_exploration('15')
             self._reload_exploration('25')
+            self._reload_exploration('13')
+
             story = story_domain.Story.create_default_story(
-                story_id, 'Dummy Story 1', topic_id_1)
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'Dummy Chapter 1')
-            story.update_node_destination_node_ids(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), [
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, 2)])
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '15')
-            exp_services.update_exploration(
-                self.user_id, '15', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'category',
-                    'new_value': 'Astronomy'
-                })], 'Change category')
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 'Dummy Chapter 2')
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), '25')
+                story_id, 'Help Jaime win the Arcade', topic_id_1)
+
+            story_node_dicts = [{
+                'exp_id': '15',
+                'title': 'What are the place values?',
+                'description': 'Jaime learns the place value of each digit ' +
+                               'in a big number.'
+            }, {
+                'exp_id': '25',
+                'title': 'Finding the value of a number',
+                'description': 'Jaime understands the value of his ' +
+                               'arcade score.'
+            }, {
+                'exp_id': '13',
+                'title': 'Comparing Numbers',
+                'description': 'Jaime learns if a number is smaller or ' +
+                               'greater than another number.'
+            }]
+
+            def generate_dummy_story_nodes(node_id, exp_id, title, description):
+                """Generates and connects sequential story nodes.
+
+                Args:
+                    node_id: int. The node id.
+                    exp_id: str. The exploration id.
+                    title: str. The title of the story node.
+                    description: str. The description of the story node.
+                """
+
+                story.add_node(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    title)
+                story.update_node_description(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    description)
+                story.update_node_exploration_id(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+                if node_id != len(story_node_dicts):
+                    story.update_node_destination_node_ids(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+
+                exp_services.update_exploration(
+                    self.user_id, exp_id, [exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'Astronomy'
+                    })], 'Change category')
+
+            for i, story_node_dict in enumerate(story_node_dicts):
+                generate_dummy_story_nodes(i + 1, **story_node_dict)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
@@ -446,6 +482,11 @@ class AdminHandler(base.BaseHandler):
                     'title': 'Dummy Subtopic Title'
                 })]
             )
+
+            # Generates translation opportunities for the Contributor Dashboard.
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids_in_story)
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
         else:
@@ -737,6 +778,7 @@ class AddCommunityReviewerHandler(base.BaseHandler):
 
 class RemoveCommunityReviewerHandler(base.BaseHandler):
     """Handles removing reviewer for community dashboard."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
@@ -798,6 +840,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
 
 class CommunityReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
@@ -821,6 +864,7 @@ class CommunityReviewersListHandler(base.BaseHandler):
 
 class CommunityReviewerRightsDataHandler(base.BaseHandler):
     """Handler to show the review rights of a user."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page

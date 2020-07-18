@@ -91,7 +91,7 @@ if os.path.isdir(oppia_tools_path):
 
 THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.9.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.9.1'),
     os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.5'),
     os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
     os.path.join(ROOT_PATH, 'third_party', 'future-0.17.1'),
@@ -99,11 +99,12 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.1'),
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.43.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'packaging-20.3'),
+    os.path.join(ROOT_PATH, 'third_party', 'packaging-20.4'),
+    os.path.join(ROOT_PATH, 'third_party', 'pylatexenc-2.6'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.17.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'six-1.15.0'),
     os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.5'),
     os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
 ]

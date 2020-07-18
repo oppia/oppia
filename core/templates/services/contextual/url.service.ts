@@ -34,10 +34,18 @@ interface UrlParamsType {
 export class UrlService {
   constructor(private windowRef: WindowRef) {}
 
+   /**
+   * Returns the current location.
+   * @return {boolean} the current location.
+   */
   getCurrentLocation(): Location {
     return this.windowRef.nativeWindow.location;
   }
 
+   /**
+   * Returns the current query string.
+   * @return {boolean} the current query string.
+   */
   getCurrentQueryString(): string {
     return this.getCurrentLocation().search;
   }
@@ -80,7 +88,7 @@ export class UrlService {
   /**
    * Gets the topic id from url.
    * @return {string} the topic id.
-   * @throws throws the error if the url is invalid.
+   * @throws Will throw an error if the url is invalid.
    */
   getTopicIdFromUrl(): string {
     let pathname = this.getPathname();
@@ -93,7 +101,7 @@ export class UrlService {
   /**
    * Gets the topic name from the learner's url.
    * @return {string} the topic name.
-   * @throws throws an error if the url is invalid.
+   * @throws Will throw an error if the url is invalid.
    */
   getTopicNameFromLearnerUrl(): string {
     let pathname = this.getPathname();
@@ -106,7 +114,7 @@ export class UrlService {
   /**
    * Gets the classroom name from the learner's url.
    * @return {string} the classroom name.
-   * @throws throws an error if the url is invalid.
+   * @throws Will throw an error if the url is invalid.
    */
   getClassroomNameFromUrl(): string {
     let pathname = this.getPathname();
@@ -120,7 +128,7 @@ export class UrlService {
   /**
    * Gets the subtopic id from the learner's url.
    * @return {string} the subtopic id.
-   * @throws throws an error if the url is invalid.
+   * @throws Will throw an error if the url is invalid.
    */
   getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
@@ -134,7 +142,7 @@ export class UrlService {
   /**
    * Gets the story id from the learner's url.
    * @return {string} the story id.
-   * @throws throws an error if the url is invalid.
+   * @throws Will Throw an error if the url is invalid.
    */
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
@@ -147,7 +155,7 @@ export class UrlService {
   /**
    * Gets the story id from the viewer's url.
    * @return {string} the story id.
-   * @throws throws an error if the url is invalid.
+   * @throws Will throw an error if the url is invalid.
    */
   getStoryIdFromViewerUrl(): string {
     let pathname = this.getPathname();
@@ -160,7 +168,7 @@ export class UrlService {
 
   /**
    * Gets the story id from the player.
-   * @return {string} the story id.
+   * @return {string} the story id if the id exists.
    */
   getStoryIdInPlayer(): string | null {
     let query = this.getCurrentQueryString();
@@ -177,7 +185,7 @@ export class UrlService {
   /**
    * Gets the skill id from the url.
    * @return {string} the skill id.
-   * @throws throws an error if the skill Id is invalid.
+   * @throws Will throw an error if the skill Id is invalid.
    */
   getSkillIdFromUrl(): string {
     let pathname = this.getPathname();
@@ -242,8 +250,8 @@ export class UrlService {
 
   /**
    * Gets the collection id from the exploration url.
-   * @return {string} a collection id if the url parameter doesn't have a 'parent' property but have a 'collection_id' property;
-   * @return {null} if otherwise.
+   * @return {string} a collection id if the url parameter doesn't have a 'parent' property  
+   * but have a 'collection_id' property; @return {null} if otherwise.
    */
   getCollectionIdFromExplorationUrl(): string | null {
     let urlParams: UrlParamsType = this.getUrlParams();
@@ -270,8 +278,8 @@ export class UrlService {
   }
 
   /**
-   * Gets the username from the url.
-   * @return {string} the username.
+   * Gets the collection id from the url.
+   * @return {string} the collection id.
    * @throws Will throw exception if the profile URL is invalid.
    */
   getCollectionIdFromUrl(): string {
@@ -297,9 +305,8 @@ export class UrlService {
 
   /**
    * Gets the exploration version id from the url.
-   * @return {string} the collection id.
    * @return {number} the exploration version from Url if an exploration version can be extracted;
-   * @return {null} if otherwise.
+   * {null} if otherwise.
    */
   getExplorationVersionFromUrl(): number | null {
     let urlParams: UrlParamsType = this.getUrlParams();

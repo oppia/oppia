@@ -25,18 +25,11 @@ require('services/context.service.ts');
 
 angular.module('oppia').run([
   '$compile', '$rootScope', '$timeout', 'RteHelperService',
-  'HtmlEscaperService', 'ContextService', 'ENABLE_LITERALLY_CANVAS_EDITOR',
+  'HtmlEscaperService', 'ContextService',
   function($compile, $rootScope, $timeout, RteHelperService,
-      HtmlEscaperService, ContextService, ENABLE_LITERALLY_CANVAS_EDITOR) {
+      HtmlEscaperService, ContextService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-      // TODO(#9358): Remove the if condition once the svgeditor is
-      // available for the users.
-      if (componentDefn.id === 'svgeditor') {
-        if (!ENABLE_LITERALLY_CANVAS_EDITOR) {
-          return;
-        }
-      }
       // The name of the CKEditor widget corresponding to this component.
       var ckName = 'oppia' + componentDefn.id;
 

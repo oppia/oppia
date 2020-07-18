@@ -36,6 +36,17 @@ export = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  "SKILL_STATUS_OPTIONS": {
+    "ALL": "All",
+    "ASSIGNED": "Assigned",
+    "UNASSIGNED": "Unassigned"
+  },
+  "TOPIC_SKILL_DASHBOARD_SORT_OPTIONS": {
+    "IncreasingCreatedOn": "Newly Created",
+    "DecreasingCreatedOn": "Oldest Created",
+    "IncreasingUpdatedOn": "Most Recently Updated",
+    "DecreasingUpdatedOn": "Least Recently Updated"
+  },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
   "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
@@ -52,6 +63,19 @@ export = {
     "subtopic": ["#FFFFFF"],
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
   },
+
+  "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
+  "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
+  "TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS": "successive_incorrect_answers",
+  "TASK_TYPE_NEEDS_GUIDING_RESPONSES": "needs_guiding_responses",
+
+  "TASK_STATUS_OPEN": "open",
+  "TASK_STATUS_OBSOLETE": "obsolete",
+  "TASK_STATUS_RESOLVED": "resolved",
+
+  "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
+
+  "TASK_TARGET_TYPE_STATE": "state",
 
   // The SVG tag-specific attribute whitelist is based on the list of tags and
   // and attributes specified in this project:
@@ -4830,6 +4854,9 @@ export = {
     "id": "es",
     "text": "Español"
   }, {
+    "id": "fr",
+    "text": "français (French)"
+  }, {
     "id": "pt-br",
     "text": "Português (Brasil)"
   }, {
@@ -5098,6 +5125,9 @@ export = {
       "LogicProof",
       "NumericInput",
       "SetInput",
+      "NumericExpressionInput",
+      "AlgebraicExpressionInput",
+      "MathEquationInput",
       "MathExpressionInput",
       "NumberWithUnits"
     ]
@@ -5175,7 +5205,6 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
-  "ENABLE_LITERALLY_CANVAS_EDITOR": false,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
@@ -5184,7 +5213,7 @@ export = {
   // This is split up so as to access the viewers in production without
   // exposing the POST and PUT endpoints just yet.
   "ENABLE_NEW_STRUCTURE_PLAYERS": true,
-  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": false,
+  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
 
@@ -5261,6 +5290,20 @@ export = {
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
     "floor", "if", "log", "or", "pow", "round", "then"
+  ],
+
+  // Greek letters allowed in math interactions.
+  "GREEK_LETTERS": [
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
+    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
+    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
+  ],
+
+  // Functions allowed in math interactions.
+  "MATH_FUNCTION_NAMES": [
+    "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
+    "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
 
   // Unfinished features.

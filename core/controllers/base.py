@@ -107,17 +107,39 @@ class UserFacingExceptions(python_utils.OBJECT):
     class NotLoggedInException(Exception):
         """Error class for users that are not logged in (error code 401)."""
 
+        pass
+
+
     class InvalidInputException(Exception):
         """Error class for invalid input on the user side (error code 400)."""
+
+        pass
+
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""
 
+        pass
+
+
     class PageNotFoundException(Exception):
         """Error class for a page not found error (error code 404)."""
 
+        pass
+
+
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+        pass
+
+
+    class TemporaryMaintenanceException(Exception):
+        """Error class for when the server is currently down for temporary
+        maintenance (error code 503).
+        """
+
+        pass
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -146,6 +168,17 @@ class BaseHandler(webapp2.RequestHandler):
 
         # Initializes the return dict for the handlers.
         self.values = {}
+
+        if self.request.get('payload'):
+            self.payload = json.loads(self.request.get('payload'))
+        else:
+            self.payload = None
+        self.iframed = False
+
+        self.is_super_admin = (
+            current_user_services.is_current_user_super_admin())
+        if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
+            return
 
         self.gae_id = current_user_services.get_current_gae_id()
         self.user_id = None
@@ -185,21 +218,12 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.user = user_services.UserActionsInfo(self.user_id)
 
-        self.is_super_admin = (
-            current_user_services.is_current_user_super_admin())
-
-        self.iframed = False
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.is_super_admin
-
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
-        else:
-            self.payload = None
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass.
@@ -213,6 +237,15 @@ class BaseHandler(webapp2.RequestHandler):
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
             self.redirect(
                 b'https://oppiatestserver.appspot.com', permanent=True)
+            return
+
+        if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
+            self.handle_exception(
+                self.TemporaryMaintenanceException(
+                    'Oppia is currently being upgraded, and the site should '
+                    'be up and running again in a few hours. '
+                    'Thanks for your patience!'),
+                self.app.debug)
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -368,6 +401,8 @@ class BaseHandler(webapp2.RequestHandler):
             if self.iframed:
                 self.render_template(
                     'error-iframed.mainpage.html', iframe_restriction=None)
+            elif values['status_code'] == 503:
+                self.render_template('maintenance-page.mainpage.html')
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
@@ -388,7 +423,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert error_code in [400, 401, 404, 500]
+        assert error_code in [400, 401, 404, 500, 503]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
 
@@ -406,8 +441,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
-            self._render_exception_json_or_html(
-                None, values)
+            self._render_exception_json_or_html(None, values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler.
@@ -465,6 +499,12 @@ class BaseHandler(webapp2.RequestHandler):
                 exception)})
             return
 
+        if isinstance(exception, self.TemporaryMaintenanceException):
+            self.error(503)
+            self._render_exception(503, {'error': python_utils.convert_to_bytes(
+                exception)})
+            return
+
         self.error(500)
         self._render_exception(
             500, {'error': python_utils.convert_to_bytes(exception)})
@@ -474,6 +514,8 @@ class BaseHandler(webapp2.RequestHandler):
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
     PageNotFoundException = UserFacingExceptions.PageNotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
+    TemporaryMaintenanceException = (
+        UserFacingExceptions.TemporaryMaintenanceException)
 
 
 class Error404Handler(BaseHandler):

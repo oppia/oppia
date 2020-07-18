@@ -33,6 +33,7 @@ import feconf
 
 class TopicFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for topic fetchers."""
+
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -105,6 +106,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='canonical_name',
+            description='description',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
@@ -125,6 +127,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id_2',
             name='name 2',
+            description='description 2',
             abbreviated_name='abbrev',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,

@@ -23,10 +23,10 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.directive.ts');
+  'exploration-title-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.directive.ts');
+  'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.directive.ts');
@@ -49,7 +49,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
+require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
@@ -128,7 +128,7 @@ angular.module('oppia').directive('settingsTab', [
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
 
-          var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
+          var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
           var EXPLORE_PAGE_PREFIX = '/explore/';
 
           ctrl.getExplorePageUrl = function() {
@@ -392,10 +392,10 @@ angular.module('oppia').directive('settingsTab', [
 
             UserExplorationPermissionsService.getPermissionsAsync()
               .then(function(permissions) {
-                ctrl.canDelete = permissions.can_delete;
-                ctrl.canModifyRoles = permissions.can_modify_roles;
-                ctrl.canReleaseOwnership = permissions.can_release_ownership;
-                ctrl.canUnpublish = permissions.can_unpublish;
+                ctrl.canDelete = permissions.canDelete;
+                ctrl.canModifyRoles = permissions.canModifyRoles;
+                ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                ctrl.canUnpublish = permissions.canUnpublish;
               });
 
             ctrl.explorationTitleService = ExplorationTitleService;

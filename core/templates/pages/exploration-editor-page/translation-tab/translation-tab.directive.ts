@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.directive.ts');
@@ -123,7 +123,7 @@ angular.module('oppia').directive('translationTab', [
             if (permissions === null) {
               return;
             }
-            if (permissions.can_voiceover) {
+            if (permissions.canVoiceover) {
               EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }
@@ -155,7 +155,7 @@ angular.module('oppia').directive('translationTab', [
             $scope.$on('refreshTranslationTab', function() {
               initTranslationTab();
             });
-            // Toggles the translation tab tutorial on/off
+            // Toggles the translation tab tutorial on/off.
             $scope.translationTutorial = false;
             $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
               type: 'title',

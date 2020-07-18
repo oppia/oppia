@@ -17,7 +17,9 @@
  */
 
 interface RandomSelectorCustomScope extends ng.IScope {
-  generatorId?: string;
+  $ctrl?: {
+    generatorId?: string;
+  }
   getTemplateUrl?: (() => string);
 }
 
@@ -26,7 +28,7 @@ angular.module('oppia').directive('randomSelector', [
     return {
       link: function(scope: RandomSelectorCustomScope, element) {
         scope.getTemplateUrl = function() {
-          return '/value_generator_handler/' + scope.generatorId;
+          return '/value_generator_handler/' + scope.$ctrl.generatorId;
         };
         $compile(element.contents())(scope);
       },

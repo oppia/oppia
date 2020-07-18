@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import subprocess
 
 import python_utils
 import release_constants
@@ -27,6 +28,8 @@ from scripts import common
 
 SECTIONS_TO_ADD = [
     '[Add main changes]',
+    '[Add screenshots/celebration text for major changes. You can '
+    'collect these from project leads]',
     '[Add editorials/announcements if required]',
     '[Add Author details (Use Email C&P Blurbs about authors from '
     'release_summary.md)]',
@@ -37,6 +40,7 @@ RELEASE_MAIL_MESSAGE_TEMPLATE = (
     'Hi all,\n\n'
     '   We are happy to announce the release of v%s of Oppia.\n'
     '   The main changes in this release are %s.\n'
+    '   %s.\n'
     '   %s.\n'
     '   %s\n'
     '   Finally, I\'d like to thank %s for their help with pre-release '
@@ -62,32 +66,40 @@ def create_new_file_with_release_message_template():
         'Please make updates to following file %s for generating the '
         'release announcement mail by adding:\n'
         '   1. Main changes for release\n'
-        '   2. Editorials/announcements if required\n'
-        '   3. Author details from release_summary.md\n'
-        '   4. Names of release testers\n'
-        '   5. Name of QA Team lead\n'
-        '   6. Your name\n' % RELEASE_MAIL_MESSAGE_FILEPATH)
+        '   2. Screenshots/celebration text for major changes. You can '
+        'collect these from project leads\n'
+        '   3. Editorials/announcements if required\n'
+        '   4. Author details from release_summary.md\n'
+        '   5. Names of release testers\n'
+        '   6. Name of QA Team lead\n'
+        '   7. Your name\n' % RELEASE_MAIL_MESSAGE_FILEPATH)
+    common.ask_user_to_confirm('Please save the file.')
 
 
 def validate_release_message():
     """Checks the message after the mail template is updated by the
     user.
-
-    Raises:
-        Exception: The message still contains sections from template
-            which are not updated.
     """
-    with python_utils.open_file(RELEASE_MAIL_MESSAGE_FILEPATH, 'r') as f:
-        release_mail_message = f.read()
+    # Validation will work fine for cases where no new contributors are
+    # found since in that case the release co-ordinator will completely
+    # remove the new contributors section from the announcement mail.
+    message_is_invalid = True
+    while message_is_invalid:
+        mail_message_file = python_utils.open_file(
+            RELEASE_MAIL_MESSAGE_FILEPATH, 'r')
+        release_mail_message = mail_message_file.read()
         extra_sections = [
             section for section in SECTIONS_TO_ADD if (
                 section in release_mail_message)]
         if extra_sections:
-            raise Exception(
+            common.ask_user_to_confirm(
                 'Template not formatted correctly. '
                 'Following sections still not updated: %s.\n'
-                'Please re-run the scripts and make the updates again.' % (
+                'Please update the sections correctly.' % (
                     ', '.join(extra_sections)))
+            common.ask_user_to_confirm('Please save the file.')
+        else:
+            message_is_invalid = False
 
 
 def get_new_authors_and_contributors_mail_ids():
@@ -95,7 +107,7 @@ def get_new_authors_and_contributors_mail_ids():
 
     Returns:
         list(str). List of mail ids of new authors and contributors
-            for the release.
+        for the release.
     """
     with python_utils.open_file(
         release_constants.RELEASE_SUMMARY_FILEPATH, 'r') as f:
@@ -141,7 +153,7 @@ def prompt_user_to_send_announcement_email():
             RELEASE_MAIL_MESSAGE_FILEPATH, new_contributors_mail_ids,
             release_version))
     common.open_new_tab_in_browser_if_possible(
-        'https://groups.google.com/forum/#!categories/oppia/announcements')
+        'https://groups.google.com/forum/#!categories/oppia')
     common.ask_user_to_confirm('Add announcements label to the email sent.\n')
     common.ask_user_to_confirm(
         'Ensure the email sent to oppia@ is in the Announcements category')
@@ -187,6 +199,27 @@ def prepare_for_next_release():
         'the next release\n' % release_constants.JOBS_FORM_URL)
 
 
+def draft_new_release():
+    """Drafts a new release tag on github."""
+    release_version = common.get_current_release_version_number(
+        common.get_current_branch_name())
+    remote_alias = common.get_remote_alias(release_constants.REMOTE_URL)
+    subprocess.check_call([
+        'git', 'tag', '-a', 'v%s' % release_version,
+        '-m', 'Version %s' % release_version])
+    subprocess.check_call([
+        'git', 'push', remote_alias, 'v%s' % release_version])
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.NEW_RELEASE_URL)
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.GITHUB_RELEASE_TAB_URL)
+    common.ask_user_to_confirm(
+        'Please draft a new release on GitHub pointing to the '
+        'new tag and including relevant changelog information.\n'
+        'The two tabs in your browser point to: '
+        'Page to draft a new release, examples of previous releases.')
+
+
 def main():
     """Performs task to generate message for release announcement."""
     if not common.is_current_branch_a_release_branch():
@@ -198,6 +231,8 @@ def main():
             'Release summary file %s is missing. Please run the '
             'release_info.py script and re-run this script.' % (
                 release_constants.RELEASE_SUMMARY_FILEPATH))
+
+    draft_new_release()
 
     try:
         create_new_file_with_release_message_template()

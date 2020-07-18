@@ -74,10 +74,15 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
+USER_PREFERENCES = {'open_new_tab_in_browser': None}
+
+FECONF_PATH = os.path.join('.', 'feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 
 
 def is_windows_os():
@@ -150,6 +155,15 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
+    if USER_PREFERENCES['open_new_tab_in_browser'] is None:
+        python_utils.PRINT(
+            '\nDo you want the url to be opened in the browser? '
+            'Confirm by entering y/ye/yes.')
+        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+    if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
+        python_utils.PRINT(
+            'Please open the following link in browser: %s' % url)
+        return
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
@@ -239,6 +253,17 @@ def get_current_release_version_number(release_branch_name):
         raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
+def is_current_branch_a_hotfix_branch():
+    """Checks if the current branch is a hotfix branch.
+
+    Returns:
+        bool. Whether the current branch is hotfix branch.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+
+
 def is_current_branch_a_release_branch():
     """Returns whether the current branch is a release branch.
 
@@ -313,7 +338,7 @@ def is_port_open(port):
     Args:
         port: int. The port number.
 
-    Return:
+    Returns:
         bool. True if port is open else False.
     """
     with contextlib.closing(
@@ -451,7 +476,7 @@ def check_prs_for_current_release_are_released(repo):
 
     Raises:
         Exception: Some pull requests for current release do not have a
-            PR: released label.
+            "PR: released" label.
     """
     current_release_label = repo.get_label(
         release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)

@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -134,7 +134,7 @@ angular.module('oppia').directive('explorationSaveAndPublishButtons', [
             UserExplorationPermissionsService.getPermissionsAsync()
               .then(function(permissions) {
                 $scope.showPublishButton = function() {
-                  return permissions.can_publish && (
+                  return permissions.canPublish && (
                     ExplorationRightsService.isPrivate());
                 };
               });

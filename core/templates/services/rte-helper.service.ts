@@ -21,24 +21,24 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/rte-helper-modal.controller.ts');
 
+require('services/alerts.service.ts');
+require('services/assets-backend-api.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
+require('services/image-upload-helper.service.ts');
 require('app.constants.ajs.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal', 'HtmlEscaperService',
-  'UrlInterpolationService', 'ENABLE_LITERALLY_CANVAS_EDITOR',
-  'INLINE_RTE_COMPONENTS', 'RTE_COMPONENT_SPECS', function(
+  'UrlInterpolationService', 'INLINE_RTE_COMPONENTS',
+  'RTE_COMPONENT_SPECS', function(
       $document, $log, $uibModal, HtmlEscaperService,
-      UrlInterpolationService, ENABLE_LITERALLY_CANVAS_EDITOR,
-      INLINE_RTE_COMPONENTS, RTE_COMPONENT_SPECS) {
+      UrlInterpolationService, INLINE_RTE_COMPONENTS,
+      RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
-      if (componentId === 'Svgeditor') {
-        if (!ENABLE_LITERALLY_CANVAS_EDITOR) {
-          return;
-        }
-      }
       _RICH_TEXT_COMPONENTS.push({
         backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
         customizationArgSpecs: angular.copy(

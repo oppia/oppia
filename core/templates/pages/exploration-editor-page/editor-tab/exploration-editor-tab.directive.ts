@@ -89,6 +89,9 @@ angular.module('oppia').directive('explorationEditorTab', [
                 'You can speak to the learner here, then ask them a question.');
             }
           };
+          ctrl.getStateContentSaveButtonPlaceholder = function() {
+            return 'Save Content';
+          };
 
           ctrl.addState = function(newStateName) {
             ExplorationStatesService.addState(newStateName, null);
