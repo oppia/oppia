@@ -50,7 +50,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
 
-    def test_get_pending_deletion_request(self):
+    def test_gets_pending_deletion_request(self):
         pending_deletion_request_model = (
             user_models.PendingDeletionRequestModel(
                 id=self.user_1_id,
@@ -73,7 +73,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(pending_deletion_request.collection_ids, ['col1'])
         self.assertEqual(pending_deletion_request.story_mappings, None)
 
-    def test_save_pending_deletion_request_new(self):
+    def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
                 self.user_1_id, self.USER_1_EMAIL, [], []))
@@ -91,7 +91,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(pending_deletion_request_model.collection_ids, [])
         self.assertEqual(pending_deletion_request_model.story_mappings, None)
 
-    def test_save_pending_deletion_request_existing(self):
+    def test_saves_pending_deletion_request_when_already_existing(self):
         pending_deletion_request_model_old = (
             user_models.PendingDeletionRequestModel(
                 id=self.user_1_id,
@@ -131,7 +131,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             pending_deletion_request_model_old.created_on,
             pending_deletion_request_model_new.created_on)
 
-    def test_delete_pending_deletion_request(self):
+    def test_deletes_pending_deletion_request(self):
         pending_deletion_request_model = (
             user_models.PendingDeletionRequestModel(
                 id=self.user_1_id,
@@ -418,6 +418,17 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.user_2_id))
 
+    def test_after_deletion_user_cannot_do_anything(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(user_services.get_user_settings(self.user_1_id))
+        with self.assertRaisesRegexp(Exception, 'User not found.'):
+            # Try to do some action with the deleted user.
+            user_services.update_preferred_language_codes(
+                self.user_1_id, ['en'])
+
 
 class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
@@ -490,7 +501,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
 
-    def test_delete_story_simple(self):
+    def test_one_story_is_pseudonymized(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -508,14 +519,14 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id,
             pending_deletion_model.story_mappings[self.STORY_1_ID])
 
-    def test_delete_story_simple_invalid_data(self):
+    def test_one_story_with_missing_snapshot_is_pseudonymized(self):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
             """Mocks logging.warning()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
 
         story_models.StoryCommitLogEntryModel(
             id='story-%s-1' % self.STORY_2_ID,
@@ -533,8 +544,9 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_log_messages,
-            ['The commit log and snapshot story IDs differ: '
-             '[u\'%s\']' % self.STORY_2_ID])
+            ['The commit log and snapshot story IDs differ. '
+             'Snapshots without commit logs: [], '
+             'Commit logs without snapshots: [u\'%s\'].' % self.STORY_2_ID])
 
         # Verify user is deleted.
         pending_deletion_model = (
@@ -555,7 +567,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_log_model_2.user_id,
             pending_deletion_model.story_mappings[self.STORY_2_ID])
 
-    def test_delete_story_repeated(self):
+    def test_one_story_is_pseudonymized_when_the_deletion_is_repeated(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -584,7 +596,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id,
             pending_deletion_model.story_mappings[self.STORY_1_ID])
 
-    def test_delete_story_multiple_stories(self):
+    def test_multiple_stories_are_pseudonymized(self):
         self.save_new_topic(self.TOPIC_1_ID, self.user_1_id, name='Topic 2')
         self.save_new_story(self.STORY_2_ID, self.user_1_id, self.TOPIC_1_ID)
 
@@ -614,12 +626,9 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id,
             pending_deletion_model.story_mappings[self.STORY_2_ID])
 
-    def test_delete_story_multiple_users_multiple_stories(self):
+    def test_multiple_stories_with_multiple_users_are_pseudonymized(self):
         self.save_new_topic(self.TOPIC_1_ID, self.user_2_id, name='Topic 2')
-        self.save_new_story(
-            self.STORY_2_ID,
-            self.user_2_id,
-            corresponding_topic_id=self.TOPIC_1_ID)
+        self.save_new_story(self.STORY_2_ID, self.user_2_id, self.TOPIC_1_ID)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -663,7 +672,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id,
             pending_deletion_model.story_mappings[self.STORY_2_ID])
 
-    def test_delete_story_multiple_users_one_story(self):
+    def test_one_story_with_multiple_users_is_pseudonymized(self):
         story_services.update_story(
             self.user_2_id,
             self.STORY_1_ID,
@@ -747,13 +756,13 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
 
-    def test_delete_story_simple(self):
+    def test_verification_is_successfull(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_1_id)))
 
-    def test_delete_story_broken(self):
+    def test_verification_is_unsuccessfull_when_deletion_failed(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
 

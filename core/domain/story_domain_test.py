@@ -222,8 +222,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, corresponding_topic_id=self.TOPIC_ID
-        )
+            self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.story.add_node(self.NODE_ID_2, 'Node title 2')
         self.story.update_node_destination_node_ids(

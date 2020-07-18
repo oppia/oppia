@@ -142,19 +142,20 @@ def pre_delete_user(user_id):
     )
 
 
-def delete_user(pending_deletion):
-    """Delete all the models for user specified in pending_deletion.
+def delete_user(pending_deletion_request):
+    """Delete all the models for user specified in pending_deletion_request.
 
     Args:
-        pending_deletion: PendingDeletionRequest.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to delete or pseudonymize all the models.
     """
-    _delete_user_models(pending_deletion.user_id)
-    _hard_delete_explorations_and_collections(pending_deletion)
-    _delete_story_models(pending_deletion)
+    _delete_user_models(pending_deletion_request.user_id)
+    _hard_delete_explorations_and_collections(pending_deletion_request)
+    _delete_story_models(pending_deletion_request)
 
 
 def verify_user_deleted(pending_deletion_request):
-    """Verify that all the models for user specified in pending_deletion
+    """Verify that all the models for user specified in pending_deletion_request
     are deleted.
 
     Args:
@@ -184,20 +185,21 @@ def _delete_user_models(user_id):
             model_class.apply_deletion_policy(user_id)
 
 
-def _hard_delete_explorations_and_collections(pending_deletion):
+def _hard_delete_explorations_and_collections(pending_deletion_request):
     """Hard delete the exploration and collection models that are private and
     solely owned by the user.
 
     Args:
-        pending_deletion: PendingDeletionRequest.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to delete the explorations and collections.
     """
     exp_services.delete_explorations(
-        pending_deletion.user_id,
-        pending_deletion.exploration_ids,
+        pending_deletion_request.user_id,
+        pending_deletion_request.exploration_ids,
         force_deletion=True)
     collection_services.delete_collections(
-        pending_deletion.user_id,
-        pending_deletion.collection_ids,
+        pending_deletion_request.user_id,
+        pending_deletion_request.collection_ids,
         force_deletion=True)
 
 
@@ -207,7 +209,7 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     Args:
         activity_ids: list(str). List of activity IDs for which to generate
             new pseudonymous user IDs. The IDs are of activities that were
-            somehow modified by the user that is currently being deleted.
+            modified in some way by the user who is currently being deleted.
 
     Returns:
         dict(str, str). Mapping between the activity IDs and pseudonymous
@@ -239,9 +241,12 @@ def _delete_story_models(pending_deletion_request):
     ).fetch()
     commit_log_ids = set(model.story_id for model in commit_log_models)
     if story_ids != commit_log_ids:
-        logging.warning(
-            'The commit log and snapshot story IDs differ: %s',
-            list(story_ids ^ commit_log_ids))
+        logging.error(
+            'The commit log and snapshot story IDs differ. '
+            'Snapshots without commit logs: %s, '
+            'Commit logs without snapshots: %s.',
+            list(story_ids - commit_log_ids),
+            list(commit_log_ids - story_ids))
 
     story_ids |= commit_log_ids
     if not pending_deletion_request.story_mappings:

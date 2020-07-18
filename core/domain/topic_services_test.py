@@ -65,21 +65,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.save_new_story(
-            self.story_id_1, self.user_id, corresponding_topic_id=self.TOPIC_ID)
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
         self.save_new_story(
             self.story_id_3,
             self.user_id,
+            self.TOPIC_ID,
             title='Title 3',
-            description='Description 3',
-            corresponding_topic_id=self.TOPIC_ID
+            description='Description 3'
         )
         self.save_new_story(
             self.story_id_2,
             self.user_id,
+            self.TOPIC_ID,
             title='Title 2',
-            description='Description 2',
-            corresponding_topic_id=self.TOPIC_ID
+            description='Description 2'
         )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
@@ -532,9 +531,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_story(
             'story_10',
             self.user_id,
+            self.TOPIC_ID,
             title='Title 2',
-            description='Description 2',
-            corresponding_topic_id=self.TOPIC_ID
+            description='Description 2'
         )
         with self.assertRaisesRegexp(
             Exception, 'Story with given id doesn\'t exist in the topic'):
@@ -550,9 +549,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_story(
             'story_id_new',
             self.user_id,
+            self.TOPIC_ID,
             title='Title 2',
-            description='Description 2',
-            corresponding_topic_id=self.TOPIC_ID
+            description='Description 2'
         )
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_new')

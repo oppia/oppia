@@ -56,8 +56,12 @@ class PendingDeletionRequest(python_utils.OBJECT):
         Args:
             user_id: str. The ID of the user who is being deleted.
             email: str. The email of the user who is being deleted.
-            exploration_ids: list(str).
-            collection_ids: list(str).
+            exploration_ids: list(str). Private explorations that are marked as
+                deleted and need to be hard deleted. These are known at the time
+                when user requests deletion so we can set them outright.
+            collection_ids: list(str). Private explorations that are marked as
+                deleted and need to be hard deleted. These are known at the time
+                when user requests deletion so we can set them outright.
 
         Returns:
             PendingDeletionRequest. The default pending deletion request

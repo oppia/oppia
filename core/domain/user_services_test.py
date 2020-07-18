@@ -69,6 +69,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
     def test_is_user_id_correct(self):
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SYSTEM_COMMITTER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertFalse(
             user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))

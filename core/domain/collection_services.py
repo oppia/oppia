@@ -1099,11 +1099,12 @@ def delete_collection_summaries(collection_ids):
     """
     summary_models = (
         collection_models.CollectionSummaryModel.get_multi(collection_ids))
-    summary_models = [
+    existing_summary_models = [
         summary_model for summary_model in summary_models
         if summary_model is not None
     ]
-    collection_models.CollectionSummaryModel.delete_multi(summary_models)
+    collection_models.CollectionSummaryModel.delete_multi(
+        existing_summary_models)
 
 
 def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):

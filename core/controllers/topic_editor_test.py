@@ -104,18 +104,18 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.save_new_story(
             canonical_story_id,
             self.admin_id,
+            topic_id,
             title='title',
             description='description',
-            notes='note',
-            corresponding_topic_id=topic_id
+            notes='note'
         )
         self.save_new_story(
             additional_story_id,
             self.admin_id,
+            topic_id,
             title='another title',
             description='another description',
-            notes='another note',
-            corresponding_topic_id=topic_id
+            notes='another note'
         )
 
         topic_services.publish_story(

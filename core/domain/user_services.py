@@ -304,6 +304,9 @@ def is_user_id_correct(user_id):
     Returns:
         bool. True when the ID is in a correct format, False otherwise.
     """
+    if user_id in feconf.SYSTEM_USERS.keys():
+        return True
+
     return all((
         user_id.islower(),
         user_id.startswith('uid_'),
@@ -1105,7 +1108,7 @@ def update_user_role(user_id, role):
 
 
 def mark_user_for_deletion(user_id):
-    """Set deleted of the user with given user_id to True.
+    """Set the 'deleted' property of the user with given user_id to True.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
