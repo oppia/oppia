@@ -130,16 +130,15 @@ export class UserService{
       return this.http.put<IPreferencesBackendDict>(
         this.PREFERENCES_DATA_URL, putData).toPromise();
     }
-    getLoginUrlAsync(): string/*Promise<string>*/ {
-      // let urlParameters = {
-      //   current_url: this.windowRef.nativeWindow.location.pathname
-      // }
-      return this.windowRef.nativeWindow.location.pathname;
-      // return this.http.get<IUrlBackendDict>('/url_handler', 
-      //   { params: urlParameters }).toPromise().then(
-      //     (backendDict) => {
-      //       return backendDict.login_url;
-      //   });
+    getLoginUrlAsync(): Promise<string> {
+      let urlParameters = {
+        current_url: this.windowRef.nativeWindow.location.pathname
+      }
+      return this.http.get<IUrlBackendDict>('/url_handler', 
+        { params: urlParameters }).toPromise().then(
+          (backendDict) => {
+            return backendDict.login_url;
+        });
     }
     getUserCommunityRightsData(): Promise<IUserCommunityRightsDataBackendDict>{
       if (this.userCommunityRightsInfo) {

@@ -26,6 +26,17 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UrlService } from './contextual/url.service';
 
+class MockWindowRef {
+  _window = {
+    location: {
+      pathname: 'home'
+    }
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
 fdescribe('User Service', () => {
   let userService: UserService = null;
   let urlInterpolationService: UrlInterpolationService = null;
@@ -33,8 +44,10 @@ fdescribe('User Service', () => {
   let urlService: UrlService = null;
   let httpTestingController: HttpTestingController = null;
   let csrfService: CsrfTokenService = null;
+  let windowRef: MockWindowRef = null;
 
   beforeEach(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
@@ -44,7 +57,7 @@ fdescribe('User Service', () => {
     userInfoObjectFactory = TestBed.get(UserInfoObjectFactory);
     urlService = TestBed.get(UrlService);
     csrfService = TestBed.get(CsrfTokenService);
-    //check below
+    
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       () =>{
         return Promise.resolve('sample-csrf-token');
@@ -231,14 +244,14 @@ fdescribe('User Service', () => {
   it('should return the login url', fakeAsync(() => {
     var loginUrl = '/login';
     var currentUrl = 'home';
-    expect(userService.getLoginUrlAsync()).toEqual(currentUrl);
-    // userService.getLoginUrlAsync().then((dataUrl) => {
-    //   expect(dataUrl).toBe(loginUrl);
-    // });
-    // var req = httpTestingController.expectOne(
-    //   '/url_handler?current_url=' + currentUrl);
-    // expect(req.request.method).toEqual('GET');
-    // req.flush({login_url: loginUrl});
+    
+    userService.getLoginUrlAsync().then((dataUrl) => {
+      expect(dataUrl).toBe(loginUrl);
+    });
+    var req = httpTestingController.expectOne(
+      '/url_handler?current_url=' + currentUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({login_url: loginUrl});
 
     flushMicrotasks();
   }));
