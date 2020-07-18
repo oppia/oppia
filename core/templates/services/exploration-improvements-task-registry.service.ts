@@ -137,7 +137,7 @@ class StateTasks implements Iterable<ExplorationTask> {
     yield this.siaTask;
   }
 
-  map<U>(fn: <T extends ExplorationTask>(t: T) => U): U[] {
+  map<U>(fn: <T extends ExplorationTask>(_: T) => U): U[] {
     return [
       fn(this.hbrTask),
       fn(this.iflTask),

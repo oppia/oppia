@@ -70,6 +70,14 @@ export class ExplorationStats {
     return this.stateStatsMapping.get(stateName);
   }
 
+  /**
+   * Constructs a new copy of the exploration stats, but with a zero-stats entry
+   * for the given state name.
+   *
+   * This method allows instances of ExplorationStats to remain immutable, while
+   * providing users with an interface for reflecting changes made to an
+   * exploration.
+   */
   createNewWithStateAdded(newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     newStateStatsMapping.set(newStateName, new StateStats(0, 0, 0, 0, 0, 0));
@@ -78,6 +86,14 @@ export class ExplorationStats {
       this.numCompletions, newStateStatsMapping);
   }
 
+  /**
+   * Constructs a new copy of the exploration stats, but with the given state
+   * name removed.
+   *
+   * This method allows instances of ExplorationStats to remain immutable, while
+   * providing users with an interface for reflecting changes made to an
+   * exploration.
+   */
   createNewWithStateDeleted(oldStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     // ES2016 Map uses delete as a method name despite it being a reserved word.
@@ -88,6 +104,14 @@ export class ExplorationStats {
       this.numCompletions, newStateStatsMapping);
   }
 
+  /**
+   * Constructs a new copy of the exploration stats, but with the given state's
+   * name changed.
+   *
+   * This method allows instances of ExplorationStats to remain immutable, while
+   * providing users with an interface for reflecting changes made to an
+   * exploration.
+   */
   createNewWithStateRenamed(
       oldStateName: string, newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);

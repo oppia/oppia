@@ -107,6 +107,8 @@ describe('Exploration task object factory', () => {
     expect(
       () => expTaskObjectFactory.createFromBackendDict(
         this.newTaskEntryBackendDict('unknown_task_type'))
-    ).toThrowError(/unsupported task type: .*"task_type":"unknown_task_type"/);
+    ).toThrowError(new RegExp(
+      'Unsupported task type "unknown_task_type" for backend dict: ' +
+      '{.*"task_type":"unknown_task_type".*}'));
   });
 });

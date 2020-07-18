@@ -105,6 +105,7 @@ export class ExplorationTaskObjectFactory {
 
   createFromBackendDict(
       backendDict: ExplorationTaskBackendDict): ExplorationTask {
+    const taskType = backendDict.task_type;
     switch (backendDict.task_type) {
       case 'high_bounce_rate':
         return this.hbrTaskObjectFactory.createFromBackendDict(backendDict);
@@ -117,7 +118,8 @@ export class ExplorationTaskObjectFactory {
       default: {
         const invalidBackendDict: never = backendDict;
         throw new Error(
-          'unsupported task type: ' + JSON.stringify(invalidBackendDict));
+          `Unsupported task type "${taskType}" for backend dict: ` +
+          JSON.stringify(invalidBackendDict));
       }
     }
   }
