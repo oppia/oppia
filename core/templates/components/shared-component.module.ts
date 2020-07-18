@@ -55,7 +55,7 @@ import { TopicSummaryTileComponent } from
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    SchemaBasedExpressionEditorComponent, SchemaBasedExpressionEditorComponent,
+    SchemaBasedBoolEditorComponent, SchemaBasedExpressionEditorComponent,
     TopicSummaryTileComponent, ExplorationSummaryTileDirective],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
