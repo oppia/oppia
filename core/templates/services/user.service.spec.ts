@@ -187,34 +187,36 @@ fdescribe('User Service', () => {
       user_is_logged_in: true
     };
 
-    // userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-    //   expect(dataUrl).toBe('image data');
-    // });
+    userService.getProfileImageDataUrlAsync().then((dataUrl) => {
+      //expect(dataUrl).toBe('image data');
+      expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
+        '/avatar/user_blue_72px.webp'));      
+    });
 
-    // var req = httpTestingController.expectOne('/userinfohandler');
-    // expect(req.request.method).toEqual('GET');
-    // req.flush(sampleUserInfoBackendObject);
+    var req = httpTestingController.expectOne('/userinfohandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfoBackendObject);
 
     // req = httpTestingController.expectOne(requestUrl);
     // expect(req.request.method).toEqual('GET');
     // req.flush({profile_picture_data_url: 'image data'});
     
-    // flushMicrotasks();
-
-    userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-      expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));
-    });
-    
-    var req = httpTestingController.expectOne('/userinfohandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleUserInfoBackendObject);
-    
-    req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(404);
-    
     flushMicrotasks();
+
+    // userService.getProfileImageDataUrlAsync().then((dataUrl) => {
+    //   expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
+    //     '/avatar/user_blue_72px.webp'));
+    // });
+    
+    // var req = httpTestingController.expectOne('/userinfohandler');
+    // expect(req.request.method).toEqual('GET');
+    // req.flush(sampleUserInfoBackendObject);
+    
+    // req = httpTestingController.expectOne(requestUrl);
+    // expect(req.request.method).toEqual('GET');
+    // req.flush(404);
+    
+    // flushMicrotasks();
   }));
 
   it('should return the default profile image path when user is not logged',
