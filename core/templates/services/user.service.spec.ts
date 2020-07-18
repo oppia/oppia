@@ -193,30 +193,30 @@ fdescribe('User Service', () => {
         '/avatar/user_blue_72px.webp'));      
     });
 
-    var req = httpTestingController.expectOne('/userinfohandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleUserInfoBackendObject);
+    var req1 = httpTestingController.expectOne('/userinfohandler');
+    expect(req1.request.method).toEqual('GET');
+    req1.flush(sampleUserInfoBackendObject);
 
-    // req = httpTestingController.expectOne(requestUrl);
-    // expect(req.request.method).toEqual('GET');
-    // req.flush({profile_picture_data_url: 'image data'});
+    var req2 = httpTestingController.expectOne(requestUrl);
+    expect(req2.request.method).toEqual('GET');
+    req2.flush({profile_picture_data_url: 'image data'});
     
     flushMicrotasks();
 
-    // userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-    //   expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-    //     '/avatar/user_blue_72px.webp'));
-    // });
+    userService.getProfileImageDataUrlAsync().then((dataUrl) => {
+      expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
+        '/avatar/user_blue_72px.webp'));
+    });
     
-    // var req = httpTestingController.expectOne('/userinfohandler');
-    // expect(req.request.method).toEqual('GET');
-    // req.flush(sampleUserInfoBackendObject);
+    var req3 = httpTestingController.expectOne('/userinfohandler');
+    expect(req3.request.method).toEqual('GET');
+    req3.flush(sampleUserInfoBackendObject);
     
-    // req = httpTestingController.expectOne(requestUrl);
-    // expect(req.request.method).toEqual('GET');
-    // req.flush(404);
+    var req4 = httpTestingController.expectOne(requestUrl);
+    expect(req4.request.method).toEqual('GET');
+    req4.flush(404);
     
-    // flushMicrotasks();
+    flushMicrotasks();
   }));
 
   it('should return the default profile image path when user is not logged',
