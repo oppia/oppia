@@ -2197,35 +2197,3 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-
-class ExplorationDraftChangesMathRichTextInfoModelTests(
-        test_utils.GenericTestBase):
-    """Tests the ExplorationDraftChangesMathRichTextInfoModel class."""
-
-    def setUp(self):
-        super(ExplorationDraftChangesMathRichTextInfoModelTests, self).setUp()
-        user_models.ExplorationDraftChangesMathRichTextInfoModel(
-            id='user_id.exp_id',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=1000).put()
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.
-            get_deletion_policy(), base_models.DELETION_POLICY.DELETE)
-
-    def test_get_export_policy(self):
-        self.assertEqual(
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.
-            get_export_policy(), base_models.EXPORT_POLICY.NOT_APPLICABLE)
-
-    def test_get_count_of_draft_changes_with_math_rich_text(self):
-        self.assertEqual(
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.
-            get_count_of_draft_changes_with_math_rich_text(), 1)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            user_models.ExplorationDraftChangesMathRichTextInfoModel
-            .has_reference_to_user_id('any_id'))

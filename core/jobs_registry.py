@@ -87,7 +87,6 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.DraftChangesMathRichTextInfoModelGenerationOneOffJob,
-    user_jobs_one_off.DraftChangesMathRichTextInfoModelDeletionOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,

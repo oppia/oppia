@@ -261,9 +261,9 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     # raw_latex value.
     estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
         indexed=True, required=True)
-    # Set of latex values from all the math-rich text components of the
-    # exploration.
-    latex_values = ndb.StringProperty(repeated=True)
+    # Set of latex values without an SVG saved from all the math-rich text
+    # components of the exploration.
+    latex_values_without_svgs = ndb.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():

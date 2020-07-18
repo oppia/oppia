@@ -321,14 +321,15 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
     text components in an exploration's HTML.
     """
 
-    def __init__(self, latex_values):
+    def __init__(self, latex_values_without_svgs):
         """Initializes an ExplorationMathRichTextInfo domain object.
 
         Args:
-            latex_values: list(str). list of unique latex values.
+            latex_values_without_svgs: list(str). list of unique latex values.
         """
-        self.latex_values = latex_values
+        self.latex_values_without_svgs = latex_values_without_svgs
         self.validate()
+        self.approx_size_of_math_svgs_bytes = self.get_svg_size_in_bytes()
 
     def to_dict(self):
         """Returns a dict representing this ExplorationMathRichTextInfo domain
@@ -339,7 +340,9 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             instance.
         """
         return {
-            'latex_values': self.latex_values,
+            'latex_values_without_svgs': self.latex_values_without_svgs,
+            'approx_size_of_math_svgs_bytes': (
+                self.approx_size_of_math_svgs_bytes)
         }
 
     def validate(self):
@@ -349,13 +352,15 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             ValidationError: attributes of the ExplorationMathRichTextInfo
                 are invalid.
         """
-        if not isinstance(self.latex_values, list):
-            raise utils.ValidationError('Expected latex_values to be a list')
-        for latex_value in self.latex_values:
+        if not isinstance(self.latex_values_without_svgs, list):
+            raise utils.ValidationError(
+                'Expected latex_values to be a list, received %s' % (
+                    self.latex_values))
+        for latex_value in self.latex_values_without_svgs:
             if not isinstance(latex_value, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each element in the list of latex values to be'
-                    ' a str')
+                    ' a str, received %s' % latex_value)
 
     def get_svg_size_in_bytes(self):
         """Returns the approximate size of SVG images for the latex values in
@@ -372,7 +377,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         # be lesser than 3000 bytes. So the below approximation to find the
         # size will give us the maximum size.
         size_in_bytes = 0
-        for latex_value in self.latex_values:
+        for latex_value in self.latex_values_without_svgs:
             # The characters in special Latex keywords like 'frac' and 'sqrt'
             #  don't add up to the total size of SVG.
             length_of_expression = (
@@ -389,7 +394,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         Returns:
             str. The largest latex value.
         """
-        return max(self.latex_values, key=len)
+        return max(self.latex_values_without_svgs, key=len)
 
 
 class ExplorationVersionsDiff(python_utils.OBJECT):

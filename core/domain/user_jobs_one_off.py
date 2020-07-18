@@ -371,6 +371,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
     information required for generating math rich text component SVG images.
     """
 
+    _SUCCESS_KEY = 'found_draft_changes_with_math_tags'
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.ExplorationUserDataModel]
@@ -407,22 +408,9 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
                     extract_latex_values_from_math_rich_text_without_filename(
                         html_string))
                 if len(latex_values) > 0:
-                    math_rich_text_info = (
-                        exp_domain.ExplorationMathRichTextInfo(
-                            latex_values))
-                    approx_size_of_math_svgs_bytes = (
-                        math_rich_text_info.get_svg_size_in_bytes())
-                    longest_raw_latex_string = (
-                        math_rich_text_info.get_largest_latex_value())
                     yield (
-                        'Found draft changes with math-tags', {
-                            'draft_change_id': item.id,
-                            'approx_size_of_math_svgs_bytes': (
-                                approx_size_of_math_svgs_bytes),
-                            'longest_raw_latex_string': (
-                                longest_raw_latex_string),
-                            'latex_values': latex_values
-                        })
+                        DraftChangesMathRichTextInfoModelGenerationOneOffJob.
+                        _SUCCESS_KEY, item.id)
 
             except Exception as e:
                 logging.error(
@@ -436,56 +424,12 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
     @staticmethod
     def reduce(key, values):
         if key == 'Found draft changes with math-tags':
-            final_values = [ast.literal_eval(value) for value in values]
-            longest_raw_latex_string = ''
-            number_of_drafts_having_math = 0
-            exploration_draft_math_rich_text_info_models = []
-            for value in final_values:
-                exploration_draft_math_rich_text_info_models.append(
-                    user_models.ExplorationDraftChangesMathRichTextInfoModel(
-                        id=value['draft_change_id'],
-                        math_images_generation_required=True,
-                        latex_values=value['latex_values'],
-                        estimated_max_size_of_images_in_bytes=int(
-                            value['approx_size_of_math_svgs_bytes'])))
-                number_of_drafts_having_math += 1
-                longest_raw_latex_string = (
-                    max(
-                        value['longest_raw_latex_string'],
-                        longest_raw_latex_string, key=len))
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.put_multi(
-                exploration_draft_math_rich_text_info_models)
-            final_value_dict = {
-                'longest_raw_latex_string': longest_raw_latex_string,
-                'number_of_drafts_having_math': (
-                    number_of_drafts_having_math)
-            }
-            yield (key, final_value_dict)
+            yield (
+                ('found %d draft changes with math-tags having no SVG') % (len(
+                    values)),
+                values)
         else:
             yield (key, values)
-
-
-class DraftChangesMathRichTextInfoModelDeletionOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes all instances of the DraftChangesMathRichTextInfoModel
-    from the datastore.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.ExplorationDraftChangesMathRichTextInfoModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()
-        yield ('model_deleted', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        no_of_models_deleted = (
-            sum(ast.literal_eval(v) for v in values))
-        yield (key, ['%d models successfully delelted.' % (
-            no_of_models_deleted)])
 
 
 class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(

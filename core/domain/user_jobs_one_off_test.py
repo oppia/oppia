@@ -1208,8 +1208,11 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
         exploration2 = exp_domain.Exploration.create_default_exploration(
             'exp_id2')
         exp_services.save_new_exploration(self.owner_id, exploration2)
+        exploration3 = exp_domain.Exploration.create_default_exploration(
+            'exp_id3')
+        exp_services.save_new_exploration(self.owner_id, exploration3)
 
-        change_list_with_math_tags = [exp_domain.ExplorationChange({
+        change_list_with_math_tags1 = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'State1',
             'property_name': 'widget_customization_args',
@@ -1234,6 +1237,20 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
                 }
             }
         }).to_dict()]
+        change_list_with_math_tags2 = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Intro',
+            'property_name': 'content',
+            'new_value': {
+                'content_id': 'content',
+                'html': ('<p>Value</p><oppia-noninteractive-math math_content-'
+                         'with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot'
+                         ';+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                         ': &amp;quot;&amp;quot;}"></oppia-noninteractive-mat'
+                         'h>')
+            }
+        }).to_dict()]
+
         change_list_without_math_tags = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'State1',
@@ -1259,7 +1276,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
             exploration_id='exp_id',
-            draft_change_list=change_list_with_math_tags,
+            draft_change_list=change_list_with_math_tags1,
             draft_change_list_last_updated=self.DATETIME,
             draft_change_list_exp_version=1,
             draft_change_list_id=1).put()
@@ -1267,6 +1284,14 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.owner_id, 'exp_id2'), user_id=self.owner_id,
             exploration_id='exp_id2',
+            draft_change_list=change_list_with_math_tags2,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1).put()
+
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, 'exp_id3'), user_id=self.owner_id,
+            exploration_id='exp_id3',
             draft_change_list=change_list_without_math_tags,
             draft_change_list_last_updated=self.DATETIME,
             draft_change_list_exp_version=1,
@@ -1283,24 +1308,12 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)
-        self.assertEqual(
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.
-            get_count_of_draft_changes_with_math_rich_text(), 1)
         actual_output_list = ast.literal_eval(actual_output[0])
+        expected_value_list = [
+            ('%s.%s' % (self.owner_id, 'exp_id')),
+            ('%s.%s' % (self.owner_id, 'exp_id2'))]
         self.assertEqual(
-            actual_output_list[1]['longest_raw_latex_string'],
-            '+,-,-,+')
-        self.assertEqual(
-            actual_output_list[1]['number_of_drafts_having_math'], 1)
-        exp1_math_image_model = (
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.get_by_id(
-                '%s.%s' % (self.owner_id, 'exp_id')))
-        self.assertEqual(
-            exp1_math_image_model.estimated_max_size_of_images_in_bytes, 7000)
-        expected_latex_values_1 = ['+,-,-,+']
-        self.assertEqual(
-            sorted(exp1_math_image_model.latex_values),
-            sorted(expected_latex_values_1))
+            sorted(expected_value_list), sorted(actual_output_list[1]))
 
     def test_draft_changes_having_math_with_version_less_than_exploration(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -1357,25 +1370,10 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)
-        self.assertEqual(
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.
-            get_count_of_draft_changes_with_math_rich_text(), 1)
         actual_output_list = ast.literal_eval(actual_output[0])
-        self.assertEqual(
-            actual_output_list[1]['longest_raw_latex_string'],
-            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)')
-        self.assertEqual(
-            actual_output_list[1]['number_of_drafts_having_math'], 1)
-        exp1_math_image_model = (
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.get_by_id(
-                '%s.%s' % (self.owner_id, 'exp_id')))
-        self.assertEqual(
-            exp1_math_image_model.estimated_max_size_of_images_in_bytes, 31000)
-        expected_latex_values_1 = ['(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
-        self.assertEqual(
-            sorted(exp1_math_image_model.latex_values),
-            sorted(expected_latex_values_1))
-
+        expected_value_list = [
+            ('%s.%s' % (self.owner_id, 'exp_id'))]
+        self.assertEqual(expected_value_list, actual_output_list[1])
 
     def test_draft_changes_failing_updation_to_exploration_version(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -1572,52 +1570,6 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
              ': u\'value\'"]]'])
         self.assertEqual(actual_output, expected_output)
 
-
-class DraftChangesMathRichTextInfoModelDeletionOneOffJobTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(
-            DraftChangesMathRichTextInfoModelDeletionOneOffJobTests,
-            self).setUp()
-        user_models.ExplorationDraftChangesMathRichTextInfoModel(
-            id='user_id.exp_id',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=1000).put()
-        user_models.ExplorationDraftChangesMathRichTextInfoModel(
-            id='user_id1.exp_id1',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=2000).put()
-        user_models.ExplorationDraftChangesMathRichTextInfoModel(
-            id='user_id2.exp_id2',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=3000).put()
-
-    def test_that_all_the_models_are_deleted(self):
-
-        no_of_models_before_job_is_run = (
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.
-            get_count_of_draft_changes_with_math_rich_text())
-        self.assertEqual(no_of_models_before_job_is_run, 3)
-
-        job = (
-            user_jobs_one_off.
-            DraftChangesMathRichTextInfoModelDeletionOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        no_of_models_after_job_is_run = (
-            user_models.ExplorationDraftChangesMathRichTextInfoModel.
-            get_count_of_draft_changes_with_math_rich_text())
-        self.assertEqual(no_of_models_after_job_is_run, 0)
-
-        expected_output = (
-            [u'[u\'model_deleted\', [u\'3 models successfully delelted.\']]'])
-        self.assertEqual(actual_output, expected_output)
 
 
 class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):

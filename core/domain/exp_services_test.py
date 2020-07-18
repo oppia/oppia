@@ -1000,6 +1000,47 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_fetchers.get_multiple_explorations_by_version('exp_id_1', [1])
 
 
+    def test_save_multi_exploration_math_rich_text_info_model(self):
+        multiple_explorations_math_rich_text_info = []
+
+        math_rich_text_info1 = (
+            exp_domain.ExplorationMathRichTextInfo(['abc1', 'xyz1']))
+        multiple_explorations_math_rich_text_info.append(
+            (math_rich_text_info1, 'exp_id1'))
+        math_rich_text_info2 = (
+            exp_domain.ExplorationMathRichTextInfo(['abc2', 'xyz2']))
+        multiple_explorations_math_rich_text_info.append(
+            (math_rich_text_info2, 'exp_id2'))
+        math_rich_text_info3 = (
+            exp_domain.ExplorationMathRichTextInfo(['abc3', 'xyz3']))
+        multiple_explorations_math_rich_text_info.append(
+            (math_rich_text_info3, 'exp_id3'))
+
+        exp_services.save_multi_exploration_math_rich_text_info_model(
+            multiple_explorations_math_rich_text_info)
+
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 3)
+
+        exp1_math_image_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
+        self.assertEqual(
+            sorted(exp1_math_image_model.latex_values_without_svgs),
+            sorted(['abc1', 'xyz1']))
+
+        exp2_math_image_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id2'))
+        self.assertEqual(
+            sorted(exp2_math_image_model.latex_values_without_svgs),
+            sorted(['abc2', 'xyz2']))
+
+        exp3_math_image_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id3'))
+        self.assertEqual(
+            sorted(exp3_math_image_model.latex_values_without_svgs),
+            sorted(['abc3', 'xyz3']))
+
+
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):

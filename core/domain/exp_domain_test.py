@@ -8381,8 +8381,24 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exploration_math_rich_text_info.to_dict(), {
-                'latex_values': ['abc', 'x']
+                'latex_values': ['abc', 'x'],
+                'approx_size_of_math_svgs_bytes': 4000
             })
+
+    def test_validate_when_latex_values_not_list(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected latex_values to be a list, received '
+            'invalid_latex_format'):
+            exp_domain.ExplorationMathRichTextInfo('invalid_latex_format')
+
+    def test_validate_when_each_latex_values_are_string(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected each element in the list of latex values to be a str, '
+            'received 3'):
+            exp_domain.ExplorationMathRichTextInfo(['x^2', 3])
+
 
     def test_get_svg_size_in_bytes(self):
         exploration_math_rich_text_info = (

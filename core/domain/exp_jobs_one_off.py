@@ -535,6 +535,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
     generating math rich text component SVG images.
     """
 
+    _SUCCESS_KEY = 'exploration-with-math-tags'
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -556,68 +557,61 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
             return
-        longest_raw_latex_string = ''
         html_strings_in_exploration = ''
         for state in exploration.states.values():
             html_strings_in_exploration += (
                 ''.join(state.get_all_html_content_strings()))
-        list_of_latex_values = (
+        list_of_latex_values_without_svgs = (
             html_validation_service.
             extract_latex_values_from_math_rich_text_without_filename(
                 html_strings_in_exploration))
-        if len(list_of_latex_values) > 0:
-            math_rich_text_info = (
-                exp_domain.ExplorationMathRichTextInfo(list_of_latex_values))
-            approx_size_of_math_svgs_bytes = (
-                math_rich_text_info.get_svg_size_in_bytes())
-            longest_raw_latex_string = (
-                math_rich_text_info.get_largest_latex_value())
+        if len(list_of_latex_values_without_svgs) > 0:
             yield (
-                'Found exploration with math-tags', {
-                    'exploration_id': item.id,
-                    'approx_size_of_math_svgs_bytes': (
-                        approx_size_of_math_svgs_bytes),
-                    'longest_raw_latex_string': longest_raw_latex_string,
-                    'latex_values': list_of_latex_values
-                })
+                ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                _SUCCESS_KEY,
+                (item.id, list_of_latex_values_without_svgs))
 
     @staticmethod
     def reduce(key, values):
-        if key == 'Found exploration with math-tags':
+        if key == (
+                ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                _SUCCESS_KEY):
             final_values = [ast.literal_eval(value) for value in values]
-            number_of_explorations_having_math = 0
-            longest_raw_latex_string = ''
             estimated_no_of_batches = 1
             approx_size_of_math_svgs_bytes_in_a_batch = 0
-            exploration_math_rich_text_info_models = []
+            multiple_explorations_math_rich_text_info = []
+            longest_raw_latex_string = ''
             total_number_of_svgs_required = 0
             for value in final_values:
-                exploration_math_rich_text_info_models.append(
-                    exp_models.ExplorationMathRichTextInfoModel(
-                        id=value['exploration_id'],
-                        math_images_generation_required=True,
-                        latex_values=value['latex_values'],
-                        estimated_max_size_of_images_in_bytes=int(
-                            value['approx_size_of_math_svgs_bytes'])))
-                total_number_of_svgs_required += len(value['latex_values'])
-                number_of_explorations_having_math += 1
+                math_rich_text_info = (
+                    exp_domain.ExplorationMathRichTextInfo(value[1]))
+                multiple_explorations_math_rich_text_info.append(
+                    (math_rich_text_info, value[0]))
+
+                approx_size_of_math_svgs_bytes = (
+                    math_rich_text_info.get_svg_size_in_bytes())
+                longest_raw_latex_string_in_exploration = (
+                    math_rich_text_info.get_largest_latex_value())
+                total_number_of_svgs_required += len(value[1])
                 longest_raw_latex_string = (
                     max(
-                        value['longest_raw_latex_string'],
+                        longest_raw_latex_string_in_exploration,
                         longest_raw_latex_string, key=len))
                 approx_size_of_math_svgs_bytes_in_a_batch += (
-                    int(value['approx_size_of_math_svgs_bytes']))
+                    int(approx_size_of_math_svgs_bytes))
                 if (approx_size_of_math_svgs_bytes_in_a_batch >
                         feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
                     approx_size_of_math_svgs_bytes_in_a_batch = 0
                     estimated_no_of_batches += 1
-            exp_models.ExplorationMathRichTextInfoModel.put_multi(
-                exploration_math_rich_text_info_models)
+
+            exp_services.save_multi_exploration_math_rich_text_info_model(
+                multiple_explorations_math_rich_text_info)
+
             final_value_dict = {
                 'estimated_no_of_batches': estimated_no_of_batches,
                 'longest_raw_latex_string': longest_raw_latex_string,
                 'number_of_explorations_having_math': (
-                    number_of_explorations_having_math),
+                    len(final_values)),
                 'total_number_of_svgs_required': total_number_of_svgs_required
             }
             yield (key, final_value_dict)

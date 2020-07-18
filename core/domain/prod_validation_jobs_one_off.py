@@ -3062,7 +3062,7 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
             approx_size_of_math_svgs_bytes = (
                 math_rich_text_info.get_svg_size_in_bytes())
 
-            if list_of_latex_values != item.latex_values:
+            if list_of_latex_values != item.latex_values_without_svgs:
                 cls._add_error(
                     'latex values check',
                     'Entity id %s: Latex values in the model does not match '
