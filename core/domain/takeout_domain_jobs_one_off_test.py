@@ -16,12 +16,15 @@
 
 """Tests for TakeoutDomain-related one-off jobs"""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.domain import takeout_domain_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 
-from google.appengine.ext import ndb
 import google.appengine.api.datastore_errors
+from google.appengine.ext import ndb
 
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
@@ -55,7 +58,7 @@ class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
         index_swap = self.swap(
             base_models.BaseSnapshotMetadataModel, 'commit_message',
             commit_message_swapped)
-        
+
         with index_swap:
             model_class = config_models.ConfigPropertySnapshotMetadataModel
             model_class(
@@ -63,10 +66,10 @@ class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
                 commit_type='create', commit_message='test1').put()
 
             # Ensure the model is created.
-            models = model_class.query(
+            config_models = model_class.query(
                 model_class.committer_id == 'committer_id'
             ).fetch()
-            self.assertEqual(len(models), 1)
+            self.assertEqual(len(config_models), 1)
 
             # Try a query on the unindexed field and observe failure.
             with self.assertRaisesRegexp(
@@ -83,15 +86,15 @@ class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
             commit_message='test1').put()
 
         # Ensure the model is created.
-        models = model_class.query(
+        config_models = model_class.query(
             model_class.committer_id == 'committer_id'
         ).fetch()
-        self.assertEqual(len(models), 1)
+        self.assertEqual(len(config_models), 1)
 
         self._run_one_off_job()
 
         # Ensure valid querying on commit_message.
-        models = model_class.query(
+        config_models = model_class.query(
             model_class.commit_message == 'test1').fetch()
-        self.assertEqual(len(models), 1)
-        self.assertEqual(models[0].id, 'model_id-1')
+        self.assertEqual(len(config_models), 1)
+        self.assertEqual(config_models[0].id, 'model_id-1')
