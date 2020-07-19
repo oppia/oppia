@@ -2993,7 +2993,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             sorted(exp3_math_image_model.latex_values_without_svgs),
             sorted(expected_latex_values_1))
         self.assertEqual(
-            exp_models.ExplorationMathRichTextInfoModel.get_all().count() , 3)
+            exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 3)
 
     def test_one_off_job_fails_with_invalid_exploration(self):
         """Test the audit job fails when there is an invalid exploration."""
