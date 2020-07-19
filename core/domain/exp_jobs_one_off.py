@@ -593,14 +593,12 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
 
                 approx_size_of_math_svgs_bytes = (
                     math_rich_text_info.get_svg_size_in_bytes())
-                longest_raw_latex_string_in_exploration = (
-                    math_rich_text_info.get_longest_latex_value())
                 total_number_of_svgs_required += (
                     len(
                         list_of_latex_values_without_svg))
                 longest_raw_latex_string = (
                     max(
-                        longest_raw_latex_string_in_exploration,
+                        math_rich_text_info.get_longest_latex_value(),
                         longest_raw_latex_string, key=len))
                 approx_size_of_math_svgs_bytes_in_a_batch += (
                     int(approx_size_of_math_svgs_bytes))
