@@ -41,7 +41,7 @@ class SnapshotMetadataCommitMsgOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(SnapshotMetadataCommitMsgOneOffJob, cls).enqueue(
-			         job_id, shard_count=64)
+                     job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):

@@ -98,4 +98,4 @@ class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
         queried_models = model_class.query(
             model_class.commit_message == 'test1').fetch()
         self.assertEqual(len(queried_models), 1)
-        self.assertEqual(queries_models[0].id, 'model_id-1')
+        self.assertEqual(queried_models[0].id, 'model_id-1')
