@@ -1135,10 +1135,12 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_update_on_unpublished_explorations(
             self):
@@ -1164,8 +1166,9 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
-        self.assertIsNone(user_services.get_user_settings(
-            self.owner_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.owner_id).first_contribution_msec)
 
     def test_contribution_msec_is_not_generated_if_exploration_not_created(
             self):
@@ -1181,8 +1184,9 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        self.assertIsNone(user_services.get_user_settings(
-            self.owner_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.owner_id).first_contribution_msec)
 
 
 class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
@@ -1367,10 +1371,12 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
                 self.owner_id, 'deleted exploration')
 
         self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
+            len(
+                user_models.UserSubscriptionsModel.get(self.owner_id)
                 .activity_ids), 3)
         self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
+            len(
+                user_models.UserSubscriptionsModel.get(self.user_id)
                 .activity_ids), 3)
 
         job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
@@ -1382,10 +1388,12 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
+            len(
+                user_models.UserSubscriptionsModel.get(self.owner_id)
                 .activity_ids), 0)
         self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
+            len(
+                user_models.UserSubscriptionsModel.get(self.user_id)
                 .activity_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [

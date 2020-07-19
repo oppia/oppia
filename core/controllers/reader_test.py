@@ -321,8 +321,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             json_response_1 = self.get_json(
                 '%s/%s?story_id=%s' % (
                     feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
-        self.assertTrue(json_response_1['pretest_question_dicts'][0]['id'] in
-                        [question_id, question_id_2])
+        self.assertTrue(
+            json_response_1['pretest_question_dicts'][0]['id'] in
+            [question_id, question_id_2])
 
         self.get_json(
             '%s/%s?story_id=%s' % (
@@ -434,8 +435,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
                 feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME),
             skill_ids_for_url, 'true')
         json_response = self.get_json(url)
-        self.assertEqual(len(json_response['question_dicts']),
-                         feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+        self.assertEqual(
+            len(json_response['question_dicts']),
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
@@ -1269,8 +1271,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
             payload, csrf_token=csrf_token)
-        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0])
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
@@ -1279,8 +1282,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
             payload, csrf_token=csrf_token)
-        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0])
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
@@ -1314,8 +1318,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
-        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_1_0])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_1_0])
 
         # Now we test the case when the collection is completed.
         self.post_json(
@@ -1813,13 +1818,15 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler(self):
         """Test the handler for handling batched events."""
-        self.post_json('/explorehandler/stats_events/%s' % (
-            self.exp_id), {
-                'aggregated_stats': self.aggregated_stats,
-                'exp_version': self.exp_version})
+        self.post_json(
+            '/explorehandler/stats_events/%s' % (
+                self.exp_id), {
+                    'aggregated_stats': self.aggregated_stats,
+                    'exp_version': self.exp_version})
 
-        self.assertEqual(self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_STATS), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_STATS), 1)
         self.process_and_flush_pending_tasks()
 
         # Check that the models are updated.
@@ -1859,10 +1866,11 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.aggregated_stats.pop('num_starts')
 
         with self.swap(logging, 'error', _mock_logging_function):
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+            self.post_json(
+                '/explorehandler/stats_events/%s' % (
+                    self.exp_id), {
+                        'aggregated_stats': self.aggregated_stats,
+                        'exp_version': self.exp_version})
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertIn(
@@ -1882,10 +1890,11 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             'total_hit_count')
 
         with self.swap(logging, 'error', _mock_logging_function):
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+            self.post_json(
+                '/explorehandler/stats_events/%s' % (
+                    self.exp_id), {
+                        'aggregated_stats': self.aggregated_stats,
+                        'exp_version': self.exp_version})
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertIn(

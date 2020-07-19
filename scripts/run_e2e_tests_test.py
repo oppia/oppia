@@ -213,8 +213,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ('.*%s.*' % re.escape(webdriver_download_path),)
         ]
         expected_pattern = process_pattern[:]
-        expected_pattern[1] = ('.*%s.*' % re.escape(
-            os.path.abspath(webdriver_download_path)),)
+        expected_pattern[1] = (
+            '.*%s.*' % re.escape(
+                os.path.abspath(webdriver_download_path)),)
         def mock_kill_process_based_on_regex(unused_regex):
             return
 
@@ -634,10 +635,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver)
 
         expected_commands = [
-            (['update', '--versions.chrome',
-              CHROME_DRIVER_VERSION],),
-            (['start', '--versions.chrome',
-              CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
+            ([
+                'update', '--versions.chrome',
+                CHROME_DRIVER_VERSION],),
+            ([
+                'start', '--versions.chrome',
+                CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
         ]
 
         run_swap = self.swap_with_checks(
@@ -1153,22 +1156,24 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                         CHROME_DRIVER_VERSION])
 
     def test_update_community_dashboard_status_with_dashboard_enabled(self):
-        swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
-            run_e2e_tests.FECONF_FILE_PATH,
-            'COMMUNITY_DASHBOARD_ENABLED = .*',
-            'COMMUNITY_DASHBOARD_ENABLED = True'
-        )])
+        swap_inplace_replace = self.inplace_replace_swap(
+            expected_args=[(
+                run_e2e_tests.FECONF_FILE_PATH,
+                'COMMUNITY_DASHBOARD_ENABLED = .*',
+                'COMMUNITY_DASHBOARD_ENABLED = True'
+            )])
 
         with swap_inplace_replace:
             run_e2e_tests.update_community_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, True)
 
     def test_update_community_dashboard_status_with_dashboard_disabled(self):
-        swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
-            run_e2e_tests.FECONF_FILE_PATH,
-            'COMMUNITY_DASHBOARD_ENABLED = .*',
-            'COMMUNITY_DASHBOARD_ENABLED = False'
-        )])
+        swap_inplace_replace = self.inplace_replace_swap(
+            expected_args=[(
+                run_e2e_tests.FECONF_FILE_PATH,
+                'COMMUNITY_DASHBOARD_ENABLED = .*',
+                'COMMUNITY_DASHBOARD_ENABLED = False'
+            )])
         with swap_inplace_replace:
             run_e2e_tests.update_community_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, False)

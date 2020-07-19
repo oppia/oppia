@@ -302,8 +302,9 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             len(library_groups[0]['activity_summary_dicts']), 1)
         actual_exploration_summary_dict = (
             library_groups[0]['activity_summary_dicts'][0])
-        self.assertDictContainsSubset(expected_exploration_summary_dict, (
-            actual_exploration_summary_dict))
+        self.assertDictContainsSubset(
+            expected_exploration_summary_dict, (
+                actual_exploration_summary_dict))
 
 
 class FeaturedExplorationDisplayableSummariesTest(
@@ -955,8 +956,9 @@ class CollectionNodeMetadataDictsTest(
             self.EXP_ID4])
 
     def test_get_exploration_metadata_dicts(self):
-        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert))
+        metadata_dicts = (
+            summary_services.get_exploration_metadata_dicts(
+                [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID1,
@@ -974,14 +976,16 @@ class CollectionNodeMetadataDictsTest(
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_get_exploration_metadata_dicts_with_invalid_exploration_id(self):
-        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            ['invalid_exp_id'], self.albert))
+        metadata_dicts = (
+            summary_services.get_exploration_metadata_dicts(
+                ['invalid_exp_id'], self.albert))
 
         self.assertEqual(metadata_dicts, [])
 
     def test_private_exps_of_another_user_are_not_returned(self):
-        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID5, self.EXP_ID4], self.bob))
+        metadata_dicts = (
+            summary_services.get_exploration_metadata_dicts(
+                [self.EXP_ID5, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID4,
@@ -991,8 +995,9 @@ class CollectionNodeMetadataDictsTest(
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_public_exps_of_another_user_are_returned(self):
-        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
+        metadata_dicts = (
+            summary_services.get_exploration_metadata_dicts(
+                [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID2,
@@ -1012,8 +1017,9 @@ class CollectionNodeMetadataDictsTest(
     def test_deleted_exps_are_not_returned(self):
         exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
 
-        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
+        metadata_dicts = (
+            summary_services.get_exploration_metadata_dicts(
+                [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,
@@ -1039,8 +1045,9 @@ class CollectionNodeMetadataDictsTest(
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_invalid_exp_ids(self):
-        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID3, self.INVALID_EXP_ID], self.albert))
+        metadata_dicts = (
+            summary_services.get_exploration_metadata_dicts(
+                [self.EXP_ID3, self.INVALID_EXP_ID], self.albert))
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,

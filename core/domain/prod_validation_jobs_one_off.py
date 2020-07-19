@@ -83,8 +83,9 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
-ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
+ALLOWED_IMAGE_EXTENSIONS = list(
+    itertools.chain.from_iterable(
+        iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
 ASSETS_PATH_REGEX = '/exploration/[A-Za-z0-9-_]{1,12}/assets/'
 IMAGE_PATH_REGEX = (
     '%simage/[A-Za-z0-9-_]{1,}\\.(%s)' % (
@@ -2773,8 +2774,9 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
         message_ids = []
         for reference in item.feedback_message_references:
             try:
-                message_ids.append('%s.%s' % (
-                    reference['thread_id'], reference['message_id']))
+                message_ids.append(
+                    '%s.%s' % (
+                        reference['thread_id'], reference['message_id']))
             except Exception:
                 cls._add_error(
                     'feedback message %s' % ERROR_CATEGORY_REFERENCE_CHECK,
@@ -5922,9 +5924,10 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        return re.escape(improvements_models.TaskEntryModel.generate_task_id(
-            item.entity_type, item.entity_id, item.entity_version,
-            item.task_type, item.target_type, item.target_id))
+        return re.escape(
+            improvements_models.TaskEntryModel.generate_task_id(
+                item.entity_type, item.entity_id, item.entity_version,
+                item.task_type, item.target_type, item.target_id))
 
     @classmethod
     def _get_external_id_relationships(cls, item):

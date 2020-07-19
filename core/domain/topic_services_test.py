@@ -262,16 +262,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_index_values(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index, to_index')):
+            Exception,
+            'The following required attributes are missing: '
+            'from_index, to_index'):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
             })
 
     def test_cannot_rearrange_story_with_missing_from_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index')):
+            Exception,
+            'The following required attributes are missing: from_index'):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'to_index': 1
@@ -279,8 +280,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_to_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'to_index')):
+            Exception,
+            'The following required attributes are missing: to_index'):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'from_index': 1
@@ -1111,8 +1112,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_admin_can_manage_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
 
-        self.assertTrue(topic_services.check_can_edit_topic(
-            self.user_admin, topic_rights))
+        self.assertTrue(
+            topic_services.check_can_edit_topic(
+                self.user_admin, topic_rights))
 
     def test_filter_published_topic_ids(self):
         published_topic_ids = topic_services.filter_published_topic_ids([
@@ -1171,10 +1173,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
 
-        self.assertTrue(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+        self.assertTrue(
+            topic_services.check_can_edit_topic(self.user_a, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_b, topic_rights))
 
     def test_non_admin_cannot_assign_roles(self):
         with self.assertRaisesRegexp(
@@ -1185,10 +1187,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_a, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_b, topic_rights))
 
     def test_role_cannot_be_assigned_to_non_topic_manager(self):
         with self.assertRaisesRegexp(
@@ -1211,10 +1213,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
-        self.assertTrue(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+        self.assertTrue(
+            topic_services.check_can_edit_topic(self.user_a, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_b, topic_rights))
 
     def test_get_all_topic_rights_of_user(self):
         topic_services.assign_role(
@@ -1380,10 +1382,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
-        self.assertTrue(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+        self.assertTrue(
+            topic_services.check_can_edit_topic(self.user_a, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_b, topic_rights))
 
     def test_deassigning_manager_role(self):
         topic_services.assign_role(
@@ -1392,8 +1394,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
 
-        self.assertTrue(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
+        self.assertTrue(
+            topic_services.check_can_edit_topic(self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
@@ -1401,19 +1403,19 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_admin, self.user_a,
             topic_domain.ROLE_NONE, self.TOPIC_ID)
 
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_a, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_b, topic_rights))
 
         topic_services.assign_role(
             self.user_admin, self.user_a,
             topic_domain.ROLE_NONE, self.TOPIC_ID)
 
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_a, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_b, topic_rights))
 
 
 # TODO(lilithxxx): Remove this mock class and the SubtopicMigrationTests class

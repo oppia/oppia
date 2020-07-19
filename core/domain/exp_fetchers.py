@@ -66,15 +66,16 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     if states_schema_version is None or states_schema_version < 1:
         states_schema_version = 0
 
-    if not (0 <= states_schema_version
+    if not (
+            0 <= states_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned exploration '
             'state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    while (states_schema_version <
-           feconf.CURRENT_STATE_SCHEMA_VERSION):
+    while (
+            states_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states, states_schema_version,
             exploration_id)
@@ -173,7 +174,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
-    if (run_conversion and exploration_model.states_schema_version !=
+    if (
+            run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_states_schema(
             versioned_exploration_states, exploration_model.id)
@@ -371,8 +373,9 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             exploration = get_exploration_from_model(model)
             db_results_dict[eid] = exploration
         else:
-            logging.info('Tried to fetch exploration with id %s, but no such '
-                         'exploration exists in the datastore' % eid)
+            logging.info(
+                'Tried to fetch exploration with id %s, but no such '
+                'exploration exists in the datastore' % eid)
             not_found.append(eid)
 
     if strict and not_found:

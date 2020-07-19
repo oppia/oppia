@@ -1116,9 +1116,10 @@ class BaseSnapshotMetadataModel(BaseModel):
             BaseSnapshotMetadataModel instance of the construct from which this
             is called.
         """
-        return cls(id=snapshot_id, committer_id=committer_id,
-                   commit_type=commit_type, commit_message=commit_message,
-                   commit_cmds=commit_cmds)
+        return cls(
+            id=snapshot_id, committer_id=committer_id,
+            commit_type=commit_type, commit_message=commit_message,
+            commit_cmds=commit_cmds)
 
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.

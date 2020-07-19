@@ -59,9 +59,10 @@ class BaseValueGenerator(python_utils.OBJECT):
         Returns:
             str. The HTML template corresponding to the class.
         """
-        return utils.get_file_contents(os.path.join(
-            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
-            '%s.html' % cls.__name__))
+        return utils.get_file_contents(
+            os.path.join(
+                os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
+                '%s.html' % cls.__name__))
 
     def generate_value(self, *args, **kwargs):
         """Generates a new value, using the given customization args.

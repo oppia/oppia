@@ -69,21 +69,22 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
 
-_PARSER = argparse.ArgumentParser(description="""
-Run this script from the oppia root folder:
-   bash scripts/run_e2e_tests.sh
+_PARSER = argparse.ArgumentParser(
+    description="""
+    Run this script from the oppia root folder:
+       bash scripts/run_e2e_tests.sh
 
-The root folder MUST be named 'oppia'.
+    The root folder MUST be named 'oppia'.
 
 
-  --suite=suite_name Performs test for different suites, here suites are the
-        name of the test files present in core/tests/protractor_desktop/ and
-        core/test/protractor/ dirs. e.g. for the file
-        core/tests/protractor/accessibility.js use --suite=accessibility.
-        For performing a full test, no argument is required.
-Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
-single test or test suite.
-""")
+      --suite=suite_name Performs test for different suites, here suites are the
+            name of the test files present in core/tests/protractor_desktop/ and
+            core/test/protractor/ dirs. e.g. for the file
+            core/tests/protractor/accessibility.js use --suite=accessibility.
+            For performing a full test, no argument is required.
+    Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
+    single test or test suite.
+    """)
 
 
 _PARSER.add_argument(
@@ -205,11 +206,13 @@ def wait_for_port_to_be_open(port_number):
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (not common.is_port_open(port_number) and
-           waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+    while (
+            not common.is_port_open(port_number) and
+            waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
-    if (waited_seconds ==
+    if (
+            waited_seconds ==
             MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
             not common.is_port_open(port_number)):
         python_utils.PRINT(
@@ -505,8 +508,9 @@ def main(args=None):
     # This flag ensures tests fail if waitFor calls time out.
     commands.append('--unhandled-rejections=strict')
     commands.append(PROTRACTOR_BIN_PATH)
-    commands.extend(get_e2e_test_parameters(
-        parsed_args.sharding_instances, parsed_args.suite, dev_mode))
+    commands.extend(
+        get_e2e_test_parameters(
+            parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
     p = subprocess.Popen(commands)
     p.communicate()

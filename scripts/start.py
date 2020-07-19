@@ -38,11 +38,12 @@ from . import build  # isort:skip
 from . import common  # isort:skip
 # pylint: enable=wrong-import-position
 
-_PARSER = argparse.ArgumentParser(description="""
-Run the script from the oppia root folder:
-    python -m scripts.start
-Note that the root folder MUST be named 'oppia'.
-""")
+_PARSER = argparse.ArgumentParser(
+    description="""
+    Run the script from the oppia root folder:
+        python -m scripts.start
+    Note that the root folder MUST be named 'oppia'.
+    """)
 
 _PARSER.add_argument(
     '--save_datastore',
@@ -134,22 +135,25 @@ def main(args=None):
     if not parsed_args.prod_env:
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
-        background_processes.append(subprocess.Popen([
-            common.NODE_BIN_PATH,
-            os.path.join(
-                common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-            '--config', 'webpack.dev.config.ts', '--watch']))
+        background_processes.append(
+            subprocess.Popen([
+                common.NODE_BIN_PATH,
+                os.path.join(
+                    common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
+                '--config', 'webpack.dev.config.ts', '--watch']))
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 
     python_utils.PRINT('Starting GAE development server')
-    background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check true %s' % (
-            common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg, disable_host_checking_arg, no_auto_restart,
-            python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            app_yaml_filepath), shell=True))
+    background_processes.append(
+        subprocess.Popen(
+            'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
+            '--admin_port 8000 --host 0.0.0.0 --port %s %s '
+            '--skip_sdk_update_check true %s' % (
+                common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
+                enable_console_arg, disable_host_checking_arg, no_auto_restart,
+                python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
+                app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
@@ -158,9 +162,10 @@ def main(args=None):
     # Launch a browser window.
     if common.is_linux_os() and not parsed_args.no_browser:
         detect_virtualbox_pattern = re.compile('.*VBOX.*')
-        if list(filter(
-                detect_virtualbox_pattern.match,
-                os.listdir('/dev/disk/by-id/'))):
+        if list(
+                filter(
+                    detect_virtualbox_pattern.match,
+                    os.listdir('/dev/disk/by-id/'))):
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Setting up a local development server. You can access this '

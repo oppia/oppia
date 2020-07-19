@@ -190,12 +190,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests objects of type HTML."""
         # TODO(sll): Add more tests.
         mappings = [
-            ('<p onclick="evil_function()">a paragraph</p>',
-             '<p>a paragraph</p>'),
+            (
+                '<p onclick="evil_function()">a paragraph</p>',
+                '<p>a paragraph</p>'),
             ('<iframe src="evil-site"></iframe>', ''),
             (u'¡Hola!', u'¡Hola!'),
-            ('<a href="evil-site">spam spam SPAM!</a>',
-             '<a>spam spam SPAM!</a>'),
+            (
+                '<a href="evil-site">spam spam SPAM!</a>',
+                '<a>spam spam SPAM!</a>'),
         ]
         invalid_values = [{'a': 1}, [1, 2, 1], None]
 
@@ -551,8 +553,9 @@ class NormalizedRectangleTests(test_utils.GenericTestBase):
 
     def test_normalize(self):
         normalized_rectangle = objects.NormalizedRectangle2D()
-        self.assertEqual(normalized_rectangle.normalize(
-            [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
+        self.assertEqual(
+            normalized_rectangle.normalize(
+                [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
 
         with self.assertRaisesRegexp(
             TypeError, 'Cannot convert to Normalized Rectangle '):

@@ -426,8 +426,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         with self.assertRaisesRegexp(
             Exception,
-            ('SkillOpportunity corresponding to skill ID %s already exists.'
-             % self.SKILL_ID)):
+            (
+                'SkillOpportunity corresponding to skill ID %s already exists.'
+                % self.SKILL_ID)):
             opportunity_services.create_skill_opportunity(
                 self.SKILL_ID, 'description')
 

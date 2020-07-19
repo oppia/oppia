@@ -61,8 +61,9 @@ WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
     'Added compressed versions of images in exploration')
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
-ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
+ALLOWED_IMAGE_EXTENSIONS = list(
+    itertools.chain.from_iterable(
+        iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
 GCS_AUDIO_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
@@ -378,7 +379,8 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
-        if (item.states_schema_version !=
+        if (
+                item.states_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
@@ -545,7 +547,8 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_rights is None:
             return
 
-        if (exploration_rights.status == constants.ACTIVITY_STATUS_PRIVATE
+        if (
+                exploration_rights.status == constants.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
 

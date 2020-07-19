@@ -238,7 +238,8 @@ def apply_change_list(topic_id, change_list):
     modified_subtopic_change_cmds = collections.defaultdict(list)
 
     for change in change_list:
-        if (change.cmd ==
+        if (
+                change.cmd ==
                 subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
             if change.subtopic_id < topic.next_subtopic_id:
                 existing_subtopic_page_ids_to_be_modified.append(
@@ -261,7 +262,7 @@ def apply_change_list(topic_id, change_list):
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))
                 modified_subtopic_pages[subtopic_page_id] = (
-                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( #pylint: disable=line-too-long
+                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
                         change.subtopic_id, topic_id)
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
@@ -306,36 +307,45 @@ def apply_change_list(topic_id, change_list):
                 topic.remove_skill_id_from_subtopic(
                     change.subtopic_id, change.skill_id)
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
                     topic.update_name(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
+                elif (
+                        change.property_name ==
+                        topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
                     topic.update_abbreviated_name(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_DESCRIPTION):
+                elif (
+                        change.property_name ==
+                        topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     topic.update_description(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
+                elif (
+                        change.property_name ==
+                        topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                elif (
+                        change.property_name ==
+                        topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_thumbnail_filename(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
+                elif (
+                        change.property_name ==
+                        topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)
-            elif (change.cmd ==
-                  subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+            elif (
+                    change.cmd ==
+                    subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))
-                if ((modified_subtopic_pages[subtopic_page_id] is None) or
+                if (
+                        (modified_subtopic_pages[subtopic_page_id] is None) or
                         (change.subtopic_id in deleted_subtopic_ids)):
                     raise Exception(
                         'The subtopic with id %s doesn\'t exist' % (
                             change.subtopic_id))
 
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         subtopic_page_domain.
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
                     modified_subtopic_pages[
@@ -343,23 +353,27 @@ def apply_change_list(topic_id, change_list):
                             state_domain.SubtitledHtml.from_dict(
                                 change.new_value))
 
-                elif (change.property_name ==
-                      subtopic_page_domain.
-                      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
+                elif (
+                        change.property_name ==
+                        subtopic_page_domain.
+                        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_audio(
                             state_domain.RecordedVoiceovers.from_dict(
                                 change.new_value))
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
                     topic.update_subtopic_title(
                         change.subtopic_id, change.new_value)
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_subtopic_thumbnail_filename(
                         change.subtopic_id, change.new_value)
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_subtopic_thumbnail_bg_color(
                         change.subtopic_id, change.new_value)
@@ -1126,7 +1140,8 @@ def assign_role(committer, assignee, new_role, topic_id):
     """
     committer_id = committer.user_id
     topic_rights = get_topic_rights(topic_id)
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
+    if (
+            role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
         logging.error(
             'User %s tried to allow user %s to be a %s of topic %s '

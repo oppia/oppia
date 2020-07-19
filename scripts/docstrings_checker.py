@@ -65,7 +65,8 @@ def get_setters_property_name(node):
     """
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
-        if (isinstance(decorator_node, astroid.Attribute) and
+        if (
+                isinstance(decorator_node, astroid.Attribute) and
                 decorator_node.attrname == 'setter' and
                 isinstance(decorator_node.expr, astroid.Name)):
             return decorator_node.expr.name
@@ -130,8 +131,9 @@ def possible_exc_types(node):
         inferred = utils.safe_infer(node.exc)
         if inferred:
             excs = [inferred.name]
-    elif (isinstance(node.exc, astroid.Call) and
-          isinstance(node.exc.func, astroid.Name)):
+    elif (
+            isinstance(node.exc, astroid.Call) and
+            isinstance(node.exc.func, astroid.Name)):
         target = utils.safe_infer(node.exc.func)
         if isinstance(target, astroid.ClassDef):
             excs = [target.name]
@@ -141,9 +143,11 @@ def possible_exc_types(node):
                     continue
 
                 val = utils.safe_infer(ret.value)
-                if (val and isinstance(val, (
-                        astroid.Instance, astroid.ClassDef)) and
-                        utils.inherit_from_std_ex(val)):
+                if (
+                        val and isinstance(
+                            val, (
+                                astroid.Instance, astroid.ClassDef)) and
+                                utils.inherit_from_std_ex(val)):
                     excs.append(val.name)
     elif node.exc is None:
         handler = node.parent
@@ -152,8 +156,9 @@ def possible_exc_types(node):
 
         if handler and handler.type:
             inferred_excs = astroid.unpack_infer(handler.type)
-            excs = (exc.name for exc in inferred_excs
-                    if exc is not astroid.Uninferable)
+            excs = (
+                        exc.name for exc in inferred_excs
+                        if exc is not astroid.Uninferable)
 
 
     try:
@@ -189,7 +194,8 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """
 
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
-    re_param_line = re.compile(r"""
+    re_param_line = re.compile(
+        r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
         \s*  ( [:]
             \s*
@@ -201,7 +207,8 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
-    re_returns_line = re.compile(r"""
+    re_returns_line = re.compile(
+        r"""
         \s* (({type}|\S*).)?              # identifier
         \s* (.*)                          # beginning of description
     """.format(
@@ -282,11 +289,11 @@ class ASTDocStringChecker(python_utils.OBJECT):
             arg_name_colon = arg_name + ':'
             if arg_name_colon not in docstring:
                 if arg_name not in docstring:
-                    results.append('Arg missing from docstring: {}'.format(
-                        arg_name))
+                    results.append(
+                        'Arg missing from docstring: {}'.format(arg_name))
                 else:
-                    results.append('Arg not followed by colon: {}'.format(
-                        arg_name))
+                    results.append(
+                        'Arg not followed by colon: {}'.format(arg_name))
         # Only check ordering if there's more than one argument in the
         # function definition, and no other errors have been found.
         if len(func_def_args) > 0 and len(results) == 0:

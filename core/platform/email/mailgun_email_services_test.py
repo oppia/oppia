@@ -49,9 +49,10 @@ class EmailTests(test_utils.GenericTestBase):
             })
             expected = (
                 'https://api.mailgun.net/v3/domain/messages',
-                ('to=b%40b.com&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
-                 '%2C%3Cbr%3E+%F0%9F%98%82&from=a%40a.com&subject=Hola+%F0'
-                 '%9F%98%82+-+invitation+to+collaborate'),
+                (
+                    'to=b%40b.com&text=plaintext_body+%F0%9F%98%82&html=Hi+abc'
+                    '%2C%3Cbr%3E+%F0%9F%98%82&from=a%40a.com&subject=Hola+%F0'
+                    '%9F%98%82+-+invitation+to+collaborate'),
                 {'Authorization': 'Basic YXBpOmtleQ=='})
             self.assertEqual(result, expected)
 
@@ -106,8 +107,8 @@ class EmailTests(test_utils.GenericTestBase):
                     'html': 'html'}
 
         # Lambda function, will replace post_to_mailgun().
-        req_post_lambda = (lambda data=None:
-                           self.assertDictContainsSubset(expected, data))
+        req_post_lambda = (
+            lambda data=None: self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
             mailgun_email_services, 'post_to_mailgun', req_post_lambda)
 
@@ -129,9 +130,9 @@ class EmailTests(test_utils.GenericTestBase):
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         # Lambda function, will replace post_to_mailgun().
-        req_post_lambda = (lambda data=None:
-                           self.assertEqual(
-                               data['bcc'], feconf.ADMIN_EMAIL_ADDRESS))
+        req_post_lambda = (
+            lambda data=None: self.assertEqual(
+                data['bcc'], feconf.ADMIN_EMAIL_ADDRESS))
         post_request = self.swap(
             mailgun_email_services, 'post_to_mailgun', req_post_lambda)
 
@@ -214,13 +215,14 @@ class EmailTests(test_utils.GenericTestBase):
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
 
         # Data that we expect to have been sent in the post_to_mailgun().
-        expected = ({'from': feconf.SYSTEM_EMAIL_ADDRESS, 'to': recipients,
-                     'subject': 'subject', 'text': 'body', 'html': 'html',
-                     'recipient-variables': '{}'})
+        expected = ({
+            'from': feconf.SYSTEM_EMAIL_ADDRESS, 'to': recipients,
+            'subject': 'subject', 'text': 'body', 'html': 'html',
+            'recipient-variables': '{}'})
 
         # Lambda function, will replace post_to_mailgun().
-        req_post_lambda = (lambda data=None:
-                           self.assertDictContainsSubset(expected, data))
+        req_post_lambda = (
+            lambda data=None: self.assertDictContainsSubset(expected, data))
         post_request = self.swap(
             mailgun_email_services, 'post_to_mailgun', req_post_lambda)
 

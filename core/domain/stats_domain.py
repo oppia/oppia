@@ -605,8 +605,8 @@ class Playthrough(python_utils.OBJECT):
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError:
-            raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type))
+            raise utils.ValidationError(
+                'Invalid issue type: %s' % self.issue_type)
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -707,8 +707,9 @@ class ExplorationIssue(python_utils.OBJECT):
         current_issue_schema_version = issue_dict['schema_version']
         issue_dict['schema_version'] += 1
 
-        conversion_fn = getattr(cls, '_convert_issue_v%s_dict_to_v%s_dict' % (
-            current_issue_schema_version, current_issue_schema_version + 1))
+        conversion_fn = getattr(
+            cls, '_convert_issue_v%s_dict_to_v%s_dict' % (
+                current_issue_schema_version, current_issue_schema_version + 1))
         issue_dict = conversion_fn(issue_dict)
 
     @classmethod
@@ -735,8 +736,8 @@ class ExplorationIssue(python_utils.OBJECT):
             issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError:
-            raise utils.ValidationError('Invalid issue type: %s' % (
-                self.issue_type))
+            raise utils.ValidationError(
+                'Invalid issue type: %s' % self.issue_type)
 
         customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
@@ -816,8 +817,10 @@ class LearnerAction(python_utils.OBJECT):
         current_action_schema_version = action_dict['schema_version']
         action_dict['schema_version'] += 1
 
-        conversion_fn = getattr(cls, '_convert_action_v%s_dict_to_v%s_dict' % (
-            current_action_schema_version, current_action_schema_version + 1))
+        conversion_fn = getattr(
+            cls, '_convert_action_v%s_dict_to_v%s_dict' % (
+                current_action_schema_version,
+                current_action_schema_version + 1))
         action_dict = conversion_fn(action_dict)
 
     @classmethod
@@ -910,7 +913,8 @@ class StateAnswers(python_utils.OBJECT):
                     % python_utils.UNICODE(self.interaction_id))
 
             # Verify interaction_id is valid.
-            if (self.interaction_id not in
+            if (
+                    self.interaction_id not in
                     interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
                     'Unknown interaction_id: %s' % self.interaction_id)
@@ -1314,7 +1318,8 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
                 'Expected calculation_id to be a string, received %s'
                 % python_utils.UNICODE(self.calculation_id))
 
-        if (not isinstance(self.calculation_output, AnswerFrequencyList)
+        if (
+                not isinstance(self.calculation_output, AnswerFrequencyList)
                 and not isinstance(
                     self.calculation_output, CategorizedAnswerFrequencyLists)):
             raise utils.ValidationError(
@@ -1453,7 +1458,8 @@ class LearnerAnswerDetails(python_utils.OBJECT):
                 'Expected interaction_id to be a string, received %s'
                 % python_utils.UNICODE(self.interaction_id))
 
-        if (self.interaction_id not in
+        if (
+                self.interaction_id not in
                 interaction_registry.Registry.get_all_interaction_ids()):
             raise utils.ValidationError(
                 'Unknown interaction_id: %s' % self.interaction_id)
@@ -1493,7 +1499,8 @@ class LearnerAnswerDetails(python_utils.OBJECT):
         """
         learner_answer_info_dict_size = (
             learner_answer_info.get_learner_answer_info_dict_size())
-        if (self.accumulated_answer_info_json_size_bytes +
+        if (
+                self.accumulated_answer_info_json_size_bytes +
                 learner_answer_info_dict_size <= (
                     MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE)):
             self.learner_answer_info_list.append(learner_answer_info)
@@ -1626,8 +1633,8 @@ class LearnerAnswerInfo(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The answer details submitted cannot be an empty string.')
         if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
-            raise utils.ValidationError('The answer details size is to large '
-                                        'to be stored')
+            raise utils.ValidationError(
+                'The answer details size is to large to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s'

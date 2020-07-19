@@ -137,12 +137,14 @@ def get_image_filenames_from_html_strings(html_strings):
         if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
-        elif ('id' in rte_comp and
-              rte_comp['id'] == 'oppia-noninteractive-svgdiagram'):
+        elif (
+                'id' in rte_comp and
+                rte_comp['id'] == 'oppia-noninteractive-svgdiagram'):
             filenames.append(
                 rte_comp['customization_args']['svg_filename-with-value'])
-        elif ('id' in rte_comp and
-              rte_comp['id'] == 'oppia-noninteractive-math'):
+        elif (
+                'id' in rte_comp and
+                rte_comp['id'] == 'oppia-noninteractive-math'):
             filenames.append(
                 rte_comp['customization_args']['math_content-with-value'][
                     'svg_filename'])

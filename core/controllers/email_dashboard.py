@@ -121,7 +121,8 @@ class EmailDashboardDataHandler(base.BaseHandler):
             'edited_at_least_n_exps', 'edited_fewer_than_n_exps']
 
         for key, value in data.items():
-            if (key not in possible_keys or not isinstance(value, int) or
+            if (
+                    key not in possible_keys or not isinstance(value, int) or
                     value < 0):
                 # Raise exception if key is not one of the allowed keys or
                 # corresponding value is not of type integer..
@@ -163,7 +164,8 @@ class EmailDashboardResultPage(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def get(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
+        if (
+                query_model is None or
                 query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
             raise self.InvalidInputException('400 Invalid query id.')
 
@@ -176,7 +178,8 @@ class EmailDashboardResultPage(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
+        if (
+                query_model is None or
                 query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
             raise self.InvalidInputException('400 Invalid query id.')
 
@@ -200,7 +203,8 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
+        if (
+                query_model is None or
                 query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
             raise self.InvalidInputException('400 Invalid query id.')
 
@@ -222,7 +226,8 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
         query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
+        if (
+                query_model is None or
                 query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
             raise self.InvalidInputException('400 Invalid query id.')
 

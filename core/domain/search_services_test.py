@@ -113,8 +113,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         # The rank will be at least 0.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
-        self.assertEqual(search_services.get_search_rank_from_exp_summary(
-            exp_summary), 0)
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(
+                exp_summary), 0)
 
     def test_search_explorations(self):
         expected_query_string = 'a query string'
@@ -124,8 +125,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
+        def mock_search(
+                query_string, index, cursor=None, limit=20, sort='',
+                ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(cursor, expected_cursor)
@@ -155,8 +157,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
+        def mock_search(
+                query_string, index, cursor=None, limit=20, sort='',
+                ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)

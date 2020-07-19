@@ -126,9 +126,10 @@ def tokenize(expression):
     # For eg. 'x + epsilon' should be tokenized as ['x','+','epsilon'] and not
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
-        '|'.join(sorted(
-            constants.GREEK_LETTERS + constants.MATH_FUNCTION_NAMES,
-            reverse=True, key=len)),
+        '|'.join(
+            sorted(
+                constants.GREEK_LETTERS + constants.MATH_FUNCTION_NAMES,
+                reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))
 
     token_texts = re.findall(re_string, expression)
@@ -167,12 +168,12 @@ def tokenize(expression):
             # operation to be performed is multiplication and insert a '*' sign
             # to explicitly denote the operation. For eg. 'ab+x' would be
             # transformed into 'a*b+x'.
-            if ((
-                    token_list[i].category in _CLOSING_CATEGORIES or
-                    token_list[i].text in _CLOSING_PARENS) and
+            if (
                     (
-                        token_list[i + 1].category in _OPENING_CATEGORIES or
-                        token_list[i + 1].text in _OPENING_PARENS)):
+                        token_list[i].category in _CLOSING_CATEGORIES or
+                        token_list[i].text in _CLOSING_PARENS) and (
+                            token_list[i + 1].category in _OPENING_CATEGORIES or
+                            token_list[i + 1].text in _OPENING_PARENS)):
                 final_token_list.append(Token('*'))
 
     return final_token_list

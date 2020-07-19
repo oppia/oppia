@@ -177,7 +177,8 @@ class UserSettings(python_utils.OBJECT):
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
-        if (self.gae_id is not None and
+        if (
+                self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
             raise utils.ValidationError(
                 'Expected gae_id to be a string, received %s' %
@@ -189,7 +190,8 @@ class UserSettings(python_utils.OBJECT):
                 'Expected email to be a string, received %s' % self.email)
         if not self.email:
             raise utils.ValidationError('No user email specified.')
-        if ('@' not in self.email or self.email.startswith('@')
+        if (
+                '@' not in self.email or self.email.startswith('@')
                 or self.email.endswith('@')):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
@@ -205,8 +207,10 @@ class UserSettings(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref)
-        if (self.creator_dashboard_display_pref not in
-                list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values(
+        if (
+                self.creator_dashboard_display_pref not in
+                list(
+                    constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values(
                     ))):
             raise utils.ValidationError(
                 '%s is not a valid value for the dashboard display '
@@ -302,10 +306,11 @@ def is_user_id_correct(user_id):
     Returns:
         bool. True when the ID is in a correct format, False otherwise.
     """
-    return all((
-        user_id.islower(),
-        user_id.startswith('uid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
+    return all(
+        (
+            user_id.islower(),
+            user_id.startswith('uid_'),
+            len(user_id) == user_models.USER_ID_LENGTH))
 
 
 def is_username_taken(username):
@@ -407,14 +412,15 @@ def get_users_settings(user_ids):
     result = []
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
-            result.append(UserSettings(
-                user_id=feconf.SYSTEM_COMMITTER_ID,
-                gae_id=feconf.SYSTEM_COMMITTER_ID,
-                email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_ID_ADMIN,
-                username='admin',
-                last_agreed_to_terms=datetime.datetime.utcnow()
-            ))
+            result.append(
+                UserSettings(
+                    user_id=feconf.SYSTEM_COMMITTER_ID,
+                    gae_id=feconf.SYSTEM_COMMITTER_ID,
+                    email=feconf.SYSTEM_EMAIL_ADDRESS,
+                    role=feconf.ROLE_ID_ADMIN,
+                    username='admin',
+                    last_agreed_to_terms=datetime.datetime.utcnow()
+                ))
         else:
             result.append(_transform_user_settings(model))
     return result
@@ -1147,8 +1153,9 @@ def get_human_readable_user_ids(user_ids):
     usernames = []
     for ind, user_settings in enumerate(users_settings):
         if user_settings is None:
-            logging.error('User id %s not known in list of user_ids %s' % (
-                user_ids[ind], user_ids))
+            logging.error(
+                'User id %s not known in list of user_ids %s' % (
+                    user_ids[ind], user_ids))
             raise Exception('User not found.')
         elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
             usernames.append('admin')
@@ -1328,11 +1335,12 @@ def get_users_email_preferences(user_ids):
             result.append(
                 user_domain.UserGlobalPrefs.create_default_prefs())
         else:
-            result.append(user_domain.UserGlobalPrefs(
-                email_preferences_model.site_updates,
-                email_preferences_model.editor_role_notifications,
-                email_preferences_model.feedback_message_notifications,
-                email_preferences_model.subscription_notifications))
+            result.append(
+                user_domain.UserGlobalPrefs(
+                    email_preferences_model.site_updates,
+                    email_preferences_model.editor_role_notifications,
+                    email_preferences_model.feedback_message_notifications,
+                    email_preferences_model.subscription_notifications))
 
     return result
 
@@ -1414,9 +1422,10 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
             result.append(
                 user_domain.UserExplorationPrefs.create_default_prefs())
         else:
-            result.append(user_domain.UserExplorationPrefs(
-                exploration_user_model.mute_feedback_notifications,
-                exploration_user_model.mute_suggestion_notifications))
+            result.append(
+                user_domain.UserExplorationPrefs(
+                    exploration_user_model.mute_feedback_notifications,
+                    exploration_user_model.mute_suggestion_notifications))
 
     return result
 
@@ -1633,7 +1642,8 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
         Exception: If schema_version > CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
     """
     stats_schema_version = versioned_dashboard_stats.schema_version
-    if not (1 <= stats_schema_version
+    if not (
+            1 <= stats_schema_version
             <= feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
@@ -1786,7 +1796,8 @@ def is_at_least_moderator(user_id):
         bool. True if user is atleast a moderator, False otherwise.
     """
     user_role = get_user_role_from_id(user_id)
-    if (user_role == feconf.ROLE_ID_MODERATOR or
+    if (
+            user_role == feconf.ROLE_ID_MODERATOR or
             user_role == feconf.ROLE_ID_ADMIN):
         return True
     return False
@@ -2015,8 +2026,8 @@ def get_community_reviewer_usernames(review_category, language_code=None):
             .get_voiceover_reviewer_user_ids(language_code))
     elif review_category == constants.REVIEW_CATEGORY_QUESTION:
         if language_code is not None:
-            raise Exception('Expected language_code to be None, found: %s' % (
-                language_code))
+            raise Exception(
+                'Expected language_code to be None, found: %s' % language_code)
         reviewer_ids = (
             user_models.UserCommunityRightsModel
             .get_question_reviewer_user_ids())

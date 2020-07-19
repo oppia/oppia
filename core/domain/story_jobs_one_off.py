@@ -69,7 +69,8 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new story into the datastore if it's different from
         # the old version.
-        if (item.story_contents_schema_version <=
+        if (
+                item.story_contents_schema_version <=
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
             commit_cmds = [story_domain.StoryChange({
                 'cmd': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
@@ -85,11 +86,13 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == StoryMigrationOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['Encountered %d deleted stories.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         elif key == StoryMigrationOneOffJob._MIGRATED_KEY:
-            yield (key, ['%d stories successfully migrated.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['%d stories successfully migrated.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
 
@@ -124,10 +127,12 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == RegenerateStorySummaryOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['Encountered %d deleted stories.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         elif key == RegenerateStorySummaryOneOffJob._PROCESSED_KEY:
-            yield (key, ['Successfully processed %d stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['Successfully processed %d stories.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

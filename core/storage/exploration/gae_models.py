@@ -352,11 +352,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            cls.query(ndb.OR(
-                cls.owner_ids == user_id,
-                cls.editor_ids == user_id,
-                cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
+            cls.query(
+                ndb.OR(
+                    cls.owner_ids == user_id,
+                    cls.editor_ids == user_id,
+                    cls.voice_artist_ids == user_id,
+                    cls.viewer_ids == user_id
             )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
@@ -655,12 +656,13 @@ class ExpSummaryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
-            cls.owner_ids == user_id,
-            cls.editor_ids == user_id,
-            cls.voice_artist_ids == user_id,
-            cls.viewer_ids == user_id,
-            cls.contributor_ids == user_id
+        return cls.query(
+            ndb.OR(
+                cls.owner_ids == user_id,
+                cls.editor_ids == user_id,
+                cls.voice_artist_ids == user_id,
+                cls.viewer_ids == user_id,
+                cls.contributor_ids == user_id
         )).get(keys_only=True) is not None
 
     @classmethod
@@ -711,10 +713,11 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(ExpSummaryModel.owner_ids == user_id,
-                   ExpSummaryModel.editor_ids == user_id,
-                   ExpSummaryModel.voice_artist_ids == user_id,
-                   ExpSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                ExpSummaryModel.owner_ids == user_id,
+                ExpSummaryModel.editor_ids == user_id,
+                ExpSummaryModel.voice_artist_ids == user_id,
+                ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -731,8 +734,9 @@ class ExpSummaryModel(base_models.BaseModel):
             editable by the given user.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(ExpSummaryModel.owner_ids == user_id,
-                   ExpSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                ExpSummaryModel.owner_ids == user_id,
+                ExpSummaryModel.editor_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

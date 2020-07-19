@@ -160,7 +160,8 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
+        if (
+                len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
                 or search_cursor is None):
             break
         else:
@@ -168,7 +169,8 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
+    if (
+            len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -357,11 +359,13 @@ def apply_change_list(exploration_id, change_list):
                 exploration.delete_state(change.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state = exploration.states[change.state_name]
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
+                        list(
+                            python_utils.MAP(
+                                to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
@@ -401,8 +405,9 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if not isinstance(change.new_value, list):
-                        raise Exception('Expected hints_list to be a list,'
-                                        ' received %s' % change.new_value)
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
                     new_hints_list = [state_domain.Hint.from_dict(hint_dict)
                                       for hint_dict in change.new_value]
                     state.update_interaction_hints(new_hints_list)
@@ -483,8 +488,9 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
+                        list(
+                            python_utils.MAP(
+                                to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -931,10 +937,11 @@ def update_exploration(
             'Exploration is public so expected a commit message but '
             'received none.')
 
-    if (is_suggestion and (
-            not commit_message or
-            not commit_message.startswith(
-                feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX))):
+    if (
+            is_suggestion and (
+                not commit_message or
+                not commit_message.startswith(
+                    feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX))):
         raise ValueError('Invalid commit message for suggestion.')
     if (not is_suggestion and commit_message and commit_message.startswith(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)):
@@ -1226,9 +1233,10 @@ def revert_exploration(
     transaction_services.run_in_transaction(_update_storage_models)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        (classifier_services
-         .create_classifier_training_job_for_reverted_exploration(
-             exploration_at_current_version, exploration_to_revert_to))
+        (
+            classifier_services
+            .create_classifier_training_job_for_reverted_exploration(
+                exploration_at_current_version, exploration_to_revert_to))
 
 
 # Creation and deletion methods.
@@ -1298,7 +1306,8 @@ def save_new_exploration_from_yaml_and_assets(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(asset_filename, asset_content)
 
-    if (exp_schema_version <=
+    if (
+            exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
         # The schema of the YAML file for older explorations did not include
         # a title and a category; these need to be manually specified.
@@ -1342,8 +1351,9 @@ def delete_demo(exploration_id):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if not exploration:
-        logging.info('Exploration with id %s was not deleted, because it '
-                     'does not exist.' % exploration_id)
+        logging.info(
+            'Exploration with id %s was not deleted, because it '
+            'does not exist.' % exploration_id)
     else:
         delete_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
@@ -1420,12 +1430,13 @@ def get_next_page_of_all_non_private_commits(
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
             page_size, urlsafe_start_cursor, max_age=max_age))
 
-    return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id,
-        entry.exploration_id, entry.commit_type, entry.commit_message,
-        entry.commit_cmds, entry.version, entry.post_commit_status,
-        entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], new_urlsafe_start_cursor, more)
+    return ([
+        exp_domain.ExplorationCommitLogEntry(
+            entry.created_on, entry.last_updated, entry.user_id,
+            entry.exploration_id, entry.commit_type, entry.commit_message,
+            entry.commit_cmds, entry.version, entry.post_commit_status,
+            entry.post_commit_community_owned, entry.post_commit_is_private
+        ) for entry in results], new_urlsafe_start_cursor, more)
 
 
 def get_image_filenames_from_exploration(exploration):
@@ -1542,7 +1553,8 @@ def is_voiceover_change_list(change_list):
         allowed for voice artist to do.
     """
     for change in change_list:
-        if (change.property_name !=
+        if (
+                change.property_name !=
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
@@ -1591,10 +1603,11 @@ def get_user_exploration_data(
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                     and exp_user_data.draft_change_list else None)
-    draft_change_list_id = (exp_user_data.draft_change_list_id
-                            if exp_user_data else 0)
+    draft_changes = (
+        exp_user_data.draft_change_list if exp_user_data
+        and exp_user_data.draft_change_list else None)
+    draft_change_list_id = (
+        exp_user_data.draft_change_list_id if exp_user_data else 0)
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
@@ -1664,7 +1677,8 @@ def create_or_update_draft(
             'changes in the change list.')
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    if (exp_user_data and exp_user_data.draft_change_list and
+    if (
+            exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
 
@@ -1722,7 +1736,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_change_list_exp_version = exploration.version
     updated_exploration = None
 
-    if (exp_user_data and exp_user_data.draft_change_list and
+    if (
+            exp_user_data and exp_user_data.draft_change_list and
             is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
         updated_exploration = apply_change_list(exp_id, draft_change_list)
         updated_exploration_has_no_invalid_math_tags = True

@@ -180,13 +180,15 @@ for path, handler_class in mapreduce_main.create_handlers_map():
             path = path.replace('.*', '/mapreduce/ui', 1)
 
     if '/ui/' in path or path.endswith('/ui'):
-        if (hasattr(handler_class, 'dispatch') and
+        if (
+                hasattr(handler_class, 'dispatch') and
                 not hasattr(handler_class, 'real_dispatch')):
             handler_class.real_dispatch = handler_class.dispatch
             handler_class.dispatch = ui_access_wrapper
         MAPREDUCE_HANDLERS.append((path, handler_class))
     else:
-        if (hasattr(handler_class, 'dispatch') and
+        if (
+                hasattr(handler_class, 'dispatch') and
                 not hasattr(handler_class, 'real_dispatch')):
             handler_class.real_dispatch = handler_class.dispatch
             handler_class.dispatch = authorization_wrapper

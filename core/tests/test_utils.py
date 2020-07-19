@@ -155,7 +155,8 @@ def check_image_png_or_webp(image_string):
     Returns:
         boolean. Returns true if image is in WebP format.
     """
-    if (image_string.startswith('data:image/png') or
+    if (
+            image_string.startswith('data:image/png') or
             image_string.startswith('data:image/webp')):
         return True
     return False
@@ -475,144 +476,146 @@ class TestBase(unittest.TestCase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
+        auto_tts_enabled: true
+        blurb: ''
+        category: Category
+        correctness_feedback_enabled: false
+        init_state_name: %s
+        language_code: en
+        objective: ''
         param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-states_schema_version: %d
-tags: []
-title: Title
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
+        param_specs: {}
+        schema_version: %d
+        states:
+          %s:
+            classifier_model_id: null
+            content:
+              content_id: content
+              html: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args: {}
+              default_outcome:
+                dest: %s
+                feedback:
+                  content_id: default_outcome
+                  html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              hints: []
+              id: null
+              solution: null
+            param_changes: []
+            recorded_voiceovers:
+              voiceovers_mapping:
+                content: {}
+                default_outcome: {}
+            solicit_answer_details: false
+            written_translations:
+              translations_mapping:
+                content: {}
+                default_outcome: {}
+          New state:
+            classifier_model_id: null
+            content:
+              content_id: content
+              html: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args: {}
+              default_outcome:
+                dest: New state
+                feedback:
+                  content_id: default_outcome
+                  html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              hints: []
+              id: null
+              solution: null
+            param_changes: []
+            recorded_voiceovers:
+              voiceovers_mapping:
+                content: {}
+                default_outcome: {}
+            solicit_answer_details: false
+            written_translations:
+              translations_mapping:
+                content: {}
+                default_outcome: {}
+        states_schema_version: %d
+        tags: []
+        title: Title
+        """) % (
+            feconf.DEFAULT_INIT_STATE_NAME,
+            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
+    SAMPLE_UNTITLED_YAML_CONTENT = (
+        """author_notes: ''
+        blurb: ''
+        default_skin: conversation_v1
+        init_state_name: %s
+        language_code: en
+        objective: ''
         param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
+        param_specs: {}
+        schema_version: %d
+        states:
+          %s:
+            content:
+            - type: text
+              value: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args: {}
+              default_outcome:
+                dest: %s
+                feedback: []
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              fallbacks: []
+              id: null
+            param_changes: []
+          New state:
+            content:
+            - type: text
+              value: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args: {}
+              default_outcome:
+                dest: New state
+                feedback: []
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              fallbacks: []
+              id: null
+            param_changes: []
+        states_schema_version: %d
+        tags: []
+        """) % (
+            feconf.DEFAULT_INIT_STATE_NAME,
+            exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
@@ -711,8 +714,8 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(response.status_int, expected_status_int)
         if not expect_errors:
-            self.assertTrue(response.status_int >= 200 and
-                            response.status_int < 400)
+            self.assertTrue(
+                response.status_int >= 200 and response.status_int < 400)
         else:
             self.assertTrue(response.status_int >= 400)
         self.assertEqual(
@@ -831,8 +834,9 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_json(self, url, payload, csrf_token=None,
-                  expected_status_int=200, upload_files=None):
+    def post_json(
+            self, url, payload, csrf_token=None,
+            expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -909,8 +913,9 @@ tags: []
         # Convert the files to bytes.
         if upload_files is not None:
             upload_files = tuple(
-                tuple(python_utils.convert_to_bytes(
-                    j) for j in i) for i in upload_files)
+                tuple(
+                    python_utils.convert_to_bytes(
+                        j) for j in i) for i in upload_files)
 
         json_response = app.post(
             url, data, expect_errors=expect_errors,
@@ -2275,7 +2280,8 @@ class AppEngineTestBase(TestBase):
                 method's execution.
         """
         self.assertTrue(
-            any(all(phrase in output for phrase in phrases) for
+            any(
+                all(phrase in output for phrase in phrases) for
                 output in stdout))
 
 

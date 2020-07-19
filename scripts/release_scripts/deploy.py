@@ -479,8 +479,9 @@ def execute_deployment():
 
     install_third_party_libs.main()
 
-    if not (common.is_current_branch_a_release_branch() or (
-            common.is_current_branch_a_test_branch())):
+    if not (
+            common.is_current_branch_a_release_branch() or (
+                common.is_current_branch_a_test_branch())):
         raise Exception(
             'The deployment script must be run from a release or test branch.')
     if common.is_current_branch_a_test_branch() and (
@@ -531,7 +532,8 @@ def execute_deployment():
             update_configs.main(personal_access_token)
             with python_utils.open_file(common.FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()
-                if ('MAILGUN_API_KEY' not in feconf_contents or
+                if (
+                        'MAILGUN_API_KEY' not in feconf_contents or
                         'MAILGUN_API_KEY = None' in feconf_contents):
                     raise Exception(
                         'The mailgun API key must be added before deployment.')

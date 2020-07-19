@@ -58,9 +58,10 @@ from . import setup_gae  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
-_PARSER = argparse.ArgumentParser(description="""
-Installation script for Oppia third-party libraries.
-""")
+_PARSER = argparse.ArgumentParser(
+    description="""
+    Installation script for Oppia third-party libraries.
+    """)
 
 PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,

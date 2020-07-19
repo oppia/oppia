@@ -110,8 +110,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 args for the interaction.
         """
         for ca_spec in customization_args:
-            self.assertTrue(all(hasattr(ca_spec, attr) for attr in [
-                'name', 'description', 'schema', 'default_value']))
+            self.assertTrue(
+                all(hasattr(ca_spec, attr) for attr in [
+                    'name', 'description', 'schema', 'default_value']))
 
             self.assertTrue(
                 isinstance(ca_spec.name, python_utils.BASESTRING))
@@ -271,9 +272,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.
         generated_html_field_types_dict = (
-            collections.defaultdict(lambda: collections.defaultdict(
-                lambda: collections.defaultdict(lambda: collections.defaultdict(
-                    lambda: collections.defaultdict(set))))))
+            collections.defaultdict(
+                lambda: collections.defaultdict(
+                    lambda: collections.defaultdict(
+                        lambda: collections.defaultdict(
+                            lambda: collections.defaultdict(set))))))
 
         # Verify that each html_type dict has a format key, which must be
         # unique. After verification we delete the key for comparison with
@@ -329,7 +332,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         # Below, we raise an exception if the existing
                         # interaction ID is overwritten by another
                         # interaction ID.
-                        if (html_type_dict['interactionId'] !=
+                        if (
+                                html_type_dict['interactionId'] !=
                                 interaction_id):
                             raise Exception(
                                 'Each html type should refer to only'
@@ -375,24 +379,29 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction_dir_optional_dirs_and_files_count = 0
 
             try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, 'protractor.js')))
+                self.assertTrue(
+                    os.path.isfile(
+                        os.path.join(interaction_dir, 'protractor.js')))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir,
-                    '%s-prediction.service.ts' % hyphenated_interaction_id)))
+                self.assertTrue(
+                    os.path.isfile(
+                        os.path.join(
+                            interaction_dir, '%s-prediction.service.ts' % (
+                                hyphenated_interaction_id))))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, '%s-prediction.service.spec.ts'
-                    % hyphenated_interaction_id)))
+                self.assertTrue(
+                    os.path.isfile(
+                        os.path.join(
+                            interaction_dir, '%s-prediction.service.spec.ts'
+                            % hyphenated_interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -495,8 +504,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             self.assertTrue(os.path.isfile(interaction_ts_file))
             self.assertTrue(os.path.isfile(response_ts_file))
-            self.assertTrue(os.path.isfile(
-                short_response_ts_file))
+            self.assertTrue(
+                os.path.isfile(short_response_ts_file))
             self.assertTrue(os.path.isfile(rules_service_ts_file))
             self.assertTrue(os.path.isfile(validation_service_ts_file))
             self.assertTrue(os.path.isfile(interaction_html))
@@ -596,8 +605,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
-                self.assertTrue(isinstance(
-                    getattr(interaction, item), item_type))
+                self.assertTrue(
+                    isinstance(getattr(interaction, item), item_type))
                 if item_type == python_utils.BASESTRING:
                     self.assertTrue(getattr(interaction, item))
 
@@ -734,6 +743,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        self.assertEqual(len(missing_interaction_ids), 0, msg=(
-            'Missing interaction IDs in demo exploration: %s' %
-            missing_interaction_ids))
+        self.assertEqual(
+            len(missing_interaction_ids), 0, msg=(
+                'Missing interaction IDs in demo exploration: %s' %
+                missing_interaction_ids))

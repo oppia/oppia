@@ -1726,9 +1726,11 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         # is not included in the shard count. Since a total of 100 answers were
         # submitted, there must therefore be fewer than 100 answers in the
         # index shard.
-        model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, python_utils.UNICODE(self.exploration.version),
-            self.exploration.init_state_name, '0'))
+        model = stats_models.StateAnswersModel.get(
+            '%s:%s:%s:%s' % (
+                self.exploration.id,
+                python_utils.UNICODE(self.exploration.version),
+                self.exploration.init_state_name, '0'))
         self.assertEqual(model.shard_count, 1)
 
         # Verify that the list of sample answers returned contains fewer than
@@ -2265,10 +2267,10 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.question_id = 'q_id_1'
         self.interaction_id = 'TextInput'
         self.state_reference_exploration = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( # pylint: disable=line-too-long
                 self.exp_id, self.state_name))
         self.state_reference_question = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question( # pylint: disable=line-too-long
                 self.question_id))
         self.learner_answer_details_model_exploration = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(

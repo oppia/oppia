@@ -283,11 +283,12 @@ class CollectionRightsModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            cls.query(ndb.OR(
-                cls.owner_ids == user_id,
-                cls.editor_ids == user_id,
-                cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
+            cls.query(
+                ndb.OR(
+                    cls.owner_ids == user_id,
+                    cls.editor_ids == user_id,
+                    cls.voice_artist_ids == user_id,
+                    cls.viewer_ids == user_id
             )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
@@ -562,11 +563,12 @@ class CollectionSummaryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
-            cls.owner_ids == user_id,
-            cls.editor_ids == user_id,
-            cls.viewer_ids == user_id,
-            cls.contributor_ids == user_id)).get(keys_only=True) is not None
+        return cls.query(
+            ndb.OR(
+                cls.owner_ids == user_id,
+                cls.editor_ids == user_id,
+                cls.viewer_ids == user_id,
+                cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
     @classmethod
     def get_non_private(cls):
@@ -596,9 +598,10 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id,
-                   CollectionSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id,
+                CollectionSummaryModel.viewer_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -616,8 +619,9 @@ class CollectionSummaryModel(base_models.BaseModel):
             least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

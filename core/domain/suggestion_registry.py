@@ -193,8 +193,9 @@ class BaseSuggestion(python_utils.OBJECT):
                     self.score_category))
 
         if (
-                len(self.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER))) != 2:
+                len(
+                    self.score_category.split(
+                        suggestion_models.SCORE_CATEGORY_DELIMITER))) != 2:
             raise utils.ValidationError(
                 'Expected score_category to be of the form'
                 ' score_type%sscore_sub_type, received %s' % (
@@ -318,8 +319,8 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected cmd to be %s, received %s' % (
                     exp_domain.CMD_EDIT_STATE_PROPERTY, self.change.cmd))
 
-        if (self.change.property_name !=
-                exp_domain.STATE_PROPERTY_CONTENT):
+        if (
+                self.change.property_name != exp_domain.STATE_PROPERTY_CONTENT):
             raise utils.ValidationError(
                 'Expected property_name to be %s, received %s' % (
                     exp_domain.STATE_PROPERTY_CONTENT,
@@ -607,9 +608,10 @@ class SuggestionAddQuestion(BaseSuggestion):
         if (
                 self.change.cmd !=
                 question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
-            raise utils.ValidationError('Expected cmd to be %s, obtained %s' % (
-                question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-                self.change.cmd))
+            raise utils.ValidationError(
+                'Expected cmd to be %s, obtained %s' % (
+                    question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                    self.change.cmd))
 
         if not self.change.question_dict:
             raise utils.ValidationError(

@@ -147,13 +147,15 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             old_status = args[1]
             updated_status = args[2]
             # Status changed from closed to open.
-            if (old_status != feedback_models.STATUS_CHOICES_OPEN
+            if (
+                    old_status != feedback_models.STATUS_CHOICES_OPEN
                     and updated_status == feedback_models.STATUS_CHOICES_OPEN):
                 transaction_services.run_in_transaction(
                     _increment_open_threads_count)
             # Status changed from open to closed.
-            elif (old_status == feedback_models.STATUS_CHOICES_OPEN
-                  and updated_status != feedback_models.STATUS_CHOICES_OPEN):
+            elif (
+                    old_status == feedback_models.STATUS_CHOICES_OPEN
+                    and updated_status != feedback_models.STATUS_CHOICES_OPEN):
                 transaction_services.run_in_transaction(
                     _decrement_open_threads_count)
 
@@ -184,14 +186,16 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             feedback_models.FeedbackAnalyticsModel.get_multi(exploration_ids))
         return [feedback_domain.FeedbackAnalytics(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_ids[i],
-            (realtime_models[i].num_open_threads
-             if realtime_models[i] is not None else 0) +
-            (feedback_thread_analytics_models[i].num_open_threads
-             if feedback_thread_analytics_models[i] is not None else 0),
-            (realtime_models[i].num_total_threads
-             if realtime_models[i] is not None else 0) +
-            (feedback_thread_analytics_models[i].num_total_threads
-             if feedback_thread_analytics_models[i] is not None else 0)
+            (
+                realtime_models[i].num_open_threads
+                if realtime_models[i] is not None else 0) + (
+                    feedback_thread_analytics_models[i].num_open_threads
+                    if feedback_thread_analytics_models[i] is not None else 0),
+            (
+                realtime_models[i].num_total_threads
+                if realtime_models[i] is not None else 0) + (
+                    feedback_thread_analytics_models[i].num_total_threads
+                    if feedback_thread_analytics_models[i] is not None else 0)
         ) for i in python_utils.RANGE(len(exploration_ids))]
 
     @classmethod

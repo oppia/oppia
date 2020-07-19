@@ -109,10 +109,12 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 
         question_models.QuestionModel.put_multi_questions(
             [question_model1, question_model2])
-        self.assertEqual(question_models.QuestionModel.get(
-            question_ids[0]).linked_skill_ids, ['skill_id3'])
-        self.assertEqual(question_models.QuestionModel.get(
-            question_ids[1]).linked_skill_ids, ['skill_id3'])
+        self.assertEqual(
+            question_models.QuestionModel.get(
+                question_ids[0]).linked_skill_ids, ['skill_id3'])
+        self.assertEqual(
+            question_models.QuestionModel.get(
+                question_ids[1]).linked_skill_ids, ['skill_id3'])
 
 
     def test_raise_exception_by_mocking_collision(self):
@@ -499,10 +501,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
-            (question_models.QuestionSkillLinkModel.
-             get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
-                 3, skill_ids, 0.6
-             ))
+            (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                    3, skill_ids, 0.6
+                ))
 
     def test_get_questions_with_no_skills(self):
         question_skill_links = (
@@ -677,9 +680,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
-            (question_models.QuestionSkillLinkModel.
-             get_question_skill_links_equidistributed_by_skill(
-                 3, skill_ids))
+            (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_equidistributed_by_skill(
+                    3, skill_ids))
 
 
 class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):

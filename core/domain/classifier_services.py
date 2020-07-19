@@ -359,10 +359,12 @@ def fetch_next_job():
             classifier_models.ClassifierTrainingJobModel.
             query_new_and_pending_training_jobs(cursor))
         for training_job in classifier_training_jobs:
-            if (training_job.status == (
-                    feconf.TRAINING_JOB_STATUS_PENDING)):
-                if (training_job.next_scheduled_check_time <= (
-                        datetime.datetime.utcnow())):
+            if (
+                    training_job.status == (
+                        feconf.TRAINING_JOB_STATUS_PENDING)):
+                if (
+                        training_job.next_scheduled_check_time <= (
+                            datetime.datetime.utcnow())):
                     timed_out_job_ids.append(training_job.id)
             else:
                 valid_jobs.append(training_job)
@@ -450,8 +452,9 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
 
     classifier_training_jobs = []
     for job_model in classifier_training_job_models:
-        classifier_training_jobs.append(get_classifier_training_job_from_model(
-            job_model))
+        classifier_training_jobs.append(
+            get_classifier_training_job_from_model(
+                job_model))
 
     # Backfill None's to maintain indexes.
     for index, mapping_model in enumerate(

@@ -123,71 +123,43 @@ class HangingIndentCheckerTests(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.HangingIndentChecker)
         checker_test_object.setup_method()
-        node_break_after_hanging_indent = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
+        node_break_after_hanging_indent = (
                 u"""self.post_json('/ml/trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
                 """)
-        node_break_after_hanging_indent.file = filename
-        node_break_after_hanging_indent.path = filename
 
-        checker_test_object.checker.process_module(
-            node_break_after_hanging_indent)
+        message = testutils.Message(
+            msg_id='no-break-after-hanging-indent',
+            line=1
+        )
 
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='no-break-after-hanging-indent',
-                line=1
-            ),
-        ):
-            temp_file.close()
+        with checker_test_object.assertAddsMessages(message):
+            checker_test_object.checker.process_tokens(
+                testutils._tokenize_str(node_break_after_hanging_indent))
 
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
+        node_with_no_error_message = (
                 u"""\"""Some multiline
                 docstring.
                 \"""
                 # Load JSON.
                 master_translation_dict = json.loads(
-                utils.get_file_contents(os.path.join(
+                utils.get_file_contents(
+                os.path.join(
                 os.getcwd(), 'assets', 'i18n', 'en.json')))
                 """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        checker_test_object.checker.process_module(node_with_no_error_message)
 
         with checker_test_object.assertNoMessages():
-            temp_file.close()
+            checker_test_object.checker.process_tokens(
+                testutils._tokenize_str(node_with_no_error_message))
 
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""self.post_json('/',
+        node_with_no_error_message = (
+                u"""self.post_json(
+                '/',
                 self.payload, expect_errors=True, expected_status_int=401)""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        checker_test_object.checker.process_module(node_with_no_error_message)
 
         with checker_test_object.assertNoMessages():
-            temp_file.close()
+            checker_test_object.checker.process_tokens(
+                testutils._tokenize_str(node_with_no_error_message))
 
 
 class DocstringParameterCheckerTests(unittest.TestCase):

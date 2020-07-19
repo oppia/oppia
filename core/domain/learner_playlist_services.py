@@ -61,8 +61,8 @@ def save_learner_playlist(learner_playlist):
         'collection_ids': learner_playlist.collection_ids
     }
 
-    learner_playlist_model = (user_models.LearnerPlaylistModel.get_by_id(
-        learner_playlist.id))
+    learner_playlist_model = (
+        user_models.LearnerPlaylistModel.get_by_id(learner_playlist.id))
     if learner_playlist_model is not None:
         learner_playlist_model.populate(**learner_playlist_dict)
         learner_playlist_model.put()

@@ -71,9 +71,8 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
-_PARSER = argparse.ArgumentParser(description="""
-Installation script for Oppia third-party libraries.
-""")
+_PARSER = argparse.ArgumentParser(
+    description="""Installation script for Oppia third-party libraries.""")
 
 
 def download_files(source_url_root, target_dir, source_filenames):
@@ -122,8 +121,9 @@ def download_and_unzip_files(
             renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        python_utils.PRINT('Downloading and unzipping file %s to %s ...' % (
-            zip_root_name, target_parent_dir))
+        python_utils.PRINT(
+            'Downloading and unzipping file %s to %s ...' % (
+                zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
         python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
@@ -174,13 +174,14 @@ def download_and_untar_files(
             renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        python_utils.PRINT('Downloading and untarring file %s to %s ...' % (
-            tar_root_name, target_parent_dir))
+        python_utils.PRINT(
+            'Downloading and untarring file %s to %s ...' % (
+                tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
         python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
-        with contextlib.closing(tarfile.open(
-            name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
+        with contextlib.closing(
+            tarfile.open(name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 
@@ -256,15 +257,17 @@ def test_manifest_syntax(dependency_type, dependency_dict):
         dependency_url = dependency_url.rpartition('#')[0]
     is_zip_file_format = dependency_type == _DOWNLOAD_FORMAT_ZIP
     is_tar_file_format = dependency_type == _DOWNLOAD_FORMAT_TAR
-    if (dependency_url.endswith('.zip') and not is_zip_file_format or
+    if (
+            dependency_url.endswith('.zip') and not is_zip_file_format or
             is_zip_file_format and not dependency_url.endswith('.zip') or
             dependency_url.endswith('.tar.gz') and not is_tar_file_format or
             is_tar_file_format and not dependency_url.endswith('.tar.gz')):
         python_utils.PRINT('------------------------------------------')
         python_utils.PRINT('There is syntax error in this dependency')
         python_utils.PRINT(dependency_dict)
-        python_utils.PRINT('This url %s is invalid for %s file format.' % (
-            dependency_url, dependency_type))
+        python_utils.PRINT(
+            'This url %s is invalid for %s file format.' % (
+                dependency_url, dependency_type))
         python_utils.PRINT('Exiting.')
         sys.exit(1)
 

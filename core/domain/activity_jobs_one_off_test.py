@@ -502,8 +502,10 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
 
         def mock_add_documents_to_index(docs, index):
             indexed_docs.extend(docs)
-            self.assertIn(index, (search_services.SEARCH_INDEX_EXPLORATIONS,
-                                  search_services.SEARCH_INDEX_COLLECTIONS))
+            self.assertIn(
+                index, (
+                    search_services.SEARCH_INDEX_EXPLORATIONS,
+                    search_services.SEARCH_INDEX_COLLECTIONS))
 
         add_docs_swap = self.swap(
             gae_search_services, 'add_documents_to_index',

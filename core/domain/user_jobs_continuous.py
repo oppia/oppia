@@ -670,9 +670,11 @@ class UserStatsMRJobManager(
         exponent = python_utils.divide(2.0, 3)
 
         # Find the final score and round to a whole number.
-        user_impact_score = int(python_utils.ROUND(sum(
-            value['exploration_impact_score'] for value in values
-            if value.get('exploration_impact_score')) ** exponent))
+        user_impact_score = int(
+            python_utils.ROUND(
+                sum(
+                    value['exploration_impact_score'] for value in values
+                    if value.get('exploration_impact_score')) ** exponent))
 
         # Sum up the total plays for all explorations.
         total_plays = sum(

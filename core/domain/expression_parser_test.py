@@ -37,14 +37,16 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.contains_balanced_brackets('[a/ 2]'))
         self.assertTrue(expression_parser.contains_balanced_brackets(' {a/2} '))
         self.assertTrue(expression_parser.contains_balanced_brackets('([a]/2)'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '[(a/{ 2 })]'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '(([{}]{})( ){[ ]})'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '[[ [((()))[[[[[]{}]]{}]]()]] ]'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '{( 2x^2 ) ^ [ 3/2 ]} / 4'))
+        self.assertTrue(
+            expression_parser.contains_balanced_brackets('[(a/{ 2 })]'))
+        self.assertTrue(
+            expression_parser.contains_balanced_brackets('(([{}]{})( ){[ ]})'))
+        self.assertTrue(
+            expression_parser.contains_balanced_brackets(
+                '[[ [((()))[[[[[]{}]]{}]]()]] ]'))
+        self.assertTrue(
+            expression_parser.contains_balanced_brackets(
+                '{( 2x^2 ) ^ [ 3/2 ]} / 4'))
 
         self.assertFalse(expression_parser.contains_balanced_brackets('(a/2'))
         self.assertFalse(expression_parser.contains_balanced_brackets('a/2]'))
@@ -462,35 +464,36 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_valid_expression('2x + 3/2'))
         self.assertTrue(expression_parser.is_valid_expression('alpha + bet/2'))
         self.assertTrue(expression_parser.is_valid_expression('Alpha/2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '42 - [5/a] (4)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'a + sqrt(beta/gamma)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'cos(theta/2^epsilon)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('42 - [5/a] (4)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('a + sqrt(beta/gamma)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('cos(theta/2^epsilon)'))
         self.assertTrue(expression_parser.is_valid_expression('a+{-b/22}'))
         self.assertTrue(expression_parser.is_valid_expression('abs(a^2 + b^2)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'sin(theta)^2 + cos(theta)^2'))
+        self.assertTrue(
+            expression_parser.is_valid_expression(
+                'sin(theta)^2 + cos(theta)^2'))
         self.assertTrue(expression_parser.is_valid_expression('(2*pi*r^2)/2'))
         self.assertTrue(expression_parser.is_valid_expression('1 + (2*a)'))
         self.assertTrue(expression_parser.is_valid_expression('(a+ b) '))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{a+(beta - gamma)}'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '(a) / ((b)/(c))'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{a+(b-[c])-(beta^4)}'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('{a+(beta - gamma)}'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('(a) / ((b)/(c))'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('{a+(b-[c])-(beta^4)}'))
         self.assertTrue(expression_parser.is_valid_expression('alpha + (-3)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'alpha^(3.9/beta*gamma)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{a-(-3)/(2-(-b)^4)}^2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'a+(-3)/alpha + gamma^2'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('alpha^(3.9/beta*gamma)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('{a-(-3)/(2-(-b)^4)}^2'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('a+(-3)/alpha + gamma^2'))
         self.assertTrue(expression_parser.is_valid_expression('(x+y) * (x-y)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '(a+ b)^2 - (c+d) ^ 3'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('(a+ b)^2 - (c+d) ^ 3'))
 
         self.assertTrue(expression_parser.is_valid_expression('3+2'))
         self.assertTrue(expression_parser.is_valid_expression('---+34'))
@@ -498,23 +501,23 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_valid_expression('3+2^3'))
         self.assertTrue(expression_parser.is_valid_expression('(5-2^[6+3])'))
         self.assertTrue(expression_parser.is_valid_expression('(-5)^(-1)/2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '2*10^3 + 3*10^2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{55 - 2/(-3)^100 + [5-4]}'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('2*10^3 + 3*10^2'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('{55 - 2/(-3)^100 + [5-4]}'))
         self.assertTrue(expression_parser.is_valid_expression('(3^2) - (4^2)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '(1+2+3)/(1-2-3)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '24.6 + 3^(-1/2)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('(1+2+3)/(1-2-3)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('24.6 + 3^(-1/2)'))
         self.assertTrue(expression_parser.is_valid_expression('1^1^1^1^1^1^1'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '1000 + 200 + 30 + 4'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('1000 + 200 + 30 + 4'))
         self.assertTrue(expression_parser.is_valid_expression('(1.01)^39'))
         self.assertTrue(expression_parser.is_valid_expression('506/(2-3)^(-3)'))
         self.assertTrue(expression_parser.is_valid_expression('sqrt(-1)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'sqrt(-abs(-1))^2/abs(5)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('sqrt(-abs(-1))^2/abs(5)'))
 
 
         self.assertFalse(expression_parser.is_valid_expression('a+b/'))
@@ -524,11 +527,11 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.is_valid_expression('a^2.'))
         self.assertFalse(expression_parser.is_valid_expression('(352+)-3*x'))
         self.assertFalse(expression_parser.is_valid_expression('(a-2^34-)'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            '(25 + 3.4.3*a)'))
+        self.assertFalse(
+            expression_parser.is_valid_expression('(25 + 3.4.3*a)'))
         self.assertFalse(expression_parser.is_valid_expression('sqrt(abs)'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            'alpha + bet/2.3.4'))
+        self.assertFalse(
+            expression_parser.is_valid_expression('alpha + bet/2.3.4'))
         self.assertFalse(expression_parser.is_valid_expression('a_b'))
         self.assertFalse(expression_parser.is_valid_expression('!/'))
         self.assertFalse(expression_parser.is_valid_expression('a~b'))
@@ -548,10 +551,10 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.is_valid_expression('192.168.1 + 3'))
         self.assertFalse(expression_parser.is_valid_expression('{1 - 2 (/3}'))
         self.assertFalse(expression_parser.is_valid_expression('[5^(3-2])'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            '55.02//3.5-(-a)'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            'alpha + beta-^1'))
+        self.assertFalse(
+            expression_parser.is_valid_expression('55.02//3.5-(-a)'))
+        self.assertFalse(
+            expression_parser.is_valid_expression('alpha + beta-^1'))
         self.assertFalse(expression_parser.is_valid_expression('(3+2]'))
         self.assertFalse(expression_parser.is_valid_expression('3!2'))
         self.assertFalse(expression_parser.is_valid_expression('3~2'))

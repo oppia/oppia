@@ -73,27 +73,30 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if (
                 item.skill_contents_schema_version <=
                 feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-            commit_cmds.append(skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
-                'from_version': item.skill_contents_schema_version,
-                'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
-            }))
+            commit_cmds.append(
+                skill_domain.SkillChange({
+                    'cmd': skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
+                    'from_version': item.skill_contents_schema_version,
+                    'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+                }))
         if (
                 item.misconceptions_schema_version <=
                 feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-            commit_cmds.append(skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
-                'from_version': item.misconceptions_schema_version,
-                'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
-            }))
+            commit_cmds.append(
+                skill_domain.SkillChange({
+                    'cmd': skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
+                    'from_version': item.misconceptions_schema_version,
+                    'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+                }))
         if (
                 item.rubric_schema_version <=
                 feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
-            commit_cmds.append(skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
-                'from_version': item.rubric_schema_version,
-                'to_version': feconf.CURRENT_RUBRIC_SCHEMA_VERSION
-            }))
+            commit_cmds.append(
+                skill_domain.SkillChange({
+                    'cmd': skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
+                    'from_version': item.rubric_schema_version,
+                    'to_version': feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+                }))
 
         if commit_cmds:
             skill_services.update_skill(
@@ -109,10 +112,12 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == SkillMigrationOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted skills.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['Encountered %d deleted skills.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         elif key == SkillMigrationOneOffJob._MIGRATED_KEY:
-            yield (key, ['%d skills successfully migrated.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['%d skills successfully migrated.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

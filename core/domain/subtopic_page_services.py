@@ -47,14 +47,16 @@ def _migrate_page_contents_to_latest_schema(versioned_page_contents):
             is supported at present.
     """
     page_contents_schema_version = versioned_page_contents['schema_version']
-    if not (1 <= page_contents_schema_version
+    if not (
+            1 <= page_contents_schema_version
             <= feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d page schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION)
 
-    while (page_contents_schema_version <
-           feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+    while (
+            page_contents_schema_version <
+            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
         subtopic_page_domain.SubtopicPage.update_page_contents_from_model(
             versioned_page_contents, page_contents_schema_version)
         page_contents_schema_version += 1
@@ -73,7 +75,8 @@ def get_subtopic_page_from_model(subtopic_page_model):
         'schema_version': subtopic_page_model.page_contents_schema_version,
         'page_contents': copy.deepcopy(subtopic_page_model.page_contents)
     }
-    if (subtopic_page_model.page_contents_schema_version !=
+    if (
+            subtopic_page_model.page_contents_schema_version !=
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
         _migrate_page_contents_to_latest_schema(versioned_page_contents)
     return subtopic_page_domain.SubtopicPage(

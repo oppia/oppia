@@ -820,14 +820,17 @@ class JobRegistryTests(test_utils.GenericTestBase):
             for event_type in event_types_listened_to:
                 self.assertTrue(
                     isinstance(event_type, python_utils.BASESTRING))
-                self.assertTrue(issubclass(
-                    event_services.Registry.get_event_class_by_type(
-                        event_type),
-                    event_services.BaseEventHandler))
+                self.assertTrue(
+                    issubclass(
+                        event_services.Registry.get_event_class_by_type(
+                            event_type),
+                        event_services.BaseEventHandler))
 
             rdc = klass._get_realtime_datastore_class()  # pylint: disable=protected-access
-            self.assertTrue(issubclass(
-                rdc, jobs.BaseRealtimeDatastoreClassForContinuousComputations))
+            self.assertTrue(
+                issubclass(
+                    rdc,
+                    jobs.BaseRealtimeDatastoreClassForContinuousComputations))
 
             # The list of allowed base classes. This can be extended as the
             # need arises, though we may also want to implement
@@ -836,9 +839,10 @@ class JobRegistryTests(test_utils.GenericTestBase):
             # that are added to this list.
             allowed_base_batch_job_classes = [
                 jobs.BaseMapReduceJobManagerForContinuousComputations]
-            self.assertTrue(any([
-                issubclass(klass._get_batch_job_manager_class(), superclass)  # pylint: disable=protected-access
-                for superclass in allowed_base_batch_job_classes]))
+            self.assertTrue(
+                any([
+                    issubclass(klass._get_batch_job_manager_class(), superclass)  # pylint: disable=protected-access
+                    for superclass in allowed_base_batch_job_classes]))
 
 
 class BaseMapReduceJobManagerForContinuousComputationsTests(
@@ -1188,10 +1192,12 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
-            self.assertEqual(MockStartExplorationRealtimeModel.get(
-                '0:%s' % self.EXP_ID).count, 1)
-            self.assertEqual(MockStartExplorationRealtimeModel.get(
-                '1:%s' % self.EXP_ID).count, 1)
+            self.assertEqual(
+                MockStartExplorationRealtimeModel.get(
+                    '0:%s' % self.EXP_ID).count, 1)
+            self.assertEqual(
+                MockStartExplorationRealtimeModel.get(
+                    '1:%s' % self.EXP_ID).count, 1)
 
             # The batch job has not run yet, so no entity for self.EXP_ID will
             # have been created in the batch model yet.
@@ -1201,11 +1207,13 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             # Launch the batch computation.
             batch_job_id = StartExplorationEventCounter.start_computation()
             # Data in realtime layer 0 is still there.
-            self.assertEqual(MockStartExplorationRealtimeModel.get(
-                '0:%s' % self.EXP_ID).count, 1)
+            self.assertEqual(
+                MockStartExplorationRealtimeModel.get(
+                    '0:%s' % self.EXP_ID).count, 1)
             # Data in realtime layer 1 has been deleted.
-            self.assertIsNone(MockStartExplorationRealtimeModel.get(
-                '1:%s' % self.EXP_ID, strict=False))
+            self.assertIsNone(
+                MockStartExplorationRealtimeModel.get(
+                    '1:%s' % self.EXP_ID, strict=False))
 
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
@@ -1227,11 +1235,13 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             # Data in realtime layer 0 has been deleted.
-            self.assertIsNone(MockStartExplorationRealtimeModel.get(
-                '0:%s' % self.EXP_ID, strict=False))
+            self.assertIsNone(
+                MockStartExplorationRealtimeModel.get(
+                    '0:%s' % self.EXP_ID, strict=False))
             # Data in realtime layer 1 has been deleted.
-            self.assertIsNone(MockStartExplorationRealtimeModel.get(
-                '1:%s' % self.EXP_ID, strict=False))
+            self.assertIsNone(
+                MockStartExplorationRealtimeModel.get(
+                    '1:%s' % self.EXP_ID, strict=False))
 
     def test_events_coming_in_while_batch_job_is_running(self):
         with self.swap(

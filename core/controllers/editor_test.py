@@ -314,148 +314,152 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""classifier_model_id: null
-content:
-  content_id: content
-  html: ''
-interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value: ''
-    rows:
-      value: 1
-  default_outcome:
-    dest: State A
-    feedback:
-      content_id: default_outcome
-      html: ''
-    labelled_as_correct: false
-    missing_prerequisite_skill_id: null
-    param_changes: []
-    refresher_exploration_id: null
-  hints: []
-  id: TextInput
-  solution: null
-param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    content: {}
-    default_outcome: {}
-solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    content: {}
-    default_outcome: {}
-"""),
-        'State B': ("""classifier_model_id: null
-content:
-  content_id: content
-  html: ''
-interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value: ''
-    rows:
-      value: 1
-  default_outcome:
-    dest: State B
-    feedback:
-      content_id: default_outcome
-      html: ''
-    labelled_as_correct: false
-    missing_prerequisite_skill_id: null
-    param_changes: []
-    refresher_exploration_id: null
-  hints: []
-  id: TextInput
-  solution: null
-param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    content: {}
-    default_outcome: {}
-solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    content: {}
-    default_outcome: {}
-"""),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
-content:
-  content_id: content
-  html: ''
-interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value: ''
-    rows:
-      value: 1
-  default_outcome:
-    dest: %s
-    feedback:
-      content_id: default_outcome
-      html: ''
-    labelled_as_correct: false
-    missing_prerequisite_skill_id: null
-    param_changes: []
-    refresher_exploration_id: null
-  hints: []
-  id: TextInput
-  solution: null
-param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    content: {}
-    default_outcome: {}
-solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    content: {}
-    default_outcome: {}
-""") % feconf.DEFAULT_INIT_STATE_NAME
+        'State A': (
+            """classifier_model_id: null
+            content:
+              content_id: content
+              html: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args:
+                placeholder:
+                  value: ''
+                rows:
+                  value: 1
+              default_outcome:
+                dest: State A
+                feedback:
+                  content_id: default_outcome
+                  html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              hints: []
+              id: TextInput
+              solution: null
+            param_changes: []
+            recorded_voiceovers:
+              voiceovers_mapping:
+                content: {}
+                default_outcome: {}
+            solicit_answer_details: false
+            written_translations:
+              translations_mapping:
+                content: {}
+                default_outcome: {}
+            """),
+        'State B': (
+            """classifier_model_id: null
+            content:
+              content_id: content
+              html: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args:
+                placeholder:
+                  value: ''
+                rows:
+                  value: 1
+              default_outcome:
+                dest: State B
+                feedback:
+                  content_id: default_outcome
+                  html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              hints: []
+              id: TextInput
+              solution: null
+            param_changes: []
+            recorded_voiceovers:
+              voiceovers_mapping:
+                content: {}
+                default_outcome: {}
+            solicit_answer_details: false
+            written_translations:
+              translations_mapping:
+                content: {}
+                default_outcome: {}
+            """),
+        feconf.DEFAULT_INIT_STATE_NAME: (
+            """classifier_model_id: null
+            content:
+              content_id: content
+              html: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args:
+                placeholder:
+                  value: ''
+                rows:
+                  value: 1
+              default_outcome:
+                dest: %s
+                feedback:
+                  content_id: default_outcome
+                  html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              hints: []
+              id: TextInput
+              solution: null
+            param_changes: []
+            recorded_voiceovers:
+              voiceovers_mapping:
+                content: {}
+                default_outcome: {}
+            solicit_answer_details: false
+            written_translations:
+              translations_mapping:
+                content: {}
+                default_outcome: {}
+            """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""classifier_model_id: null
-content:
-  content_id: content
-  html: ''
-interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value: ''
-    rows:
-      value: 1
-  default_outcome:
-    dest: State A
-    feedback:
-      content_id: default_outcome
-      html: ''
-    labelled_as_correct: false
-    missing_prerequisite_skill_id: null
-    param_changes: []
-    refresher_exploration_id: null
-  hints: []
-  id: TextInput
-  solution: null
-param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    content: {}
-    default_outcome: {}
-solicit_answer_details: false
-written_translations:
-  translations_mapping:
-    content: {}
-    default_outcome: {}
-""")
+    SAMPLE_STATE_STRING = (
+        """classifier_model_id: null
+        content:
+          content_id: content
+          html: ''
+        interaction:
+          answer_groups: []
+          confirmed_unclassified_answers: []
+          customization_args:
+            placeholder:
+              value: ''
+            rows:
+              value: 1
+          default_outcome:
+            dest: State A
+            feedback:
+              content_id: default_outcome
+              html: ''
+            labelled_as_correct: false
+            missing_prerequisite_skill_id: null
+            param_changes: []
+            refresher_exploration_id: null
+          hints: []
+          id: TextInput
+          solution: null
+        param_changes: []
+        recorded_voiceovers:
+          voiceovers_mapping:
+            content: {}
+            default_outcome: {}
+        solicit_answer_details: false
+        written_translations:
+          translations_mapping:
+            content: {}
+            default_outcome: {}
+        """)
 
     def test_can_not_download_exploration_with_disabled_exp_id(self):
         download_url = '/createhandler/download/5'
@@ -527,8 +531,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
         self.assertEqual(
@@ -607,8 +612,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-Hola!-v1.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
@@ -635,8 +641,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-unpublished_exploration-v1.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
@@ -1203,8 +1210,8 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             if not isinstance(rev_version, int):
                 self.assertIn('Expected an integer', response_dict['error'])
             else:
-                self.assertIn('Cannot revert to version',
-                              response_dict['error'])
+                self.assertIn(
+                    'Cannot revert to version', response_dict['error'])
 
             # Check that exploration is really not reverted to old version.
             reader_dict = self.get_json(
@@ -1821,26 +1828,28 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].subject,
                 'Your Oppia exploration "My Exploration" has been unpublished')
-            self.assertEqual(messages[0].body.decode(), (
-                'Hi %s,\n\n'
-                '%s\n\n'
-                'Thanks!\n'
-                '%s (Oppia moderator)\n\n'
-                'You can change your email preferences via the Preferences '
-                'page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
-            self.assertEqual(messages[0].html.decode(), (
-                'Hi %s,<br><br>'
-                '%s<br><br>'
-                'Thanks!<br>'
-                '%s (Oppia moderator)<br><br>'
-                'You can change your email preferences via the '
-                '<a href="https://www.example.com">Preferences</a> page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
+            self.assertEqual(
+                messages[0].body.decode(), (
+                    'Hi %s,\n\n'
+                    '%s\n\n'
+                    'Thanks!\n'
+                    '%s (Oppia moderator)\n\n'
+                    'You can change your email preferences via the Preferences '
+                    'page.' % (
+                        self.EDITOR_USERNAME,
+                        new_email_body,
+                        self.MODERATOR_USERNAME)))
+            self.assertEqual(
+                messages[0].html.decode(), (
+                    'Hi %s,<br><br>'
+                    '%s<br><br>'
+                    'Thanks!<br>'
+                    '%s (Oppia moderator)<br><br>'
+                    'You can change your email preferences via the '
+                    '<a href="https://www.example.com">Preferences</a> page.' % (
+                        self.EDITOR_USERNAME,
+                        new_email_body,
+                        self.MODERATOR_USERNAME)))
 
             self.logout()
 

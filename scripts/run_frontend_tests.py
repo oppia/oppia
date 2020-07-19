@@ -29,13 +29,14 @@ from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 
-_PARSER = argparse.ArgumentParser(description="""
-Run this script from the oppia root folder:
-    python -m scripts.run_frontend_tests
-The root folder MUST be named 'oppia'.
-Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
-a single test or test suite.
-""")
+_PARSER = argparse.ArgumentParser(
+    description="""
+    Run this script from the oppia root folder:
+        python -m scripts.run_frontend_tests
+    The root folder MUST be named 'oppia'.
+    Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
+    a single test or test suite.
+    """)
 
 _PARSER.add_argument(
     '--skip_install',

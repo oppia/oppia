@@ -102,9 +102,10 @@ class SentEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
-            cls.recipient_id == user_id,
-            cls.sender_id == user_id,
+        return cls.query(
+            ndb.OR(
+                cls.recipient_id == user_id,
+                cls.sender_id == user_id,
         )).get(keys_only=True) is not None
 
     @classmethod
@@ -128,8 +129,9 @@ class SentEmailModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
-                    python_utils.UNICODE(utils.get_random_int(
-                        base_models.RAND_RANGE)),
+                    python_utils.UNICODE(
+                        utils.get_random_int(
+                            base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -259,7 +261,8 @@ class SentEmailModel(base_models.BaseModel):
             email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
 
         for message in messages:
-            if (message.recipient_id == recipient_id and
+            if (
+                    message.recipient_id == recipient_id and
                     message.subject == email_subject and
                     message.html_body == email_body):
                 return True
@@ -440,8 +443,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         instance_id = cls._generate_id(user_id, thread_id)
         if cls.get_by_id(instance_id):
-            raise Exception('Unique reply-to ID for given user and thread'
-                            ' already exists.')
+            raise Exception(
+                'Unique reply-to ID for given user and thread already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
         feedback_email_reply_model_instance = cls(

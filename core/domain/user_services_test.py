@@ -471,8 +471,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             set(['name1', 'name2']))
 
         self.assertEqual(
-            set(user_services.get_usernames_by_role(
-                feconf.ROLE_ID_BANNED_USER)),
+            set(
+                user_services.get_usernames_by_role(
+                    feconf.ROLE_ID_BANNED_USER)),
             set(['name3', 'name4']))
 
     def test_get_user_ids_by_role(self):
@@ -499,8 +500,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             set([user_ids[0], user_ids[1]]))
 
         self.assertEqual(
-            set(user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_BANNED_USER)),
+            set(
+                user_services.get_user_ids_by_role(feconf.ROLE_ID_BANNED_USER)),
             set([user_ids[2], user_ids[3]]))
 
     def test_update_user_creator_dashboard_display(self):
@@ -531,13 +532,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
 
         user_services.update_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_mark_user_for_deletion(self):
         gae_id = 'test_id'
@@ -666,8 +669,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test all owners and editors of exploration after publication have
         # updated first contribution times in msecs.
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test editor of published exploration has updated contribution time.
         rights_manager.release_ownership_of_exploration(
@@ -681,8 +685,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'new_value': 'MultipleChoiceInput'
             })], 'commit')
 
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_update_until_exp_is_published(self):
         exploration = self.save_new_valid_exploration(
@@ -691,8 +696,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that saving an exploration does not update first contribution
         # time.
-        self.assertIsNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test that commit to unpublished exploration does not update
         # contribution time.
@@ -703,8 +709,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             })], '')
-        self.assertIsNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test that another user who commits to unpublished exploration does not
         # have updated first contribution time.
@@ -716,17 +723,20 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_state_name': u'¡Hola! αβγ',
             })], '')
-        self.assertIsNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
         # Test that after an exploration is published, all contributors have
         # updated first contribution time.
         exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_change_if_no_contribution_to_exp(self):
         self.save_new_valid_exploration(
@@ -738,10 +748,12 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that contribution time is not given to an editor that has not
         # contributed.
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
-        self.assertIsNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_change_if_exp_unpublished(self):
         self.save_new_valid_exploration(
@@ -753,8 +765,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that contribution time is not eliminated if exploration is
         # unpublished.
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.owner_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.owner_id).first_contribution_msec)
 
     def test_contribution_msec_updates_on_published_collections(self):
         self.save_new_valid_collection(
@@ -770,8 +783,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test all owners and editors of collection after publication have
         # updated first contribution times.
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test editor of published collection has updated
         # first contribution time.
@@ -785,8 +799,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'new_value': 'Some new title'
             }], 'Changed the title')
 
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_update_until_collection_is_published(
             self):
@@ -798,8 +813,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that saving a collection does not update first contribution
         # time.
-        self.assertIsNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test that commit to unpublished collection does not update
         # contribution time.
@@ -822,17 +838,20 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'property_name': 'category',
                 'new_value': 'Some new category'
             }], '')
-        self.assertIsNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
         # Test that after an collection is published, all contributors have
         # updated first contribution times.
         collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_change_if_no_contribution_to_collection(
             self):
@@ -848,10 +867,12 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that contribution time is not given to an editor that has not
         # contributed.
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
-        self.assertIsNone(user_services.get_user_settings(
-            self.editor_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_change_if_collection_unpublished(self):
         self.save_new_valid_collection(
@@ -865,8 +886,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that first contribution msec is not eliminated if collection is
         # unpublished.
-        self.assertIsNotNone(user_services.get_user_settings(
-            self.owner_id).first_contribution_msec)
+        self.assertIsNotNone(
+            user_services.get_user_settings(
+                self.owner_id).first_contribution_msec)
 
 
 class UserDashboardStatsTests(test_utils.GenericTestBase):

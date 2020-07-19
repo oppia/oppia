@@ -114,6 +114,8 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
             set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_COLLECTION_EDITOR]))
 
         # Sets are compared as their element order don't need to be same.
-        self.assertEqual(set(collection_editor_actions),
-                         set(role_services.get_all_actions(
-                             feconf.ROLE_ID_COLLECTION_EDITOR)))
+        self.assertEqual(
+            set(collection_editor_actions),
+            set(
+                role_services.get_all_actions(
+                    feconf.ROLE_ID_COLLECTION_EDITOR)))

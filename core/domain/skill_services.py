@@ -296,8 +296,10 @@ def _filter_skills_by_keywords(augmented_skill_summaries, keywords):
     filtered_augmented_skill_summaries = []
 
     for augmented_skill_summary in augmented_skill_summaries:
-        if any((augmented_skill_summary.description.lower().find(
-                keyword.lower()) != -1) for keyword in keywords):
+        if any(
+                (
+                    augmented_skill_summary.description.lower().find(
+                        keyword.lower()) != -1) for keyword in keywords):
             filtered_augmented_skill_summaries.append(augmented_skill_summary)
 
     return filtered_augmented_skill_summaries
@@ -429,8 +431,9 @@ def get_all_topic_assignments_for_skill(skill_id):
                     subtopic_id = subtopic.id
                     break
 
-            topic_assignments.append(skill_domain.TopicAssignment(
-                topic.id, topic.name, topic.version, subtopic_id))
+            topic_assignments.append(
+                skill_domain.TopicAssignment(
+                    topic.id, topic.name, topic.version, subtopic_id))
 
     return topic_assignments
 
@@ -448,17 +451,19 @@ def remove_skill_from_all_topics(user_id, skill_id):
         if skill_id in topic.get_all_skill_ids():
             for subtopic in topic.subtopics:
                 if skill_id in subtopic.skill_ids:
-                    change_list.append(topic_domain.TopicChange({
-                        'cmd': 'remove_skill_id_from_subtopic',
-                        'subtopic_id': subtopic.id,
-                        'skill_id': skill_id
-                    }))
+                    change_list.append(
+                        topic_domain.TopicChange({
+                            'cmd': 'remove_skill_id_from_subtopic',
+                            'subtopic_id': subtopic.id,
+                            'skill_id': skill_id
+                        }))
                     break
 
-            change_list.append(topic_domain.TopicChange({
-                'cmd': 'remove_uncategorized_skill_id',
-                'uncategorized_skill_id': skill_id
-            }))
+            change_list.append(
+                topic_domain.TopicChange({
+                    'cmd': 'remove_uncategorized_skill_id',
+                    'uncategorized_skill_id': skill_id
+                }))
             skill_name = get_skill_summary_by_id(skill_id).description
             topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
@@ -569,7 +574,8 @@ def apply_change_list(skill_id, change_list, committer_id):
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         skill_domain.SKILL_PROPERTY_DESCRIPTION):
                     if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (
                             user.actions):
@@ -577,25 +583,31 @@ def apply_change_list(skill_id, change_list, committer_id):
                             'The user does not have enough rights to edit the '
                             'skill description.')
                     skill.update_description(change.new_value)
-                    (opportunity_services
-                     .update_skill_opportunity_skill_description(
-                         skill.id, change.new_value))
-                elif (change.property_name ==
-                      skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
+                    (
+                        opportunity_services
+                        .update_skill_opportunity_skill_description(
+                            skill.id, change.new_value))
+                elif (
+                        change.property_name ==
+                        skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
-                elif (change.property_name ==
-                      skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
+                elif (
+                        change.property_name ==
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
                     skill.update_superseding_skill_id(change.new_value)
-                elif (change.property_name ==
-                      skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
+                elif (
+                        change.property_name ==
+                        skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
                     skill.record_that_all_questions_are_merged(change.new_value)
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
                     skill.update_explanation(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
-                elif (change.property_name ==
-                      skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
+                elif (
+                        change.property_name ==
+                        skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     worked_examples_list = [
                         skill_domain.WorkedExample.from_dict(worked_example)
                         for worked_example in change.new_value]
@@ -613,32 +625,38 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 skill.update_rubric(
                     change.difficulty, change.explanations)
-            elif (change.cmd ==
-                  skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
-                if (change.property_name ==
+            elif (
+                    change.cmd ==
+                    skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
+                if (
+                        change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
                     skill.update_misconception_name(
                         change.misconception_id, change.new_value)
-                elif (change.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
+                elif (
+                        change.property_name ==
+                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
                     skill.update_misconception_notes(
                         change.misconception_id, change.new_value)
-                elif (change.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
+                elif (
+                        change.property_name ==
+                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
-                elif (change.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
+                elif (
+                        change.property_name ==
+                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
                     skill.update_misconception_must_be_addressed(
                         change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
-            elif (change.cmd ==
-                  skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
-                  or change.cmd ==
-                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION # pylint: disable=line-too-long
-                  or change.cmd ==
-                  skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
+            elif (
+                    change.cmd ==
+                    skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
+                    or change.cmd ==
+                    skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION # pylint: disable=line-too-long
+                    or change.cmd ==
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -891,11 +909,12 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
     user_skill_mastery_models = []
 
     for skill_id, degree_of_mastery in degrees_of_mastery.items():
-        user_skill_mastery_models.append(user_models.UserSkillMasteryModel(
-            id=user_models.UserSkillMasteryModel.construct_model_id(
-                user_id, skill_id),
-            user_id=user_id, skill_id=skill_id,
-            degree_of_mastery=degree_of_mastery))
+        user_skill_mastery_models.append(
+            user_models.UserSkillMasteryModel(
+                id=user_models.UserSkillMasteryModel.construct_model_id(
+                    user_id, skill_id),
+                user_id=user_id, skill_id=skill_id,
+                degree_of_mastery=degree_of_mastery))
     user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
 
 
@@ -938,8 +957,9 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
     model_ids = []
 
     for skill_id in skill_ids:
-        model_ids.append(user_models.UserSkillMasteryModel.construct_model_id(
-            user_id, skill_id))
+        model_ids.append(
+            user_models.UserSkillMasteryModel.construct_model_id(
+                user_id, skill_id))
 
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)

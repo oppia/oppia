@@ -68,7 +68,8 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new question into the datastore if it's different from
         # the old version.
-        if (item.question_state_data_schema_version <=
+        if (
+                item.question_state_data_schema_version <=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             commit_cmds = [question_domain.QuestionChange({
                 'cmd': question_domain.CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
@@ -84,10 +85,12 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == QuestionMigrationOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted questions.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['Encountered %d deleted questions.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         elif key == QuestionMigrationOneOffJob._MIGRATED_KEY:
-            yield (key, ['%d questions successfully migrated.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['%d questions successfully migrated.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

@@ -94,8 +94,9 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
     THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
 
 # The default message to be shown when accepting stale suggestions.
-DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
-                                     ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
+DEFAULT_SUGGESTION_ACCEPT_MESSAGE = (
+    'Automatically accepting suggestion after'
+    ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
 
 # The message to be shown when rejecting a suggestion with a target ID of a
 # deleted skill.
@@ -197,10 +198,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
         instance_id = thread_id
 
         if cls.get_by_id(instance_id):
-            raise Exception('There is already a suggestion with the given'
-                            ' id: %s' % instance_id)
+            raise Exception(
+                'There is already a suggestion with the given'
+                ' id: %s' % instance_id)
 
-        cls(id=instance_id, suggestion_type=suggestion_type,
+        cls(
+            id=instance_id, suggestion_type=suggestion_type,
             target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
@@ -416,8 +419,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
-            return cls.query(ndb.AND(
-                cls.author_id == author_id, cls.status == status)).fetch()
+            return cls.query(
+                ndb.AND(
+                    cls.author_id == author_id, cls.status == status)).fetch()
         else:
             return cls.query(cls.author_id == author_id).fetch()
 
@@ -435,9 +439,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             applications which the given user can review.
         """
-        return cls.query(ndb.AND(
-            cls.author_id != user_id,
-            cls.status == STATUS_IN_REVIEW)).fetch()
+        return cls.query(
+            ndb.AND(
+                cls.author_id != user_id,
+                cls.status == STATUS_IN_REVIEW)).fetch()
 
     @classmethod
     def get_voiceover_applications(cls, target_type, target_id, language_code):
@@ -454,9 +459,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             application which is submitted to a give entity in a given language.
         """
-        return cls.query(ndb.AND(
-            cls.target_type == target_type, cls.target_id == target_id,
-            cls.language_code == language_code)).fetch()
+        return cls.query(
+            ndb.AND(
+                cls.target_type == target_type, cls.target_id == target_id,
+                cls.language_code == language_code)).fetch()
 
     @staticmethod
     def get_export_policy():

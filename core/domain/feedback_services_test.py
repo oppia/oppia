@@ -251,8 +251,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.EXPECTED_THREAD_DICT_VIEWER, threads[0].to_dict())
 
     def test_get_total_open_threads_before_job_run(self):
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi([self.EXP_ID_1])), 0)
+        self.assertEqual(
+            feedback_services.get_total_open_threads(
+                feedback_services.get_thread_analytics_multi(
+                    [self.EXP_ID_1])), 0)
 
         feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None,
@@ -262,9 +264,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, False)
         self.assertEqual(1, len(threads))
 
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi(
-                [self.EXP_ID_1])), 0)
+        self.assertEqual(
+            feedback_services.get_total_open_threads(
+                feedback_services.get_thread_analytics_multi(
+                    [self.EXP_ID_1])), 0)
 
     def test_get_total_open_threads_for_single_exploration(self):
         feedback_services.create_thread(
@@ -276,9 +279,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(1, len(threads))
 
         self._run_computation()
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi(
-                [self.EXP_ID_1])), 1)
+        self.assertEqual(
+            feedback_services.get_total_open_threads(
+                feedback_services.get_thread_analytics_multi(
+                    [self.EXP_ID_1])), 1)
 
     def test_get_total_open_threads_for_multiple_explorations(self):
         feedback_services.create_thread(
@@ -306,13 +310,16 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         _close_thread(threads_exp_1[0].id)
 
-        self.assertEqual(len(feedback_services.get_closed_threads(
-            'exploration', self.EXP_ID_1, False)), 1)
+        self.assertEqual(
+            len(
+                feedback_services.get_closed_threads(
+                    'exploration', self.EXP_ID_1, False)), 1)
         self._run_computation()
 
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi(
-                [self.EXP_ID_1, self.EXP_ID_2])), 1)
+        self.assertEqual(
+            feedback_services.get_total_open_threads(
+                feedback_services.get_thread_analytics_multi(
+                    [self.EXP_ID_1, self.EXP_ID_2])), 1)
 
     def test_get_thread_summaries(self):
         feedback_services.create_thread(
@@ -350,8 +357,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         threads = []
         threads.append(feedback_services.get_thread(thread_ids[0]))
         threads.append(feedback_services.get_thread(thread_ids[1]))
-        threads.append(feedback_services.get_thread(
-            'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID))
+        threads.append(
+            feedback_services.get_thread(
+                'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID))
         # Check if the number of unread messages match.
         self.assertEqual(number_of_unread_threads, 0)
         for summary, thread, exploration_title in python_utils.ZIP(
@@ -425,15 +433,17 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         message_ids = [message.message_id for message in messages]
 
         # The viewer has not read in messages yet.
-        self.assertEqual(self._get_all_messages_read(
-            self.viewer_id, thread_id), [])
+        self.assertEqual(
+            self._get_all_messages_read(
+                self.viewer_id, thread_id), [])
 
         feedback_services.update_messages_read_by_the_user(
             self.viewer_id, thread_id, message_ids)
 
         # Check if the message is added to the read section of the viewer.
-        self.assertEqual(self._get_all_messages_read(
-            self.viewer_id, thread_id), message_ids)
+        self.assertEqual(
+            self._get_all_messages_read(
+                self.viewer_id, thread_id), message_ids)
 
     def test_only_exploration_threads_trigger_events(self):
         exp_id = 'eid'

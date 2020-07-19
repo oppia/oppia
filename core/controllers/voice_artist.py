@@ -79,20 +79,21 @@ class AudioUploadHandler(base.BaseHandler):
             # seems to return None. It's not clear if this is always
             # the case. Occasionally, mutagen.File() also seems to
             # raise a MutagenError.
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
         tempbuffer.close()
 
         if audio is None:
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
                 'Audio files must be under %s seconds in length. The uploaded '
                 'file is %.2f seconds long.' % (
                     feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
-        if len(set(audio.mime).intersection(
-                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
+        if len(
+                set(audio.mime).intersection(
+                    set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
             raise self.InvalidInputException(
                 'Although the filename extension indicates the file '
                 'is a %s file, it was not recognized as one. '
@@ -111,8 +112,9 @@ class AudioUploadHandler(base.BaseHandler):
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs = fs_domain.AbstractFileSystem(
+            file_system_class(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(
             '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)

@@ -487,15 +487,17 @@ class StoryContents(python_utils.OBJECT):
             node.validate()
             for destination_node_id in node.destination_node_ids:
                 if python_utils.NEXT(
-                        (node for node in self.nodes
-                         if node.id == destination_node_id), None) is None:
+                        (
+                            node for node in self.nodes
+                            if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
                         'Expected all destination nodes to exist')
             if node.id == self.initial_node_id:
                 initial_node_is_present = True
             # Checks whether the number in the id of any node is greater than
             # the value of next_node_id.
-            if (StoryNode.get_number_from_node_id(node.id) >=
+            if (
+                    StoryNode.get_number_from_node_id(node.id) >=
                     StoryNode.get_number_from_node_id(self.next_node_id)):
                 raise utils.ValidationError(
                     'The node with id %s is out of bounds.' % node.id)
@@ -630,8 +632,9 @@ class StoryContents(python_utils.OBJECT):
             if node.exploration_id == exp_id:
                 return node
 
-        raise Exception('Unable to find the exploration id in any node: %s' % (
-            exp_id))
+        raise Exception(
+            'Unable to find the exploration id in any node: %s' % (
+                exp_id))
 
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
@@ -777,7 +780,8 @@ class Story(python_utils.OBJECT):
                 'Expected story contents schema version to be an integer, '
                 'received %s' % self.story_contents_schema_version)
 
-        if (self.story_contents_schema_version !=
+        if (
+                self.story_contents_schema_version !=
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected story contents schema version to be %s, '

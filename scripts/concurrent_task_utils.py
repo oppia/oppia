@@ -63,7 +63,8 @@ class TaskThread(threading.Thread):
                 log('LOG %s:' % self.name, show_time=True)
                 log(self.output)
                 log('----------------------------------------')
-            log('FINISHED %s: %.1f secs' %
+            log(
+                'FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)
         except Exception as e:
             self.exception = e
@@ -71,7 +72,8 @@ class TaskThread(threading.Thread):
             if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
                     self.exception.args[0]):
                 log(e)
-                log('ERROR %s: %.1f secs' %
+                log(
+                    'ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
         finally:
             self.semaphore.release()
@@ -84,10 +86,11 @@ def _check_all_tasks(tasks):
 
     for task in tasks:
         if task.isAlive():
-            running_tasks_data.append('  %s (started %s)' % (
-                task.name,
-                time.strftime('%H:%M:%S', time.localtime(task.start_time))
-            ))
+            running_tasks_data.append(
+                '  %s (started %s)' % (
+                    task.name,
+                    time.strftime('%H:%M:%S', time.localtime(task.start_time))
+                ))
 
         if task.exception:
             ALL_ERRORS.append(task.stacktrace)

@@ -149,8 +149,9 @@ class DummyMailTest(test_utils.GenericTestBase):
             self.assertEqual(messages[0].to, dummy_receiver_address)
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
-            self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
-                          messages[0].html.decode())
+            self.assertIn(
+                'This is a test mail from DUMMY_SYSTEM_NAME',
+                messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
@@ -246,12 +247,13 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             self.login(self.EDITOR_EMAIL)
 
             csrf_token = self.get_new_csrf_token()
-            self.put_json('%s/%s' % (
-                feconf.EXPLORATION_RIGHTS_PREFIX, self.exploration.id), {
-                    'version': self.exploration.version,
-                    'new_member_username': self.NEW_USER_USERNAME,
-                    'new_member_role': rights_manager.ROLE_EDITOR,
-                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/%s' % (
+                    feconf.EXPLORATION_RIGHTS_PREFIX, self.exploration.id), {
+                        'version': self.exploration.version,
+                        'new_member_username': self.NEW_USER_USERNAME,
+                        'new_member_role': rights_manager.ROLE_EDITOR,
+                    }, csrf_token=csrf_token)
 
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
@@ -745,8 +747,10 @@ class SignupEmailTests(test_utils.GenericTestBase):
 
             # However, an error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertTrue(logged_errors[0].startswith(
-                'Original email HTML body does not match cleaned HTML body'))
+            self.assertTrue(
+                logged_errors[0].startswith(
+                    'Original email HTML body does not match '
+                    'cleaned HTML body'))
 
             # Check that no email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -1216,8 +1220,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            email_sent_time = (datetime.datetime.utcnow() -
-                               datetime.timedelta(minutes=4))
+            email_sent_time = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=4))
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
@@ -1230,8 +1234,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_sent_time = (datetime.datetime.utcnow() -
-                               datetime.timedelta(minutes=2))
+            email_sent_time = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=2))
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
@@ -2524,28 +2528,34 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             user_services.set_username(user_settings.user_id, username)
 
         # Both users can receive all emails in default setting.
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, True), [True, True])
-        self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), msg=[True, True])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, True), [True, True])
+        self.assertTrue(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, False), msg=[True, True])
 
         # First user have muted feedback notifications for this exploration,
         # therefore he should receive only suggestion emails.
         user_services.set_email_preferences_for_exploration(
             user_ids[0], exp_id, mute_feedback_notifications=True)
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, True), [True, True])
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), [False, True])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, True), [True, True])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, False), [False, True])
 
         # Second user have muted suggestion notifications for this exploration,
         # therefore he should receive only feedback emails.
         user_services.set_email_preferences_for_exploration(
             user_ids[1], exp_id, mute_suggestion_notifications=True)
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, True), [True, False])
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), [False, True])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, True), [True, False])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, False), [False, True])
 
         # Both users have disabled all emails globally, therefore they
         # should not receive any emails.
@@ -2553,10 +2563,12 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             user_services.update_email_preferences(
                 user_id, True, True, False, True)
 
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, True), [False, False])
-        self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), msg=[False, False])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, True), [False, False])
+        self.assertTrue(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, False), msg=[False, False])
 
         # Both users have unmuted feedback/suggestion emails for this
         # exploration, but all emails are still disabled globally,
@@ -2567,10 +2579,12 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             user_ids[1], exp_id, mute_suggestion_notifications=False)
         user_services.update_email_preferences(
             user_id, True, True, False, True)
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, True), [False, False])
-        self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), msg=[False, False])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, True), [False, False])
+        self.assertTrue(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, False), msg=[False, False])
 
         # Both user have enabled all emails globally, therefore they should
         # receive all emails.
@@ -2578,10 +2592,12 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             user_services.update_email_preferences(
                 user_id, True, True, True, True)
 
-        self.assertListEqual(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, True), [True, True])
-        self.assertTrue(email_manager.can_users_receive_thread_email(
-            user_ids, exp_id, False), msg=[True, True])
+        self.assertListEqual(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, True), [True, True])
+        self.assertTrue(
+            email_manager.can_users_receive_thread_email(
+                user_ids, exp_id, False), msg=[True, True])
 
 
 class ModeratorActionEmailsTests(test_utils.GenericTestBase):
@@ -2620,8 +2636,9 @@ class ModeratorActionEmailsTests(test_utils.GenericTestBase):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
     def test_correct_email_draft_received_on_exploration_unpublish(self):
-        expected_draft_text_body = ('I\'m writing to inform you that '
-                                    'I have unpublished the above exploration.')
+        expected_draft_text_body = (
+            'I\'m writing to inform you that '
+            'I have unpublished the above exploration.')
         with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
             d_text = email_manager.get_moderator_unpublish_exploration_email()
             self.assertEqual(d_text, expected_draft_text_body)

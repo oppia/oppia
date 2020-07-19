@@ -354,10 +354,10 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             {'filename': 'test.svg'},
             csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=((
-                'image',
-                'unused_filename',
-                '<svg><path d="%s" /></svg>' % (
+            upload_files=(
+                ('image',
+                 'unused_filename',
+                 '<svg><path d="%s" /></svg>' % (
                     'M150 0 L75 200 L225 200 Z ' * 4000)),)
         )
         self.assertEqual(response_dict['status_code'], 400)
@@ -410,8 +410,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn('Image filename with no extension',
-                      response_dict['error'])
+        self.assertIn(
+            'Image filename with no extension', response_dict['error'])
 
         self.logout()
 
@@ -431,8 +431,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn('Expected a filename ending in .png, received test.pdf',
-                      response_dict['error'])
+        self.assertIn(
+            'Expected a filename ending in .png, received test.pdf',
+            response_dict['error'])
 
         self.logout()
 
@@ -538,8 +539,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, '0'))
+        fs = fs_domain.AbstractFileSystem(
+            file_system_class(feconf.ENTITY_TYPE_EXPLORATION, '0'))
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
@@ -609,8 +610,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                 upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
             )
         self.logout()
-        self.assertEqual(response_dict['error'], 'Audio not recognized as '
-                         'a flac file')
+        self.assertEqual(
+            response_dict['error'], 'Audio not recognized as a flac file')
 
     def test_audio_upload_mpeg_container(self):
         self.login(self.EDITOR_EMAIL)
@@ -637,8 +638,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         filename_without_extension = 'test'
         invalid_extension = 'wav'
-        supplied_filename = ('%s.%s'
-                             % (filename_without_extension, invalid_extension))
+        supplied_filename = (
+            '%s.%s' % (filename_without_extension, invalid_extension))
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
@@ -691,8 +692,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'], 'Audio not recognized as '
-                         'a mp3 file')
+        self.assertEqual(
+            response_dict['error'], 'Audio not recognized as a mp3 file')
 
     def test_missing_extensions_are_detected(self):
         """Test upload of filenames with no extensions are caught."""
@@ -740,9 +741,9 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn('Audio files must be under %s seconds in length'
-                      % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
-                      response_dict['error'])
+        self.assertIn(
+            'Audio files must be under %s seconds in length'
+            % feconf.MAX_AUDIO_FILE_LENGTH_SEC, response_dict['error'])
 
     def test_non_matching_extensions_are_detected(self):
         """Test that filenames with extensions that don't match the audio are
@@ -769,8 +770,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'], 'Audio not recognized as '
-                         'a mp3 file')
+        self.assertEqual(
+            response_dict['error'], 'Audio not recognized as a mp3 file')
 
     def test_upload_check_for_duration_sec_as_response(self):
         """Tests the file upload and trying to confirm the
@@ -791,6 +792,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
-        expected_value = ({'filename': self.TEST_AUDIO_FILE_MP3,
-                           'duration_secs': 15.255510204081633})
+        expected_value = ({
+            'filename': self.TEST_AUDIO_FILE_MP3,
+            'duration_secs': 15.255510204081633})
         self.assertEqual(response_dict, expected_value)

@@ -41,7 +41,8 @@ def can_perform_cron_tasks(handler):
             UnauthorizedUserException: The user does not have
                 credentials to access the page.
         """
-        if (self.request.headers.get('X-AppEngine-Cron') is None and
+        if (
+                self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')

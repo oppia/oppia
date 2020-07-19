@@ -28,8 +28,8 @@ class LearnerProgressUnitTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Tests init method."""
-        user_learner_progress = (learner_progress_domain.LearnerProgress(
-            [], [], [], [], [], []))
+        user_learner_progress = (
+            learner_progress_domain.LearnerProgress([], [], [], [], [], []))
 
         self.assertEqual(
             user_learner_progress.incomplete_exp_summaries, [])

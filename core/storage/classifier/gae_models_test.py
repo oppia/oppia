@@ -223,8 +223,9 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(mapping.job_id, 'job_id4')
 
         # Test that exception is raised when creating mapping with same id.
-        with self.assertRaisesRegexp(Exception, (
-            'A model with the same ID already exists.')):
+        with self.assertRaisesRegexp(
+            Exception,
+            'A model with the same ID already exists.'):
             mapping_id = (
                 classifier_models.TrainingJobExplorationMappingModel.create(
                     'exp_id1', 2, 'state_name4', 'job_id4'))
@@ -238,8 +239,9 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name1.encode(
-            encoding='utf-8')))
+        self.assertEqual(
+            mapping_id, b'exp_id1.2.%s' % (
+                state_name1.encode(encoding='utf-8')))
 
         state_name2 = u'टेक्स्ट'
         mapping_id = (
@@ -249,8 +251,9 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name2.encode(
-            encoding='utf-8')))
+        self.assertEqual(
+            mapping_id, b'exp_id1.2.%s' % (
+                state_name2.encode(encoding='utf-8')))
 
     def test_get_model_from_exploration_attributes(self):
         exp_id = 'exp_id1'

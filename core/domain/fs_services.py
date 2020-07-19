@@ -55,8 +55,8 @@ def save_original_and_compressed_versions_of_image(
     micro_image_filepath = '%s/%s' % (filename_prefix, micro_image_filename)
 
     file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        entity_type, entity_id))
+    fs = fs_domain.AbstractFileSystem(
+        file_system_class(entity_type, entity_id))
 
     if image_is_compressible:
         compressed_image_content = image_services.compress_image(
@@ -99,8 +99,8 @@ def save_classifier_data(exp_id, job_id, classifier_data):
     """
     filepath = '%s-classifier-data.json' % (job_id)
     file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    fs = fs_domain.AbstractFileSystem(
+        file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     fs.commit(
         filepath, json.dumps(classifier_data),
         mimetype='application/json')
@@ -119,8 +119,8 @@ def read_classifier_data(exp_id, job_id):
     """
     filepath = '%s-classifier-data.json' % (job_id)
     file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    fs = fs_domain.AbstractFileSystem(
+        file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     if not fs.isfile(filepath):
         return None
     classifier_data = fs.get(filepath)
@@ -136,8 +136,8 @@ def delete_classifier_data(exp_id, job_id):
     """
     filepath = '%s-classifier-data.json' % (job_id)
     file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    fs = fs_domain.AbstractFileSystem(
+        file_system_class(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     fs.delete(filepath)
 
 

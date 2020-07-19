@@ -36,14 +36,15 @@ from . import run_frontend_tests
 from . import setup
 from . import setup_gae
 
-_PARSER = argparse.ArgumentParser(description="""
-Run this script from the oppia root folder:
-    python -m scripts.run_tests
-This script runs all the tests, in this order:
-- Frontend Karma unit tests
-- Backend Python tests
-- End-to-end Protractor tests
-""")
+_PARSER = argparse.ArgumentParser(
+    description="""
+    Run this script from the oppia root folder:
+        python -m scripts.run_tests
+    This script runs all the tests, in this order:
+    - Frontend Karma unit tests
+    - Backend Python tests
+    - End-to-end Protractor tests
+    """)
 
 
 def main(args=None):

@@ -229,12 +229,12 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_are_datetimes_close(self):
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
         with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
-            self.assertTrue(utils.are_datetimes_close(
-                datetime.datetime(2016, 12, 1, 0, 0, 1),
-                initial_time))
-            self.assertFalse(utils.are_datetimes_close(
-                datetime.datetime(2016, 12, 1, 0, 0, 3),
-                initial_time))
+            self.assertTrue(
+                utils.are_datetimes_close(
+                    datetime.datetime(2016, 12, 1, 0, 0, 1), initial_time))
+            self.assertFalse(
+                utils.are_datetimes_close(
+                    datetime.datetime(2016, 12, 1, 0, 0, 3), initial_time))
 
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]

@@ -108,11 +108,13 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if (
                 key not in [
                     SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
-                    (SuggestionMathMigrationOneOffJob.
-                     _ERROR_KEY_BEFORE_MIGRATION)]):
+                    (
+                        SuggestionMathMigrationOneOffJob.
+                        _ERROR_KEY_BEFORE_MIGRATION)]):
             no_of_suggestions_migrated = (
                 sum(ast.literal_eval(v) for v in values))
-            yield (key, ['%d suggestions successfully migrated.' % (
-                no_of_suggestions_migrated)])
+            yield (
+                key, ['%d suggestions successfully migrated.' % (
+                    no_of_suggestions_migrated)])
         else:
             yield (key, values)

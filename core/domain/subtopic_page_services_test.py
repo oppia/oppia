@@ -94,8 +94,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
         expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
-        self.assertEqual([subtopic_pages[0].to_dict(), subtopic_pages[1]],
-                         expected_subtopic_pages)
+        self.assertEqual(
+            [subtopic_pages[0].to_dict(), subtopic_pages[1]],
+            expected_subtopic_pages)
         subtopic_ids = []
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)

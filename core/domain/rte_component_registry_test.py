@@ -67,8 +67,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
     def _validate_customization_arg_specs(self, customization_arg_specs):
         """Validates the given customization arg specs."""
         for ca_spec in customization_arg_specs:
-            self.assertEqual(set(ca_spec.keys()), set([
-                'name', 'description', 'schema', 'default_value']))
+            self.assertEqual(
+                set(ca_spec.keys()), set([
+                    'name', 'description', 'schema', 'default_value']))
 
             self.assertTrue(
                 isinstance(ca_spec['name'], python_utils.BASESTRING))
@@ -192,8 +193,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in _COMPONENT_CONFIG_SCHEMA:
-                self.assertTrue(isinstance(
-                    component_specs[item], item_type))
+                self.assertTrue(
+                    isinstance(component_specs[item], item_type))
                 # The string attributes should be non-empty.
                 if item_type == python_utils.BASESTRING:
                     self.assertTrue(component_specs[item])
@@ -237,8 +238,8 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         obtained_components = list(
             rte_component_registry.Registry.get_all_rte_components().keys())
         actual_components = [name for name in os.listdir(
-            './extensions/rich_text_components') if os.path.isdir(os.path.join(
-                './extensions/rich_text_components', name))]
+            './extensions/rich_text_components') if os.path.isdir(
+                os.path.join('./extensions/rich_text_components', name))]
 
         self.assertEqual(set(obtained_components), set(actual_components))
 

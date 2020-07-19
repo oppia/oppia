@@ -66,9 +66,10 @@ def count_at_least_editable_exploration_summaries(user_id):
         int. The number of exploration summaries that are at least editable
         by the given user.
     """
-    return len(exp_fetchers.get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_at_least_editable(
-            user_id=user_id)))
+    return len(
+        exp_fetchers.get_exploration_summaries_from_models(
+            exp_models.ExpSummaryModel.get_at_least_editable(
+                user_id=user_id)))
 
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
@@ -230,8 +231,9 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'MultipleChoiceInput'), '')
-        self.assertEqual(exp_services.get_interaction_id_for_state(
-            self.EXP_0_ID, 'Introduction'), 'MultipleChoiceInput')
+        self.assertEqual(
+            exp_services.get_interaction_id_for_state(
+                self.EXP_0_ID, 'Introduction'), 'MultipleChoiceInput')
         with self.assertRaisesRegexp(
             Exception, 'There exist no state in the exploration'):
             exp_services.get_interaction_id_for_state(
@@ -1063,7 +1065,8 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     HINT_AUDIO_FILE = 'answer_hint.mp3'
     SOLUTION_AUDIO_FILE = 'answer_solution.mp3'
 
-    YAML_WITH_AUDIO_TRANSLATIONS = ("""author_notes: ''
+    YAML_WITH_AUDIO_TRANSLATIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -1269,7 +1272,8 @@ title: Title
         self.assertEqual(solution_voiceovers, {})
 
     def test_cannot_load_yaml_with_no_schema_version(self):
-        yaml_with_no_schema_version = ("""
+        yaml_with_no_schema_version = (
+            """
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
@@ -1611,7 +1615,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -1703,7 +1708,8 @@ title: A title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
-    UPDATED_YAML_CONTENT = ("""author_notes: ''
+    UPDATED_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -1823,8 +1829,8 @@ title: A title
                 })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=zip_file_output))
 
         self.assertEqual(zf.namelist(), ['A title.yaml'])
         self.assertEqual(
@@ -1836,8 +1842,8 @@ title: A title
             self.EXP_0_ID, self.owner_id, title='')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=zip_file_output))
 
         self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
 
@@ -1884,8 +1890,8 @@ title: A title
         fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=zip_file_output))
 
         self.assertEqual(
             zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
@@ -1943,16 +1949,16 @@ title: A title
         # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=2)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=3)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
 
@@ -1963,7 +1969,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents.
     """
 
-    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+    _SAMPLE_INIT_STATE_CONTENT = (
+        """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2001,7 +2008,8 @@ written_translations:
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""classifier_model_id: null
+        'New state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2040,7 +2048,8 @@ written_translations:
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""classifier_model_id: null
+        'Renamed state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2560,13 +2569,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'content_id': 'content',
             })
 
-        change_list.append(exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': self.init_state_name,
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p><strong>Test content</strong></p>',
-            'translation_html': '<p>Translated text</p>'
+        change_list.append(
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': self.init_state_name,
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>'
         }))
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
@@ -3424,12 +3434,15 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         # Check that only the owner may edit.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
-        self.assertTrue(exp_services.is_exp_summary_editable(
-            exp_summary, user_id=self.owner_id))
-        self.assertFalse(exp_services.is_exp_summary_editable(
-            exp_summary, user_id=self.editor_id))
-        self.assertFalse(exp_services.is_exp_summary_editable(
-            exp_summary, user_id=self.viewer_id))
+        self.assertTrue(
+            exp_services.is_exp_summary_editable(
+                exp_summary, user_id=self.owner_id))
+        self.assertFalse(
+            exp_services.is_exp_summary_editable(
+                exp_summary, user_id=self.editor_id))
+        self.assertFalse(
+            exp_services.is_exp_summary_editable(
+                exp_summary, user_id=self.viewer_id))
 
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_exploration(
@@ -3445,8 +3458,9 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             exp_summary, user_id=self.owner_id))
         self.assertTrue(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.editor_id))
-        self.assertFalse(exp_services.is_exp_summary_editable(
-            exp_summary, user_id=self.viewer_id))
+        self.assertFalse(
+            exp_services.is_exp_summary_editable(
+                exp_summary, user_id=self.viewer_id))
 
     def test_contributors_not_updated_on_revert(self):
         """Test that a user who only makes a revert on an exploration
@@ -3639,8 +3653,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 )}
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(list(actual_summaries.keys()),
-                         list(expected_summaries.keys()))
+        self.assertEqual(
+            list(actual_summaries.keys()),
+            list(expected_summaries.keys()))
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
@@ -3651,8 +3666,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'exploration_model_last_updated']
         for exp_id in actual_summaries:
             for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
+                self.assertEqual(
+                    getattr(actual_summaries[exp_id], prop),
+                    getattr(expected_summaries[exp_id], prop))
 
     def test_get_all_exploration_summaries(self):
         actual_summaries = exp_services.get_all_exploration_summaries()
@@ -3692,7 +3708,8 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = ("""author_notes: ''
+    UPGRADED_EXP_YAML = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -4132,8 +4149,8 @@ title: Old Title
             }
         }
 
-        with self.assertRaisesRegexp(Exception,
-                                     'Expected hints_list to be a list.*'):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected hints_list to be a list.*'):
             hints_update = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
@@ -4329,20 +4346,23 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_draft_version_valid_returns_true(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
-        self.assertTrue(exp_services.is_version_of_draft_valid(
-            self.EXP_ID1, exp_user_data.draft_change_list_exp_version))
+        self.assertTrue(
+            exp_services.is_version_of_draft_valid(
+                self.EXP_ID1, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_returns_false(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID2))
-        self.assertFalse(exp_services.is_version_of_draft_valid(
-            self.EXP_ID2, exp_user_data.draft_change_list_exp_version))
+        self.assertFalse(
+            exp_services.is_version_of_draft_valid(
+                self.EXP_ID2, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_when_no_draft_exists(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID3))
-        self.assertFalse(exp_services.is_version_of_draft_valid(
-            self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
+        self.assertFalse(
+            exp_services.is_version_of_draft_valid(
+                self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
     def test_create_or_update_draft_when_older_draft_exists(self):
         exp_services.create_or_update_draft(
@@ -4482,9 +4502,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                     'value': [
                         '<p>1</p>',
                         '<p>2</p>',
-                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>'),
+                        '<oppia-noninteractive-math raw_latex-with-value="&am'
+                        'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                        'uot;"></oppia-noninteractive-math>',
                         '<p>4</p>'
                     ]
                 },

@@ -36,15 +36,16 @@ import utils
 # If evaluating differences in YAML, conversion to dict form via
 # utils.dict_from_yaml can isolate differences quickly.
 
-SAMPLE_YAML_CONTENT = ("""category: A category
-language_code: en
-nodes:
-- exploration_id: an_exploration_id
-objective: An objective
-schema_version: %d
-tags: []
-title: A title
-""") % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+SAMPLE_YAML_CONTENT = (
+    """category: A category
+    language_code: en
+    nodes:
+    - exploration_id: an_exploration_id
+    objective: An objective
+    schema_version: %d
+    tags: []
+    title: A title
+    """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
 class CollectionChangeTests(test_utils.GenericTestBase):
@@ -526,8 +527,8 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # If another exploration has been added, then the first exploration
         # should be the next one to complete.
         collection.add_node('exp_id_1')
-        self.assertEqual(collection.get_next_exploration_id(
-            ['exp_id_0']), 'exp_id_1')
+        self.assertEqual(
+            collection.get_next_exploration_id(['exp_id_0']), 'exp_id_1')
 
         # If another exploration is added, then based on explorations
         # completed, the correct exploration should be shown as the next one.
@@ -677,16 +678,18 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
         for version_num in python_utils.RANGE(
                 1, current_collection_schema_version):
-            self.assertTrue(hasattr(
+            self.assertTrue(
+                hasattr(
+                    collection_domain.Collection,
+                    '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
+                        version_num, version_num + 1)))
+
+        self.assertFalse(
+            hasattr(
                 collection_domain.Collection,
                 '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
-                    version_num, version_num + 1)))
-
-        self.assertFalse(hasattr(
-            collection_domain.Collection,
-            '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
-                current_collection_schema_version,
-                current_collection_schema_version + 1)))
+                    current_collection_schema_version,
+                    current_collection_schema_version + 1)))
 
     def test_correct_collection_schema_conversion_methods_exist(self):
         """Test that the right collection schema conversion methods exist."""
@@ -695,130 +698,138 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 
         for version_num in python_utils.RANGE(
                 1, current_collection_schema_version):
-            self.assertTrue(hasattr(
+            self.assertTrue(
+                hasattr(
+                    collection_domain.Collection,
+                    '_convert_v%s_dict_to_v%s_dict' % (
+                        version_num, version_num + 1)))
+
+        self.assertFalse(
+            hasattr(
                 collection_domain.Collection,
                 '_convert_v%s_dict_to_v%s_dict' % (
-                    version_num, version_num + 1)))
-
-        self.assertFalse(hasattr(
-            collection_domain.Collection,
-            '_convert_v%s_dict_to_v%s_dict' % (
-                current_collection_schema_version,
-                current_collection_schema_version + 1)))
+                    current_collection_schema_version,
+                    current_collection_schema_version + 1)))
 
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = ("""category: A category
-nodes:
-- acquired_skills:
-  - Skill1
-  - Skill2
-  exploration_id: Exp1
-  prerequisite_skills: []
-- acquired_skills: []
-  exploration_id: Exp2
-  prerequisite_skills:
-  - Skill1
-objective: ''
-schema_version: 1
-title: A title
-""")
-    YAML_CONTENT_V2 = ("""category: A category
-language_code: en
-nodes:
-- acquired_skills:
-  - Skill1
-  - Skill2
-  exploration_id: Exp1
-  prerequisite_skills: []
-- acquired_skills: []
-  exploration_id: Exp2
-  prerequisite_skills:
-  - Skill1
-objective: ''
-schema_version: 2
-tags: []
-title: A title
-""")
-    YAML_CONTENT_V3 = ("""category: A category
-language_code: en
-nodes:
-- acquired_skills:
-  - Skill1
-  - Skill2
-  exploration_id: Exp1
-  prerequisite_skills: []
-- acquired_skills: []
-  exploration_id: Exp2
-  prerequisite_skills:
-  - Skill1
-objective: ''
-schema_version: 2
-tags: []
-title: A title
-""")
-    YAML_CONTENT_V4 = ("""category: A category
-language_code: en
-next_skill_id: 2
-nodes:
-- acquired_skill_ids:
-  - skill0
-  - skill1
-  exploration_id: Exp1
-  prerequisite_skill_ids: []
-- acquired_skill_ids: []
-  exploration_id: Exp2
-  prerequisite_skill_ids:
-  - skill0
-objective: ''
-schema_version: 4
-skills:
-  skill0:
-    name: Skill1
-    question_ids: []
-  skill1:
-    name: Skill2
-    question_ids: []
-tags: []
-title: A title
-""")
-    YAML_CONTENT_V5 = ("""category: A category
-language_code: en
-next_skill_index: 2
-nodes:
-- acquired_skill_ids:
-  - skill0
-  - skill1
-  exploration_id: Exp1
-  prerequisite_skill_ids: []
-- acquired_skill_ids: []
-  exploration_id: Exp2
-  prerequisite_skill_ids:
-  - skill0
-objective: ''
-schema_version: 5
-skills:
-  skill0:
-    name: Skill1
-    question_ids: []
-  skill1:
-    name: Skill2
-    question_ids: []
-tags: []
-title: A title
-""")
-    YAML_CONTENT_V6 = ("""category: A category
-language_code: en
-nodes:
-- exploration_id: Exp1
-- exploration_id: Exp2
-objective: ''
-schema_version: 6
-tags: []
-title: A title
-""")
+    YAML_CONTENT_V1 = (
+        """category: A category
+        nodes:
+        - acquired_skills:
+          - Skill1
+          - Skill2
+          exploration_id: Exp1
+          prerequisite_skills: []
+        - acquired_skills: []
+          exploration_id: Exp2
+          prerequisite_skills:
+          - Skill1
+        objective: ''
+        schema_version: 1
+        title: A title
+        """)
+    YAML_CONTENT_V2 = (
+        """category: A category
+        language_code: en
+        nodes:
+        - acquired_skills:
+          - Skill1
+          - Skill2
+          exploration_id: Exp1
+          prerequisite_skills: []
+        - acquired_skills: []
+          exploration_id: Exp2
+          prerequisite_skills:
+          - Skill1
+        objective: ''
+        schema_version: 2
+        tags: []
+        title: A title
+        """)
+    YAML_CONTENT_V3 = (
+        """category: A category
+        language_code: en
+        nodes:
+        - acquired_skills:
+          - Skill1
+          - Skill2
+          exploration_id: Exp1
+          prerequisite_skills: []
+        - acquired_skills: []
+          exploration_id: Exp2
+          prerequisite_skills:
+          - Skill1
+        objective: ''
+        schema_version: 2
+        tags: []
+        title: A title
+        """)
+    YAML_CONTENT_V4 = (
+        """category: A category
+        language_code: en
+        next_skill_id: 2
+        nodes:
+        - acquired_skill_ids:
+          - skill0
+          - skill1
+          exploration_id: Exp1
+          prerequisite_skill_ids: []
+        - acquired_skill_ids: []
+          exploration_id: Exp2
+          prerequisite_skill_ids:
+          - skill0
+        objective: ''
+        schema_version: 4
+        skills:
+          skill0:
+            name: Skill1
+            question_ids: []
+          skill1:
+            name: Skill2
+            question_ids: []
+        tags: []
+        title: A title
+        """)
+    YAML_CONTENT_V5 = (
+        """category: A category
+        language_code: en
+        next_skill_index: 2
+        nodes:
+        - acquired_skill_ids:
+          - skill0
+          - skill1
+          exploration_id: Exp1
+          prerequisite_skill_ids: []
+        - acquired_skill_ids: []
+          exploration_id: Exp2
+          prerequisite_skill_ids:
+          - skill0
+        objective: ''
+        schema_version: 5
+        skills:
+          skill0:
+            name: Skill1
+            question_ids: []
+          skill1:
+            name: Skill2
+            question_ids: []
+        tags: []
+        title: A title
+        """)
+    YAML_CONTENT_V6 = (
+        """category: A category
+        language_code: en
+        nodes:
+        - exploration_id: Exp1
+        - exploration_id: Exp2
+        objective: ''
+        schema_version: 6
+        tags: []
+        title: A title
+        """)
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V6
 

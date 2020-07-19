@@ -178,7 +178,8 @@ def mark_exploration_as_completed(user_id, exp_id):
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model)
 
-    if (exp_id not in subscribed_exploration_ids and
+    if (
+            exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.exploration_ids):
         # Remove the exploration from the in progress and learner playlist
         # (if present) as it is now completed.
@@ -216,7 +217,8 @@ def mark_collection_as_completed(user_id, collection_id):
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model)
 
-    if (collection_id not in subscribed_collection_ids and
+    if (
+            collection_id not in subscribed_collection_ids and
             collection_id not in activities_completed.collection_ids):
         # Remove the collection from the in progress and learner playlist
         # (if present) as it is now completed.
@@ -259,7 +261,8 @@ def mark_exploration_as_incomplete(
     incomplete_activities = _get_incomplete_activities_from_model(
         incomplete_activities_model)
 
-    if (exploration_id not in exploration_ids and
+    if (
+            exploration_id not in exploration_ids and
             exploration_id not in subscribed_exploration_ids):
 
         if exploration_id not in incomplete_activities.exploration_ids:
@@ -310,7 +313,8 @@ def mark_collection_as_incomplete(user_id, collection_id):
     incomplete_activities = _get_incomplete_activities_from_model(
         incomplete_activities_model)
 
-    if (collection_id not in subscribed_collection_ids and
+    if (
+            collection_id not in subscribed_collection_ids and
             collection_id not in incomplete_activities.collection_ids and
             collection_id not in collection_ids):
         # Remove the collection from the learner playlist (if present) as it
@@ -349,7 +353,8 @@ def add_collection_to_learner_playlist(
     belongs_to_subscribed_activities = False
     belongs_to_completed_or_incomplete_list = False
 
-    if (collection_id not in completed_collection_ids and
+    if (
+            collection_id not in completed_collection_ids and
             collection_id not in incomplete_collection_ids):
 
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
@@ -395,7 +400,8 @@ def add_exp_to_learner_playlist(
     belongs_to_subscribed_activities = False
     belongs_to_completed_or_incomplete_list = False
 
-    if (exploration_id not in completed_exploration_ids and
+    if (
+            exploration_id not in completed_exploration_ids and
             exploration_id not in incomplete_exploration_ids):
 
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
@@ -530,8 +536,8 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
             _save_incomplete_activities(incomplete_activities)
 
 
-def _remove_activity_ids_from_incomplete_list(user_id, exploration_ids=None,
-                                              collection_ids=None):
+def _remove_activity_ids_from_incomplete_list(
+        user_id, exploration_ids=None, collection_ids=None):
     """Removes the collections and explorations from the incomplete list of the
     user.
 

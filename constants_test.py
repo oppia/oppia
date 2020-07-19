@@ -29,8 +29,8 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_file_is_existing(self):
         """Test if the constants file is existing."""
-        self.assertTrue(os.path.isfile(os.path.join(
-            'assets', 'constants.ts')))
+        self.assertTrue(
+            os.path.isfile(os.path.join('assets', 'constants.ts')))
 
     def test_constants_file_contains_valid_json(self):
         """Test if the constants file is valid json file."""

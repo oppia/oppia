@@ -835,15 +835,17 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        if (not image.has_attr('filepath-with-value') or
+        if (
+                not image.has_attr('filepath-with-value') or
                 image['filepath-with-value'] == ''):
             image.decompose()
             continue
 
         try:
             filename = json.loads(unescape_html(image['filepath-with-value']))
-            image['filepath-with-value'] = escape_html(json.dumps(
-                get_filename_with_dimensions(filename, exp_id)))
+            image['filepath-with-value'] = escape_html(
+                json.dumps(
+                    get_filename_with_dimensions(filename, exp_id)))
         except Exception as e:
             logging.error(
                 'Exploration %s failed to load image: %s' %
@@ -864,8 +866,9 @@ def get_filename_with_dimensions(old_filename, exp_id):
         str. The new filename of the image file.
     """
     file_system_class = fs_services.get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    fs = fs_domain.AbstractFileSystem(
+        file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))
@@ -1026,8 +1029,9 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
         if math_tag.has_attr('math_content-with-value'):
             try:
                 math_content_dict = (
-                    json.loads(unescape_html(
-                        math_tag['math_content-with-value'])))
+                    json.loads(
+                        unescape_html(
+                            math_tag['math_content-with-value'])))
                 raw_latex = math_content_dict['raw_latex']
                 svg_filename = math_content_dict['svg_filename']
                 objects.UnicodeString.normalize(svg_filename)

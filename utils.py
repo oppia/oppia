@@ -148,8 +148,8 @@ def get_exploration_components_from_dir(dir_path):
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
                 filename = '/'.join(filepath_array[dir_path_length + 1:])
-                assets_list.append((filename, get_file_contents(
-                    filepath, raw_bytes=True)))
+                assets_list.append(
+                    (filename, get_file_contents(filepath, raw_bytes=True)))
 
     if yaml_content is None:
         raise Exception('No yaml file specifed for %s' % dir_path)
@@ -740,9 +740,10 @@ def get_hashable_value(value):
     if isinstance(value, list):
         return tuple(get_hashable_value(e) for e in value)
     elif isinstance(value, dict):
-        return tuple(sorted(
-            # Dict keys are already hashable, only values need converting.
-            (k, get_hashable_value(v)) for k, v in value.items()))
+        return tuple(
+            sorted(
+                # Dict keys are already hashable, only values need converting.
+                (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
 

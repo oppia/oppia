@@ -411,8 +411,10 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
-                for state_stats in (list(datastore_stats_for_version.
-                                         state_stats_mapping.values())):
+                for state_stats in (
+                        list(
+                            datastore_stats_for_version.
+                            state_stats_mapping.values())):
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0
@@ -685,8 +687,10 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
             # Number of starts must never be less than the number of
             # completions.
             if num_starts_v1 < num_completions_v1:
-                yield ('Completions > starts: exp_id:%s version:%s %s > %s' % (
-                    exp_id, exp_version, num_completions_v1, num_starts_v1),)
+                yield (
+                    'Completions > starts: exp_id:%s version:%s %s > %s' % (
+                        exp_id, exp_version,
+                        num_completions_v1, num_starts_v1),)
 
             # Number of actual starts must never be less than the number of
             # completions.
@@ -864,8 +868,10 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
             # Number of starts must never be less than the number of
             # completions.
             if num_starts_v2 < num_completions_v2:
-                yield ('Completions > starts: exp_id:%s version:%s %s > %s' % (
-                    exp_id, exp_version, num_completions_v2, num_starts_v2),)
+                yield (
+                    'Completions > starts: exp_id:%s version:%s %s > %s' % (
+                        exp_id, exp_version,
+                        num_completions_v2, num_starts_v2),)
 
             # Number of actual starts must never be less than the number of
             # completions.
@@ -1099,9 +1105,10 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                     (key, value['version'], value['completions']),)
 
             if value['completions'] > value['starts']:
-                yield ('Completions > starts: exp_id:%s version:%s %s>%s' % (
-                    key, value['version'], value['completions'],
-                    value['starts']),)
+                yield (
+                    'Completions > starts: exp_id:%s version:%s %s>%s' % (
+                        key, value['version'], value['completions'],
+                        value['starts']),)
 
             if value['version'] == stats_jobs_continuous.VERSION_ALL:
                 all_starts = value['starts']
@@ -1124,7 +1131,8 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 % (key, sum_completions, all_completions),)
 
         for state_name in all_state_hit:
-            if (state_name not in sum_state_hit and
+            if (
+                    state_name not in sum_state_hit and
                     all_state_hit[state_name] != 0):
                 yield (
                     'state hit count not same exp_id:%s state:%s, '

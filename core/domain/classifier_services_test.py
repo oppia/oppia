@@ -331,9 +331,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_retrieval_of_classifier_training_jobs(self):
         """Test the get_classifier_training_job_by_id method."""
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegexp(
+            Exception,
             'Entity for class ClassifierTrainingJobModel with id fake_id '
-            'not found')):
+            'not found'):
             classifier_services.get_classifier_training_job_by_id('fake_id')
 
         exp_id = u'1'
@@ -378,10 +379,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegexp(
+            Exception,
             'Entity for class ClassifierTrainingJobModel '
             'with id %s not found' % (
-                job_id))):
+                job_id)):
             classifier_services.get_classifier_training_job_by_id(job_id)
 
     def test_mark_training_job_complete(self):
@@ -411,10 +413,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegexp(
+            Exception,
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_COMPLETE,
-                feconf.TRAINING_JOB_STATUS_COMPLETE))):
+                feconf.TRAINING_JOB_STATUS_COMPLETE)):
             classifier_services.mark_training_job_complete(job_id)
 
     def test_mark_training_job_pending(self):
@@ -444,10 +447,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_PENDING)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegexp(
+            Exception,
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_PENDING,
-                feconf.TRAINING_JOB_STATUS_PENDING))):
+                feconf.TRAINING_JOB_STATUS_PENDING)):
             classifier_services.mark_training_job_pending(job_id)
 
     def test_mark_training_jobs_failed(self):
@@ -477,10 +481,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_FAILED)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegexp(
+            Exception,
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_FAILED,
-                feconf.TRAINING_JOB_STATUS_FAILED))):
+                feconf.TRAINING_JOB_STATUS_FAILED)):
             classifier_services.mark_training_jobs_failed([job_id])
 
     def test_fetch_next_job(self):
@@ -605,7 +610,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         }
 
         output_dict = (
-            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
+            classifier_services.convert_strings_to_float_numbers_in_classifier_data( # pylint: disable=line-too-long
                 test_dict))
         self.assertDictEqual(expected_dict, output_dict)
 
@@ -613,8 +618,9 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected all classifier data objects to be '
             'lists, dicts, strings, integers but received'):
-            (classifier_services.
-             convert_strings_to_float_numbers_in_classifier_data(2.0124))
+            (
+                classifier_services.
+                convert_strings_to_float_numbers_in_classifier_data(2.0124))
 
     def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(self):
         with self.assertRaisesRegexp(

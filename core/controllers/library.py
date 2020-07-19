@@ -271,9 +271,11 @@ class ExplorationSummariesHandler(base.BaseHandler):
         if not editor_user_id:
             include_private_exps = False
 
-        if (not isinstance(exp_ids, list) or not all([
-                isinstance(
-                    exp_id, python_utils.BASESTRING) for exp_id in exp_ids])):
+        if (
+                not isinstance(exp_ids, list) or not all([
+                    isinstance(
+                        exp_id,
+                        python_utils.BASESTRING) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
         if include_private_exps:

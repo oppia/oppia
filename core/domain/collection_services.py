@@ -80,14 +80,16 @@ def _migrate_collection_contents_to_latest_schema(
             supported at present.
     """
     collection_schema_version = versioned_collection_contents['schema_version']
-    if not (1 <= collection_schema_version
+    if not (
+            1 <= collection_schema_version
             <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d collection schemas at '
             'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    while (collection_schema_version <
-           feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+    while (
+            collection_schema_version <
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         collection_domain.Collection.update_collection_contents_from_model(
             versioned_collection_contents, collection_schema_version)
         collection_schema_version += 1
@@ -137,7 +139,8 @@ def get_collection_from_model(collection_model):
         }
 
     # Migrate the collection if it is not using the latest schema version.
-    if (collection_model.schema_version !=
+    if (
+            collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         _migrate_collection_contents_to_latest_schema(
             versioned_collection_contents)
@@ -277,8 +280,9 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             collection = get_collection_from_model(model)
             db_results_dict[cid] = collection
         else:
-            logging.info('Tried to fetch collection with id %s, but no such '
-                         'collection exists in the datastore' % cid)
+            logging.info(
+                'Tried to fetch collection with id %s, but no such '
+                'collection exists in the datastore' % cid)
             not_found.append(cid)
 
     if strict and not_found:
@@ -623,20 +627,25 @@ def apply_change_list(collection_id, change_list):
             elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
                 collection.swap_nodes(change.first_index, change.second_index)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
                     collection.update_title(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                elif (
+                        change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_CATEGORY):
                     collection.update_category(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                elif (
+                        change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                elif (
+                        change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
                     collection.update_language_code(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_TAGS):
+                elif (
+                        change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_TAGS):
                     collection.update_tags(change.new_value)
             elif (
                     change.cmd ==
@@ -940,7 +949,8 @@ def update_collection(
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
-    if (not rights_manager.is_collection_private(collection.id) and
+    if (
+            not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
@@ -1140,8 +1150,9 @@ def delete_demo(collection_id):
 
     collection = get_collection_by_id(collection_id, strict=False)
     if not collection:
-        logging.info('Collection with id %s was not deleted, because it '
-                     'does not exist.' % collection_id)
+        logging.info(
+            'Collection with id %s was not deleted, because it '
+            'does not exist.' % collection_id)
     else:
         delete_collection(
             feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)

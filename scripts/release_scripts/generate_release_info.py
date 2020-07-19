@@ -223,10 +223,10 @@ def check_versions(current_release):
     with python_utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
         new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
-        old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 old_feconf)[0]
-        new_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 new_feconf)[0]
+        old_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, old_feconf)[0]
+        new_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, new_feconf)[0]
         if old_version != new_version:
             feconf_changed_version.append(variable)
     return feconf_changed_version
@@ -324,8 +324,9 @@ def main(personal_access_token):
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
-            out.write('\n### Feconf version changes:\nThis indicates that a '
-                      'migration may be needed\n\n')
+            out.write(
+                '\n### Feconf version changes:\nThis indicates that a '
+                'migration may be needed\n\n')
             for var in feconf_version_changes:
                 out.write('* %s\n' % var)
 
@@ -344,9 +345,10 @@ def main(personal_access_token):
         }
         release_authors = {(log.author, log.email) for log in new_release_logs}
 
-        new_authors = sorted(set(
-            [(name, email) for name, email in release_authors
-             if email not in past_authors]))
+        new_authors = sorted(
+            set([
+                (name, email) for name, email in release_authors
+                if email not in past_authors]))
         existing_authors = sorted(set(
             [(name, email) for name, email in release_authors
              if email in past_authors]))
@@ -369,11 +371,12 @@ def main(personal_access_token):
         # Generate the author sections of the email.
         out.write('\n%s' % release_constants.EMAIL_HEADER)
         new_author_comma_list = (
-            '%s, and %s' % (', '.join(
-                new_author_names[:-1]), new_author_names[-1]))
+            '%s, and %s' % (
+                ', '.join(new_author_names[:-1]), new_author_names[-1]))
         existing_author_comma_list = (
-            '%s, and %s' % (', '.join(
-                existing_author_names[:-1]), existing_author_names[-1]))
+            '%s, and %s' % (
+                ', '.join(
+                    existing_author_names[:-1]), existing_author_names[-1]))
         out.write(
             '``Please welcome %s for whom this release marks their first '
             'contribution to Oppia!``\n\n' % new_author_comma_list)
@@ -397,7 +400,8 @@ def main(personal_access_token):
         if issue_links:
             out.write('\n%s' % release_constants.ISSUES_HEADER)
             for link in issue_links:
-                out.write('* [%s](%s)\n' % (link, link))
+                out.write(
+                    '* [%s](%s)\n' % (link, link))
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
         release_constants.RELEASE_SUMMARY_FILEPATH))

@@ -59,7 +59,7 @@ class UserGlobalPrefs(python_utils.OBJECT):
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
-        self.can_receive_feedback_message_email = ( #pylint: disable=invalid-name
+        self.can_receive_feedback_message_email = ( # pylint: disable=invalid-name
             can_receive_feedback_message_email)
         self.can_receive_subscription_email = can_receive_subscription_email
 
@@ -316,10 +316,11 @@ class UserCommunityRights(python_utils.OBJECT):
                     self.can_review_translation_for_language_codes))
         for language_code in self.can_review_translation_for_language_codes:
             if not utils.is_supported_audio_language_code(language_code):
-                raise utils.ValidationError('Invalid language_code: %s' % (
-                    language_code))
-        if len(self.can_review_translation_for_language_codes) != len(set(
-                self.can_review_translation_for_language_codes)):
+                raise utils.ValidationError(
+                    'Invalid language_code: %s' % (
+                        language_code))
+        if len(self.can_review_translation_for_language_codes) != len(
+                set(self.can_review_translation_for_language_codes)):
             raise utils.ValidationError(
                 'Expected can_review_translation_for_language_codes list not '
                 'to have duplicate values, found: %s' % (
@@ -332,10 +333,10 @@ class UserCommunityRights(python_utils.OBJECT):
                     self.can_review_voiceover_for_language_codes))
         for language_code in self.can_review_voiceover_for_language_codes:
             if not utils.is_supported_audio_language_code(language_code):
-                raise utils.ValidationError('Invalid language_code: %s' % (
-                    language_code))
-        if len(self.can_review_voiceover_for_language_codes) != len(set(
-                self.can_review_voiceover_for_language_codes)):
+                raise utils.ValidationError(
+                    'Invalid language_code: %s' % language_code)
+        if len(self.can_review_voiceover_for_language_codes) != len(
+                set(self.can_review_voiceover_for_language_codes)):
             raise utils.ValidationError(
                 'Expected can_review_voiceover_for_language_codes list not to '
                 'have duplicate values, found: %s' % (

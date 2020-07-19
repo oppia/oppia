@@ -27,9 +27,10 @@ import python_utils
 
 from . import common
 
-_PARSER = argparse.ArgumentParser(description="""
-Python execution environment setup for scripts that require GAE.
-""")
+_PARSER = argparse.ArgumentParser(
+    description="""
+    Python execution environment setup for scripts that require GAE.
+    """)
 
 GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 

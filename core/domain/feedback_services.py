@@ -205,8 +205,10 @@ def create_message(
         if suggestion:
             suggestion.put()
 
-    if (feconf.CAN_SEND_EMAILS and feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id)):
+    if (
+            feconf.CAN_SEND_EMAILS and (
+                feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
+                user_services.is_user_registered(author_id))):
         _add_message_to_email_buffer(
             author_id, thread_id, message_id, len(text), old_status, new_status)
 
@@ -542,7 +544,8 @@ def get_closed_threads(entity_type, entity_id, has_suggestion):
     """
     return [
         thread for thread in get_threads(entity_type, entity_id)
-        if (thread.has_suggestion == has_suggestion and
+        if (
+            thread.has_suggestion == has_suggestion and
             thread.status != feedback_models.STATUS_CHOICES_OPEN)
     ]
 
@@ -669,7 +672,8 @@ def update_feedback_email_retries(user_id):
     time_since_buffered = (
         (datetime.datetime.utcnow() - model.created_on).seconds)
 
-    if (time_since_buffered >
+    if (
+            time_since_buffered >
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):
         model.retries += 1
         model.put()
@@ -714,7 +718,8 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
 
     updated_references = [
         reference for reference in model.feedback_message_references
-        if (reference['entity_id'] != exploration_id or
+        if (
+            reference['entity_id'] != exploration_id or
             reference['thread_id'] != thread_id)
     ]
 

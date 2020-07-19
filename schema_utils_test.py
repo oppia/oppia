@@ -191,8 +191,8 @@ def _validate_validator(obj_type, validator):
 
     customization_keys = list(validator.keys())
     customization_keys.remove('id')
-    assert (set(customization_keys) ==
-            set(reference_dict[validator['id']].keys()))
+    assert (
+        set(customization_keys) == set(reference_dict[validator['id']].keys()))
     for key in customization_keys:
         value = validator[key]
         schema = reference_dict[validator['id']][key]
@@ -612,9 +612,10 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [
             ('<script></script>', ''),
             (b'<script></script>', ''),
-            ('<a class="webLink" href="https'
-             '://www.oppia.com/"><img src="images/oppia.png"></a>',
-             '<a href="https://www.oppia.com/"></a>')]
+            (
+                '<a class="webLink" href="https'
+                '://www.oppia.com/"><img src="images/oppia.png"></a>',
+                '<a href="https://www.oppia.com/"></a>')]
         invalid_vals = [['<script></script>', '<script></script>']]
         self.check_normalization(schema, mappings, invalid_vals)
 

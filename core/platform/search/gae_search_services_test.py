@@ -380,9 +380,10 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def test_arguments_are_preserved_in_retries(self):
         index = search.Index('index')
-        index.put([search.Document(doc_id='doc', fields=[
-            search.TextField(name='prop', value='val')
-        ])])
+        index.put(
+            [search.Document(doc_id='doc', fields=[
+                search.TextField(name='prop', value='val')
+            ])])
         exception = self._get_delete_error(1, transient=0)
         failing_delete = test_utils.FailingFunction(
             search.Index.delete, exception, 3)
@@ -430,8 +431,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
         self.assertEqual(delete_docs_counter.times_called, 5)
         for i in python_utils.RANGE(3):
-            result = search.Index('my_index').get(bytes(
-                'doc' + python_utils.convert_to_bytes(i)))
+            result = search.Index('my_index').get(
+                bytes('doc' + python_utils.convert_to_bytes(i)))
             self.assertIsNone(result)
 
     def test_put_error_without_transient_result(self):

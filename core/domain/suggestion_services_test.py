@@ -385,9 +385,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state_1',
             'new_value': {
                 'content_id': 'content',
-                'html': ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>')
+                'html': (
+                    '<oppia-noninteractive-math raw_latex-with-value="&am'
+                    'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                    'uot;"></oppia-noninteractive-math>')
             }
         }
         with self.swap(
@@ -850,12 +851,14 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
-        self.assertEqual(len(
-            suggestion_services
-            .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
-        self.assertEqual(len(
-            suggestion_services
-            .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
+        self.assertEqual(
+            len(
+                suggestion_services
+                .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
+        self.assertEqual(
+            len(
+                suggestion_services
+                .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
 
 
 

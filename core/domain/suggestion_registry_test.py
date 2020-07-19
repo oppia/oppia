@@ -618,11 +618,12 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'The new change cmd must be equal to edit_state_property'):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Exploration 1 Albert title'
-            }))
+            suggestion.pre_update_validate(
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 Albert title'
+                }))
 
     def test_get_all_html_content_strings(self):
         change_dict = {

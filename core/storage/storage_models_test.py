@@ -106,8 +106,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     clazz.get_deletion_policy(),
                     base_models.DELETION_POLICY.__dict__)
             except NotImplementedError:
-                self.fail(msg='get_deletion_policy is not defined for %s' % (
-                    clazz.__name__))
+                self.fail(
+                    msg='get_deletion_policy is not defined for %s' % (
+                        clazz.__name__))
 
     def test_base_models_do_not_have_get_deletion_policy(self):
         for clazz in self._get_model_classes():
@@ -118,7 +119,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
             self):
         for clazz in self._get_base_or_versioned_model_child_classes():
-            if (clazz.get_deletion_policy() ==
+            if (
+                    clazz.get_deletion_policy() ==
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
                 with self.assertRaises(NotImplementedError):
                     clazz.has_reference_to_user_id('any_id')
@@ -141,8 +143,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
             for clazz in self._get_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
-        models_with_export = (takeout_service
-                              .get_models_which_should_be_exported())
+        models_with_export = (
+            takeout_service.get_models_which_should_be_exported())
         for model in all_models:
             export_policy = model.get_export_policy()
             if model in models_with_export:

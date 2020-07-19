@@ -170,10 +170,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
 
-        self.assertEqual(len(
-            response_dict['created_exp_summary_dicts']), 1)
-        self.assertEqual(len(
-            response_dict['edited_exp_summary_dicts']), 1)
+        self.assertEqual(
+            len(response_dict['created_exp_summary_dicts']), 1)
+        self.assertEqual(
+            len(response_dict['edited_exp_summary_dicts']), 1)
         self.assertEqual(
             response_dict['created_exp_summary_dicts'][0]['id'],
             self.EXP_ID_1)
@@ -203,10 +203,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)
-        self.assertEqual(len(
-            response_dict['created_exp_summary_dicts']), 0)
-        self.assertEqual(len(
-            response_dict['edited_exp_summary_dicts']), 1)
+        self.assertEqual(
+            len(response_dict['created_exp_summary_dicts']), 0)
+        self.assertEqual(
+            len(response_dict['edited_exp_summary_dicts']), 1)
         self.assertEqual(
             response_dict['edited_exp_summary_dicts'][0]['id'],
             self.EXP_ID_1)
@@ -292,8 +292,9 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertTrue(test_utils.check_image_png_or_webp(
-            user_settings.profile_picture_data_url))
+        self.assertTrue(
+            test_utils.check_image_png_or_webp(
+                user_settings.profile_picture_data_url))
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             payload={'update_type': 'profile_picture_data_url',
@@ -363,8 +364,9 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(user_bio_response['status_code'], 400)
-        self.assertIn('User bio exceeds maximum character limit: 2000',
-                      user_bio_response['error'])
+        self.assertIn(
+            'User bio exceeds maximum character limit: 2000',
+            user_bio_response['error'])
         self.logout()
 
 
@@ -611,23 +613,25 @@ class SignupTests(test_utils.GenericTestBase):
 
         response = self.get_html_response(
             '/signup?return_url=https://google.com', expected_status_int=302)
-        self.assertEqual('', strip_domain_from_location_header(
-            response.headers['location']))
+        self.assertEqual(
+            '', strip_domain_from_location_header(response.headers['location']))
 
         response = self.get_html_response(
             '/signup?return_url=//google.com', expected_status_int=302)
-        self.assertEqual('', strip_domain_from_location_header(
-            response.headers['location']))
+        self.assertEqual(
+            '', strip_domain_from_location_header(response.headers['location']))
 
         response = self.get_html_response(
             '/signup?return_url=/page#hello', expected_status_int=302)
-        self.assertEqual('page', strip_domain_from_location_header(
-            response.headers['location']))
+        self.assertEqual(
+            'page', strip_domain_from_location_header(
+                response.headers['location']))
 
         response = self.get_html_response(
             '/signup?return_url=/page/hello', expected_status_int=302)
-        self.assertEqual('page/hello', strip_domain_from_location_header(
-            response.headers['location']))
+        self.assertEqual(
+            'page/hello', strip_domain_from_location_header(
+                response.headers['location']))
 
         response = self.get_html_response(
             '/signup?return_url=/page/hello?id=tests', expected_status_int=302)
@@ -861,8 +865,9 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 
             # Check downloaded zip file.
             filename = 'oppia_takeout_data.zip'
-            self.assertEqual(data.headers['Content-Disposition'],
-                             'attachment; filename=%s' % filename)
+            self.assertEqual(
+                data.headers['Content-Disposition'],
+                'attachment; filename=%s' % filename)
             zf_saved = zipfile.ZipFile(
                 python_utils.string_io(buffer_value=data.body))
             self.assertEqual(
@@ -917,8 +922,8 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response('/pending-account-deletion',
-                                   expected_status_int=404)
+            self.get_html_response(
+                '/pending-account-deletion', expected_status_int=404)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

@@ -302,8 +302,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, ('Expected story to only belong to a valid topic, but '
-                        'found no topic with ID: %s' % topic_id)):
+            Exception,
+            'Expected story to only belong to a valid topic, but '
+            'found no topic with ID: %s' % topic_id):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
@@ -327,16 +328,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, ('Expected story to belong to the topic %s, but it is '
-                        'neither a part of the canonical stories or the '
-                        'additional stories of the topic.' % topic_id)):
+            Exception,
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the '
+            'additional stories of the topic.' % topic_id):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)
-        self.assertEqual(story_fetchers.get_story_by_id(
-            self.STORY_ID, strict=False), None)
+        self.assertEqual(
+            story_fetchers.get_story_by_id(
+                self.STORY_ID, strict=False), None)
         self.assertEqual(
             story_fetchers.get_story_summary_by_id(
                 self.STORY_ID, strict=False), None)
@@ -1624,21 +1627,25 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
     def test_get_completed_node_ids(self):
         # There should be no exception if the user or story do not exist;
         # it should also return an empty list in both of these situations.
-        self.assertEqual(story_fetchers.get_completed_node_ids(
-            'Fake', self.STORY_1_ID), [])
-        self.assertEqual(story_fetchers.get_completed_node_ids(
-            self.owner_id, 'Fake'), [])
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids(
+                'Fake', self.STORY_1_ID), [])
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids(
+                self.owner_id, 'Fake'), [])
 
         # If no model exists, there should be no completed node IDs.
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.STORY_1_ID))
-        self.assertEqual(story_fetchers.get_completed_node_ids(
-            self.owner_id, self.STORY_1_ID), [])
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids(
+                self.owner_id, self.STORY_1_ID), [])
 
         # If the first node is completed, it should be reported.
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        self.assertEqual(story_fetchers.get_completed_node_ids(
-            self.owner_id, self.STORY_1_ID), [self.NODE_ID_1])
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids(
+                self.owner_id, self.STORY_1_ID), [self.NODE_ID_1])
 
         # If all nodes are completed, all of them should be reported.
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
@@ -1651,8 +1658,9 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
     def test_get_latest_completed_node_ids(self):
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.STORY_1_ID))
-        self.assertEqual(story_fetchers.get_latest_completed_node_ids(
-            self.owner_id, self.STORY_1_ID), [])
+        self.assertEqual(
+            story_fetchers.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID), [])
 
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self.assertEqual(

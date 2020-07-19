@@ -115,8 +115,9 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             categorized_skills_dict[topic.name]['uncategorized'] = (
                 skills_list)
             for subtopic in subtopics:
-                skills = (skill_services.get_descriptions_of_skills(
-                    subtopic.skill_ids))[0]
+                skills = (
+                    skill_services.get_descriptions_of_skills(
+                        subtopic.skill_ids))[0]
                 skills_list = []
                 for skill_id in subtopic.skill_ids:
                     skill_dict = {
@@ -202,33 +203,40 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         sort_by = self.payload.get('sort')
         status = self.payload.get('status')
 
-        if (classroom_name is not None and
+        if (
+                classroom_name is not None and
                 not isinstance(classroom_name, python_utils.BASESTRING)):
             raise self.InvalidInputException(
                 'Classroom name should be a string.')
 
-        if (urlsafe_start_cursor is not None and
+        if (
+                urlsafe_start_cursor is not None and
                 not isinstance(urlsafe_start_cursor, python_utils.BASESTRING)):
             raise self.InvalidInputException(
                 'Next Cursor should be a string.')
 
-        if (num_skills_to_fetch is None or
+        if (
+                num_skills_to_fetch is None or
                 not isinstance(num_skills_to_fetch, int)):
             raise self.InvalidInputException(
                 'Number of skills to fetch should be a number.')
 
-        if (keywords is not None and (not isinstance(keywords, list) or not all(
-                [isinstance(keyword, python_utils.BASESTRING)
-                 for keyword in keywords]))):
+        if (
+                keywords is not None and (
+                    not isinstance(keywords, list) or not all([
+                        isinstance(keyword, python_utils.BASESTRING)
+                        for keyword in keywords]))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 
-        if (sort_by is not None and
+        if (
+                sort_by is not None and
                 not isinstance(sort_by, python_utils.BASESTRING)):
             raise self.InvalidInputException(
                 'The value of sort_by should be a string.')
 
-        if (status is not None and
+        if (
+                status is not None and
                 not isinstance(status, python_utils.BASESTRING)):
             raise self.InvalidInputException(
                 'Status should be a string.')

@@ -236,8 +236,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>HasElementXAtPositionY rule_spec html</p>',
                 '<p>y input for HasElementXAtPositionY rule_spec </p>',
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
-                 'pec htmls</p>'), '',
+                (
+                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
+                    'pec htmls</p>'), '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
                 '<p>state customization arg html 1</p>',
@@ -825,8 +826,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
-        init_state.update_interaction_solution(state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict))
+        init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
@@ -1195,8 +1197,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
-        with self.assertRaisesRegexp(Exception, (
-            'Expected solicit_answer_details to be a boolean, received')):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected solicit_answer_details to be a boolean, received'):
             init_state.update_solicit_answer_details('abc')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)

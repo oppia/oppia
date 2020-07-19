@@ -190,11 +190,13 @@ class AnswerGroup(python_utils.OBJECT):
                             input_variable_match_found = True
                             rule_input_variable = (
                                 rule_spec.inputs[input_variable])
-                            if (html_type_format ==
+                            if (
+                                    html_type_format ==
                                     feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
                                 html_list = html_list + [rule_input_variable]
-                            elif (html_type_format ==
-                                  feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                            elif (
+                                    html_type_format ==
+                                    feconf.HTML_RULE_VARIABLE_FORMAT_SET):
                                 # Here we are checking the type of the
                                 # rule_specs.inputs because the rule type
                                 # 'Equals' is used by other interactions as
@@ -205,9 +207,10 @@ class AnswerGroup(python_utils.OBJECT):
                                         if isinstance(
                                                 value, python_utils.BASESTRING):
                                             html_list = html_list + [value]
-                            elif (html_type_format ==
-                                  feconf.
-                                  HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                            elif (
+                                    html_type_format ==
+                                    feconf.
+                                    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                                 for rule_spec_html in rule_input_variable:
                                     html_list = html_list + rule_spec_html
                             else:
@@ -970,8 +973,9 @@ class Voiceover(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
                 'the following extensions: %s. Received: %s'
-                % (list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
-                   self.filename))
+                % (
+                    list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
+                    self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
@@ -1632,13 +1636,15 @@ class RuleSpec(python_utils.OBJECT):
                         input_variable_match_found = True
                         rule_input_variable = (
                             rule_spec_dict['inputs'][input_variable])
-                        if (html_type_format ==
+                        if (
+                                html_type_format ==
                                 feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
                             rule_spec_dict['inputs'][input_variable] = (
                                 conversion_fn(
                                     rule_spec_dict['inputs'][input_variable]))
-                        elif (html_type_format ==
-                              feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                        elif (
+                                html_type_format ==
+                                feconf.HTML_RULE_VARIABLE_FORMAT_SET):
                             # Here we are checking the type of the
                             # rule_specs.inputs because the rule type
                             # 'Equals' is used by other interactions as
@@ -1652,9 +1658,10 @@ class RuleSpec(python_utils.OBJECT):
                                         rule_spec_dict['inputs'][
                                             input_variable][value_index] = (
                                                 conversion_fn(value))
-                        elif (html_type_format ==
-                              feconf.
-                              HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                        elif (
+                                html_type_format ==
+                                feconf.
+                                HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                             for list_index, html_list in enumerate(
                                     rule_spec_dict['inputs'][input_variable]):
                                 for rule_html_index, rule_html in enumerate(
@@ -1903,8 +1910,9 @@ class State(python_utils.OBJECT):
             component_names = set([
                 component['id'].replace(component_name_prefix, '')
                 for component in html_cleaner.get_rte_components(html)])
-            return any(component_names.difference(
-                android_validation_constants.VALID_RTE_COMPONENTS))
+            return any(
+                component_names.difference(
+                    android_validation_constants.VALID_RTE_COMPONENTS))
 
         if self.content and require_valid_component_names(
                 self.content.html):
@@ -1947,8 +1955,9 @@ class State(python_utils.OBJECT):
         for answer_group in self.interaction.answer_groups:
             training_examples_count += len(answer_group.training_data)
             labels_count += 1
-        if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
-                (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
+        if (
+                (training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES)
+                and (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
             return True
         return False
 
@@ -2139,7 +2148,8 @@ class State(python_utils.OBJECT):
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
-                    if (isinstance(value, python_utils.BASESTRING) and
+                    if (
+                            isinstance(value, python_utils.BASESTRING) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types.
@@ -2404,8 +2414,9 @@ class State(python_utils.OBJECT):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            RecordedVoiceovers.from_dict(copy.deepcopy(
-                feconf.DEFAULT_RECORDED_VOICEOVERS)),
+            RecordedVoiceovers.from_dict(
+                copy.deepcopy(
+                    feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
             False)
