@@ -28,7 +28,7 @@ describe('Splash Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
   var $q = null;
-  var UserService = null;
+  var userService: UserService = null;
   var LoaderService = null;
   var loadingMessage = null;
   var SiteAnalyticsService = null;
@@ -54,7 +54,7 @@ describe('Splash Page', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    //UserService = $injector.get('UserService');
+    userService = $injector.get('UserService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
@@ -119,7 +119,7 @@ describe('Splash Page', function() {
   });
 
   it('should evaluate if user is logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {
@@ -139,7 +139,7 @@ describe('Splash Page', function() {
   });
 
   it('should evaluate if user is not logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {
