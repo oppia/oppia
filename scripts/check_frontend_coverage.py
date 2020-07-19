@@ -407,7 +407,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'summary-list-header.directive.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
-    'teach-oppia-modal.controller.ts',
     'teacher.ts',
     'teacher2.ts',
     'test-interaction-panel.directive.ts',
