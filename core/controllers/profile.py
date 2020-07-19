@@ -109,7 +109,7 @@ class ProfileHandler(base.BaseHandler):
 class PreferencesPage(base.BaseHandler):
     """The preferences page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         self.render_template('preferences-page.mainpage.html')
@@ -120,7 +120,7 @@ class PreferencesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -167,7 +167,7 @@ class PreferencesHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
         update_type = self.payload.get('update_type')
@@ -214,7 +214,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -340,7 +340,7 @@ class SignupHandler(base.BaseHandler):
 class DeleteAccountPage(base.BaseHandler):
     """The delete account page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
@@ -351,7 +351,7 @@ class DeleteAccountPage(base.BaseHandler):
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def delete(self):
         """Handles DELETE requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
@@ -366,7 +366,7 @@ class ExportAccountHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_EXPORT:
@@ -431,7 +431,7 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
         site_language_code = self.payload.get('site_language_code')
