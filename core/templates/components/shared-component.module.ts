@@ -40,9 +40,8 @@ import { ExplorationEmbedButtonModalComponent } from
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { TopicSummaryTileComponent } from
-  './summary-tile/topic-summary-tile.component';
-
+import { ExplorationSummaryTileDirective } from
+  './summary-tile/exploration-summary-tile.directive';
 
 
 @NgModule({
@@ -51,17 +50,16 @@ import { TopicSummaryTileComponent } from
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    TopicSummaryTileComponent],
+    ExplorationSummaryTileDirective],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    TopicSummaryTileComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
   ],
   exports: [
     BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, MaterialModule
+    SharingLinksComponent, MaterialModule, ExplorationSummaryTileDirective
   ],
 })
 

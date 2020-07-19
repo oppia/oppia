@@ -13,25 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for creating a list of collection nodes which link to
- * playing the exploration in each node.
+ * @fileoverview Component for a topic tile.
  */
 
+require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('collectionNodeList', [
+angular.module('oppia').directive('topicSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
-        getCollectionId: '&collectionId',
-        getCollectionNodes: '&collectionNodes'
+        getTopicSummary: '&topicSummary'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-player-page/collection-node-list/' +
-        'collection-node-list.directive.html'),
+        '/components/summary-tile/topic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: ['TOPIC_VIEWER_URL_TEMPLATE',
+        function(TOPIC_VIEWER_URL_TEMPLATE) {
+          var ctrl = this;
+          ctrl.getTopicLink = function() {
+            return UrlInterpolationService.interpolateUrl(
+              TOPIC_VIEWER_URL_TEMPLATE, {
+                topic_name: ctrl.getTopicSummary().getName()
+              });
+          };
+
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+        }
+      ]
     };
   }]);

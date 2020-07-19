@@ -3,7 +3,7 @@
     <div class="col-sm-5">
       <ul>
         <li>
-          <img ng-src="<[$ctrl.getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
+          <img [src]="getStaticImageUrl('/general/apple.svg')" class="collection-footer-img" alt="">
         </li>
       </ul>
     </div>
@@ -11,14 +11,14 @@
       <div class="float-right">
         <ul>
           <li>
-            <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
+            <h4 [innerHTML]="'I18N_PLAYER_SHARE_THIS_COLLECTION' | translate" class="oppia-share-collection-footer"></h4>
           </li>
           <li>
-            <sharing-links ng-click="$event.stopPropagation()"
-                           [collection-id]="$ctrl.collectionId"
-                           layout-type="row"
-                           layout-align-type="center center"
-                           share-type="collection"
+            <sharing-links (click)="$event.stopPropagation()"
+                           [collectionId]="collectionId"
+                           layoutType="row"
+                           layoutAlignType="center center"
+                           shareType="collection"
                            class="oppia-collection-footer-sharing-links"
                            aria-label="Social media links">
             </sharing-links>
