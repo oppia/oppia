@@ -1186,14 +1186,14 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self.owner_id).first_contribution_msec)
 
 
-class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
+class DraftChangeMathRichTextAuditOneOffJobTests(
         test_utils.GenericTestBase):
 
     DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
     def setUp(self):
         super(
-            DraftChangesMathRichTextInfoModelGenerationOneOffJobTests,
+            DraftChangeMathRichTextAuditOneOffJobTests,
             self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -1300,7 +1300,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
 
         job = (
             user_jobs_one_off.
-            DraftChangesMathRichTextInfoModelGenerationOneOffJob)
+            DraftChangeMathRichTextAuditOneOffJob)
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
@@ -1360,7 +1360,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
 
         job = (
             user_jobs_one_off.
-            DraftChangesMathRichTextInfoModelGenerationOneOffJob)
+            DraftChangeMathRichTextAuditOneOffJob)
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
@@ -1413,7 +1413,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
             draft_change_list_id=1).put()
         job = (
             user_jobs_one_off.
-            DraftChangesMathRichTextInfoModelGenerationOneOffJob)
+            DraftChangeMathRichTextAuditOneOffJob)
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
@@ -1460,7 +1460,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
             draft_change_list_id=1).put()
         job = (
             user_jobs_one_off.
-            DraftChangesMathRichTextInfoModelGenerationOneOffJob)
+            DraftChangeMathRichTextAuditOneOffJob)
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
@@ -1511,7 +1511,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
             draft_change_list_id=1).put()
         job = (
             user_jobs_one_off.
-            DraftChangesMathRichTextInfoModelGenerationOneOffJob)
+            DraftChangeMathRichTextAuditOneOffJob)
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
@@ -1600,7 +1600,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
             _mock_try_upgrading_draft_to_exp_version):
             job = (
                 user_jobs_one_off.
-                DraftChangesMathRichTextInfoModelGenerationOneOffJob)
+                DraftChangeMathRichTextAuditOneOffJob)
             job_id = job.create_new()
             job.enqueue(job_id)
             self.assertEqual(

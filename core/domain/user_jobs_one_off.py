@@ -364,11 +364,10 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_model.put()
 
 
-class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
+class DraftChangeMathRichTextAuditOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that finds all the valid exploration draft changes with math rich
-    text components and creates a temporary storage model with all the
-    information required for generating math rich text component SVG images.
+    text components having no SVG and outputs the corresponding exploration IDs.
     """
 
     _SUCCESS_KEY = 'found_draft_changes_with_math_tags'
@@ -415,7 +414,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
                         html_string))
                 if len(latex_values) > 0:
                     yield (
-                        DraftChangesMathRichTextInfoModelGenerationOneOffJob.
+                        DraftChangeMathRichTextAuditOneOffJob.
                         _SUCCESS_KEY, item.exploration_id)
 
             except Exception as e:
@@ -430,7 +429,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
     @staticmethod
     def reduce(key, values):
         if key == (
-                DraftChangesMathRichTextInfoModelGenerationOneOffJob.
+                DraftChangeMathRichTextAuditOneOffJob.
                 _SUCCESS_KEY):
             final_values = list(set(values))
             yield (
