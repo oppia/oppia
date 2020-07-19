@@ -49,13 +49,14 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
               ctrl.answer !== undefined &&
               ctrl.answer !== null && ctrl.answer !== '' &&
               angular.isUndefined(
-                NumericInputValidationService.getErrorString(ctrl.answer)));
+                NumericInputValidationService.getErrorString(
+                  ctrl.answer)));
           };
 
           ctrl.submitAnswer = function(answer) {
             if (isAnswerValid()) {
               CurrentInteractionService.onSubmit(
-                NumericInputValidationService.parseValue(answer),
+                answer,
                 NumericInputRulesService);
             }
           };

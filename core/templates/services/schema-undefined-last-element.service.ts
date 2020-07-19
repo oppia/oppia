@@ -19,6 +19,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Schema } from 'services/schema-default-value.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,10 +27,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class SchemaUndefinedLastElementService {
   // Returns true if the input value, taken as the last element in a list,
   // should be considered as 'undefined' and therefore deleted.
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'schema' is a complex dict requiring very careful
-  // backtracking.
-  getUndefinedValue(schema: any): any {
+  getUndefinedValue(schema: Schema): string {
     if (schema.type === 'unicode' || schema.type === 'html') {
       return '';
     } else {
