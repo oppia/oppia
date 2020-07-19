@@ -422,7 +422,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-editor-stories-list.directive.ts',
     'topic-questions-tab.directive.ts',
     'topic-selector.directive.ts',
-    'topic-summary-tile.component.ts',
+    'topic-summary-tile.directive.ts',
     'topic-viewer-navbar-breadcrumb.directive.ts',
     'topic-viewer-stories-list.directive.ts',
     'TopicObjectFactory.ts',
