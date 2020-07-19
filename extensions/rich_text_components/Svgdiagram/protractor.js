@@ -17,6 +17,7 @@
  * testing with Protractor.js
  */
 
+var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 var request = require('request');
@@ -81,7 +82,7 @@ const SVGTAGS = {
     ' -62.5)" d="M 40 40 Q 95 100 150 40" stroke-linecap="round"/></g></svg>')
 };
 
-var customizeComponent = async function(modal, shapes) {
+var customizeComponent = async function(modal, shapes, altText) {
   for (var i = 0; i < shapes.length; i++) {
     var shapeClass = '.protractor-test-create-' + shapes[i];
     var shapeTool = modal.element(by.css(shapeClass));
@@ -93,6 +94,8 @@ var customizeComponent = async function(modal, shapes) {
     }
     await shapeTool.click();
   }
+  var altTextInputElement = (
+    element(by.css('[placeholder = "Description of the diagram"]')));
   var saveDiagram = modal.element(by.css('.protractor-test-save-diagram'));
   await waitFor.elementToBeClickable(
     saveDiagram,
@@ -101,12 +104,19 @@ var customizeComponent = async function(modal, shapes) {
   await waitFor.visibilityOf(
     modal.element(by.css('.protractor-test-saved-diagram-container')),
     'Diagram container not visible');
+  await action.sendKeys('Alt text input', altTextInputElement, altText);
 };
 
-var expectComponentDetailsToMatch = async function(elem, shapesName) {
+var expectComponentDetailsToMatch = async function(elem, shapesName, altText) {
   var svgName = shapesName.join('_');
-  var src = await elem.element(by.css(
-    '.protractor-test-svg-diagram')).getAttribute('src');
+  var svgDiagramInputElement = elem.element(by.css(
+    '.protractor-test-svg-diagram'));
+  await waitFor.visibilityOf(
+    svgDiagramInputElement,
+    'SVG Diagram input element takes too long to load.');
+  var src = await svgDiagramInputElement.getAttribute('src');
+  var alt = await svgDiagramInputElement.getAttribute('alt');
+  expect(alt).toEqual(altText);
   await request(src, function(error, response, body) {
     expect(body.replace(/(\r\n|\n|\r)/gm, '')).toBe(SVGTAGS[svgName]);
   });
