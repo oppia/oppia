@@ -7,18 +7,16 @@
       <div class="practice-content">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate"></span>
       </div>
-        <mat-card-content>
-          <div *ngFor="let subtopic of availableSubtopics; let i = index">
-            <mat-checkbox class="practice-tab-mat-checkbox" [(ngModel)] = "selectedSubtopicIndices[i]">
-              {{ subtopic.getTitle() }}
-            </mat-checkbox>
-          </div>
+      <mat-card-content>
+        <div *ngFor="let subtopic of availableSubtopics; let i = index">
+          <mat-checkbox class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]">
+            {{ subtopic.getTitle() }}
+          </mat-checkbox>
+        </div>
       </mat-card-content>
       <mat-card-actions>
         <div class="fx-row fx-main-center fx-cross-center full-width">
-          <button mat-raised-button [disabled]="isStartButtonDisabled()"
-                    (click)="openNewPracticeSession()"
-                    class="practice-session-button">
+          <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button">
             <span [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
           </button>
         </div>
@@ -28,8 +26,8 @@
 </div>
 <style>
   .practice-tab .oppia-practice-tab-container .oppia-page-card {
-    width: 550px;
     padding: 30px 55px 30px 45px;
+    width: 550px;
   }
 
   .practice-tab .tab-title {
@@ -67,9 +65,10 @@
     background-color: #00645C;
     color: white;
   }
+
   .practice-tab .practice-session-button:disabled {
-    color: rgba(0,0,0,.26);
-    background-color: rgba(0,0,0,.26);
+    background-color: rgba(0, 0, 0, .26);
+    color: rgba(0, 0, 0, .26);
     box-shadow: none;
   }
 
@@ -78,11 +77,7 @@
   }
 
   .practice-tab .full-width {
-    width: 100%;
     text-align: center;
-  }
-
-  .full-width {
     width: 100%;
   }
 
