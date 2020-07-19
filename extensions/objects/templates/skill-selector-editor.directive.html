@@ -1,4 +1,4 @@
-<div class="list-group">
+<div class="list-group" ng-model="$ctrl.value" apply-validation validators="$ctrl.validators">
   <md-card layout="row" class="list-view-item protractor-test-skill-select-header">
     Search By Skill
     <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
