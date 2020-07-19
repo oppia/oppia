@@ -239,6 +239,59 @@ class ExplorationContextModel(base_models.BaseModel):
         return False
 
 
+class ExplorationMathRichTextInfoModel(base_models.BaseModel):
+    """Temporary Storage model for storing information useful while
+    generating images for math rich-text components in explorations.
+
+    TODO (#9952): This model needs to removed once we generate SVG images for
+    all the math rich text componets in old explorations.
+
+    The id of each instance is the id of the corresponding exploration.
+    """
+
+    # A boolean which indicates whether the exploration requires images to be
+    # generated and saved for the math rich-text components. If this field is
+    # False, we will need to generate math rich-text component images for the
+    # exploration. The field will be true only if for each math rich-text
+    # components there is a valid image stored in the datastore.
+    math_images_generation_required = ndb.BooleanProperty(
+        indexed=True, required=True)
+    # Approximate maximum size of Math rich-text components SVG images that
+    # would be generated for the exploration according to the length of
+    # raw_latex value.
+    estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
+        indexed=True, required=True)
+    # Set of latex values without an SVG saved from all the math-rich text
+    # components of the exploration.
+    latex_values_without_svg = ndb.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationMathRichTextInfoModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether ExplorationMathRichTextInfoModel references the given
+        user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+                be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""

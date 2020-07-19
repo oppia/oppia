@@ -35,6 +35,9 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -45,6 +48,7 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -3006,6 +3010,95 @@ class ExplorationContextModelValidator(BaseModelValidator):
                 'story_ids', story_models.StoryModel, [item.story_id]),
             ExternalModelFetcherDetails(
                 'exp_ids', exp_models.ExplorationModel, [item.id])]
+
+
+class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
+    """Class for validating ExplorationMathRichTextInfoModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'exp_ids', exp_models.ExplorationModel, [item.id])]
+
+    @classmethod
+    def _validate_latex_values_info(
+            cls, item, field_name_to_external_model_references):
+        """Validate that latex values and other related information in the
+        model is valid and matches the corresponding exploration.
+
+        Args:
+            item: ndb.Model. ExplorationMathRichTextInfoModel to validate.
+            field_name_to_external_model_references:
+                dict(str, (list(ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exploration_model_references = (
+            field_name_to_external_model_references['exp_ids'])
+
+        for exploration_model_reference in exploration_model_references:
+            exploration_model = exploration_model_reference.model_instance
+            html_strings_in_exploration = ''
+            for state_dict in exploration_model.states.values():
+                state = state_domain.State.from_dict(state_dict)
+                html_strings_in_exploration += (
+                    ''.join(state.get_all_html_content_strings()))
+
+            latex_values_without_svg = (
+                html_validation_service.
+                get_latext_values_without_svg_from_html(
+                    html_strings_in_exploration))
+            math_rich_text_info = (
+                exp_domain.ExplorationMathRichTextInfo(
+                    exploration_model.id,
+                    item.math_images_generation_required,
+                    latex_values_without_svg))
+            approx_size_of_math_svgs_bytes = (
+                math_rich_text_info.get_svg_size_in_bytes())
+
+            if latex_values_without_svg != item.latex_values_without_svg:
+                cls._add_error(
+                    'latex values check',
+                    'Entity id %s: Latex values in the model does not match '
+                    'latex values in the exploration model' % (
+                        item.id))
+            if (approx_size_of_math_svgs_bytes !=
+                    item.estimated_max_size_of_images_in_bytes):
+                cls._add_error(
+                    'svg size check',
+                    'Entity id %s: estimated svg size in the model does not'
+                    ' match estimated svg size in the exploration model' % (
+                        item.id))
+            if not item.math_images_generation_required:
+                filenames = (
+                    html_validation_service.
+                    extract_svg_filenames_in_math_rte_components(
+                        html_strings_in_exploration))
+                for filename in filenames:
+                    file_system_class = (
+                        fs_services.get_entity_file_system_class())
+                    fs = fs_domain.AbstractFileSystem(file_system_class(
+                        feconf.ENTITY_TYPE_EXPLORATION, exploration_model.id))
+                    filepath = 'image/%s' % filename
+                    if not fs.isfile(filepath):
+                        cls._add_error(
+                            'image generation requirement check',
+                            'Entity id %s: status of image generation does not'
+                            ' match the image generation requirement for the'
+                            ' exploration model' % (
+                                item.id))
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_latex_values_info]
 
 
 class QuestionSkillLinkModelValidator(BaseModelValidator):
@@ -6215,6 +6308,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         GeneralFeedbackEmailReplyToIdModelValidator),
     exp_models.ExplorationContextModel: (
         ExplorationContextModelValidator),
+    exp_models.ExplorationMathRichTextInfoModel: (
+        ExplorationMathRichTextInfoModelValidator),
     exp_models.ExplorationModel: ExplorationModelValidator,
     exp_models.ExplorationSnapshotMetadataModel: (
         ExplorationSnapshotMetadataModelValidator),
@@ -6712,6 +6807,15 @@ class ExplorationContextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationContextModel]
+
+
+class ExplorationMathRichTextInfoModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationMathRichTextInfoModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationMathRichTextInfoModel]
 
 
 class QuestionSnapshotMetadataModelAuditOneOffJob(

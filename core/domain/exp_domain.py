@@ -316,6 +316,102 @@ class ExpVersionReference(python_utils.OBJECT):
                 'Expected version to be an int, received %s' % self.version)
 
 
+class ExplorationMathRichTextInfo(python_utils.OBJECT):
+    """Value object representing all the information related to math rich
+    text components in an exploration's HTML.
+    """
+
+    def __init__(
+            self, exp_id, math_images_generation_required,
+            latex_values_without_svg):
+        """Initializes an ExplorationMathRichTextInfo domain object.
+
+        Args:
+            exp_id: str. ID of the exploration
+            math_images_generation_required: bool. A boolean which indicates
+                whether the exploration requires images to be generated and
+                saved for the math rich-text components.
+            latex_values_without_svg: list(str). list of unique latex values.
+        """
+        self.exp_id = exp_id
+        self.math_images_generation_required = math_images_generation_required
+        self.latex_values_without_svg = latex_values_without_svg
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this ExplorationMathRichTextInfo domain
+        object.
+
+        Returns:
+            dict. A dict, mapping all fields of ExplorationMathRichTextInfo
+            instance.
+        """
+        return {
+            'exp_id': self.exp_id,
+            'math_images_generation_required': (
+                self.math_images_generation_required),
+            'latex_values_without_svg': self.latex_values_without_svg
+        }
+
+    def validate(self):
+        """Validates properties of the ExplorationMathRichTextInfo.
+
+        Raises:
+            ValidationError: attributes of the ExplorationMathRichTextInfo
+                are invalid.
+        """
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected exp_id to be a str, received %s' % self.exp_id)
+        if not isinstance(self.math_images_generation_required, bool):
+            raise utils.ValidationError(
+                'Expected math_images_generation_required to be an bool, '
+                'received %s' % self.math_images_generation_required)
+        if not isinstance(self.latex_values_without_svg, list):
+            raise utils.ValidationError(
+                'Expected latex_values to be a list, received %s' % (
+                    self.latex_values_without_svg))
+        for latex_value in self.latex_values_without_svg:
+            if not isinstance(latex_value, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each element in the list of latex values to be'
+                    ' a str, received %s' % latex_value)
+
+    def get_svg_size_in_bytes(self):
+        """Returns the approximate size of SVG images for the latex values in
+        bytes.
+
+        Returns:
+            int. The approximate size of Math SVGs in bytes.
+        """
+
+        # The approximate size for an SVG image for a Latex with one character
+        # is around 1000 Kb. But, when the number of characters increase the
+        # size of SVG per character reduces. For example: If the size of SVG
+        # for the character 'a' is 1000 bytes, the size of SVG for 'abc' will
+        # be lesser than 3000 bytes. So the below approximation to find the
+        # size will give us the maximum size.
+        size_in_bytes = 0
+        for latex_value in self.latex_values_without_svg:
+            # The characters in special Latex keywords like 'frac' and 'sqrt'
+            #  don't add up to the total size of SVG.
+            length_of_expression = (
+                len(
+                    latex_value.replace('frac', '').replace('sqrt', '').replace(
+                        ' ', '')))
+            size_in_bytes += (length_of_expression * 1000)
+        return size_in_bytes
+
+    def get_longest_latex_value(self):
+        """Returns the largest latex value by length among the latex values in
+        the object.
+
+        Returns:
+            str. The largest latex value.
+        """
+        return max(self.latex_values_without_svg, key=len)
+
+
 class ExplorationVersionsDiff(python_utils.OBJECT):
     """Domain object for the difference between two versions of an Oppia
     exploration.
