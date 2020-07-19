@@ -8384,7 +8384,7 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
             exploration_math_rich_text_info.to_dict(), {
                 'exp_id': 'exp_id1',
                 'math_images_generation_required': True,
-                'latex_values_without_svgs': ['abc', 'x']
+                'latex_values_without_svg': ['abc', 'x']
             })
 
     def test_validate_when_latex_values_not_list(self):

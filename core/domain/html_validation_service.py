@@ -932,7 +932,7 @@ def get_latext_values_without_svg_from_html(html_string):
 
     Returns:
         list(str). list of unique latex values of math-tags without svg
-        filenames.
+        filename.
     """
 
     soup = bs4.BeautifulSoup(

@@ -410,7 +410,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
                 if len(latex_values) > 0:
                     yield (
                         DraftChangesMathRichTextInfoModelGenerationOneOffJob.
-                        _SUCCESS_KEY, item.id)
+                        _SUCCESS_KEY, item.exploration_id)
 
             except Exception as e:
                 logging.error(
@@ -426,10 +426,12 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
         if key == (
                 DraftChangesMathRichTextInfoModelGenerationOneOffJob.
                 _SUCCESS_KEY):
+            final_values = list(set(values))
             yield (
-                ('found %d draft changes with math-tags having no SVG') % (len(
-                    values)),
-                values)
+                ('found %d explorations having draft changes with math-tags '
+                 'having no SVG') % (len(
+                     final_values)),
+                final_values)
         else:
             yield (key, values)
 

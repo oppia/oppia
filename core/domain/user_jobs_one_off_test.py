@@ -1309,9 +1309,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)
         actual_output_list = ast.literal_eval(actual_output[0])
-        expected_value_list = [
-            ('%s.%s' % (self.owner_id, 'exp_id')),
-            ('%s.%s' % (self.owner_id, 'exp_id2'))]
+        expected_value_list = ['exp_id', 'exp_id2']
         self.assertEqual(
             sorted(expected_value_list), sorted(actual_output_list[1]))
 
@@ -1371,9 +1369,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)
         actual_output_list = ast.literal_eval(actual_output[0])
-        expected_value_list = [
-            ('%s.%s' % (self.owner_id, 'exp_id'))]
-        self.assertEqual(expected_value_list, actual_output_list[1])
+        self.assertEqual(['exp_id'], actual_output_list[1])
 
     def test_draft_changes_failing_updation_to_exploration_version(self):
         exploration = exp_domain.Exploration.create_default_exploration(

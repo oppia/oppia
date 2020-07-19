@@ -263,7 +263,7 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
         indexed=True, required=True)
     # Set of latex values without an SVG saved from all the math-rich text
     # components of the exploration.
-    latex_values_without_svgs = ndb.StringProperty(repeated=True)
+    latex_values_without_svg = ndb.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():

@@ -6074,21 +6074,21 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         self.model_instance_0 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='0',
-                latex_values_without_svgs=['+,+,+,+'],
+                latex_values_without_svg=['+,+,+,+'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_0.put()
         self.model_instance_1 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='1',
-                latex_values_without_svgs=['+,+,+,+'],
+                latex_values_without_svg=['+,+,+,+'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_1.put()
         self.model_instance_2 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='2',
-                latex_values_without_svgs=['+,+,+,+'],
+                latex_values_without_svg=['+,+,+,+'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_2.put()
@@ -6107,7 +6107,7 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         self.model_instance_2 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='2',
-                latex_values_without_svgs=['+,+,+,+', 'x^2'],
+                latex_values_without_svg=['+,+,+,+', 'x^2'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_2.put()
@@ -6160,7 +6160,7 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         model_instance = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='3',
-                latex_values_without_svgs=['+,+,+,+'],
+                latex_values_without_svg=['+,+,+,+'],
                 math_images_generation_required=False,
                 estimated_max_size_of_images_in_bytes=7000))
         model_instance.put()

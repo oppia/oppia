@@ -2978,19 +2978,19 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)',
             '\\frac{x}{y}']
         self.assertEqual(
-            sorted(exp1_math_image_model.latex_values_without_svgs),
+            sorted(exp1_math_image_model.latex_values_without_svg),
             sorted(expected_latex_values_1))
         self.assertEqual(
             exp2_math_image_model.estimated_max_size_of_images_in_bytes,
             54000)
         self.assertEqual(
-            sorted(exp2_math_image_model.latex_values_without_svgs),
+            sorted(exp2_math_image_model.latex_values_without_svg),
             sorted(expected_latex_values_2))
         self.assertEqual(
             exp3_math_image_model.estimated_max_size_of_images_in_bytes,
             47000)
         self.assertEqual(
-            sorted(exp3_math_image_model.latex_values_without_svgs),
+            sorted(exp3_math_image_model.latex_values_without_svg),
             sorted(expected_latex_values_1))
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 3)

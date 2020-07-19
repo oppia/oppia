@@ -323,7 +323,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
 
     def __init__(
             self, exp_id, math_images_generation_required,
-            latex_values_without_svgs):
+            latex_values_without_svg):
         """Initializes an ExplorationMathRichTextInfo domain object.
 
         Args:
@@ -331,11 +331,11 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             math_images_generation_required: bool. A boolean which indicates
                 whether the exploration requires images to be generated and
                 saved for the math rich-text components.
-            latex_values_without_svgs: list(str). list of unique latex values.
+            latex_values_without_svg: list(str). list of unique latex values.
         """
         self.exp_id = exp_id
         self.math_images_generation_required = math_images_generation_required
-        self.latex_values_without_svgs = latex_values_without_svgs
+        self.latex_values_without_svg = latex_values_without_svg
         self.validate()
 
     def to_dict(self):
@@ -350,7 +350,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             'exp_id': self.exp_id,
             'math_images_generation_required': (
                 self.math_images_generation_required),
-            'latex_values_without_svgs': self.latex_values_without_svgs
+            'latex_values_without_svg': self.latex_values_without_svg
         }
 
     def validate(self):
@@ -367,11 +367,11 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected math_images_generation_required to be an bool, '
                 'received %s' % self.math_images_generation_required)
-        if not isinstance(self.latex_values_without_svgs, list):
+        if not isinstance(self.latex_values_without_svg, list):
             raise utils.ValidationError(
                 'Expected latex_values to be a list, received %s' % (
-                    self.latex_values_without_svgs))
-        for latex_value in self.latex_values_without_svgs:
+                    self.latex_values_without_svg))
+        for latex_value in self.latex_values_without_svg:
             if not isinstance(latex_value, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each element in the list of latex values to be'
@@ -392,7 +392,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         # be lesser than 3000 bytes. So the below approximation to find the
         # size will give us the maximum size.
         size_in_bytes = 0
-        for latex_value in self.latex_values_without_svgs:
+        for latex_value in self.latex_values_without_svg:
             # The characters in special Latex keywords like 'frac' and 'sqrt'
             #  don't add up to the total size of SVG.
             length_of_expression = (
@@ -409,7 +409,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         Returns:
             str. The largest latex value.
         """
-        return max(self.latex_values_without_svgs, key=len)
+        return max(self.latex_values_without_svg, key=len)
 
 
 class ExplorationVersionsDiff(python_utils.OBJECT):

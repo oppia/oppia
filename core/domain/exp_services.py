@@ -1773,8 +1773,8 @@ def save_multi_exploration_math_rich_text_info_model(
     exploration_math_rich_text_info_models = []
     for exploration_math_rich_text_info in (
             exploration_math_rich_text_info_list):
-        latex_values_without_svgs = (
-            exploration_math_rich_text_info.latex_values_without_svgs)
+        latex_values_without_svg = (
+            exploration_math_rich_text_info.latex_values_without_svg)
         math_images_generation_required = (
             exploration_math_rich_text_info.math_images_generation_required)
         exp_id = (
@@ -1785,7 +1785,7 @@ def save_multi_exploration_math_rich_text_info_model(
             exp_models.ExplorationMathRichTextInfoModel(
                 id=exp_id,
                 math_images_generation_required=math_images_generation_required,
-                latex_values_without_svgs=latex_values_without_svgs,
+                latex_values_without_svg=latex_values_without_svg,
                 estimated_max_size_of_images_in_bytes=(
                     estimated_max_size_of_images_in_bytes)))
 

@@ -563,15 +563,15 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
         for state in exploration.states.values():
             html_strings_in_exploration += (
                 ''.join(state.get_all_html_content_strings()))
-        list_of_latex_values_without_svgs = (
+        list_of_latex_values_without_svg = (
             html_validation_service.
             get_latext_values_without_svg_from_html(
                 html_strings_in_exploration))
-        if len(list_of_latex_values_without_svgs) > 0:
+        if len(list_of_latex_values_without_svg) > 0:
             yield (
                 ExplorationMathRichTextInfoModelGenerationOneOffJob.
                 _SUCCESS_KEY,
-                (item.id, list_of_latex_values_without_svgs))
+                (item.id, list_of_latex_values_without_svg))
 
     @staticmethod
     def reduce(key, values):
@@ -584,10 +584,10 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
             exploration_math_rich_text_info_list = []
             longest_raw_latex_string = ''
             total_number_of_svgs_required = 0
-            for exp_id, list_of_latex_values_without_svgs in final_values:
+            for exp_id, list_of_latex_values_without_svg in final_values:
                 math_rich_text_info = (
                     exp_domain.ExplorationMathRichTextInfo(
-                        exp_id, True, list_of_latex_values_without_svgs))
+                        exp_id, True, list_of_latex_values_without_svg))
                 exploration_math_rich_text_info_list.append(
                     math_rich_text_info)
 
@@ -597,7 +597,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
                     math_rich_text_info.get_longest_latex_value())
                 total_number_of_svgs_required += (
                     len(
-                        list_of_latex_values_without_svgs))
+                        list_of_latex_values_without_svg))
                 longest_raw_latex_string = (
                     max(
                         longest_raw_latex_string_in_exploration,
