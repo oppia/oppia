@@ -25,7 +25,7 @@ import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
 
 
-describe('Exploration Summary Backend Api Service', () => {
+fdescribe('Exploration Summary Backend Api Service', () => {
   let explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService = null;
   let httpTestingController: HttpTestingController;
