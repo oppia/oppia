@@ -82,17 +82,17 @@ const SVGTAGS = {
 };
 
 var customizeComponent = async function(modal, shapes) {
-  await shapes.forEach(async function(shape) {
-    var shapeClass = '.protractor-test-create-' + shape;
+  for (var i = 0; i < shapes.length; i++) {
+    var shapeClass = '.protractor-test-create-' + shapes[i];
     var shapeTool = modal.element(by.css(shapeClass));
     await waitFor.elementToBeClickable(
       shapeTool,
       'Could not click on the required tool');
-    if (shape === 'bezier') {
+    if (shapes[i] === 'bezier') {
       await shapeTool.click();
     }
     await shapeTool.click();
-  });
+  }
   var saveDiagram = modal.element(by.css('.protractor-test-save-diagram'));
   await waitFor.elementToBeClickable(
     saveDiagram,
