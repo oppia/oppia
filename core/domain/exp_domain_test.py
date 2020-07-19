@@ -8424,13 +8424,13 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_math_rich_text_info.get_svg_size_in_bytes(), 8000)
 
-    def test_get_largest_latex_value(self):
+    def test_get_longest_latex_value(self):
         exploration_math_rich_text_info = (
             exp_domain.ExplorationMathRichTextInfo(
                 'exp_id1', True, ['x^2 + 2ax', 'x']))
 
         self.assertEqual(
-            exploration_math_rich_text_info.get_largest_latex_value(),
+            exploration_math_rich_text_info.get_longest_latex_value(),
             'x^2 + 2ax')
 
 

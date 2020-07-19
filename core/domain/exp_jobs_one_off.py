@@ -594,7 +594,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
                 approx_size_of_math_svgs_bytes = (
                     math_rich_text_info.get_svg_size_in_bytes())
                 longest_raw_latex_string_in_exploration = (
-                    math_rich_text_info.get_largest_latex_value())
+                    math_rich_text_info.get_longest_latex_value())
                 total_number_of_svgs_required += (
                     len(
                         list_of_latex_values_without_svgs))

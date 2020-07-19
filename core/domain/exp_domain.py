@@ -402,7 +402,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             size_in_bytes += (length_of_expression * 1000)
         return size_in_bytes
 
-    def get_largest_latex_value(self):
+    def get_longest_latex_value(self):
         """Returns the largest latex value by length among the latex values in
         the object.
 
