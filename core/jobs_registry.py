@@ -34,6 +34,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
+from core.domain import takeout_domain_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
@@ -80,6 +81,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
+    takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,

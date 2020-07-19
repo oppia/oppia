@@ -862,14 +862,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_collection_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
@@ -877,28 +875,24 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_subtopic_page_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_topic_rights_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_topic_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
@@ -906,21 +900,18 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_question_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_config_property_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
@@ -928,29 +919,17 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
         expected_exploration_sm = {
             'exp_1-1': {
                 'commit_type': 'create',
-                'commit_cmds': [{
-                    'category': 'A category',
-                    'cmd': 'create_new',
-                    'title': 'A title'
-                }],
                 'commit_message':
                     'New exploration created with title \'A title\'.'
             },
             'exp_1-2': {
                 'commit_type': 'edit',
-                'commit_cmds': [{
-                    'new_value': 'the objective',
-                    'cmd': 'edit_exploration_property',
-                    'old_value': None,
-                    'property_name': 'objective'
-                }],
                 'commit_message': 'Test edit'
             }
         }

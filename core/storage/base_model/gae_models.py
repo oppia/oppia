@@ -1067,7 +1067,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     commit_type = ndb.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
     # The commit message associated with this snapshot.
-    commit_message = ndb.TextProperty(indexed=False)
+    commit_message = ndb.TextProperty(indexed=True)
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
@@ -1139,14 +1139,14 @@ class BaseSnapshotMetadataModel(BaseModel):
     @classmethod
     def export_data(cls, user_id):
         metadata_models = (
-            cls.query(cls.committer_id == user_id).fetch())
+            cls.query(cls.committer_id == user_id).fetch(
+                projection=[cls.commit_type, cls.commit_message]))
 
         user_data = {}
         for metadata_model in metadata_models:
             user_data[metadata_model.id] = {
                 'commit_type': metadata_model.commit_type,
                 'commit_message': metadata_model.commit_message,
-                'commit_cmds': metadata_model.commit_cmds
             }
         return user_data
 
