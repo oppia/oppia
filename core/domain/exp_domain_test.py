@@ -8377,12 +8377,14 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
 
     def test_create_html_math_rich_text_info(self):
         exploration_math_rich_text_info = (
-            exp_domain.ExplorationMathRichTextInfo(['abc', 'x']))
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc', 'x']))
 
         self.assertEqual(
             exploration_math_rich_text_info.to_dict(), {
-                'latex_values_without_svgs': ['abc', 'x'],
-                'approx_size_of_math_svgs_bytes': 4000
+                'exp_id': 'exp_id1',
+                'math_images_generation_required': True,
+                'latex_values_without_svgs': ['abc', 'x']
             })
 
     def test_validate_when_latex_values_not_list(self):
@@ -8390,26 +8392,42 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
             Exception,
             'Expected latex_values to be a list, received '
             'invalid_latex_format'):
-            exp_domain.ExplorationMathRichTextInfo('invalid_latex_format')
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, 'invalid_latex_format')
 
     def test_validate_when_each_latex_values_are_string(self):
         with self.assertRaisesRegexp(
             Exception,
             'Expected each element in the list of latex values to be a str, '
             'received 3'):
-            exp_domain.ExplorationMathRichTextInfo(['x^2', 3])
+            exp_domain.ExplorationMathRichTextInfo('exp_id1', True, ['x^2', 3])
 
+    def test_validate_exp_id_is_string(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected exp_id to be a str, received 0'):
+            exp_domain.ExplorationMathRichTextInfo(0, True, ['x^2', 3])
+
+    def test_validate_math_images_generation_required_is_bool(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected math_images_generation_required to be an bool, '
+            'received invalid'):
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', 'invalid', ['x^2', 3])
 
     def test_get_svg_size_in_bytes(self):
         exploration_math_rich_text_info = (
-            exp_domain.ExplorationMathRichTextInfo(['x^2 + 2ax', 'x']))
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
 
         self.assertEqual(
             exploration_math_rich_text_info.get_svg_size_in_bytes(), 8000)
 
     def test_get_largest_latex_value(self):
         exploration_math_rich_text_info = (
-            exp_domain.ExplorationMathRichTextInfo(['x^2 + 2ax', 'x']))
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
 
         self.assertEqual(
             exploration_math_rich_text_info.get_largest_latex_value(),

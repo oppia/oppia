@@ -1004,17 +1004,17 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         multiple_explorations_math_rich_text_info = []
 
         math_rich_text_info1 = (
-            exp_domain.ExplorationMathRichTextInfo(['abc1', 'xyz1']))
-        multiple_explorations_math_rich_text_info.append(
-            (math_rich_text_info1, 'exp_id1'))
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc1', 'xyz1']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
         math_rich_text_info2 = (
-            exp_domain.ExplorationMathRichTextInfo(['abc2', 'xyz2']))
-        multiple_explorations_math_rich_text_info.append(
-            (math_rich_text_info2, 'exp_id2'))
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id2', True, ['abc2', 'xyz2']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
         math_rich_text_info3 = (
-            exp_domain.ExplorationMathRichTextInfo(['abc3', 'xyz3']))
-        multiple_explorations_math_rich_text_info.append(
-            (math_rich_text_info3, 'exp_id3'))
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id3', True, ['abc3', 'xyz3']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
 
         exp_services.save_multi_exploration_math_rich_text_info_model(
             multiple_explorations_math_rich_text_info)

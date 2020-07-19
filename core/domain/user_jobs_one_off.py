@@ -423,7 +423,9 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        if key == 'Found draft changes with math-tags':
+        if key == (
+                DraftChangesMathRichTextInfoModelGenerationOneOffJob.
+                _SUCCESS_KEY):
             yield (
                 ('found %d draft changes with math-tags having no SVG') % (len(
                     values)),

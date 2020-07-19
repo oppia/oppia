@@ -2935,7 +2935,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
         mock_max_size_of_math_svgs_batch = 0.06 * 1024 * 1024
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.
-            get_count_of_exploration_with_math_rich_text(), 0)
+            get_all().count(), 0)
         with self.swap(
             feconf, 'MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES',
             mock_max_size_of_math_svgs_batch):
@@ -3083,7 +3083,7 @@ class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
     def test_that_all_the_models_are_deleted(self):
         no_of_models_before_job_is_run = (
             exp_models.ExplorationMathRichTextInfoModel.
-            get_count_of_exploration_with_math_rich_text())
+            get_all().count())
         self.assertEqual(no_of_models_before_job_is_run, 3)
 
         job = (
@@ -3098,7 +3098,7 @@ class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
         actual_output = job.get_output(job_id)
         no_of_models_after_job_is_run = (
             exp_models.ExplorationMathRichTextInfoModel.
-            get_count_of_exploration_with_math_rich_text())
+            get_all().count())
         self.assertEqual(no_of_models_after_job_is_run, 0)
 
         expected_output = (

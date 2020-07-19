@@ -321,15 +321,22 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
     text components in an exploration's HTML.
     """
 
-    def __init__(self, latex_values_without_svgs):
+    def __init__(
+            self, exp_id, math_images_generation_required,
+            latex_values_without_svgs):
         """Initializes an ExplorationMathRichTextInfo domain object.
 
         Args:
+            exp_id: str. ID of the exploration
+            math_images_generation_required: bool. A boolean which indicates
+                whether the exploration requires images to be generated and
+                saved for the math rich-text components.
             latex_values_without_svgs: list(str). list of unique latex values.
         """
+        self.exp_id = exp_id
+        self.math_images_generation_required = math_images_generation_required
         self.latex_values_without_svgs = latex_values_without_svgs
         self.validate()
-        self.approx_size_of_math_svgs_bytes = self.get_svg_size_in_bytes()
 
     def to_dict(self):
         """Returns a dict representing this ExplorationMathRichTextInfo domain
@@ -340,9 +347,10 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             instance.
         """
         return {
-            'latex_values_without_svgs': self.latex_values_without_svgs,
-            'approx_size_of_math_svgs_bytes': (
-                self.approx_size_of_math_svgs_bytes)
+            'exp_id': self.exp_id,
+            'math_images_generation_required': (
+                self.math_images_generation_required),
+            'latex_values_without_svgs': self.latex_values_without_svgs
         }
 
     def validate(self):
@@ -352,6 +360,13 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             ValidationError: attributes of the ExplorationMathRichTextInfo
                 are invalid.
         """
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected exp_id to be a str, received %s' % self.exp_id)
+        if not isinstance(self.math_images_generation_required, bool):
+            raise utils.ValidationError(
+                'Expected math_images_generation_required to be an bool, '
+                'received %s' % self.math_images_generation_required)
         if not isinstance(self.latex_values_without_svgs, list):
             raise utils.ValidationError(
                 'Expected latex_values to be a list, received %s' % (

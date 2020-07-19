@@ -107,11 +107,6 @@ class ExplorationMathRichTextInfoModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationMathRichTextInfoModel.get_export_policy(),
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
-    def test_get_count_of_exploration_with_math_rich_text(self):
-        self.assertEqual(
-            exp_models.ExplorationMathRichTextInfoModel.
-            get_count_of_exploration_with_math_rich_text(), 1)
-
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             exp_models.ExplorationContextModel

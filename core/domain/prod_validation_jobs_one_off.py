@@ -3046,23 +3046,25 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
 
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
-            list_of_latex_values = []
             html_strings_in_exploration = ''
             for state_dict in exploration_model.states.values():
                 state = state_domain.State.from_dict(state_dict)
                 html_strings_in_exploration += (
                     ''.join(state.get_all_html_content_strings()))
 
-            list_of_latex_values = (
+            latex_values_without_svgs = (
                 html_validation_service.
                 get_latext_values_without_svg_from_html(
                     html_strings_in_exploration))
             math_rich_text_info = (
-                exp_domain.ExplorationMathRichTextInfo(list_of_latex_values))
+                exp_domain.ExplorationMathRichTextInfo(
+                    exploration_model.id,
+                    item.math_images_generation_required,
+                    latex_values_without_svgs))
             approx_size_of_math_svgs_bytes = (
                 math_rich_text_info.get_svg_size_in_bytes())
 
-            if list_of_latex_values != item.latex_values_without_svgs:
+            if latex_values_without_svgs != item.latex_values_without_svgs:
                 cls._add_error(
                     'latex values check',
                     'Entity id %s: Latex values in the model does not match '

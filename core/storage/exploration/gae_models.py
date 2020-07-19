@@ -278,13 +278,6 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_count_of_exploration_with_math_rich_text(cls):
-        """Returns the total number of explorations having math rich-text
-        components.
-        """
-        return cls.get_all().count()
-
-    @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """Check whether ExplorationMathRichTextInfoModel references the given
         user.

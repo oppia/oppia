@@ -535,6 +535,8 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
     generating math rich text component SVG images.
     """
 
+    # A constant that will be yielded as a key by this job in the map function,
+    # When it finds an exploration with math rich text components without SVGs.
     _SUCCESS_KEY = 'exploration-with-math-tags'
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -579,20 +581,23 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
             final_values = [ast.literal_eval(value) for value in values]
             estimated_no_of_batches = 1
             approx_size_of_math_svgs_bytes_in_a_batch = 0
-            multiple_explorations_math_rich_text_info = []
+            exploration_math_rich_text_info_list = []
             longest_raw_latex_string = ''
             total_number_of_svgs_required = 0
-            for value in final_values:
+            for exp_id, list_of_latex_values_without_svgs in final_values:
                 math_rich_text_info = (
-                    exp_domain.ExplorationMathRichTextInfo(value[1]))
-                multiple_explorations_math_rich_text_info.append(
-                    (math_rich_text_info, value[0]))
+                    exp_domain.ExplorationMathRichTextInfo(
+                        exp_id, True, list_of_latex_values_without_svgs))
+                exploration_math_rich_text_info_list.append(
+                    math_rich_text_info)
 
                 approx_size_of_math_svgs_bytes = (
                     math_rich_text_info.get_svg_size_in_bytes())
                 longest_raw_latex_string_in_exploration = (
                     math_rich_text_info.get_largest_latex_value())
-                total_number_of_svgs_required += len(value[1])
+                total_number_of_svgs_required += (
+                    len(
+                        list_of_latex_values_without_svgs))
                 longest_raw_latex_string = (
                     max(
                         longest_raw_latex_string_in_exploration,
@@ -605,7 +610,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
                     estimated_no_of_batches += 1
 
             exp_services.save_multi_exploration_math_rich_text_info_model(
-                multiple_explorations_math_rich_text_info)
+                exploration_math_rich_text_info_list)
 
             final_value_dict = {
                 'estimated_no_of_batches': estimated_no_of_batches,

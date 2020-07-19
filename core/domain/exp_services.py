@@ -1760,28 +1760,31 @@ def get_interaction_id_for_state(exp_id, state_name):
 
 
 def save_multi_exploration_math_rich_text_info_model(
-        multiple_explorations_math_rich_text_info):
+        exploration_math_rich_text_info_list):
     """Saves multiple instances of ExplorationMathRichTextInfoModel to the
     datastore.
 
     Args:
-        multiple_explorations_math_rich_text_info:
-        tuple(ExplorationMathRichTextInfoModel, str). list of
-        ExplorationMathRichTextInfoModel domain object and corresponding
-        exploration ID.
+        exploration_math_rich_text_info_list:
+        list(ExplorationMathRichTextInfoModel). A list of
+            ExplorationMathRichTextInfoModel domain object.
     """
 
     exploration_math_rich_text_info_models = []
-    for exploration_math_rich_text_info, exp_id in (
-            multiple_explorations_math_rich_text_info):
+    for exploration_math_rich_text_info in (
+            exploration_math_rich_text_info_list):
         latex_values_without_svgs = (
             exploration_math_rich_text_info.latex_values_without_svgs)
+        math_images_generation_required = (
+            exploration_math_rich_text_info.math_images_generation_required)
+        exp_id = (
+            exploration_math_rich_text_info.exp_id)
         estimated_max_size_of_images_in_bytes = (
             exploration_math_rich_text_info.get_svg_size_in_bytes())
         exploration_math_rich_text_info_models.append(
             exp_models.ExplorationMathRichTextInfoModel(
                 id=exp_id,
-                math_images_generation_required=True,
+                math_images_generation_required=math_images_generation_required,
                 latex_values_without_svgs=latex_values_without_svgs,
                 estimated_max_size_of_images_in_bytes=(
                     estimated_max_size_of_images_in_bytes)))
