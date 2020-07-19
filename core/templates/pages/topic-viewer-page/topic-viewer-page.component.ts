@@ -57,7 +57,7 @@ angular.module('oppia').component('topicViewerPage', {
       };
       ctrl.$onInit = function() {
         ctrl.canonicalStorySummaries = [];
-        ctrl.setActiveTab('practice');
+        ctrl.setActiveTab('info');
         ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
         PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
