@@ -298,18 +298,10 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.showSubtopicEditOptions = function(index) {
-            if ($scope.subtopicEditOptionsAreShown !== undefined) {
-              $scope.subtopicEditOptionsAreShown = undefined;
-              return;
-            }
             $scope.subtopicEditOptionsAreShown = index;
           };
 
           $scope.toggleUncategorizedSkillOptions = function(index) {
-            if ($scope.uncategorizedEditOptionsIndex !== undefined) {
-              $scope.uncategorizedEditOptionsIndex = undefined;
-              return;
-            }
             $scope.uncategorizedEditOptionsIndex = index;
           };
 

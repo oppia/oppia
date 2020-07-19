@@ -169,8 +169,6 @@ describe('Topic editor tab directive', function() {
   it('should show subtopic edit options', function() {
     $scope.showSubtopicEditOptions(1);
     expect($scope.subtopicEditOptionsAreShown).toEqual(1);
-    $scope.showSubtopicEditOptions(1);
-    expect($scope.subtopicEditOptionsAreShown).toEqual(undefined);
     $scope.showSubtopicEditOptions(2);
     expect($scope.subtopicEditOptionsAreShown).toEqual(2);
   });
@@ -358,8 +356,8 @@ describe('Topic editor tab directive', function() {
   it('should toggle uncategorized skill options', function() {
     $scope.toggleUncategorizedSkillOptions(10);
     expect($scope.uncategorizedEditOptionsIndex).toEqual(10);
-    $scope.toggleUncategorizedSkillOptions(10);
-    expect($scope.uncategorizedEditOptionsIndex).toEqual(undefined);
+    $scope.toggleUncategorizedSkillOptions(20);
+    expect($scope.uncategorizedEditOptionsIndex).toEqual(20);
   });
 
   it('should open ChangeSubtopicAssignment modal when change ' +

@@ -9,7 +9,7 @@
       <div class="item-flex-container">
         <md-card class="item-container uncategorized-skill-ids protractor-test-uncategorized-skills-container"
                  ng-class="{'skills-valid': !$ctrl.uncategorizedSkillSummaries.length, 'skills-invalid': $ctrl.uncategorizedSkillSummaries.length}"
-                 dnd-list="uncategorizedSkillSummaries"
+                 dnd-list="$ctrl.uncategorizedSkillSummaries"
                  dnd-drop="$ctrl.onMoveSkillEnd(null)">
           <strong>Uncategorized Skills</strong>
           <div class="uncategorized-skills-container">
@@ -41,7 +41,7 @@
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
           </div>
-          <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicIndex">
+          <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicId">
             <input type="text" ng-model="$ctrl.editableName">
             <button class="btn btn-secondary" ng-click="$ctrl.editNameOfSubtopicWithId(null)">Cancel</button>
             <button class="btn btn-primary" ng-click="$ctrl.updateSubtopicTitle(subtopic.getId())">Save</button>
