@@ -21,15 +21,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-import { UrlInterpolationService } from 
+import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service.ts';
-import { UserInfoObjectFactory, UserInfo, IUserInfoBackendDict } from 
+import { UserInfoObjectFactory, UserInfo, IUserInfoBackendDict } from
   'domain/user/UserInfoObjectFactory.ts';
 import { AppConstants } from 'app.constants';
 import { List } from 'lodash';
 
-interface subscription_summary {
+interface subscriptionSummary {
   'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
@@ -37,7 +37,7 @@ interface subscription_summary {
 interface IPreferencesBackendDict {
   'preferred_language_codes': string;
   'preferred_site_language_code': string;
-  'preferred_audio_language_code': string;  
+  'preferred_audio_language_code': string;
   'profile_picture_data_url': string;
   'default_dashboard': string;
   'user_bio': string;
@@ -46,7 +46,7 @@ interface IPreferencesBackendDict {
   'can_receive_editor_role_email': boolean;
   'can_receive_feedback_message_email': boolean;
   'can_receive_subscription_email': boolean;
-  'subscription_list': List<subscription_summary>;
+  'subscription_list': List<subscriptionSummary>;
 }
 interface IUrlBackendDict {
   'login_url': string;
@@ -59,9 +59,9 @@ interface IUserCommunityRightsDataBackendDict {
 
 
 @Injectable({
-  providedIn: 'root'  
+  providedIn: 'root'
 })
-export class UserService{
+export class UserService {
   constructor(
     private http: HttpClient,
     private windowRef: WindowRef,
@@ -76,25 +76,25 @@ export class UserService{
     private userCommunityRightsInfo = null;
 
     getUserInfoAsync(): Promise<UserInfo> {
-      if (this.urlService.getPathname() === '/signup'){
-        return Promise.resolve(this.userInfoObjectFactory.createDefault())
+      if (this.urlService.getPathname() === '/signup') {
+        return Promise.resolve(this.userInfoObjectFactory.createDefault());
       }
       if (this.userInfo) {
         return Promise.resolve(this.userInfo);
       }
       return this.http.get<IUserInfoBackendDict>(
         '/userinfohandler').toPromise().then(
-          (backendDict) => {
-            if (backendDict.user_is_logged_in) {
-              this.userInfo = 
-                this.userInfoObjectFactory.createFromBackendDict(
-                  backendDict);
-              return Promise.resolve(this.userInfo);
-            } else {
-              return Promise.resolve(
-                this.userInfoObjectFactory.createDefault());
-            }
-      });
+        (backendDict) => {
+          if (backendDict.user_is_logged_in) {
+            this.userInfo =
+              this.userInfoObjectFactory.createFromBackendDict(
+                backendDict);
+            return Promise.resolve(this.userInfo);
+          } else {
+            return Promise.resolve(
+              this.userInfoObjectFactory.createDefault());
+          }
+        });
     }
     getProfileImageDataUrlAsync(): Promise<string> {
       let profilePictureDataUrl = (
@@ -105,47 +105,48 @@ export class UserService{
           if (userInfo.isLoggedIn()) {
             return this.http.get<IPreferencesBackendDict>(
               '/preferenceshandler/profile_picture'
-            ).toPromise().then(
-              (backendDict) => {
-                if (backendDict.profile_picture_data_url){
-                  profilePictureDataUrl = 
-                    backendDict.profile_picture_data_url;
-                }
-                return profilePictureDataUrl;
-            });
+                ).toPromise().then(
+                (backendDict) => {
+                  if (backendDict.profile_picture_data_url) {
+                    profilePictureDataUrl =
+                      backendDict.profile_picture_data_url;
+                  }
+                  return profilePictureDataUrl;
+                });
           } else {
             return Promise.resolve(profilePictureDataUrl);
           }
         });
     }
-    setProfileImageDataUrlAsync(newProfileImageDataUrl: string): 
+    setProfileImageDataUrlAsync(newProfileImageDataUrl: string):
       Promise<IPreferencesBackendDict> {
       let putData = {
         update_type: 'profile_picture_data_url',
         data: newProfileImageDataUrl
-      }
+      };
       return this.http.put<IPreferencesBackendDict>(
         this.PREFERENCES_DATA_URL, putData).toPromise();
     }
     getLoginUrlAsync(): Promise<string> {
       let urlParameters = {
         current_url: this.windowRef.nativeWindow.location.pathname
-      }
-      return this.http.get<IUrlBackendDict>('/url_handler', 
+      };
+      return this.http.get<IUrlBackendDict>('/url_handler',
         { params: urlParameters }).toPromise().then(
-          (backendDict) => {
-            return backendDict.login_url;
+        (backendDict) => {
+          return backendDict.login_url;
         });
     }
-    getUserCommunityRightsData(): Promise<IUserCommunityRightsDataBackendDict>{
+    getUserCommunityRightsData():
+      Promise<IUserCommunityRightsDataBackendDict> {
       if (this.userCommunityRightsInfo) {
         return Promise.resolve(this.userCommunityRightsInfo);
       } else {
         return this.http.get<IUserCommunityRightsDataBackendDict>(
-          this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
-            (backendDict) => {
-              this.userCommunityRightsInfo = backendDict;
-              return Promise.resolve(this.userCommunityRightsInfo);
+        this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
+        (backendDict) => {
+          this.userCommunityRightsInfo = backendDict;
+          return Promise.resolve(this.userCommunityRightsInfo);
         });
       }
     }
@@ -153,4 +154,4 @@ export class UserService{
 
 angular.module('oppia').factory(
   'UserService',
-   downgradeInjectable(UserService));
+  downgradeInjectable(UserService));

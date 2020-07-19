@@ -23,7 +23,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { UserService } from 'services/user.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UrlService } from './contextual/url.service';
 
@@ -59,11 +60,11 @@ describe('User Service', () => {
     userInfoObjectFactory = TestBed.get(UserInfoObjectFactory);
     urlService = TestBed.get(UrlService);
     csrfService = TestBed.get(CsrfTokenService);
-    
+
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       () =>{
         return Promise.resolve('sample-csrf-token');
-    });
+      });
   });
 
   afterEach(() => {
@@ -71,7 +72,7 @@ describe('User Service', () => {
   });
 
   it('should return userInfo data', fakeAsync(() => {
-    // creating a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -103,22 +104,23 @@ describe('User Service', () => {
 
     var req = httpTestingController.expectOne('/userinfohandler');
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleUserInfoBackendObject);      
+    req.flush(sampleUserInfoBackendObject);
 
     flushMicrotasks();
   }));
 
-  it('should return new userInfo data when url path is signup', fakeAsync(() => {
-    spyOn(urlService, 'getPathname').and.returnValue('/signup');
-    var sampleUserInfo = userInfoObjectFactory.createDefault();
+  it('should return new userInfo data when url path is signup',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/signup');
+      var sampleUserInfo = userInfoObjectFactory.createDefault();
 
-    userService.getUserInfoAsync().then((userInfo) => {
-      expect(userInfo).toEqual(sampleUserInfo);
-    });
-  }));
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+    }));
 
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
-    // creating a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -148,7 +150,7 @@ describe('User Service', () => {
   }));
 
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
-    // creating a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -174,7 +176,7 @@ describe('User Service', () => {
 
   it('should return image data', fakeAsync(() => {
     var requestUrl = '/preferenceshandler/profile_picture';
-    // creating a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -188,7 +190,7 @@ describe('User Service', () => {
     };
 
     userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-      expect(dataUrl).toBe('image data'); 
+      expect(dataUrl).toBe('image data');
     });
 
     var req1 = httpTestingController.expectOne('/userinfohandler');
@@ -198,28 +200,28 @@ describe('User Service', () => {
     var req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');
     req2.flush({profile_picture_data_url: 'image data'});
-    
+
     flushMicrotasks();
 
     userService.getProfileImageDataUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.webp'));
     });
-    
+
     var req3 = httpTestingController.expectOne('/userinfohandler');
     expect(req3.request.method).toEqual('GET');
     req3.flush(sampleUserInfoBackendObject);
-    
+
     var req4 = httpTestingController.expectOne(requestUrl);
     expect(req4.request.method).toEqual('GET');
     req4.flush(404);
-    
+
     flushMicrotasks();
   }));
 
   it('should return the default profile image path when user is not logged',
     fakeAsync(() => {
-      // creating a test user for checking profile picture of user.
+      // Creating a test user for checking profile picture of user.
       var sampleUserInfoBackendObject = {
         is_moderator: false,
         is_admin: false,
@@ -246,7 +248,7 @@ describe('User Service', () => {
   it('should return the login url', fakeAsync(() => {
     var loginUrl = '/login';
     var currentUrl = 'home';
-    
+
     userService.getLoginUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(loginUrl);
     });
@@ -273,21 +275,22 @@ describe('User Service', () => {
     flushMicrotasks();
   }));
 
-  it('should handle when set profile image data url is reject', fakeAsync(() => {
-    var newProfileImageDataurl = '/avatar/x.png';
-    var errorMessage = 'It\'s not possible to set a new profile image data';
-    userService.setProfileImageDataUrlAsync(newProfileImageDataurl)
-      /* eslint-disable dot-notation */
-      .catch((error) => {
-      /* eslint-enable dot-notation */
-        expect(error.data).toEqual(errorMessage);
-      });
-    var req = httpTestingController.expectOne('/preferenceshandler/data');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(errorMessage);
+  it('should handle when set profile image data url is reject',
+    fakeAsync(() => {
+      var newProfileImageDataurl = '/avatar/x.png';
+      var errorMessage = 'It\'s not possible to set a new profile image data';
+      userService.setProfileImageDataUrlAsync(newProfileImageDataurl)
+        /* eslint-disable dot-notation */
+        .catch((error) => {
+        /* eslint-enable dot-notation */
+          expect(error.data).toEqual(errorMessage);
+        });
+      var req = httpTestingController.expectOne('/preferenceshandler/data');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(errorMessage);
 
-    flushMicrotasks();
-  }));
+      flushMicrotasks();
+    }));
 
   it('should return user community rights data', fakeAsync(() => {
     var sampleUserCommunityRightsDict = {
@@ -299,7 +302,7 @@ describe('User Service', () => {
     userService.getUserCommunityRightsData().then(
       (userCommunityRights) => {
         expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
-    });
+      });
     var req = httpTestingController.expectOne(
       '/usercommunityrightsdatahandler');
     expect(req.request.method).toEqual('GET');
@@ -330,7 +333,7 @@ describe('User Service', () => {
         '/usercommunityrightsdatahandler');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleUserCommunityRightsDict);
-  
+
       flushMicrotasks();
     }));
 });
