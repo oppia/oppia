@@ -105,14 +105,14 @@ export class UserService {
           if (userInfo.isLoggedIn()) {
             return this.http.get<IPreferencesBackendDict>(
               '/preferenceshandler/profile_picture'
-                ).toPromise().then(
-                (backendDict) => {
-                  if (backendDict.profile_picture_data_url) {
-                    profilePictureDataUrl =
-                      backendDict.profile_picture_data_url;
-                  }
-                  return profilePictureDataUrl;
-                });
+            ).toPromise().then(
+              (backendDict) => {
+                if (backendDict.profile_picture_data_url) {
+                  profilePictureDataUrl =
+                    backendDict.profile_picture_data_url;
+                }
+                return profilePictureDataUrl;
+              });
           } else {
             return Promise.resolve(profilePictureDataUrl);
           }
@@ -143,11 +143,11 @@ export class UserService {
         return Promise.resolve(this.userCommunityRightsInfo);
       } else {
         return this.http.get<IUserCommunityRightsDataBackendDict>(
-        this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
-        (backendDict) => {
-          this.userCommunityRightsInfo = backendDict;
-          return Promise.resolve(this.userCommunityRightsInfo);
-        });
+          this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
+          (backendDict) => {
+            this.userCommunityRightsInfo = backendDict;
+            return Promise.resolve(this.userCommunityRightsInfo);
+          });
       }
     }
 }
