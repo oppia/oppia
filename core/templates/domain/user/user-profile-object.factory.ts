@@ -28,7 +28,7 @@ import {
 export interface UserProfileBackendDict {
   'username': string;
   'profile_is_of_current_user': boolean;
-  'profile_username': string;
+  'username_of_viewed_profile': string;
   'user_bio': string;
   'subject_interests': string[];
   'first_contribution_msec': number;
@@ -69,7 +69,7 @@ export class UserProfileObjectFactory {
     return new UserProfile(
       backendDict.username,
       backendDict.profile_is_of_current_user,
-      backendDict.profile_username,
+      backendDict.username_of_viewed_profile,
       backendDict.user_bio,
       backendDict.subject_interests,
       backendDict.first_contribution_msec,

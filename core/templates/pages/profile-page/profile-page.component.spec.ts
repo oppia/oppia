@@ -108,7 +108,7 @@ describe('Profile page', function() {
   describe('when user has edited explorations', function() {
     var profileData = {
       username: '',
-      profile_username: 'username1',
+      username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
       user_impact_score: 100,
       profile_is_of_current_user: false,
@@ -187,7 +187,7 @@ describe('Profile page', function() {
   describe('when changing pages', function() {
     var profileData = {
       username: '',
-      profile_username: 'username1',
+      username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
       user_impact_score: 100,
       created_exp_summary_dicts: new Array(7).fill({
@@ -298,7 +298,7 @@ describe('Profile page', function() {
   describe('when user is not logged in', function() {
     var profileData = {
       username: '',
-      profile_username: 'username1',
+      username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
       user_impact_score: 100,
       created_exp_summary_dicts: [],
@@ -353,7 +353,7 @@ describe('Profile page', function() {
   describe('when user is logged in', function() {
     var profileData = {
       username: 'username1',
-      profile_username: 'username1',
+      username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
       user_impact_score: 100,
       created_exp_summary_dicts: [],
@@ -379,7 +379,8 @@ describe('Profile page', function() {
       expect(ctrl.isAlreadySubscribed).toBe(true);
       expect(ctrl.subscriptionButtonPopoverText).toBe(
         'Unsubscribe to stop receiving email notifications regarding new' +
-        ' explorations published by ' + profileData.profile_username + '.');
+        ' explorations published by ' + profileData.username_of_viewed_profile +
+        '.');
 
       spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
         'unsubscribe').and.returnValue($q.resolve());
@@ -389,7 +390,8 @@ describe('Profile page', function() {
       expect(ctrl.isAlreadySubscribed).toBe(false);
       expect(ctrl.subscriptionButtonPopoverText).toBe(
         'Receive email notifications, whenever ' +
-        profileData.profile_username + ' publishes a new exploration.');
+        profileData.username_of_viewed_profile +
+        ' publishes a new exploration.');
     });
   });
 });

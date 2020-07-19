@@ -199,7 +199,7 @@ describe('Profile test backend API service', () => {
         title: 'Test Title'
       }],
       subject_interests: [],
-      profile_username: 'user2',
+      username_of_viewed_profile: 'user2',
       user_bio: 'hi',
       profile_picture_data_url: 'image',
     });

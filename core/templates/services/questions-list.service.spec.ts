@@ -211,6 +211,6 @@ describe('Questions List Service', function() {
     expect(broadcastSpy).toHaveBeenCalledTimes(1);
 
     var cachedQuestionSummaries = qls.getCachedQuestionSummaries();
-    expect(cachedQuestionSummaries[0]._questionSummary._questionId).toBe('0');
+    expect(cachedQuestionSummaries[0]._questionSummary._id).toBe('0');
   }));
 });

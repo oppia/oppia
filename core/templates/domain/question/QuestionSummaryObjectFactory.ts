@@ -26,17 +26,17 @@ export interface IQuestionSummaryBackendDict {
 }
 
 export class QuestionSummary {
-  _questionId: string;
+  _id: string;
   _questionContent: string;
 
   constructor(
       questionId: string, questionContent: string) {
-    this._questionId = questionId;
+    this._id = questionId;
     this._questionContent = questionContent;
   }
 
   getQuestionId(): string {
-    return this._questionId;
+    return this._id;
   }
 
   getQuestionContent(): string {
