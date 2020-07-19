@@ -8381,7 +8381,7 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exploration_math_rich_text_info.to_dict(), {
-                'latex_values': ['abc', 'x'],
+                'latex_values_without_svgs': ['abc', 'x'],
                 'approx_size_of_math_svgs_bytes': 4000
             })
 

@@ -355,7 +355,8 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         if not isinstance(self.latex_values_without_svgs, list):
             raise utils.ValidationError(
                 'Expected latex_values to be a list, received %s' % (
-                    self.latex_values))
+                    self.latex_values_without_svgs))
+            return
         for latex_value in self.latex_values_without_svgs:
             if not isinstance(latex_value, python_utils.BASESTRING):
                 raise utils.ValidationError(
