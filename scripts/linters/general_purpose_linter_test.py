@@ -96,6 +96,8 @@ INVALID_INPUT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_input.py')
 INVALID_REQUEST_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_request.py')
 INVALID_URLJOIN_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_urljoin.py')
 INVALID_UNQUOTE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_unquote.py')
+INVALID_NO_NEWLINE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_no_newline.py')
 INVALID_PARSE_QS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_parse_qs.py')
 INVALID_URL_UNSPLIT_FILEPATH = os.path.join(
@@ -765,6 +767,35 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['There are no files to be checked.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 0)
+
+    def test_file_with_no_newline_at_eof(self):
+        with self.print_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_NO_NEWLINE_FILEPATH],
+                FILE_CACHE, True).perform_all_lint_checks()
+        self.assert_same_list_elements(
+            ['There should be a single newline at the end of file.'],
+            self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
+
+    def test_with_excluded_filepath(self):
+        def mock_is_filepath_excluded_for_bad_patterns_check(
+                unused_pattern, unused_filepath):
+            return True
+
+        filepath_excluded_swap = self.swap(
+            general_purpose_linter,
+            'is_filepath_excluded_for_bad_patterns_check',
+            mock_is_filepath_excluded_for_bad_patterns_check)
+
+        with self.print_swap, filepath_excluded_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_NO_NEWLINE_FILEPATH],
+                FILE_CACHE, True).perform_all_lint_checks()
+        self.assert_same_list_elements(
+            ['There should be a single newline at the end of file.'],
+            self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = general_purpose_linter.get_linters(
