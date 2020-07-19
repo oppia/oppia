@@ -31,6 +31,7 @@ from google.appengine.ext import ndb
 
 taskqueue_services = models.Registry.import_taskqueue_services()
 
+
 class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off commit message indexing job."""
 
@@ -66,10 +67,10 @@ class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
                 commit_type='create', commit_message='test1').put()
 
             # Ensure the model is created.
-            config_models = model_class.query(
+            queried_models = model_class.query(
                 model_class.committer_id == 'committer_id'
             ).fetch()
-            self.assertEqual(len(config_models), 1)
+            self.assertEqual(len(queried_models), 1)
 
             # Try a query on the unindexed field and observe failure.
             with self.assertRaisesRegexp(
@@ -86,15 +87,15 @@ class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
             commit_message='test1').put()
 
         # Ensure the model is created.
-        config_models = model_class.query(
+        queried_models = model_class.query(
             model_class.committer_id == 'committer_id'
         ).fetch()
-        self.assertEqual(len(config_models), 1)
+        self.assertEqual(len(queried_models), 1)
 
         self._run_one_off_job()
 
         # Ensure valid querying on commit_message.
-        config_models = model_class.query(
+        queried_models = model_class.query(
             model_class.commit_message == 'test1').fetch()
-        self.assertEqual(len(config_models), 1)
-        self.assertEqual(config_models[0].id, 'model_id-1')
+        self.assertEqual(len(queried_models), 1)
+        self.assertEqual(queries_models[0].id, 'model_id-1')

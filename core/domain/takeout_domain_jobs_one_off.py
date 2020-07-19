@@ -32,6 +32,7 @@ from core.platform import models
     models.NAMES.topic, models.NAMES.question
 ])
 
+
 class SnapshotMetadataCommitMsgOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that indexes the commit_msg field of the
     BaseSnapshotMetadataModels.
