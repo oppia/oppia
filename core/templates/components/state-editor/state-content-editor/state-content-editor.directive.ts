@@ -51,11 +51,11 @@ angular.module('oppia').directive('stateContentEditor', [
         '/components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
-        '$scope', 'ContextService', 'EditabilityService',
+        '$scope', '$rootScope', 'ContextService', 'EditabilityService',
         'EditorFirstTimeEventsService', 'StateContentService',
         'StateEditorService',
         function(
-            $scope, ContextService, EditabilityService,
+            $scope, $rootScope, ContextService, EditabilityService,
             EditorFirstTimeEventsService, StateContentService,
             StateEditorService) {
           var ctrl = this;
@@ -81,6 +81,7 @@ angular.module('oppia').directive('stateContentEditor', [
             if ($scope.isEditable()) {
               EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
               $scope.contentEditorIsOpen = true;
+              $rootScope.$apply();
             }
           };
 

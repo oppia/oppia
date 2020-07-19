@@ -337,6 +337,6 @@ describe('Embedding', function() {
         'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
         '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
         'locale=en#version=0.0.1&secret=';
-      await general.checkForConsoleErrors([errorToIgnore]);
+      await general.checkForConsoleErrors([errorToIgnore, 'progress', 'Refused']);
     });
 });
