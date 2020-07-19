@@ -2878,11 +2878,11 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
             utils.tokenize_module(node_pragma_for_multiline))
 
         message1 = testutils.Message(
-            msg_id='multi-line-pragma',
+            msg_id='single-line-pragma',
             line=2)
 
         message2 = testutils.Message(
-            msg_id='multi-line-pragma',
+            msg_id='single-line-pragma',
             line=6)
 
         with self.checker_test_object.assertAddsMessages(
@@ -2898,13 +2898,13 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    # pylint: disable=multi-line-pragma
+                    # pylint: disable=single-line-pragma
                     def func():
                         \"\"\"
                         # pylint: disable=testing-purpose
                         \"\"\"
                         pass
-                    # pylint: enable=multi-line-pragma
+                    # pylint: enable=single-line-pragma
                 """)
         node_enable_single_line_pragma_for_muliline.file = filename
         node_enable_single_line_pragma_for_muliline.path = filename
@@ -2913,7 +2913,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
             utils.tokenize_module(node_enable_single_line_pragma_for_muliline))
 
         message = testutils.Message(
-            msg_id='multi-line-pragma',
+            msg_id='single-line-pragma',
             line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
@@ -2928,7 +2928,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    def funcName():  # pylint: disable=multi-line-pragma
+                    def funcName():  # pylint: disable=single-line-pragma
                         pass
                 """)
         node_with_no_error_message.file = filename

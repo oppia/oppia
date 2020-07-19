@@ -1786,13 +1786,13 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
 
     __implements__ = interfaces.ITokenChecker
 
-    name = 'multi-line-pragma'
+    name = 'single-line-pragma'
     priority = -1
     msgs = {
         'C0027': (
             'Pylint pragmas should be used to disable a rule '
             'for a single line only',
-            'multi-line-pragma',
+            'single-line-pragma',
             'Please use pylint pragmas to disable a rule for a single line only'
         )
     }
@@ -1809,18 +1809,18 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                 line = line.lstrip()
                 # Ignore line that is enabling this check.
                 # Example:
-                # # pylint: disable=unused-args, multi-line-pragma
+                # # pylint: disable=import-only-modules, single-line-pragma
                 # def func(a, b):
-                # # pylint: enable=unused-args, multi-line-pragma
+                # # pylint: enable=import-only-modules, single-line-pragma
                 # Now if do not ignore the line with 'enable' statement
-                # pylint will raise the error of multi-line-pragma because
+                # pylint will raise the error of single-line-pragma because
                 # from here on all this lint check is enabled. So we need to
                 # ignore this line.
                 if line.startswith(b'# pylint:'):
-                    if 'enable' in line and 'multi-line-pragma' in line:
+                    if 'enable' in line and 'single-line-pragma' in line:
                         continue
                     self.add_message(
-                        'multi-line-pragma', line=line_num)
+                        'single-line-pragma', line=line_num)
 
 
 def register(linter):
