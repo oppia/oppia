@@ -146,9 +146,11 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             parameters.append([(name, defval), False])
 
         num_positional_args_unused = num_positional_args
+        # The list below will store all the keyword arguments present in the
+        # function definition.
+        keyword_args_in_funcdef = []
         # Check that all parameters with a default value have
         # been called explicitly.
-        keyword_args_in_funcdef = []
         for [(name, defval), _] in parameters:
             if defval:
                 display_name = repr(name)
@@ -177,7 +179,14 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         for arg in keyword_args:
             # If there is *args and **kwargs in the function definition skip the
             # check because we can use keywords arguments in function call even
-            # if **kwargs is present in the function definition.
+            # if **kwargs is present in the function definition. See Example:
+            # Fucntion def -> def func(entity_id, *args, **kwargs):
+            # Function call -> func(entity_id='1', a=1, b=2, c=3)
+            # by parsing calling method we get
+            # keyword_arguments = entity_id, a, b, c.
+            # But from the function call, we will get keyword_arguments = []
+            # now we do not have a way to identify which one is a keyword
+            # argument and which one is not.
             if not called.args.kwarg and callable_name != 'constructor':
                 if not arg in keyword_args_in_funcdef:
                     # This try/except block tries to get the function

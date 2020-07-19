@@ -274,7 +274,7 @@ def url_encode(query, doseq=False):
     return urlparse_urlencode.urlencode(query, doseq)
 
 
-def url_retrieve(source_url, filename):
+def url_retrieve(source_url, filename=None):
     """Copy a network object denoted by a URL to a local file using
     urllib.urlretrieve if run under Python 2 and urllib.request.urlretrieve if
     run under Python 3.
