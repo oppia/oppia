@@ -756,13 +756,13 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
 
-    def test_verification_is_successfull(self):
+    def test_verification_is_successful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_1_id)))
 
-    def test_verification_is_unsuccessfull_when_deletion_failed(self):
+    def test_verification_is_unsuccessful_when_deletion_failed(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
 

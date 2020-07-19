@@ -65,13 +65,13 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-    def test_deletion_repeated_is_successfull(self):
+    def test_repeated_deletion_is_successful(self):
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
         output = self._run_one_off_job()
         self.assertIn(['ALREADY DONE', [self.user_1_id]], output)
 
-    def test_deletion_regular_is_successful(self):
+    def test_regular_deletion_is_successful(self):
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
 
@@ -128,11 +128,11 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-    def test_verification_user_not_deleted(self):
+    def test_verification_when_user_is_not_deleted(self):
         output = self._run_one_off_job()
         self.assertIn(['NOT DELETED', [self.user_1_id]], output)
 
-    def test_verification_user_deleted_is_successful(self):
+    def test_verification_when_user_is_deleted_is_successful(self):
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         wipeout_service.delete_user(pending_deletion_request)
@@ -142,7 +142,7 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
 
-    def test_verification_user_wrongly_deleted_fails(self):
+    def test_verification_when_user_is_wrongly_deleted_fails(self):
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         wipeout_service.delete_user(pending_deletion_request)

@@ -2188,7 +2188,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_id(cls, unused_entity_name=''):
+    def get_new_id(cls, unused_entity_name):
         """Gets a new id for an entity, based on its name.
 
         The returned id is guaranteed to be unique among all instances of this

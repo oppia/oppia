@@ -296,13 +296,15 @@ class UserSettings(python_utils.OBJECT):
 
 
 def is_user_id_correct(user_id):
-    """Verify that the user ID is in a correct format.
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
 
     Args:
         user_id: str. The user ID to be checked.
 
     Returns:
-        bool. True when the ID is in a correct format, False otherwise.
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
     """
     if user_id in feconf.SYSTEM_USERS.keys():
         return True
