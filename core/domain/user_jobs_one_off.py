@@ -395,6 +395,12 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
                     draft_change_list, draft_change_list_version,
                     exploration_version, exp_id))
             final_draft_change_list = updated_draft_change_list
+        else:
+            yield (
+                'Invalid Draft change list found.',
+                'Draft change %s version greater than exploration version' % (
+                    item.id))
+            return
 
 
         if final_draft_change_list is not None:

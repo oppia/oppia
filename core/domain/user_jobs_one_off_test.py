@@ -1475,6 +1475,56 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJobTests(
              ': u\'value\'"]]'])
         self.assertEqual(actual_output, expected_output)
 
+    def test_changes_with_version_greater_than_exploration_raise_error(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'State1',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'choices': {
+                    'value': [
+                        '<p>1</p>',
+                        '<p>2</p>',
+                        '<p>3</p>',
+                        '<p>4</p>'
+                    ]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 1
+                },
+                'minAllowableSelectionCount': {
+                    'value': 1
+                }
+            }
+        }).to_dict()]
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
+            exploration_id='exp_id',
+            draft_change_list=change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=2,
+            draft_change_list_id=1).put()
+        job = (
+            user_jobs_one_off.
+            DraftChangesMathRichTextInfoModelGenerationOneOffJob)
+        job_id = job.create_new()
+        job.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = job.get_output(job_id)
+        expected_output = (
+            [u'[u\'Invalid Draft change list found.\', [u\'Draft change %s.exp'
+             '_id version greater than exploration version\']]' % (
+                 self.owner_id)])
+        self.assertEqual(actual_output, expected_output)
 
     def test_invalid_draft_changes_after_updation_to_exploration_version(self):
         exploration = exp_domain.Exploration.create_default_exploration(
