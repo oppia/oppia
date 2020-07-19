@@ -137,7 +137,7 @@ describe('User Service', () => {
 
     userService.getUserInfoAsync().then((userInfo) => {
       expect(userInfo).toEqual(sampleUserInfo);
-      // Fetch userInfo again
+      // Fetch userInfo again.
       userService.getUserInfoAsync().then((sameUserInfo) => {
         expect(sameUserInfo).toEqual(userInfo);
       });
