@@ -171,14 +171,14 @@ def update_datastore_types_for_mock_datetime():
     of ndb datetime properties does not fail.
     """
 
-    # pylint: disable=protected-access, single-line-pragma
+    # pylint: disable=protected-access, multi-line-pragma
     datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime13Hours] = (
         datastore_types.ValidatePropertyNothing)
     datastore_types._PACK_PROPERTY_VALUES[MockDatetime13Hours] = (
         datastore_types.PackDatetime)
     datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (
         datastore_types.entity_pb.Property.GD_WHEN)
-    # pylint: enable=protected-access, single-line-pragma
+    # pylint: enable=protected-access, multi-line-pragma
 
 
 class MockModel(base_models.BaseModel):

@@ -25,6 +25,7 @@ import linecache
 import os
 import re
 import sys
+import tokenize
 
 import python_utils
 from .. import docstrings_checker
@@ -1783,58 +1784,43 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
     a rule for a single line only.
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.ITokenChecker
 
-    name = 'single-line-pragma'
+    name = 'multi-line-pragma'
     priority = -1
     msgs = {
         'C0027': (
             'Pylint pragmas should be used to disable a rule '
             'for a single line only',
-            'single-line-pragma',
+            'multi-line-pragma',
             'Please use pylint pragmas to disable a rule for a single line only'
         )
     }
 
-    def process_module(self, node):
+    def process_tokens(self, tokens):
         """Custom pylint checker which allows paramas to disable a rule for a
         single line only.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            tokens: Token. Object to access all tokens of a module.
         """
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-
-        for line_num, line in enumerate(file_content):
-            line = file_content[line_num].lstrip()
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            # Ignore line that is enabling this check.
-            # Example: # pylint: enable:single-line-pragma
-            # else that line will raise warning.
-            if line.startswith(b'# pylint:'):
-                if 'enable' in line and 'single-line-pragma' in line:
-                    continue
-                self.add_message(
-                    'single-line-pragma', line=line_num + 1)
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT:
+                line = line.lstrip()
+                # Ignore line that is enabling this check.
+                # Example:
+                # # pylint: disable=unused-args, multi-line-pragma
+                # def func(a, b):
+                # # pylint: enable=unused-args, multi-line-pragma
+                # Now if do not ignore the line with 'enable' statement
+                # pylint will raise the error of multi-line-pragma because
+                # from here on all this lint check is enabled. So we need to
+                # ignore this line.
+                if line.startswith(b'# pylint:'):
+                    if 'enable' in line and 'multi-line-pragma' in line:
+                        continue
+                    self.add_message(
+                        'multi-line-pragma', line=line_num)
 
 
 def register(linter):
