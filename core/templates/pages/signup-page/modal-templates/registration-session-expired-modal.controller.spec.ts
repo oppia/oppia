@@ -46,7 +46,7 @@ describe('Registration Session Expired Modal Controller', function() {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
-    UserService = $injector.get('UserService');
+    //UserService = $injector.get('UserService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);

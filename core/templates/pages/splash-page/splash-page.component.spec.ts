@@ -54,7 +54,7 @@ describe('Splash Page', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    UserService = $injector.get('UserService');
+    //UserService = $injector.get('UserService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
