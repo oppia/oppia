@@ -20,6 +20,7 @@ import 'zone.js';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -50,7 +51,7 @@ import { TopicSummaryTileComponent } from
   './summary-tile/topic-summary-tile.component';
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule],
+  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
 
   declarations: [
     BackgroundBannerComponent,
@@ -79,6 +80,7 @@ import { TopicSummaryTileComponent } from
   ],
 
   exports: [
+    FormsModule,
     BackgroundBannerComponent,
     TranslatePipe,
     SharingLinksComponent,

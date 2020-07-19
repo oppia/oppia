@@ -1,45 +1,84 @@
-<div class="oppia-practice-tab-container">
-  <mat-card class="oppia-page-card oppia-long-text">
-    <h2 class="tab-title">
-      <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate"></span>
-    </h2>
-    <span class="practice-content">
-      <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate"></span>
-    </span> <br>
-    <div *ngFor="let subtopic of availableSubtopics; let i = index">
-      <mat-checkbox>
-        {{ subtopic.getTitle() }}
-      </mat-checkbox>
-    </div>
-    <button mat-raised-button color="accent" [disabled]="isStartButtonDisabled()"
-               (click)="openNewPracticeSession()"
-               class="practice-session-button mat-accent mat-raised">
-      <span translate="I18N_TOPIC_VIEWER_START_PRACTICE"></span>
-    </button>
-  </mat-card>
+<div class="practice-tab">
+  <div class="oppia-practice-tab-container">
+    <mat-card class="oppia-page-card oppia-long-text">
+        <h2 class="tab-title">
+          <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate"></span>
+        </h2>
+        <div class="practice-content">
+          <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate"></span>
+        </div>
+        <div *ngFor="let subtopic of availableSubtopics; let i = index">
+          <mat-checkbox class="practice-tab-mat-checkbox" [(ngModel)] = "selectedSubtopicIndices[i]">
+            {{ subtopic.getTitle() }}
+          </mat-checkbox>
+        </div>
+        <div class="fx-row fx-main-center fx-cross-center full-width">
+          <button mat-raised-button [disabled]="isStartButtonDisabled()"
+                    (click)="openNewPracticeSession()"
+                    class="practice-session-button">
+            <span [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
+          </button>
+        </div>
+    </mat-card>
+  </div>
 </div>
 <style>
-  practice-tab .oppia-practice-tab-container .oppia-page-card {
+  .practice-tab .oppia-practice-tab-container .oppia-page-card {
     width: 550px;
+    padding: 30px 55px 30px 45px;
   }
 
   @media (max-width: 1024px) {
-    practice-tab .oppia-practice-tab-container .oppia-page-card {
+    .practice-tab .oppia-practice-tab-container .oppia-page-card {
       width: 60vw;
     }
   }
 
   @media (max-width: 500px) {
-    practice-tab .oppia-practice-tab-container .oppia-page-card {
+    .practice-tab .oppia-practice-tab-container .oppia-page-card {
       width: 90vw;
     }
   }
 
-  practice-tab .mat-button.mat-raised.mat-accent.practice-session-button:not([disabled]) {
-    background-color: #00645C;
+  .practice-tab .mat-button {
+    align-self: center;
+    border-radius: 0.4em;
+    color: white;
+    font-family: "Roboto", Arial, sans-serif;
+    margin-top: 20px;
+    text-transform: uppercase;
+    width: 200px;
   }
 
-  practice-tab .practice-content {
+  .practice-tab .practice-tab-mat-checkbox .mat-label {
+    margin-top: -1px;
+    vertical-align: top;
+  }
+
+  .practice-tab .practice-session-button {
+    background-color: #00645C;
+    color: white;
+  }
+  .practice-tab .practice-session-button:disabled {
+    color: rgba(0,0,0,.26);
+    background-color: rgba(0,0,0,.26);
+    box-shadow: none;
+  }
+
+  .practice-tab .practice-tab-mat-checkbox {
+    margin-top: 1vh;
+  }
+
+  .practice-tab .full-width {
+    width: 100%;
+    text-align: center;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .practice-tab .practice-content {
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1.2em;
     margin-bottom: 2.5vh;
