@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing'; 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { UserService } from 'services/user.service';
 
