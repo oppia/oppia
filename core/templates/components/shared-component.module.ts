@@ -50,6 +50,7 @@ import { ExplorationSummaryTileDirective } from
 import { TopicSummaryTileComponent } from
   './summary-tile/topic-summary-tile.component';
 
+
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
 
@@ -69,10 +70,9 @@ import { TopicSummaryTileComponent } from
 
   entryComponents: [
     BackgroundBannerComponent,
-    SharingLinksComponent, BackgroundBannerComponent, SharingLinksComponent,
+    SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    TopicSummaryTileComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent,

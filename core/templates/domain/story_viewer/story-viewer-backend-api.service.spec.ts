@@ -33,7 +33,8 @@ describe('Story viewer backend API service', () => {
   let sampleDataResults = {
     story_title: 'Story title',
     story_description: 'Story description',
-    story_nodes: []
+    story_nodes: [],
+    topic_name: 'Topic name'
   };
 
   beforeEach(() => {
