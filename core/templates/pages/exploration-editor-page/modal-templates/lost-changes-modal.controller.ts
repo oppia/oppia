@@ -19,6 +19,9 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require(
+  'pages/exploration-editor-page/changes-in-human-readable-form/' +
+  'changes-in-human-readable-form.component.ts');
 
 angular.module('oppia').controller('LostChangesModalController', [
   '$controller', '$log', '$scope', '$uibModalInstance',
