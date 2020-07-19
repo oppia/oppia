@@ -23,13 +23,11 @@ import multiprocessing
 import os
 
 from core.tests import test_utils
-import python_utils
 
 from . import general_purpose_linter
 from . import pre_commit_linter
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
@@ -137,28 +135,7 @@ INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
 INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
 
 
-class LintTests(test_utils.GenericTestBase):
-    """Tests for general_purpose_linter.py file."""
-
-    def setUp(self):
-        super(LintTests, self).setUp()
-        self.linter_stdout = []
-
-        def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
-            linter_stdout list.
-
-            Args:
-                *args: str. Variable length argument list of values to print in
-                    the same line of output.
-            """
-            self.linter_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
-
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
-
-
-class HTMLLintTests(LintTests):
+class HTMLLintTests(test_utils.LinterTestBase):
     """Test the HTML lint functions."""
 
     def test_invalid_use_of_ng_template(self):
@@ -169,6 +146,7 @@ class HTMLLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 9: The directives must be directly referenced.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_trailing_whitespace(self):
         with self.print_swap:
@@ -178,6 +156,7 @@ class HTMLLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 9: There should not be any trailing whitespaces.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_parent(self):
         with self.print_swap:
@@ -188,9 +167,10 @@ class HTMLLintTests(LintTests):
             'Line 13: Please do not access parent properties using '
             '$parent. Use the scope object for this purpose.'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
 
-class JsTsLintTests(LintTests):
+class JsTsLintTests(test_utils.LinterTestBase):
     """Test the JsTs lint functions."""
 
     def test_invalid_use_of_browser_explore(self):
@@ -201,6 +181,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 30: In tests, please do not use browser.explore().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_browser_pause(self):
         with self.print_swap:
@@ -210,6 +191,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 30: In tests, please do not use browser.pause().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_browser_sleep(self):
         with self.print_swap:
@@ -219,6 +201,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 30: In tests, please do not use browser.sleep().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_browser_wait_for_angular(self):
         with self.print_swap:
@@ -228,6 +211,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 30: In tests, please do not use '
             'browser.waitForAngular().'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_fdescribe_ddescribe(self):
         with self.print_swap:
@@ -240,6 +224,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 28: In tests, please use \'describe\' instead of '
             '\'ddescribe\'or \'fdescribe\''], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_iit_fit(self):
         with self.print_swap:
@@ -252,6 +237,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 64: In tests, please use \'it\' instead of \'iit\' or '
             '\'fit\''], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_inject(self):
         with self.print_swap:
@@ -261,6 +247,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 26: In tests, please use \'angular.mock.inject\' '
             'instead of \'inject\''], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_template_url(self):
         with self.print_swap:
@@ -270,6 +257,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 24: The directives must be directly referenced.'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_parent(self):
         with self.print_swap:
@@ -280,6 +268,7 @@ class JsTsLintTests(LintTests):
             'Line 25: Please do not access parent properties using '
             '$parent. Use the scope objectfor this purpose.'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_relative_import(self):
         with self.print_swap:
@@ -289,6 +278,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 20: Please, don\'t use relative imports in require().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_inner_html(self):
         with self.print_swap:
@@ -298,6 +288,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 27: Please do not use innerHTML property.'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_to_throw(self):
         with self.print_swap:
@@ -307,6 +298,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 25: Please use \'toThrowError\' instead of \'toThrow\''],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_throw(self):
         with self.print_swap:
@@ -316,6 +308,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 27: Please use \'throw new\' instead of \'throw\''],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_throw_with_string(self):
         with self.print_swap:
@@ -325,6 +318,7 @@ class JsTsLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 27: Please use \'throw new Error\' instead of '
             '\'throw\''], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_eslint_camelcase_comment(self):
         with self.print_swap:
@@ -336,9 +330,10 @@ class JsTsLintTests(LintTests):
             'you are using this statement to define properties in an '
             'interface for a backend dict. Wrap the property name in '
             'single quotes instead.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
 
-class PythonLintTests(LintTests):
+class PythonLintTests(test_utils.LinterTestBase):
     """Test the Python lint functions."""
 
     def test_invalid_use_of_author(self):
@@ -349,6 +344,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 26: Please remove author tags from this file.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_datetime_now(self):
         with self.print_swap:
@@ -358,6 +354,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 42: Please use datetime.datetime.utcnow() instead '
             'of datetime.datetime.now().'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_print(self):
         with self.print_swap:
@@ -367,6 +364,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 42: Please use python_utils.PRINT().'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_pylint_id(self):
         with self.print_swap:
@@ -379,6 +377,7 @@ class PythonLintTests(LintTests):
             'The id-to-message list can be seen '
             'here->http://pylint-messages.wikidot.com/all-codes'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_assert_equals(self):
         with self.print_swap:
@@ -389,6 +388,7 @@ class PythonLintTests(LintTests):
             'Line 43: Please do not use self.assertEquals method. This '
             'method has been deprecated. Instead use self.assertEqual '
             'method.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_open(self):
         with self.print_swap:
@@ -398,6 +398,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 42: Please use python_utils.open_file() instead '
             'of open().'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_stringio(self):
         with self.print_swap:
@@ -407,6 +408,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 44: Please use python_utils.string_io() instead of '
             'import StringIO.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_quote(self):
         with self.print_swap:
@@ -416,6 +418,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 44: Please use python_utils.url_quote().'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_unquote_plus(self):
         with self.print_swap:
@@ -425,6 +428,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 45: Please use python_utils.url_unquote_plus().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_urlencode(self):
         with self.print_swap:
@@ -434,6 +438,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 46: Please use python_utils.url_encode().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_urlretrieve(self):
         with self.print_swap:
@@ -443,6 +448,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 46: Please use python_utils.url_retrieve().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_urlopen(self):
         with self.print_swap:
@@ -452,6 +458,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 45: Please use python_utils.url_open().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_urlsplit(self):
         with self.print_swap:
@@ -461,6 +468,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 46: Please use python_utils.url_split().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_urlparse(self):
         with self.print_swap:
@@ -470,6 +478,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 46: Please use python_utils.url_parse().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_url_unsplit(self):
         with self.print_swap:
@@ -479,6 +488,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 46: Please use python_utils.url_unsplit().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_parse_qs(self):
         with self.print_swap:
@@ -488,6 +498,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 45: Please use python_utils.parse_query_string().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_unquote(self):
         with self.print_swap:
@@ -497,6 +508,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 44: Please use python_utils.urllib_unquote().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_urljoin(self):
         with self.print_swap:
@@ -506,6 +518,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 46: Please use python_utils.url_join().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_request(self):
         with self.print_swap:
@@ -515,6 +528,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 47: Please use python_utils.url_request().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_input(self):
         with self.print_swap:
@@ -524,6 +538,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 42: Please use python_utils.INPUT.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_map(self):
         with self.print_swap:
@@ -533,6 +548,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 42: Please use python_utils.MAP.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_next(self):
         with self.print_swap:
@@ -542,6 +558,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 43: Please use python_utils.NEXT.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_object(self):
         with self.print_swap:
@@ -551,6 +568,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 25: Please use python_utils.OBJECT.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_range(self):
         with self.print_swap:
@@ -560,6 +578,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 42: Please use python_utils.RANGE.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_round(self):
         with self.print_swap:
@@ -569,6 +588,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 42: Please use python_utils.ROUND.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_str(self):
         with self.print_swap:
@@ -581,6 +601,7 @@ class PythonLintTests(LintTests):
             'strings used directly in NDB datastore models. If you need to'
             ' cast ints/floats to strings, please use '
             'python_utils.UNICODE() instead.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_zip(self):
         with self.print_swap:
@@ -590,6 +611,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 44: Please use python_utils.ZIP.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_basestring(self):
         with self.print_swap:
@@ -599,6 +621,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 42: Please use python_utils.BASESTRING.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_metaclass(self):
         with self.print_swap:
@@ -608,6 +631,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 46: Please use python_utils.with_metaclass().'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_iteritems(self):
         with self.print_swap:
@@ -617,6 +641,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 43: Please use items() instead.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_itervalues(self):
         with self.print_swap:
@@ -626,6 +651,7 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 43: Please use values() instead.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_iterkeys(self):
         with self.print_swap:
@@ -635,19 +661,21 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 43: Please use keys() instead.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
 
-class GeneralLintTests(LintTests):
+class GeneralLintTests(test_utils.LinterTestBase):
     """Test all other general lint functions."""
 
     def test_invalid_use_of_tabs(self):
         with self.print_swap:
             general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_TABS_FILEPATH, FILE_IN_EXCLUDED_PATH], FILE_CACHE, True
+                [INVALID_TABS_FILEPATH], FILE_CACHE, True
             ).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['Please use spaces instead of tabs.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_merge_conflict_present(self):
         with self.print_swap:
@@ -658,6 +686,7 @@ class GeneralLintTests(LintTests):
             'Please fully resolve existing merge conflicts.',
             'Please fully resolve existing merge conflicts.'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_glyphicon(self):
         with self.print_swap:
@@ -667,6 +696,7 @@ class GeneralLintTests(LintTests):
         self.assert_same_list_elements(
             ['Please use equivalent material-icons instead of glyphicons.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_use_of_todo(self):
         with self.print_swap:
@@ -676,6 +706,7 @@ class GeneralLintTests(LintTests):
         self.assert_same_list_elements([
             'Line 33: Please assign TODO comments to a user in the format'
             ' TODO(username): XXX.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_missing_copyright(self):
         with self.print_swap:
@@ -685,6 +716,7 @@ class GeneralLintTests(LintTests):
         self.assert_same_list_elements([
             'Please ensure this file should contain a proper copyright '
             'notice.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_missing_unicode_literal(self):
         with self.print_swap:
@@ -694,6 +726,7 @@ class GeneralLintTests(LintTests):
         self.assert_same_list_elements([
             'Please ensure this file should contain unicode_literals '
             'future import.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_missing_fileoverview(self):
         with self.print_swap:
@@ -703,10 +736,15 @@ class GeneralLintTests(LintTests):
         self.assert_same_list_elements([
             'Please ensure this file should contain a file overview i.e. '
             'a short description of the file.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_invalid_dev_mode_in_constant_ts(self):
         def mock_readlines(unused_self, unused_filepath):
-            return ('"DEV_MODE": false',)
+            return (
+                'Copyright 2020 The Oppia Authors. All Rights Reserved.',
+                ' * @fileoverview Initializes constants for '
+                'the Oppia codebase.',
+                '"DEV_MODE": false\n',)
 
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
@@ -718,6 +756,7 @@ class GeneralLintTests(LintTests):
         self.assert_same_list_elements([
             'Please set the DEV_MODE variable in constants.ts'
             'to true before committing.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_linter_with_no_files(self):
         with self.print_swap:
@@ -725,6 +764,7 @@ class GeneralLintTests(LintTests):
                 [], FILE_CACHE, True).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['There are no files to be checked.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = general_purpose_linter.get_linters(
