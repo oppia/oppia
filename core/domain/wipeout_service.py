@@ -217,7 +217,7 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
         pseudonymous user ID.
     """
     return {
-        activity_id: user_models.PseudonymizedUserModel.get_new_id()
+        activity_id: user_models.PseudonymizedUserModel.get_new_id('')
         for activity_id in activity_ids
     }
 
