@@ -30,13 +30,14 @@ from core.platform import models
 ])
 
 class SnapshotMetadataCommitMsgOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that indexes the commit_msg field of the BaseSnapshotMetadataModels.
+    """Job that indexes the commit_msg field of the
+    BaseSnapshotMetadataModels.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(SnapshotMetadataCommitMsgOneOffJob, cls).enqueue(
-			job_id, shard_count=64)
+			         job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -53,7 +54,7 @@ class SnapshotMetadataCommitMsgOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             topic_models.TopicSnapshotMetadataModel,
             question_models.QuestionSnapshotMetadataModel,
         ]
-    
+
     @staticmethod
     def map(item):
         item.put(update_last_updated_time=False)
