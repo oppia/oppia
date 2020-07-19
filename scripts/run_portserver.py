@@ -16,8 +16,8 @@
 # bf6250b121cd610c3280cd748b5702a2be040f41) at
 # https://github.com/google/python_portpicker/blob/main/src/portserver.py,
 # which is Copyright 2015 Google Inc. All Rights Reserved. The following
-# changes have been made by The Oppia Authors to this file since it was
-# copied from the python_portpicker project:
+# changes were made by The Oppia Authors to this file when it was
+# originally introduced. More may have been made since.
 #
 # * We used threading instead of asyncio for compatibility with Python 2.
 #   This change involved adding a Server class to replace asyncio's
@@ -47,6 +47,9 @@ $ export PORTSERVER_ADDRESS=portserver.sock
 $ # ... launch a bunch of tests that use portpicker ...
 """
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import argparse
 import collections
 import logging
@@ -55,44 +58,55 @@ import socket
 import sys
 import threading
 
-log = None  # Initialized to a logging.Logger by _configure_logging().
+import python_utils
 
-_PROTOS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
-           (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
+_PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
+              (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
 
 
 def _get_process_command_line(pid):
+    """Get the command for a process."""
     try:
-        with open('/proc/{}/cmdline'.format(pid), 'rt') as cmdline_f:
-            return cmdline_f.read()
+        with python_utils.open_file(
+            '/proc/{}/cmdline'.format(pid), 'rt'
+        ) as f:
+            return f.read()
     except IOError:
         return ''
 
 
 def _get_process_start_time(pid):
+    """Get the start time for a process."""
     try:
-        with open('/proc/{}/stat'.format(pid), 'rt') as pid_stat_f:
-            return int(pid_stat_f.readline().split()[21])
+        with python_utils.open_file(
+            '/proc/{}/stat'.format(pid), 'rt'
+        ) as f:
+            return int(f.readline().split()[21])
     except IOError:
         return 0
 
 
-def _bind(port, socket_type, socket_proto):
+def _bind(port, socket_type, socket_protocol):
     """Try to bind to a socket of the specified type, protocol, and port.
     For the port to be considered available, the kernel must support at least
     one of (IPv6, IPv4), and the port must be available on each supported
     family.
+
     Args:
-      port: The port number to bind to, or 0 to have the OS pick a free port.
-      socket_type: The type of the socket (ex: socket.SOCK_STREAM).
-      socket_proto: The protocol of the socket (ex: socket.IPPROTO_TCP).
+        port: int. The port number to bind to, or 0 to have the OS pick
+            a free port.
+        socket_type: int. The type of the socket (ex:
+            socket.SOCK_STREAM).
+        socket_protocol: int. The protocol of the socket (ex:
+            socket.IPPROTO_TCP).
+
     Returns:
-      The port number on success or None on failure.
+        int. The port number on success or None on failure.
     """
     got_socket = False
     for family in (socket.AF_INET6, socket.AF_INET):
         try:
-            sock = socket.socket(family, socket_type, socket_proto)
+            sock = socket.socket(family, socket_type, socket_protocol)
             got_socket = True
         except socket.error:
             continue
@@ -111,38 +125,42 @@ def _bind(port, socket_type, socket_proto):
 
 def _is_port_free(port):
     """Check if specified port is free.
+
     Args:
-      port: integer, port to check
+        port: int. Port to check.
+
     Returns:
-      boolean, whether it is free to use for both TCP and UDP
+        bool. Whether it is free to use for both TCP and UDP.
     """
-    return _bind(port, *_PROTOS[0]) and _bind(port, *_PROTOS[1])
+    return _bind(port, *_PROTOCOLS[0]) and _bind(port, *_PROTOCOLS[1])
 
 
 def _should_allocate_port(pid):
-    """Determine if we should allocate a port for use by the given process id."""
+    """Determine whether to allocate a port for a process id."""
     if pid <= 0:
-        log.info('Not allocating a port to invalid pid')
+        logging.info('Not allocating a port to invalid pid')
         return False
     if pid == 1:
         # The client probably meant to send us its parent pid but
         # had been reparented to init.
-        log.info('Not allocating a port to init.')
+        logging.info('Not allocating a port to init.')
         return False
     try:
         os.kill(pid, 0)
-    except ProcessLookupError:
-        log.info('Not allocating a port to a non-existent process')
+    except OSError:
+        logging.info('Not allocating a port to a non-existent process')
         return False
     return True
 
 
-class _PortInfo(object):
+class _PortInfo(python_utils.OBJECT):
     """Container class for information about a given port assignment.
+
     Attributes:
-      port: integer port number
-      pid: integer process id or 0 if unassigned.
-      start_time: Time in seconds since the epoch that the process started.
+      port: int. Port number.
+      pid: int. Process id or 0 if unassigned.
+      start_time: int. Time in seconds since the epoch that the process
+          started.
     """
 
     __slots__ = ('port', 'pid', 'start_time')
@@ -153,19 +171,22 @@ class _PortInfo(object):
         self.start_time = 0
 
 
-class _PortPool(object):
+class _PortPool(python_utils.OBJECT):
     """Manage available ports for processes.
+
     Ports are reclaimed when the reserving process exits and the reserved port
     is no longer in use.  Only ports which are free for both TCP and UDP will be
     handed out.  It is easier to not differentiate between protocols.
     The pool must be pre-seeded with add_port_to_free_pool() calls
     after which get_port_for_process() will allocate and reclaim ports.
     The len() of a _PortPool returns the total number of ports being managed.
+
     Attributes:
-      ports_checked_for_last_request: The number of ports examined in order to
-          return from the most recent get_port_for_process() request.  A high
-          number here likely means the number of available ports with no active
-          process using them is getting low.
+      ports_checked_for_last_request: int. The number of ports examined
+          in order to return from the most recent get_port_for_process()
+          request.  A high number here likely means the number of
+          available ports with no active process using them is getting
+          low.
     """
 
     def __init__(self):
@@ -173,10 +194,18 @@ class _PortPool(object):
         self.ports_checked_for_last_request = 0
 
     def num_ports(self):
+        """Get the number of ports in the pool."""
         return len(self._port_queue)
 
     def get_port_for_process(self, pid):
-        """Allocates and returns port for pid or 0 if none could be allocated."""
+        """Allocates port.
+
+        Args:
+            pid: int. ID for process to allocate port to.
+
+        Returns:
+            int. Allocated port or 0 if none could be allocated.
+        """
         if not self._port_queue:
             raise RuntimeError('No ports being managed.')
 
@@ -188,21 +217,22 @@ class _PortPool(object):
             candidate = self._port_queue.pop()
             self._port_queue.appendleft(candidate)
             check_count += 1
-            if (candidate.start_time == 0 or
-                candidate.start_time != _get_process_start_time(candidate.pid)):
+            if (candidate.start_time == 0
+                    or candidate.start_time
+                    != _get_process_start_time(candidate.pid)):
                 if _is_port_free(candidate.port):
                     candidate.pid = pid
                     candidate.start_time = _get_process_start_time(pid)
                     if not candidate.start_time:
-                        log.info("Can't read start time for pid %d.", pid)
+                        logging.info('Can\'t read start time for pid %d.', pid)
                     self.ports_checked_for_last_request = check_count
                     return candidate.port
                 else:
-                    log.info(
+                    logging.info(
                         'Port %d unexpectedly in use, last owning pid %d.',
                         candidate.port, candidate.pid)
 
-        log.info('All ports in use.')
+        logging.info('All ports in use.')
         self.ports_checked_for_last_request = check_count
         return 0
 
@@ -215,8 +245,9 @@ class _PortPool(object):
         self._port_queue.append(port_info)
 
 
-class _PortServerRequestHandler(object):
+class _PortServerRequestHandler(python_utils.OBJECT):
     """A class to handle port allocation and status requests.
+
     Allocates ports to process ids via the dead simple port server protocol
     when the handle_port_request asyncio.coroutine handler has been registered.
     Statistics can be logged using the dump_stats method.
@@ -224,9 +255,10 @@ class _PortServerRequestHandler(object):
 
     def __init__(self, ports_to_serve):
         """Initialize a new port server.
+
         Args:
-          ports_to_serve: A sequence of unique port numbers to test and offer
-              up to clients.
+            ports_to_serve: list. A sequence of unique port numbers to
+                test and offer up to clients.
         """
         self._port_pool = _PortPool()
         self._total_allocations = 0
@@ -237,20 +269,22 @@ class _PortServerRequestHandler(object):
 
     def handle_port_request(self, client_data):
         """Given a port request body, parse it and respond appropriately.
+
         Args:
-          client_data: The request bytes from the client.
+            client_data: bytes. The request bytes from the client.
+
         Returns:
-          The response to return to the client
+            str. The response to return to the client.
         """
         try:
             pid = int(client_data)
         except ValueError as error:
             self._client_request_errors += 1
-            log.warning('Could not parse request: %s', error)
+            logging.warning('Could not parse request: %s', error)
             return
 
-        log.info('Request on behalf of pid %d.', pid)
-        log.info('cmdline: %s', _get_process_command_line(pid))
+        logging.info('Request on behalf of pid %d.', pid)
+        logging.info('cmdline: %s', _get_process_command_line(pid))
 
         if not _should_allocate_port(pid):
             self._denied_allocations += 1
@@ -259,16 +293,16 @@ class _PortServerRequestHandler(object):
         port = self._port_pool.get_port_for_process(pid)
         if port > 0:
             self._total_allocations += 1
-            log.debug('Allocated port %d to pid %d', port, pid)
-            return '{:d}\n'.format(port).encode('utf-8')
+            logging.debug('Allocated port %d to pid %d', port, pid)
+            return '{:d}\n'.format(port).encode(encoding='utf-8')
         else:
             self._denied_allocations += 1
-            log.info('Denied allocation to pid %d', pid)
+            logging.info('Denied allocation to pid %d', pid)
             return ''
 
     def dump_stats(self):
         """Logs statistics of our operation."""
-        log.info('Dumping statistics:')
+        logging.info('Dumping statistics:')
         stats = []
         stats.append(
             'client-request-errors {}'.format(self._client_request_errors))
@@ -278,7 +312,7 @@ class _PortServerRequestHandler(object):
             self._port_pool.ports_checked_for_last_request))
         stats.append('total-allocations {}'.format(self._total_allocations))
         for stat in stats:
-            log.info(stat)
+            logging.info(stat)
 
 
 def _parse_command_line():
@@ -294,15 +328,7 @@ def _parse_command_line():
         type=str,
         default='portserver.sock',
         help='Address of AF_UNIX socket on which to listen (first @ is a NUL).')
-    parser.add_argument('--verbose',
-                        action='store_true',
-                        default=False,
-                        help='Enable verbose messages.')
-    parser.add_argument('--debug',
-                        action='store_true',
-                        default=False,
-                        help='Enable full debug messages.')
-    return parser.parse_args(sys.argv[1:])
+    return parser.parse_args(args=sys.argv[1:])
 
 
 def _parse_port_ranges(pool_str):
@@ -313,70 +339,98 @@ def _parse_port_ranges(pool_str):
             a, b = range_str.split('-', 1)
             start, end = int(a), int(b)
         except ValueError:
-            log.error('Ignoring unparsable port range %r.', range_str)
+            logging.error('Ignoring unparsable port range %r.', range_str)
             continue
         if start < 1 or end > 65535:
-            log.error('Ignoring out of bounds port range %r.', range_str)
+            logging.error('Ignoring out of bounds port range %r.', range_str)
             continue
-        ports.update(set(range(start, end + 1)))
+        ports.update(set(python_utils.RANGE(start, end + 1)))
     return ports
 
 
-def _configure_logging(verbose=False, debug=False):
-    """Configure the log global, message format, and verbosity settings."""
-    overall_level = logging.DEBUG if debug else logging.INFO
-    logging.basicConfig(
-        format=(
-            '[%(levelname)s %(asctime)s %(thread)s '
-            '%(filename)s : %(lineno)s] %(message)s'
-        ),
-        datefmt='%m%d %H:%M:%S',
-        style='{',
-        level=overall_level)
-    global log
-    log = logging.getLogger('portserver')
-    # The verbosity controls our loggers logging level, not the global
-    # one above. This avoids debug messages from libraries such as asyncio.
-    log.setLevel(logging.DEBUG if verbose else overall_level)
+class Server(python_utils.OBJECT):
+    """Manages the portserver server.
 
-
-class Server:
+    Attributes:
+        max_backlog: int. The maximum number of pending requests to hold
+            at a time.
+        message_size: int. Maximum number of bytes to read from each
+            connection to read the request.
+    """
 
     max_backlog = 5
     message_size = 1024
 
     def __init__(self, handler, socket_path):
+        """Runs the portserver
+
+        Args:
+            handler: Callable. Function that accepts a port allocation
+                request string and returns the allocated port number.
+            socket_path: str. Path to socket file.
+        """
         self.socket_path = socket_path
-        self.sock = self._start_server(self.socket_path)
+        self.socket = self._start_server(self.socket_path)
         self.handler = handler
 
     def run(self):
+        """Run the server in an infinite loop.
+
+        Spawns a thread to handle each connection to the socket. Uses
+        the handle_connection function to handle each connection.
+        """
         while True:
-            conn, addr = self.sock.accept()
+            connection, _ = self.socket.accept()
             thread = threading.Thread(
                 target=Server.handle_connection,
-                args=(conn, self.handler),
+                args=(connection, self.handler),
             )
             thread.start()
 
     def close(self):
+        """Gracefully shut down the server.
+
+        Shutting down the server involves closing the socket and
+        removing the socket file.
+        """
         try:
-            self.sock.shutdown(socket.SHUT_RDWR)
+            self.socket.shutdown(socket.SHUT_RDWR)
         except socket.error:
             pass
         finally:
-            self.sock.close()
+            self.socket.close()
         if not self.socket_path.startswith('\0'):
             os.remove(self.socket_path)
 
     @staticmethod
     def handle_connection(connection, handler):
+        """Handle a socket connection.
+
+        Reads the request from the socket connection and passes it to
+        the handler.
+
+        Args:
+            connection: Socket. The connection socket to read the
+                request from.
+            handler: Callable. The handler function that will handle the
+                request. Should accept a string with the PID of the
+                requesting process and return allocated socket.
+        """
         request = connection.recv(Server.message_size)
         response = handler(request)
         connection.sendall(response)
         connection.close()
 
     def _start_server(self, path):
+        """Start the server bound to a socket file.
+
+        Args:
+            path: str. Path to socket file. No such file should exist,
+                and a new one will be created.
+
+        Returns:
+            Socket. A new socket object bound to the socket file.
+        """
         sock = self._get_socket()
         try:
             sock.bind(path)
@@ -389,19 +443,28 @@ class Server:
         return sock
 
     def _get_socket(self):
+        """Get a new socket.
+
+        Returns:
+            Socket. A new socket object. If UNIX sockets are supported,
+            such a socket will be created. Otherwise, an AF_INET socket
+            is created.
+        """
         if hasattr(socket, 'AF_UNIX'):
             return socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         else:
-            # fallback to AF_INET if this is not unix
+            # Fallback to AF_INET if this is not unix.
             return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 def main():
+    """Runs the portserver until ctrl-C, then shuts it down."""
     config = _parse_command_line()
-    _configure_logging(verbose=config.verbose, debug=config.debug)
     ports_to_serve = _parse_port_ranges(config.portserver_static_pool)
     if not ports_to_serve:
-        log.error('No ports.  Invalid port ranges in --portserver_static_pool?')
+        logging.error(
+            'No ports. Invalid port ranges in --portserver_static_pool?'
+        )
         sys.exit(1)
 
     request_handler = _PortServerRequestHandler(ports_to_serve)
@@ -410,15 +473,18 @@ def main():
         request_handler.handle_port_request,
         config.portserver_unix_socket_address.replace('@', '\0', 1),
     )
-    log.info('Serving on %s', config.portserver_unix_socket_address)
+    logging.info(
+        'Serving portserver on %s',
+        config.portserver_unix_socket_address
+    )
     try:
         server.run()
     except KeyboardInterrupt:
-        log.info('Stopping due to ^C.')
+        logging.info('Stopping portserver due to ^C.')
 
     server.close()
     request_handler.dump_stats()
-    log.info('Goodbye.')
+    logging.info('Shutting down portserver.')
 
 
 if __name__ == '__main__':

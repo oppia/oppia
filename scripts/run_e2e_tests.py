@@ -506,7 +506,7 @@ def cleanup_portserver(portserver_process):
         The Popen subprocess object for the portserver.
     """
     portserver_process.send_signal(signal.SIGINT)
-    for _ in range(KILL_PORTSERVER_TIMEOUT):
+    for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT):
         time.sleep(1)
         if not portserver_process.poll():
             break
