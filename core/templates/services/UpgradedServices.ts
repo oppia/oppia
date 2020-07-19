@@ -82,6 +82,8 @@ import { DragAndDropSortInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { EndExplorationValidationService } from
@@ -339,6 +341,10 @@ export class UpgradedServices {
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
+    upgradedServices['EditableStoryBackendApiService'] =
+      new EditableStoryBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(
         new HttpClient(new HttpXhrBackend(
