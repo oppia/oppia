@@ -200,6 +200,10 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
       - run:
+          name: Run e2e subscriptions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
+      - run:
           name: Run e2e profileMenu test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
@@ -207,6 +211,10 @@ jobs:
           name: Run e2e preferences test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
+      - run:
+          name: Run e2e profileFeatures test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
