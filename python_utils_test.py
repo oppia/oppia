@@ -75,7 +75,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         tmp_file = tempfile.NamedTemporaryFile()
         tmp_file.name = 'temp_file.txt'
         python_utils.url_retrieve(
-            'http://www.google.com', 'temp_file.txt')
+            'http://www.google.com', filename='temp_file.txt')
 
         with python_utils.open_file('temp_file.txt', 'rb', encoding=None) as f:
             content = f.read()
