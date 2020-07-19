@@ -22,6 +22,7 @@ import contextlib
 import functools
 import os
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -40,14 +41,25 @@ CHROME_DRIVER_VERSION = '77.0.3865.40'
 
 
 class MockProcessClass(python_utils.OBJECT):
-    def __init__(self):
-        pass
-
-    kill_count = 0
+    def __init__(self, clean_shutdown=True):
+        self.poll_count = 0
+        self.signals_received = []
+        self.kill_count = 0
+        self.poll_return = True
+        self.clean_shutdown = clean_shutdown
 
     # pylint: disable=missing-docstring
     def kill(self):
-        MockProcessClass.kill_count += 1
+        self.kill_count += 1
+
+    def poll(self):
+        self.poll_count += 1
+        return self.poll_return
+
+    def send_signal(self, signal_number):
+        self.signals_received.append(signal_number)
+        if signal_number == signal.SIGINT and self.clean_shutdown:
+            self.poll_return = False
     # pylint: enable=missing-docstring
 
 
@@ -1250,3 +1262,26 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with swap_inplace_replace:
             run_e2e_tests.update_community_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, False)
+
+    def test_cleanup_portserver_when_server_shuts_down_cleanly(self):
+        process = MockProcessClass(clean_shutdown=True)
+        run_e2e_tests.cleanup_portserver(process)
+        self.assertEqual(process.kill_count, 0)
+        # Server gets polled twice. Once to break out of wait loop and
+        # again to check that the process shut down and does not need to
+        # be killed.
+        self.assertEqual(process.poll_count, 2)
+        self.assertEqual(process.signals_received, [signal.SIGINT])
+
+    def test_cleanup_portserver_when_server_shutdown_fails(self):
+        process = MockProcessClass(clean_shutdown=False)
+        run_e2e_tests.cleanup_portserver(process)
+        self.assertEqual(process.kill_count, 1)
+        # Server gets polled 11 times. 1 for each second of the wait
+        # loop and again to see that the process did not shut down and
+        # therefore needs to be killed.
+        self.assertEqual(
+            process.poll_count,
+            run_e2e_tests.KILL_PORTSERVER_TIMEOUT + 1
+        )
+        self.assertEqual(process.signals_received, [signal.SIGINT])
