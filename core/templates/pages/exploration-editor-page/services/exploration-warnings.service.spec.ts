@@ -584,7 +584,7 @@ describe('Exploration Warnings Service', function() {
               isAddressed: false
             }]
           },
-          interaction_ids: {
+          interactionIds: {
             Hola: 'TextInput'
           },
         });

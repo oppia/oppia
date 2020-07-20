@@ -42,20 +42,20 @@
       </td>
       <td>
         <p class="text-center list-summary">
-          <span> <[topic.canonical_story_count]> </span>
+          <span> <[topic.canonicalStoryCount]> </span>
         </p>
       </td>
       <td>
         <p class="text-center list-summary">
-          <span> <[topic.subtopic_count]> </span>
+          <span> <[topic.subtopicCount]> </span>
         </p>
       </td>
       <td>
         <p class="list-summary text-center">
-          <span> <[topic.total_skill_count]> </span>
+          <span> <[topic.totalSkillCount]> </span>
           <div ng-show="$ctrl.topic.uncategorized_skill_count"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-               uib-tooltip="This topic has <[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']>." tooltip-placement="bottom">
+               uib-tooltip="This topic has <[topic.uncategorizedSkillCount]> uncategorized skill<[topic.uncategorizedSkillCount > 1 ? 's' : '']>." tooltip-placement="bottom">
             <span class="oppia-editor-warnings-count">
               &nbsp;!
             </span>
@@ -63,8 +63,8 @@
         </p>
       </td>
       <td class="text-center topic-list-status">
-        <span class="topic-list-status-text" ng-if="topic.is_published"> Published </span>
-        <span class="topic-list-status-text" ng-if="!topic.is_published"> Not Published </span>
+        <span class="topic-list-status-text" ng-if="topic.isPublished"> Published </span>
+        <span class="topic-list-status-text" ng-if="!topic.isPublished"> Not Published </span>
         <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
         <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
@@ -117,7 +117,7 @@
         <div class="topic-item-entities">
           <div class="topic-item-entity">
             <div class="topic-item-value">
-              <span><[topic.canonical_story_count]></span>
+              <span><[topic.canonicalStoryCount]></span>
             </div>
             <div class="topic-item-type">
               Stories
@@ -125,7 +125,7 @@
           </div>
           <div class="topic-item-entity">
             <div class="topic-item-value">
-              <span><[topic.subtopic_count]></span>
+              <span><[topic.subtopicCount]></span>
             </div>
             <div class="topic-item-type">
               Subtopics
@@ -133,15 +133,15 @@
           </div>
           <div class="topic-item-entity">
             <div class="topic-item-value">
-              <span><[topic.total_skill_count]></span>
+              <span><[topic.totalSkillCount]></span>
             </div>
             <div class="topic-item-type">
               Skills
             </div>
           </div>
           <div class="topic-item-entity topic-item-status">
-            <div class="topic-item-value" ng-if="topic.is_published">Published</div>
-            <div class="topic-item-value" ng-if="!topic.is_published">Not Published</div>
+            <div class="topic-item-value" ng-if="topic.isPublished">Published</div>
+            <div class="topic-item-value" ng-if="!topic.isPublished">Not Published</div>
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IAnswerStatsBackendDict } from
+import { AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { IInteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArg } from
@@ -85,7 +85,7 @@ class MockAnswerStats {
     this.frequency = frequency;
     this.isAddressed = isAddressed;
   }
-  toBackendDict(): IAnswerStatsBackendDict {
+  toBackendDict(): AnswerStatsBackendDict {
     return {
       answer: angular.copy(this.answer),
       frequency: this.frequency
@@ -239,7 +239,7 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('is true after call to .init', function() {
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interactionIds: {}});
 
       expect(StateTopAnswersStatsService.isInitialized()).toBe(true);
     });
@@ -255,10 +255,12 @@ describe('StateTopAnswersStatsService', function() {
             {answer: 'que?', frequency: 2},
           ]
         },
-        interaction_ids: {Hola: 'TextInput'},
+        interactionIds: {Hola: 'TextInput'},
       });
 
       var stateStats = StateTopAnswersStatsService.getStateStats('Hola');
+
+
       expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
       expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
       expect(stateStats).toContain(joC({answer: 'que?', isAddressed: false}));
@@ -273,7 +275,7 @@ describe('StateTopAnswersStatsService', function() {
             {answer: 'que?', frequency: 2},
           ]
         },
-        interaction_ids: {Hola: 'TextInput'},
+        interactionIds: {Hola: 'TextInput'},
       });
 
       expect(StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
@@ -298,7 +300,7 @@ describe('StateTopAnswersStatsService', function() {
           'registerOnStateInteractionSavedCallback')
       ];
 
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interactionIds: {}});
 
       expectedRegistrationFunctions.forEach(function(registrationFunction) {
         expect(registrationFunction).toHaveBeenCalled();
@@ -314,9 +316,9 @@ describe('StateTopAnswersStatsService', function() {
           'registerOnStateInteractionSavedCallback')
       ];
 
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interactionIds: {}});
       // Second call should not add more callbacks.
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interactionIds: {}});
 
       expectedRegistrationFunctions.forEach(function(registrationFunction) {
         expect(registrationFunction.calls.count()).toEqual(1);
@@ -333,7 +335,7 @@ describe('StateTopAnswersStatsService', function() {
     it('is true when the state contains answers', function() {
       StateTopAnswersStatsService.init({
         answers: {Hola: [{answer: 'hola', frequency: 3}]},
-        interaction_ids: {Hola: 'TextInput'},
+        interactionIds: {Hola: 'TextInput'},
       });
 
       expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
@@ -341,7 +343,7 @@ describe('StateTopAnswersStatsService', function() {
 
     it('is true even when the state contains no answers', function() {
       StateTopAnswersStatsService.init(
-        {answers: {Hola: []}, interaction_ids: {Hola: 'TextInput'}}
+        {answers: {Hola: []}, interactionIds: {Hola: 'TextInput'}}
       );
 
       expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
@@ -350,7 +352,7 @@ describe('StateTopAnswersStatsService', function() {
     it('is false when the state does not exist', function() {
       StateTopAnswersStatsService.init({
         answers: {Hola: [{answer: 'hola', frequency: 3}]},
-        interaction_ids: {Hola: 'TextInput'},
+        interactionIds: {Hola: 'TextInput'},
       });
 
       expect(StateTopAnswersStatsService.hasStateStats('Me Llamo')).toBe(false);
@@ -361,7 +363,7 @@ describe('StateTopAnswersStatsService', function() {
     it('only returns state names that have stats', function() {
       StateTopAnswersStatsService.init({
         answers: {Hola: [{answer: 'hola', frequency: 3}]},
-        interaction_ids: {Hola: 'TextInput'},
+        interactionIds: {Hola: 'TextInput'},
       });
 
       expect(StateTopAnswersStatsService.getStateNamesWithStats())
@@ -379,7 +381,7 @@ describe('StateTopAnswersStatsService', function() {
             {answer: 'que?', frequency: 2},
           ]
         },
-        interaction_ids: {Hola: 'TextInput'},
+        interactionIds: {Hola: 'TextInput'},
       });
     });
 

@@ -25,7 +25,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { IImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
-import { TopicCreationBackendApiService, ITopicCreationBackend } from
+import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
 describe('Topic creation backend api service', () => {
@@ -36,7 +36,7 @@ describe('Topic creation backend api service', () => {
   let topic: NewlyCreatedTopic = null;
   let imagesData: IImageData[] = null;
   const thumbnailBgColor = '#e3e3e3';
-  let postData: ITopicCreationBackend = {
+  let postData = {
     name: 'topic-name',
     description: 'Description',
     thumbnailBgColor: thumbnailBgColor,
