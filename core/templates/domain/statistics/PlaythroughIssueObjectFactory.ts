@@ -71,13 +71,15 @@ export type IPlaythroughIssueBackendDict = (
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This class takes the type according to the IssueType parameter.
-class PlaythroughIssueBase<IssueType> {
+abstract class PlaythroughIssueBase<IssueType> {
   constructor(
     public readonly issueType: IssueType,
     public issueCustomizationArgs: IssueCustomizationArgs<IssueType>,
     public playthroughIds: string[],
     public schemaVersion: number,
     public isValid: boolean) { }
+
+  abstract getStateNameWithIssue(): string;
 
   toBackendDict(): IPlaythroughIssueBackendDictBase<IssueType> {
     return {
@@ -91,13 +93,26 @@ class PlaythroughIssueBase<IssueType> {
 }
 
 export class EarlyQuitPlaythroughIssue extends
-  PlaythroughIssueBase<'EarlyQuit'> { }
+  PlaythroughIssueBase<'EarlyQuit'> {
+  getStateNameWithIssue(): string {
+    return this.issueCustomizationArgs.state_name.value;
+  }
+}
 
 export class MultipleIncorrectSubmissionsPlaythroughIssue extends
-  PlaythroughIssueBase<'MultipleIncorrectSubmissions'> { }
+  PlaythroughIssueBase<'MultipleIncorrectSubmissions'> {
+  getStateNameWithIssue(): string {
+    return this.issueCustomizationArgs.state_name.value;
+  }
+}
 
 export class CyclicStateTransitionsPlaythroughIssue extends
-  PlaythroughIssueBase<'CyclicStateTransitions'> { }
+  PlaythroughIssueBase<'CyclicStateTransitions'> {
+  getStateNameWithIssue(): string {
+    const stateNames = this.issueCustomizationArgs.state_names.value;
+    return stateNames[stateNames.length - 1];
+  }
+}
 
 export type PlaythroughIssue = (
   EarlyQuitPlaythroughIssue |
@@ -109,8 +124,7 @@ export type PlaythroughIssue = (
 })
 export class PlaythroughIssueObjectFactory {
   createFromBackendDict(
-      backendDict: IPlaythroughIssueBackendDict):
-    PlaythroughIssue {
+      backendDict: IPlaythroughIssueBackendDict): PlaythroughIssue {
     switch (backendDict.issue_type) {
       case 'EarlyQuit':
         return new EarlyQuitPlaythroughIssue(

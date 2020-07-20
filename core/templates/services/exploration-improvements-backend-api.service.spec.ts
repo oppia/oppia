@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import {
   ExplorationTaskObjectFactory,
-  IExplorationTaskBackendDict
+  ExplorationTaskBackendDict,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import {
   ExplorationImprovementsHistoryResponse,
@@ -51,7 +51,7 @@ describe('Exploration stats backend api service', () => {
   });
 
   it('should return an ExplorationImprovementsResponse', fakeAsync(async() => {
-    const taskDict: IExplorationTaskBackendDict = {
+    const taskDict: ExplorationTaskBackendDict = {
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,
@@ -85,7 +85,7 @@ describe('Exploration stats backend api service', () => {
 
   it('should return an ExplorationImprovementsHistoryResponse',
     fakeAsync(async() => {
-      const taskDict: IExplorationTaskBackendDict = {
+      const taskDict: ExplorationTaskBackendDict = {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -121,7 +121,7 @@ describe('Exploration stats backend api service', () => {
 
   it('should return an ExplorationImprovementsHistoryResponse when given a ' +
     'cursor', fakeAsync(async() => {
-    const taskDict: IExplorationTaskBackendDict = {
+    const taskDict: ExplorationTaskBackendDict = {
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,

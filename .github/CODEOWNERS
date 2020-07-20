@@ -282,6 +282,7 @@
 /core/templates/pages/exploration-editor-page/improvements-tab/ @seanlip
 /core/templates/pages/exploration-editor-page/statistics-tab/ @seanlip
 /core/templates/services/exploration-improvements-backend-api.service*.ts @seanlip
+/core/templates/services/exploration-improvements-task-registry.service*.ts @seanlip
 /core/templates/services/exploration-stats.service*.ts @seanlip
 /core/templates/services/exploration-stats-backend-api.service*.ts @seanlip
 /core/templates/services/improvements.service*.ts @seanlip
