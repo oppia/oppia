@@ -97,7 +97,7 @@ def is_email_valid(email_address):
         email_address: str. Email address to check.
 
     Returns:
-        bool. Whether specified email address is valid.
+        bool. Whether the specified email address is valid.
     """
     if not isinstance(email_address, python_utils.BASESTRING):
         return False

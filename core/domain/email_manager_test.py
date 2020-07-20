@@ -58,10 +58,10 @@ class FailedMLTest(test_utils.EmailTestBase):
     def test_send_failed_ml_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to='moderator@example.com')
             self.assertEqual(len(messages), 0)
 
@@ -69,12 +69,12 @@ class FailedMLTest(test_utils.EmailTestBase):
             email_manager.send_job_failure_email('123ABC')
 
             # Make sure emails are sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             expected_subject = 'Failed ML Job'
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to='moderator@example.com')
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
@@ -98,7 +98,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
 
         with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
 
@@ -106,7 +106,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             email_manager.send_mail_to_admin('Dummy Subject', 'Dummy Body')
 
             # Make sure emails are sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -134,7 +134,7 @@ class DummyMailTest(test_utils.EmailTestBase):
 
         with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=dummy_receiver_address)
             self.assertEqual(len(messages), 0)
 
@@ -142,7 +142,7 @@ class DummyMailTest(test_utils.EmailTestBase):
             email_manager.send_dummy_mail_to_admin(dummy_system_name)
 
             # Make sure emails are sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=dummy_receiver_address)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -254,7 +254,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                     'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token=csrf_token)
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -267,7 +267,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -276,7 +276,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -287,7 +287,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id,
                 rights_manager.ROLE_EDITOR, self.exploration.id,
                 self.exploration.title)
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -297,7 +297,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -376,7 +376,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -436,7 +436,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -497,7 +497,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 rights_manager.ROLE_VOICE_ARTIST, self.exploration.id,
                 self.exploration.title)
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -555,7 +555,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -633,7 +633,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that no email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
@@ -673,7 +673,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'emails to be sent.')
 
             # Check that no email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
@@ -721,7 +721,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'emails to be sent.')
 
             # Check that no email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
@@ -764,7 +764,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Original email HTML body does not match cleaned HTML body'))
 
             # Check that no email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
@@ -790,7 +790,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -823,7 +823,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -835,7 +835,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that no new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -860,7 +860,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 csrf_token=csrf_token, expected_status_int=400)
 
             # Check that no email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
@@ -872,7 +872,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -901,7 +901,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1011,7 +1011,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(0, len(messages))
 
@@ -1052,7 +1052,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS)
 
             # Check that a new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1075,7 +1075,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1111,7 +1111,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1161,7 +1161,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1211,7 +1211,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1276,7 +1276,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
@@ -1330,7 +1330,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1345,7 +1345,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1356,7 +1356,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1411,7 +1411,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 self.editor_id, feedback_messages)
 
             # Check that email body is correct.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1472,7 +1472,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 self.recipient_list)
 
         # Check that email is not sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1483,7 +1483,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 self.recipient_list)
 
         # Check that email is not sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1524,7 +1524,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 self.recipient_list)
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1582,7 +1582,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1592,7 +1592,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1631,7 +1631,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
                 self.editor_id, self.exploration.id, self.exploration.title)
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1691,7 +1691,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 self.exploration.id, 'a subject')
 
         # Make sure correct email is sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1703,7 +1703,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 self.exploration.id, 'a subject')
 
         # Make sure correct email is sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1743,7 +1743,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 self.exploration.id, 'a subject')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1813,7 +1813,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 self.report_text)
 
         # Make sure correct email is sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.MODERATOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1853,7 +1853,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 self.report_text)
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1864,7 +1864,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 expected_email_text_body)
 
             # Make sure correct email is sent to multiple moderators.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.moderator2_email)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1928,7 +1928,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 self.reviewer_id, 'Algebra')
 
         # Make sure correct email is sent.
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -1961,7 +1961,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 self.reviewer_id, 'Algebra')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2007,7 +2007,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra')
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -2032,7 +2032,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 self.reviewer_id, 'Algebra')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2121,7 +2121,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 self.submitter_id, query_id)
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2193,7 +2193,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 self.submitter_id, query_id, query_params)
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2220,7 +2220,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
 
             # Make sure that correct email is sent to admin.
-            admin_messages = self.email_services_mock.mock_get_sent_messages(
+            admin_messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(admin_messages), 1)
             self.assertEqual(
@@ -2236,11 +2236,11 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 email_subject,
                 email_body,
                 email_intent)
-            messages_a = self.email_services_mock.mock_get_sent_messages(
+            messages_a = self._get_sent_email_messages(
                 to=self.RECIPIENT_A_EMAIL)
             self.assertEqual(len(messages_a), 1)
 
-            messages_b = self.email_services_mock.mock_get_sent_messages(
+            messages_b = self._get_sent_email_messages(
                 to=self.RECIPIENT_B_EMAIL)
             self.assertEqual(len(messages_b), 1)
 
@@ -2271,12 +2271,9 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
     @classmethod
     def setUpClass(cls):
         super(VoiceoverApplicationEmailUnitTest, cls).setUpClass()
-        cls._log_handler = test_utils.MockLoggingHandler()
 
     def setUp(self):
         super(VoiceoverApplicationEmailUnitTest, self).setUp()
-        self._log_handler.reset()
-
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         user_services.update_email_preferences(
@@ -2290,7 +2287,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             email_manager.send_accepted_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en')
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -2319,7 +2316,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 self.applicant_id, 'Lesson to voiceover', 'en')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2364,7 +2361,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 'A rejection message!')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2390,16 +2387,23 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
 
     def test_can_send_emails_is_false_logs_error(self):
         """When feconf.CAN_SEND_EMAILS is false, send_rejected_voiceover should
-        log an error
+        log an error.
         """
-        with self.swap(logging, 'error', self._log_handler.error):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'error', _mock_logging_function):
             email_manager.send_rejected_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en',
                 'A rejection message!')
 
-            self.assertEqual(
-                self._log_handler.messages['error'],
-                ['This app cannot send emails to users.'])
+            expected_log_message = 'This app cannot send emails to users.'
+
+            self.assertTrue(
+                observed_log_messages[0].startswith(expected_log_message))
 
 
 class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
@@ -2421,7 +2425,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             email_manager.send_account_deleted_email(
                 self.applicant_id, self.APPLICANT_EMAIL)
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -2440,7 +2444,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
                 self.applicant_id, self.APPLICANT_EMAIL)
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2505,7 +2509,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
                 self.sender_id, self.recipient_ids, email_subject,
                 email_html_body, feconf.BULK_EMAIL_INTENT_MARKETING)
 
-        messages_a = self.email_services_mock.mock_get_sent_messages(
+        messages_a = self._get_sent_email_messages(
             to=self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 1)
         self.assertEqual(
@@ -2513,7 +2517,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(
             messages_a[0].body.decode(), email_text_body)
 
-        messages_b = self.email_services_mock.mock_get_sent_messages(
+        messages_b = self._get_sent_email_messages(
             to=self.RECIPIENT_B_EMAIL)
         self.assertEqual(len(messages_b), 1)
         self.assertEqual(
@@ -2551,11 +2555,11 @@ class BulkEmailsTests(test_utils.EmailTestBase):
                 feconf.BULK_EMAIL_INTENT_MARKETING)
 
         # Check that no email was sent.
-        messages_a = self.email_services_mock.mock_get_sent_messages(
+        messages_a = self._get_sent_email_messages(
             to=self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 0)
 
-        messages_b = self.email_services_mock.mock_get_sent_messages(
+        messages_b = self._get_sent_email_messages(
             to=self.RECIPIENT_B_EMAIL)
         self.assertEqual(len(messages_b), 0)
 
@@ -2567,11 +2571,11 @@ class BulkEmailsTests(test_utils.EmailTestBase):
                 self.fake_sender_id, self.recipient_ids, 'email_subject',
                 'email_html_body', feconf.BULK_EMAIL_INTENT_MARKETING)
 
-        messages_a = self.email_services_mock.mock_get_sent_messages(
+        messages_a = self._get_sent_email_messages(
             to=self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 0)
 
-        messages_b = self.email_services_mock.mock_get_sent_messages(
+        messages_b = self._get_sent_email_messages(
             to=self.RECIPIENT_B_EMAIL)
         self.assertEqual(len(messages_b), 0)
 
@@ -2585,7 +2589,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             email_manager.send_test_email_for_bulk_emails(
                 self.sender_id, email_subject, email_body
             )
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.SENDER_EMAIL)
         self.assertEqual(len(messages), 1)
 
@@ -2723,7 +2727,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
             email_manager.send_moderator_action_email(
                 self.moderator_id, self.recipient_id,
                 email_intent, exploration_title, email_html_body)
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.RECIPIENT_EMAIL)
         self.assertEqual(len(messages), 1)
 
@@ -2767,7 +2771,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -2815,7 +2819,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2861,7 +2865,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.VOICEOVER_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2906,7 +2910,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.QUESTION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -2935,7 +2939,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
@@ -2985,7 +2989,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -3031,7 +3035,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.VOICEOVER_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -3075,7 +3079,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
                 language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.QUESTION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(

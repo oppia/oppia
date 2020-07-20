@@ -55,18 +55,19 @@ def send_email_to_recipients(
                     {"bob@example.com": {"first":"Bob", "id":1},
                      "alice@example.com": {"first":"Alice", "id":2}}
                 subject = 'Hey, %recipient.first%’
-            More info at:
+            More info about this format at:
             https://documentation.mailgun.com/en/
                 latest/user_manual.html#batch-sending
 
     Raises:
-        Exception: If mailgun api key is not stored in feconf.MAILGUN_API_KEY.
-        Exception: If mailgun domain name is not stored in
+        Exception: If the mailgun api key is not stored in
+            feconf.MAILGUN_API_KEY.
+        Exception: If the mailgun domain name is not stored in
             feconf.MAILGUN_DOMAIN_NAME.
 
     Returns:
-        bool. Whether the email is sent successfully, contingent on the mailgun
-        API returning a status code of 200.
+        bool. Whether the email is "sent" successfully, contingent on the
+        mailgun API returning a status code of 200.
     """
     if not feconf.MAILGUN_API_KEY:
         raise Exception('Mailgun API key is not available.')
@@ -89,16 +90,10 @@ def send_email_to_recipients(
             'html': html_body
         }
 
-        if len(email_list) == 1:
-            data['to'] = email_list[0]
-        else:
-            data['to'] = email_list
+        data['to'] = email_list[0] if len(email_list) == 1 else email_list
 
         if bcc:
-            if len(bcc) == 1:
-                data['bcc'] = bcc[0]
-            else:
-                data['bcc'] = bcc
+            data['bcc'] = bcc[0] if len(bcc) == 1 else bcc
 
         if reply_to:
             data['h:Reply-To'] = reply_to
@@ -106,10 +101,7 @@ def send_email_to_recipients(
         # 'recipient-variable' in post data forces mailgun to send individual
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
-        if recipient_variables:
-            data['recipient_variables'] = recipient_variables
-        else:
-            data['recipient_variables'] = {}
+        data['recipient_variables'] = recipient_variables or {}
 
         encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
         auth_str = 'Basic %s' % encoded
@@ -122,7 +114,7 @@ def send_email_to_recipients(
         resp = python_utils.url_open(req)
         # The function url_open returns a file_like object that can be queried
         # for the status code of the url query. If it is not 200, the mail query
-        # failed so we return False(this function did not complete
+        # failed so we return False (this function did not complete
         # successfully).
         if resp.getcode() != 200:
             return False

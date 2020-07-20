@@ -315,7 +315,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'Preferences page.'
         ) % query_id
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
@@ -359,7 +359,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'You can change your email preferences via the Preferences page.'
         ) % query_id
 
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)

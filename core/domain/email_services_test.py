@@ -86,13 +86,12 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, 'subject')
             self.assertEqual(messages[0].body, 'body')
             self.assertEqual(messages[0].html, 'html')
-
 
     def test_bcc_admin_flag(self):
         """Verifies that the bcc admin flag is working properly in send_mail.
@@ -111,7 +110,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
@@ -128,7 +127,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html',
                 bcc_admin=False, reply_to_id=reply_id)
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -164,7 +163,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, recipients)

@@ -1808,7 +1808,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                 valid_payload, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 

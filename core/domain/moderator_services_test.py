@@ -87,7 +87,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
             self.process_and_flush_pending_tasks()
 
             # Make sure correct email is sent.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(

@@ -45,8 +45,7 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_send_email_to_mailgun(self):
         """Test for sending HTTP POST request."""
-
-        # Test send mail without bcc, reply_to or recipient_variables.
+        # Test sending email without bcc, reply_to or recipient_variables.
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             ('from=a%40a.com&text=plaintext_body+%F0%9F%98%82&recipient_' +
@@ -72,7 +71,7 @@ class EmailTests(test_utils.GenericTestBase):
                 html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
             self.assertTrue(resp)
 
-        # Test send mail with single bcc and single recipient email.
+        # Test sending email with single bcc and single recipient email.
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             ('from=a%40a.com&h%3AReply-To=abc&text=plaintext_body' +
@@ -102,7 +101,7 @@ class EmailTests(test_utils.GenericTestBase):
                 recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
             self.assertTrue(resp)
 
-        # Test send mail with single bcc, and multiple recipient emails
+        # Test sending email with single bcc, and multiple recipient emails
         # differentiated by recipient_variables ids.
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
@@ -161,7 +160,7 @@ class EmailTests(test_utils.GenericTestBase):
                 html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
             self.assertTrue(resp)
 
-    def test_mailgun_key_or_domain_name_not_set(self):
+    def test_mailgun_key_or_domain_name_not_set_raises_exception(self):
         """Test that exceptions are raised when API key or domain name are
         unset.
         """

@@ -29,7 +29,7 @@ def send_email_to_recipients(
         sender_email, recipient_emails, subject,
         plaintext_body, html_body, bcc=None, reply_to=None,
         recipient_variables=None):
-    """Logs out sent email details to terminal console in DEV_MODE, to model
+    """Logs sent email details to terminal console in DEV_MODE, to model
     sending out an email.
 
     Args:
@@ -56,12 +56,12 @@ def send_email_to_recipients(
                     {"bob@example.com": {"first":"Bob", "id":1},
                      "alice@example.com": {"first":"Alice", "id":2}}
                 subject = 'Hey, %recipient.first%’
-            More info at:
+            More info about this format at:
             https://documentation.mailgun.com/en/
                 latest/user_manual.html#batch-sending
 
     Returns:
-        bool. Whether the email is logged successfully.
+        bool. Whether the email is "sent" successfully.
     """
 
     # Show the first 3 emails in the recipient list.

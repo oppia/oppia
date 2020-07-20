@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import os
 
 from constants import constants
@@ -442,7 +441,7 @@ class EmailMockTests(test_utils.EmailTestBase):
         """Test sending email to recipients using mock adds the correct objects
         to emails_dict.
         """
-        self.email_services_mock.mock_send_email_to_recipients(
+        self._send_email_to_recipients(
             sender_email='a@a.com',
             recipient_emails=['b@b.com'],
             subject=(
@@ -453,9 +452,9 @@ class EmailMockTests(test_utils.EmailTestBase):
             bcc=['c@c.com'],
             reply_to='abc',
             recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to='b@b.com')
-        all_messages = self.email_services_mock.mock_get_all_messages()
+        all_messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), len(all_messages))
         self.assertEqual(
             messages[0].subject,
@@ -467,48 +466,6 @@ class EmailMockTests(test_utils.EmailTestBase):
             messages[0].html,
             'Hi abc,<br> 😂'.encode(encoding='utf-8'))
         self.assertEqual(messages[0].bcc, 'c@c.com')
-
-
-class MockLoggingHandlerTests(test_utils.GenericTestBase):
-    """Class for testing MockLoggingHandler."""
-
-    def setUp(self):
-        super(MockLoggingHandlerTests, self).setUp()
-        self._log_handler = test_utils.MockLoggingHandler()
-
-    def test_swapping_logging_produces_correct_logs(self):
-        """Test all of the swaps correctly replace logging methods."""
-        with self.swap(logging, 'info', self._log_handler.info):
-            logging.info('Info Message')
-        with self.swap(logging, 'debug', self._log_handler.debug):
-            logging.debug('Debug Message')
-        with self.swap(logging, 'warning', self._log_handler.warning):
-            logging.warning('Warning Message')
-        with self.swap(logging, 'error', self._log_handler.error):
-            logging.error('Error Message')
-        with self.swap(logging, 'critical', self._log_handler.critical):
-            logging.critical('Critical Message')
-
-        self.assertEqual(
-            self._log_handler.messages['info'],
-            ['Info Message'])
-        self.assertEqual(
-            self._log_handler.messages['debug'],
-            ['Debug Message'])
-        self.assertEqual(
-            self._log_handler.messages['warning'],
-            ['Warning Message'])
-        self.assertEqual(
-            self._log_handler.messages['error'],
-            ['Error Message'])
-        self.assertEqual(
-            self._log_handler.messages['critical'],
-            ['Critical Message'])
-        self._log_handler.reset()
-        self.assertEqual(
-            self._log_handler.messages,
-            {'debug': [], 'info': [], 'warning': [], 'error': [],
-             'critical': []})
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):

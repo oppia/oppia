@@ -314,7 +314,7 @@ class TopicEditorTests(
         # Check that admins can access the editable topic data.
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.get_json(
@@ -325,7 +325,7 @@ class TopicEditorTests(
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
@@ -436,7 +436,7 @@ class TopicEditorTests(
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.put_json(
@@ -450,7 +450,7 @@ class TopicEditorTests(
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
@@ -699,7 +699,7 @@ class TopicPublishSendMailHandlerTests(
                 '%s/%s' % (
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
                 {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        messages = self.email_services_mock.mock_get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s, please review'

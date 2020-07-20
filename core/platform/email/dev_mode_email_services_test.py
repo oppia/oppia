@@ -30,19 +30,16 @@ import feconf
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    @classmethod
-    def setUpClass(cls):
-        super(EmailTests, cls).setUpClass()
-        cls._log_handler = test_utils.MockLoggingHandler()
-
-    def setUp(self):
-        super(EmailTests, self).setUp()
-        self._log_handler.reset()
-
     def test_send_mail_logs_to_terminal(self):
         """In DEV Mode, platforms email_service API that sends a singular email
         logs the correct email info to terminal.
         """
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
         msg_body = (
             """
             EmailService.SendMail
@@ -73,21 +70,27 @@ class EmailTests(test_utils.GenericTestBase):
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with allow_emailing, swap_api, swap_domain, (
-            self.swap(logging, 'info', self._log_handler.info)):
+            self.swap(logging, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
-        self.assertEqual(len(self._log_handler.messages['info']), 2)
+        self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
-            self._log_handler.messages['info'],
+            observed_log_messages,
             [logging_info_email_body, logging_info_notification])
 
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self):
         """In DEV Mode, platform email_services that sends mail to multiple
         recipients logs the correct info to terminal.
         """
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
-        bcc_email_list_str = 'e@e.com f@f.com'
+        bcc_email_list_str = 'e@e.com f@f.com g@g.com... Total: 4 emails.'
         recipient_variables = (
             {
                 'a@a.com': {'first': 'Bob', 'id': 1},
@@ -126,15 +129,15 @@ class EmailTests(test_utils.GenericTestBase):
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with allow_emailing, swap_api, swap_domain, (
-            self.swap(logging, 'info', self._log_handler.info)):
+            self.swap(logging, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],
                 'subject', 'body', 'html',
-                bcc=['e@e.com', 'f@f.com'],
+                bcc=['e@e.com', 'f@f.com', 'g@g.com', 'h@h.com'],
                 reply_to='123',
                 recipient_variables=recipient_variables)
-        self.assertEqual(len(self._log_handler.messages['info']), 2)
+        self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
-            self._log_handler.messages['info'],
+            observed_log_messages,
             [logging_info_email_body, logging_info_notification])

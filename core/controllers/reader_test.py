@@ -1156,7 +1156,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(

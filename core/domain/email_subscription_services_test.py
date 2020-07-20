@@ -83,15 +83,15 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             # Make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.
             messages = (
-                self.email_services_mock.mock_get_sent_messages(
+                self._get_sent_email_messages(
                     to=self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
             messages = (
-                self.email_services_mock.mock_get_sent_messages(
+                self._get_sent_email_messages(
                     to=self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
             messages = (
-                self.email_services_mock.mock_get_sent_messages(
+                self._get_sent_email_messages(
                     to=self.USER_EMAIL_2))
             self.assertEqual(len(messages), 0)
 

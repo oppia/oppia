@@ -821,7 +821,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -841,7 +841,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -857,7 +857,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -883,7 +883,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -903,7 +903,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -919,7 +919,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -935,7 +935,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.process_and_flush_pending_tasks()
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -1139,7 +1139,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1203,7 +1203,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1229,7 +1229,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
                 {'thread_id': thread_id}, csrf_token=csrf_token)
 
             self.process_and_flush_pending_tasks()
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -1292,7 +1292,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 thread_id, self.editor_id, None, None, 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1341,7 +1341,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 feedback_models.STATUS_CHOICES_FIXED, None, '')
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
@@ -1417,7 +1417,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 2)
             self.assertEqual(
@@ -1447,6 +1447,6 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)

@@ -167,10 +167,10 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
                 # Check that there are no sent emails to either
                 # email address before posting json.
-                messages = self.email_services_mock.mock_get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
-                messages = self.email_services_mock.mock_get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to='moderator@example.com')
                 self.assertEqual(len(messages), 0)
 
@@ -180,12 +180,12 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                     expected_status_int=500)
 
                 # Check that there are now emails sent.
-                messages = self.email_services_mock.mock_get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
-                messages = self.email_services_mock.mock_get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to='moderator@example.com')
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)

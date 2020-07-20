@@ -184,12 +184,12 @@ class TopicPageDataHandlerTests(
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.login(self.NEW_USER_EMAIL)
             with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-                messages = self.email_services_mock.mock_get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
                 json_response = self.get_json(
                     '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
-                messages = self.email_services_mock.mock_get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 expected_email_html_body = (
                     'The deleted skills: %s are still'

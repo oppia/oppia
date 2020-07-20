@@ -543,7 +543,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 sorted([self.user_a_id, self.user_b_id]))
 
             # Check that query completion email is sent to submitter.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -561,7 +561,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.logout()
 
             # Check that emails are sent to qualified users.
-            messages_a = self.email_services_mock.mock_get_sent_messages(
+            messages_a = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 1)
             self.assertEqual(
@@ -569,7 +569,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.assertEqual(
                 messages_a[0].body.decode(), 'body')
 
-            messages_b = self.email_services_mock.mock_get_sent_messages(
+            messages_b = self._get_sent_email_messages(
                 to=self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 1)
             self.assertEqual(
@@ -725,13 +725,13 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             # Check that emails are sent to max n qualified users.
             # One email is sent to submitter for query completion and second
             # is sent to one of the 2 qualified users.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, [self.SUBMITTER_EMAIL])
-            messages_a = self.email_services_mock.mock_get_sent_messages(
+            messages_a = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
-            messages_b = self.email_services_mock.mock_get_sent_messages(
+            messages_b = self._get_sent_email_messages(
                 to=self.USER_B_EMAIL)
             self.assertTrue((len(messages_a) == 1) or (len(messages_b) == 1))
 
@@ -767,10 +767,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.logout()
 
             # Check that no email is sent to qualified users.
-            messages_a = self.email_services_mock.mock_get_sent_messages(
+            messages_a = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 0)
-            messages_b = self.email_services_mock.mock_get_sent_messages(
+            messages_b = self._get_sent_email_messages(
                 to=self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 0)
 
@@ -813,7 +813,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 '[This is a test email.]<br><br> %s' % email_body)
             test_email_text_body = '[This is a test email.]\n\n %s' % email_body
 
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
             self.assertEqual(
@@ -867,7 +867,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
             # Check that test email is sent to submitter of query.
             # One email is sent when query is completed and other is test email.
-            messages = self.email_services_mock.mock_get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
 
@@ -879,9 +879,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 sorted(query_model.user_ids),
                 sorted([self.user_a_id, self.user_b_id]))
             # Check that no emails are sent to user A or user B.
-            messages_a = self.email_services_mock.mock_get_sent_messages(
+            messages_a = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 0)
-            messages_b = self.email_services_mock.mock_get_sent_messages(
+            messages_b = self._get_sent_email_messages(
                 to=self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 0)
