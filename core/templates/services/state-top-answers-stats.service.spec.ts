@@ -26,6 +26,8 @@ import { AnswerGroupObjectFactory } from
 import { IAnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { IInteractionAnswer } from 'interactions/answer-defs';
+import { InteractionCustomizationArg } from
+  'domain/exploration/InteractionCustomizationArgObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
@@ -64,7 +66,6 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { InteractionCustomizationArgObjectFactory, InteractionCustomizationArg } from 'domain/exploration/InteractionCustomizationArgObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');

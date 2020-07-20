@@ -20,6 +20,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { InteractionCustomizationArg } from
+  'domain/exploration/InteractionCustomizationArgObjectFactory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -30,7 +32,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
-import { InteractionCustomizationArg } from 'domain/exploration/InteractionCustomizationArgObjectFactory';
+
 
 describe('State card object factory', () => {
   let stateCardObjectFactory = null;

@@ -37,6 +37,7 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { InteractionCustomizationArg } from 'domain/exploration/InteractionCustomizationArgObjectFactory';
 
 interface IAnswerChoice {
   val: string | number;
@@ -145,7 +146,7 @@ export class StateEditorService {
   }
 
   setInteractionCustomizationArgs(
-      newArgs: InteractionCustomizationArgs): void {
+      newArgs: {[name: string]: InteractionCustomizationArg}): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 

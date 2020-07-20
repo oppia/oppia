@@ -263,7 +263,7 @@ describe('Training Modal Controller', function() {
               placeholder: {
                 value: {
                   content_id: 'custarg_placeholder_0',
-                  unicode_str: ''
+                  unicode_str: 'Type your answer here.'
                 }
               },
               rows: { value: 1 }
@@ -276,15 +276,7 @@ describe('Training Modal Controller', function() {
               }
             },
             hints: [],
-            id: 'TextInput',
-            customization_args: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
-              }
-            },
+            id: 'TextInput'
           },
           written_translations: {
             translations_mapping: {},
