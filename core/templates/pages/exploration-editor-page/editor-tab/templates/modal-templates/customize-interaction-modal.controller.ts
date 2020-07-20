@@ -23,6 +23,8 @@ import { SubtitledUnicode } from
 import { Schema } from 'services/schema-default-value.service';
 import { InteractionCustomizationArgsValue } from
   'interactions/customization-args-defs';
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -255,7 +257,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           schema: Schema,
           contentId: string,
       ): void => {
-        if (schema.type === 'list') {
+        if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (
             let i = 0;
             i < (<InteractionCustomizationArgsValue[]> value).length;
@@ -266,7 +268,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
               <Schema> schema.items,
               `${contentId}`);
           }
-        } else if (schema.type === 'dict') {
+        } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
           schema.properties.forEach(property => {
             const name = property.name;
             traverseSchemaAndAssignContentIds(
@@ -274,9 +276,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
               property.schema,
               `${contentId}_${name}`);
           });
-        } else if (schema.type === 'custom' &&
-            (schema.obj_type === 'SubtitledUnicode' ||
-            schema.obj_type === 'SubtitledHtml')
+        } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+            ((schema.obj_type ===
+              SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE) ||
+            schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
         ) {
           if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
             contentId = (

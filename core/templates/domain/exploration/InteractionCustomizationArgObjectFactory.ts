@@ -31,6 +31,8 @@ import {
   InteractionCustomizationArgsValue
 } from 'interactions/customization-args-defs';
 import { cloneDeep } from 'lodash';
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
 
 export interface InteractionCustomizationArgBackendDict {
   value: InteractionCustomizationArgsBackendDictValue
@@ -87,7 +89,7 @@ export class InteractionCustomizationArgObjectFactory {
         schema: Schema
     ): InteractionCustomizationArgsValue => {
       let result: InteractionCustomizationArgsValue = value;
-      if (schema.type === 'list') {
+      if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (
           let i = 0;
           i < (<InteractionCustomizationArgsBackendDictValue[]>value).length;
@@ -97,18 +99,21 @@ export class InteractionCustomizationArgObjectFactory {
             value[i],
             <Schema> schema.items);
         }
-      } else if (schema.type === 'dict') {
+      } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
         schema.properties.forEach(property => {
           const name = property.name;
           result[name] = traverseSchemaAndConvertSubtitledFromDicts(
             value[name],
             property.schema);
         });
-      } else if (schema.type === 'custom') {
-        if (schema.obj_type === 'SubtitledHtml') {
+      } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM) {
+        if (schema.obj_type ===
+            SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
+        ) {
           result = this.subtitledHtmlObjectFactory.createFromBackendDict(
             <SubtitledHtmlBackendDict> value);
-        } else if (schema.obj_type === 'SubtitledUnicode') {
+        } else if (schema.obj_type ===
+            SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE) {
           result = this.subtitledUnicodeObjectFactory.createFromBackendDict(
             <SubtitledUnicodeBackendDict> value);
         }

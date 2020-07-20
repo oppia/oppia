@@ -24,6 +24,8 @@ import { SubtitledHtmlObjectFactory, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
 
 const OBJECT_DEFAULTS = require('objects/object_defaults.json');
 
@@ -108,11 +110,12 @@ export class SchemaDefaultValueService {
   getDefaultValue(schema: Schema): SchemaDefaultValue {
     if ('choices' in schema) {
       return schema.choices[0];
-    } else if (schema.type === 'bool') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_BOOL) {
       return false;
-    } else if (schema.type === 'unicode' || schema.type === 'html') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_UNICODE ||
+        schema.type === SchemaConstants.SCHEMA_TYPE_HTML) {
       return '';
-    } else if (schema.type === 'list') {
+    } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
       var that = this;
       if (!Array.isArray(schema.items)) {
         return [];
@@ -120,22 +123,24 @@ export class SchemaDefaultValueService {
       return schema.items.map(function(item) {
         return that.getDefaultValue(item);
       });
-    } else if (schema.type === 'dict') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
       var result = {};
       for (var i = 0; i < schema.properties.length; i++) {
         result[schema.properties[i].name] = this.getDefaultValue(
           schema.properties[i].schema);
       }
       return result;
-    } else if (schema.type === 'int' || schema.type === 'float') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_INT ||
+        schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
-    } else if (schema.type === 'custom') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM) {
       let defaultValue = angular.copy(OBJECT_DEFAULTS[schema.obj_type]);
 
-      if (schema.obj_type === 'SubtitledHtml') {
+      if (schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) {
         return this.subtitledHtmlObjectFactory.createFromBackendDict(
           defaultValue);
-      } else if (schema.obj_type === 'SubtitledUnicode') {
+      } else if (schema.obj_type ===
+          SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE) {
         return this.subtitledUnicodeObjectFactory.createFromBackendDict(
           defaultValue);
       }
