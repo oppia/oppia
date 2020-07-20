@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require(
   'pages/community-dashboard-page/services/translate-text.service.ts');
 
-fdescribe('TranslateTextService', function() {
+describe('TranslateTextService', function() {
   let TranslateTextService;
   let $httpBackend;
 
