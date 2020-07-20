@@ -29,7 +29,7 @@ class PlatformParameterChange(change_domain.BaseChange):
         - 'replace_parameter_rules' (with new_rules)
     """
 
-    CMD_REPLACE_PARAMETER_RULES = 'replace_parameter_rules'
+    CMD_REPLACE_PARAMETER_RULES = 'edit_rules'
     ALLOWED_COMMANDS = [{
         'name': CMD_REPLACE_PARAMETER_RULES,
         'required_attribute_names': ['new_rules'],
