@@ -22,4 +22,4 @@ require('pages/maintenance-page/maintenance-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/maintenance-page/maintenance-page.component.ts');
+// Require('pages/maintenance-page/maintenance-page.component.ts');

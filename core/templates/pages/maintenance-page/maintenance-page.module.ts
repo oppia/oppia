@@ -41,6 +41,8 @@ import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+import { MaintenancePageComponent } from './maintenance-page.component';
+
 
 @NgModule({
   imports: [
@@ -49,10 +51,12 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    MaintenancePageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    MaintenancePageComponent
   ],
   providers: [
     AppConstants,
