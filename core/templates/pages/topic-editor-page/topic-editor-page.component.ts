@@ -116,8 +116,8 @@ angular.module('oppia').directive('topicEditorPage', [
               const activeTab = ctrl.getActiveTabName();
               if (activeTab === 'main') {
                 return (
-                  `Topic Editor: ${ctrl.topic.getName()}
-                  (v${ctrl.topic.getVersion()})`);
+                  `Topic Editor: ${ctrl.topic.getName()}` +
+                  `(v${ctrl.topic.getVersion()})`);
               }
               if (activeTab.startsWith('subtopic')) {
                 return 'Subtopic Editor';
