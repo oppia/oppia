@@ -86,7 +86,7 @@ describe('OnScreenKeyboard', function() {
       spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
       spyOn(
         guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-          {guppyInstance: new MockGuppy()});
+        {guppyInstance: new MockGuppy()});
       expect(ctrl.showOSK()).toBeTrue();
 
       expect(ctrl.isActive).toBeFalse();
