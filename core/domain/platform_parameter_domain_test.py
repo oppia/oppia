@@ -26,8 +26,8 @@ import feconf
 import utils
 
 
-(parameter_models,) = models.Registry.import_models(
-    [models.NAMES.platform_parameter])
+(config_models,) = models.Registry.import_models(
+    [models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
 
 
@@ -847,14 +847,15 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         parameter.validate()
 
         self.assertEqual(len(parameter.rules), 2)
-        self.assertIsNone(parameter_models.PlatformParameterModel.get(
+        self.assertIsNone(config_models.PlatformParameterModel.get(
             parameter.name, strict=False))
         parameter.update(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
+            commit_message='commit message',
             new_rule_dicts=[{'filters': [], 'value_when_matched': '333'}]
         )
         self.assertEqual(len(parameter.rules), 1)
-        self.assertIsNotNone(parameter_models.PlatformParameterModel.get(
+        self.assertIsNotNone(config_models.PlatformParameterModel.get(
             parameter.name, strict=False))
 
     def test_update_with_validation_error(self):
@@ -884,6 +885,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected string'):
             parameter.update(
                 committer_id=feconf.SYSTEM_COMMITTER_ID,
+                commit_message='commit message',
                 new_rule_dicts=[{'filters': [], 'value_when_matched': False}]
             )
 
@@ -1020,6 +1022,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_domain.Registry.update_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
+            'commit message',
             [{'filters': [], 'value_when_matched': 'updated'}],
         )
         # Cache is invalidated after update.
@@ -1048,6 +1051,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_domain.Registry.update_platform_parameter(
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
+            'commit message',
             [{'filters': [], 'value_when_matched': 'updated'}],
         )
 

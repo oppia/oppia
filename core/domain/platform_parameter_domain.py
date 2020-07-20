@@ -546,7 +546,7 @@ class PlatformParameter(python_utils.OBJECT):
         """
         return self._metadata
 
-    def update(self, committer_id, new_rule_dicts):
+    def update(self, committer_id, commit_message, new_rule_dicts):
         """Updates the rules of the platform parameter instance.
 
         Args:
@@ -563,7 +563,7 @@ class PlatformParameter(python_utils.OBJECT):
             self._name, strict=False)
         if model_instance is None:
             model_instance = config_models.PlatformParameterModel.create(
-                name=self._name,
+                param_name=self._name,
                 rule_dicts=[rule.to_dict() for rule in self._rules],
             )
 
@@ -582,10 +582,13 @@ class PlatformParameter(python_utils.OBJECT):
         model_instance.rules = [rule.to_dict() for rule in self._rules]
 
         model_instance.commit(
-            committer_id, [{
+            committer_id,
+            commit_message,
+            [{
                 'cmd': PlatformParameterChange.CMD_REPLACE_PARAMETER_RULES,
                 'new_rules': new_rule_dicts
-            }])
+            }]
+        )
 
     def validate(self):
         """Validates the PlatformParameter domain object."""
@@ -799,10 +802,11 @@ class Registry(python_utils.OBJECT):
         return parameter
 
     @classmethod
-    def update_platform_parameter(cls, name, committer_id, update_dict):
+    def update_platform_parameter(
+            cls, name, committer_id, commit_message, update_dict):
         """not ready."""
         parameter = cls.get_platform_parameter(name)
-        parameter.update(committer_id, update_dict)
+        parameter.update(committer_id, commit_message, update_dict)
 
         memcache_services.delete(PlatformParameter.get_memcache_key(name))
 
