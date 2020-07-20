@@ -117,7 +117,7 @@ def redirect_stdout(new_target):
     """Redirect stdout to the new target.
 
     Args:
-        new_target: TextIOWrapper. The new target to which stdout is redirected.
+        new_target: TextIOWrapper. The new target to which stdout is redirected.jjj
 
     Yields:
         TextIOWrapper. The new target.
