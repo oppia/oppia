@@ -16,26 +16,38 @@
  * @fileoverview The component for the maintenance page.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/document-attribute-customization.service.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/document-attribute-customization.service';
 
-angular.module('oppia').component('maintenancePage', {
-  template: require('./maintenance-page.component.html'),
-  controller: [
-    '$scope', 'DocumentAttributeCustomizationService',
-    'UrlInterpolationService',
-    function(
-        $scope, DocumentAttributeCustomizationService,
-        UrlInterpolationService) {
-      let ctrl = this;
-      $scope.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-      ctrl.$onInit = function() {
-        $scope.currentLang = 'en';
-        DocumentAttributeCustomizationService.addAttribute(
-          'lang', $scope.currentLang);
-      };
-    }
-  ]
-});
+@Component({
+  selector: 'maintenance-page',
+  templateUrl: './maintenance-page.component.html',
+  styleUrls: []
+})
+export class MaintenancePageComponent implements OnInit {
+  currentLang: string = 'en';
+
+  constructor(
+    private documentAttributeCustomizationService:
+      DocumentAttributeCustomizationService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
+  ngOnInit(): void {
+    this.currentLang = 'en';
+    this.documentAttributeCustomizationService.addAttribute(
+      'lang', this.currentLang);
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+}
+
+angular.module('oppia').directive(
+  'maintenancePage', downgradeComponent(
+    {component: MaintenancePageComponent}));
