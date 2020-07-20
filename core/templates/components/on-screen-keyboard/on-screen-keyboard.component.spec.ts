@@ -35,11 +35,11 @@ describe('OnScreenKeyboard', function() {
       backspace: function() {},
       left: function() {},
       right: function() {},
-    }
+    };
 
     activate() {
       ctrl.isActive = true;
-    };
+    }
   }
 
   beforeEach(angular.mock.module('oppia'));
@@ -84,8 +84,9 @@ describe('OnScreenKeyboard', function() {
     function() {
       spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
       spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
-      spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-        {guppyInstance: new MockGuppy()});
+      spyOn(
+        guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+          {guppyInstance: new MockGuppy()});
       expect(ctrl.showOSK()).toBeTrue();
 
       expect(ctrl.isActive).toBeFalse();
@@ -93,7 +94,7 @@ describe('OnScreenKeyboard', function() {
       expect(ctrl.isActive).toBeTrue();
 
       ctrl.isActive = false;
-      
+
       expect(ctrl.isActive).toBeFalse();
       ctrl.changeTab('newTab');
       expect(ctrl.isActive).toBeTrue();
@@ -133,7 +134,8 @@ describe('OnScreenKeyboard', function() {
       expect(ctrl.isActive).toBeFalse();
       ctrl.exponent('2');
       expect(ctrl.isActive).toBeTrue();
-  });
+    }
+  );
 
   it('should get static image url', function() {
     var imagePath = '/path/to/image.png';
