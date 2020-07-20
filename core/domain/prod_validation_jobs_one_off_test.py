@@ -6222,9 +6222,10 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         expected_output = [
             (
                 u'[u\'failed validation check for '
-                'exp_ids field check of ExplorationMathRichTextInfoModel\', '
+                'exploration_ids field check of '
+                'ExplorationMathRichTextInfoModel\', '
                 '[u"Entity id 2: based on field '
-                'exp_ids having value 2, expect model ExplorationModel '
+                'exploration_ids having value 2, expect model ExplorationModel '
                 'with id 2 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)

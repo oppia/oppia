@@ -3019,7 +3019,7 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         return [
             ExternalModelFetcherDetails(
-                'exp_ids', exp_models.ExplorationModel, [item.id])]
+                'exploration_ids', exp_models.ExplorationModel, [item.id])]
 
     @classmethod
     def _validate_latex_values_info(
@@ -3042,10 +3042,20 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
                 storage model.
         """
         exploration_model_references = (
-            field_name_to_external_model_references['exp_ids'])
+            field_name_to_external_model_references['exploration_ids'])
 
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
+            if exploration_model is None or exploration_model.deleted:
+                model_class = exploration_model_reference.class_name
+                model_id = exploration_model_reference.model_id
+                cls._add_error(
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id))
+                continue
             html_strings_in_exploration = ''
             for state_dict in exploration_model.states.values():
                 state = state_domain.State.from_dict(state_dict)
