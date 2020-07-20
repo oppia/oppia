@@ -29,6 +29,10 @@ export class PageTitleService {
   setPageTitle(title: string) {
     this.titleService.setTitle(title);
   }
+
+  getPageTitle(): string {
+    return this.titleService.getTitle();
+  }
 }
 
 angular.module('oppia').factory(

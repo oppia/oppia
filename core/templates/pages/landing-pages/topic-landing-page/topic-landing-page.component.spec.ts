@@ -17,9 +17,11 @@
  */
 
 import { TopicLandingPageComponent } from './topic-landing-page.component';
-import { ComponentFixture, TestBed, async, tick, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, async, tick, fakeAsync }
+  from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -31,7 +33,20 @@ require(
 class MockWindowRef {
   _window = {
     location: {
-      _pathname: ''
+      _pathname: '/math/ratios',
+      _href: '',
+      get pathname(): string {
+        return this._pathname;
+      },
+      set pathname(val: string) {
+        this._pathname = val;
+      },
+      get href(): string {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      }
     }
   };
   get nativeWindow() {
@@ -48,25 +63,10 @@ class MockSiteAnalyticsService {
 let component: TopicLandingPageComponent;
 let fixture: ComponentFixture<TopicLandingPageComponent>;
 
-fdescribe('Topic Landing Page', () => {
+describe('Topic Landing Page', () => {
   let siteAnalyticsService = null;
-  let windowRef: MockWindowRef = null;
+  let windowRef: MockWindowRef;
   let pageTitleService = null;
-
-  // BeforeEach(angular.mock.module('oppia'));
-  // beforeEach(angular.mock.module('oppia', function($provide) {
-  //   $provide.value('WindowRef', windowRef);
-  //   $provide.value('PageTitleService', {
-  //     setPageTitle: function() {}
-  //   });
-  // }));
-  // beforeEach(angular.mock.inject(function($injector, $componentController) {
-  //   $timeout = $injector.get('$timeout');
-  //   $window = $injector.get('$window');
-  //   SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-
-  //   ctrl = $componentController('topicLandingPage');
-  // }));
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -92,31 +92,20 @@ fdescribe('Topic Landing Page', () => {
 
 
   it('should get information from topic identified at pathname', () => {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/math/ratios'
-      }
-    });
+    windowRef.nativeWindow.location.pathname = '/math/ratios';
     component.ngOnInit();
     expect(component.topicTitle).toBe('Ratios');
   });
 
   it('should click get started button', fakeAsync(() => {
-    var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-    nativeWindowSpy.and.returnValue({
-      location: {
-        pathname: '/math/ratios'
-      }
-    });
+    windowRef.nativeWindow.location.pathname = '/math/ratios';
     var analyticsSpy = spyOn(
       siteAnalyticsService, 'registerOpenCollectionFromLandingPageEvent')
       .and.callThrough();
     // Get collection id from ratios.
     component.ngOnInit();
 
-    nativeWindowSpy.and.returnValue({
-      location: ''
-    });
+    windowRef.nativeWindow.location.href = '';
     component.onClickGetStartedButton();
 
     var ratiosCollectionId = '53gXGLIR044l';
@@ -124,32 +113,26 @@ fdescribe('Topic Landing Page', () => {
     tick(150);
     fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location).toBe(
+    expect(windowRef.nativeWindow.location.href).toBe(
       '/collection/' + ratiosCollectionId);
   }));
 
   it('should click learn more button', fakeAsync(() => {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
-    });
+    windowRef.nativeWindow.location.href = '';
     component.onClickLearnMoreButton();
     tick(150);
     fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location).toBe('/community-library');
+    expect(windowRef.nativeWindow.location.href).toBe('/community-library');
   }));
 
   it('should have a tagline in the page title', fakeAsync(() => {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/math/fractions'
-      }
-    });
+    windowRef.nativeWindow.location.pathname = '/math/fractions';
     component.ngOnInit();
     tick(150);
     fixture.detectChanges();
-    // Expect($window.document.title).toBe('Fractions | ' +
-    //   'Add, Subtract, Multiply and Divide | Oppia');
+    expect(pageTitleService.getPageTitle()).toBe('Fractions | ' +
+      'Add, Subtract, Multiply and Divide | Oppia');
   }));
 
   it('should return correct lesson quality image src', function() {
