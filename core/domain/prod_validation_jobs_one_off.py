@@ -3026,6 +3026,11 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
             cls, item, field_name_to_external_model_references):
         """Validate that latex values and other related information in the
         model is valid and matches the corresponding exploration.
+        The latex values present in this model is valid if the latex values
+        without SVG filenames in the exploration matches this list, also the
+        estimated SVG size of these latex values should be same. We also verify
+        that the field 'math_images_generation_required' is valid by checking
+        each 'svg_filename' field in the actual exploration.
 
         Args:
             item: ndb.Model. ExplorationMathRichTextInfoModel to validate.

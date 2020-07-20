@@ -6102,7 +6102,6 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
         run_job_and_check_output(self, expected_output)
 
-
     def test_model_with_latex_values_not_matching_exploration(self):
         self.model_instance_2 = (
             exp_models.ExplorationMathRichTextInfoModel(
@@ -6138,7 +6137,6 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_wrong_status_of_image_generation_requirement(self):
-
         exploration = (
             exp_domain.Exploration.create_default_exploration(
                 '3', title='title4', category='category4'))
