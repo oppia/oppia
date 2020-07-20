@@ -373,7 +373,7 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
 
-        def mock_url_retrieve(url, unused_filename):
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
             self.urls.append(url)
 
         def mock_check_call(commands):
@@ -416,7 +416,7 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
 
-        def mock_url_retrieve(url, unused_filename):
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
             self.urls.append(url)
 
         def mock_check_call(commands):
