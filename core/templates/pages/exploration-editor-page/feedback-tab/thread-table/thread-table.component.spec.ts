@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for threadTable.
  */
 
-describe('Thread Table directive', function() {
+describe('Thread table directive', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var DateTimeFormatService = null;
