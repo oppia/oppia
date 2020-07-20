@@ -33,11 +33,12 @@ import {
   MultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { InteractionCustomizationArg } from
+  'domain/exploration/InteractionCustomizationArgObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { InteractionCustomizationArg } from 'domain/exploration/InteractionCustomizationArgObjectFactory';
 
 interface IAnswerChoice {
   val: string | number;
