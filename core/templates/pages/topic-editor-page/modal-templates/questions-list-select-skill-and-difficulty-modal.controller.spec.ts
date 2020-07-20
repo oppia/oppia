@@ -18,8 +18,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 
@@ -51,12 +51,12 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       TestBed.configureTestingModule({
         providers: [
           SkillDifficultyObjectFactory,
-          SkillSummaryObjectFactory
+          ShortSkillSummaryObjectFactory
         ]
       });
 
       skillDifficultyObjectFactory = TestBed.get(SkillDifficultyObjectFactory);
-      skillSummaryObjectFactory = TestBed.get(SkillSummaryObjectFactory);
+      skillSummaryObjectFactory = TestBed.get(ShortSkillSummaryObjectFactory);
     });
 
     beforeEach(angular.mock.inject(function($injector, $controller) {

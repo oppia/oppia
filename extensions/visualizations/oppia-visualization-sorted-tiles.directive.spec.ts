@@ -21,7 +21,7 @@ require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
 import { TestBed } from '@angular/core/testing';
 
-import { IAnswerStatsBackendDict, AnswerStatsObjectFactory } from
+import { AnswerStatsBackendDict, AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { UtilsService } from 'services/utils.service';
 
@@ -42,7 +42,7 @@ describe('Oppia sorted tiles visualization', function() {
   }));
 
   const newDirective = (
-    (data: IAnswerStatsBackendDict[], options: Object): JQLite => {
+    (data: AnswerStatsBackendDict[], options: Object): JQLite => {
       const elementHtml = (
         '<oppia-visualization-sorted-tiles data="data" options="options">' +
         '</oppia-visualization-sorted-tiles>');

@@ -313,7 +313,7 @@ angular.module('oppia').component('explorationEditorPage', {
             });
 
           StateEditorService.updateExplorationWhitelistedStatus(
-            featuresData.is_exploration_whitelisted);
+            featuresData.isExplorationWhitelisted);
 
           GraphDataService.recompute();
 

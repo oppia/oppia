@@ -89,7 +89,7 @@ class ProfileHandler(base.BaseHandler):
 
         self.values.update({
             'profile_is_of_current_user': profile_is_of_current_user,
-            'profile_username': user_settings.username,
+            'username_of_viewed_profile': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'first_contribution_msec': (

@@ -13,39 +13,41 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
- * featured translation language domain objects.
+ * @fileoverview Frontend domain object factory for assigned skill.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface FeaturedTranslationLanguageBackendDict {
-  'language_code': string;
-  explanation: string;
+export interface AssignedSkillBackendDict {
+  'topic_id': string;
+  'topic_name': string;
+  'topic_version': number;
+  'subtopic_id': number;
 }
 
-export class FeaturedTranslationLanguage {
+export class AssignedSkill {
   constructor(
-      readonly languageCode: string,
-      readonly explanation: string
-  ) {}
+    public topicId: string,
+    public topicName: string,
+    public topicVersion: number,
+    public subtopicId: number) {}
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class FeaturedTranslationLanguageObjectFactory {
+export class AssignedSkillObjectFactory {
   createFromBackendDict(
-      featuredTranslationBackendDict: FeaturedTranslationLanguageBackendDict
-  ): FeaturedTranslationLanguage {
-    return new FeaturedTranslationLanguage(
-      featuredTranslationBackendDict.language_code,
-      featuredTranslationBackendDict.explanation
-    );
+      backendDict: AssignedSkillBackendDict): AssignedSkill {
+    return new AssignedSkill(
+      backendDict.topic_id,
+      backendDict.topic_name,
+      backendDict.topic_version,
+      backendDict.subtopic_id);
   }
 }
 
 angular.module('oppia').factory(
-  'FeaturedTranslationLanguageObjectFactory',
-  downgradeInjectable(FeaturedTranslationLanguageObjectFactory));
+  'AssignedSkillObjectFactory',
+  downgradeInjectable(AssignedSkillObjectFactory));

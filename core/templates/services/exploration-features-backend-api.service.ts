@@ -25,6 +25,18 @@ import { ServicesConstants } from 'services/services.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+interface ExplorationFeaturesBackendDict {
+  'is_improvements_tab_enabled': boolean;
+  'is_exploration_whitelisted': boolean;
+  'always_ask_learners_for_answer_details': boolean;
+}
+
+export interface ExplorationFeatures {
+  isImprovementsTabEnabled: boolean;
+  isExplorationWhitelisted: boolean;
+  alwaysAskLearnersForAnswerDetails: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,16 +46,25 @@ export class ExplorationFeaturesBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchExplorationFeatures(explorationId: string): Promise<Object> {
-    return this.http.get(
+  _fetchExplorationFeatures(
+      explorationId: string): Promise<ExplorationFeatures> {
+    return this.http.get<ExplorationFeaturesBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.EXPLORATION_FEATURES_URL,
         {exploration_id: explorationId}
       )
-    ).toPromise();
+    ).toPromise().then(response => {
+      return {
+        isExplorationWhitelisted: response.is_exploration_whitelisted,
+        isImprovementsTabEnabled: response.is_improvements_tab_enabled,
+        alwaysAskLearnersForAnswerDetails: (
+          response.always_ask_learners_for_answer_details)
+      };
+    });
   }
 
-  fetchExplorationFeatures(explorationId: string): Promise<Object> {
+  fetchExplorationFeatures(
+      explorationId: string): Promise<ExplorationFeatures> {
     return this._fetchExplorationFeatures(explorationId);
   }
 }

@@ -21,6 +21,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { ServicesConstants } from 'services/services.constants';
+import {
+  StateTopAnswersStats,
+  StateTopAnswersStatsBackendDict,
+  StateTopAnswersStatsObjectFactory
+} from 'domain/statistics/state-top-answers-stats-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -30,19 +35,21 @@ import { UrlInterpolationService } from
 export class StateTopAnswersStatsBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory
   ) {}
 
-  _fetchStats(explorationId: string): Promise<Object> {
-    return this.http.get(
+  _fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
+    return this.http.get<StateTopAnswersStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.STATE_ANSWER_STATS_URL,
         {exploration_id: explorationId}
       )
-    ).toPromise();
+    ).toPromise().then(backendDict => this.stateTopAnswersStatsObjectFactory
+      .createFromBackendDict(backendDict));
   }
 
-  fetchStats(explorationId: string): Promise<Object> {
+  fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
     return this._fetchStats(explorationId);
   }
 }

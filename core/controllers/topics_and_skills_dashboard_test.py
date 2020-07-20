@@ -104,7 +104,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             if skill_dict['description'] == 'Description 3':
                 self.assertEqual(skill_dict['id'], self.linked_skill_id)
         self.assertEqual(
-            len(json_response['categorized_skills_dict']), 2)
+            len(json_response['categorized_skills_dict']), 1)
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)

@@ -285,7 +285,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           if (ctrl.threadSummaries[index].threadId === threadId) {
             threadIndex = index;
             var threadSummary = ctrl.threadSummaries[index];
-            if (!threadSummary.lastMessageRead) {
+            if (!threadSummary.lastMessageIsRead) {
               ctrl.numberOfUnreadThreads -= 1;
             }
             threadSummary.markTheLastTwoMessagesAsRead();

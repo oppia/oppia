@@ -20,32 +20,39 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export class SkillSummary {
-  _id: string;
-  _description: string;
+export interface ShortSkillSummaryBackendDict {
+  'skill_id': string;
+  'skill_description': string;
+}
 
-  constructor(skillId: string, skillDescription: string) {
-    this._id = skillId;
-    this._description = skillDescription;
-  }
+export class ShortSkillSummary {
+  constructor(public id: string, public description: string) {}
+
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getDescription(): string {
-    return this._description;
+    return this.description;
   }
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class SkillSummaryObjectFactory {
-  create(skillId: string, skillDescription: string): SkillSummary {
-    return new SkillSummary(skillId, skillDescription);
+export class ShortSkillSummaryObjectFactory {
+  create(skillId: string, skillDescription: string): ShortSkillSummary {
+    return new ShortSkillSummary(skillId, skillDescription);
+  }
+
+  createFromBackendDict(
+      backendDict: ShortSkillSummaryBackendDict): ShortSkillSummary {
+    return new ShortSkillSummary(
+      backendDict.skill_id,
+      backendDict.skill_description);
   }
 }
 
 angular.module('oppia').factory(
-  'SkillSummaryObjectFactory',
-  downgradeInjectable(SkillSummaryObjectFactory));
+  'ShortSkillSummaryObjectFactory',
+  downgradeInjectable(ShortSkillSummaryObjectFactory));

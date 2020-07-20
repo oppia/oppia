@@ -6,27 +6,27 @@
     </md-card>
     <div class="skill-list-box">
       <md-radio-group ng-model="selectedSkill" ng-change="setSelectedSkillId()">
-        <md-card ng-if="!hasUntriagedSkills(topicName)" ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
+        <md-card ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
           <md-card layout="row" class="list-view-item">
             <h2><label style="padding-left:10px"><[topicName]></label></h2>
           </md-card>
           <div ng-if="!checkIfEmpty(skills)" ng-repeat="(subtopicName, skills) in subtopics" class="list-view-item ">
             <md-card class="list-view-item">
               <label style="padding-top:20px;padding-bottom:20px;padding-left:10px"><[subtopicName]></label>
-              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
-                <[skill.skill_description]>
+              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
+                <[skill.description]>
               </md-radio-button>
             </md-card>
           </div>
         </md-card>
-        <md-card ng-if="hasUntriagedSkills(topicName)" ng-repeat="(topicName, skills) in categorizedSkills" class="list-view-item">
+        <md-card ng-if="untriagedSkillSummaries" class="list-view-item">
           <md-card layout="row" class="list-view-item">
             <h2><label style="padding-left:10px">Untriaged Skills</label></h2>
           </md-card>
-          <div ng-if="!checkIfEmpty(skills)" class="list-view-item ">
+          <div ng-if="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
             <md-card class="list-view-item">
-              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
-                <[skill.skill_description]>
+              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in untriagedSkillSummaries | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
+                <[skill.description]>
               </md-radio-button>
             </md-card>
           </div>

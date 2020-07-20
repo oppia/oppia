@@ -22,13 +22,16 @@ require(
 angular.module('oppia').controller('SelectSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'allowSkillsFromOtherTopics',
   'categorizedSkills', 'skillsInSameTopicCount', 'sortedSkillSummaries',
+  'untriagedSkillSummaries',
   function($controller, $scope, $uibModalInstance, allowSkillsFromOtherTopics,
-      categorizedSkills, skillsInSameTopicCount, sortedSkillSummaries) {
+      categorizedSkills, skillsInSameTopicCount, sortedSkillSummaries,
+      untriagedSkillSummaries) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
     $scope.skillSummaries = sortedSkillSummaries;
+    $scope.untriagedSkillSummaries = untriagedSkillSummaries;
     $scope.categorizedSkills = categorizedSkills;
     $scope.allowSkillsFromOtherTopics = allowSkillsFromOtherTopics;
     $scope.selectedSkillId = null;

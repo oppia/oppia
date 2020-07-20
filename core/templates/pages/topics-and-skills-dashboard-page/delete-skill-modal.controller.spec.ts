@@ -53,9 +53,7 @@ describe('Delete Skill Modal Controller', function() {
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchTopicAssignmentsForSkill: () => {
           var deferred = $q.defer();
-          deferred.resolve({
-            topic_assignment_dicts: []
-          });
+          deferred.resolve([]);
           return deferred.promise;
         }
       };
@@ -80,10 +78,10 @@ describe('Delete Skill Modal Controller', function() {
 
   describe('when skill has assigned topics', function() {
     var assignedTopicDicts = [{
-      topic_name: 'topic1',
-      topic_id: 'tasd42',
-      topic_version: 1,
-      subtopic_id: 1}];
+      topicName: 'topic1',
+      topicId: 'tasd42',
+      topicVersion: 1,
+      subtopicId: 1}];
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $rootScope = $injector.get('$rootScope');
       $q = $injector.get('$q');
@@ -93,9 +91,7 @@ describe('Delete Skill Modal Controller', function() {
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchTopicAssignmentsForSkill: () => {
           var deferred = $q.defer();
-          deferred.resolve({
-            topic_assignment_dicts: assignedTopicDicts
-          });
+          deferred.resolve(assignedTopicDicts);
           return deferred.promise;
         }
       };

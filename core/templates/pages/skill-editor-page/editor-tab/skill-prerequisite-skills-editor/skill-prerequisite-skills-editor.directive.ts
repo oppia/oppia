@@ -52,9 +52,11 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             $scope, $filter, $uibModal, AlertsService) {
           var ctrl = this;
           var categorizedSkills = null;
+          var untriagedSkillSummaries = null;
           TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
             function(response) {
-              categorizedSkills = response.categorized_skills_dict;
+              categorizedSkills = response.categorizedSkillsDict;
+              untriagedSkillSummaries = response.untriagedSkillSummaries;
             });
           var groupedSkillSummaries =
             SkillEditorStateService.getGroupedSkillSummaries();
@@ -83,7 +85,8 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
                 categorizedSkills: () => categorizedSkills,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => untriagedSkillSummaries
               },
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',

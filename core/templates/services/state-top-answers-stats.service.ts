@@ -26,10 +26,10 @@ require('services/context.service.ts');
 
 angular.module('oppia').factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ExplorationStatesService',
+  'ExplorationStatesService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ExplorationStatesService) {
+      ExplorationStatesService) {
     /**
      * A collection of answers associated to a specific interaction id.
      * @typedef {Object} AnswerStatsCache
@@ -100,17 +100,16 @@ angular.module('oppia').factory('StateTopAnswersStatsService', [
        * @param {Object.<string, *>} stateTopAnswersStatsBackendDict - The
        *    backend representation of the state top answers statistics.
        */
-      init: function(stateTopAnswersStatsBackendDict) {
+      init: function(stateTopAnswersStats) {
         if (isInitialized) {
           return;
         }
         workingStateTopAnswersStats = {};
-        for (var stateName in stateTopAnswersStatsBackendDict.answers) {
+        for (let stateName in stateTopAnswersStats.answers) {
           workingStateTopAnswersStats[stateName] = {
-            answers: stateTopAnswersStatsBackendDict.answers[stateName].map(
-              AnswerStatsObjectFactory.createFromBackendDict),
+            answers: stateTopAnswersStats.answers[stateName],
             interactionId: (
-              stateTopAnswersStatsBackendDict.interaction_ids[stateName]),
+              stateTopAnswersStats.interactionIds[stateName]),
           };
           // Finally, manually refresh the addressed information.
           refreshAddressedInfo(stateName);

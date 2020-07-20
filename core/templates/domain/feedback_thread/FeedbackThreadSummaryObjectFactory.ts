@@ -41,8 +41,8 @@ export class FeedbackThreadSummary {
   lastUpdatedMsecs: number;
   lastMessageText: string;
   totalMessageCount: number;
-  lastMessageRead: boolean;
-  secondLastMessageRead: boolean;
+  lastMessageIsRead: boolean;
+  secondLastMessageIsRead: boolean;
   authorLastMessage: string;
   authorSecondLastMessage: string;
   explorationTitle: string;
@@ -52,7 +52,7 @@ export class FeedbackThreadSummary {
   constructor(
       status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
-      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
       authorLastMessage: string, authorSecondLastMessage: string,
       explorationTitle: string, explorationId: string, threadId: string) {
     this.status = status;
@@ -60,8 +60,8 @@ export class FeedbackThreadSummary {
     this.lastUpdatedMsecs = lastUpdatedMsecs;
     this.lastMessageText = lastMessageText;
     this.totalMessageCount = totalMessageCount;
-    this.lastMessageRead = lastMessageRead;
-    this.secondLastMessageRead = secondLastMessageRead;
+    this.lastMessageIsRead = lastMessageIsRead;
+    this.secondLastMessageIsRead = secondLastMessageIsRead;
     this.authorLastMessage = authorLastMessage;
     this.authorSecondLastMessage = authorSecondLastMessage;
     this.explorationTitle = explorationTitle;
@@ -71,9 +71,9 @@ export class FeedbackThreadSummary {
 
   markTheLastTwoMessagesAsRead(): void {
     if (this.authorSecondLastMessage) {
-      this.secondLastMessageRead = true;
+      this.secondLastMessageIsRead = true;
     }
-    this.lastMessageRead = true;
+    this.lastMessageIsRead = true;
   }
 
   appendNewMessage(lastMessageText: string, authorLastMessage: string): void {
@@ -82,8 +82,8 @@ export class FeedbackThreadSummary {
     this.authorSecondLastMessage = this.authorLastMessage;
     this.authorLastMessage = authorLastMessage;
     this.totalMessageCount += 1;
-    this.lastMessageRead = true;
-    this.secondLastMessageRead = true;
+    this.lastMessageIsRead = true;
+    this.secondLastMessageIsRead = true;
   }
 }
 
@@ -94,13 +94,13 @@ export class FeedbackThreadSummaryObjectFactory {
   create(
       status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
-      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
       authorLastMessage: string, authorSecondLastMessage: string,
       explorationTitle: string, explorationId: string,
       threadId: string): FeedbackThreadSummary {
     return new FeedbackThreadSummary(status, originalAuthorId, lastUpdatedMsecs,
-      lastMessageText, totalMessageCount, lastMessageRead,
-      secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
+      lastMessageText, totalMessageCount, lastMessageIsRead,
+      secondLastMessageIsRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
   }
 

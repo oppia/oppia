@@ -25,18 +25,22 @@ import { TopicsAndSkillsDashboardFilterObjectFactory } from
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;
   let dfof: TopicsAndSkillsDashboardFilterObjectFactory = null;
+  let tsof: TopicSummaryObjectFactory = null;
 
   beforeEach(() => {
     tsds = new TopicsAndSkillsDashboardPageService();
     dfof = new TopicsAndSkillsDashboardFilterObjectFactory();
+    tsof = new TopicSummaryObjectFactory();
   });
 
   it('should filter the topics', () => {
-    const topic1 = {
+    const topic1 = tsof.createFromBackendDict({
       topic_model_created_on: 1581839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -52,9 +56,8 @@ describe('Topic and Skill dashboard page service', () => {
       description: 'Alpha description',
       subtopic_count: 0,
       language_code: 'en',
-      $$hashKey: 'object:63',
-    };
-    const topic2 = {
+    });
+    const topic2 = tsof.createFromBackendDict({
       topic_model_created_on: 1681839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -69,10 +72,9 @@ describe('Topic and Skill dashboard page service', () => {
       version: 1,
       description: 'Beta description',
       subtopic_count: 0,
-      language_code: 'en',
-      $$hashKey: 'object:63',
-    };
-    const topic3 = {
+      language_code: 'en'
+    });
+    const topic3 = tsof.createFromBackendDict({
       topic_model_created_on: 1781839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -88,8 +90,7 @@ describe('Topic and Skill dashboard page service', () => {
       description: 'Gamma description',
       subtopic_count: 0,
       language_code: 'en',
-      $$hashKey: 'object:63',
-    };
+    });
     let topicsArray = [topic1, topic2, topic3];
     let filterOptions = dfof.createDefault();
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
