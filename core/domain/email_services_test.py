@@ -94,7 +94,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, 'html')
 
     def test_bcc_admin_flag(self):
-        """Verifies that the bcc admin flag is working properly in send_mail.
+        """Verifies that the bcc admin flag is working properly in
+        send_mail.
         """
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
