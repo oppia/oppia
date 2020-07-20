@@ -61,10 +61,11 @@ describe('Bar Chart directive', function() {
       }));
 
       $scope = $rootScope.$new();
-      $scope.data = () => ({});
       ctrl = $componentController('barChart', {
         $scope: $scope,
         $element: [{}]
+      }, {
+        data: () => ({})
       });
       ctrl.$onInit();
     }));
@@ -104,11 +105,12 @@ describe('Bar Chart directive', function() {
       }));
 
       $scope = $rootScope.$new();
-      $scope.data = () => [];
-      $scope.options = () => ({});
       ctrl = $componentController('barChart', {
         $scope: $scope,
         $element: [{}]
+      }, {
+        data: () => [],
+        options: () => ({})
       });
       ctrl.$onInit();
     }));
@@ -149,16 +151,17 @@ describe('Bar Chart directive', function() {
         }));
 
         $scope = $rootScope.$new();
-        $scope.data = () => [];
-        $scope.options = () => ({
-          chartAreaWidth: 0,
-          colors: [],
-          height: 0,
-          width: 0
-        });
         ctrl = $componentController('barChart', {
           $scope: $scope,
           $element: [{}]
+        }, {
+          data: () => [],
+          options: () => ({
+            chartAreaWidth: 0,
+            colors: [],
+            height: 0,
+            width: 0
+          })
         });
         ctrl.$onInit();
       }));

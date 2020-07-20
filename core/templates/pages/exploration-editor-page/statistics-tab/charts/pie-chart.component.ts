@@ -29,10 +29,10 @@ angular.module('oppia').component('pieChart', {
     var ctrl = this;
 
     ctrl.$onInit = function() {
-      if (!$.isArray($scope.data())) {
+      if (!$.isArray(ctrl.data())) {
         return;
       }
-      var options = $scope.options();
+      var options = ctrl.options();
       var chart = null;
 
       // Need to wait for load statement in editor template to finish.
@@ -44,7 +44,7 @@ angular.module('oppia').component('pieChart', {
       });
       var redrawChart = function() {
         if (chart !== null) {
-          chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+          chart.draw(google.visualization.arrayToDataTable(ctrl.data()), {
             title: options.title,
             pieHole: options.pieHole,
             pieSliceTextStyle: {

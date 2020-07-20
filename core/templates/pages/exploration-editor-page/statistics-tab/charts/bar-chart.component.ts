@@ -29,10 +29,10 @@ angular.module('oppia').component('barChart', {
     var ctrl = this;
 
     ctrl.$onInit = function() {
-      if (!$.isArray($scope.data())) {
+      if (!$.isArray(ctrl.data())) {
         return;
       }
-      var options = $scope.options();
+      var options = ctrl.options();
       var chart = null;
 
       var redrawChart = function() {
@@ -48,7 +48,7 @@ angular.module('oppia').component('barChart', {
             return;
           }
         }
-        chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+        chart.draw(google.visualization.arrayToDataTable(ctrl.data()), {
           chartArea: {
             left: 0,
             width: options.chartAreaWidth

@@ -65,10 +65,11 @@ describe('Pie Chart directive', function() {
       });
 
       $scope = $rootScope.$new();
-      $scope.data = () => ({});
       ctrl = $componentController('pieChart', {
         $scope: $scope,
         $element: []
+      }, {
+        data: () => ({})
       });
       ctrl.$onInit();
     }));
@@ -112,11 +113,12 @@ describe('Pie Chart directive', function() {
       });
 
       $scope = $rootScope.$new();
-      $scope.data = () => [];
-      $scope.options = () => ({});
       var ctrl = $componentController('pieChart', {
         $scope: $scope,
         $element: []
+      }, {
+        data: () => [],
+        options: () => ({})
       });
       ctrl.$onInit();
     }));
@@ -160,21 +162,22 @@ describe('Pie Chart directive', function() {
       });
 
       $scope = $rootScope.$new();
-      $scope.data = () => [];
-      $scope.options = () => ({
-        title: 'Pie title',
-        pieHole: null,
-        pieSliceTextStyleColor: '#fff',
-        pieSliceBorderColor: '#fff',
-        left: 0,
-        chartAreaWidth: 0,
-        colors: [],
-        height: 0,
-        width: 0
-      });
       var ctrl = $componentController('pieChart', {
         $scope: $scope,
         $element: []
+      }, {
+        data: () => [],
+        options: () => ({
+          title: 'Pie title',
+          pieHole: null,
+          pieSliceTextStyleColor: '#fff',
+          pieSliceBorderColor: '#fff',
+          left: 0,
+          chartAreaWidth: 0,
+          colors: [],
+          height: 0,
+          width: 0
+        })
       });
       ctrl.$onInit();
     }));
