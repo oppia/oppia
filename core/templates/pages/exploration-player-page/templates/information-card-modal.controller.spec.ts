@@ -19,12 +19,14 @@
 describe('Information Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
+  var DateTimeFormatService = null;
 
   var expInfo = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
+    DateTimeFormatService = $injector.get('DateTimeFormatService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -62,6 +64,11 @@ describe('Information Card Modal Controller', function() {
       community_owned: true,
       title: 'Test of all interactions'
     };
+
+    // This method is being mocked because the return value can be tricky
+    // depending on timezone.
+    spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
+      .returnValue('Feb 17');
 
     $scope = $rootScope.$new();
     $controller('InformationCardModalController', {
