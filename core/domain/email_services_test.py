@@ -95,12 +95,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     def test_bcc_admin_flag(self):
         """Verifies that the bcc admin flag is working properly in send_mail.
-
-        Note that we replace the
-        platform_email_services.send_email_to_recipients() function in send_mail
-        with an alternate lambda that asserts the correct
-        values were placed in the data dictionary that is then passed to the
-        platform api.
         """
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
@@ -223,7 +217,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'subject', 'body', 'html')
 
     def test_unsuccessful_status_codes_raises_exception(self):
-        """Test that unsuccessful status codes raises an exception."""
+        """Test that unsuccessful status codes returned raises an exception."""
 
         email_exception = self.assertRaisesRegexp(
             Exception, 'Bulk email failed to send. Please check your ' +

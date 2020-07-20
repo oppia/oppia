@@ -426,8 +426,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
 
 class EmailMockTests(test_utils.EmailTestBase):
-    """Class for testing EmailTestBase, EmailMessageMock and
-    EmailServiceMock.
+    """Class for testing EmailTestBase.
     """
 
     def test_override_run_swaps_contexts(self):

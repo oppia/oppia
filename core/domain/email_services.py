@@ -111,7 +111,7 @@ def is_email_valid(email_address):
 
 
 def is_sender_email_valid(sender_email):
-    """Gets the sender_email address and validates it is of the form
+    """Gets the sender_email address and validates that it is of the form
     'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
 
     Args:
@@ -161,7 +161,7 @@ def send_mail(
             sent.
         Exception: If any recipient email addresses are malformed.
         Exception: If any sender email addresses are malformed.
-        Exception: If the email was not sent correctly and the
+        Exception: If the email was not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
@@ -213,7 +213,7 @@ def send_bulk_mail(
             sent.
         Exception: If any recipient email addresses are malformed.
         Exception: If any sender email addresses are malformed.
-        Exception: If the email was not sent correctly and the
+        Exception: If the email was not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """

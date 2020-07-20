@@ -281,8 +281,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_editor_role_emails_is_false(self):
-        with self.can_send_emails_ctx, (
-            self.can_not_send_editor_role_email_ctx):
+        with self.can_send_emails_ctx, self.can_not_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id,
                 rights_manager.ROLE_EDITOR, self.exploration.id,
@@ -1587,7 +1586,6 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_subscription_emails_is_false(self):
-
         with self.can_send_emails_ctx, self.can_not_send_subscription_email_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
@@ -2267,10 +2265,6 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
 
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
-
-    @classmethod
-    def setUpClass(cls):
-        super(VoiceoverApplicationEmailUnitTest, cls).setUpClass()
 
     def setUp(self):
         super(VoiceoverApplicationEmailUnitTest, self).setUp()

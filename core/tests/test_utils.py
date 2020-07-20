@@ -47,7 +47,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-
 import feconf
 import main
 import main_mail
@@ -161,22 +160,6 @@ def check_image_png_or_webp(image_string):
             image_string.startswith('data:image/webp')):
         return True
     return False
-
-
-class EmailMessageMock(python_utils.OBJECT):
-    """Mock for core.platform.models email services messages."""
-
-    def __init__(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc=None, reply_to=None, recipient_variables=None):
-        self.sender = sender_email
-        self.to = recipient_email
-        self.subject = subject
-        self.body = plaintext_body
-        self.html = html_body
-        self.bcc = bcc
-        self.reply_to = reply_to
-        self.recipient_variables = recipient_variables
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -2300,6 +2283,21 @@ GenericTestBase = AppEngineTestBase
 class GenericEmailTestBase(GenericTestBase):
     """Base class for tests requiring email services."""
 
+    class EmailMessageMock(python_utils.OBJECT):
+        """Mock for core.platform.models email services messages."""
+
+        def __init__(
+                self, sender_email, recipient_email, subject, plaintext_body,
+                html_body, bcc=None, reply_to=None, recipient_variables=None):
+            self.sender = sender_email
+            self.to = recipient_email
+            self.subject = subject
+            self.body = plaintext_body
+            self.html = html_body
+            self.bcc = bcc
+            self.reply_to = reply_to
+            self.recipient_variables = recipient_variables
+
     emails_dict = {}
 
     def run(self, result=None):
@@ -2363,7 +2361,7 @@ class GenericEmailTestBase(GenericTestBase):
         if bcc:
             bcc_emails = bcc[0] if len(bcc) == 1 else bcc
 
-        new_email = EmailMessageMock(
+        new_email = self.EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
             recipient_variables=(

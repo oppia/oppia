@@ -217,10 +217,11 @@ class _Gae(Platform):
     @classmethod
     def import_email_services(cls):
         """Imports and returns the email services module specified in feconf.py.
+        If in DEV_MODE, uses the dev mode version of email services.
 
         Returns:
             module. The email_services module to use, based on the feconf.py
-            setting.
+            setting and DEV_MODE setting.
 
         Raises:
             Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
