@@ -47,6 +47,42 @@ describe('TranslateTextService', function() {
   });
 
   describe('getTextToTranslate', function() {
+    fit('should return all texts per state', function() {
+      let textAndAvailability;
+      $httpBackend.expect(
+        'GET', '/gettranslatabletexthandler?exp_id=1&language_code=en')
+        .respond({
+          state_names_to_content_id_mapping: {
+            stateName1: {contentId1: 'text1', contentId2: 'text2'},
+            stateName2: {contentId3: 'text3'}
+          },
+          version: 1
+        });
+      TranslateTextService.init('1', 'en', () => {});
+      $httpBackend.flush();
+
+      const expectedTextAndAvailability1 = {
+        text: 'text2',
+        more: true
+      };
+      textAndAvailability = TranslateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
+
+      const expectedTextAndAvailability2 = {
+        text: 'text1',
+        more: true
+      };
+      textAndAvailability = TranslateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+
+      const expectedTextAndAvailability3 = {
+        text: 'text3',
+        more: false
+      };
+      textAndAvailability = TranslateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
+    });
+
     it('should return no more available for states with no texts', function() {
       const expectedTextAndAvailability = {
         text: 'text1',
