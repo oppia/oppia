@@ -85,7 +85,8 @@ export class TopicLandingPageComponent implements OnInit {
       description: (
         'No matter your level, there\'s a lesson for you! From learning ' +
           this.topicData.chapters[0].toLowerCase() + ', to ' +
-          this.topicData.chapters[1].toLowerCase() + ' - Oppia has you covered.'),
+          this.topicData.chapters[1].toLowerCase() +
+          ' - Oppia has you covered.'),
       imagePngFilename: 'suitable_for_all.png',
       imageWebpFilename: 'suitable_for_all.webp',
       imageAlt: 'Lesson viewers and learners.'
