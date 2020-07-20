@@ -180,12 +180,12 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             # If there is *args and **kwargs in the function definition skip the
             # check because we can use keywords arguments in function call even
             # if **kwargs is present in the function definition. See Example:
-            # Fucntion def -> def func(entity_id, *args, **kwargs):
+            # Function def -> def func(entity_id, *args, **kwargs):
             # Function call -> func(entity_id='1', a=1, b=2, c=3)
             # by parsing calling method we get
             # keyword_arguments = entity_id, a, b, c. but
             # from the function definition, we will get keyword_arguments = []
-            # now we do not have a way to identify which one is a keyword
+            # Now we do not have a way to identify which one is a keyword
             # argument and which one is not.
             if not called.args.kwarg and callable_name != 'constructor':
                 if not arg in keyword_args_in_funcdef:
