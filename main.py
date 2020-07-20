@@ -27,8 +27,8 @@ from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
-from core.controllers import contributor_dashboard
 from core.controllers import concept_card_viewer
+from core.controllers import contributor_dashboard
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor

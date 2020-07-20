@@ -22,6 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require(
+  // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
 
 describe('Community dashboard page constants', function() {

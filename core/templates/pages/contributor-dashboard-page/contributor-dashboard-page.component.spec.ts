@@ -23,7 +23,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 const CONSTANTS = require('constants.ts');
 
-require('pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
+require(
+  'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 
 describe('Community dashboard page', function() {
   var ctrl = null;

@@ -45,6 +45,7 @@ require('services/local-storage.service.ts');
 require('services/user.service.ts');
 
 require(
+  // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').component('communityDashboardPage', {

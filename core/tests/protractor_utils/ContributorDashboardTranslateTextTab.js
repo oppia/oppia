@@ -93,4 +93,6 @@ var ContributorDashboardTranslateTextTab = function() {
     expect(await selectedLanguageElement.getText()).toMatch(language);
   };
 };
-exports.ContributorDashboardTranslateTextTab = ContributorDashboardTranslateTextTab;
+
+exports.ContributorDashboardTranslateTextTab =
+  ContributorDashboardTranslateTextTab;

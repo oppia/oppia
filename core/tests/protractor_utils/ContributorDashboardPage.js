@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the contributor dashboard, for use in Protractor
- * tests.
+ * @fileoverview Page object for the contributor dashboard, for use in
+ * Protractor tests.
  */
 var waitFor = require('./waitFor.js');
 
