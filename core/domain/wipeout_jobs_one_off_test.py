@@ -91,8 +91,8 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         self.assertTrue(pending_deletion_model.deletion_complete)
 
 
-class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for VerifyUserDeletionOneOffJob."""
+class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for FullyCompleteUserDeletionOneOffJob."""
 
     USER_1_EMAIL = 'a@example.com'
     USER_1_USERNAME = 'a'
@@ -100,20 +100,23 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         self.process_and_flush_pending_tasks()
-        job_id = wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.create_new()
-        wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.enqueue(job_id)
+        job_id = (
+            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
+            .create_new())
+        wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.get_output(job_id))
+            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
+            .get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item)
                        for stringified_item in stringified_output]
         return eval_output
 
     def setUp(self):
-        super(VerifyUserDeletionOneOffJobTests, self).setUp()
+        super(FullyCompleteUserDeletionOneOffJobTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         user_models.CompletedActivitiesModel(

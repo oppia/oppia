@@ -53,8 +53,15 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for verifying the user deletion."""
+class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for verifying the user deletion. It checks if all models do
+    not contain the user ID of the deleted user in their fields. If any field
+    contains the user ID of the deleted user, the deletion_complete is set
+    to False, so that later the UserDeletionOneOffJob will be run on that
+    user again. If all the fields do not contain the user ID of the deleted
+    user, the final email announcing that the deletion was completed is sent,
+    and the deletion request is deleted.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -66,7 +73,7 @@ class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
         # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
         # for the user. The verification will be done in the next run of
-        # VerifyUserDeletionOneOffJob.
+        # FullyCompleteUserDeletionOneOffJob.
         pending_deletion_request = wipeout_service.get_pending_deletion_request(
             pending_deletion_request_model.id)
         if not pending_deletion_request.deletion_complete:
