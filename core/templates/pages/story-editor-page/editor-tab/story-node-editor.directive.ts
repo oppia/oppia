@@ -102,6 +102,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
           var categorizedSkills = null;
+          var untriagedSkillSummaries = null;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
@@ -115,7 +116,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
-                categorizedSkills = response.categorized_skills_dict;
+                categorizedSkills = response.categorizedSkillsDict;
+                untriagedSkillSummaries = response.untriagedSkillSummaries;
               });
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
@@ -261,7 +263,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
                 categorizedSkills: () => categorizedSkills,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => untriagedSkillSummaries
               },
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',
@@ -297,7 +300,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
                 categorizedSkills: () => categorizedSkillsInTopic,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => null
               },
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',

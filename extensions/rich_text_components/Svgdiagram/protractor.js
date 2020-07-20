@@ -17,6 +17,7 @@
  * testing with Protractor.js
  */
 
+var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 var request = require('request');
@@ -62,9 +63,11 @@ const SVGTAGS = {
   '">Enter</tspan><tspan x="-21.51" y="17.45">Text</tspan></text></g></svg>')
 };
 
-var customizeComponent = async function(modal, shape) {
+var customizeComponent = async function(modal, shape, altText) {
   var shapeClass = '.protractor-test-create-' + shape;
   var shapeTool = modal.element(by.css(shapeClass));
+  var altTextInputElement = (
+    element(by.css('[placeholder = "Description of the diagram"]')));
   await waitFor.elementToBeClickable(
     shapeTool,
     'Could not click on the required tool');
@@ -77,11 +80,18 @@ var customizeComponent = async function(modal, shape) {
   await waitFor.visibilityOf(
     modal.element(by.css('.protractor-test-saved-diagram-container')),
     'Diagram container not visible');
+  await action.sendKeys('Alt text input', altTextInputElement, altText);
 };
 
-var expectComponentDetailsToMatch = async function(elem, shapeName) {
-  var src = await elem.element(by.css(
-    '.protractor-test-svg-diagram')).getAttribute('src');
+var expectComponentDetailsToMatch = async function(elem, shapeName, altText) {
+  var svgDiagramInputElement = elem.element(by.css(
+    '.protractor-test-svg-diagram'));
+  await waitFor.visibilityOf(
+    svgDiagramInputElement,
+    'SVG Diagram input element takes too long to load.');
+  var src = await svgDiagramInputElement.getAttribute('src');
+  var alt = await svgDiagramInputElement.getAttribute('alt');
+  expect(alt).toEqual(altText);
   await request(src, function(error, response, body) {
     expect(body.replace(/(\r\n|\n|\r)/gm, '')).toBe(SVGTAGS[shapeName]);
   });

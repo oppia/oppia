@@ -19,7 +19,7 @@
       <div ng-if="prerequisiteSkillsAreShown">
         <md-card class="skill-id" ng-repeat="skillId in skill.getPrerequisiteSkillIds()">
           <div class="skill-description-card">
-            <span ng-click="removeSkillId(skillId)" aria-hidden="true">
+            <span class="remove-skill-icon" ng-click="removeSkillId(skillId)" aria-hidden="true">
               <i class="material-icons md-18">&#xE14C;</i>
             </span>
             <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
@@ -31,6 +31,12 @@
   </div>
 </md-card>
 <style>
+  skill-prerequisite-skills-editor .remove-skill-icon {
+    color: #f00;
+    cursor: pointer;
+    float: right;
+  }
+
   skill-prerequisite-skills-editor .skill-id {
     background-color: #efefef;
     margin-left: 0;
@@ -46,7 +52,9 @@
     background-color: #e0e0e0;
   }
   skill-prerequisite-skills-editor .skill-description-card {
-    height: 2.5em;
+    max-height: 10em;
+    overflow-wrap: break-word;
+    padding-bottom: 10px;
     padding-left: 10px;
     padding-top: 10px;
   }
