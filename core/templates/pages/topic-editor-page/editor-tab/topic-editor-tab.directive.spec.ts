@@ -348,4 +348,28 @@ describe('Topic editor tab directive', function() {
     expect($scope.subtopicsListIsShown).toEqual(false);
     expect($scope.storiesListIsShown).toEqual(false);
   });
+
+  it('should record the index of the subtopic being moved', function() {
+    $scope.onRearrangeSubtopicStart(10);
+    expect($scope.fromIndex).toEqual(10);
+    $scope.onRearrangeSubtopicStart(6);
+    expect($scope.fromIndex).toEqual(6);
+  });
+
+  it('should call the TopicUpdateService to rearrange subtopic', function() {
+    $scope.fromIndex = 0;
+    var moveSubtopicSpy = (
+      spyOn(TopicUpdateService, 'rearrangeSubtopic'));
+    $scope.onRearrangeSubtopicEnd(1);
+    expect(moveSubtopicSpy).toHaveBeenCalled();
+  });
+
+  it('should not call the TopicUpdateService to rearrange subtopic if ' +
+      'subtopic is moved to the same position', function() {
+    $scope.fromIndex = 0;
+    var moveSubtopicSpy = (
+      spyOn(TopicUpdateService, 'rearrangeSubtopic'));
+    $scope.onRearrangeSubtopicEnd(0);
+    expect(moveSubtopicSpy).not.toHaveBeenCalled();
+  });
 });
