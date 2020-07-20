@@ -47,7 +47,7 @@ describe('TranslateTextService', function() {
   });
 
   describe('getTextToTranslate', function() {
-    fit('should return all texts per state', function() {
+    it('should return all texts per state', function() {
       let textAndAvailability;
       $httpBackend.expect(
         'GET', '/gettranslatabletexthandler?exp_id=1&language_code=en')
