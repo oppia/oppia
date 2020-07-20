@@ -18,6 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { DocumentAttributeCustomizationService } from
@@ -34,8 +35,7 @@ export class MaintenancePageComponent implements OnInit {
   constructor(
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
-    private urlInterpolationService: UrlInterpolationService
-  ) {}
+    private urlInterpolationService: UrlInterpolationService) {}
 
   ngOnInit(): void {
     this.currentLang = 'en';
@@ -48,6 +48,5 @@ export class MaintenancePageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'maintenancePage', downgradeComponent(
-    {component: MaintenancePageComponent}));
+angular.module('oppia').directive('maintenancePage', downgradeComponent(
+  {component: MaintenancePageComponent}));

@@ -19,13 +19,15 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 import { PageTitleService } from 'services/page-title.service';
-import { TopicLandingPageConstants } from './topic-landing-page.constants';
+import { TopicLandingPageConstants } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
 
 
 interface ILessonsQuality {
@@ -154,6 +156,5 @@ export class TopicLandingPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'topicLandingPage', downgradeComponent(
-    {component: TopicLandingPageComponent}));
+angular.module('oppia').directive('topicLandingPage',
+  downgradeComponent({component: TopicLandingPageComponent}));

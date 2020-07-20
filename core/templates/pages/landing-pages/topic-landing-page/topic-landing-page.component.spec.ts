@@ -16,19 +16,17 @@
  * @fileoverview Unit tests for topicLandingPage.
  */
 
-import { TopicLandingPageComponent } from './topic-landing-page.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, async, tick, fakeAsync }
   from '@angular/core/testing';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { TopicLandingPageComponent } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
 import { PageTitleService } from 'services/page-title.service';
-
-require(
-  'pages/landing-pages/topic-landing-page/topic-landing-page.component.ts');
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
   _window = {

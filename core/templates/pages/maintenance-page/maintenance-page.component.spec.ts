@@ -19,7 +19,8 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, async, TestBed } from '@angular/core/testing';
 
-import { MaintenancePageComponent } from './maintenance-page.component';
+import { MaintenancePageComponent } from
+  'pages/maintenance-page/maintenance-page.component';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 
