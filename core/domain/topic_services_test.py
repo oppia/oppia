@@ -385,6 +385,53 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_commit_log_entry.commit_message,
             'Rearranged skill from index 2 to index 0 for subtopic with id 1.')
 
+    def test_rearrange_subtopic(self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title2',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title3',
+            'subtopic_id': 3
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Added subtopics to the topic.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 3)
+        subtopics = topic.subtopics
+        self.assertEqual(subtopics[0].id, 1)
+        self.assertEqual(subtopics[1].id, 2)
+        self.assertEqual(subtopics[2].id, 3)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REARRANGE_SUBTOPIC,
+            'from_index': 2,
+            'to_index': 0
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Rearranged subtopic from index 2 to index 0.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 3)
+        subtopics = topic.subtopics
+        self.assertEqual(subtopics[0].id, 3)
+        self.assertEqual(subtopics[1].id, 1)
+        self.assertEqual(subtopics[2].id, 2)
+
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 4)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Rearranged subtopic from index 2 to index 0.')
+
     def test_cannot_update_topic_property_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
             Exception, (
