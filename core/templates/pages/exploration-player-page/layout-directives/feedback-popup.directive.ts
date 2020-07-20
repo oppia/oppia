@@ -20,7 +20,7 @@ require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('services/alerts.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/background-mask.service.ts');
 require('services/stateful/focus-manager.service.ts');
@@ -44,11 +44,11 @@ angular.module('oppia').directive('feedbackPopup', [
       controller: [
         '$scope', '$element', '$filter', '$http', '$log', '$timeout',
         'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
-        'PlayerPositionService', 'UserService', 'WindowDimensionsService',
+        'PlayerPositionService', 'UserBackendApiService', 'WindowDimensionsService',
         function(
             $scope, $element, $filter, $http, $log, $timeout,
             AlertsService, BackgroundMaskService, FocusManagerService,
-            PlayerPositionService, UserService, WindowDimensionsService) {
+            PlayerPositionService, UserBackendApiService, WindowDimensionsService) {
           var ctrl = this;
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +
@@ -134,8 +134,11 @@ angular.module('oppia').directive('feedbackPopup', [
             $scope.feedbackText = '';
             $scope.isSubmitterAnonymized = false;
             $scope.isLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               $scope.isLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $scope.$applyAsync();
             });
             $scope.feedbackSubmitted = false;
             // We generate a random id since there may be multiple popover

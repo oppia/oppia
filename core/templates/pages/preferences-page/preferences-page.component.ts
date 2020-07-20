@@ -33,7 +33,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/utils.service.ts');
 
 angular.module('oppia').component('preferencesPage', {
@@ -48,14 +48,14 @@ angular.module('oppia').component('preferencesPage', {
     '$http', '$q', '$translate', '$timeout', '$window',
     '$uibModal', 'AlertsService', 'I18nLanguageCodeService',
     'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
-    'UserService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
+    'UserBackendApiService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
     'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
     'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
     function(
         $http, $q, $translate, $timeout, $window,
         $uibModal, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
+        UserBackendApiService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
         ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
         SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
@@ -156,7 +156,7 @@ angular.module('oppia').component('preferencesPage', {
           backdrop: 'static',
           controller: 'EditProfilePictureModalController'
         }).result.then(function(newProfilePictureDataUrl) {
-          UserService.setProfileImageDataUrlAsync(
+          UserBackendApiService.setProfileImageDataUrlAsync(
             newProfilePictureDataUrl)
             .then(function() {
               // The reload is needed in order to update the profile picture
@@ -176,7 +176,7 @@ angular.module('oppia').component('preferencesPage', {
 
         ctrl.username = '';
         LoaderService.showLoadingScreen('Loading');
-        var userInfoPromise = UserService.getUserInfoAsync();
+        var userInfoPromise = UserBackendApiService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           ctrl.email = userInfo.getEmail();

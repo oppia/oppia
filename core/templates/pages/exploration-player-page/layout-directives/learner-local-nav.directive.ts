@@ -36,7 +36,7 @@ require(
   'pages/exploration-player-page/suggestion-modal-for-learner-local-view/' +
   'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 require(
@@ -57,14 +57,14 @@ angular.module('oppia').directive('learnerLocalNav', [
         'ExplorationEngineService', 'ExplorationPlayerStateService',
         'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
-        'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
+        'UrlInterpolationService', 'UserBackendApiService', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
             $http, $uibModal, AlertsService, LoaderService,
             ExplorationEngineService, ExplorationPlayerStateService,
             FocusManagerService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
-            UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
+            UrlInterpolationService, UserBackendApiService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getFeedbackPopoverUrl = function() {
@@ -123,7 +123,7 @@ angular.module('oppia').directive('learnerLocalNav', [
               });
             ctrl.username = '';
             LoaderService.showLoadingScreen('Loading');
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
               LoaderService.hideLoadingScreen();
             });

@@ -42,7 +42,7 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
@@ -59,7 +59,7 @@ angular.module('oppia').component('learnerDashboardPage', {
     'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'FeedbackThreadSummaryObjectFactory',
     'FeedbackMessageSummaryObjectFactory',
-    'SuggestionModalForLearnerDashboardService', 'UserService',
+    'SuggestionModalForLearnerDashboardService', 'UserBackendApiService',
     function(
         $http, $q, $scope, $uibModal, $window, AlertsService,
         LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -71,7 +71,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         FeedbackThreadSummaryObjectFactory,
         FeedbackMessageSummaryObjectFactory,
-        SuggestionModalForLearnerDashboardService, UserService) {
+        SuggestionModalForLearnerDashboardService, UserBackendApiService) {
       var ctrl = this;
       var threadIndex = null;
 
@@ -430,15 +430,21 @@ angular.module('oppia').component('learnerDashboardPage', {
         };
         ctrl.PAGE_SIZE = 8;
         ctrl.Math = window.Math;
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+        UserBackendApiService.getProfileImageDataUrlAsync().then(function(dataUrl) {
           ctrl.profilePictureDataUrl = dataUrl;
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $scope.$applyAsync();
         });
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.username = '';
-        var userInfoPromise = UserService.getUserInfoAsync();
+        var userInfoPromise = UserBackendApiService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $scope.$applyAsync();
         });
 
         var dashboardDataPromise = (

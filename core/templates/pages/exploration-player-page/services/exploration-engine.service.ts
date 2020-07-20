@@ -44,7 +44,7 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-html-formatter.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/focus-manager.service.ts');

@@ -22,7 +22,7 @@ require(
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').directive('searchResults', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -35,9 +35,9 @@ angular.module('oppia').directive('searchResults', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$q', '$timeout', '$window', 'LoaderService',
-        'SiteAnalyticsService', 'UserService',
+        'SiteAnalyticsService', 'UseBackendApirService',
         function($scope, $q, $timeout, $window, LoaderService,
-            SiteAnalyticsService, UserService) {
+            SiteAnalyticsService, UserBackendApiService) {
           var ctrl = this;
 
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -56,9 +56,12 @@ angular.module('oppia').directive('searchResults', [
 
             ctrl.userIsLoggedIn = null;
             LoaderService.showLoadingScreen('Loading');
-            var userInfoPromise = UserService.getUserInfoAsync();
+            var userInfoPromise = UserBackendApiService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $scope.$applyAsync();
             });
 
             // Called when the first batch of search results is retrieved from

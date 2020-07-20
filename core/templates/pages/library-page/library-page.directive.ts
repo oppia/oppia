@@ -32,7 +32,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/search.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
@@ -53,7 +53,7 @@ angular.module('oppia').directive('libraryPage', [
         'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
-        'UrlInterpolationService', 'UrlService', 'UserService',
+        'UrlInterpolationService', 'UrlService', 'UserBackendApiService',
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
         'LIBRARY_TILE_WIDTH_PX',
@@ -63,7 +63,7 @@ angular.module('oppia').directive('libraryPage', [
             LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
-            UrlInterpolationService, UrlService, UserService,
+            UrlInterpolationService, UrlService, UserBackendApiService,
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES,
             LIBRARY_TILE_WIDTH_PX) {
@@ -271,7 +271,7 @@ angular.module('oppia').directive('libraryPage', [
               $http.get('/libraryindexhandler').then(function(response) {
                 ctrl.libraryGroups =
                 response.data.activity_summary_dicts_by_category;
-                UserService.getUserInfoAsync().then(function(userInfo) {
+                UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
                   ctrl.activitiesOwned = {explorations: {}, collections: {}};
                   if (userInfo.isLoggedIn()) {
                     $http.get('/creatordashboardhandler/data')
@@ -321,6 +321,9 @@ angular.module('oppia').directive('libraryPage', [
                   } else {
                     LoaderService.hideLoadingScreen();
                   }
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$apply();
                 });
 
                 $rootScope.$broadcast(
