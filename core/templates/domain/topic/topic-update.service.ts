@@ -33,6 +33,7 @@ angular.module('oppia').factory('TopicUpdateService', [
   'CMD_DELETE_CANONICAL_STORY', 'CMD_DELETE_SUBTOPIC',
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'CMD_REARRANGE_CANONICAL_STORY',
   'CMD_REARRANGE_SKILL_IN_SUBTOPIC',
+  'CMD_REARRANGE_SUBTOPIC',
   'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC',
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
   'CMD_UPDATE_SUBTOPIC_PROPERTY', 'CMD_UPDATE_TOPIC_PROPERTY',
@@ -49,6 +50,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
       CMD_MOVE_SKILL_ID_TO_SUBTOPIC, CMD_REARRANGE_CANONICAL_STORY,
       CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+      CMD_REARRANGE_SUBTOPIC,
       CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
       CMD_REMOVE_UNCATEGORIZED_SKILL_ID, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
       CMD_UPDATE_SUBTOPIC_PROPERTY, CMD_UPDATE_TOPIC_PROPERTY,
@@ -603,6 +605,23 @@ angular.module('oppia').factory('TopicUpdateService', [
         }, function(changeDict, topic) {
           // ---- Undo ----
           topic.rearrangeSkillInSubtopic(subtopicId, toIndex, fromIndex);
+        });
+      },
+      /**
+       * Rearranges a subtopic to another position and records the change in
+       * undo/redo service.
+       */
+      rearrangeSubtopic: function(
+          topic, fromIndex, toIndex) {
+        _applyChange(topic, CMD_REARRANGE_SUBTOPIC, {
+          from_index: fromIndex,
+          to_index: toIndex
+        }, function(changeDict, topic) {
+          // ---- Apply ----
+          topic.rearrangeSubtopic(fromIndex, toIndex);
+        }, function(changeDict, topic) {
+          // ---- Undo ----
+          topic.rearrangeSubtopic(toIndex, fromIndex);
         });
       },
 

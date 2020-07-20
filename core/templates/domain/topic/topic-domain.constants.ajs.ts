@@ -55,6 +55,9 @@ angular.module('oppia').constant(
   'CMD_REARRANGE_SKILL_IN_SUBTOPIC',
   TopicDomainConstants.CMD_REARRANGE_SKILL_IN_SUBTOPIC);
 angular.module('oppia').constant(
+  'CMD_REARRANGE_SUBTOPIC',
+  TopicDomainConstants.CMD_REARRANGE_SUBTOPIC);
+angular.module('oppia').constant(
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
   TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC);
 angular.module('oppia').constant(

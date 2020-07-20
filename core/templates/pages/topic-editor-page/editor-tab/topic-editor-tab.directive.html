@@ -111,7 +111,12 @@
             </a>
             <i class="fa fa-trash" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></i>
           </div>
-          <div ng-repeat="subtopic in subtopics track by $index" ng-init="subtopicIndex = $index">
+          <div ng-repeat="subtopic in subtopics track by $index"
+               ng-init="subtopicIndex = $index"
+               dnd-list="subtopics"
+               dnd-dragstart="onRearrangeSubtopicStart($index)"
+               dnd-drop="onRearrangeSubtopicEnd($index)"
+               dnd-draggable="subtopic">
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
