@@ -863,6 +863,9 @@ class ImageWithRegions(BaseObject):
                     }, {
                         'name': 'region',
                         'schema': ImageRegion.SCHEMA
+                    }, {
+                        'name': 'regionDescription',
+                        'schema': UnicodeString.SCHEMA
                     }]
                 }
             }
