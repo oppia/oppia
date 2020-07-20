@@ -318,64 +318,72 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), col_ids)
 
     def test_remove_exploration_from_learner_playlist(self):
-        self.assertEqual(self._get_all_learner_playlist_exp_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(self.user_id), [])
 
         # Add explorations to learner playlist.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_0)
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_1)
-        self.assertEqual(self._get_all_learner_playlist_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Removing an exploration.
         learner_playlist_services.remove_exploration_from_learner_playlist(
             self.user_id, self.EXP_ID_0)
-        self.assertEqual(self._get_all_learner_playlist_exp_ids(
-            self.user_id), [self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_1])
 
         # Removing the same exploration again has no effect.
         learner_playlist_services.remove_exploration_from_learner_playlist(
             self.user_id, self.EXP_ID_0)
-        self.assertEqual(self._get_all_learner_playlist_exp_ids(
-            self.user_id), [self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_1])
 
         # Removing the second exploration.
         learner_playlist_services.remove_exploration_from_learner_playlist(
             self.user_id, self.EXP_ID_1)
-        self.assertEqual(self._get_all_learner_playlist_exp_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(self.user_id), [])
 
     def test_remove_collection_from_learner_playlist(self):
-        self.assertEqual(self._get_all_learner_playlist_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [])
 
         # Add collections to learner playlist.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_0)
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_learner_playlist_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Removing a collection.
         learner_playlist_services.remove_collection_from_learner_playlist(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_learner_playlist_collection_ids(
-            self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_1])
 
         # Removing the same collection again has no effect.
         learner_playlist_services.remove_collection_from_learner_playlist(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_learner_playlist_collection_ids(
-            self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_1])
 
         # Removing the second collection.
         learner_playlist_services.remove_collection_from_learner_playlist(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_learner_playlist_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [])
 
     def test_get_all_exp_ids_in_learner_playlist(self):
         self.assertEqual(

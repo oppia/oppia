@@ -74,13 +74,14 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         # username.
         self.login(self.EDITOR_EMAIL)
         self.csrf_token = self.get_new_csrf_token()
-        self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
-        ), {
-            'state_name': self._get_unicode_test_string('statename'),
-            'subject': self._get_unicode_test_string('subject'),
-            'text': self._get_unicode_test_string('text'),
-        }, csrf_token=self.csrf_token)
+        self.post_json(
+            '%s/%s' % (
+                feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
+            ), {
+                'state_name': self._get_unicode_test_string('statename'),
+                'subject': self._get_unicode_test_string('subject'),
+                'text': self._get_unicode_test_string('text'),
+            }, csrf_token=self.csrf_token)
         self.logout()
 
     def test_invalid_exploration_ids_return_page_not_found(self):
@@ -281,8 +282,9 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         threadlist = response_dict['feedback_thread_dicts']
         self.assertIsNone(threadlist[0]['original_author_username'])
 
-        response_dict = self.get_json('%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, threadlist[0]['thread_id']))
+        response_dict = self.get_json(
+            '%s/%s' % (
+                feconf.FEEDBACK_THREAD_URL_PREFIX, threadlist[0]['thread_id']))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
 
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
@@ -424,13 +426,14 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
-        ), {
-            'state_name': 'statename',
-            'subject': 'subject',
-            'text': 'a sample message',
-        }, csrf_token=csrf_token)
+        self.post_json(
+            '%s/%s' % (
+                feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
+            ), {
+                'state_name': 'statename',
+                'subject': 'subject',
+                'text': 'a sample message',
+            }, csrf_token=csrf_token)
 
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))

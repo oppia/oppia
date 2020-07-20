@@ -140,12 +140,14 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT(result)
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
-            summary_message = ('%s %s CSS file' % (
-                linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
+            summary_message = (
+                '%s %s CSS file' % (
+                    linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:
-            summary_message = ('%s %s CSS file linted (%.1f secs)' % (
-                linter_utils.SUCCESS_MESSAGE_PREFIX, num_css_files,
-                time.time() - start_time))
+            summary_message = (
+                '%s %s CSS file linted (%.1f secs)' % (
+                    linter_utils.SUCCESS_MESSAGE_PREFIX, num_css_files,
+                    time.time() - start_time))
         python_utils.PRINT(summary_message)
         summary_messages.append(summary_message)
 

@@ -452,13 +452,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_reject['target_id'],
-            suggestion_to_reject['suggestion_id']), {
-                'action': u'reject',
-                'review_message': u'Rejected!'
-            }, csrf_token=csrf_token)
+        self.put_json(
+            '%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_reject['target_id'],
+                suggestion_to_reject['suggestion_id']), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_reject['suggestion_id'])
@@ -481,14 +482,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.author_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
+        self.put_json(
+            '%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -511,14 +513,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.author_id_2))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token, expected_status_int=401)
+        self.put_json(
+            '%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
         # Testing that author cannot accept own suggestion.
@@ -529,14 +532,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.author_id_2))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token, expected_status_int=401)
+        self.put_json(
+            '%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token, expected_status_int=401)
 
         # Testing users with scores above threshold can accept.
         self.login(self.AUTHOR_EMAIL)
@@ -544,14 +548,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.author_id, 'content.Algebra', 15)
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
+        self.put_json(
+            '%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
 
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -569,14 +574,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id_2))['suggestions'][1]
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
+        self.put_json(
+            '%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -631,8 +637,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json('%s/resubmit/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id), {
+        self.put_json(
+            '%s/resubmit/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id),
+            {
                 'summary_message': 'summary message',
                 'action': u'resubmit',
                 'change': {
@@ -670,14 +678,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.translator_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
+        self.put_json(
+            '%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -765,15 +774,16 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            self.put_json('%s/skill/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'This looks good!',
-                    'skill_id': self.SKILL_ID
-                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/skill/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'This looks good!',
+                        'skill_id': self.SKILL_ID
+                    }, csrf_token=csrf_token)
 
         suggestion_post_accept = self.get_json(
             '%s?suggestion_type=%s' % (
@@ -982,13 +992,14 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            self.put_json('%s/skill/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_reject['target_id'],
-                suggestion_to_reject['suggestion_id']), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
-                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/skill/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_reject['target_id'],
+                    suggestion_to_reject['suggestion_id']), {
+                        'action': u'reject',
+                        'review_message': u'Rejected!'
+                    }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_reject['suggestion_id'])
@@ -1011,15 +1022,16 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            self.put_json('%s/skill/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted!',
-                    'skill_id': self.skill_id
-                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/skill/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted!',
+                        'skill_id': self.skill_id
+                    }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
@@ -1043,15 +1055,16 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            self.put_json('%s/skill/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted!',
-                    'skill_id': self.skill_id
-                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/skill/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']), {
+                        'action': u'accept',
+                        'commit_message': u'commit message',
+                        'review_message': u'Accepted!',
+                        'skill_id': self.skill_id
+                    }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])

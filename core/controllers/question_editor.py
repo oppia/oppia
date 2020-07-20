@@ -99,9 +99,9 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Skill difficulties must be a float value')
 
-        if any((
-                difficulty < 0 or difficulty > 1)
-               for difficulty in skill_difficulties):
+        if any(
+                (difficulty < 0 or difficulty > 1)
+                for difficulty in skill_difficulties):
             raise self.InvalidInputException(
                 'Skill difficulties must be between 0 and 1')
 

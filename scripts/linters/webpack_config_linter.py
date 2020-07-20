@@ -43,8 +43,8 @@ def check_webpack_config_file(file_cache, verbose_mode_enabled):
         summary_messages = []
         plugins_section_found = False
         htmlwebpackplugin_section_found = False
-        for line_num, line in enumerate(file_cache.readlines(
-                WEBPACK_CONFIG_FILEPATH)):
+        for line_num, line in enumerate(
+                file_cache.readlines(WEBPACK_CONFIG_FILEPATH)):
             stripped_line = line.strip()
             if stripped_line.startswith('plugins:'):
                 plugins_section_found = True

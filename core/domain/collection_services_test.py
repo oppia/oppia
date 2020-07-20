@@ -47,9 +47,10 @@ transaction_services = models.Registry.import_transaction_services()
 
 def count_at_least_editable_collection_summaries(user_id):
     """Returns the count of collection summaries that are atleast editable."""
-    return len(collection_services.get_collection_summary_dicts_from_models(
-        collection_models.CollectionSummaryModel.get_at_least_editable(
-            user_id=user_id)))
+    return len(
+        collection_services.get_collection_summary_dicts_from_models(
+            collection_models.CollectionSummaryModel.get_at_least_editable(
+                user_id=user_id)))
 
 
 class CollectionServicesUnitTests(test_utils.GenericTestBase):
@@ -466,23 +467,27 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
     def test_get_completed_exploration_ids(self):
         # There should be no exception if the user or collection do not exist;
         # it should also return an empty list in both of these situations.
-        self.assertEqual(collection_services.get_completed_exploration_ids(
-            'Fake', self.COL_ID_0), [])
-        self.assertEqual(collection_services.get_completed_exploration_ids(
-            self.owner_id, 'Fake'), [])
+        self.assertEqual(
+            collection_services.get_completed_exploration_ids(
+                'Fake', self.COL_ID_0), [])
+        self.assertEqual(
+            collection_services.get_completed_exploration_ids(
+                self.owner_id, 'Fake'), [])
 
         # If no model exists, there should be no completed exploration IDs.
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.COL_ID_0))
-        self.assertEqual(collection_services.get_completed_exploration_ids(
-            self.owner_id, self.COL_ID_0), [])
+        self.assertEqual(
+            collection_services.get_completed_exploration_ids(
+                self.owner_id, self.COL_ID_0), [])
 
         # If the first exploration is completed, it should be reported.
         self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_0)
         self.assertIsNotNone(
             self._get_progress_model(self.owner_id, self.COL_ID_0))
-        self.assertEqual(collection_services.get_completed_exploration_ids(
-            self.owner_id, self.COL_ID_0), [self.EXP_ID_0])
+        self.assertEqual(
+            collection_services.get_completed_exploration_ids(
+                self.owner_id, self.COL_ID_0), [self.EXP_ID_0])
 
         # If all explorations are completed, all of them should be reported.
         # Also, they should be reported in the order they were completed.
@@ -1799,12 +1804,12 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Check that only the owner may edit.
         collection_summary = collection_services.get_collection_summary_by_id(
             self.COLLECTION_0_ID)
-        self.assertTrue(collection_summary.is_editable_by(
-            user_id=self.owner_id))
-        self.assertFalse(collection_summary.is_editable_by(
-            user_id=self.editor_id))
-        self.assertFalse(collection_summary.is_editable_by(
-            user_id=self.viewer_id))
+        self.assertTrue(
+            collection_summary.is_editable_by(user_id=self.owner_id))
+        self.assertFalse(
+            collection_summary.is_editable_by(user_id=self.editor_id))
+        self.assertFalse(
+            collection_summary.is_editable_by(user_id=self.viewer_id))
 
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_collection(
@@ -1817,12 +1822,12 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Check that owner and editor may edit, but not viewer.
         collection_summary = collection_services.get_collection_summary_by_id(
             self.COLLECTION_0_ID)
-        self.assertTrue(collection_summary.is_editable_by(
-            user_id=self.owner_id))
-        self.assertTrue(collection_summary.is_editable_by(
-            user_id=self.editor_id))
-        self.assertFalse(collection_summary.is_editable_by(
-            user_id=self.viewer_id))
+        self.assertTrue(
+            collection_summary.is_editable_by(user_id=self.owner_id))
+        self.assertTrue(
+            collection_summary.is_editable_by(user_id=self.editor_id))
+        self.assertFalse(
+            collection_summary.is_editable_by(user_id=self.viewer_id))
 
     def test_contributor_ids(self):
         # Sign up two users.

@@ -90,6 +90,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         expected_output_2 = [
             'DTest.service.ts', 'ATestFactory.ts', 'BTestService.ts',
             'CTest.service.ts', 'ETestFactory.ts']
-        self.assertTrue((
-            actual_output == expected_output_1) or (
-                actual_output == expected_output_2))
+        self.assertTrue(
+            (
+                actual_output == expected_output_1) or (
+                    actual_output == expected_output_2))

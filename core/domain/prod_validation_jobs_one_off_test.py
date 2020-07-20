@@ -9039,10 +9039,12 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
             self.admin_id, change, score_category, thread_id)
         model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
-        expected_output = [((
-            u'[u\'failed validation check for score category subtype check of '
-            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
-            'valid does not match target exploration category Art\']]') % (
+        expected_output = [(
+            (
+                u'[u\'failed validation check for score category subtype check '
+                'of GeneralSuggestionModel\', [u\'Entity id %s: score category '
+                'sub invalid does not match target exploration category Art\']]'
+            ) % (
                 model_instance.id)),
                            u'[u\'fully-validated GeneralSuggestionModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)

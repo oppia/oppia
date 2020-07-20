@@ -352,8 +352,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             return []
 
         question_count_per_skill = int(
-            math.ceil(python_utils.divide(
-                float(total_question_count), float(len(skill_ids)))))
+            math.ceil(
+                python_utils.divide(
+                    float(total_question_count), float(len(skill_ids)))))
 
         question_skill_link_mapping = {}
 

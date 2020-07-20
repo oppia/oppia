@@ -42,8 +42,8 @@ def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
         failed = False
         summary_messages = []
         skip_files_section_found = False
-        for line_num, line in enumerate(file_cache.readlines(
-                APP_YAML_FILEPATH)):
+        for line_num, line in enumerate(
+                file_cache.readlines(APP_YAML_FILEPATH)):
             stripped_line = line.strip()
             if '# Third party files:' in stripped_line:
                 skip_files_section_found = True

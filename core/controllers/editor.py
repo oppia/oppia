@@ -401,8 +401,9 @@ class ExplorationFileDownloader(EditorHandler):
                     exploration_id, version=version),
                 filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-            self.render_json(exp_services.export_states_to_yaml(
-                exploration_id, version=version))
+            self.render_json(
+                exp_services.export_states_to_yaml(
+                    exploration_id, version=version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
@@ -497,8 +498,9 @@ class ExplorationStatisticsHandler(EditorHandler):
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
 
-        self.render_json(stats_services.get_exploration_stats(
-            exploration_id, current_exploration.version).to_frontend_dict())
+        self.render_json(
+            stats_services.get_exploration_stats(
+                exploration_id, current_exploration.version).to_frontend_dict())
 
 
 class StateInteractionStatsHandler(EditorHandler):
@@ -515,8 +517,9 @@ class StateInteractionStatsHandler(EditorHandler):
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
             logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % (
-                list(current_exploration.states.keys())))
+            logging.error(
+                'Available states: %s' % (
+                    list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 
         self.render_json({
@@ -641,8 +644,8 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException(e)
 
         file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            entity_type, entity_id))
+        fs = fs_domain.AbstractFileSystem(
+            file_system_class(entity_type, entity_id))
         filepath = '%s/%s' % (filename_prefix, filename)
 
         if fs.isfile(filepath):

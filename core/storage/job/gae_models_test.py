@@ -75,15 +75,15 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
             [job_models.JobModel.get_by_id('MyJobId2')])
 
     def test_do_unfinished_jobs_exist(self):
-        self.assertFalse(job_models.JobModel.do_unfinished_jobs_exist(
-            'JobType1'))
-        self.assertTrue(job_models.JobModel.do_unfinished_jobs_exist(
-            'JobType2'))
+        self.assertFalse(
+            job_models.JobModel.do_unfinished_jobs_exist('JobType1'))
+        self.assertTrue(
+            job_models.JobModel.do_unfinished_jobs_exist('JobType2'))
         job2 = job_models.JobModel.get('MyJobId2', strict=True)
         job2.status_code = job_models.STATUS_CODE_COMPLETED
         job2.put()
-        self.assertFalse(job_models.JobModel.do_unfinished_jobs_exist(
-            'JobType2'))
+        self.assertFalse(
+            job_models.JobModel.do_unfinished_jobs_exist('JobType2'))
 
 
 class ContinuousComputationModelTest(test_utils.GenericTestBase):

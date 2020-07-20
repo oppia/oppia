@@ -48,10 +48,11 @@ def remove_release_labels(repo):
         release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
     released_label = repo.get_label(release_constants.LABEL_FOR_RELEASED_PRS)
 
-    current_release_prs = list(repo.get_issues(
-        state='all', labels=[current_release_label])) + list(
-            repo.get_issues(
-                state='open', labels=[released_label]))
+    current_release_prs = list(
+        repo.get_issues(
+            state='all', labels=[current_release_label])) + list(
+                repo.get_issues(
+                    state='open', labels=[released_label]))
 
     released_prs = repo.get_issues(state='closed', labels=[released_label])
 
@@ -67,12 +68,14 @@ def remove_release_labels(repo):
 
     for pr in current_release_prs:
         pr.remove_from_labels(release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-        python_utils.PRINT('%s label removed from PR: #%s' % (
-            release_constants.LABEL_FOR_CURRENT_RELEASE_PRS, pr.number))
+        python_utils.PRINT(
+            '%s label removed from PR: #%s' % (
+                release_constants.LABEL_FOR_CURRENT_RELEASE_PRS, pr.number))
     for pr in released_prs:
         pr.remove_from_labels(release_constants.LABEL_FOR_RELEASED_PRS)
-        python_utils.PRINT('%s label removed from PR: #%s' % (
-            release_constants.LABEL_FOR_RELEASED_PRS, pr.number))
+        python_utils.PRINT(
+            '%s label removed from PR: #%s' % (
+                release_constants.LABEL_FOR_RELEASED_PRS, pr.number))
 
 
 def remove_blocking_bugs_milestone_from_issues(repo):
@@ -92,8 +95,9 @@ def remove_blocking_bugs_milestone_from_issues(repo):
         common.open_new_tab_in_browser_if_possible(
             'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
             'is%3Aissue+milestone%3A%22Blocking+bugs%22')
-        raise Exception('%s blocking bugs are not resolved.' % (
-            blocking_bugs_milestone.open_issues))
+        raise Exception(
+            '%s blocking bugs are not resolved.' % (
+                blocking_bugs_milestone.open_issues))
     issues = repo.get_issues(milestone=blocking_bugs_milestone, state='closed')
     for issue in issues:
         issue.edit(milestone=None)

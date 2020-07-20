@@ -1396,8 +1396,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             topic_services.check_can_edit_topic(self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+        self.assertFalse(
+            topic_services.check_can_edit_topic(self.user_b, topic_rights))
 
         topic_services.assign_role(
             self.user_admin, self.user_a,

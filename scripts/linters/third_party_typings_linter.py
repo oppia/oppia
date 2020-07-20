@@ -78,11 +78,13 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
         failed = False
         summary_messages = []
 
-        manifest = json.load(python_utils.open_file(
-            MANIFEST_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
+        manifest = json.load(
+            python_utils.open_file(
+                MANIFEST_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
 
-        package = json.load(python_utils.open_file(
-            PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
+        package = json.load(
+            python_utils.open_file(
+                PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
 
         files_in_typings_dir = os.listdir(
             os.path.join(os.getcwd(), 'typings'))

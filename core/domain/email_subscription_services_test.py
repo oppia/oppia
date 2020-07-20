@@ -92,19 +92,30 @@ class InformSubscribersTest(test_utils.GenericTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(True, any(
-                model.recipient_id == self.user_id for model in all_models))
-            self.assertEqual(True, any(
-                model.recipient_email == self.USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
+            self.assertEqual(
+                True, any(
+                    model.recipient_id == self.user_id for model in all_models))
+            self.assertEqual(
+                True, any(
+                    model.recipient_email ==
+                    self.USER_EMAIL for model in all_models))
 
-            self.assertEqual(True, any(
-                model.recipient_id == self.new_user_id for model in all_models)) # pylint: disable=line-too-long
-            self.assertEqual(True, any(
-                model.recipient_email == self.NEW_USER_EMAIL for model in all_models)) # pylint: disable=line-too-long
+            self.assertEqual(
+                True, any(
+                    model.recipient_id ==
+                    self.new_user_id for model in all_models))
+            self.assertEqual(
+                True, any(
+                    model.recipient_email ==
+                    self.NEW_USER_EMAIL for model in all_models))
 
             # No email model is stored for the user who has unsubscribed from
             # subscription emails.
-            self.assertEqual(False, any(
-                model.recipient_id == self.user_id_2 for model in all_models))
-            self.assertEqual(False, any(
-                model.recipient_email == self.USER_EMAIL_2 for model in all_models)) # pylint: disable=line-too-long
+            self.assertEqual(
+                False, any(
+                    model.recipient_id ==
+                    self.user_id_2 for model in all_models))
+            self.assertEqual(
+                False, any(
+                    model.recipient_email ==
+                    self.USER_EMAIL_2 for model in all_models))

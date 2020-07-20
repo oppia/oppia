@@ -349,8 +349,9 @@ class Question(python_utils.OBJECT):
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)
 
-        conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
-            current_state_schema_version, current_state_schema_version + 1))
+        conversion_fn = getattr(
+            cls, '_convert_state_v%s_dict_to_v%s_dict' % (
+                current_state_schema_version, current_state_schema_version + 1))
 
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
@@ -370,10 +371,12 @@ class Question(python_utils.OBJECT):
             raise utils.ValidationError(
                 'linked_skill_ids is either null or an empty list')
 
-        if not (isinstance(self.linked_skill_ids, list) and (
-                all(isinstance(
-                    elem, python_utils.BASESTRING) for elem in (
-                        self.linked_skill_ids)))):
+        if not (
+                isinstance(self.linked_skill_ids, list) and (
+                    all(
+                        isinstance(
+                            elem, python_utils.BASESTRING) for elem in (
+                                self.linked_skill_ids)))):
             raise utils.ValidationError(
                 'Expected linked_skill_ids to be a list of strings, '
                 'received %s' % self.linked_skill_ids)

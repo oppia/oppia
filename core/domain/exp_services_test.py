@@ -2574,7 +2574,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
                 'translation_html': '<p>Translated text</p>'
-        }))
+            }))
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
 
@@ -3451,10 +3451,12 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         # Check that owner and editor may edit, but not viewer.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
-        self.assertTrue(exp_services.is_exp_summary_editable(
-            exp_summary, user_id=self.owner_id))
-        self.assertTrue(exp_services.is_exp_summary_editable(
-            exp_summary, user_id=self.editor_id))
+        self.assertTrue(
+            exp_services.is_exp_summary_editable(
+                exp_summary, user_id=self.owner_id))
+        self.assertTrue(
+            exp_services.is_exp_summary_editable(
+                exp_summary, user_id=self.editor_id))
         self.assertFalse(
             exp_services.is_exp_summary_editable(
                 exp_summary, user_id=self.viewer_id))

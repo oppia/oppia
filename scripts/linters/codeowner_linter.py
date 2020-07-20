@@ -207,8 +207,8 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
         important_rules_in_critical_section = []
         file_patterns = []
         dir_patterns = []
-        for line_num, line in enumerate(file_cache.readlines(
-                CODEOWNER_FILEPATH)):
+        for line_num, line in enumerate(
+                file_cache.readlines(CODEOWNER_FILEPATH)):
             stripped_line = line.strip()
             if '# Critical files' in line:
                 critical_file_section_found = True

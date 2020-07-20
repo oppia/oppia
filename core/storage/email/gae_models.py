@@ -106,7 +106,7 @@ class SentEmailModel(base_models.BaseModel):
             ndb.OR(
                 cls.recipient_id == user_id,
                 cls.sender_id == user_id,
-        )).get(keys_only=True) is not None
+            )).get(keys_only=True) is not None
 
     @classmethod
     def _generate_id(cls, intent):

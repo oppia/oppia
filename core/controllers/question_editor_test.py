@@ -586,8 +586,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_get_with_admin_email_allows_question_fetching(self):
         self.login(self.ADMIN_EMAIL)
-        response_dict = self.get_json('%s/%s' % (
-            feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
+        response_dict = self.get_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
         self.assertEqual(
             response_dict['question_dict']['id'], self.question_id)
         self.assertEqual(
@@ -604,8 +605,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_get_with_topic_manager_email_allows_question_fetching(self):
         self.login(self.TOPIC_MANAGER_EMAIL)
-        response_dict = self.get_json('%s/%s' % (
-            feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
+        response_dict = self.get_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
         self.assertEqual(
             response_dict['question_dict']['id'], self.question_id)
         self.assertEqual(

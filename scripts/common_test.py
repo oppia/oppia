@@ -460,16 +460,19 @@ class CommonTests(test_utils.GenericTestBase):
         for root, directories, filenames in os.walk(root_temp_dir):
             for directory in directories:
                 self.assertEqual(
-                    oct(stat.S_IMODE(
-                        os.stat(os.path.join(root, directory)).st_mode)),
+                    oct(
+                        stat.S_IMODE(
+                            os.stat(os.path.join(root, directory)).st_mode)),
                     '0744')
                 self.assertEqual(
                     os.stat(os.path.join(root, directory)).st_uid, os.getuid())
 
             for filename in filenames:
                 self.assertEqual(
-                    oct(stat.S_IMODE(
-                        os.stat(os.path.join(root, filename)).st_mode)), '0744')
+                    oct(
+                        stat.S_IMODE(
+                            os.stat(os.path.join(root, filename)).st_mode)),
+                    '0744')
                 self.assertEqual(
                     os.stat(os.path.join(root, filename)).st_uid, os.getuid())
 

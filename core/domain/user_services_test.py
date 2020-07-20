@@ -825,8 +825,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'property_name': 'title',
                 'new_value': 'Some new title'
             }], '')
-        self.assertIsNone(user_services.get_user_settings(
-            self.admin_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.

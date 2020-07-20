@@ -269,8 +269,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
-            self.assertTrue(isinstance(
-                next_response['next_cursor'], python_utils.BASESTRING))
+            self.assertTrue(
+                isinstance(
+                    next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_with_invalid_language_code(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(

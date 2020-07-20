@@ -1176,8 +1176,9 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             id='exp_id-1', committer_id=self.owner_id, commit_type='create')
         model1.put()
 
-        self.assertIsNone(user_services.get_user_settings(
-            self.owner_id).first_contribution_msec)
+        self.assertIsNone(
+            user_services.get_user_settings(
+                self.owner_id).first_contribution_msec)
 
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())

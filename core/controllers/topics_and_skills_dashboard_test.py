@@ -579,8 +579,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'thumbnail_filename': 'image.svg'
             },
             csrf_token=csrf_token,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            upload_files=(
+                ('image', 'unused_filename', self.original_image_content),))
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -601,8 +601,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            upload_files=(
+                ('image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -717,8 +717,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            upload_files=(
+                ('image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -735,8 +735,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            upload_files=(
+                ('image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
 
         payload = {
@@ -777,8 +777,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            upload_files=(
+                ('image', 'unused_filename', self.original_image_content),))
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(

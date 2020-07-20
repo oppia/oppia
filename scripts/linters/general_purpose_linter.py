@@ -181,16 +181,17 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
-                             r'throw\s\b(\bError|\bTypeError|\bRangeError'
-                             r'\bSyntaxError|\bDimensionError)\('),
+        'regexp': re.compile(
+            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
+            r'throw\s\b(\bError|\bTypeError|\bRangeError'
+            r'\bSyntaxError|\bDimensionError)\('),
         'message': 'Please use \'throw new\' instead of \'throw\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
-                             r'throw\s\'.*\';'),
+        'regexp': re.compile(
+            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})throw\s\'.*\';'),
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
@@ -526,9 +527,10 @@ def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
         bool: Whether to exclude the given file from this
         particular pattern check.
     """
-    return (any(filepath.startswith(bad_pattern)
-                for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
-            or filepath in BAD_PATTERNS[pattern]['excluded_files'])
+    return (
+        any(filepath.startswith(bad_pattern)
+            for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
+        or filepath in BAD_PATTERNS[pattern]['excluded_files'])
 
 
 def check_bad_pattern_in_file(filepath, file_content, pattern):
@@ -552,10 +554,12 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
     summary_messages = []
     failed = False
     regexp = pattern['regexp']
-    if not (any(filepath.startswith(excluded_dir)
-                for excluded_dir in pattern['excluded_dirs'])
-            or any(filepath.endswith(excluded_file)
-                   for excluded_file in pattern['excluded_files'])):
+    if not (
+            any(
+                filepath.startswith(excluded_dir)
+                    for excluded_dir in pattern['excluded_dirs'])
+                or any(filepath.endswith(excluded_file)
+                    for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content, 1):
             if line.endswith('\n'):
@@ -565,8 +569,9 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
             if regexp.search(stripped_line):
-                summary_message = ('%s --> Line %s: %s' % (
-                    filepath, line_num, pattern['message']))
+                summary_message = (
+                    '%s --> Line %s: %s' % (
+                        filepath, line_num, pattern['message']))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
                 python_utils.PRINT('')
@@ -660,16 +665,18 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         file_content = self.file_cache.readlines(filepath)
         for index, regexp_to_check in enumerate(
                 pattern_list):
-            if (any([filepath.endswith(
-                    allowed_type) for allowed_type in (
-                        regexp_to_check['included_types'])]) and (
-                            not any([
-                                filepath.endswith(
-                                    pattern) for pattern in (
-                                        regexp_to_check[
-                                            'excluded_files'] +
-                                        regexp_to_check[
-                                            'excluded_dirs'])]))):
+            if (
+                    any(
+                        [filepath.endswith(
+                            allowed_type) for allowed_type in (
+                                regexp_to_check['included_types'])]) and (
+                                    not any([
+                                        filepath.endswith(
+                                            pattern) for pattern in (
+                                                regexp_to_check[
+                                                    'excluded_files'] +
+                                                regexp_to_check[
+                                                    'excluded_dirs'])]))):
                 pattern_found_list.append(index)
                 for line in file_content:
                     if regexp_to_check['regexp'].search(line):
@@ -678,9 +685,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         if pattern_found_list:
             failed = True
             for pattern_found in pattern_found_list:
-                summary_message = ('%s --> %s' % (
-                    filepath,
-                    pattern_list[pattern_found]['message']))
+                summary_message = (
+                    '%s --> %s' % (
+                        filepath, pattern_list[pattern_found]['message']))
                 summary_messages.append(summary_message)
                 python_utils.PRINT(summary_message)
 
@@ -748,9 +755,10 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     for line_num, line in enumerate(file_content):
                         if pattern in line:
                             failed = True
-                            summary_message = ('%s --> Line %s: %s' % (
-                                filepath, line_num + 1,
-                                BAD_PATTERNS[pattern]['message']))
+                            summary_message = (
+                                '%s --> Line %s: %s' % (
+                                    filepath, line_num + 1,
+                                    BAD_PATTERNS[pattern]['message']))
                             summary_messages.append(summary_message)
                             python_utils.PRINT(summary_message)
                             python_utils.PRINT('')
@@ -779,9 +787,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
                         if pattern not in file_content:
                             failed = True
-                            summary_message = ('%s --> %s' % (
-                                filepath,
-                                REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
+                            summary_message = (
+                                '%s --> %s' % (
+                                    filepath,
+                                    REQUIRED_STRINGS_CONSTANTS[
+                                        pattern]['message']))
                             python_utils.PRINT(summary_message)
                             summary_messages.append(summary_message)
                             python_utils.PRINT('')
@@ -801,8 +811,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             if total_files_checked == 0:
                 python_utils.PRINT('There are no files to be checked.')
             else:
-                python_utils.PRINT('(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count))
+                python_utils.PRINT(
+                    '(%s files checked, %s errors found)' % (
+                        total_files_checked, total_error_count))
                 python_utils.PRINT(summary_message)
         return summary_messages
 

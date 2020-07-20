@@ -89,10 +89,12 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == CollectionMigrationOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted collections.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['Encountered %d deleted collections.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         elif key == CollectionMigrationOneOffJob._MIGRATED_KEY:
-            yield (key, ['%d collections successfully migrated.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            yield (
+                key, ['%d collections successfully migrated.' % (
+                    sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

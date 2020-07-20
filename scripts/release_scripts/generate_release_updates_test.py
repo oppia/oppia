@@ -110,8 +110,9 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     f.read(),
                     generate_release_updates.RELEASE_MAIL_MESSAGE_TEMPLATE % (
-                        tuple(['1.2.3'] + (
-                            generate_release_updates.SECTIONS_TO_ADD))))
+                        tuple(
+                            ['1.2.3'] + (
+                                generate_release_updates.SECTIONS_TO_ADD))))
 
     def test_validate_release_message_with_valid_message(self):
         check_function_calls = {

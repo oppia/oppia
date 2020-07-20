@@ -229,8 +229,8 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
         self._run_user_stats_aggregator_job()
-        self.assertIsNone(user_models.UserStatsModel.get(
-            self.owner_id_1, strict=False))
+        self.assertIsNone(
+            user_models.UserStatsModel.get(self.owner_id_1, strict=False))
         self.logout()
 
     def test_one_play_for_single_exploration(self):

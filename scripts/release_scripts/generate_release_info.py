@@ -349,9 +349,10 @@ def main(personal_access_token):
             set([
                 (name, email) for name, email in release_authors
                 if email not in past_authors]))
-        existing_authors = sorted(set(
-            [(name, email) for name, email in release_authors
-             if email in past_authors]))
+        existing_authors = sorted(
+            set(
+                [(name, email) for name, email in release_authors
+                if email in past_authors]))
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
@@ -403,8 +404,9 @@ def main(personal_access_token):
                 out.write(
                     '* [%s](%s)\n' % (link, link))
 
-    python_utils.PRINT('Done. Summary file generated in %s' % (
-        release_constants.RELEASE_SUMMARY_FILEPATH))
+    python_utils.PRINT(
+        'Done. Summary file generated in %s' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

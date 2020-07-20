@@ -119,8 +119,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
             for filepath in files_to_check:
                 if filepath.endswith('_test.py'):
                     continue
-                for line_num, line in enumerate(self.file_cache.readlines(
-                        filepath)):
+                for line_num, line in enumerate(
+                        self.file_cache.readlines(filepath)):
                     line = line.strip()
                     words = line.split()
                     if len(words) < 2:
@@ -200,11 +200,13 @@ class PythonLintChecksManager(python_utils.OBJECT):
         validation_jobs_list = []
         for filepath in self.all_filepaths:
             if filepath.endswith('prod_validation_jobs_one_off.py'):
-                validation_jobs_list.extend(_get_jobs_class_names_in_filepath(
-                    filepath, 'ProdValidationAuditOneOffJob'))
+                validation_jobs_list.extend(
+                    _get_jobs_class_names_in_filepath(
+                        filepath, 'ProdValidationAuditOneOffJob'))
             elif filepath.endswith('_jobs_one_off.py'):
-                one_off_jobs_list.extend(_get_jobs_class_names_in_filepath(
-                    filepath, 'BaseMapReduceOneOffJobManager'))
+                one_off_jobs_list.extend(
+                    _get_jobs_class_names_in_filepath(
+                        filepath, 'BaseMapReduceOneOffJobManager'))
 
         # Removing jobs which are used in cron.
         one_off_jobs_list = [
@@ -374,8 +376,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             current_files_to_lint = files_to_lint[
                 current_batch_start_index: current_batch_end_index]
             if self.verbose_mode_enabled:
-                python_utils.PRINT('Linting Python files %s to %s...' % (
-                    current_batch_start_index + 1, current_batch_end_index))
+                python_utils.PRINT(
+                    'Linting Python files %s to %s...' % (
+                        current_batch_start_index + 1, current_batch_end_index))
 
             # This line invokes Pylint and redirect its output
             # to the StringMessageStream.
@@ -496,8 +499,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             summary_message = (
                 '%s %s Python files linted for Python 3 compatibility '
                 '(%.1f secs)'
-                % (linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files, (
-                    time.time() - start_time)))
+                % (
+                    linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files, (
+                        time.time() - start_time)))
 
         python_utils.PRINT(summary_message)
         summary_messages.append(summary_message)
@@ -523,9 +527,10 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 # and returns True if it finds an error else returns False
                 # If check is set to True, isort simply checks the file and
                 # if check is set to False, it autocorrects import-order errors.
-                if (isort.SortImports(
-                        filepath, check=True, show_diff=(
-                            True)).incorrectly_sorted):
+                if (
+                        isort.SortImports(
+                            filepath, check=True, show_diff=(
+                                True)).incorrectly_sorted):
                     failed = True
                     python_utils.PRINT('')
 

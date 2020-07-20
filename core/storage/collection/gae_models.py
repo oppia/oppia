@@ -289,7 +289,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                     cls.editor_ids == user_id,
                     cls.voice_artist_ids == user_id,
                     cls.viewer_ids == user_id
-            )).get(keys_only=True) is not None
+                )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     def save(self, committer_id, commit_message, commit_cmds):

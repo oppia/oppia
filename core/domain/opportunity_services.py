@@ -68,8 +68,8 @@ def get_exploration_opportunity_summary_from_model(model):
         model.incomplete_translation_language_codes +
         model.need_voice_artist_in_language_codes +
         model.assigned_voice_artist_in_language_codes)
-    supported_language_codes = set([language['id'] for language in (
-        constants.SUPPORTED_AUDIO_LANGUAGES)])
+    supported_language_codes = set(
+        [language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
     missing_language_codes = list(
         supported_language_codes - set_of_all_languages)
     if missing_language_codes:

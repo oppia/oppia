@@ -427,8 +427,8 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             if subscriptions_model else [])
 
     def test_subscribe_to_creator(self):
-        self.assertEqual(self._get_all_subscribers_of_creator(
-            self.owner_id), [])
+        self.assertEqual(
+            self._get_all_subscribers_of_creator(self.owner_id), [])
 
         # Subscribe a user to a creator.
         subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
@@ -457,8 +457,8 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
                 USER_ID_2), [self.owner_id])
 
     def test_unsubscribe_from_creator(self):
-        self.assertEqual(self._get_all_subscribers_of_creator(
-            self.owner_id), [])
+        self.assertEqual(
+            self._get_all_subscribers_of_creator(self.owner_id), [])
 
         # Add subscribers to a creator.
         subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
@@ -490,8 +490,8 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         # Unsubscribing the second user.
         subscription_services.unsubscribe_from_creator(
             USER_ID_2, self.owner_id)
-        self.assertEqual(self._get_all_subscribers_of_creator(
-            self.owner_id), [])
+        self.assertEqual(
+            self._get_all_subscribers_of_creator(self.owner_id), [])
         self.assertEqual(
             self._get_all_creators_subscribed_to(USER_ID_2),
             [])

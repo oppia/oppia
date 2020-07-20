@@ -59,8 +59,9 @@ def create_new_file_with_release_message_template():
     release_version = common.get_current_release_version_number(
         common.get_current_branch_name())
     with python_utils.open_file(RELEASE_MAIL_MESSAGE_FILEPATH, 'w') as f:
-        f.write(RELEASE_MAIL_MESSAGE_TEMPLATE % (
-            tuple([release_version] + SECTIONS_TO_ADD)))
+        f.write(
+            RELEASE_MAIL_MESSAGE_TEMPLATE % (
+                tuple([release_version] + SECTIONS_TO_ADD)))
 
     common.ask_user_to_confirm(
         'Please make updates to following file %s for generating the '

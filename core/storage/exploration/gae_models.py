@@ -358,7 +358,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     cls.editor_ids == user_id,
                     cls.voice_artist_ids == user_id,
                     cls.viewer_ids == user_id
-            )).get(keys_only=True) is not None
+                )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     def save(self, committer_id, commit_message, commit_cmds):
@@ -663,7 +663,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 cls.voice_artist_ids == user_id,
                 cls.viewer_ids == user_id,
                 cls.contributor_ids == user_id
-        )).get(keys_only=True) is not None
+            )).get(keys_only=True) is not None
 
     @classmethod
     def get_non_private(cls):

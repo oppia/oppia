@@ -107,10 +107,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
-            cls.original_author_id == user_id,
-            cls.last_nonempty_message_author_id == user_id
-        )).get(keys_only=True) is not None
+        return cls.query(
+            ndb.OR(
+                cls.original_author_id == user_id,
+                cls.last_nonempty_message_author_id == user_id
+            )).get(keys_only=True) is not None
 
     @classmethod
     def export_data(cls, user_id):

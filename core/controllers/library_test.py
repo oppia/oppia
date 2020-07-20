@@ -521,14 +521,16 @@ class CategoryConfigTests(test_utils.GenericTestBase):
 
         # Test that an icon exists for each default category.
         for category in all_categories:
-            utils.get_file_contents(os.path.join(
-                self.get_static_asset_filepath(), 'assets', 'images',
-                'subjects', '%s.svg' % category.replace(' ', '')))
+            utils.get_file_contents(
+                os.path.join(
+                    self.get_static_asset_filepath(), 'assets', 'images',
+                    'subjects', '%s.svg' % category.replace(' ', '')))
 
         # Test that the default icon exists.
-        utils.get_file_contents(os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'images', 'subjects',
-            '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON))
+        utils.get_file_contents(
+            os.path.join(
+                self.get_static_asset_filepath(), 'assets', 'images',
+                'subjects', '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON))
 
 
 class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):

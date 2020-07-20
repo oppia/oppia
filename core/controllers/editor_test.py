@@ -1846,10 +1846,10 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
                     'Thanks!<br>'
                     '%s (Oppia moderator)<br><br>'
                     'You can change your email preferences via the '
-                    '<a href="https://www.example.com">Preferences</a> page.' % (
-                        self.EDITOR_USERNAME,
-                        new_email_body,
-                        self.MODERATOR_USERNAME)))
+                    '<a href="https://www.example.com">Preferences</a> page.' %
+                    self.EDITOR_USERNAME,
+                    new_email_body,
+                    self.MODERATOR_USERNAME))
 
             self.logout()
 

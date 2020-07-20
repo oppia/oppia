@@ -189,13 +189,13 @@ class HangingIndentChecker(checkers.BaseChecker):
     }
 
     def process_tokens(self, tokens):
-        """Process a module.
+        """Process tokens to check if there is a line brake after the bracket.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            tokens: Tokens. Object to process tokens.
         """
         string_indicator = b'\''
-        for (token_type, token, (line_num, col_num), _, line) in tokens:
+        for (token_type, token, (line_num, _), _, line) in tokens:
             if (
                     token_type == tokenize.OP and (
                         token == b'(' or token == b')')):
@@ -207,7 +207,9 @@ class HangingIndentChecker(checkers.BaseChecker):
                     char = line[char_num]
 
                     if char == string_indicator:
-                        if line[char_num - 1] != b'\\':
+                        if not (
+                                line[char_num - 1] != b'\\' or
+                                line[char_num - 2] != b'\\'):
                             in_string = not in_string
 
                     if in_string:
@@ -1255,7 +1257,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
 
             if (
                     line_num + 1 < file_length and (
-                    blank_line_counter == 0 or blank_line_counter > 1)):
+                        blank_line_counter == 0 or blank_line_counter > 1)):
                 line = file_content[line_num + 1].strip()
                 if line == b'Args:':
                     self.add_message(
@@ -1501,8 +1503,8 @@ class DocstringChecker(checkers.BaseChecker):
             'malformed parameter',
             'malformed-parameter',
             'The parameter is incorrectly formatted: \nFor returns and yields,'
-             ' headers should have this format: "type (elaboration). \n'
-             'For raises, headers should have the format: "exception: '
+            ' headers should have this format: "type (elaboration). \n'
+            'For raises, headers should have the format: "exception: '
         )
     }
 
@@ -1644,8 +1646,9 @@ class DocstringChecker(checkers.BaseChecker):
                 # Check if we are in a docstring raises section.
                 elif (
                         current_docstring_section and
-                        (current_docstring_section ==
-                        self.DOCSTRING_SECTION_RAISES)):
+                        (
+                            current_docstring_section ==
+                            self.DOCSTRING_SECTION_RAISES)):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
@@ -1690,7 +1693,7 @@ class DocstringChecker(checkers.BaseChecker):
                     if (
                             re.search(
                                 br'^[a-zA-Z_() -:,\*]+\.', line) and
-                                not in_description):
+                            not in_description):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
                             self.add_message(
@@ -1706,8 +1709,8 @@ class DocstringChecker(checkers.BaseChecker):
                     elif in_description:
                         if (
                                 current_line_indentation != (
-                                args_indentation_in_spaces + 4)
-                                and not in_freeform_section):
+                                    args_indentation_in_spaces + 4)
+                                    and not in_freeform_section):
                             self.add_message(
                                 '4-space-indentation-in-docstring',
                                 line=line_num + 1)

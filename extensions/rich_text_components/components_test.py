@@ -266,9 +266,10 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
         """Test that all components are defined."""
         rich_text_components_dir = (
             os.path.join(os.curdir, 'extensions', 'rich_text_components'))
-        actual_components = [name for name in os.listdir(
-            rich_text_components_dir) if os.path.isdir(os.path.join(
-                rich_text_components_dir, name))]
+        actual_components = [
+            name for name in os.listdir(
+                rich_text_components_dir) if os.path.isdir(
+                    os.path.join(rich_text_components_dir, name))]
         defined_components = []
         for name, obj in inspect.getmembers(components):
             if inspect.isclass(obj):
@@ -286,9 +287,10 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             'extensions', 'rich_text_components', 'protractor.js')
         rich_text_components_dir = (
             os.path.join(os.curdir, 'extensions', 'rich_text_components'))
-        actual_components = [name for name in os.listdir(
-            rich_text_components_dir) if os.path.isdir(os.path.join(
-                rich_text_components_dir, name))]
+        actual_components = [
+            name for name in os.listdir(
+                rich_text_components_dir) if os.path.isdir(
+                    os.path.join(rich_text_components_dir, name))]
         with python_utils.open_file(test_file, 'r') as f:
             text = f.read()
             # Replace all spaces and new lines with empty space.

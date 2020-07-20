@@ -40,8 +40,8 @@ class Registry(python_utils.OBJECT):
         return list(
             itertools.chain(
                 *[interaction_category['interaction_ids']
-                for interaction_category in constants
-                .ALLOWED_INTERACTION_CATEGORIES
+                  for interaction_category in constants
+                  .ALLOWED_INTERACTION_CATEGORIES
                  ]))
 
     @classmethod

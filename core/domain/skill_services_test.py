@@ -1190,8 +1190,8 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
                 masteries[:feconf.MAX_NUMBER_OF_SKILL_IDS])
 
         # Testing the arrangement.
-        excluded_skill_ids = list(set(self.SKILL_IDS) - set(
-            arranged_filtered_skill_ids))
+        excluded_skill_ids = list(
+            set(self.SKILL_IDS) - set(arranged_filtered_skill_ids))
         for skill_id in excluded_skill_ids:
             self.SKILL_IDS.remove(skill_id)
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)

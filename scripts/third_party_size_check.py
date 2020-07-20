@@ -99,8 +99,9 @@ def _check_third_party_size():
         THIRD_PARTY_PATH, skip_files_list)
     python_utils.PRINT('')
     python_utils.PRINT('------------------------------------------------------')
-    python_utils.PRINT('    Number of files in third-party folder: %d' % (
-        number_of_files_in_third_party))
+    python_utils.PRINT(
+        '    Number of files in third-party folder: %d' % (
+            number_of_files_in_third_party))
     python_utils.PRINT('')
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
         python_utils.PRINT(

@@ -161,9 +161,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # get_current_time_in_millisecs function while testing, the times are
         # usually offset by  few seconds. Therefore we check if the difference
         # between the times is less than 10 seconds.
-        self.assertLess((
-            actual_details['timestamp'] -
-            details_fetched_from_model['timestamp']).total_seconds(), 10)
+        self.assertLess(
+            (
+                actual_details['timestamp'] -
+                details_fetched_from_model['timestamp']).total_seconds(), 10)
 
     def _get_all_incomplete_collection_ids(self, user_id):
         """Returns the list of all the collection ids that are incompletely
@@ -197,8 +198,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add an exploration to the in progress list of the learner.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_1, state_name, version)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_1])
         # Add an exploration to the learner playlist of the learner.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_3)
@@ -210,17 +211,19 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # it gets removed from the incomplete list.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_1)
-        self.assertEqual(self._get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [])
 
         # Test that on adding an exploration to the completed list, it gets
         # removed from the learner playlist.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_3)
-        self.assertEqual(self._get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
+        self.assertEqual(
+            self._get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [])
@@ -229,8 +232,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # completed list.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_2)
-        self.assertEqual(self._get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
+        self.assertEqual(
+            self._get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
     def test_mark_collection_as_completed(self):
         self.assertEqual(
@@ -239,30 +243,35 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add a collection to the completed list.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_0])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0])
 
         # Completing a collection again has no effect.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_0])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0])
 
         # Add a collection to the incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_1])
 
         # If the collection is present in the incomplete list, on completion
         # it is removed from the incomplete list and added to the complete
         # list.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [])
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Add a collection to the learner playlist of the learner.
         learner_playlist_services.mark_collection_to_be_played_later(
@@ -275,8 +284,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # removed from the learner playlist.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_3)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [])
@@ -285,12 +295,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # completed list.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_2)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
     def test_mark_exploration_as_incomplete(self):
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [])
 
         state_name = u'state name'
         version = 1
@@ -304,11 +315,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add an exploration to the incomplete list of a learner.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_0, state_name, version)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_0])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_0])
         self._check_if_exp_details_match(
-            self._get_incomplete_exp_details(self.user_id, self.EXP_ID_0),
-            exp_details)
+            self._get_incomplete_exp_details(
+                self.user_id, self.EXP_ID_0), exp_details)
 
         state_name = u'new_state_name'
         version = 2
@@ -323,19 +334,19 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # version.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_0, state_name, version)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_0])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_0])
         self._check_if_exp_details_match(
-            self._get_incomplete_exp_details(self.user_id, self.EXP_ID_0),
-            modified_exp_details)
+            self._get_incomplete_exp_details(
+                self.user_id, self.EXP_ID_0), modified_exp_details)
 
         # If an exploration has already been completed, it is not added.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_1)
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_1, state_name, version)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_0])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_0])
 
         # Add an exploration to the learner playlist.
         learner_playlist_services.mark_exploration_to_be_played_later(
@@ -348,8 +359,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # removed from the learner playlist.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_3, state_name, version)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [])
@@ -358,24 +370,27 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # incomplete list.
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_2, state_name, version)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
 
     def test_mark_collection_as_incomplete(self):
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(self.user_id), [])
 
         # Add a collection to the incomplete list of the learner.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_0])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0])
 
         # Adding a collection again has no effect.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_0])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0])
 
         # If a collection has been completed, it is not added to the incomplete
         # list.
@@ -383,8 +398,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_1)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_0])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0])
 
         # Add a collection to the learner playlist of the learner.
         learner_playlist_services.mark_collection_to_be_played_later(
@@ -397,8 +413,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # removed from the learner playlist.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_3)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_3])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_3])
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [])
@@ -407,12 +424,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_2)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_3])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_3])
 
     def test_remove_exp_from_incomplete_list(self):
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(
+                self.user_id), [])
 
         state_name = 'state name'
         version = 1
@@ -422,72 +441,79 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0, state_name, version)
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_1, state_name, version)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Removing an exploration.
         learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, self.EXP_ID_0)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_1])
 
         # Removing the same exploration again has no effect.
         learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, self.EXP_ID_0)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [self.EXP_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [self.EXP_ID_1])
 
         # Removing the second exploration.
         learner_progress_services.remove_exp_from_incomplete_list(
             self.user_id, self.EXP_ID_1)
-        self.assertEqual(self._get_all_incomplete_exp_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_incomplete_exp_ids(self.user_id), [])
 
     def test_remove_collection_from_incomplete_list(self):
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(self.user_id), [])
 
         # Add two collections to the incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
         learner_progress_services.remove_collection_from_incomplete_list(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_1])
 
         # Removing the same collection again has no effect.
         learner_progress_services.remove_collection_from_incomplete_list(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_1])
 
         # Removing another collection.
         learner_progress_services.remove_collection_from_incomplete_list(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_incomplete_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_incomplete_collection_ids(self.user_id), [])
 
     def test_get_all_completed_exp_ids(self):
-        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [])
 
         # Add an exploration to the completed list.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
-        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0])
 
         # Add another exploration.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_1)
-        self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
-            self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
     def test_unpublishing_completed_exploration_filters_it_out(self):
         # Add explorations to the completed list.

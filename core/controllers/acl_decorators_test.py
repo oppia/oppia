@@ -59,11 +59,13 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_play_exploration/<exploration_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -138,11 +140,12 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_collection/<collection_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_play_collection/<collection_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -229,11 +232,12 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_edit_collection/<collection_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_edit_collection/<collection_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -328,10 +332,11 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_banned_users([self.username])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/create', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/create', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_banned_user_cannot_create_exploration(self):
         self.login(self.user_email)
@@ -378,10 +383,11 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_collection_editors([self.username])
         self.set_admins([self.ADMIN_USERNAME])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/create', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/create', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_guest_cannot_create_collection_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -433,10 +439,11 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_banned_users([self.username])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/access', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/access', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_banned_user_cannot_access_editor_dashboard(self):
         self.login(self.user_email)
@@ -476,12 +483,13 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_comment_on_feedback_thread/<thread_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_comment_on_feedback_thread/<thread_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -590,12 +598,13 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_create_feedback_thread/<exploration_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_create_feedback_thread/<exploration_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -672,11 +681,12 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_view_feedback_thread/<thread_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_view_feedback_thread/<thread_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -756,13 +766,14 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [
-                webapp2.Route('/mock/', self.MockHandler),
-                webapp2.Route('/mock/<query_id>', self.MockHandler)
-            ],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route('/mock/', self.MockHandler),
+                    webapp2.Route('/mock/<query_id>', self.MockHandler)
+                ],
+                debug=feconf.DEBUG,
+            ))
 
     def test_moderator_cannot_access_email_dashboard(self):
         self.login(self.MODERATOR_EMAIL)
@@ -799,10 +810,11 @@ class RateExplorationTests(test_utils.GenericTestBase):
     def setUp(self):
         super(RateExplorationTests, self).setUp()
         self.signup(self.user_email, self.username)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_guest_cannot_give_rating(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -833,10 +845,11 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_admins([self.ADMIN_USERNAME])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_normal_user_cannot_access_moderator_page(self):
         self.login(self.user_email)
@@ -869,10 +882,11 @@ class FlagExplorationTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FlagExplorationTests, self).setUp()
         self.signup(self.user_email, self.username)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_guest_cannot_flag_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -903,10 +917,11 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SubscriptionToUsersTests, self).setUp()
         self.signup(self.user_email, self.username)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_guest_cannot_subscribe_to_users(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -937,10 +952,11 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_admins([self.ADMIN_USERNAME])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_normal_user_cannot_send_moderator_emails(self):
         self.login(self.user_email)
@@ -991,10 +1007,11 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id_1, self.owner_id)
         self.save_new_valid_exploration(
@@ -1116,12 +1133,13 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.username])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_edit_exploration/<exploration_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_edit_exploration/<exploration_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -1197,10 +1215,11 @@ class ManageOwnProfileTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
         self.set_banned_users([self.banned_user])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_banned_user_cannot_update_preferences(self):
         self.login(self.banned_user_email)
@@ -1230,10 +1249,11 @@ class UploadExplorationTests(test_utils.GenericTestBase):
         super(UploadExplorationTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_upload_exploration/', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock_upload_exploration/', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_super_admin_can_upload_explorations(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1281,11 +1301,13 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_delete_exploration/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_delete_exploration/<exploration_id>',
+                                  self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -1363,10 +1385,11 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.set_banned_users([self.banned_username])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_banned_user_cannot_suggest_changes(self):
         self.login(self.banned_user_email)
@@ -1404,10 +1427,11 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.set_banned_users([self.banned_username])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_banned_user_cannot_suggest_changes(self):
         self.login(self.banned_user_email)
@@ -1456,10 +1480,11 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         self.signup(self.owner_email, self.owner_username)
         self.author_id = self.get_user_id_from_email(self.author_email)
         self.owner_id = self.get_user_id_from_email(self.owner_email)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_default_exploration(self.exploration_id, self.owner_id)
         suggestion_services.create_suggestion(
             self.SUGGESTION_TYPE, self.TARGET_TYPE,
@@ -1523,12 +1548,13 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_accept_suggestion/<target_id>/<suggestion_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_accept_suggestion/<target_id>/<suggestion_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_default_exploration(self.EXPLORATION_ID, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.EXPLORATION_ID)
         suggestion_services.create_suggestion(
@@ -1593,12 +1619,13 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_publish_exploration/<exploration_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_publish_exploration/<exploration_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.public_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -1665,10 +1692,11 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
 
@@ -1729,17 +1757,18 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [
-                webapp2.Route(
-                    '/mock_publish_collection/<collection_id>',
-                    self.MockPublishHandler),
-                webapp2.Route(
-                    '/mock_unpublish_collection/<collection_id>',
-                    self.MockUnpublishHandler)
-            ],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_publish_collection/<collection_id>',
+                        self.MockPublishHandler),
+                    webapp2.Route(
+                        '/mock_unpublish_collection/<collection_id>',
+                        self.MockUnpublishHandler)
+                ],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -1830,10 +1859,11 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.user)
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_banned_user_is_redirected(self):
         self.login(self.banned_user_email)
@@ -1878,10 +1908,12 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.manager = user_services.UserActionsInfo(self.manager_id)
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_edit_topic/<topic_id>', self.MockHandler)],
+                    debug=feconf.DEBUG,
+                ))
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
@@ -1944,10 +1976,12 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.UserActionsInfo(self.admin_id)
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_edit_story/<story_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_edit_story/<story_id>', self.MockHandler)],
+                    debug=feconf.DEBUG,
+                ))
         self.story_id = story_services.get_new_story_id()
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_story(
@@ -2040,11 +2074,12 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.manager = user_services.UserActionsInfo(self.manager_id)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_add_story_to_topic/<topic_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_add_story_to_topic/<topic_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
@@ -2132,10 +2167,11 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_story/<story_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock_story/<story_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
         self.topic_id = topic_services.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
@@ -2195,10 +2231,11 @@ class CreateSkillTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_create_skill', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock_create_skill', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_admin_can_create_skill(self):
         self.login(self.ADMIN_EMAIL)
@@ -2249,12 +2286,13 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_manage_question_skill_status/<skill_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_manage_question_skill_status/<skill_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
             self.question_id, self.admin_id,
@@ -2314,10 +2352,11 @@ class CreateTopicTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_create_topic', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock_create_topic', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_admin_can_create_topic(self):
         self.login(self.ADMIN_EMAIL)
@@ -2368,11 +2407,13 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_manage_rights_for_topic/<topic_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_manage_rights_for_topic/<topic_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_admin_can_manage_rights(self):
@@ -2434,12 +2475,13 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_change_publication_status/<topic_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_change_publication_status/<topic_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_admin_can_change_topic_publication_status(self):
         self.login(self.ADMIN_EMAIL)
@@ -2499,10 +2541,11 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_perform_cron_task', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock_perform_cron_task', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_super_admin_can_perform_cron_tasks(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -2555,10 +2598,12 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.manager = user_services.UserActionsInfo(self.manager_id)
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_edit_skill/<skill_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock_edit_skill/<skill_id>',
+                 self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_cannot_edit_skill_with_invalid_skill_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -2630,11 +2675,12 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
             self.question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_edit_question/<question_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_edit_question/<question_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_guest_cannot_edit_question(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2694,19 +2740,20 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
         super(PlayQuestionDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_question/<question_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_play_question/<question_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_question(
             self.question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
     def test_can_play_question_with_valid_question_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_play_question/%s' % (
-                self.question_id))
+            response = self.get_json(
+                '/mock_play_question/%s' % (self.question_id))
             self.assertEqual(response['question_id'], self.question_id)
 
 
@@ -2734,12 +2781,13 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_entity/<entity_type>/<entity_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_play_entity/<entity_type>/<entity_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id, self.owner_id,
@@ -2752,14 +2800,17 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_play_exploration_on_disabled_exploration_ids(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_play_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_EXPLORATION,
-                feconf.DISABLED_EXPLORATION_IDS[0]), expected_status_int=404)
+            self.get_json(
+                '/mock_play_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    feconf.DISABLED_EXPLORATION_IDS[0]),
+                    expected_status_int=404)
 
     def test_guest_can_play_exploration_on_published_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_play_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_EXPLORATION, self.published_exp_id))
+            response = self.get_json(
+                '/mock_play_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_EXPLORATION, self.published_exp_id))
             self.assertEqual(
                 response['entity_type'], feconf.ENTITY_TYPE_EXPLORATION)
             self.assertEqual(
@@ -2767,9 +2818,10 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_play_exploration_on_private_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_play_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_EXPLORATION,
-                self.private_exp_id), expected_status_int=404)
+            self.get_json(
+                '/mock_play_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    self.private_exp_id), expected_status_int=404)
 
     def test_cannot_play_exploration_with_none_exploration_rights(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2780,8 +2832,9 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_can_play_question_for_valid_question_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_play_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_QUESTION, self.question_id))
+            response = self.get_json(
+                '/mock_play_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_QUESTION, self.question_id))
         self.assertEqual(
             response['entity_type'], feconf.ENTITY_TYPE_QUESTION)
         self.assertEqual(response['entity_id'], self.question_id)
@@ -2789,14 +2842,17 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_play_question_invalid_question_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_play_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_QUESTION, 'question_id'),
-                          expected_status_int=404)
+            self.get_json(
+                '/mock_play_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_QUESTION, 'question_id'),
+                            expected_status_int=404)
 
     def test_cannot_play_entity_for_invalid_entity(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_play_entity/%s/%s' % (
-                'fake_entity_type', 'fake_entity_id'), expected_status_int=404)
+            self.get_json(
+                '/mock_play_entity/%s/%s' % (
+                    'fake_entity_type', 'fake_entity_id'),
+                    expected_status_int=404)
 
 
 class EditEntityDecoratorTests(test_utils.GenericTestBase):
@@ -2825,12 +2881,13 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.username])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_edit_entity/<entity_type>/<entity_id>',
-                self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route(
+                    '/mock_edit_entity/<entity_type>/<entity_id>',
+                    self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id, self.owner_id,
@@ -2873,8 +2930,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_can_edit_question_with_valid_question_id(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_edit_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_QUESTION, self.question_id))
+            response = self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_QUESTION, self.question_id))
             self.assertEqual(response['entity_id'], self.question_id)
             self.assertEqual(response['entity_type'], 'question')
         self.logout()
@@ -2888,8 +2946,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_edit_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_TOPIC, topic_id))
+            response = self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_TOPIC, topic_id))
             self.assertEqual(response['entity_id'], topic_id)
             self.assertEqual(response['entity_type'], 'topic')
         self.logout()
@@ -2909,8 +2968,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_edit_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_SKILL, skill_id))
+            response = self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_SKILL, skill_id))
             self.assertEqual(response['entity_id'], skill_id)
             self.assertEqual(response['entity_type'], 'skill')
         self.logout()
@@ -2928,16 +2988,18 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_edit_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_STORY, story_id))
+            response = self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_STORY, story_id))
             self.assertEqual(response['entity_id'], story_id)
             self.assertEqual(response['entity_type'], 'story')
         self.logout()
 
     def test_cannot_edit_entity_invalid_entity(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_edit_entity/%s/%s' % (
-                'invalid_entity_type', 'q_id'), expected_status_int=404)
+            self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    'invalid_entity_type', 'q_id'), expected_status_int=404)
 
 
 class SaveExplorationTests(test_utils.GenericTestBase):
@@ -2975,10 +3037,11 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
         self.save_new_valid_exploration(
             self.published_exp_id_1, self.owner_id)
         self.save_new_valid_exploration(

@@ -677,14 +677,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        self.assertEqual(recommendations_services.get_topic_similarity(
-            'Art', 'Biology'), 0.1)
-        self.assertEqual(recommendations_services.get_topic_similarity(
-            'Art', 'Art'), feconf.SAME_TOPIC_SIMILARITY)
-        self.assertEqual(recommendations_services.get_topic_similarity(
-            'Topic 1', 'Topic 2'), feconf.DEFAULT_TOPIC_SIMILARITY)
-        self.assertEqual(recommendations_services.get_topic_similarity(
-            'Topic', 'Topic'), feconf.SAME_TOPIC_SIMILARITY)
+        self.assertEqual(
+            recommendations_services.get_topic_similarity(
+                'Art', 'Biology'), 0.1)
+        self.assertEqual(
+            recommendations_services.get_topic_similarity(
+                'Art', 'Art'), feconf.SAME_TOPIC_SIMILARITY)
+        self.assertEqual(
+            recommendations_services.get_topic_similarity(
+                'Topic 1', 'Topic 2'), feconf.DEFAULT_TOPIC_SIMILARITY)
+        self.assertEqual(
+            recommendations_services.get_topic_similarity(
+                'Topic', 'Topic'), feconf.SAME_TOPIC_SIMILARITY)
 
         topic_similarities_data = (
             'Art,Biology,Chemistry\n'
@@ -699,8 +703,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'data': topic_similarities_data
             }, csrf_token=csrf_token)
 
-        self.assertEqual(recommendations_services.get_topic_similarity(
-            'Art', 'Biology'), 0.2)
+        self.assertEqual(
+            recommendations_services.get_topic_similarity(
+                'Art', 'Biology'), 0.2)
 
         self.logout()
 
@@ -1343,8 +1348,9 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
 
-        self.assertTrue(user_services.can_review_translation_suggestions(
-            self.translation_reviewer_id, language_code='hi'))
+        self.assertTrue(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
 
     def test_add_translation_reviewer_in_invalid_language_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1402,8 +1408,9 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
 
-        self.assertTrue(user_services.can_review_voiceover_applications(
-            self.voiceover_reviewer_id, language_code='hi'))
+        self.assertTrue(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
 
     def test_add_voiceover_reviewer_in_invalid_language(self):
         self.assertFalse(
@@ -1455,8 +1462,9 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             'language code hi')
 
     def test_add_question_reviewer(self):
-        self.assertFalse(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
+        self.assertFalse(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -1467,12 +1475,14 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'review_category': 'question'
             }, csrf_token=csrf_token)
 
-        self.assertTrue(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
+        self.assertTrue(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
 
     def test_assigning_same_user_as_question_reviewer_raise_error(self):
-        self.assertFalse(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
+        self.assertFalse(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -1481,8 +1491,9 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'username': 'question',
                 'review_category': 'question'
             }, csrf_token=csrf_token)
-        self.assertTrue(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
+        self.assertTrue(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
 
         response = self.post_json(
             '/addcommunityreviewerhandler', {
@@ -1574,8 +1585,9 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
 
-        self.assertFalse(user_services.can_review_translation_suggestions(
-            self.translation_reviewer_id, language_code='hi'))
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
 
     def test_remove_translation_reviewer_in_invalid_language_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1632,8 +1644,9 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
 
-        self.assertFalse(user_services.can_review_voiceover_applications(
-            self.translation_reviewer_id, language_code='hi'))
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.translation_reviewer_id, language_code='hi'))
 
     def test_remove_voiceover_reviewer_in_invalid_language_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1671,8 +1684,9 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
     def test_remove_question_reviewer(self):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
-        self.assertTrue(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
+        self.assertTrue(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -1683,12 +1697,14 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'review_category': 'question'
             }, csrf_token=csrf_token)
 
-        self.assertFalse(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
+        self.assertFalse(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
 
     def test_removing_unassigned_question_reviewer_raise_error(self):
-        self.assertFalse(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
+        self.assertFalse(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -1731,8 +1747,9 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     def test_remove_reviewer_from_all_reviewable_items(self):
         user_services.allow_user_to_review_question(
             self.translation_reviewer_id)
-        self.assertTrue(user_services.can_review_question_suggestions(
-            self.translation_reviewer_id))
+        self.assertTrue(
+            user_services.can_review_question_suggestions(
+                self.translation_reviewer_id))
 
         user_services.allow_user_to_review_voiceover_in_language(
             self.translation_reviewer_id, 'hi')
@@ -1754,8 +1771,9 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 'removal_type': 'all'
             }, csrf_token=csrf_token)
 
-        self.assertFalse(user_services.can_review_question_suggestions(
-            self.translation_reviewer_id))
+        self.assertFalse(
+            user_services.can_review_question_suggestions(
+                self.translation_reviewer_id))
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.translation_reviewer_id, language_code='hi'))

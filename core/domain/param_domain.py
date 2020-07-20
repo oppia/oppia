@@ -85,9 +85,8 @@ class ParamSpec(python_utils.OBJECT):
                 (
                     '%s is not among the supported object types for parameters:'
                     ' {%s}.') %
-                    (
-                        self.obj_type, ', '.join(
-                            sorted(self.SUPPORTED_OBJ_TYPES))))
+                (
+                    self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
 class ParamChange(python_utils.OBJECT):

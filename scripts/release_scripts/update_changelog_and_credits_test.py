@@ -281,8 +281,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
         expected_developer_names = existing_developer_names
         for name in new_developer_names:
-            expected_developer_names.append('%s\'%s\',\n' % (
-                update_changelog_and_credits.CREDITS_INDENT, name))
+            expected_developer_names.append(
+                '%s\'%s\',\n' % (
+                    update_changelog_and_credits.CREDITS_INDENT, name))
         expected_developer_names = sorted(
             list(set(expected_developer_names)), key=lambda s: s.lower())
 

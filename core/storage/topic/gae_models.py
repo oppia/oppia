@@ -437,9 +437,10 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (cls.query(
-            cls.manager_ids == user_id).get(keys_only=True) is not None
-                or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return (
+            cls.query(
+                cls.manager_ids == user_id).get(keys_only=True) is not None
+            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @classmethod
     def get_by_user(cls, user_id):

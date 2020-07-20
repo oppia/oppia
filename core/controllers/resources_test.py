@@ -254,7 +254,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             '%s.png' % filename_without_extension)
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            os.path.join(
+                feconf.TESTS_DATA_DIR, 'img.png'),
             mode='rb', encoding=None) as f:
             raw_image = f.read()
         # Pass JPG extension even though raw_image data is PNG.
@@ -355,11 +356,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400,
             upload_files=(
-                ('image',
-                 'unused_filename',
-                 '<svg><path d="%s" /></svg>' % (
-                    'M150 0 L75 200 L225 200 Z ' * 4000)),)
-        )
+                (
+                    'image',
+                     'unused_filename',
+                     '<svg><path d="%s" /></svg>' % (
+                         'M150 0 L75 200 L225 200 Z ' * 4000)),)
+            )
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'], 'Image exceeds file size limit of 100 KB.')

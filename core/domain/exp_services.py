@@ -931,8 +931,9 @@ def update_exploration(
                 not commit_message.startswith(
                     feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX))):
         raise ValueError('Invalid commit message for suggestion.')
-    if (not is_suggestion and commit_message and commit_message.startswith(
-            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)):
+    if (
+            not is_suggestion and commit_message and commit_message.startswith(
+                feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)):
         raise ValueError(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)

@@ -189,8 +189,8 @@ class TranslatableTextHandler(base.BaseHandler):
         exp_id = self.request.get('exp_id')
 
         if not utils.is_supported_audio_language_code(language_code):
-            raise self.InvalidInputException('Invalid language_code: %s' % (
-                language_code))
+            raise self.InvalidInputException(
+                'Invalid language_code: %s' % language_code)
 
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):

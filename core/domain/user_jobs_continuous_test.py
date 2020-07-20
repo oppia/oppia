@@ -294,25 +294,26 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .get_recent_user_changes(editor_id)[1])
-            self.assertEqual([(
-                self._get_expected_activity_created_dict(
-                    editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
-                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                    exp2_last_updated_ms)
-            ), {
-                'activity_id': EXP_1_ID,
-                'activity_title': EXP_1_TITLE,
-                'author_id': editor_id,
-                'last_updated_ms': utils.get_time_in_millisecs(
-                    message.created_on),
-                'subject': FEEDBACK_THREAD_SUBJECT,
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-            }, (
-                self._get_expected_activity_created_dict(
-                    editor_id, EXP_1_ID, EXP_1_TITLE, 'exploration',
-                    feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                    exp1_last_updated_ms)
-            )], recent_notifications)
+            self.assertEqual([
+                (
+                    self._get_expected_activity_created_dict(
+                        editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
+                        feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                        exp2_last_updated_ms)
+                ), {
+                    'activity_id': EXP_1_ID,
+                    'activity_title': EXP_1_TITLE,
+                    'author_id': editor_id,
+                    'last_updated_ms': utils.get_time_in_millisecs(
+                        message.created_on),
+                    'subject': FEEDBACK_THREAD_SUBJECT,
+                    'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+                }, (
+                    self._get_expected_activity_created_dict(
+                        editor_id, EXP_1_ID, EXP_1_TITLE, 'exploration',
+                        feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                        exp1_last_updated_ms)
+                )], recent_notifications)
 
     def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
         with self.swap(

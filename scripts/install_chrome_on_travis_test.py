@@ -62,9 +62,10 @@ class InstallChromeOnTravisTests(test_utils.GenericTestBase):
             expected_args=[(os.path.join('HOME', '.cache/TravisChrome/'),)])
         isfile_swap = self.swap_with_checks(
             os.path, 'isfile', mock_isfile,
-            expected_args=[(os.path.join(
-                'HOME', '.cache/TravisChrome/',
-                'google-chrome-stable_77.0.3865.75-1_amd64.deb'),)])
+            expected_args=[(
+                os.path.join(
+                    'HOME', '.cache/TravisChrome/',
+                    'google-chrome-stable_77.0.3865.75-1_amd64.deb'),)])
         chdir_swap = self.swap_with_checks(
             os, 'chdir', mock_chdir, expected_args=[
                 (os.path.join('HOME', '.cache/TravisChrome/'),),

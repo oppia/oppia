@@ -30,8 +30,8 @@ class UserGlobalPrefsTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        user_global_prefs = (user_domain.UserGlobalPrefs(
-            True, False, True, False))
+        user_global_prefs = (
+            user_domain.UserGlobalPrefs(True, False, True, False))
 
         self.assertTrue(user_global_prefs.can_receive_email_updates)
         self.assertFalse(user_global_prefs.can_receive_editor_role_email)
@@ -62,8 +62,8 @@ class UserExplorationPrefsTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        user_exp_prefs = (user_domain.UserExplorationPrefs(
-            False, True))
+        user_exp_prefs = (
+            user_domain.UserExplorationPrefs(False, True))
 
         mute_feedback_notifications = (
             user_exp_prefs.mute_feedback_notifications)
@@ -87,8 +87,8 @@ class UserExplorationPrefsTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         """Testing to_dict."""
-        user_exp_prefs = (user_domain.UserExplorationPrefs(
-            False, True))
+        user_exp_prefs = (
+            user_domain.UserExplorationPrefs(False, True))
         default_user_global_prefs = (
             user_domain.UserExplorationPrefs.create_default_prefs())
 
@@ -118,8 +118,9 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        exp_last_playthrough = (user_domain.ExpUserLastPlaythrough(
-            'user_id0', 'exp_id0', 0, 'last_updated', 'state0'))
+        exp_last_playthrough = (
+            user_domain.ExpUserLastPlaythrough(
+                'user_id0', 'exp_id0', 0, 'last_updated', 'state0'))
 
         self.assertEqual(
             exp_last_playthrough.id, 'user_id0.exp_id0')
@@ -136,8 +137,9 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_update_last_played_information(self):
         """Testing update_last_played_information."""
-        exp_last_playthrough = (user_domain.ExpUserLastPlaythrough(
-            'user_id0', 'exp_id0', 0, 'last_updated', 'state0'))
+        exp_last_playthrough = (
+            user_domain.ExpUserLastPlaythrough(
+                'user_id0', 'exp_id0', 0, 'last_updated', 'state0'))
 
         self.assertEqual(
             exp_last_playthrough.last_played_exp_version, 0)
@@ -157,10 +159,12 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        incomplete_activities = (
+            user_domain.IncompleteActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
-        self.assertEqual(incomplete_activities.id, 'user_id0')
+        self.assertEqual(
+            incomplete_activities.id, 'user_id0')
         self.assertListEqual(
             incomplete_activities.exploration_ids, ['exp_id0'])
         self.assertListEqual(
@@ -168,8 +172,9 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
 
     def test_add_exploration_id(self):
         """Testing add_exploration_id."""
-        incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        incomplete_activities = (
+            user_domain.IncompleteActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             incomplete_activities.exploration_ids, ['exp_id0'])
@@ -182,8 +187,9 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
 
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
-        incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        incomplete_activities = (
+            user_domain.IncompleteActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             incomplete_activities.exploration_ids, ['exp_id0'])
@@ -195,8 +201,9 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
 
     def test_add_collection_id(self):
         """Testing add_collection_id."""
-        incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        incomplete_activities = (
+            user_domain.IncompleteActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             incomplete_activities.collection_ids, ['collect_id0'])
@@ -209,16 +216,16 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
 
     def test_remove_collection_id(self):
         """Testing remove_collection_id."""
-        incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        incomplete_activities = (
+            user_domain.IncompleteActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             incomplete_activities.collection_ids, ['collect_id0'])
 
         incomplete_activities.remove_collection_id('collect_id0')
 
-        self.assertListEqual(
-            incomplete_activities.collection_ids, [])
+        self.assertListEqual(incomplete_activities.collection_ids, [])
 
 
 class CompletedActivitiesTests(test_utils.GenericTestBase):
@@ -226,8 +233,9 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        completed_activities = (
+            user_domain.CompletedActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertEqual('user_id0', completed_activities.id)
         self.assertListEqual(
@@ -237,11 +245,11 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
     def test_add_exploration_id(self):
         """Testing add_exploration_id."""
-        completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        completed_activities = (
+            user_domain.CompletedActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
-        self.assertListEqual(
-            completed_activities.exploration_ids, ['exp_id0'])
+        self.assertListEqual(completed_activities.exploration_ids, ['exp_id0'])
 
         completed_activities.add_exploration_id('exp_id1')
 
@@ -251,8 +259,9 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
-        completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        completed_activities = (
+            user_domain.CompletedActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             completed_activities.exploration_ids, ['exp_id0'])
@@ -264,8 +273,9 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
     def test_add_collection_id(self):
         """Testing add_collection_id."""
-        completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        completed_activities = (
+            user_domain.CompletedActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             completed_activities.collection_ids, ['collect_id0'])
@@ -278,8 +288,9 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
     def test_remove_collection_id(self):
         """Testing remove_collection_id."""
-        completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        completed_activities = (
+            user_domain.CompletedActivities(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             completed_activities.collection_ids, ['collect_id0'])
@@ -295,8 +306,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        learner_playlist = (user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        learner_playlist = (
+            user_domain.LearnerPlaylist(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertEqual(learner_playlist.id, 'user_id0')
         self.assertListEqual(
@@ -306,8 +318,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_insert_exploration_id_at_given_position(self):
         """Testing inserting the given exploration id at the given position."""
-        learner_playlist = (user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        learner_playlist = (
+            user_domain.LearnerPlaylist(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             learner_playlist.exploration_ids, ['exp_id0'])
@@ -323,8 +336,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_add_exploration_id_to_list(self):
         """Testing add_exploration_id_to_list."""
-        learner_playlist = (user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        learner_playlist = (
+            user_domain.LearnerPlaylist(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             learner_playlist.exploration_ids, ['exp_id0'])
@@ -336,8 +350,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_insert_collection_id_at_given_position(self):
         """Testing insert_exploration_id_at_given_position."""
-        learner_playlist = (user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        learner_playlist = (
+            user_domain.LearnerPlaylist(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             learner_playlist.collection_ids, ['collect_id0'])
@@ -354,8 +369,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_add_collection_id_list(self):
         """Testing add_collection_id."""
-        learner_playlist = (user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        learner_playlist = (
+            user_domain.LearnerPlaylist(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             learner_playlist.collection_ids, ['collect_id0'])
@@ -368,8 +384,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
-        learner_playlist = (user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        learner_playlist = (
+            user_domain.LearnerPlaylist(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             learner_playlist.exploration_ids, ['exp_id0'])
@@ -381,8 +398,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_remove_collection_id(self):
         """Testing remove_collection_id."""
-        learner_playlist = (user_domain.LearnerPlaylist(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+        learner_playlist = (
+            user_domain.LearnerPlaylist(
+                'user_id0', ['exp_id0'], ['collect_id0']))
 
         self.assertListEqual(
             learner_playlist.collection_ids, ['collect_id0'])
@@ -398,8 +416,9 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        user_contribution_scoring = (user_domain.UserContributionScoring(
-            'user_id0', 'category0', 5, True))
+        user_contribution_scoring = (
+            user_domain.UserContributionScoring(
+                'user_id0', 'category0', 5, True))
 
         self.assertEqual(user_contribution_scoring.user_id, 'user_id0')
         self.assertEqual(user_contribution_scoring.score_category, 'category0')

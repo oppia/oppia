@@ -219,8 +219,9 @@ class BuildTests(test_utils.GenericTestBase):
             build._verify_filepath_hash(base_filename, file_hashes)
 
         base_without_hash_filename = 'base_without_hash.html'
-        self.assertIsNone(build._verify_filepath_hash(
-            base_without_hash_filename, file_hashes))
+        self.assertIsNone(
+            build._verify_filepath_hash(
+                base_without_hash_filename, file_hashes))
 
         bad_filepath = 'README'
         with self.assertRaisesRegexp(
@@ -301,20 +302,25 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'FILEPATHS_NOT_TO_RENAME', (
                 '*.py', 'path/to/fonts/*', 'path/to/third_party.min.js.map',
                 'path/to/third_party.min.css.map')):
-            self.assertFalse(build.hash_should_be_inserted(
-                'path/to/fonts/fontawesome-webfont.svg'))
-            self.assertFalse(build.hash_should_be_inserted(
-                'path/to/third_party.min.css.map'))
-            self.assertFalse(build.hash_should_be_inserted(
-                'path/to/third_party.min.js.map'))
-            self.assertTrue(build.hash_should_be_inserted(
-                'path/to/wrongFonts/fonta.eot'))
-            self.assertTrue(build.hash_should_be_inserted(
-                'rich_text_components/Video/protractor.js'))
-            self.assertFalse(build.hash_should_be_inserted(
-                'main.py'))
-            self.assertFalse(build.hash_should_be_inserted(
-                'extensions/domain.py'))
+            self.assertFalse(
+                build.hash_should_be_inserted(
+                    'path/to/fonts/fontawesome-webfont.svg'))
+            self.assertFalse(
+                build.hash_should_be_inserted(
+                    'path/to/third_party.min.css.map'))
+            self.assertFalse(
+                build.hash_should_be_inserted(
+                    'path/to/third_party.min.js.map'))
+            self.assertTrue(
+                build.hash_should_be_inserted(
+                    'path/to/wrongFonts/fonta.eot'))
+            self.assertTrue(
+                build.hash_should_be_inserted(
+                    'rich_text_components/Video/protractor.js'))
+            self.assertFalse(
+                build.hash_should_be_inserted('main.py'))
+            self.assertFalse(
+                build.hash_should_be_inserted('extensions/domain.py'))
 
     def test_generate_copy_tasks_to_copy_from_source_to_target(self):
         """Test generate_copy_tasks_to_copy_from_source_to_target queues up
@@ -871,22 +877,28 @@ class BuildTests(test_utils.GenericTestBase):
             """Mocks build.safe_delete_file()."""
             pass
 
-        self.assertFalse(os.path.isfile(
-            'core/tests/data/third_party/css/third_party.min.css'))
-        self.assertFalse(os.path.isfile(
-            'core/tests/data/third_party/js/third_party.min.js'))
-        self.assertFalse(os.path.isfile(
-            'core/tests/data/third_party/js/third_party.min.js.map'))
+        self.assertFalse(
+            os.path.isfile(
+                'core/tests/data/third_party/css/third_party.min.css'))
+        self.assertFalse(
+            os.path.isfile(
+                'core/tests/data/third_party/js/third_party.min.js'))
+        self.assertFalse(
+            os.path.isfile(
+                'core/tests/data/third_party/js/third_party.min.js.map'))
 
         with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
             build.minify_third_party_libs('core/tests/data/third_party')
 
-        self.assertTrue(os.path.isfile(
-            'core/tests/data/third_party/css/third_party.min.css'))
-        self.assertTrue(os.path.isfile(
-            'core/tests/data/third_party/js/third_party.min.js'))
-        self.assertTrue(os.path.isfile(
-            'core/tests/data/third_party/js/third_party.min.js.map'))
+        self.assertTrue(
+            os.path.isfile(
+                'core/tests/data/third_party/css/third_party.min.css'))
+        self.assertTrue(
+            os.path.isfile(
+                'core/tests/data/third_party/js/third_party.min.js'))
+        self.assertTrue(
+            os.path.isfile(
+                'core/tests/data/third_party/js/third_party.min.js.map'))
 
         self.assertLess(
             os.path.getsize(

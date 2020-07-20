@@ -120,32 +120,35 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_exp_id(self):
         self.exploration_stats.exp_id = 10
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_id to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_id to be a string'):
             self.exploration_stats.validate()
 
     def test_validation_with_string_num_actual_starts(self):
         self.exploration_stats.num_actual_starts_v2 = '0'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected num_actual_starts_v2 to be an int')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected num_actual_starts_v2 to be an int'):
             self.exploration_stats.validate()
 
     def test_validation_with_list_state_stats_mapping(self):
         self.exploration_stats.state_stats_mapping = []
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected state_stats_mapping to be a dict')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected state_stats_mapping to be a dict'):
             self.exploration_stats.validate()
 
     def test_validation_with_negative_num_completions(self):
         self.exploration_stats.num_completions_v2 = -5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            '%s cannot have negative values' % ('num_completions_v2'))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            '%s cannot have negative values' % ('num_completions_v2')):
             self.exploration_stats.validate()
 
     def test_validate_exp_version(self):
         self.exploration_stats.exp_version = 'invalid_exp_version'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version to be an int')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_version to be an int'):
             self.exploration_stats.validate()
 
     def test_to_frontend_dict(self):
@@ -299,14 +302,16 @@ class StateStatsTests(test_utils.GenericTestBase):
 
     def test_validation_for_state_stats_with_string_total_answers_count(self):
         self.state_stats.total_answers_count_v2 = '10'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected total_answers_count_v2 to be an int')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected total_answers_count_v2 to be an int'):
             self.state_stats.validate()
 
     def test_validation_for_state_stats_with_negative_total_answers_count(self):
         self.state_stats.total_answers_count_v2 = -5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            '%s cannot have negative values' % ('total_answers_count_v2'))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            '%s cannot have negative values' % ('total_answers_count_v2')):
             self.state_stats.validate()
 
     def test_to_frontend_dict(self):
@@ -434,22 +439,23 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_exp_id(self):
         self.exp_issues.exp_id = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_id to be a string, received %s' % (type(5)))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected exp_id to be a string, received %s' % (type(5))):
             self.exp_issues.validate()
 
     def test_validate_exp_version(self):
         self.exp_issues.exp_version = 'invalid_version'
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version to be an int')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_version to be an int'):
             self.exp_issues.validate()
 
     def test_validate_unresolved_issues(self):
         self.exp_issues.unresolved_issues = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected unresolved_issues to be a list')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected unresolved_issues to be a list'):
             self.exp_issues.validate()
 
 
@@ -589,20 +595,21 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'actions': []
         }
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'exp_id not in playthrough data dict.'):
+            utils.ValidationError, 'exp_id not in playthrough data dict.'):
             stats_domain.Playthrough.from_dict(playthrough_dict)
 
     def test_validate_with_string_exp_version(self):
         self.playthrough.exp_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version to be an int, received %s' % (type('1')))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected exp_version to be an int, received %s' % (type('1'))):
             self.playthrough.validate()
 
     def test_validate_with_invalid_issue_type(self):
         self.playthrough.issue_type = 'InvalidIssueType'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid issue type: %s' % self.playthrough.issue_type)):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Invalid issue type: %s' % self.playthrough.issue_type)):
             self.playthrough.validate()
 
     def test_validate_with_invalid_action_type(self):
@@ -616,36 +623,38 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     }
                 },
             })]
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid action type: %s' % 'InvalidActionType')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Invalid action type: %s' % 'InvalidActionType'):
             self.playthrough.validate()
 
     def test_validate_non_str_exp_id(self):
         self.playthrough.exp_id = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_id to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_id to be a string'):
             self.playthrough.validate()
 
     def test_validate_non_str_issue_type(self):
         self.playthrough.issue_type = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected issue_type to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected issue_type to be a string'):
             self.playthrough.validate()
 
     def test_validate_non_list_actions(self):
         self.playthrough.actions = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected actions to be a list')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected actions to be a list'):
             self.playthrough.validate()
 
     def test_validate_non_dict_issue_customization_args(self):
         self.playthrough.issue_customization_args = 0
 
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected issue_customization_args to be a dict')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected issue_customization_args to be a dict'):
             self.playthrough.validate()
 
 
@@ -828,34 +837,36 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_issue_type(self):
         self.exp_issue.issue_type = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected issue_type to be a string, received %s' % (type(5)))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected issue_type to be a string, received %s' % (type(5))):
             self.exp_issue.validate()
 
     def test_validate_with_string_schema_version(self):
         self.exp_issue.schema_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schema_version to be an int, received %s' % (type('1')))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected schema_version to be an int, received %s' % (type('1'))):
             self.exp_issue.validate()
 
     def test_validate_issue_type(self):
         self.exp_issue.issue_type = 'invalid_issue_type'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid issue type')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid issue type'):
             self.exp_issue.validate()
 
     def test_validate_playthrough_ids(self):
         self.exp_issue.playthrough_ids = 'invalid_playthrough_ids'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected playthrough_ids to be a list')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected playthrough_ids to be a list'):
             self.exp_issue.validate()
 
     def test_validate_playthrough_id_type(self):
         self.exp_issue.playthrough_ids = [0, 1]
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected each playthrough_id to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each playthrough_id to be a string'):
             self.exp_issue.validate()
-
 
 
 class LearnerActionTests(test_utils.GenericTestBase):
@@ -1013,14 +1024,16 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_action_type(self):
         self.learner_action.action_type = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected action_type to be a string, received %s' % (type(5)))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected action_type to be a string, received %s' % (type(5))):
             self.learner_action.validate()
 
     def test_validate_with_string_schema_version(self):
         self.learner_action.schema_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schema_version to be an int, received %s' % (type('1')))):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected schema_version to be an int, received %s' % (type('1'))):
             self.learner_action.validate()
 
 

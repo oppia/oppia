@@ -59,8 +59,9 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.editor_id), [self.user_id])
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(
                 self.user_id), [self.editor_id])
@@ -69,8 +70,9 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.editor_id), [self.user_id])
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(
                 self.user_id), [self.editor_id])
@@ -84,8 +86,9 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id, self.user_id_2])
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.editor_id), [self.user_id, self.user_id_2])
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(
                 self.user_id_2), [self.editor_id])
@@ -119,8 +122,9 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.UNSUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.editor_id), [self.user_id])
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(
                 self.user_id_2), [])
@@ -129,8 +133,9 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.UNSUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.editor_id), [self.user_id])
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(
                 self.user_id_2), [])
@@ -143,8 +148,9 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.UNSUBSCRIBE_URL_PREFIX, payload,
             csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [])
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.editor_id), [])
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(
                 self.user_id), [])

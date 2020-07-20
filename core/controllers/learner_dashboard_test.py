@@ -319,13 +319,14 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)
         self.csrf_token = self.get_new_csrf_token()
-        self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1
-        ), {
-            'state_name': self._get_unicode_test_string('statename'),
-            'subject': self._get_unicode_test_string('subject'),
-            'text': 'a sample message',
-        }, csrf_token=self.csrf_token)
+        self.post_json(
+            '%s/%s' % (
+                feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1
+            ), {
+                'state_name': self._get_unicode_test_string('statename'),
+                'subject': self._get_unicode_test_string('subject'),
+                'text': 'a sample message',
+            }, csrf_token=self.csrf_token)
         self.logout()
 
     def test_get_message_summaries(self):
@@ -414,8 +415,9 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(test_utils.check_image_png_or_webp(
-            messages_summary['author_picture_data_url']))
+        self.assertTrue(
+            test_utils.check_image_png_or_webp(
+                messages_summary['author_picture_data_url']))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
@@ -447,8 +449,9 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(test_utils.check_image_png_or_webp(
-            messages_summary['author_picture_data_url']))
+        self.assertTrue(
+            test_utils.check_image_png_or_webp(
+                messages_summary['author_picture_data_url']))
         self.assertEqual(
             utils.get_time_in_millisecs(first_suggestion.created_on),
             messages_summary['created_on_msecs'])

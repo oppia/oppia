@@ -47,12 +47,14 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name', 'abbrev', 'description')
-        self.topic.subtopics.append(topic_domain.Subtopic(
-            1, 'subtopic_name', [self.skill_id1], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
-        self.topic.subtopics.append(topic_domain.Subtopic(
-            2, 'subtopic_name_2', [self.skill_id2], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
+        self.topic.subtopics.append(
+            topic_domain.Subtopic(
+                1, 'subtopic_name', [self.skill_id1], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
+        self.topic.subtopics.append(
+            topic_domain.Subtopic(
+                2, 'subtopic_name_2', [self.skill_id2], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
         self.topic.next_subtopic_id = 3
         self.topic.thumbnail_filename = 'Topic.svg'
         self.topic.thumbnail_bg_color = (
@@ -120,9 +122,10 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         topic.thumbnail_filename = 'Topic.svg'
         topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
-        topic.subtopics.append(topic_domain.Subtopic(
-            1, 'subtopic_name', ['non_existent_skill'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
+        topic.subtopics.append(
+            topic_domain.Subtopic(
+                1, 'subtopic_name', ['non_existent_skill'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic('topic_id_3', self.admin_id)

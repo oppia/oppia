@@ -51,8 +51,9 @@ from .. import build  # isort:skip
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
     CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')
 
-FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
-    FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
+FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(
+    python_utils.open_file(
+        FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
@@ -862,8 +863,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # *.constants.ajs.ts file.
                 if not filepath.endswith(
                         ('.constants.ajs.ts', '.constants.ts')):
-                    for line_num, line in enumerate(self.file_cache.readlines(
-                            filepath)):
+                    for line_num, line in enumerate(
+                            self.file_cache.readlines(filepath)):
                         if 'angular.module(\'oppia\').constant(' in line:
                             failed = True
                             summary_message = (

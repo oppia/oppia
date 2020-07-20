@@ -190,12 +190,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
             last_starttag, last_starttag_line_num, last_starttag_col_num = (
                 self.tag_stack.pop())
         except IndexError:
-            raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filepath))
+            raise TagMismatchException(
+                'Error in line %s of file %s\n' % (
+                    line_number, self.filepath))
 
         if last_starttag != tag:
-            raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filepath))
+            raise TagMismatchException(
+                'Error in line %s of file %s\n' % (
+                    line_number, self.filepath))
 
         if leading_spaces_count != last_starttag_col_num and (
                 last_starttag_line_num != line_number):
@@ -435,8 +437,9 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 total_error_count += error_count
             total_files_checked = len(html_files_to_lint)
             if total_error_count:
-                python_utils.PRINT('(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count))
+                python_utils.PRINT(
+                    '(%s files checked, %s errors found)' % (
+                        total_files_checked, total_error_count))
                 summary_message = (
                     '%s HTML linting failed, fix the HTML files listed above'
                     '.' % linter_utils.FAILED_MESSAGE_PREFIX)

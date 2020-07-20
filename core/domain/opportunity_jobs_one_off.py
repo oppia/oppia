@@ -25,8 +25,8 @@ from core import jobs
 from core.domain import opportunity_services
 from core.platform import models
 
-(topic_models, skill_models,) = (models.Registry.import_models(
-    [models.NAMES.topic, models.NAMES.skill]))
+(topic_models, skill_models,) = (
+    models.Registry.import_models([models.NAMES.topic, models.NAMES.skill]))
 
 
 class ExplorationOpportunitySummaryModelRegenerationJob(

@@ -147,7 +147,7 @@ def possible_exc_types(node):
                         val and isinstance(
                             val, (
                                 astroid.Instance, astroid.ClassDef)) and
-                                utils.inherit_from_std_ex(val)):
+                        utils.inherit_from_std_ex(val)):
                     excs.append(val.name)
     elif node.exc is None:
         handler = node.parent
@@ -157,8 +157,8 @@ def possible_exc_types(node):
         if handler and handler.type:
             inferred_excs = astroid.unpack_infer(handler.type)
             excs = (
-                        exc.name for exc in inferred_excs
-                        if exc is not astroid.Uninferable)
+                exc.name for exc in inferred_excs
+                if exc is not astroid.Uninferable)
 
 
     try:

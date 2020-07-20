@@ -87,8 +87,9 @@ def initiate_backup_restoration_process():
     if not re.match(
             r'^oppia-export-backups/(\d{8}-\d{6})/\1\.overall_export_metadata$',
             export_metadata_filepath):
-        raise Exception('Invalid export metadata filepath: %s' % (
-            export_metadata_filepath))
+        raise Exception(
+            'Invalid export metadata filepath: %s' % (
+                export_metadata_filepath))
     common.run_cmd([
         GCLOUD_PATH, 'datastore', 'import',
         'gs://%s' % export_metadata_filepath, '--async'])
