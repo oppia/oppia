@@ -106,6 +106,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         Args:
             param_name: str. The context for evaluation.
             rule_dicts: list(dict). List of dict mappings of rule objects.
+
         Returns:
             PlatformParameterModel. the created PlatformParameterModel
             instance.
