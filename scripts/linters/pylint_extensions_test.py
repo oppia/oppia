@@ -1037,7 +1037,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         node_well_formed_one_line_yield_file.file = filename
         node_well_formed_one_line_yield_file.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_well_formed_one_line_yield_file)
 
         with self.checker_test_object.assertNoMessages():
@@ -1059,7 +1059,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         node_well_formed_mult_lines_file.file = filename
         node_well_formed_mult_lines_file.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_well_formed_mult_lines_file)
 
         with self.checker_test_object.assertNoMessages():
@@ -1080,7 +1080,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         yield_nothing_file.file = filename
         yield_nothing_file.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             yield_nothing_file)
 
         # No errors on yield statements that do nothing.
@@ -1116,7 +1116,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         yield_in_multiline_file.file = filename
         yield_in_multiline_file.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             yield_in_multiline_file)
 
         # No errors on yield statements in multi-line comments.
@@ -1138,15 +1138,14 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         node_too_many_spaces_after_yield_file.file = filename
         node_too_many_spaces_after_yield_file.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_too_many_spaces_after_yield_file)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-after-yield',
-                line=2
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='single-space-after-yield',
+            node=node_too_many_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
     def test_no_space_after_yield_statement(self):
@@ -1164,15 +1163,14 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         node_no_spaces_after_yield_file.file = filename
         node_no_spaces_after_yield_file.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_no_spaces_after_yield_file)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-after-yield',
-                line=2
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='single-space-after-yield',
+            node=node_no_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
 
@@ -1611,138 +1609,41 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
             pylint_extensions.DivisionOperatorChecker)
         self.checker_test_object.setup_method()
 
-    def test_division_operator(self):
-        node_division_operator = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""division = a / b
-                    division=a/b
-                """)
-        node_division_operator.file = filename
-        node_division_operator.path = filename
-
-        self.checker_test_object.checker.process_module(node_division_operator)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='division-operator-used',
-                line=1
-            ),
-            testutils.Message(
-                msg_id='division-operator-used',
-                line=2
-            ),
-        ):
-            temp_file.close()
-
-    def test_division_operator_inside_single_line_comment(self):
-        node_single_line_comment = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# Division = a / b.
-                    division = python_utils.divide(a, b)
-                """)
-        node_single_line_comment.file = filename
-        node_single_line_comment.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_single_line_comment)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_division_operator_inside_string(self):
-        node_division_inside_string = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""string = 'a / b or a/b' + 'a/b'
-                    division = python_utils.divide(a, b)
-                """)
-        node_division_inside_string.file = filename
-        node_division_inside_string.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_division_inside_string)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_division_operator_inside_multiline_docstring(self):
-        node_division_inside_multiline_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
+    def test_division_operator_with_spaces(self):
+        node_division_operator_with_spaces = astroid.extract_node(
                 u"""
-                    \"\"\"This is inside a multiline docstring
-                    in scripts/linter/pre_commit_linter.\"\"\"
+                division = a / b #@
                 """)
-        node_division_inside_multiline_docstring.file = filename
-        node_division_inside_multiline_docstring.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_division_inside_multiline_docstring)
+        message = testutils.Message(
+            msg_id='division-operator-used',
+            node=node_division_operator_with_spaces)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_assign(
+                node_division_operator_with_spaces)
 
-    def test_division_operator_inside_single_line_docstring(self):
-        node_division_inside_singleline_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
+    def test_division_operator_without_spaces(self):
+        node_division_operator_without_spaces = astroid.extract_node(
                 u"""
-                    \"\"\"scripts/linters/pre_commit_linter.py\"\"\"
+                division = a/b #@
                 """)
-        node_division_inside_singleline_docstring.file = filename
-        node_division_inside_singleline_docstring.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_division_inside_singleline_docstring)
+        message = testutils.Message(
+            msg_id='division-operator-used',
+            node=node_division_operator_without_spaces)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_assign(
+                node_division_operator_without_spaces)
 
     def test_divide_method_used(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
+        node_with_no_error_message = astroid.extract_node(
                 u"""division = python_utils.divide(a, b)""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_assign(
+                node_with_no_error_message)
 
 
 class SingleLineCommentCheckerTests(unittest.TestCase):
