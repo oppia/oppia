@@ -64,6 +64,7 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { InteractionCustomizationArgObjectFactory, InteractionCustomizationArg } from 'domain/exploration/InteractionCustomizationArgObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -192,6 +193,15 @@ describe('StateTopAnswersStatsService', function() {
               labelled_as_correct: true,
             },
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'custarg_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'Hola',
             feedback: {content_id: 'default_outcome', html: 'try again!'},
@@ -460,10 +470,10 @@ describe('StateTopAnswersStatsService', function() {
 
         ExplorationStatesService.saveInteractionId('Hola', 'FractionInput');
         ExplorationStatesService.saveInteractionCustomizationArgs('Hola', {
-          requireSimplestForm: false,
-          allowImproperFraction: true,
-          allowNonzeroIntegerPart: true,
-          customPlaceholder: '',
+          requireSimplestForm: new InteractionCustomizationArg(false),
+          allowImproperFraction: new InteractionCustomizationArg(true),
+          allowNonzeroIntegerPart: new InteractionCustomizationArg(true),
+          customPlaceholder: new InteractionCustomizationArg(''),
         });
 
         expect(StateTopAnswersStatsService.getStateStats('Hola').length)

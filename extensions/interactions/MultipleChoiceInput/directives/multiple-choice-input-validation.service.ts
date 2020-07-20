@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IMultipleChoiceInputCustomizationArgs } from
+import { MultipleChoiceInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class MultipleChoiceInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IMultipleChoiceInputCustomizationArgs): IWarning[] {
+      customizationArgs: MultipleChoiceInputCustomizationArgs): IWarning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -76,7 +76,7 @@ export class MultipleChoiceInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IMultipleChoiceInputCustomizationArgs,
+      customizationArgs: MultipleChoiceInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 

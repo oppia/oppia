@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current interaction id.
+ * @fileoverview A data service that stores the next content id index.
  */
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';

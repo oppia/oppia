@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { IInteractionBackendDict, Interaction, InteractionObjectFactory } from
+import { InteractionBackendDict, Interaction, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { IParamChangeBackendDict, ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
@@ -31,7 +31,7 @@ import {
   RecordedVoiceoversObjectFactory
 } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  ISubtitledHtmlBackendDict,
+  SubtitledHtmlBackendDict,
   SubtitledHtml,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
@@ -45,8 +45,8 @@ const constants = require('constants.ts');
 
 export interface IStateBackendDict {
   'classifier_model_id': string;
-  'content': ISubtitledHtmlBackendDict;
-  'interaction': IInteractionBackendDict;
+  'content': SubtitledHtmlBackendDict;
+  'interaction': InteractionBackendDict;
   'param_changes': IParamChangeBackendDict[];
   'recorded_voiceovers': IRecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;

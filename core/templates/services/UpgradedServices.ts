@@ -253,6 +253,8 @@ import { ImageFileObjectFactory } from
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+import { InteractionCustomizationArgObjectFactory } from
+  'domain/exploration/InteractionCustomizationArgObjectFactory';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -951,6 +953,10 @@ export class UpgradedServices {
     upgradedServices['ImageClickInputValidationService'] =
       new ImageClickInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['InteractionCustomizationArgObjectFactory'] =
+      new InteractionCustomizationArgObjectFactory(
+        upgradedServices['SubtitledHtmlObjectFactory'],
+        upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['InteractiveMapValidationService'] =
       new InteractiveMapValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1534,8 +1540,7 @@ export class UpgradedServices {
       upgradedServices['HintObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
       upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['SubtitledHtmlObjectFactory'],
-      upgradedServices['SubtitledUnicodeObjectFactory']);
+      upgradedServices['InteractionCustomizationArgObjectFactory']);
 
     // Topological level: 8.
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(

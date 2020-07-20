@@ -23,9 +23,10 @@ import { AnswerGroupObjectFactory } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import {
-  InteractionObjectFactory, applyConversionFnOnInteractionCustArgsContent
-} from 'domain/exploration/InteractionObjectFactory';
+import { InteractionCustomizationArg } from
+  'domain/exploration/InteractionCustomizationArgObjectFactory';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { SolutionObjectFactory } from
@@ -129,68 +130,11 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(copyInteractionDict);
 
     expect(testInteraction.customizationArgs).toEqual({
-      placeholder: {
-        value: new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
-      },
-      rows: { value: 1 }
+      placeholder: new InteractionCustomizationArg(
+        new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
+      ),
+      rows: new InteractionCustomizationArg(1)
     });
-  });
-
-  it('should correctly set customization arguments for interactions ' +
-     'containing dictionaries', () => {
-    // No interactions currently have dictionaries in their customization
-    // arguments, but we test here for coverage + future development.
-
-    const conversionSpy = jasmine.createSpy();
-
-    // The customization argument value is an array of dictionaries.
-    const caSchema = {
-      type: 'list',
-      items: {
-        type: 'dict',
-        properties: [{
-          name: 'content',
-          schema: {
-            type: 'custom',
-            obj_type: 'SubtitledUnicode'
-          }
-        }, {
-          name: 'show',
-          schema: {
-            type: 'boolean'
-          }
-        }]
-      }
-    };
-
-    const caValue = [
-      {
-        content: { unicode_str: 'first', content_id: 'custarg_content_0' },
-        show: true
-      },
-      {
-        content: { unicode_str: 'second', content_id: 'custarg_content_1' },
-        show: true
-      }
-    ];
-
-    applyConversionFnOnInteractionCustArgsContent(
-      caValue,
-      caSchema,
-      conversionSpy
-    );
-
-    expect(conversionSpy).toHaveBeenCalledTimes(2);
-    expect(conversionSpy.calls.allArgs()).toEqual(
-      [
-        [
-          { unicode_str: 'first', content_id: 'custarg_content_0' },
-          'SubtitledUnicode'
-        ], [
-          { unicode_str: 'second', content_id: 'custarg_content_1' },
-          'SubtitledUnicode'
-        ]
-      ]);
   });
 
   it('should create an object when default outcome is null', () => {
@@ -285,16 +229,16 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
     const newCustomizationArgs = {
-      placeholder: {
-        value: new SubtitledUnicode('', '')
-      },
-      rows: { value: 1 }
+      placeholder: new InteractionCustomizationArg(
+        new SubtitledUnicode('New', 'custarg_placeholder_1')
+      ),
+      rows: { value: 2 }
     };
     expect(testInteraction.customizationArgs).toEqual({
-      placeholder: {
-        value: new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
-      },
-      rows: { value: 1 }
+      placeholder: new InteractionCustomizationArg(
+        new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
+      ),
+      rows: new InteractionCustomizationArg(1)
     });
     testInteraction.setCustomizationArgs(newCustomizationArgs);
     expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
@@ -407,7 +351,7 @@ describe('Interaction object factory', () => {
       },
       default_outcome: newDefaultOutcome,
       hints: newHintDict,
-      id: 'MultipleChoice',
+      id: 'MultipleChoiceInput',
       solution: newSolutionDict
     };
     const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
@@ -433,7 +377,7 @@ describe('Interaction object factory', () => {
       },
       default_outcome: newDefaultOutcome,
       hints: newHintDict,
-      id: 'MultipleChoice',
+      id: 'MultipleChoiceInput',
       solution: newSolutionDict
     }));
   });
@@ -464,7 +408,7 @@ describe('Interaction object factory', () => {
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
-      id: 'MultipleChoice',
+      id: 'MultipleChoiceInput',
       solution: solutionDict
     };
     const testInteraction = iof.createFromBackendDict(mcInteractionDict);

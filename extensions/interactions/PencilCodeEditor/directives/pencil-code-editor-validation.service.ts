@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { baseInteractionValidationService, IWarning } from
   'interactions/base-interaction-validation.service';
-import { IPencilCodeCustomizationArgs } from
+import { PencilCodeCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -37,13 +37,13 @@ export class PencilCodeEditorValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IPencilCodeCustomizationArgs): IWarning[] {
+      customizationArgs: PencilCodeCustomizationArgs): IWarning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: IPencilCodeCustomizationArgs,
+      stateName: string, customizationArgs: PencilCodeCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(

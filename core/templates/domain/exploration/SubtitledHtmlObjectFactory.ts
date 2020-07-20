@@ -20,15 +20,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface ISubtitledHtmlBackendDict {
+export interface SubtitledHtmlBackendDict {
   'content_id': string;
   'html': string;
 }
 
 export class SubtitledHtml {
   _html: string;
-  _contentId: string;
-  constructor(html: string, contentId: string) {
+  _contentId: string | null;
+  constructor(html: string, contentId: string | null) {
     this._html = html;
     this._contentId = contentId;
   }
@@ -53,7 +53,7 @@ export class SubtitledHtml {
     return !this._html;
   }
 
-  toBackendDict(): ISubtitledHtmlBackendDict {
+  toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
       content_id: this._contentId
@@ -70,7 +70,7 @@ export class SubtitledHtml {
 })
 export class SubtitledHtmlObjectFactory {
   createFromBackendDict(
-      subtitledHtmlBackendDict: ISubtitledHtmlBackendDict): SubtitledHtml {
+      subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }

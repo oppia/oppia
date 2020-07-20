@@ -31,8 +31,8 @@ import { ParamChangesObjectFactory } from
 import { IParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
 import {
-  IEndExplorationCustomizationArgs,
-  IInteractionCustomizationArgs
+  EndExplorationCustomizationArgs,
+  InteractionCustomizationArgs
 } from 'interactions/customization-args-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { IBindableVoiceovers } from
@@ -99,7 +99,7 @@ export class Exploration {
     }
 
     const customizationArgs = (
-      <IEndExplorationCustomizationArgs> this.getInteractionCustomizationArgs(
+      <EndExplorationCustomizationArgs> this.getInteractionCustomizationArgs(
         stateName));
     return customizationArgs && customizationArgs.recommendedExplorationIds ?
       customizationArgs.recommendedExplorationIds.value : null;
@@ -123,7 +123,7 @@ export class Exploration {
   }
 
   getInteractionCustomizationArgs(
-      stateName: string): IInteractionCustomizationArgs {
+      stateName: string): InteractionCustomizationArgs {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;

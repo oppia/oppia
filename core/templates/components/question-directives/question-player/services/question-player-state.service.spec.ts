@@ -124,7 +124,15 @@ describe('Question player state service', function() {
             tagged_skill_misconception_id: 'skill_id_1-0'
           }],
           confirmed_unclassified_answers: [],
-          customization_args: {},
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'custarg_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: null,
             feedback: {

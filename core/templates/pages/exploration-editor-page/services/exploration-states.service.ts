@@ -18,13 +18,9 @@
  * keeps no mementos.
  */
 
-import { Interaction } from
-  'domain/exploration/InteractionObjectFactory';
-
 require(
   'pages/exploration-editor-page/editor-tab/templates/' +
   'modal-templates/confirm-delete-state-modal.controller.ts');
-
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -109,8 +105,12 @@ angular.module('oppia').factory('ExplorationStatesService', [
         return writtenTranslations.toBackendDict();
       },
       widget_customization_args: function(customizationArgs) {
-        return Interaction.convertCustomizationArgsToBackendDict(
-          customizationArgs);
+        const customizationArgsBackendDict = {};
+        Object.keys(customizationArgs).forEach(caName => {
+          customizationArgsBackendDict[caName] = (
+            customizationArgs[caName].toBackendDict());
+        });
+        return customizationArgsBackendDict;
       }
     };
 

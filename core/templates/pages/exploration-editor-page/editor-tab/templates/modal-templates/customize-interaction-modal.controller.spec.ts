@@ -38,6 +38,10 @@ import { EditorFirstTimeEventsService } from
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import {
+  InteractionCustomizationArgObjectFactory,
+  InteractionCustomizationArg
+} from 'domain/exploration/InteractionCustomizationArgObjectFactory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 
@@ -47,6 +51,7 @@ describe('Customize Interaction Modal Controller', function() {
   var $uibModalInstance = null;
   var imageClickInputValidationService = null;
   var editorFirstTimeEventsService = null;
+  var interactionCustomizationArgObjectFactory = null;
   var interactionDetailsCacheService = null;
   var interactionObjectFactory = null;
   var stateCustomizationArgsService = null;
@@ -60,6 +65,8 @@ describe('Customize Interaction Modal Controller', function() {
 
   beforeEach(function() {
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
+    interactionCustomizationArgObjectFactory = TestBed.get(
+      InteractionCustomizationArgObjectFactory);
     imageClickInputValidationService = TestBed.get(
       ImageClickInputValidationService);
     interactionDetailsCacheService = TestBed.get(
@@ -81,7 +88,13 @@ describe('Customize Interaction Modal Controller', function() {
         '$uibModalInstance', ['close', 'dismiss']);
 
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-      stateCustomizationArgsService.init(stateName, {});
+      stateCustomizationArgsService.init(stateName, {
+        imageAndRegions: { value: {
+          imagePath: '',
+          labeledRegions: []
+        } },
+        highlightRegionsOnHover: { value: false }
+      });
       stateInteractionIdService.init(stateName, 'ImageClickInput');
 
       $scope = $rootScope.$new();
@@ -93,6 +106,8 @@ describe('Customize Interaction Modal Controller', function() {
         $uibModalInstance: $uibModalInstance,
         EditorFirstTimeEventsService: editorFirstTimeEventsService,
         imageClickInputValidationService: imageClickInputValidationService,
+        InteractionCustomizationArgObjectFactory:
+          interactionCustomizationArgObjectFactory,
         InteractionDetailsCacheService: interactionDetailsCacheService,
         InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
@@ -134,7 +149,8 @@ describe('Customize Interaction Modal Controller', function() {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {
           value: ''
-        }
+        },
+        highlightRegionsOnHover: { value: false }
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -157,23 +173,21 @@ describe('Customize Interaction Modal Controller', function() {
 
       expect($scope.customizationArgSpecs.length).toBe(1);
       expect(stateCustomizationArgsService.displayed).toEqual({
-        question: {
-          value: {
-            assumptions: [{
-              arguments: [],
-              top_kind_name: 'variable',
-              dummies: [],
-              top_operator_name: 'p'
-            }],
-            results: [{
-              arguments: [],
-              top_kind_name: 'variable',
-              dummies: [],
-              top_operator_name: 'p'
-            }],
-            default_proof_string: ''
-          }
-        }
+        question: new InteractionCustomizationArg({
+          assumptions: [{
+            arguments: [],
+            top_kind_name: 'variable',
+            dummies: [],
+            top_operator_name: 'p'
+          }],
+          results: [{
+            arguments: [],
+            top_kind_name: 'variable',
+            dummies: [],
+            top_operator_name: 'p'
+          }],
+          default_proof_string: ''
+        })
       });
       expect($scope.hasCustomizationArgs).toBe(true);
 
@@ -237,7 +251,8 @@ describe('Customize Interaction Modal Controller', function() {
       stateCustomizationArgsService.displayed = {
         imageAndRegions: {
           value: ''
-        }
+        },
+        highlightRegionsOnHover: { value: false }
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -289,7 +304,8 @@ describe('Customize Interaction Modal Controller', function() {
               label: 'abc'
             }]
           }
-        }
+        },
+        highlightRegionsOnHover: { value: false }
       };
       stateCustomizationArgsService.saveDisplayedValue();
       $scope.form.schemaForm = {
@@ -320,6 +336,8 @@ describe('Customize Interaction Modal Controller', function() {
       $controller('CustomizeInteractionModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
+        InteractionCustomizationArgObjectFactory:
+          interactionCustomizationArgObjectFactory,
         InteractionDetailsCacheService: interactionDetailsCacheService,
         InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
@@ -340,7 +358,8 @@ describe('Customize Interaction Modal Controller', function() {
       ' interaction being displayed', function() {
       // Change customization args.
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {}
+        imageAndRegions: {},
+        highlightRegionsOnHover: { value: false }
       };
       // Save logicProof on cache.
       stateInteractionIdService.displayed = 'LogicProof';

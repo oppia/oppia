@@ -43,12 +43,6 @@ describe('SubtitledUnicode object factory', () => {
     expect(subtitledUnicode.getContentId()).toEqual('new_content_id');
   });
 
-  it('should correctly check existence of unicode', () => {
-    expect(subtitledUnicode.hasNoUnicode()).toBe(false);
-    subtitledUnicode.setUnicode('');
-    expect(subtitledUnicode.hasNoUnicode()).toBe(true);
-  });
-
   it('should correctly check emptiness', () => {
     expect(subtitledUnicode.isEmpty()).toBe(false);
 

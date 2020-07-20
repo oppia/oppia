@@ -134,6 +134,15 @@ describe('Question update service', function() {
             labelled_as_correct: true
           }
         }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'custarg_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         default_outcome: {
           dest: 'Hola',
           feedback: {
@@ -180,6 +189,15 @@ describe('Question update service', function() {
             labelled_as_correct: true
           }
         }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'custarg_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         default_outcome: {
           dest: 'Hola',
           feedback: {

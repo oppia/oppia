@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IGraphInputCustomizationArgs } from
+import { GraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -42,7 +42,7 @@ export class GraphInputValidationService {
   VERTICES_LIMIT = 50;
 
   getCustomizationArgsWarnings(
-      customizationArgs: IGraphInputCustomizationArgs): IWarning[] {
+      customizationArgs: GraphInputCustomizationArgs): IWarning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs,
@@ -78,7 +78,7 @@ export class GraphInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: IGraphInputCustomizationArgs,
+      stateName: string, customizationArgs: GraphInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var ISOMORPHISM_VERTICES_LIMIT = 10;
 

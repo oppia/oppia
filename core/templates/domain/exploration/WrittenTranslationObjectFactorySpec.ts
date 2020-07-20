@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for the WrittenTranslation object factory.
  */
 
-import { WrittenTranslationObjectFactory, WrittenTranslation } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+import {
+  WrittenTranslationObjectFactory,
+  WrittenTranslation,
+  WRITTEN_TRANSLATION_TYPE_HTML
+} from 'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('WrittenTranslation object factory', () => {
   let wtof: WrittenTranslationObjectFactory;
@@ -115,7 +118,7 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should create a new written translation translation', () => {
-    expect(wtof.createNewHtml('New')).toEqual(
+    expect(wtof.createNew(WRITTEN_TRANSLATION_TYPE_HTML, 'New')).toEqual(
       wtof.createFromBackendDict({
         data_format: 'html',
         translation: 'New',

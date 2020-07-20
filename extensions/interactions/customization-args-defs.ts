@@ -18,9 +18,9 @@
 
 import { IGraphAnswer } from 'interactions/answer-defs';
 
-import { ISubtitledHtmlBackendDict, SubtitledHtml } from
+import { SubtitledHtmlBackendDict, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { ISubtitledUnicodeBackendDict, SubtitledUnicode } from
+import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 interface ILabeledRegion {
@@ -30,21 +30,25 @@ interface ILabeledRegion {
   label: string;
 }
 
-interface IImageWithRegions {
+export interface IImageWithRegions {
   labeledRegions: ILabeledRegion[];
   imagePath: string;
 }
 
-interface IReadableMusicNote {
+export interface IReadableMusicNote {
   readableNoteName: string;
 }
 
-export interface IAlgebraicExpressionInputCustomizationArgsBackendDict { }
-export interface IAlgebraicExpressionInputCustomizationArgs extends
-  IAlgebraicExpressionInputCustomizationArgsBackendDict { }
 
-
-export interface ICodeReplCustomizationArgsBackendDict {
+interface AlgebraicExpressionInputCustomizationArgsBackendDict { }
+export interface AlgebraicExpressionInputCustomizationArgs { }
+type AlgebraicExpressionInputCustomizationArgsBackendDictValue = (
+  AlgebraicExpressionInputCustomizationArgsBackendDict[
+    keyof AlgebraicExpressionInputCustomizationArgsBackendDict]['value']);
+type AlgebraicExpressionInputCustomizationArgsValue = (
+  AlgebraicExpressionInputCustomizationArgs[
+    keyof AlgebraicExpressionInputCustomizationArgs]['value']);
+interface CodeReplCustomizationArgsBackendDict {
   language?: {
     value: string;
   };
@@ -58,49 +62,89 @@ export interface ICodeReplCustomizationArgsBackendDict {
     value: string;
   };
 }
-export interface ICodeReplCustomizationArgs extends
-    ICodeReplCustomizationArgsBackendDict { }
-
-
-export interface IContinueCustomizationArgsBackendDict {
-  buttonText?: {
-    value: ISubtitledUnicodeBackendDict;
+export interface CodeReplCustomizationArgs {
+  language?: {
+    value: string;
+  };
+  placeholder?: {
+    value: string;
+  };
+  preCode?: {
+    value: string;
+  };
+  postCode?: {
+    value: string;
   };
 }
-export interface IContinueCustomizationArgs extends
-    Omit<IContinueCustomizationArgsBackendDict, 'buttonText'> {
+type CodeReplCustomizationArgsBackendDictValue = (
+  CodeReplCustomizationArgsBackendDict[
+    keyof CodeReplCustomizationArgsBackendDict]['value']);
+type CodeReplCustomizationArgsValue = (
+  CodeReplCustomizationArgs[
+    keyof CodeReplCustomizationArgs]['value']);
+
+
+interface ContinueCustomizationArgsBackendDict {
+  buttonText?: {
+    value: SubtitledUnicodeBackendDict;
+  };
+}
+export interface ContinueCustomizationArgs {
   buttonText?: {
     value: SubtitledUnicode;
   };
 }
+type ContinueCustomizationArgsBackendDictValue = (
+  ContinueCustomizationArgsBackendDict[
+    keyof ContinueCustomizationArgsBackendDict]['value']);
+type ContinueCustomizationArgsValue = (
+  ContinueCustomizationArgs[
+    keyof ContinueCustomizationArgs]['value']);
 
 
-export interface IDragAndDropSortInputCustomizationArgsBackendDict {
+interface DragAndDropSortInputCustomizationArgsBackendDict {
   choices?: {
-    value: ISubtitledHtmlBackendDict[];
+    value: SubtitledHtmlBackendDict[];
   };
   allowMultipleItemsInSamePosition: {
     value: boolean;
   }
 }
-export interface IDragAndDropSortInputCustomizationArgs extends
-    Omit<IDragAndDropSortInputCustomizationArgsBackendDict, 'choices'> {
-      choices?: {
+export interface DragAndDropSortInputCustomizationArgs {
+  choices?: {
     value: SubtitledHtml[];
   };
+  allowMultipleItemsInSamePosition: {
+    value: boolean;
+  }
 }
+type DragAndDropSortInputCustomizationArgsBackendDictValue = (
+  DragAndDropSortInputCustomizationArgsBackendDict[
+    keyof DragAndDropSortInputCustomizationArgsBackendDict]['value']);
+type DragAndDropSortInputCustomizationArgsValue = (
+  DragAndDropSortInputCustomizationArgs[
+    keyof DragAndDropSortInputCustomizationArgs]['value']);
 
 
-export interface IEndExplorationCustomizationArgsBackendDict {
+interface EndExplorationCustomizationArgsBackendDict {
   recommendedExplorationIds?: {
     value: string[];
   };
 }
-export interface IEndExplorationCustomizationArgs extends
-  IEndExplorationCustomizationArgsBackendDict { }
+export interface EndExplorationCustomizationArgs {
+  recommendedExplorationIds?: {
+    value: string[];
+  };
+}
+type EndExplorationCustomizationArgsBackendDictValue = (
+  EndExplorationCustomizationArgsBackendDict[
+    keyof EndExplorationCustomizationArgsBackendDict]['value']);
+type EndExplorationCustomizationArgsValue = (
+  EndExplorationCustomizationArgs[
+    keyof EndExplorationCustomizationArgs]['value']);
 
 
-export interface IFractionInputCustomizationArgsBackendDict {
+interface FractionInputCustomizationArgsBackendDict {
   requireSimplestForm?: {
     value: string;
   };
@@ -111,18 +155,32 @@ export interface IFractionInputCustomizationArgsBackendDict {
     value: string;
   };
   customPlaceholder?: {
-    value: ISubtitledUnicodeBackendDict;
+    value: SubtitledUnicodeBackendDict;
   };
 }
-export interface IFractionInputCustomizationArgs extends
-    Omit<IFractionInputCustomizationArgsBackendDict, 'customPlaceholder'> {
+export interface FractionInputCustomizationArgs {
+  requireSimplestForm?: {
+    value: string;
+  };
+  allowImproperFraction?: {
+    value: string;
+  };
+  allowNonzeroIntegerPart?: {
+    value: string;
+  };
   customPlaceholder?: {
     value: SubtitledUnicode;
   };
 }
+type FractionInputCustomizationArgsBackendDictValue = (
+  FractionInputCustomizationArgsBackendDict[
+    keyof FractionInputCustomizationArgsBackendDict]['value']);
+type FractionInputCustomizationArgsValue = (
+  FractionInputCustomizationArgs[
+    keyof FractionInputCustomizationArgs]['value']);
 
 
-export interface IGraphInputCustomizationArgsBackendDict {
+interface GraphInputCustomizationArgsBackendDict {
   graph?: {
     value: IGraphAnswer;
   };
@@ -148,11 +206,41 @@ export interface IGraphInputCustomizationArgsBackendDict {
     value: boolean;
   };
 }
-export interface IGraphInputCustomizationArgs extends
-  IGraphInputCustomizationArgsBackendDict { }
+export interface GraphInputCustomizationArgs {
+  graph?: {
+    value: IGraphAnswer;
+  };
+  canAddVertex: {
+    value: boolean;
+  };
+  canDeleteVertex: {
+    value: boolean;
+  };
+  canEditVertexLabel: {
+    value: boolean;
+  };
+  canMoveVertex: {
+    value: boolean;
+  };
+  canAddEdge: {
+    value: boolean;
+  };
+  canDeleteEdge: {
+    value: boolean;
+  };
+  canEditEdgeWeight: {
+    value: boolean;
+  };
+}
+type GraphInputCustomizationArgsBackendDictValue = (
+  GraphInputCustomizationArgsBackendDict[
+    keyof GraphInputCustomizationArgsBackendDict]['value']);
+type GraphInputCustomizationArgsValue = (
+  GraphInputCustomizationArgs[
+    keyof GraphInputCustomizationArgs]['value']);
 
 
-export interface IImageClickInputCustomizationArgsBackendDict {
+interface ImageClickInputCustomizationArgsBackendDict {
   imageAndRegions?: {
     value: IImageWithRegions;
   };
@@ -160,11 +248,23 @@ export interface IImageClickInputCustomizationArgsBackendDict {
     value: string;
   };
 }
-export interface IImageClickInputCustomizationArgs extends
-  IImageClickInputCustomizationArgsBackendDict { }
+export interface ImageClickInputCustomizationArgs {
+  imageAndRegions?: {
+    value: IImageWithRegions;
+  };
+  highlightRegionsOnHover?: {
+    value: string;
+  };
+}
+type ImageClickInputCustomizationArgsBackendDictValue = (
+  ImageClickInputCustomizationArgsBackendDict[
+    keyof ImageClickInputCustomizationArgsBackendDict]['value']);
+type ImageClickInputCustomizationArgsValue = (
+  ImageClickInputCustomizationArgs[
+    keyof ImageClickInputCustomizationArgs]['value']);
 
 
-export interface IInteractiveMapCustomizationArgsBackendDict {
+interface InteractiveMapCustomizationArgsBackendDict {
   latitude?: {
     value: number;
   };
@@ -175,13 +275,28 @@ export interface IInteractiveMapCustomizationArgsBackendDict {
     value: string;
   };
 }
-export interface IInteractiveMapCustomizationArgs extends
-  IInteractiveMapCustomizationArgsBackendDict { }
+export interface InteractiveMapCustomizationArgs {
+  latitude?: {
+    value: number;
+  };
+  longitude?: {
+    value: number;
+  };
+  zoom?: {
+    value: string;
+  };
+}
+type InteractiveMapCustomizationArgsBackendDictValue = (
+  InteractiveMapCustomizationArgsBackendDict[
+    keyof InteractiveMapCustomizationArgsBackendDict]['value']);
+type InteractiveMapCustomizationArgsValue = (
+  InteractiveMapCustomizationArgs[
+    keyof InteractiveMapCustomizationArgs]['value']);
 
 
-export interface IItemSelectionInputCustomizationArgsBackendDict {
+interface ItemSelectionInputCustomizationArgsBackendDict {
   choices?: {
-    value: ISubtitledHtmlBackendDict[];
+    value: SubtitledHtmlBackendDict[];
   };
   maxAllowableSelectionCount?: {
     value: number;
@@ -190,45 +305,77 @@ export interface IItemSelectionInputCustomizationArgsBackendDict {
     value: number;
   };
 }
-export interface IItemSelectionInputCustomizationArgs extends
-    Omit<IItemSelectionInputCustomizationArgsBackendDict, 'choices'> {
+export interface ItemSelectionInputCustomizationArgs {
   choices?: {
     value: SubtitledHtml[];
   };
+  maxAllowableSelectionCount?: {
+    value: number;
+  };
+  minAllowableSelectionCount?: {
+    value: number;
+  };
 }
+type ItemSelectionInputCustomizationArgsBackendDictValue = (
+  ItemSelectionInputCustomizationArgsBackendDict[
+    keyof ItemSelectionInputCustomizationArgsBackendDict]['value']);
+type ItemSelectionInputCustomizationArgsValue = (
+  ItemSelectionInputCustomizationArgs[
+    keyof ItemSelectionInputCustomizationArgs]['value']);
 
 
-export interface ILogicCustomizationArgsBackendDict {
+interface LogicCustomizationArgsBackendDict {
   question?: {
     value: Object;
   };
 }
-export interface ILogicCustomizationArgs extends
-  ILogicCustomizationArgsBackendDict { }
+export interface LogicCustomizationArgs {
+  question?: {
+    value: Object;
+  };
+}
+type LogicCustomizationArgsBackendDictValue = (
+  LogicCustomizationArgsBackendDict[
+    keyof LogicCustomizationArgsBackendDict]['value']);
+type LogicCustomizationArgsValue = (
+  LogicCustomizationArgs[
+    keyof LogicCustomizationArgs]['value']);
 
 
-export interface IMathEquationInputCustomizationArgsBackendDict { }
-export interface IMathEquationInputCustomizationArgs extends
-  IMathEquationInputCustomizationArgsBackendDict { }
+interface MathEquationInputCustomizationArgsBackendDict { }
+export interface MathEquationInputCustomizationArgs { }
+type MathEquationInputCustomizationArgsBackendDictValue = (
+  MathEquationInputCustomizationArgsBackendDict[
+    keyof MathEquationInputCustomizationArgsBackendDict]['value']);
+type MathEquationInputCustomizationArgsValue = (
+  MathEquationInputCustomizationArgs[
+    keyof MathEquationInputCustomizationArgs]['value']);
 
-
-export interface IMultipleChoiceInputCustomizationArgsBackendDict {
+interface MultipleChoiceInputCustomizationArgsBackendDict {
   showChoicesInShuffledOrder?: {
     value: string;
   };
   choices?: {
-    value: ISubtitledHtmlBackendDict[];
+    value: SubtitledHtmlBackendDict[];
   };
 }
-export interface IMultipleChoiceInputCustomizationArgs extends
-    Omit<IMultipleChoiceInputCustomizationArgsBackendDict, 'choices'> {
+export interface MultipleChoiceInputCustomizationArgs {
+  showChoicesInShuffledOrder?: {
+    value: string;
+  };
   choices?: {
     value: SubtitledHtml[];
   };
 }
+type MultipleChoiceInputCustomizationArgsBackendDictValue = (
+  MultipleChoiceInputCustomizationArgsBackendDict[
+    keyof MultipleChoiceInputCustomizationArgsBackendDict]['value']);
+type MultipleChoiceInputCustomizationArgsValue = (
+  MultipleChoiceInputCustomizationArgs[
+    keyof MultipleChoiceInputCustomizationArgs]['value']);
 
 
-export interface IMusicNotesInputCustomizationArgsBackendDict {
+interface MusicNotesInputCustomizationArgsBackendDict {
   sequenceToGuess?: {
     value: IReadableMusicNote[];
   };
@@ -236,107 +383,206 @@ export interface IMusicNotesInputCustomizationArgsBackendDict {
     value: IReadableMusicNote[];
   };
 }
-export interface IMusicNotesInputCustomizationArgs extends
-  IMusicNotesInputCustomizationArgsBackendDict { }
+export interface MusicNotesInputCustomizationArgs {
+  sequenceToGuess?: {
+    value: IReadableMusicNote[];
+  };
+  initialSequence?: {
+    value: IReadableMusicNote[];
+  };
+}
+type MusicNotesInputCustomizationArgsBackendDictValue = (
+  MusicNotesInputCustomizationArgsBackendDict[
+    keyof MusicNotesInputCustomizationArgsBackendDict]['value']);
+type MusicNotesInputCustomizationArgsValue = (
+  MusicNotesInputCustomizationArgs[
+    keyof MusicNotesInputCustomizationArgs]['value']);
 
 
-export interface IPencilCodeCustomizationArgsBackendDict {
+interface PencilCodeCustomizationArgsBackendDict {
   initialCode?: {
     value: string;
   };
 }
-export interface IPencilCodeCustomizationArgs extends
-  IPencilCodeCustomizationArgsBackendDict { }
-
-
-export interface ISetInputCustomizationArgsBackendDict {
-  buttonText?: {
-    value: ISubtitledUnicodeBackendDict;
+export interface PencilCodeCustomizationArgs {
+  initialCode?: {
+    value: string;
   };
 }
-export interface ISetInputCustomizationArgs extends
-    Omit<ISetInputCustomizationArgsBackendDict, 'buttonText'> {
+type PencilCodeCustomizationArgsBackendDictValue = (
+  PencilCodeCustomizationArgsBackendDict[
+    keyof PencilCodeCustomizationArgsBackendDict]['value']);
+type PencilCodeCustomizationArgsValue = (
+  PencilCodeCustomizationArgs[
+    keyof PencilCodeCustomizationArgs]['value']);
+
+
+interface SetInputCustomizationArgsBackendDict {
+  buttonText?: {
+    value: SubtitledUnicodeBackendDict;
+  };
+}
+export interface SetInputCustomizationArgs {
   buttonText?: {
     value: SubtitledUnicode;
   };
 }
+type SetInputCustomizationArgsBackendDictValue = (
+  SetInputCustomizationArgsBackendDict[
+    keyof SetInputCustomizationArgsBackendDict]['value']);
+type SetInputCustomizationArgsValue = (
+  SetInputCustomizationArgs[
+    keyof SetInputCustomizationArgs]['value']);
 
 
-export interface ITextInputCustomizationArgsBackendDict {
+interface TextInputCustomizationArgsBackendDict {
   placeholder?: {
-    value: ISubtitledUnicodeBackendDict;
+    value: SubtitledUnicodeBackendDict;
   };
   rows?: {
     value: number;
   };
 }
-export interface ITextInputCustomizationArgs extends
-    Omit<ITextInputCustomizationArgsBackendDict, 'placeholder'> {
+export interface TextInputCustomizationArgs {
   placeholder?: {
     value: SubtitledUnicode;
   };
+  rows?: {
+    value: number;
+  };
 }
+type TextInputCustomizationArgsBackendDictValue = (
+  TextInputCustomizationArgsBackendDict[
+    keyof TextInputCustomizationArgsBackendDict]['value']);
+type TextInputCustomizationArgsValue = (
+  TextInputCustomizationArgs[
+    keyof TextInputCustomizationArgs]['value']);
 
 
-export interface IMathExpressionCustomizationArgsBackendDict { }
-export interface IMathExpressionCustomizationArgs extends
-  IMathExpressionCustomizationArgsBackendDict { }
+interface MathExpressionCustomizationArgsBackendDict { }
+export interface MathExpressionCustomizationArgs { }
+type MathExpressionCustomizationArgsBackendDictValue = (
+  MathExpressionCustomizationArgsBackendDict[
+    keyof MathExpressionCustomizationArgsBackendDict]['value']);
+type MathExpressionCustomizationArgsValue = (
+  MathExpressionCustomizationArgs[
+    keyof MathExpressionCustomizationArgs]['value']);
 
-export interface INumericExpressionInputCustomizationArgsBackendDict { }
-export interface INumericExpressionInputCustomizationArgs extends
-  INumericExpressionInputCustomizationArgsBackendDict { }
+interface NumericExpressionInputCustomizationArgsBackendDict { }
+export interface NumericExpressionInputCustomizationArgs { }
+type NumericExpressionInputCustomizationArgsBackendDictValue = (
+  NumericExpressionInputCustomizationArgsBackendDict[
+    keyof NumericExpressionInputCustomizationArgsBackendDict]['value']);
+type NumericExpressionInputCustomizationArgsValue = (
+  MathExpressionCustomizationArgs[
+    keyof NumericExpressionInputCustomizationArgs]['value']);
 
-export interface INumericInputCustomizationArgsBackendDict { }
-export interface INumericInputCustomizationArgs extends
-  INumericInputCustomizationArgsBackendDict { }
+interface NumericInputCustomizationArgsBackendDict { }
+export interface NumericInputCustomizationArgs { }
+type NumericInputCustomizationArgsBackendDictValue = (
+  NumericInputCustomizationArgsBackendDict[
+    keyof NumericInputCustomizationArgsBackendDict]['value']);
+type NumericInputCustomizationArgsValue = (
+  NumericInputCustomizationArgs[
+    keyof NumericInputCustomizationArgs]['value']);
 
-export interface INumberWithUnitsCustomizationArgsBackendDict { }
-export interface INumberWithUnitsCustomizationArgs extends
-  INumberWithUnitsCustomizationArgsBackendDict { }
+interface NumberWithUnitsCustomizationArgsBackendDict { }
+export interface NumberWithUnitsCustomizationArgs { }
+type NumberWithUnitsCustomizationArgsBackendDictValue = (
+  NumberWithUnitsCustomizationArgsBackendDict[
+    keyof NumberWithUnitsCustomizationArgsBackendDict]['value']);
+type NumberWithUnitsCustomizationArgsValue = (
+  NumberWithUnitsCustomizationArgs[
+    keyof NumberWithUnitsCustomizationArgs]['value']);
 
+export type InteractionCustomizationArgsBackendDict = (
+  AlgebraicExpressionInputCustomizationArgsBackendDict |
+  CodeReplCustomizationArgsBackendDict |
+  ContinueCustomizationArgsBackendDict |
+  DragAndDropSortInputCustomizationArgsBackendDict |
+  EndExplorationCustomizationArgsBackendDict |
+  FractionInputCustomizationArgsBackendDict |
+  GraphInputCustomizationArgsBackendDict |
+  ImageClickInputCustomizationArgsBackendDict |
+  InteractiveMapCustomizationArgsBackendDict |
+  ItemSelectionInputCustomizationArgsBackendDict |
+  LogicCustomizationArgsBackendDict |
+  MathEquationInputCustomizationArgsBackendDict |
+  MathExpressionCustomizationArgsBackendDict |
+  MultipleChoiceInputCustomizationArgsBackendDict |
+  MusicNotesInputCustomizationArgsBackendDict |
+  NumberWithUnitsCustomizationArgsBackendDict |
+  NumericExpressionInputCustomizationArgsBackendDict |
+  NumericInputCustomizationArgsBackendDict |
+  PencilCodeCustomizationArgsBackendDict |
+  SetInputCustomizationArgsBackendDict |
+  TextInputCustomizationArgsBackendDict);
 
-export type IInteractionCustomizationArgsBackendDict = (
-  IAlgebraicExpressionInputCustomizationArgsBackendDict |
-  ICodeReplCustomizationArgsBackendDict |
-  IContinueCustomizationArgsBackendDict |
-  IDragAndDropSortInputCustomizationArgsBackendDict |
-  IEndExplorationCustomizationArgsBackendDict |
-  IFractionInputCustomizationArgsBackendDict |
-  IGraphInputCustomizationArgsBackendDict |
-  IImageClickInputCustomizationArgsBackendDict |
-  IInteractiveMapCustomizationArgsBackendDict |
-  IItemSelectionInputCustomizationArgsBackendDict |
-  ILogicCustomizationArgsBackendDict |
-  IMathEquationInputCustomizationArgsBackendDict |
-  IMultipleChoiceInputCustomizationArgsBackendDict |
-  IMusicNotesInputCustomizationArgsBackendDict |
-  IPencilCodeCustomizationArgsBackendDict |
-  ISetInputCustomizationArgsBackendDict |
-  ITextInputCustomizationArgsBackendDict |
-  IMathExpressionCustomizationArgsBackendDict |
-  INumericExpressionInputCustomizationArgsBackendDict |
-  INumericInputCustomizationArgsBackendDict |
-  INumberWithUnitsCustomizationArgsBackendDict);
+export type InteractionCustomizationArgs = (
+  AlgebraicExpressionInputCustomizationArgs |
+  CodeReplCustomizationArgs |
+  ContinueCustomizationArgs |
+  DragAndDropSortInputCustomizationArgs |
+  EndExplorationCustomizationArgs |
+  FractionInputCustomizationArgs |
+  GraphInputCustomizationArgs |
+  ImageClickInputCustomizationArgs |
+  MathExpressionCustomizationArgs |
+  InteractiveMapCustomizationArgs |
+  ItemSelectionInputCustomizationArgs |
+  LogicCustomizationArgs |
+  MathEquationInputCustomizationArgs |
+  MultipleChoiceInputCustomizationArgs |
+  MusicNotesInputCustomizationArgs |
+  NumberWithUnitsCustomizationArgs |
+  NumericExpressionInputCustomizationArgs |
+  NumericInputCustomizationArgs |
+  PencilCodeCustomizationArgs |
+  SetInputCustomizationArgs |
+  TextInputCustomizationArgs);
 
-export type IInteractionCustomizationArgs = (
-  IAlgebraicExpressionInputCustomizationArgs |
-  ICodeReplCustomizationArgs |
-  IContinueCustomizationArgs |
-  IDragAndDropSortInputCustomizationArgs |
-  IEndExplorationCustomizationArgs |
-  IFractionInputCustomizationArgs |
-  IGraphInputCustomizationArgs |
-  IImageClickInputCustomizationArgs |
-  IInteractiveMapCustomizationArgs |
-  IItemSelectionInputCustomizationArgs |
-  ILogicCustomizationArgs |
-  IMathEquationInputCustomizationArgs |
-  IMathExpressionCustomizationArgs |
-  IMultipleChoiceInputCustomizationArgs |
-  IMusicNotesInputCustomizationArgs |
-  INumberWithUnitsCustomizationArgs |
-  INumericExpressionInputCustomizationArgs |
-  INumericInputCustomizationArgs |
-  IPencilCodeCustomizationArgs |
-  ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs);
+export type InteractionCustomizationArgsBackendDictValue = (
+  AlgebraicExpressionInputCustomizationArgsBackendDictValue |
+  CodeReplCustomizationArgsBackendDictValue |
+  ContinueCustomizationArgsBackendDictValue |
+  DragAndDropSortInputCustomizationArgsBackendDictValue |
+  EndExplorationCustomizationArgsBackendDictValue |
+  FractionInputCustomizationArgsBackendDictValue |
+  GraphInputCustomizationArgsBackendDictValue |
+  ImageClickInputCustomizationArgsBackendDictValue |
+  InteractiveMapCustomizationArgsBackendDictValue |
+  ItemSelectionInputCustomizationArgsBackendDictValue |
+  LogicCustomizationArgsBackendDictValue |
+  MathEquationInputCustomizationArgsBackendDictValue |
+  MathExpressionCustomizationArgsBackendDictValue |
+  MultipleChoiceInputCustomizationArgsBackendDictValue |
+  MusicNotesInputCustomizationArgsBackendDictValue |
+  NumberWithUnitsCustomizationArgsBackendDictValue |
+  NumericExpressionInputCustomizationArgsBackendDictValue |
+  NumericInputCustomizationArgsBackendDictValue |
+  PencilCodeCustomizationArgsBackendDictValue |
+  SetInputCustomizationArgsBackendDictValue |
+  TextInputCustomizationArgsBackendDictValue);
+
+export type InteractionCustomizationArgsValue = (
+  AlgebraicExpressionInputCustomizationArgsValue |
+  CodeReplCustomizationArgsValue |
+  ContinueCustomizationArgsValue |
+  DragAndDropSortInputCustomizationArgsValue |
+  EndExplorationCustomizationArgsValue |
+  FractionInputCustomizationArgsValue |
+  GraphInputCustomizationArgsValue |
+  ImageClickInputCustomizationArgsValue |
+  MathExpressionCustomizationArgsValue |
+  InteractiveMapCustomizationArgsValue |
+  ItemSelectionInputCustomizationArgsValue |
+  LogicCustomizationArgsValue |
+  MathEquationInputCustomizationArgsValue |
+  MultipleChoiceInputCustomizationArgsValue |
+  MusicNotesInputCustomizationArgsValue |
+  NumberWithUnitsCustomizationArgsValue |
+  NumericExpressionInputCustomizationArgsValue |
+  NumericInputCustomizationArgsValue |
+  PencilCodeCustomizationArgsValue |
+  SetInputCustomizationArgsValue |
+  TextInputCustomizationArgsValue);

@@ -267,7 +267,8 @@ describe('Translation status service', function() {
             customization_args: {
               choices: {
                 value: ['<p>1</p>', '<p>2</p>']
-              }
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,
@@ -332,8 +333,9 @@ describe('Translation status service', function() {
             id: 'MultipleChoiceInput',
             customization_args: {
               choices: {
-                value: ['<p>1</p>']
-              }
+                value: ['<p>1</p>'],
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,

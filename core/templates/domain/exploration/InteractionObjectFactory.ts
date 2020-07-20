@@ -29,105 +29,30 @@ import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
-import {
-  SubtitledUnicode, ISubtitledUnicodeBackendDict, SubtitledUnicodeObjectFactory
-} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {
-  SubtitledHtml, ISubtitledHtmlBackendDict, SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { IInteractionAnswer } from 'interactions/answer-defs';
 import {
-  IInteractionCustomizationArgsBackendDict,
-  IInteractionCustomizationArgs
+  InteractionCustomizationArgObjectFactory, InteractionCustomizationArg
+} from 'domain/exploration/InteractionCustomizationArgObjectFactory';
+import {
+  InteractionCustomizationArgsBackendDict,
 } from 'interactions/customization-args-defs';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
-export type InteractionCustArgsConversionFn<T, S> = (
-  caValue: T,
-  schemaObjType: 'SubtitledHtml' | 'SubtitledUnicode',
-) => S;
-type SubtitledBackendDicts = ISubtitledHtmlBackendDict |
-  ISubtitledUnicodeBackendDict;
-type Subtitled = SubtitledHtml | SubtitledUnicode;
-
-
-
-export interface IInteractionBackendDict {
+export interface InteractionBackendDict {
   'default_outcome': IOutcomeBackendDict;
   'answer_groups': IAnswerGroupBackendDict[];
   'confirmed_unclassified_answers': IInteractionAnswer[];
-  'customization_args': IInteractionCustomizationArgsBackendDict;
+  'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': IHintBackendDict[];
   'id': string;
   'solution': ISolutionBackendDict;
 }
-export interface CustomizationArgsSchema {
-  type: string;
-  'obj_type'?: string;
-  items?: CustomizationArgsSchema;
-  properties?: {
-    name: string;
-    schema: CustomizationArgsSchema;
-  }[]
-}
-
-export const applyConversionFnOnInteractionCustArgsContent = function<T, S>(
-    value: any,
-    schema: CustomizationArgsSchema,
-    conversionFn: InteractionCustArgsConversionFn<T, S>
-) : any {
-  const schemaType = schema.type;
-  const schemaObjType = schema.obj_type;
-
-  if (schemaObjType === 'SubtitledUnicode' ||
-      schemaObjType === 'SubtitledHtml') {
-    value = conversionFn(value, schemaObjType);
-  } else if (schemaType === 'list') {
-    for (let i = 0; i < value.length; i++) {
-      value[i] = applyConversionFnOnInteractionCustArgsContent<T, S>(
-        value[i],
-        schema.items,
-        conversionFn);
-    }
-  } else if (schemaType === 'dict') {
-    schema.properties.forEach(property => {
-      const name = property.name;
-      value[name] = applyConversionFnOnInteractionCustArgsContent<T, S>(
-        value[name],
-        property.schema,
-        conversionFn);
-    });
-  }
-
-  return value;
-};
-
-const convertInteractionCustArgsContent = function<T, S>(
-    interactionId: string,
-    caValues: IInteractionCustomizationArgsBackendDict |
-      IInteractionCustomizationArgs,
-    conversionFn: InteractionCustArgsConversionFn<T, S>
-) : void {
-  if (!interactionId || !(interactionId in INTERACTION_SPECS)) {
-    return;
-  }
-
-  const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
-
-  for (let caSpec of caSpecs) {
-    const name = caSpec.name;
-    if (name in caValues) {
-      caValues[name].value = applyConversionFnOnInteractionCustArgsContent(
-        caValues[name].value, caSpec.schema, conversionFn);
-    }
-  }
-};
 
 export class Interaction {
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: IInteractionAnswer[];
-  customizationArgs: IInteractionCustomizationArgs;
+  customizationArgs: {[name: string]: InteractionCustomizationArg};
   defaultOutcome: Outcome;
   hints: Hint[];
   id: string;
@@ -135,7 +60,7 @@ export class Interaction {
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: IInteractionAnswer[],
-      customizationArgs: IInteractionCustomizationArgs,
+      customizationArgs: {[name: string]: InteractionCustomizationArg},
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
@@ -158,7 +83,9 @@ export class Interaction {
     this.defaultOutcome = newValue;
   }
 
-  setCustomizationArgs(newValue: IInteractionCustomizationArgs): void {
+  setCustomizationArgs(
+      newValue: {[name: string]: InteractionCustomizationArg}
+  ): void {
     this.customizationArgs = newValue;
   }
 
@@ -182,46 +109,25 @@ export class Interaction {
   }
 
   static convertCustomizationArgsToBackendDict(
-      caValues: IInteractionCustomizationArgs
-  ): IInteractionCustomizationArgsBackendDict {
-    caValues = angular.copy(caValues);
-
-    const convertToBackendDict = (
-        value: Array<Object> | Object
-    ) => {
-      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
-        value = value.toBackendDict();
-      } else if (value instanceof Array) {
-        for (let i = 0; i < value.length; i++) {
-          value[i] = convertToBackendDict(value[i]);
-        }
-      } else if (value instanceof Object) {
-        Object.keys(value).forEach(key => {
-          value[key] = convertToBackendDict(value[key]);
-        });
-      }
-
-      return value;
-    };
-
-    let caValuesBackendDict = {};
-    Object.keys(caValues).forEach(key => {
-      caValuesBackendDict[key] = (
-        convertToBackendDict(caValues[key]));
+      customizationArgs: {[name: string]: InteractionCustomizationArg}
+  ): InteractionCustomizationArgsBackendDict {
+    const custArgsBackendDict: InteractionCustomizationArgsBackendDict = {};
+    Object.keys(customizationArgs).forEach(caName => {
+      custArgsBackendDict[caName] = (
+        customizationArgs[caName].toBackendDict());
     });
-    return caValuesBackendDict;
+
+    return custArgsBackendDict;
   }
 
-  toBackendDict(): IInteractionBackendDict {
+  toBackendDict(): InteractionBackendDict {
     return {
       answer_groups: this.answerGroups.map(function(answerGroup) {
         return answerGroup.toBackendDict();
       }),
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
-      customization_args: (
-        Interaction.convertCustomizationArgsToBackendDict(
-          this.customizationArgs)
-      ),
+      customization_args: Interaction.convertCustomizationArgsToBackendDict(
+        this.customizationArgs),
       default_outcome:
         this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
       hints: this.hints.map(function(hint) {
@@ -242,40 +148,35 @@ export class InteractionObjectFactory {
       private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
       private outcomeFactory: OutcomeObjectFactory,
-      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
-      private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory
+      private interactionCustomizationArgObjectFactory:
+        InteractionCustomizationArgObjectFactory
   ) {}
 
-  convertCustomizationArgsBackendDict(
+  convertFromCustomizationArgsBackendDict(
       interactionId: string,
-      caValuesBackendDict: IInteractionCustomizationArgsBackendDict
-  ) : IInteractionCustomizationArgs {
-    if (!caValuesBackendDict) {
-      return {};
+      custArgsBackendDict: InteractionCustomizationArgsBackendDict
+  ) : {[name: string]: InteractionCustomizationArg} {
+    let custArgs: {[name: string]: InteractionCustomizationArg} = {};
+
+    if (interactionId !== null &&
+      INTERACTION_SPECS.hasOwnProperty(interactionId)
+    ) {
+      const custArgsSpecs = (
+        INTERACTION_SPECS[interactionId].customization_arg_specs);
+      custArgsSpecs.forEach(custArgsSpec => {
+        custArgs[custArgsSpec.name] = (
+          this.interactionCustomizationArgObjectFactory.createFromBackendDict(
+            custArgsBackendDict[custArgsSpec.name],
+            custArgsSpec.schema)
+        );
+      });
     }
 
-    let caValues = angular.copy(caValuesBackendDict);
-
-    let convertToSubtitled:
-      InteractionCustArgsConversionFn<SubtitledBackendDicts, Subtitled> = (
-          caValue, schemaObjType
-      ) => {
-        if (schemaObjType === 'SubtitledHtml') {
-          return this.subtitledHtmlObjectFactory.createFromBackendDict(
-            <ISubtitledHtmlBackendDict> caValue);
-        } else if (schemaObjType === 'SubtitledUnicode') {
-          return this.subtitledUnicodeObjectFactory.createFromBackendDict(
-            <ISubtitledUnicodeBackendDict> caValue);
-        }
-      };
-
-    convertInteractionCustArgsContent(
-      interactionId, caValues, convertToSubtitled);
-    return <IInteractionCustomizationArgs> caValues;
+    return custArgs;
   }
 
   createFromBackendDict(
-      interactionDict: IInteractionBackendDict): Interaction {
+      interactionDict: InteractionBackendDict): Interaction {
     var defaultOutcome;
     if (interactionDict.default_outcome) {
       defaultOutcome = this.outcomeFactory.createFromBackendDict(
@@ -283,11 +184,13 @@ export class InteractionObjectFactory {
     } else {
       defaultOutcome = null;
     }
+
     return new Interaction(
       this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
       interactionDict.confirmed_unclassified_answers,
-      this.convertCustomizationArgsBackendDict(
-        interactionDict.id, interactionDict.customization_args),
+      this.convertFromCustomizationArgsBackendDict(
+        interactionDict.id,
+        interactionDict.customization_args),
       defaultOutcome,
       this.generateHintsFromBackend(interactionDict.hints),
       interactionDict.id,

@@ -58,7 +58,7 @@ describe('Exploration Html Formatter Service', () => {
   it('should correctly unwrap SubtitledUnicode and SubtitledHtml', () => {
     // No interactions currently have dictionaries in their customization
     // arguments, but we test here for coverage + future development.
-    let unwrappedCustArgs = ehfs.unwrapInteractionCustArgsContent(
+    let convertedCA = ehfs.convertCustomizationArgsToCustomizationArgsHtml(
       {
         test: [
           {
@@ -74,7 +74,7 @@ describe('Exploration Html Formatter Service', () => {
       }
     );
 
-    expect(unwrappedCustArgs)
+    expect(convertedCA)
       .toEqual({
         test: [
           {
@@ -106,13 +106,13 @@ describe('Exploration Html Formatter Service', () => {
     var answer = 'sampleAnswer';
     var interactionCustomizationArgs = {
       choices: {
-        value: 'sampleChoice'
+        value: [new SubtitledHtml('sampleChoice', '')]
       }
     };
     var expectedHtmlTag = '<oppia-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
-      'choices="&amp;quot;' + interactionCustomizationArgs.choices.value +
-      '&amp;quot;"></oppia-response-sample-id>';
+      'choices="[&amp;quot;sampleChoice' +
+      '&amp;quot;]"></oppia-response-sample-id>';
     expect(ehfs.getAnswerHtml(answer, interactionId,
       interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);
@@ -123,13 +123,13 @@ describe('Exploration Html Formatter Service', () => {
     var answer = 'sampleAnswer';
     var interactionCustomizationArgs = {
       choices: {
-        value: 'sampleChoice'
+        value: [new SubtitledHtml('sampleChoice', '')]
       }
     };
     var expectedHtmlTag = '<oppia-short-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
-      'choices="&amp;quot;' + interactionCustomizationArgs.choices.value +
-      '&amp;quot;"></oppia-short-response-sample-id>';
+      'choices="[&amp;quot;sampleChoice' +
+      '&amp;quot;]"></oppia-short-response-sample-id>';
     expect(ehfs.getShortAnswerHtml(answer, interactionId,
       interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);

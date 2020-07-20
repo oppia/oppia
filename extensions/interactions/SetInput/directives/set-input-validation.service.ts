@@ -24,7 +24,7 @@ import { AnswerGroup } from
 import { AppConstants } from 'app.constants';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { ISetInputCustomizationArgs } from
+import { SetInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -86,7 +86,7 @@ export class SetInputValidationService {
   }
 
   getCustomizationArgsWarnings(
-      customizationArgs: ISetInputCustomizationArgs): IWarning[] {
+      customizationArgs: SetInputCustomizationArgs): IWarning[] {
     let warningsList = [];
 
     let buttonText = (
@@ -188,7 +188,7 @@ export class SetInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: ISetInputCustomizationArgs,
+      stateName: string, customizationArgs: SetInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     return [
       ...this.getCustomizationArgsWarnings(customizationArgs),

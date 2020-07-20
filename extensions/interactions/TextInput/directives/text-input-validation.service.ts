@@ -25,7 +25,7 @@ import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { ITextInputCustomizationArgs } from
+import { TextInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -43,7 +43,7 @@ interface IWarning {
 export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
   getCustomizationArgsWarnings(
-      customizationArgs: ITextInputCustomizationArgs): IWarning[] {
+      customizationArgs: TextInputCustomizationArgs): IWarning[] {
     var warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
@@ -93,7 +93,7 @@ export class TextInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: ITextInputCustomizationArgs,
+      customizationArgs: TextInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.bivs.getAllOutcomeWarnings(

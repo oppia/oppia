@@ -16,12 +16,13 @@
  * @fileoverview Controller for customize interaction modal.
  */
 
-import { CustomizationArgsSchema } from
-  'domain/exploration/InteractionObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { Schema } from 'services/schema-default-value.service';
+import { InteractionCustomizationArgsValue } from
+  'interactions/customization-args-defs';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -49,7 +50,8 @@ require(
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',
   'EditorFirstTimeEventsService',
-  'InteractionDetailsCacheService', 'InteractionObjectFactory',
+  'InteractionCustomizationArgObjectFactory',
+  'InteractionDetailsCacheService',
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'StateNextContentIdIndexService',
   'UrlInterpolationService',
@@ -59,7 +61,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   function(
       $controller, $injector, $scope, $uibModalInstance,
       EditorFirstTimeEventsService,
-      InteractionDetailsCacheService, InteractionObjectFactory,
+      InteractionCustomizationArgObjectFactory,
+      InteractionDetailsCacheService,
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
@@ -106,42 +109,22 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
       StateInteractionIdService.displayed = angular.copy(
         StateInteractionIdService.savedMemento);
-      StateCustomizationArgsService.displayed = {};
+      StateCustomizationArgsService.displayed = (
+        StateCustomizationArgsService.savedMemento);
 
       // Ensure that StateCustomizationArgsService.displayed is
       // fully populated.
-      const customizationArgsBackendDict = {};
       for (
         var i = 0; i < $scope.customizationArgSpecs.length;
         i++) {
         var argName = $scope.customizationArgSpecs[i].name;
         if (
-          StateCustomizationArgsService.savedMemento.hasOwnProperty(argName)
+          !StateCustomizationArgsService.savedMemento.hasOwnProperty(argName)
         ) {
-          StateCustomizationArgsService.displayed[argName] = (
-            angular.copy(
-              StateCustomizationArgsService.savedMemento[argName]
-            )
-          );
-        } else {
-          customizationArgsBackendDict[argName] = {
-            value: angular.copy($scope.customizationArgSpecs[i].default_value)
-          };
+          throw new Error(
+            `Interaction is missing customization argument ${argName}`);
         }
       }
-
-      const defaultCustomizationArgs = (
-        InteractionObjectFactory.convertCustomizationArgsBackendDict(
-          StateInteractionIdService.displayed,
-          customizationArgsBackendDict
-        )
-      );
-
-      StateCustomizationArgsService.displayed = {
-        ...StateCustomizationArgsService.displayed,
-        ...defaultCustomizationArgs
-      };
-
 
       $scope.$broadcast('schemaBasedFormsShown');
       $scope.form = {};
@@ -189,19 +172,17 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           InteractionDetailsCacheService.get(
             newInteractionId).customization);
       } else {
-        const customizationArgsBackendDict = {};
+        const customizationArgs = {};
         $scope.customizationArgSpecs.forEach(function(caSpec) {
-          customizationArgsBackendDict[caSpec.name] = {};
-          customizationArgsBackendDict[
-            caSpec.name].value = caSpec.default_value;
+          customizationArgs[caSpec.name] = (
+            InteractionCustomizationArgObjectFactory.createFromBackendDict(
+              {value: caSpec.default_value},
+              caSpec.schema
+            )
+          );
         });
 
-        StateCustomizationArgsService.displayed = (
-          InteractionObjectFactory.convertCustomizationArgsBackendDict(
-            newInteractionId,
-            customizationArgsBackendDict
-          )
-        );
+        StateCustomizationArgsService.displayed = customizationArgs;
       }
 
       if (
@@ -260,41 +241,49 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
     };
 
-    $scope.populateBlankContentIds = function() {
+    /**
+     * The default values of SubtitledHtml and SubtitledUnicode objects in the
+     * customization arguments have a null content_id. This function populates
+     * these null content_id's with a content_id generated from traversing the
+     * schema and with next content id index, ensuring a unique content_id.
+     */
+    $scope.populateNullContentIds = function() {
       const interactionId = $scope.StateInteractionIdService.displayed;
 
-      let assignContentIdsToEmptyContent = (
-          value: any,
-          schema: CustomizationArgsSchema,
+      let traverseSchemaAndAssignContentIds = (
+          value: InteractionCustomizationArgsValue,
+          schema: Schema,
           contentId: string,
       ): void => {
-        const schemaType = schema.type;
-        const schemaObjType = schema.obj_type;
-
-        if (schemaObjType === 'SubtitledUnicode' ||
-            schemaObjType === 'SubtitledHtml') {
-          value = <SubtitledHtml | SubtitledUnicode> value;
-          if (value.getContentId() === '') {
-            contentId = (
-              `${contentId}_${StateNextContentIdIndexService.displayed}`);
-            value.setContentId(contentId);
-            StateNextContentIdIndexService.displayed += 1;
-          }
-        } else if (schemaType === 'list') {
-          for (let i = 0; i < value.length; i++) {
-            assignContentIdsToEmptyContent(
+        if (schema.type === 'list') {
+          for (
+            let i = 0;
+            i < (<InteractionCustomizationArgsValue[]> value).length;
+            i++
+          ) {
+            traverseSchemaAndAssignContentIds(
               value[i],
-              schema.items,
+              <Schema> schema.items,
               `${contentId}`);
           }
-        } else if (schemaType === 'dict') {
+        } else if (schema.type === 'dict') {
           schema.properties.forEach(property => {
             const name = property.name;
-            assignContentIdsToEmptyContent(
+            traverseSchemaAndAssignContentIds(
               value[name],
               property.schema,
               `${contentId}_${name}`);
           });
+        } else if (schema.type === 'custom' &&
+            (schema.obj_type === 'SubtitledUnicode' ||
+            schema.obj_type === 'SubtitledHtml')
+        ) {
+          if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
+            contentId = (
+              `${contentId}_${StateNextContentIdIndexService.displayed}`);
+            (<SubtitledHtml|SubtitledUnicode>value).setContentId(contentId);
+            StateNextContentIdIndexService.displayed += 1;
+          }
         }
       };
 
@@ -303,7 +292,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       for (let caSpec of caSpecs) {
         const name = caSpec.name;
         if (name in caValues) {
-          assignContentIdsToEmptyContent(
+          traverseSchemaAndAssignContentIds(
             caValues[name].value,
             caSpec.schema,
             `custarg_${name}`);
@@ -312,7 +301,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.save = function() {
-      $scope.populateBlankContentIds();
+      $scope.populateNullContentIds();
       EditorFirstTimeEventsService.registerFirstSaveInteractionEvent();
       $uibModalInstance.close();
     };

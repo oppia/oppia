@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IEndExplorationCustomizationArgs } from
+import { EndExplorationCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class EndExplorationValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IEndExplorationCustomizationArgs): IWarning[] {
+      customizationArgs: EndExplorationCustomizationArgs): IWarning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['recommendedExplorationIds']);
@@ -65,7 +65,7 @@ export class EndExplorationValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: IEndExplorationCustomizationArgs,
+      stateName: string, customizationArgs: EndExplorationCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 

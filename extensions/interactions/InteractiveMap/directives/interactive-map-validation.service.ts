@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IInteractiveMapCustomizationArgs } from
+import { InteractiveMapCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class InteractiveMapValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IInteractiveMapCustomizationArgs): IWarning[] {
+      customizationArgs: InteractiveMapCustomizationArgs): IWarning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -64,7 +64,7 @@ export class InteractiveMapValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: IInteractiveMapCustomizationArgs,
+      stateName: string, customizationArgs: InteractiveMapCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 

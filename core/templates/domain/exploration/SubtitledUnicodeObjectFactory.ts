@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-export interface ISubtitledUnicodeBackendDict {
+export interface SubtitledUnicodeBackendDict {
   'content_id': string;
   'unicode_str': string;
 }
@@ -49,19 +49,15 @@ export class SubtitledUnicode {
     this._contentId = newContentId;
   }
 
-  toBackendDict(): ISubtitledUnicodeBackendDict {
+  toBackendDict(): SubtitledUnicodeBackendDict {
     return {
       unicode_str: this._unicode,
       content_id: this._contentId
     };
   }
 
-  hasNoUnicode(): boolean {
-    return !this._unicode;
-  }
-
   isEmpty(): boolean {
-    return this.hasNoUnicode();
+    return !this._unicode;
   }
 }
 
@@ -70,7 +66,7 @@ export class SubtitledUnicode {
 })
 export class SubtitledUnicodeObjectFactory {
   createFromBackendDict(
-      subtitledUnicodeBackendDict: ISubtitledUnicodeBackendDict
+      subtitledUnicodeBackendDict: SubtitledUnicodeBackendDict
   ): SubtitledUnicode {
     return new SubtitledUnicode(
       subtitledUnicodeBackendDict.unicode_str,

@@ -30,6 +30,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { InteractionCustomizationArg } from 'domain/exploration/InteractionCustomizationArgObjectFactory';
 
 describe('State card object factory', () => {
   let stateCardObjectFactory = null;
@@ -143,12 +144,9 @@ describe('State card object factory', () => {
     expect(_sampleCard.isInteractionInline()).toEqual(true);
     expect(_sampleCard.getInteractionInstructions()).toEqual(null);
     expect(_sampleCard.getInteractionCustomizationArgs()).toEqual({
-      rows: {
-        value: 1
-      },
-      placeholder: {
-        value: new SubtitledUnicode('Type your answer here.', '')
-      }
+      rows: new InteractionCustomizationArg(1),
+      placeholder: new InteractionCustomizationArg(
+        new SubtitledUnicode('Type your answer here.', ''))
     });
     expect(_sampleCard.getInteractionHtml()).toEqual(
       '<interaction></interaction>'

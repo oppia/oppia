@@ -25,12 +25,24 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IInteractionAnswer } from 'interactions/answer-defs';
-import { IInteractionCustomizationArgs } from
+import { InteractionCustomizationArgs, InteractionCustomizationArgsValue } from
   'interactions/customization-args-defs';
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+
+type InteractionCustomizationArgsHtmlValue = (
+  Exclude<
+    InteractionCustomizationArgsValue,
+    SubtitledUnicode | SubtitledHtml | SubtitledUnicode[] | SubtitledHtml[]
+  >);
+
+type InteractionCustomizationArgsHtml = {
+  [caName: string]: {
+    value: InteractionCustomizationArgsHtmlValue
+  }
+};
 
 
 // A service that provides a number of utility functions useful to both the
@@ -44,13 +56,19 @@ export class ExplorationHtmlFormatterService {
       private extensionTagAssembler: ExtensionTagAssemblerService,
       private htmlEscaper: HtmlEscaperService
   ) {}
-
-  unwrapInteractionCustArgsContent(caValues: IInteractionCustomizationArgs) {
+  /**
+   * Convert SubtitledHtml to html string and SubtitledUnicode to unicode
+   * string.
+   * @param caValues customization argument values
+   */
+  convertCustomizationArgsToCustomizationArgsHtml(
+      caValues: InteractionCustomizationArgs
+  ) : InteractionCustomizationArgsHtml {
     if (!caValues) {
       return {};
     }
 
-    const unwrapContent = (
+    const traverseAndConvertSubtitledContentToString = (
         value: Array<Object> | Object
     ) => {
       if (value instanceof SubtitledUnicode) {
@@ -59,11 +77,11 @@ export class ExplorationHtmlFormatterService {
         value = value.getHtml();
       } else if (value instanceof Array) {
         for (let i = 0; i < value.length; i++) {
-          value[i] = unwrapContent(value[i]);
+          value[i] = traverseAndConvertSubtitledContentToString(value[i]);
         }
       } else if (value instanceof Object) {
         Object.keys(value).forEach(key => {
-          value[key] = unwrapContent(value[key]);
+          value[key] = traverseAndConvertSubtitledContentToString(value[key]);
         });
       }
 
@@ -73,7 +91,7 @@ export class ExplorationHtmlFormatterService {
     let unwrappedCaValues = {};
     Object.keys(caValues).forEach(key => {
       unwrappedCaValues[key] = (
-        unwrapContent(caValues[key]));
+        traverseAndConvertSubtitledContentToString(caValues[key]));
     });
     return unwrappedCaValues;
   }
@@ -94,14 +112,14 @@ export class ExplorationHtmlFormatterService {
    */
   getInteractionHtml(
       interactionId: string,
-      interactionCustomizationArgs: IInteractionCustomizationArgs,
+      interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     const ca = angular.copy(interactionCustomizationArgs);
-    this.unwrapInteractionCustArgsContent(ca);
+    this.convertCustomizationArgsToCustomizationArgsHtml(ca);
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(element, ca));
@@ -115,15 +133,13 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: IInteractionCustomizationArgs): string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
 
-    interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
-    this.unwrapInteractionCustArgsContent(interactionCustomizationArgs);
-
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(
@@ -139,15 +155,13 @@ export class ExplorationHtmlFormatterService {
 
   getShortAnswerHtml(
       answer: IInteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: IInteractionCustomizationArgs) : string {
+      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
     var interactionChoices = null;
-
-    interactionCustomizationArgs = angular.copy(interactionCustomizationArgs);
-    this.unwrapInteractionCustArgsContent(interactionCustomizationArgs);
 
     // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(

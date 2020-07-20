@@ -80,17 +80,22 @@ describe('Extracting Image file names in the state service', () => {
             confirmed_unclassified_answers: [],
             customization_args: {
               buttonText: {
-                value: 'Continue'
+                value: {
+                  content_id: 'custarg_buttonText_0',
+                  unicode_str: 'Continue'
+                }
               }
             },
             solution: null,
             answer_groups: [],
             hints: []
           },
+          next_content_id_index: 1,
           solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
+              custarg_buttonText_0: {},
               default_outcome: {}
             }
           },
@@ -121,6 +126,7 @@ describe('Extracting Image file names in the state service', () => {
             answer_groups: [],
             hints: []
           },
+          next_content_id_index: 0,
           solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
@@ -157,15 +163,19 @@ describe('Extracting Image file names in the state service', () => {
             confirmed_unclassified_answers: [],
             customization_args: {
               choices: {
-                value: [
-                  '<p> Go to ItemSelection <oppia-noninteractive-image' +
+                value: [{
+                  content_id: 'custarg_choices_3',
+                  html: '<p> Go to ItemSelection <oppia-noninteractive-image' +
                   ' filepath-with-value="&amp;quot;sIMultipleChoice1.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>',
-                  '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
+                  'quot;"></oppia-noninteractive-image></p>'
+                }, {
+                  content_id: 'custarg_choices_4',
+                  html: '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
                   ' filepath-with-value="&amp;quot;sIMultipleChoice2.png&amp;' +
                   'quot;"></oppia-noninteractive-image></p>'
-                ]
-              }
+                }]
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             answer_groups: [
               {
@@ -215,10 +225,13 @@ describe('Extracting Image file names in the state service', () => {
             hints: [],
             solution: null
           },
+          next_content_id_index: 5,
           solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
+              custarg_choices_3: {},
+              custarg_choices_4: {},
               default_outcome: {},
               feedback_1: {},
               feedback_2: {}
@@ -263,13 +276,17 @@ describe('Extracting Image file names in the state service', () => {
                 value: 2
               },
               choices: {
-                value: [
-                  '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
-                  'quot;s4Choice1.png&amp;quot;">' +
-                  '</oppia-noninteractive-image></p>',
-                  '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
-                  'quot;s4Choice2.png&amp;quot;">' +
-                  '</oppia-noninteractive-image></p>']
+                value: [{
+                  content_id: 'custarg_choices_3',
+                  html: '<p><oppia-noninteractive-image filepath-with-value=' +
+                  '"&amp;quot;s4Choice1.png&amp;quot;">' +
+                  '</oppia-noninteractive-image></p>'
+                }, {
+                  content_id: 'custarg_choices_4',
+                  html: '<p><oppia-noninteractive-image filepath-with-value=' +
+                  '"&amp;quot;s4Choice2.png&amp;quot;">' +
+                  '</oppia-noninteractive-image></p>'
+                }]
               }
             },
             hints: [],
@@ -325,10 +342,13 @@ describe('Extracting Image file names in the state service', () => {
               }
             ]
           },
+          next_content_id_index: 5,
           solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
+              custarg_choices_3: {},
+              custarg_choices_4: {},
               default_outcome: {},
               feedback_1: {},
               feedback_2: {}
@@ -568,7 +588,10 @@ describe('Extracting Image file names in the state service', () => {
                 value: 1
               },
               placeholder: {
-                value: ''
+                value: {
+                  content_id: 'custarg_placeholder_3',
+                  unicode_str: ''
+                }
               }
             },
             answer_groups: [{
@@ -625,10 +648,12 @@ describe('Extracting Image file names in the state service', () => {
               }
             },
           },
+          next_content_id_index: 4,
           solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
+              custarg_placeholder_3: {},
               default_outcome: {},
               feedback_1: {},
               feedback_2: {},

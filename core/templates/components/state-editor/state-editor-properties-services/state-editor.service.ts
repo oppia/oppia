@@ -22,16 +22,15 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-/* eslint-disable max-len */
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import {
-  IInteractionCustomizationArgs,
-  IDragAndDropSortInputCustomizationArgs,
-  IImageClickInputCustomizationArgs,
-  IItemSelectionInputCustomizationArgs,
-  IMultipleChoiceInputCustomizationArgs
+  InteractionCustomizationArgs,
+  DragAndDropSortInputCustomizationArgs,
+  ImageClickInputCustomizationArgs,
+  ItemSelectionInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
@@ -146,7 +145,7 @@ export class StateEditorService {
   }
 
   setInteractionCustomizationArgs(
-      newArgs: IInteractionCustomizationArgs): void {
+      newArgs: InteractionCustomizationArgs): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 
@@ -164,18 +163,18 @@ export class StateEditorService {
 
   getAnswerChoices(
       interactionId: string,
-      customizationArgs: IInteractionCustomizationArgs): IAnswerChoice[] {
+      customizationArgs: InteractionCustomizationArgs): IAnswerChoice[] {
     if (!interactionId) {
       return null;
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
-      return (<IMultipleChoiceInputCustomizationArgs> customizationArgs)
+      return (<MultipleChoiceInputCustomizationArgs> customizationArgs)
         .choices.value.map((val, ind) => ({ val: ind, label: val.getHtml() }));
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
-        <IImageClickInputCustomizationArgs> customizationArgs)
+        <ImageClickInputCustomizationArgs> customizationArgs)
         .imageAndRegions.value;
       for (
         var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
@@ -187,13 +186,13 @@ export class StateEditorService {
       return _answerChoices;
     } else if (interactionId === 'ItemSelectionInput') {
       return (
-        <IItemSelectionInputCustomizationArgs> customizationArgs)
+        <ItemSelectionInputCustomizationArgs> customizationArgs)
         .choices.value.map(val => (
           { val: val.getHtml(), label: val.getHtml() }
         ));
     } else if (interactionId === 'DragAndDropSortInput') {
       return (
-        <IDragAndDropSortInputCustomizationArgs> customizationArgs)
+        <DragAndDropSortInputCustomizationArgs> customizationArgs)
         .choices.value.map(val => (
           { val: val.getHtml(), label: val.getHtml() }
         ));
@@ -242,7 +241,7 @@ export class StateEditorService {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 
-  setNextContentIdIndex(newNextContentIdIndex): void {
+  setNextContentIdIndex(newNextContentIdIndex: number): void {
     this.nextContentIdIndex = newNextContentIdIndex;
   }
 }

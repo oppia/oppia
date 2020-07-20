@@ -93,6 +93,15 @@ describe('Training Modal Controller', function() {
                 },
                 training_data: ['This is the answer']
               }],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'custarg_placeholder_0',
+                    unicode_str: ''
+                  }
+                },
+                rows: { value: 1 }
+              },
               default_outcome: {
                 dest: '',
                 feedback: {
@@ -122,6 +131,15 @@ describe('Training Modal Controller', function() {
             training_data: ['This is the answer'],
             rule_specs: [],
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'custarg_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'Init',
             feedback: {
@@ -241,6 +259,15 @@ describe('Training Modal Controller', function() {
               training_data: ['This is the answer'],
               rule_specs: [],
             }],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'custarg_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: '',
               feedback: {
@@ -279,6 +306,15 @@ describe('Training Modal Controller', function() {
           training_data: ['This is the answer'],
           rule_specs: [],
         }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'custarg_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         default_outcome: {
           dest: 'Init',
           feedback: {
@@ -356,6 +392,15 @@ describe('Training Modal Controller', function() {
                 },
                 training_data: ['']
               }],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'custarg_placeholder_0',
+                    unicode_str: ''
+                  }
+                },
+                rows: { value: 1 }
+              },
               default_outcome: {
                 dest: '',
                 feedback: {
@@ -409,7 +454,10 @@ describe('Training Modal Controller', function() {
               value: true
             },
             placeholder: {
-              value: 1
+              value: {
+                content_id: 'custarg_placeholder_0',
+                unicode_str: ''
+              }
             }
           },
           hints: [],

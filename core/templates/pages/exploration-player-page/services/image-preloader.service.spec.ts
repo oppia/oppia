@@ -292,7 +292,8 @@ describe('Image preloader service', function() {
                   'quot;"></oppia-noninteractive-image></p>',
                   content_id: ''
                 }]
-              }
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             answer_groups: [
               {

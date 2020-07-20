@@ -167,10 +167,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.onCustomizationModalSavePostHook = function() {
-            let hasNextContentIdIndexChanged = (
+            let nextContentIdIndexHasChanged = (
               StateNextContentIdIndexService.displayed !==
               StateNextContentIdIndexService.savedMemento);
-            if (hasNextContentIdIndexChanged) {
+            if (nextContentIdIndexHasChanged) {
               StateNextContentIdIndexService.saveDisplayedValue();
               $scope.onSaveNextContentIdIndex(
                 StateNextContentIdIndexService.displayed);

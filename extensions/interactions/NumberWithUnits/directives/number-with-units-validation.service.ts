@@ -30,7 +30,7 @@ import { IWarning, baseInteractionValidationService } from
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { INumberWithUnitsCustomizationArgs } from
+import { NumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';
 
 @Injectable({
@@ -42,13 +42,13 @@ export class NumberWithUnitsValidationService {
     private baseInteraction: baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: INumberWithUnitsCustomizationArgs): IWarning[] {
+      customizationArgs: NumberWithUnitsCustomizationArgs): IWarning[] {
     return [];
   }
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: INumberWithUnitsCustomizationArgs,
+      customizationArgs: NumberWithUnitsCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList: IWarning[] = [];
 

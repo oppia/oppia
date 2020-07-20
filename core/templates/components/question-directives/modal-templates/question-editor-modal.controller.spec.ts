@@ -103,7 +103,15 @@ describe('Question Editor Modal Controller', function() {
               rule_specs: [],
             }],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'custarg_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {
@@ -440,7 +448,15 @@ describe('Question Editor Modal Controller', function() {
               rule_specs: [],
             }],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'custarg_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {

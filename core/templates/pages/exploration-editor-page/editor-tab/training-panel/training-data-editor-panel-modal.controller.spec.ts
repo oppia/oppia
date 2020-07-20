@@ -85,6 +85,15 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               },
               training_data: ['Answer2']
             }],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'custarg_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: 'Hola',
               feedback: {
@@ -132,12 +141,13 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         },
         confirmed_unclassified_answers: [],
         customization_args: {
-          rows: {
-            value: true
-          },
           placeholder: {
-            value: 1
-          }
+            value: {
+              content_id: 'custarg_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
         },
         hints: [],
       }));
@@ -276,6 +286,15 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               },
               training_data: ['Answer2']
             }],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'custarg_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: 'Hola',
               feedback: {
@@ -321,7 +340,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             value: true
           },
           placeholder: {
-            value: 1
+            value: {
+              content_id: 'custarg_placeholder_0',
+              unicode_str: ''
+            }
           }
         },
         hints: [],
@@ -394,6 +416,15 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               },
               training_data: ['Answer2']
             }],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'custarg_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: 'Hola',
               feedback: {
@@ -435,12 +466,13 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         },
         confirmed_unclassified_answers: [],
         customization_args: {
-          rows: {
-            value: true
-          },
           placeholder: {
-            value: 1
-          }
+            value: {
+              content_id: 'custarg_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
         },
         hints: [],
       }));

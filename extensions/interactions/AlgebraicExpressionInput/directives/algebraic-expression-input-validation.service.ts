@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IAlgebraicExpressionInputCustomizationArgs } from
+import { AlgebraicExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { AlgebraicExpressionInputRulesService } from
   './algebraic-expression-input-rules.service';
@@ -41,7 +41,7 @@ export class AlgebraicExpressionInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
+      customizationArgs: AlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     let warningsList = [];
     let algebraicRulesService = (

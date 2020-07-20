@@ -21,13 +21,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ISubtitledHtmlBackendDict,
+  SubtitledHtmlBackendDict,
   SubtitledHtml,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 export interface IHintBackendDict {
-  'hint_content': ISubtitledHtmlBackendDict;
+  'hint_content': SubtitledHtmlBackendDict;
 }
 
 export class Hint {

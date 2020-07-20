@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IMathEquationInputCustomizationArgs } from
+import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { MathEquationInputRulesService } from
   './math-equation-input-rules.service';
@@ -41,7 +41,7 @@ export class MathEquationInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IMathEquationInputCustomizationArgs,
+      customizationArgs: MathEquationInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     let warningsList = [];
     let meirs = new MathEquationInputRulesService();

@@ -109,7 +109,15 @@ describe('ImprovementsService', () => {
         },
         interaction: {
           id: 'FractionInput',
-          customization_args: {},
+          customization_args: {
+            requireSimplestForm: { value: false },
+            allowImproperFraction: { value: true },
+            allowNonzeroIntegerPart: { value: true },
+            customPlaceholder: { value: {
+              content_id: '',
+              unicode_str: ''
+            } },
+          },
           answer_groups: [],
           default_outcome: {
             dest: 'Introduction',

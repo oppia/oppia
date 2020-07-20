@@ -25,7 +25,7 @@ import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { IInteractionAnswer, IFractionAnswer, IMultipleChoiceAnswer } from
   'interactions/answer-defs';
-import { IMultipleChoiceInputCustomizationArgs } from
+import { MultipleChoiceInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
@@ -84,7 +84,7 @@ export class StateInteractionStatsService {
         <IFractionAnswer> answer).toString();
     } else if (state.interaction.id === 'MultipleChoiceInput') {
       const customizationArgs = (
-        <IMultipleChoiceInputCustomizationArgs>
+        <MultipleChoiceInputCustomizationArgs>
         state.interaction.customizationArgs);
       return customizationArgs.choices.value[
         <IMultipleChoiceAnswer> answer].getHtml();

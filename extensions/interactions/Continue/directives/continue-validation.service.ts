@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IContinueCustomizationArgs } from
+import { ContinueCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class ContinueValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IContinueCustomizationArgs): IWarning[] {
+      customizationArgs: ContinueCustomizationArgs): IWarning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['buttonText']);
@@ -54,7 +54,7 @@ export class ContinueValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: IContinueCustomizationArgs,
+      stateName: string, customizationArgs: ContinueCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = this.getCustomizationArgsWarnings(customizationArgs);
 

@@ -18,14 +18,14 @@
  */
 
 export interface IWorkedExampleBackendDict {
-  question: ISubtitledHtmlBackendDict,
-  explanation: ISubtitledHtmlBackendDict
+  question: SubtitledHtmlBackendDict,
+  explanation: SubtitledHtmlBackendDict
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import {
-  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict
+  SubtitledHtml, SubtitledHtmlObjectFactory, SubtitledHtmlBackendDict
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 export class WorkedExample {

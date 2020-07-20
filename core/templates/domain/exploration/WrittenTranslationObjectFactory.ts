@@ -20,17 +20,21 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-type TranslationType = 'unicode' | 'html';
+export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
+export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
+
+type WrittenTranslationType = typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
+  typeof WRITTEN_TRANSLATION_TYPE_HTML;
 
 export interface ITranslationBackendDict {
-  'data_format': TranslationType;
+  'data_format': WrittenTranslationType;
   'translation': string;
   'needs_update': boolean;
 }
 
 export class WrittenTranslation {
   constructor(
-      public translationType: TranslationType,
+      public translationType: WrittenTranslationType,
       public translation: string,
       public needsUpdate: boolean
   ) {}
@@ -44,14 +48,14 @@ export class WrittenTranslation {
   }
 
   getHtml(): string {
-    if (this.translationType !== 'html') {
+    if (this.translationType !== WRITTEN_TRANSLATION_TYPE_HTML) {
       throw new Error('This translation is not of type html');
     }
     return this.translation;
   }
 
   setHtml(html: string): void {
-    if (this.translationType !== 'html') {
+    if (this.translationType !== WRITTEN_TRANSLATION_TYPE_HTML) {
       throw new Error('This translation is not of type html');
     }
     this.translation = html;
@@ -70,8 +74,8 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNewHtml(html: string): WrittenTranslation {
-    return new WrittenTranslation('html', html, false);
+  createNew(type: WrittenTranslationType, html: string): WrittenTranslation {
+    return new WrittenTranslation(type, html, false);
   }
 
   createFromBackendDict(translationBackendDict: ITranslationBackendDict) {

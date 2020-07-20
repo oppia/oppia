@@ -18,7 +18,7 @@
  */
 
 export interface IConceptCardBackendDict {
-  'explanation': ISubtitledHtmlBackendDict;
+  'explanation': SubtitledHtmlBackendDict;
   'worked_examples': IWorkedExampleBackendDict[];
   'recorded_voiceovers': IRecordedVoiceOverBackendDict;
 }
@@ -30,7 +30,7 @@ import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
   IRecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from
+  SubtitledHtml, SubtitledHtmlObjectFactory, SubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import {
   WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict } from

@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IDragAndDropSortInputCustomizationArgs } from
+import { DragAndDropSortInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class DragAndDropSortInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IDragAndDropSortInputCustomizationArgs): IWarning[] {
+      customizationArgs: DragAndDropSortInputCustomizationArgs): IWarning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -87,7 +87,7 @@ export class DragAndDropSortInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IDragAndDropSortInputCustomizationArgs,
+      customizationArgs: DragAndDropSortInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
     var seenItems = [];

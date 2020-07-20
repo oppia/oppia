@@ -29,7 +29,7 @@ import { SubtitledUnicode } from
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { IContinueCustomizationArgs } from
+import { ContinueCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('ContinueValidationService', () => {
@@ -38,7 +38,7 @@ describe('ContinueValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let customizationArguments: IContinueCustomizationArgs;
+  let customizationArguments: ContinueCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {

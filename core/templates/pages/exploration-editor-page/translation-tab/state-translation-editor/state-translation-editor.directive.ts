@@ -16,6 +16,9 @@
  * @fileoverview Directive for the state translation editor.
  */
 
+import { WRITTEN_TRANSLATION_TYPE_HTML } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -128,7 +131,8 @@ angular.module('oppia').directive('stateTranslationEditor', [
               $scope.translationEditorIsOpen = true;
               if (!$scope.activeWrittenTranslation) {
                 $scope.activeWrittenTranslation = (
-                  WrittenTranslationObjectFactory.createNewHtml(''));
+                  WrittenTranslationObjectFactory
+                    .create(WRITTEN_TRANSLATION_TYPE_HTML, ''));
               }
             }
           };

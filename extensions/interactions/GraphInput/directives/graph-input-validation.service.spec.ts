@@ -31,14 +31,14 @@ import { IGraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { IGraphInputCustomizationArgs } from
+import { GraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('GraphInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
   let validatorService: GraphInputValidationService;
   let currentState: string;
-  let customizationArguments: IGraphInputCustomizationArgs;
+  let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;

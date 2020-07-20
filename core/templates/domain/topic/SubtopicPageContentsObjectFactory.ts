@@ -29,13 +29,13 @@ import {
 } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 
 import {
-  ISubtitledHtmlBackendDict,
+  SubtitledHtmlBackendDict,
   SubtitledHtml,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 export interface ISubtopicPageContentsBackendDict {
-  'subtitled_html': ISubtitledHtmlBackendDict;
+  'subtitled_html': SubtitledHtmlBackendDict;
   'recorded_voiceovers': IRecordedVoiceOverBackendDict;
 }
 

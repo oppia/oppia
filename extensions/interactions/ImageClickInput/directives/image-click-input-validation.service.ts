@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IImageClickInputCustomizationArgs } from
+import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class ImageClickInputValidationService {
       baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IImageClickInputCustomizationArgs): IWarning[] {
+      customizationArgs: ImageClickInputCustomizationArgs): IWarning[] {
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['imageAndRegions']);
 
@@ -106,7 +106,7 @@ export class ImageClickInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: IImageClickInputCustomizationArgs,
+      stateName: string, customizationArgs: ImageClickInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 

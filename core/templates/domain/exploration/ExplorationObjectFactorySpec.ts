@@ -29,6 +29,10 @@ import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { InteractionCustomizationArg } from
+  'domain/exploration/InteractionCustomizationArgObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
@@ -77,7 +81,15 @@ describe('Exploration object factory', () => {
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
-        customization_args: {},
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'custarg_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         default_outcome: {
           dest: 'new state',
           feedback: [],
@@ -116,7 +128,9 @@ describe('Exploration object factory', () => {
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
-        customization_args: {},
+        customization_args: {
+          recommendedExplorationIds: { value: [] }
+        },
         default_outcome: {
           dest: 'new state',
           feedback: [],
@@ -298,9 +312,15 @@ describe('Exploration object factory', () => {
       'Invalid state name: ' + 'invalid state');
 
     expect(exploration.getInteractionCustomizationArgs('first state'))
-      .toEqual({});
+      .toEqual({
+        placeholder: new InteractionCustomizationArg(
+          new SubtitledUnicode('', 'custarg_placeholder_0')),
+        rows: new InteractionCustomizationArg(1)
+      });
     expect(exploration.getInteractionCustomizationArgs('second state'))
-      .toEqual({});
+      .toEqual({
+        recommendedExplorationIds: new InteractionCustomizationArg([])
+      });
   });
 
   it('should correctly get the interaction instructions from an exploration',
@@ -354,6 +374,6 @@ describe('Exploration object factory', () => {
 
     expect(exploration.isStateTerminal('second state')).toBe(true);
     expect(exploration.getAuthorRecommendedExpIds('second state'))
-      .toBeNull();
+      .toEqual([]);
   });
 });

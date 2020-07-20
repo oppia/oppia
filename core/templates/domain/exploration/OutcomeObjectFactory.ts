@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
-  ISubtitledHtmlBackendDict,
+  SubtitledHtmlBackendDict,
   SubtitledHtml,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
@@ -30,7 +30,7 @@ import { IParamChangeBackendDict } from
 
 export interface IOutcomeBackendDict {
   'dest': string;
-  'feedback': ISubtitledHtmlBackendDict;
+  'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
   'param_changes': IParamChangeBackendDict[];
   'refresher_exploration_id': string;

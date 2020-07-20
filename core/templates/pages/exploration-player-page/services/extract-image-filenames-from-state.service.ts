@@ -22,16 +22,16 @@ import { Injectable } from '@angular/core';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { State } from 'domain/state/StateObjectFactory';
 import {
-  IDragAndDropSortInputCustomizationArgs,
-  IImageClickInputCustomizationArgs,
-  IItemSelectionInputCustomizationArgs,
-  IMultipleChoiceInputCustomizationArgs
+  DragAndDropSortInputCustomizationArgs,
+  ImageClickInputCustomizationArgs,
+  ItemSelectionInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgs
 } from 'interactions/customization-args-defs';
 
 type CustomizationArgsWithChoices = (
-  IDragAndDropSortInputCustomizationArgs |
-  IItemSelectionInputCustomizationArgs |
-  IMultipleChoiceInputCustomizationArgs);
+  DragAndDropSortInputCustomizationArgs |
+  ItemSelectionInputCustomizationArgs |
+  MultipleChoiceInputCustomizationArgs);
 
 @Injectable({
   providedIn: 'root'
@@ -171,7 +171,7 @@ export class ExtractImageFilenamesFromStateService {
       // .imagePath.
       if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         let filename = (
-          (<IImageClickInputCustomizationArgs> state.interaction
+          (<ImageClickInputCustomizationArgs> state.interaction
             .customizationArgs).imageAndRegions.value.imagePath);
         filenamesInState.push(filename);
       }
