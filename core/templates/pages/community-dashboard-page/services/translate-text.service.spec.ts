@@ -56,8 +56,7 @@ fdescribe('TranslateTextService', function() {
         'GET', '/gettranslatabletexthandler?exp_id=1&language_code=en')
         .respond({
           state_names_to_content_id_mapping: {
-            stateName1: {contentId1: 'text1'}
-          ,
+            stateName1: {contentId1: 'text1'},
             stateName2: {contentId2: ''}
           },
           version: 1
@@ -79,8 +78,7 @@ fdescribe('TranslateTextService', function() {
         'GET', '/gettranslatabletexthandler?exp_id=1&language_code=en')
         .respond({
           state_names_to_content_id_mapping: {
-            stateName1: {contentId1: ''}
-          ,
+            stateName1: {contentId1: ''},
             stateName2: {contentId2: ''}
           },
           version: 1

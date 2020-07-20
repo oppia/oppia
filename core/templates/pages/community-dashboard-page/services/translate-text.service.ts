@@ -70,37 +70,36 @@ angular.module('oppia').factory('TranslateTextService', [
         activeExpId = expId;
         activeExpVersion = null;
 
-        $http.get(
-          '/gettranslatabletexthandler', {
-            params: {
-              exp_id: expId,
-              language_code: languageCode
-            }
-          }).then(function(response) {
-            stateWiseContents = response.data.state_names_to_content_id_mapping;
-            activeExpVersion = response.data.version;
-            for (const stateName in stateWiseContents) {
-              let stateHasText = false;
-              const contentIds = [];
-              for (const [contentId, text] of Object.entries(
-                stateWiseContents[stateName])) {
-                if (text !== '') {
-                  contentIds.push(contentId);
-                  stateHasText = true;
-                }
-              }
-              // If none of the state's texts are non-empty, then don't consider
-              // the state for processing.
-              if (stateHasText) {
-                stateNamesList.push(stateName);
-                stateWiseContentIds[stateName] = contentIds;
+        $http.get('/gettranslatabletexthandler', {
+          params: {
+            exp_id: expId,
+            language_code: languageCode
+          }
+        }).then(function(response) {
+          stateWiseContents = response.data.state_names_to_content_id_mapping;
+          activeExpVersion = response.data.version;
+          for (const stateName in stateWiseContents) {
+            let stateHasText = false;
+            const contentIds = [];
+            for (const [contentId, text] of Object.entries(
+              stateWiseContents[stateName])) {
+              if (text !== '') {
+                contentIds.push(contentId);
+                stateHasText = true;
               }
             }
-            if (stateNamesList.length > 0) {
-              activeStateName = stateNamesList[0];
+            // If none of the state's texts are non-empty, then don't consider
+            // the state for processing.
+            if (stateHasText) {
+              stateNamesList.push(stateName);
+              stateWiseContentIds[stateName] = contentIds;
             }
-            successCallback();
-          });
+          }
+          if (stateNamesList.length > 0) {
+            activeStateName = stateNamesList[0];
+          }
+          successCallback();
+        });
       },
       getTextToTranslate: function() {
         return {
