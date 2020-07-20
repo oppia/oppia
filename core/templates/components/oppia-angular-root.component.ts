@@ -122,6 +122,8 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
+import { CkEditorCopyContentService } from
+  'components/ck-editor-helpers/ck-editor-copy-content-service.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
@@ -707,6 +709,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static browserCheckerService: BrowserCheckerService;
   static camelCaseToHyphensPipe: CamelCaseToHyphensPipe;
   static changeObjectFactory: ChangeObjectFactory;
+  static ckEditorCopyContentService: CkEditorCopyContentService;
   static classifierObjectFactory: ClassifierObjectFactory;
   static classroomBackendApiService: ClassroomBackendApiService;
   static codeNormalizerService: CodeNormalizerService;
@@ -1019,6 +1022,7 @@ private bottomNavbarStatusService: BottomNavbarStatusService,
 private browserCheckerService: BrowserCheckerService,
 private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
 private changeObjectFactory: ChangeObjectFactory,
+private ckEditorCopyContentService: CkEditorCopyContentService,
 private classifierObjectFactory: ClassifierObjectFactory,
 private classroomBackendApiService: ClassroomBackendApiService,
 private codeNormalizerService: CodeNormalizerService,
@@ -1332,6 +1336,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.browserCheckerService = this.browserCheckerService;
     OppiaAngularRootComponent.camelCaseToHyphensPipe = this.camelCaseToHyphensPipe;
     OppiaAngularRootComponent.changeObjectFactory = this.changeObjectFactory;
+    OppiaAngularRootComponent.ckEditorCopyContentService = this.ckEditorCopyContentService,
     OppiaAngularRootComponent.classifierObjectFactory = this.classifierObjectFactory;
     OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
     OppiaAngularRootComponent.codeNormalizerService = this.codeNormalizerService;
