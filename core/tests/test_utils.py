@@ -2390,6 +2390,7 @@ class GenericEmailTestBase(GenericTestBase):
         """Gets the entire messages dictionary."""
         return self.emails_dict
 
+
 EmailTestBase = GenericEmailTestBase
 
 
