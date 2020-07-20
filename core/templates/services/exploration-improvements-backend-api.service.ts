@@ -21,8 +21,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  IExplorationTaskBackendDict,
   ExplorationTask,
+  ExplorationTaskBackendDict,
   ExplorationTaskObjectFactory
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { ImprovementsConstants } from
@@ -31,14 +31,14 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 export interface IExplorationImprovementsResponseBackendDict {
-  'open_tasks': IExplorationTaskBackendDict[];
+  'open_tasks': ExplorationTaskBackendDict[];
   'resolved_task_types_by_state_name': {
     [stateName: string]: string[];
   };
 }
 
 export interface IExplorationImprovementsHistoryResponseBackendDict {
-  'results': IExplorationTaskBackendDict[];
+  'results': ExplorationTaskBackendDict[];
   'cursor': string;
   'more': boolean;
 }
