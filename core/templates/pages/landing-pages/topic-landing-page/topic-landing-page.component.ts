@@ -54,10 +54,10 @@ export class TopicLandingPageComponent implements OnInit {
   topicTitle: string = null;
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
+    private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private windowRef: WindowRef,
-    private pageTitleService: PageTitleService) {}
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef) {}
 
   ngOnInit(): void {
     let pathArray = this.windowRef.nativeWindow.location.pathname.split('/');
@@ -134,8 +134,8 @@ export class TopicLandingPageComponent implements OnInit {
     let collectionId = this.topicData.collectionId;
     this.siteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
       collectionId);
-    setTimeout(function() {
-      this.windowRef.nativeWindow.location = this.urlInterpolationService
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.urlInterpolationService
         .interpolateUrl('/collection/<collectionId>', {
           collectionId: collectionId
         });
@@ -143,8 +143,8 @@ export class TopicLandingPageComponent implements OnInit {
   }
 
   onClickLearnMoreButton(): void {
-    setTimeout(function() {
-      this.windowRef.nativeWindow.location = '/community-library';
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = '/community-library';
     }, 150);
   }
 }
