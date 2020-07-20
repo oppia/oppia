@@ -1509,7 +1509,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
 
 class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
-    """Tests related to remove reviewers from community dashboard page."""
+    """Tests related to remove reviewers from contributor dashboard page."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'

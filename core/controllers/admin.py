@@ -719,7 +719,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
 
 class AddCommunityReviewerHandler(base.BaseHandler):
-    """Handles adding reviewer for community dashboard page."""
+    """Handles adding reviewer for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -777,7 +777,7 @@ class AddCommunityReviewerHandler(base.BaseHandler):
 
 
 class RemoveCommunityReviewerHandler(base.BaseHandler):
-    """Handles removing reviewer for community dashboard."""
+    """Handles removing reviewer for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

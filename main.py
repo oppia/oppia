@@ -27,7 +27,7 @@ from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
-from core.controllers import community_dashboard
+from core.controllers import contributor_dashboard
 from core.controllers import concept_card_viewer
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
@@ -228,14 +228,14 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.CommunityReviewerRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
-        community_dashboard.CommunityDashboardPage),
+        contributor_dashboard.ContributorDashboardPage),
 
     get_redirect_route(
         '/notifications_dashboard',
         creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
-        '/community_dashboard',
-        creator_dashboard.OldCommunityDashboardRedirectPage),
+        '/contributor_dashboard',
+        creator_dashboard.OldContributorDashboardRedirectPage),
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
@@ -261,16 +261,16 @@ URLS = MAPREDUCE_HANDLERS + [
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
         r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
-        community_dashboard.ContributionOpportunitiesHandler),
+        contributor_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
         r'/gettranslatabletexthandler',
-        community_dashboard.TranslatableTextHandler),
+        contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
         r'/usercommunityrightsdatahandler',
-        community_dashboard.UserCommunityRightsDataHandler),
+        contributor_dashboard.UserCommunityRightsDataHandler),
     get_redirect_route(
         r'/retrivefeaturedtranslationlanguages',
-        community_dashboard.FeaturedTranslationLanguagesHandler),
+        contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),

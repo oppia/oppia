@@ -138,8 +138,8 @@ _PARSER.add_argument(
     choices=['critical', 'error', 'warning', 'info'])
 
 _PARSER.add_argument(
-    '--community_dashboard_enabled', action='store_true',
-    help='Run the test after enabling the community dashboard page.')
+    '--contributor_dashboard_enabled', action='store_true',
+    help='Run the test after enabling the contributor dashboard page.')
 
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
@@ -251,18 +251,18 @@ def run_webdriver_manager(parameters):
     p.communicate()
 
 
-def update_community_dashboard_status_in_feconf_file(
-        feconf_file_path, enable_community_dashboard):
-    """Change feconf.py file based on whether the community dashboard is
+def update_contributor_dashboard_status_in_feconf_file(
+        feconf_file_path, enable_contributor_dashboard):
+    """Change feconf.py file based on whether the contributor dashboard is
     enabled.
 
     Args:
         feconf_file_path: str. Path to the feconf.py file.
-        enable_community_dashboard: bool. Represents whether community
+        enable_contributor_dashboard: bool. Represents whether community
             dashboard is enabled.
     """
     pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_community_dashboard
+    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_contributor_dashboard
     common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 
@@ -482,8 +482,8 @@ def main(args=None):
 
     dev_mode = not parsed_args.prod_env
 
-    update_community_dashboard_status_in_feconf_file(
-        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
+    update_contributor_dashboard_status_in_feconf_file(
+        FECONF_FILE_PATH, parsed_args.contributor_dashboard_enabled)
 
     if parsed_args.skip_build:
         build.modify_constants(prod_env=parsed_args.prod_env)

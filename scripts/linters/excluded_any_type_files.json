@@ -25,7 +25,7 @@
     "core/templates/filters/remove-duplicates-in-array.pipe.ts",
     "core/templates/filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe.ts",
     "core/templates/filters/string-utility-filters/normalize-whitespace.pipe.ts",
-    "core/templates/pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts",
+    "core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.ts",
     "core/templates/pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts",
     "core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts",
     "core/templates/services/csrf-token.service.ts",
