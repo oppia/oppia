@@ -61,3 +61,54 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+
+
+class PlatformParameterSnapshotMetadataModel(
+        base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a platform parameter snapshot."""
+
+    pass
+
+
+class PlatformParameterSnapshotContentModel(
+        base_models.BaseSnapshotContentModel):
+    """Storage model for the content for a platform parameter snapshot."""
+
+    pass
+
+
+class PlatformParameterModel(base_models.VersionedModel):
+    """A class that represents a named dynamic platform parameter.
+    This model only stores fields that can be updated in run time.
+
+    The id is the name of the parameter.
+    """
+
+    SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
+
+    rules = ndb.JsonProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """PlatformParameterModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def create(cls, param_name, rule_dicts):
+        """Creates a PlatformParameterModel instance.
+
+        Args:
+            param_name: str. The context for evaluation.
+            rule_dicts: list(dict). List of dict mappings of rule objects.
+
+        Returns:
+            PlatformParameterModel. the created PlatformParameterModel
+            instance.
+        """
+        return cls(id=param_name, rules=rule_dicts)

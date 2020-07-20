@@ -77,7 +77,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
-    opportunity_models, parameter_models, question_models,
+    opportunity_models, question_models,
     recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
     user_models,) = (
@@ -86,9 +86,9 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.platform_parameter,
-            models.NAMES.question, models.NAMES.recommendations,
-            models.NAMES.skill, models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.opportunity, models.NAMES.question,
+            models.NAMES.recommendations, models.NAMES.skill,
+            models.NAMES.statistics, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
@@ -15061,12 +15061,12 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.parameter_model = parameter_models.PlatformParameterModel.create(
-            name='parameter_model_1',
+        self.parameter_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
             ])
-        self.parameter_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        self.parameter_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         self.job_class = (
             prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob)
@@ -15079,7 +15079,7 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.parameter_model.created_on = (
             self.parameter_model.last_updated + datetime.timedelta(days=1))
-        self.parameter_model.commit(self.admin_id, [])
+        self.parameter_model.commit(self.admin_id, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for time field relation check '
@@ -15108,7 +15108,7 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        parameter_models.PlatformParameterSnapshotMetadataModel.get_by_id(
+        config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
             '%s-1' % self.parameter_model.id).delete()
         expected_output = [
             (
@@ -15122,7 +15122,7 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_snapshot_content_model_failure(self):
-        parameter_models.PlatformParameterSnapshotContentModel.get_by_id(
+        config_models.PlatformParameterSnapshotContentModel.get_by_id(
             '%s-1' % self.parameter_model.id).delete()
         expected_output = [
             (
@@ -15146,19 +15146,19 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.parameter_model = parameter_models.PlatformParameterModel.create(
-            name='parameter_model_1',
+        self.parameter_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
             ])
-        self.parameter_model.commit(self.admin_id, [])
+        self.parameter_model.commit(self.admin_id, '', [])
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
             gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
-            parameter_models.PlatformParameterSnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.parameter_model.id))
 
         self.job_class = (
@@ -15166,7 +15166,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
             .PlatformParameterSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
-        self.parameter_model.commit(self.admin_id, [])
+        self.parameter_model.commit(self.admin_id, '', [])
         expected_output = [
             u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 2]']
         run_job_and_check_output(self, expected_output)
@@ -15233,7 +15233,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
     def test_invalid_parameter_model_model_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            parameter_models.PlatformParameterSnapshotMetadataModel(
+            config_models.PlatformParameterSnapshotMetadataModel(
                 id='%s-3' % self.parameter_model.id, committer_id=self.admin_id,
                 commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
@@ -15252,17 +15252,16 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance.commit_cmds = [{
-            'cmd': 'replace_parameter_rules',
+            'cmd': 'edit_rules',
             'invalid_attribute': 'invalid'
         }]
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for commit cmd '
-                'replace_parameter_rules check of '
-                'PlatformParameterSnapshotMetadataModel\', [u"Entity id %s-1: '
-                'Commit command domain validation for command: {u\'cmd\': '
-                'u\'replace_parameter_rules\', u\'invalid_attribute\': u\''
+                u'[u\'failed validation check for commit cmd edit_rules check '
+                'of PlatformParameterSnapshotMetadataModel\', [u"Entity id '
+                '%s-1: Commit command domain validation for command: {u\'cmd\''
+                ': u\'edit_rules\', u\'invalid_attribute\': u\''
                 'invalid\'} failed with error: The following required '
                 'attributes are missing: new_rules, The following extra '
                 'attributes are present: invalid_attribute"]]' % (
@@ -15282,19 +15281,19 @@ class PlatformParameterSnapshotContentModelValidatorTests(
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.parameter_model = parameter_models.PlatformParameterModel.create(
-            name='parameter_model_1',
+        self.parameter_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
             ])
-        self.parameter_model.commit(self.admin_id, [])
+        self.parameter_model.commit(self.admin_id, '', [])
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
             gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
-            parameter_models.PlatformParameterSnapshotContentModel.get_by_id(
+            config_models.PlatformParameterSnapshotContentModel.get_by_id(
                 '%s-1' % self.parameter_model.id))
 
         self.job_class = (
@@ -15302,7 +15301,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             .PlatformParameterSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
-        self.parameter_model.commit(self.admin_id, [])
+        self.parameter_model.commit(self.admin_id, '', [])
         expected_output = [
             u'[u\'fully-validated PlatformParameterSnapshotContentModel\', 2]']
         run_job_and_check_output(self, expected_output)
@@ -15356,7 +15355,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
 
     def test_invalid_platform_parameter_model_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            parameter_models.PlatformParameterSnapshotContentModel(
+            config_models.PlatformParameterSnapshotContentModel(
                 id='%s-3' % (self.parameter_model.id)))
         model_with_invalid_version_in_id.content = {}
         model_with_invalid_version_in_id.put()

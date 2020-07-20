@@ -39,17 +39,17 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
         .PlatformParameterChange
         .CMD_REPLACE_PARAMETER_RULES)
 
-    def test_platform_parameter_change_object_with_missing_cmd(self):
+    def test_param_change_object_with_missing_cmd_raises_exception(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Missing cmd key in change dict'):
             parameter_domain.PlatformParameterChange({'invalid': 'data'})
 
-    def test_platform_parameter_change_object_with_invalid_cmd(self):
+    def test_param_change_object_with_invalid_cmd_raises_exception(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Command invalid is not allowed'):
             parameter_domain.PlatformParameterChange({'cmd': 'invalid'})
 
-    def test_platform_parameter_change_object_with_missing_attribute_in_cmd(
+    def test_param_change_object_missing_attribute_in_cmd_raises_exception(
             self):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
@@ -59,7 +59,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
                 'cmd': self.VALID_CMD_NAME
             })
 
-    def test_platform_parameter_change_object_with_extra_attribute_in_cmd(
+    def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
             self):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
@@ -70,29 +70,29 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
                 'invalid': 'invalid'
             })
 
-    def test_platform_parameter_change_object_with_valid_data(self):
-        platform_parameter_change_object = (
+    def test_param_change_object_with_valid_data(self):
+        param_change_object = (
             parameter_domain.PlatformParameterChange({
                 'cmd': self.VALID_CMD_NAME,
                 'new_rules': []
             }))
 
         self.assertEqual(
-            platform_parameter_change_object.cmd, self.VALID_CMD_NAME)
+            param_change_object.cmd, self.VALID_CMD_NAME)
         self.assertEqual(
-            platform_parameter_change_object.new_rules, [])
+            param_change_object.new_rules, [])
 
     def test_to_dict(self):
-        platform_parameter_change_dict = {
+        param_change_dict = {
             'cmd': self.VALID_CMD_NAME,
             'new_rules': []
         }
-        platform_parameter_change_object = (
+        param_change_object = (
             parameter_domain.PlatformParameterChange(
-                platform_parameter_change_dict))
+                param_change_dict))
         self.assertEqual(
-            platform_parameter_change_object.to_dict(),
-            platform_parameter_change_dict)
+            param_change_object.to_dict(),
+            param_change_dict)
 
 
 class EvaluationContextTest(test_utils.GenericTestBase):

@@ -68,7 +68,7 @@ import utils
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
-    opportunity_models, parameter_models, question_models,
+    opportunity_models, question_models,
     recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
     user_models,) = (
@@ -77,9 +77,9 @@ import utils
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.platform_parameter,
-            models.NAMES.question, models.NAMES.recommendations,
-            models.NAMES.skill, models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.opportunity, models.NAMES.question,
+            models.NAMES.recommendations, models.NAMES.skill,
+            models.NAMES.statistics, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
@@ -6199,12 +6199,12 @@ class PlatformParameterModelValidator(BaseModelValidator):
         return [
             ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
-                parameter_models.PlatformParameterSnapshotMetadataModel,
+                config_models.PlatformParameterSnapshotMetadataModel,
                 snapshot_model_ids
             ),
             ExternalModelFetcherDetails(
                 'snapshot_content_ids',
-                parameter_models.PlatformParameterSnapshotContentModel,
+                config_models.PlatformParameterSnapshotContentModel,
                 snapshot_model_ids
             ),
         ]
@@ -6229,7 +6229,7 @@ class PlatformParameterSnapshotMetadataModelValidator(
         return [
             ExternalModelFetcherDetails(
                 'platform_parameter_ids',
-                parameter_models.PlatformParameterModel,
+                config_models.PlatformParameterModel,
                 [item.id[:item.id.find('-')]]
             ),
             ExternalModelFetcherDetails(
@@ -6255,7 +6255,7 @@ class PlatformParameterSnapshotContentModelValidator(
         return [
             ExternalModelFetcherDetails(
                 'platform_parameter_ids',
-                parameter_models.PlatformParameterModel,
+                config_models.PlatformParameterModel,
                 [item.id[:item.id.find('-')]]
             )
         ]
@@ -6287,10 +6287,10 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ConfigPropertySnapshotMetadataModelValidator),
     config_models.ConfigPropertySnapshotContentModel: (
         ConfigPropertySnapshotContentModelValidator),
-    parameter_models.PlatformParameterModel: PlatformParameterModelValidator,
-    parameter_models.PlatformParameterSnapshotMetadataModel: (
+    config_models.PlatformParameterModel: PlatformParameterModelValidator,
+    config_models.PlatformParameterSnapshotMetadataModel: (
         PlatformParameterSnapshotMetadataModelValidator),
-    parameter_models.PlatformParameterSnapshotContentModel: (
+    config_models.PlatformParameterSnapshotContentModel: (
         PlatformParameterSnapshotContentModelValidator),
     email_models.SentEmailModel: SentEmailModelValidator,
     email_models.BulkEmailModel: BulkEmailModelValidator,
@@ -7259,7 +7259,7 @@ class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [parameter_models.PlatformParameterModel]
+        return [config_models.PlatformParameterModel]
 
 
 class PlatformParameterSnapshotMetadataModelAuditOneOffJob(
@@ -7268,7 +7268,7 @@ class PlatformParameterSnapshotMetadataModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [parameter_models.PlatformParameterSnapshotMetadataModel]
+        return [config_models.PlatformParameterSnapshotMetadataModel]
 
 
 class PlatformParameterSnapshotContentModelAuditOneOffJob(
@@ -7277,4 +7277,4 @@ class PlatformParameterSnapshotContentModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [parameter_models.PlatformParameterSnapshotContentModel]
+        return [config_models.PlatformParameterSnapshotContentModel]

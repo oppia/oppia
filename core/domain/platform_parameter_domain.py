@@ -27,8 +27,8 @@ import python_utils
 import utils
 
 
-(parameter_models,) = models.Registry.import_models(
-    [models.NAMES.platform_parameter])
+(config_models,) = models.Registry.import_models(
+    [models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
 
 
@@ -39,7 +39,7 @@ class PlatformParameterChange(change_domain.BaseChange):
         - 'replace_parameter_rules' (with new_rules)
     """
 
-    CMD_REPLACE_PARAMETER_RULES = 'replace_parameter_rules'
+    CMD_REPLACE_PARAMETER_RULES = 'edit_rules'
     ALLOWED_COMMANDS = [{
         'name': CMD_REPLACE_PARAMETER_RULES,
         'required_attribute_names': ['new_rules'],
@@ -559,10 +559,10 @@ class PlatformParameter(python_utils.OBJECT):
             PlatformParameter. the instance with updated rules.
         """
         # Set value in datastore.
-        model_instance = parameter_models.PlatformParameterModel.get(
+        model_instance = config_models.PlatformParameterModel.get(
             self._name, strict=False)
         if model_instance is None:
-            model_instance = parameter_models.PlatformParameterModel.create(
+            model_instance = config_models.PlatformParameterModel.create(
                 name=self._name,
                 rule_dicts=[rule.to_dict() for rule in self._rules],
             )
@@ -836,7 +836,7 @@ class Registry(python_utils.OBJECT):
     @classmethod
     def load_platform_parameter_from_storage(cls, name):
         """not ready."""
-        parameter_model = parameter_models.PlatformParameterModel.get(
+        parameter_model = config_models.PlatformParameterModel.get(
             name, strict=False)
         if parameter_model:
             parameter_with_init_settings = cls.parameter_registry.get(name)
