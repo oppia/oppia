@@ -1,23 +1,25 @@
 <div class="oppia-landing-page">
-  <div class="oppia-landing-section text-center oppia-landing-page-banner">
-    <div class="oppia-landing-section-inner">
-      <div class="oppia-flex-box oppia-flex-row oppia-flex-mobile-column oppia-flex-mobile-align-center">
-        <div class="oppia-flex-item oppia-landing-page-image-container oppia-flex-mobile-order-2">
-          <picture>
-            <source type="image/webp" [srcset]="lessonInDevicesWebpImageSrc">
-            <source type="image/png" [srcset]="lessonInDevicesPngImageSrc">
-            <img class="oppia-devices-image" [src]="lessonInDevicesPngImageSrc" alt="Oppia lesson in different devices.">
-          </picture>
-        </div>
-        <div class="oppia-flex-item oppia-flex-box oppia-flex-column">
-          <div class="oppia-flex-item oppia-text-align-left">
-            <h2>{{ topicTitle }} just got easier. Learn anywhere, anytime with our free and interactive lessons.</h2>
+  <div class="oppia-landing-section text-center">
+    <div [ngStyle]="{background: 'no-repeat center/cover url(' + backgroundBannerUrl + ')'}">
+      <div class="oppia-landing-section-inner">
+        <div class="oppia-flex-box oppia-flex-row oppia-flex-mobile-column oppia-flex-mobile-align-center">
+          <div class="oppia-flex-item oppia-landing-page-image-container oppia-flex-mobile-order-2">
+            <picture>
+              <source type="image/webp" [srcset]="lessonInDevicesWebpImageSrc">
+              <source type="image/png" [srcset]="lessonInDevicesPngImageSrc">
+              <img class="oppia-devices-image" [src]="lessonInDevicesPngImageSrc" alt="Oppia lesson in different devices.">
+            </picture>
           </div>
-          <div class="oppia-flex-item oppia-text-align-left oppia-flex-mobile-order-3">
-            <p>Have your students and children get started today on our {{ topicTitle }} lessons. Oppia offers story-based content for learners at many different skill levels, and our resources are free to you, always.</p>
-          </div>
-          <div class="oppia-flex-item oppia-text-align-left oppia-mobile-text-align-center oppia-flex-mobile-order-2">
-            <button class="btn oppia-landing-page-button" (click)="onClickGetStartedButton()">Explore {{ topicTitle }} lessons</button>
+          <div class="oppia-flex-item oppia-flex-box oppia-flex-column">
+            <div class="oppia-flex-item oppia-text-align-left">
+              <h2>{{ topicTitle }} just got easier. Learn anywhere, anytime with our free and interactive lessons.</h2>
+            </div>
+            <div class="oppia-flex-item oppia-text-align-left oppia-flex-mobile-order-3">
+              <p>Have your students and children get started today on our {{ topicTitle }} lessons. Oppia offers story-based content for learners at many different skill levels, and our resources are free to you, always.</p>
+            </div>
+            <div class="oppia-flex-item oppia-text-align-left oppia-mobile-text-align-center oppia-flex-mobile-order-2">
+              <button class="btn oppia-landing-page-button" (click)="onClickGetStartedButton()">Explore {{ topicTitle }} lessons</button>
+            </div>
           </div>
         </div>
       </div>
@@ -92,9 +94,9 @@
     max-width: 1200px;
     padding: 4% 0;
   }
-  .oppia-landing-page-banner {
-    background: no-repeat center/cover url(var(backgroundBannerUrl)) #afd2eb;
-  }
+  /* .oppia-landing-page-banner {
+    background: no-repeat center/cover url(<[backgroundBannerUrl]>) #afd2eb;
+  } */
   .oppia-langing-page-qualities {
     width: 30%;
   }
