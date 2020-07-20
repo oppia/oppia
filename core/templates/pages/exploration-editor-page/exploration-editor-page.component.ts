@@ -378,9 +378,9 @@ angular.module('oppia').component('explorationEditorPage', {
           if (ExplorationRightsService.isPublic()) {
             // Stats are loaded asynchronously after the exploration data
             // because they are not needed to interact with the editor.
-            StateTopAnswersStatsBackendApiService.fetchStats(
-              ctrl.explorationId
-            ).then(StateTopAnswersStatsService.init).then(function() {
+            StateTopAnswersStatsService.initAsync(
+              ctrl.explorationId, ExplorationStatesService.getStates()
+            ).then(function() {
               ExplorationWarningsService.updateWarnings();
               $scope.$broadcast('refreshStateEditor');
             });

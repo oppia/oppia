@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,157 +12,149 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
+import { AnswerStats } from
+  'domain/exploration/AnswerStatsObjectFactory';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
+import { StateTopAnswersStatsBackendApiService } from
+  'services/state-top-answers-stats-backend-api.service';
+import { States } from 'domain/exploration/StatesObjectFactory';
+
 /**
  * @fileoverview Factory for maintaining the statistics of the top answers for
  * each state of an exploration.
  */
 
-require('domain/exploration/AnswerStatsObjectFactory.ts');
-require('pages/exploration-editor-page/services/angular-name.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-require('services/context.service.ts');
+export class AnswerStatsEntry {
+  constructor(
+      public readonly answers: readonly AnswerStats[],
+      public readonly interactionId: string) {}
+}
 
-angular.module('oppia').factory('StateTopAnswersStatsService', [
-  '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ExplorationStatesService',
-  function(
-      $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ExplorationStatesService) {
-    /**
-     * A collection of answers associated to a specific interaction id.
-     * @typedef {Object} AnswerStatsCache
-     * @property {AnswerStats[]} answers - the collection of answers.
-     * @property {string} interactionId - the interaction id of the answers.
-     */
+@Injectable({providedIn: 'root'})
+export class StateTopAnswersStatsService {
+  private initStarted: boolean;
+  private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
+  private states: States;
 
-    /** @type {boolean} */
-    var isInitialized = false;
-    /** @type {!Object.<string, AnswerStatsCache>} */
-    var workingStateTopAnswersStats = {};
+  private resolveInitPromise: () => void;
+  private rejectInitPromise: (_) => void;
+  private initPromise: Promise<void>;
 
-    /**
-     * Updates the addressed info of all the answers cached for the given state
-     * to reflect the state's current answer groups.
-     * @param {string} stateName
-     */
-    var refreshAddressedInfo = function(stateName) {
-      if (!workingStateTopAnswersStats.hasOwnProperty(stateName)) {
-        throw new Error(stateName + ' does not exist.');
-      }
-
-      var state = ExplorationStatesService.getState(stateName);
-      var stateStats = workingStateTopAnswersStats[stateName];
-
-      if (stateStats.interactionId !== state.interaction.id) {
-        stateStats.answers.length = 0;
-        stateStats.interactionId = state.interaction.id;
-      }
-
-      // Update the isAddressed property of each answer.
-      var interactionRulesService = stateStats.interactionId === null ?
-        null :
-        $injector.get(AngularNameService.getNameOfInteractionRulesService(
-          stateStats.interactionId));
-      stateStats.answers.forEach(function(answerStats) {
-        answerStats.isAddressed = interactionRulesService !== null &&
-          AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            stateName, state, answerStats.answer, interactionRulesService);
-      });
-    };
-
-    var onStateAdded = function(stateName) {
-      var state = ExplorationStatesService.getState(stateName);
-      workingStateTopAnswersStats[stateName] =
-        {answers: [], interactionId: state.interaction.id};
-    };
-
-    var onStateDeleted = function(stateName) {
-      delete workingStateTopAnswersStats[stateName];
-    };
-
-    var onStateRenamed = function(oldStateName, newStateName) {
-      workingStateTopAnswersStats[newStateName] =
-        workingStateTopAnswersStats[oldStateName];
-      delete workingStateTopAnswersStats[oldStateName];
-    };
-
-    var onStateInteractionSaved = function(stateName) {
-      refreshAddressedInfo(stateName);
-    };
-
-    return {
-      /**
-       * Calls the backend asynchronously to setup the answer statistics of each
-       * state this exploration contains.
-       *
-       * @param {Object.<string, *>} stateTopAnswersStatsBackendDict - The
-       *    backend representation of the state top answers statistics.
-       */
-      init: function(stateTopAnswersStatsBackendDict) {
-        if (isInitialized) {
-          return;
-        }
-        workingStateTopAnswersStats = {};
-        for (var stateName in stateTopAnswersStatsBackendDict.answers) {
-          workingStateTopAnswersStats[stateName] = {
-            answers: stateTopAnswersStatsBackendDict.answers[stateName].map(
-              AnswerStatsObjectFactory.createFromBackendDict),
-            interactionId: (
-              stateTopAnswersStatsBackendDict.interaction_ids[stateName]),
-          };
-          // Finally, manually refresh the addressed information.
-          refreshAddressedInfo(stateName);
-        }
-        ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
-        ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
-        ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
-        ExplorationStatesService.registerOnStateInteractionSavedCallback(
-          onStateInteractionSaved);
-        isInitialized = true;
-      },
-
-      /** @returns {boolean} - Whether the cache is ready for use. */
-      isInitialized: function() {
-        return isInitialized;
-      },
-
-      /** @returns {string[]} - list of state names with recorded stats. */
-      getStateNamesWithStats: function() {
-        return Object.keys(workingStateTopAnswersStats);
-      },
-
-      /**
-       * @returns {boolean} - Whether the cache contains any answers for the
-       * given state.
-       */
-      hasStateStats: function(stateName) {
-        return this.isInitialized() &&
-          workingStateTopAnswersStats.hasOwnProperty(stateName);
-      },
-
-      /**
-       * @param {string} stateName
-       * @returns {AnswerStats[]} - list of the statistics for the top answers.
-       */
-      getStateStats: function(stateName) {
-        if (!this.hasStateStats(stateName)) {
-          throw new Error(stateName + ' does not exist.');
-        }
-        return workingStateTopAnswersStats[stateName].answers;
-      },
-
-      /**
-       * @param {string} stateName
-       * @returns {AnswerStats[]} - list of stats for answers that are
-       *    unresolved.
-       */
-      getUnresolvedStateStats: function(stateName) {
-        return this.getStateStats(stateName).filter(function(answerStats) {
-          return !answerStats.isAddressed;
-        });
-      },
-    };
+  constructor(
+      private answerClassificationService: AnswerClassificationService,
+      private interactionRulesRegistryService: InteractionRulesRegistryService,
+      private stateTopAnswersStatsBackendApiService:
+        StateTopAnswersStatsBackendApiService) {
+    this.initStarted = false;
+    this.topAnswersStatsByStateName = new Map();
+    this.states = null;
+    this.initPromise = new Promise((resolve, reject) => {
+      this.resolveInitPromise = resolve;
+      this.rejectInitPromise = reject;
+    });
   }
-]);
+
+  /**
+   * Calls the backend asynchronously to setup the answer statistics of each
+   * state this exploration contains.
+   */
+  async initAsync(explorationId: string, states: States): Promise<void> {
+    if (!this.initStarted) {
+      this.initStarted = true;
+      try {
+        this.states = states;
+        const {answerStats, interactionIds} = (
+          await this.stateTopAnswersStatsBackendApiService.fetchStatsAsync(
+            explorationId));
+        for (const stateName of Object.keys(answerStats)) {
+          this.topAnswersStatsByStateName.set(
+            stateName, new AnswerStatsEntry(
+              answerStats.get(stateName), interactionIds.get(stateName)));
+          this.refreshAddressedInfo(stateName);
+        }
+        this.resolveInitPromise();
+      } catch (error) {
+        this.rejectInitPromise(error);
+      }
+    }
+    return this.initPromise;
+  }
+
+  getInitPromise(): Promise<void> {
+    return this.initPromise;
+  }
+
+  getStateNamesWithStats() {
+    return [...this.topAnswersStatsByStateName.keys()];
+  }
+
+  hasStateStats(stateName: string) {
+    return this.topAnswersStatsByStateName.has(stateName);
+  }
+
+  getStateStats(stateName: string) {
+    if (!this.hasStateStats(stateName)) {
+      throw new Error(stateName + ' does not exist.');
+    }
+    return this.topAnswersStatsByStateName.get(stateName).answers;
+  }
+
+  getUnresolvedStateStats(stateName: string) {
+    return this.getStateStats(stateName).filter(a => !a.isAddressed);
+  }
+
+  onStateAdded(stateName: string) {
+    const state = this.states.getState(stateName);
+    this.topAnswersStatsByStateName.set(
+      stateName, new AnswerStatsEntry([], state.interaction.id));
+  }
+
+  onStateDeleted(stateName: string) {
+    // ES2016 Map uses delete as a method name despite it being a reserved word.
+    // eslint-disable-next-line dot-notation
+    this.topAnswersStatsByStateName.delete(stateName);
+  }
+
+  onStateRenamed(oldStateName: string, newStateName: string) {
+    this.topAnswersStatsByStateName.set(
+      newStateName, this.topAnswersStatsByStateName.get(oldStateName));
+    // ES2016 Map uses delete as a method name despite it being a reserved word.
+    // eslint-disable-next-line dot-notation
+    this.topAnswersStatsByStateName.delete(oldStateName);
+  }
+
+  onStateInteractionSaved(stateName: string) {
+    this.refreshAddressedInfo(stateName);
+  }
+
+  private refreshAddressedInfo(stateName: string) {
+    if (!this.topAnswersStatsByStateName.has(stateName)) {
+      throw new Error(stateName + ' does not exist.');
+    }
+
+    const stateStats = this.topAnswersStatsByStateName.get(stateName);
+    const state = this.states.getState(stateName);
+
+    if (stateStats.interactionId !== state.interaction.id) {
+      this.topAnswersStatsByStateName.set(
+        stateName, new AnswerStatsEntry([], state.interaction.id));
+    } else {
+      const interactionRulesService = (
+        this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+          stateStats.interactionId));
+      stateStats.answers.forEach(a => a.isAddressed = (
+        this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          stateName, state, a.answer, interactionRulesService)));
+    }
+  }
+}
+
+angular.module('oppia').factory(
+  'StateTopAnswersStatsService',
+  downgradeInjectable(StateTopAnswersStatsService));

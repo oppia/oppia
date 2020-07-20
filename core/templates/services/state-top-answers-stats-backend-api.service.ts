@@ -20,30 +20,46 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { AnswerStats, AnswerStatsObjectFactory, IAnswerStatsBackendDict } from
+  'domain/exploration/AnswerStatsObjectFactory';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+export interface StateAnswerStatsBackendResponse {
+  'answers': {[stateName: string]: IAnswerStatsBackendDict[]};
+  'interaction_ids': {[stateName: string]: string};
+}
+
+export class StateAnswerStatsResponse {
+  constructor(
+      public readonly answerStats: ReadonlyMap<string, AnswerStats[]>,
+      public readonly interactionIds: ReadonlyMap<string, string>) {}
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateTopAnswersStatsBackendApiService {
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
-  ) {}
+    private answerStatsObjectFactory: AnswerStatsObjectFactory,
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
 
-  _fetchStats(explorationId: string): Promise<Object> {
-    return this.http.get(
+  async fetchStatsAsync(expId: string): Promise<StateAnswerStatsResponse> {
+    return this.http.get<StateAnswerStatsBackendResponse>(
       this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STATE_ANSWER_STATS_URL,
-        {exploration_id: explorationId}
-      )
-    ).toPromise();
-  }
-
-  fetchStats(explorationId: string): Promise<Object> {
-    return this._fetchStats(explorationId);
+        ServicesConstants.STATE_ANSWER_STATS_URL, {
+          exploration_id: expId
+        })).toPromise()
+      .then(response => new StateAnswerStatsResponse(
+        new Map(Object.entries(response.answers).map(
+          ([stateName, answerStatsBackendDicts]) => [
+            stateName,
+            answerStatsBackendDicts.map(
+              d => this.answerStatsObjectFactory.createFromBackendDict(d))
+          ])),
+        new Map(Object.entries(response.interaction_ids))));
   }
 }
 
