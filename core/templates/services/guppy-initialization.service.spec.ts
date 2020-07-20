@@ -41,7 +41,7 @@ class MockGuppy {
   static 'remove_global_symbol'(symbol: string): void {}
 }
 
-fdescribe('GuppyInitializationService', () => {
+describe('GuppyInitializationService', () => {
   let guppyInitializationService: GuppyInitializationService = null;
 
   beforeEach(() => {

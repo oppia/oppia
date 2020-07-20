@@ -22,7 +22,7 @@ import { GuppyInitializationService } from
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 
-fdescribe('OnScreenKeyboard', function() {
+describe('OnScreenKeyboard', function() {
   var ctrl = null;
 
   var guppyInitializationService = null;
@@ -52,29 +52,29 @@ fdescribe('OnScreenKeyboard', function() {
   }));
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('onScreenKeyboard');
-    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
-    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
-    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      {guppyInstance: new MockGuppy()});
     guppyInitializationService.setShowOSK(true);
     ctrl.isActive = false;
   }));
 
   it('should only show the OSK for mobile devices', function() {
-    expect(ctrl.showOSK()).toBeTrue();
-    // spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(false);
-    // spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(false);
-    // expect(ctrl.showOSK()).toBeFalse();
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(false);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(false);
+    expect(ctrl.showOSK()).toBeFalse();
   });
 
   it('should only show the OSK if there is an active guppy object', function() {
-    expect(ctrl.showOSK()).toBeTrue();
-    // spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-    //   undefined);
-    // expect(ctrl.showOSK()).toBeFalse();
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      undefined);
+    expect(ctrl.showOSK()).toBeFalse();
   });
 
   it('should set showOSK value to false upon hiding the OSK', function() {
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      {guppyInstance: new MockGuppy()});
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     ctrl.hideOSK();
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
@@ -82,35 +82,53 @@ fdescribe('OnScreenKeyboard', function() {
 
   it('should activate the instance upon each key press function call',
     function() {
+      spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+      spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+      spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+        {guppyInstance: new MockGuppy()});
       expect(ctrl.showOSK()).toBeTrue();
 
       expect(ctrl.isActive).toBeFalse();
       ctrl.activateGuppy();
       expect(ctrl.isActive).toBeTrue();
+
+      ctrl.isActive = false;
       
       expect(ctrl.isActive).toBeFalse();
       ctrl.changeTab('newTab');
       expect(ctrl.isActive).toBeTrue();
 
+      ctrl.isActive = false;
+
       expect(ctrl.isActive).toBeFalse();
       ctrl.insertString('x');
       expect(ctrl.isActive).toBeTrue();
+
+      ctrl.isActive = false;
 
       expect(ctrl.isActive).toBeFalse();
       ctrl.insertSymbol('x');
       expect(ctrl.isActive).toBeTrue();
 
+      ctrl.isActive = false;
+
       expect(ctrl.isActive).toBeFalse();
       ctrl.delete();
       expect(ctrl.isActive).toBeTrue();
+
+      ctrl.isActive = false;
 
       expect(ctrl.isActive).toBeFalse();
       ctrl.left();
       expect(ctrl.isActive).toBeTrue();
 
+      ctrl.isActive = false;
+
       expect(ctrl.isActive).toBeFalse();
       ctrl.right();
       expect(ctrl.isActive).toBeTrue();
+
+      ctrl.isActive = false;
 
       expect(ctrl.isActive).toBeFalse();
       ctrl.exponent('2');
