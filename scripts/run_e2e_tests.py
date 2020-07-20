@@ -503,7 +503,8 @@ def cleanup_portserver(portserver_process):
     to shut down, we kill the process.
 
     Args:
-        The Popen subprocess object for the portserver.
+        portserver_process: The Popen subprocess object for the
+            portserver.
     """
     portserver_process.send_signal(signal.SIGINT)
     for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT):
