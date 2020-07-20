@@ -423,6 +423,18 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+        snapshot_metadata_model.mentioned_user_ids = list(
+            set(self.owner_ids) |
+            set(self.editor_ids) |
+            set(self.voice_artist_ids) |
+            set(self.viewer_ids)
+        )
+        snapshot_metadata_model.add(
+            snapshot_metadata_model.commit_cmds[0]['assignee_id'])
+        snapshot_metadata_model.put()
+
     @classmethod
     def export_data(cls, user_id):
         """(Takeout) Export user-relevant properties of ExplorationRightsModel.

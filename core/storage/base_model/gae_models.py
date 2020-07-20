@@ -1071,6 +1071,9 @@ class BaseSnapshotMetadataModel(BaseModel):
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
+    # The user ids that are mentioned in some non-indexed field in this
+    # snapshot. For example
+    mentioned_user_ids = ndb.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_export_policy():
@@ -1087,8 +1090,10 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.committer_id == user_id).get(
-            keys_only=True) is not None
+        return cls.query(ndb.OR(
+            cls.committer_id == user_id,
+            cls.mentioned_user_ids == user_id,
+        )).get(keys_only=True) is not None
 
     @classmethod
     def create(

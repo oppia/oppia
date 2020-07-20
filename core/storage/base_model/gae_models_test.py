@@ -318,11 +318,20 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
 
     def test_exists_for_user_id(self):
         model1 = base_models.BaseSnapshotMetadataModel(
-            id='model_id-1', committer_id='committer_id', commit_type='create')
+            id='model_id-1',
+            committer_id='committer_id',
+            commit_type='create',
+            mentioned_user_ids=['mentioned_user_1_id', 'mentioned_user_2_id'])
         model1.put()
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
             .exists_for_user_id('committer_id'))
+        self.assertFalse(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('mentioned_user_1_id'))
+        self.assertFalse(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('mentioned_user_2_id'))
         self.assertFalse(
             base_models.BaseSnapshotMetadataModel
             .exists_for_user_id('x_id'))

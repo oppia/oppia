@@ -497,6 +497,17 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_is_private=not topic_rights.topic_is_published
         ).put()
 
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+        snapshot_metadata_model.mentioned_user_ids = list(set(self.manager_ids))
+        if commit_cmds[0]['cmd'] == topic_domain.CMD_CHANGE_ROLE:
+            snapshot_metadata_model.add(
+                snapshot_metadata_model.commit_cmds[0]['assignee_id'])
+        elif commit_cmds[0]['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
+            snapshot_metadata_model.add(
+                snapshot_metadata_model.commit_cmds[0]['removed_user_id'])
+        snapshot_metadata_model.put()
+
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
