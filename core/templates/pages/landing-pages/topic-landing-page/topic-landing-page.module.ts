@@ -44,6 +44,8 @@ import { ObjectsDomainConstants } from
 import { ServicesConstants } from 'services/services.constants';
 import { TopicLandingPageConstants } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
+import { TopicLandingPageComponent } from './topic-landing-page.component';
+
 
 @NgModule({
   imports: [
@@ -52,10 +54,12 @@ import { TopicLandingPageConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicLandingPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicLandingPageComponent
   ],
   providers: [
     AppConstants,
