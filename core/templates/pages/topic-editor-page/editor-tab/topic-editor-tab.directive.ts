@@ -330,6 +330,19 @@ angular.module('oppia').directive('topicEditorTab', [
             });
           };
 
+          $scope.onRearrangeSubtopicStart = function(fromIndex) {
+            $scope.fromIndex = fromIndex;
+          };
+
+          $scope.onRearrangeSubtopicEnd = function(toIndex) {
+            if ($scope.fromIndex === toIndex) {
+              return;
+            }
+            TopicUpdateService.rearrangeSubtopic(
+              $scope.topic, $scope.fromIndex, toIndex);
+            _initEditor();
+          };
+
           $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
             if (Object.keys($scope.selectedSkillEditOptionsIndex).length) {
               $scope.selectedSkillEditOptionsIndex = {};
