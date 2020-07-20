@@ -44,7 +44,9 @@ class MockTranslateService {
     I18n_plural_1: ('You have' +
      ' {lessonCount, plural, =1{1 lesson} other{# lessons}} left.'),
     I18n_plural_2: ('You have' +
-     ' {lessonCount, plural, one{1 lesson} other{# lessons}} left.')
+     ' {lessonCount, plural, one{1 lesson} other{# lessons}} left.'),
+    I18n_plural_3: '{ xy, plural, one{ hello other# world',
+    I18n_plural_4: ' xy, plural, one hello } other# world}}',
   };
 
   getInterpolatedString(key: string,
@@ -106,6 +108,13 @@ describe('TranslatePipe', () => {
       'You have 1 lesson left.');
     expect(pipe.transform('I18n_plural_1', {lessonCount: '12'})).toBe(
       'You have 12 lessons left.');
+    expect(pipe.transform('I18n_plural_1', {lessonCounts: '12'})).toBe(
+      'You have' +
+     ' {lessonCount, plural, =1{1 lesson} other{# lessons}} left.');
+    expect(pipe.transform('I18n_plural_3', {xy: '12'})).toBe(
+      '{ xy, plural, one{ hello other# world');
+    expect(pipe.transform('I18n_plural_4', {xy: '12'})).toBe(
+      ' xy, plural, one hello } other# world}}');
     expect(pipe.transform('')).toBe('');
     translateService.onLangChange.emit({newLanguageCode: 'en'});
   });

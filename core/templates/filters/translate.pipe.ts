@@ -178,7 +178,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
      */
     const pluralizationKey = codeText.split(
       ', plural,')[0];
-    if (pluralizationKey === undefined) {
+    if (pluralizationParams[pluralizationKey] === undefined) {
       return interpolatedValue;
     }
     let pluralizedValue = '';
