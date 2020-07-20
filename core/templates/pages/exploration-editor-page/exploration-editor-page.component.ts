@@ -58,7 +58,7 @@ require(
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
-  'improvements-tab.directive.ts');
+  'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require(
@@ -313,7 +313,7 @@ angular.module('oppia').component('explorationEditorPage', {
             });
 
           StateEditorService.updateExplorationWhitelistedStatus(
-            featuresData.is_exploration_whitelisted);
+            featuresData.isExplorationWhitelisted);
 
           GraphDataService.recompute();
 

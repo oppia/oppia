@@ -1,6 +1,6 @@
 <div class="oppia-lost-changes">
   <ul>
-    <li ng-repeat="lostChange in lostChanges">
+    <li ng-repeat="lostChange in $ctrl.lostChanges">
       <span ng-if="lostChange.cmd === 'add_state'">
         Added state: <[lostChange.stateName]>
       </span>
