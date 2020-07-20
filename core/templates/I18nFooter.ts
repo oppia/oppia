@@ -30,10 +30,10 @@ angular.module('oppia').directive('i18nFooter', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$timeout', '$translate', 'I18nLanguageCodeService',
-        'UserService', 'SUPPORTED_SITE_LANGUAGES',
+        'UserBackendApiService', 'SUPPORTED_SITE_LANGUAGES',
         function(
             $http, $timeout, $translate, I18nLanguageCodeService,
-            UserService, SUPPORTED_SITE_LANGUAGES) {
+            UserBackendApiService, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           // Changes the language of the translations.
           var preferencesDataUrl = '/preferenceshandler/data';
@@ -42,7 +42,7 @@ angular.module('oppia').directive('i18nFooter', [
             $translate.use(ctrl.currentLanguageCode);
             I18nLanguageCodeService.setI18nLanguageCode(
               ctrl.currentLanguageCode);
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.isLoggedIn()) {
                 $http.put(siteLanguageUrl, {
                   site_language_code: ctrl.currentLanguageCode

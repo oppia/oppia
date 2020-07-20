@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { UserService } from 'services/user.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 const constants = require('constants.ts');
 
@@ -28,7 +28,7 @@ describe('Splash Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
   var $q = null;
-  var userService: UserService = null;
+  var userBackendApiService: UserBackendApiService = null;
   var LoaderService = null;
   var loadingMessage = null;
   var SiteAnalyticsService = null;
@@ -49,12 +49,12 @@ describe('Splash Page', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserService', TestBed.get(UserService));
+    $provide.value('UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
@@ -119,7 +119,7 @@ describe('Splash Page', function() {
   });
 
   it('should evaluate if user is logged in', function() {
-    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {
@@ -139,7 +139,7 @@ describe('Splash Page', function() {
   });
 
   it('should evaluate if user is not logged in', function() {
-    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {

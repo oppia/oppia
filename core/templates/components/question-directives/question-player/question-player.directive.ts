@@ -115,7 +115,7 @@ require('domain/question/question-backend-api.service.ts');
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/url.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
@@ -140,7 +140,7 @@ angular.module('oppia').directive('questionPlayer', [
         '$sanitize', '$uibModal', '$window',
         'AlertsService', 'HtmlEscaperService',
         'QuestionBackendApiService', 'SkillMasteryBackendApiService',
-        'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
+        'UrlService', 'UserBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
         'VIEW_HINT_PENALTY_FOR_MASTERY',
@@ -151,7 +151,7 @@ angular.module('oppia').directive('questionPlayer', [
             $sanitize, $uibModal, $window,
             AlertsService, HtmlEscaperService,
             QuestionBackendApiService, SkillMasteryBackendApiService,
-            UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
+            UrlService, UserBackendApiService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
             VIEW_HINT_PENALTY_FOR_MASTERY,
@@ -564,7 +564,7 @@ angular.module('oppia').directive('questionPlayer', [
               }
             });
             ctrl.userIsLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()

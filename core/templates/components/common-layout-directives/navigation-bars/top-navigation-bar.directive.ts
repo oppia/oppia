@@ -24,7 +24,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
 require('services/navigation.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('constants.ts');
@@ -45,13 +45,13 @@ angular.module('oppia').directive('topNavigationBar', [
         '$http', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
         'I18nLanguageCodeService', 'NavigationService', 'SidebarStatusService',
-        'SiteAnalyticsService', 'UserService', 'WindowDimensionsService',
+        'SiteAnalyticsService', 'UserBackendApiService', 'WindowDimensionsService',
         'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
             $http, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
             I18nLanguageCodeService, NavigationService, SidebarStatusService,
-            SiteAnalyticsService, UserService, WindowDimensionsService,
+            SiteAnalyticsService, UserBackendApiService, WindowDimensionsService,
             LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
@@ -74,7 +74,7 @@ angular.module('oppia').directive('topNavigationBar', [
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.onLoginButtonClicked = function() {
-            UserService.getLoginUrlAsync().then(
+            UserBackendApiService.getLoginUrlAsync().then(
               function(loginUrl) {
                 if (loginUrl) {
                   SiteAnalyticsService.registerStartLoginEvent('loginButton');
@@ -248,7 +248,7 @@ angular.module('oppia').directive('topNavigationBar', [
               $timeout(truncateNavbar, 100);
             });
 
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
                 $translate.use(userInfo.getPreferredSiteLanguageCode());
                 I18nLanguageCodeService.setI18nLanguageCode(
@@ -286,7 +286,7 @@ angular.module('oppia').directive('topNavigationBar', [
               // once the controller is migrated to angular.
               $scope.$applyAsync();
             });
-            UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+            UserBackendApiService.getProfileImageDataUrlAsync().then(function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.

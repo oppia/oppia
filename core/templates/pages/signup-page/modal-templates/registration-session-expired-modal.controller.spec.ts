@@ -18,14 +18,14 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { UserService } from 'services/user.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('Registration Session Expired Modal Controller', function() {
   var $q = null;
   var $scope = null;
   var $timeout = null;
   var $uibModalInstance = null;
-  var userService: UserService = null;
+  var userBackendApiService: UserBackendApiService = null;
   var mockWindow = {
     location: {
       reload: () => {}
@@ -37,7 +37,7 @@ describe('Registration Session Expired Modal Controller', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserService', TestBed.get(UserService));
+    $provide.value('UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
@@ -46,7 +46,7 @@ describe('Registration Session Expired Modal Controller', function() {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -67,7 +67,7 @@ describe('Registration Session Expired Modal Controller', function() {
   });
 
   it('should continue registration', function() {
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+    spyOn(userBackendApiService, 'getLoginUrlAsync').and.returnValue(
       $q.resolve('login-url'));
     $scope.continueRegistration();
     $scope.$apply();
@@ -79,7 +79,7 @@ describe('Registration Session Expired Modal Controller', function() {
 
   it('should not continue registration', function() {
     spyOn(mockWindow.location, 'reload').and.callThrough();
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+    spyOn(userBackendApiService, 'getLoginUrlAsync').and.returnValue(
       $q.resolve(''));
     $scope.continueRegistration();
     $scope.$apply();
