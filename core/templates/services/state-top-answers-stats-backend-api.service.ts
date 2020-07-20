@@ -23,6 +23,11 @@ import { Injectable } from '@angular/core';
 import { AnswerStats, AnswerStatsObjectFactory, IAnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ServicesConstants } from 'services/services.constants';
+import {
+  StateTopAnswersStats,
+  StateTopAnswersStatsBackendDict,
+  StateTopAnswersStatsObjectFactory
+} from 'domain/statistics/state-top-answers-stats-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -42,6 +47,7 @@ export class StateAnswerStatsResponse {
 })
 export class StateTopAnswersStatsBackendApiService {
   constructor(
+<<<<<<< HEAD
     private answerStatsObjectFactory: AnswerStatsObjectFactory,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
@@ -60,6 +66,25 @@ export class StateTopAnswersStatsBackendApiService {
               d => this.answerStatsObjectFactory.createFromBackendDict(d))
           ])),
         new Map(Object.entries(response.interaction_ids))));
+=======
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient,
+    private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory
+  ) {}
+
+  _fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
+    return this.http.get<StateTopAnswersStatsBackendDict>(
+      this.urlInterpolationService.interpolateUrl(
+        ServicesConstants.STATE_ANSWER_STATS_URL,
+        {exploration_id: explorationId}
+      )
+    ).toPromise().then(backendDict => this.stateTopAnswersStatsObjectFactory
+      .createFromBackendDict(backendDict));
+  }
+
+  fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
+    return this._fetchStats(explorationId);
+>>>>>>> upstream/develop
   }
 }
 

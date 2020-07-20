@@ -25,8 +25,8 @@ import { ChangeObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { SubtitledHtmlObjectFactory } from
@@ -156,12 +156,12 @@ describe('Topic editor state service', function() {
     $provide.value(
       'RubricObjectFactory', new RubricObjectFactory());
     $provide.value(
-      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value(
       'SubtopicObjectFactory',
-      new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
+      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()));
     $provide.value(
       'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
     $provide.value(

@@ -148,10 +148,6 @@ export class StateTopAnswersStatsService {
       const interactionRulesService = (
         this.interactionRulesRegistryService.getRulesServiceByInteractionId(
           stateStats.interactionId));
-      stateStats.answers.forEach(a => a.isAddressed = (
-        this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          stateName, state, a.answer, interactionRulesService)));
-    }
   }
 }
 
