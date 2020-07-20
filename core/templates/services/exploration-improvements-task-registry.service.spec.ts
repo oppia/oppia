@@ -128,6 +128,7 @@ describe('Exploration improvements task registrar service', () => {
         },
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
