@@ -582,7 +582,8 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
 
 
 def wait_for_port_to_be_open(port_number):
-    """Wait until the port is open.
+    """Wait until the port is open and exit if port isn't open after
+    1000 seconds.
 
     Args:
         port_number: int. The port number to wait.
