@@ -18,7 +18,7 @@
 
 import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
 import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';\
+  'services/guppy-initialization.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 
@@ -113,7 +113,7 @@ describe('OnScreenKeyboard', function() {
       ctrl.isActive = false;
 
       expect(ctrl.isActive).toBeFalse();
-      ctrl.delete();
+      ctrl.backspace();
       expect(ctrl.isActive).toBeTrue();
 
       ctrl.isActive = false;

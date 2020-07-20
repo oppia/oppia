@@ -30,7 +30,7 @@ angular.module('oppia').component('onScreenKeyboard', {
   controller: ['GuppyInitializationService', 'UrlInterpolationService',
     'DeviceInfoService',
     function(GuppyInitializationService, UrlInterpolationService,
-      DeviceInfoService) {
+        DeviceInfoService) {
       const ctrl = this;
       let engine, guppyInstance;
 
@@ -60,7 +60,7 @@ angular.module('oppia').component('onScreenKeyboard', {
         guppyInstance.activate();
       };
 
-      ctrl.delete = function() {
+      ctrl.backspace = function() {
         engine.backspace();
         guppyInstance.activate();
       };
@@ -89,7 +89,7 @@ angular.module('oppia').component('onScreenKeyboard', {
       ctrl.showOSK = function() {
         if (
           !DeviceInfoService.isMobileUserAgent() ||
-          !DeviceInfoService.hasTouchEvents())  {
+          !DeviceInfoService.hasTouchEvents()) {
           return false;
         }
         let showOSK = GuppyInitializationService.getShowOSK();

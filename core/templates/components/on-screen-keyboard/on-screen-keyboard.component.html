@@ -35,7 +35,7 @@
     <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-exponent.svg')]>" class="oppia-osk-btn-shortcut" alt="^" ng-click="$ctrl.insertSymbol('exp')">
     <button class="oppia-osk-btn-number" ng-click="$ctrl.insertString('.')">.</button>
     <button class="oppia-osk-btn-number number-0" ng-click="$ctrl.insertString('0')">0</button>
-    <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.delete()">
+    <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.backspace()">
     <button class="oppia-osk-btn-number" ng-click="$ctrl.left()">
       <i class="fa fa-angle-left"></i>
     </button>
@@ -63,7 +63,7 @@
     <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('sinh')">sinh</button>
     <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('cosh')">cosh</button>
     <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('tanh')">tanh</button>
-    <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.delete()">
+    <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.backspace()">
   </div>
   <div class="oppia-osk-letters-tab" ng-if="$ctrl.currentTab==='lettersTab'">
     <div class="oppia-osk-letters-tab-row-1">
@@ -74,7 +74,7 @@
     </div>
     <div class="oppia-osk-letters-tab-row-3">
       <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.allLetters[2]"><[letter]></button>
-      <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.delete()">
+      <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.backspace()">
     </div>
   </div>
 </div>
@@ -101,10 +101,10 @@
   }
 
   .oppia-osk-navbar {
-    min-height: 56px;
     background-color: #fff;
-    border-top: #808080 3px solid;
     border-bottom: #d3d3d3 4px solid;
+    border-top: #808080 3px solid;
+    min-height: 56px;
   }
 
   .oppia-osk-main-tab {
@@ -121,8 +121,8 @@
   }
 
   .oppia-osk-letters-tab {
-    text-align: center;
     padding: 10px 0px;
+    text-align: center;
   }
 
   .oppia-osk-functions-tab {
@@ -133,15 +133,15 @@
 
   .oppia-osk-main-tab img,
   .oppia-osk-functions-tab img {
-    min-height: 64px;
     height: -webkit-fill-available;
+    min-height: 64px;
     width: -webkit-fill-available;
   }
 
   .oppia-osk-letters-tab img {
     border: none;
-    min-height: 64px;
     margin-top: -15px;
+    min-height: 64px;
   }
 
   .oppia-osk-custom-letters-div button:active,
@@ -232,8 +232,8 @@
   }
 
   .number-0 {
+    border-bottom: 3px #808080 solid;
     border-left: 3px #808080 solid;
     border-right: 3px #808080 solid;
-    border-bottom: 3px #808080 solid;
   }
 </style>
