@@ -486,8 +486,8 @@ def start_portserver():
         The Popen subprocess object.
     """
     process = subprocess.Popen([
-        'python',
-        os.path.join('scripts', 'run_portserver.py'),
+        'python', '-m',
+        '.'.join(['scripts', 'run_portserver']),
         '--portserver_unix_socket_address',
         PORTSERVER_SOCKET_PATH,
     ])
