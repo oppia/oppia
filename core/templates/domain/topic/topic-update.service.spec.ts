@@ -600,10 +600,53 @@ describe('Topic update service', function() {
     UndoRedoService.undoChange(_sampleTopic);
     skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
-
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
     sampleTopicBackendObject.topicDict.subtopics[0].skill_ids = ['skill_2'];
+  });
+
+  it('should rearrange a subtopic', function() {
+    var subtopicsDict = [{id: 2, title: 'Title2', skill_ids: []},
+      {id: 3, title: 'Title3', skill_ids: []}];
+    sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
+
+    _sampleTopic = TopicObjectFactory.create(
+      sampleTopicBackendObject.topicDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
+    var subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics.length).toEqual(3);
+    expect(subtopics[0].getId()).toEqual(1);
+    expect(subtopics[1].getId()).toEqual(2);
+    expect(subtopics[2].getId()).toEqual(3);
+
+    TopicUpdateService.rearrangeSubtopic(_sampleTopic, 1, 0);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(2);
+    expect(subtopics[1].getId()).toEqual(1);
+    expect(subtopics[2].getId()).toEqual(3);
+
+    TopicUpdateService.rearrangeSubtopic(_sampleTopic, 2, 1);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(2);
+    expect(subtopics[1].getId()).toEqual(3);
+    expect(subtopics[2].getId()).toEqual(1);
+
+    TopicUpdateService.rearrangeSubtopic(_sampleTopic, 2, 0);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(1);
+    expect(subtopics[1].getId()).toEqual(2);
+    expect(subtopics[2].getId()).toEqual(3);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(2);
+    expect(subtopics[1].getId()).toEqual(3);
+    expect(subtopics[2].getId()).toEqual(1);
+    sampleTopicBackendObject.topicDict.subtopics = [{
+      id: 1,
+      title: 'Title',
+      skill_ids: ['skill_2']
+    }];
   });
 
   it('should create a proper backend change dict for adding a subtopic',
