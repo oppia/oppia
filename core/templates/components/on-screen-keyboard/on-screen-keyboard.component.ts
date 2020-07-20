@@ -17,15 +17,38 @@
  * interactions.
  */
 
-require('services/guppy-configuration.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/device-info.service.ts');
 require('services/guppy-initialization.service.ts');
 
 angular.module('oppia').component('onScreenKeyboard', {
+  bindings: {
+    customizable: '=',
+    customLetters: '='
+  },
   template: require('./on-screen-keyboard.component.html'),
-  controller: ['$scope', 'GuppyInitializationService',
-    function($scope, GuppyInitializationService) {
+  controller: ['GuppyInitializationService', 'UrlInterpolationService',
+    'DeviceInfoService',
+    function(GuppyInitializationService, UrlInterpolationService,
+      DeviceInfoService) {
       const ctrl = this;
       let engine, guppyInstance;
+
+      ctrl.currentTab = 'mainTab';
+      ctrl.allLetters = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+
+      ctrl.activateGuppy = function() {
+        guppyInstance.activate();
+      };
+
+      ctrl.changeTab = function(newTab) {
+        ctrl.currentTab = newTab;
+        guppyInstance.activate();
+      };
+
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
 
       ctrl.insertString = function(string) {
         engine.insert_string(string);
@@ -40,12 +63,44 @@ angular.module('oppia').component('onScreenKeyboard', {
       ctrl.delete = function() {
         engine.backspace();
         guppyInstance.activate();
-      }
+      };
 
-      ctrl.$onInit = function() {
-        let guppyInstances = GuppyInitializationService.getGuppyInstances();
-        guppyInstance = guppyInstances[guppyInstances.length - 1].guppyInstance;
-        engine = guppyInstance.engine;
+      ctrl.left = function() {
+        engine.left();
+        guppyInstance.activate();
+      };
+
+      ctrl.right = function() {
+        engine.right();
+        guppyInstance.activate();
+      };
+
+      ctrl.exponent = function(value) {
+        engine.insert_symbol('exp');
+        engine.insert_string(value);
+        engine.right();
+        guppyInstance.activate();
+      };
+
+      ctrl.hideOSK = function() {
+        GuppyInitializationService.setShowOSK(false);
+      };
+
+      ctrl.showOSK = function() {
+        if (
+          !DeviceInfoService.isMobileUserAgent() ||
+          !DeviceInfoService.hasTouchEvents())  {
+          return false;
+        }
+        let showOSK = GuppyInitializationService.getShowOSK();
+        let activeGuppyObject = (
+          GuppyInitializationService.findActiveGuppyObject());
+        if (showOSK && activeGuppyObject !== undefined) {
+          guppyInstance = activeGuppyObject.guppyInstance;
+          engine = guppyInstance.engine;
+          return true;
+        }
+        return false;
       };
     }
   ]

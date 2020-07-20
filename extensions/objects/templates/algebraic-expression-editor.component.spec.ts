@@ -36,6 +36,7 @@ describe('AlgebraicExpressionEditor', function() {
   var guppyConfigurationService = null;
   var mathInteractionsService = null;
   var guppyInitializationService = null;
+  let deviceInfoService = null;
 
   class MockGuppy {
     constructor(id: string, config: Object) {}
@@ -56,6 +57,7 @@ describe('AlgebraicExpressionEditor', function() {
       new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
+    deviceInfoService = new DeviceInfoService(new WindowRef());
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
@@ -90,5 +92,14 @@ describe('AlgebraicExpressionEditor', function() {
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
     expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+  });
+
+  it('should set the value of showOSK to true', function() {
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+
+    expect(guppyInitializationService.getShowOSK()).toBeFalse();
+    ctrl.setShowOSK();
+    expect(guppyInitializationService.getShowOSK()).toBeTrue();
   });
 });

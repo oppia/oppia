@@ -41,7 +41,7 @@ class MockGuppy {
   static 'remove_global_symbol'(symbol: string): void {}
 }
 
-describe('GuppyInitializationService', () => {
+fdescribe('GuppyInitializationService', () => {
   let guppyInitializationService: GuppyInitializationService = null;
 
   beforeEach(() => {
@@ -71,5 +71,12 @@ describe('GuppyInitializationService', () => {
 
     expect(guppyInitializationService.findActiveGuppyObject()).not.toBe(
       undefined);
+  });
+
+  it('should correctly change and get the value of showOSK var', function() {
+    guppyInitializationService.setShowOSK(true);
+    expect(guppyInitializationService.getShowOSK()).toBeTrue();
+    guppyInitializationService.setShowOSK(false);
+    expect(guppyInitializationService.getShowOSK()).toBeFalse();
   });
 });

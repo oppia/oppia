@@ -33,8 +33,10 @@ class GuppyObject {
 })
 export class GuppyInitializationService {
   private guppyInstances: Array<GuppyObject> = [];
+  private showOSK = false;
 
   init(guppyDivClassName: string): void {
+    this.showOSK = false;
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
     let divId, guppyInstance;
     for (let i = 0; i < guppyDivs.length; i++) {
@@ -56,8 +58,12 @@ export class GuppyInitializationService {
     }
   }
 
-  getGuppyInstances(): Array<GuppyObject> {
-    return this.guppyInstances;
+  getShowOSK(): boolean {
+    return this.showOSK;
+  }
+
+  setShowOSK(value: boolean): void {
+    this.showOSK = value;
   }
 }
 

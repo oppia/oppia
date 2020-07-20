@@ -20,12 +20,12 @@
  * followed by the name of the arg.
  */
 
-require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'algebraic-expression-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
 require('services/math-interactions.service.ts');
@@ -35,11 +35,11 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   controller: [
     '$scope', 'CurrentInteractionService', 'GuppyConfigurationService',
     'AlgebraicExpressionInputRulesService', 'MathInteractionsService',
-    'GuppyInitializationService',
+    'GuppyInitializationService', 'DeviceInfoService',
     function(
         $scope, CurrentInteractionService, GuppyConfigurationService,
         AlgebraicExpressionInputRulesService, MathInteractionsService,
-        GuppyInitializationService) {
+        GuppyInitializationService, DeviceInfoService) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
@@ -68,27 +68,33 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           ctrl.value, AlgebraicExpressionInputRulesService);
       };
 
-      var changeHandler = function() {
-        let activeGuppyObject = (
-          GuppyInitializationService.findActiveGuppyObject());
-        if (activeGuppyObject !== undefined) {
-          ctrl.hasBeenTouched = true;
-          ctrl.value = activeGuppyObject.guppyInstance.asciimath();
-          // Need to manually trigger the digest cycle to make any 'watchers'
-          // aware of changes in answer.
-          if ($scope.$root.$$phase != '$apply' && (
-            $scope.$root.$$phase != '$digest')) {
-            $scope.$apply();
-          }
-        }
+      ctrl.setShowOSK = function() {
+        GuppyInitializationService.setShowOSK(true);
       };
 
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
         GuppyInitializationService.init('guppy-div-learner');
-        Guppy.event('change', changeHandler);
-        Guppy.event('focus', changeHandler);
+        let eventType = (
+          DeviceInfoService.isMobileUserAgent() &&
+          DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
+        // We need the 'focus' event while using the on screen keyboard (only
+        // for touch-based devices) to capture input from user and the 'change'
+        // event while using the normal keyboard.
+        Guppy.event(eventType, () => {
+          var activeGuppyObject = (
+            GuppyInitializationService.findActiveGuppyObject());
+          if (activeGuppyObject !== undefined) {
+            ctrl.hasBeenTouched = true;
+            ctrl.value = activeGuppyObject.guppyInstance.asciimath();
+            if (eventType === 'change') {
+              // Need to manually trigger the digest cycle to make any
+              // 'watchers' aware of changes in answer.
+              $scope.$apply();
+            }
+          }
+        });
 
         CurrentInteractionService.registerCurrentInteraction(
           ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
