@@ -28,7 +28,6 @@
             </li>
           </ul>
         </div>
-
       </li>
 
       <li ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon">
@@ -101,5 +100,11 @@
 
   .topic-editor-main .oppia-editor-warnings-box {
     max-width: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .navbar-helper {
+      display: none;
+    }
   }
 </style>
