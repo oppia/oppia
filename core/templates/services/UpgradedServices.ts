@@ -183,6 +183,8 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
@@ -1121,6 +1123,9 @@ export class UpgradedServices {
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
+    upgradedServices['ExplorationImprovementsTaskRegistryService'] =
+      new ExplorationImprovementsTaskRegistryService(
+        upgradedServices['ExplorationTaskObjectFactory']);
     upgradedServices['ExtensionTagAssemblerService'] =
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
