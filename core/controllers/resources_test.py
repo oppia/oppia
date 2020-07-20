@@ -358,9 +358,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(
                 (
                     'image',
-                     'unused_filename',
-                     '<svg><path d="%s" /></svg>' % (
-                         'M150 0 L75 200 L225 200 Z ' * 4000)),)
+                    'unused_filename',
+                    '<svg><path d="%s" /></svg>' % (
+                        'M150 0 L75 200 L225 200 Z ' * 4000)),)
             )
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(

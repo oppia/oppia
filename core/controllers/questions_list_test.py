@@ -138,13 +138,13 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
         self.get_json(
             '%s/%s?cursor=' % (
                 feconf.QUESTIONS_LIST_URL_PREFIX, '1,2'),
-                          expected_status_int=400)
+            expected_status_int=400)
 
     def test_get_fails_when_skill_does_not_exist(self):
         self.get_json(
             '%s/%s?cursor=' % (
                 feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
-                          expected_status_int=404)
+            expected_status_int=404)
 
 
 class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):

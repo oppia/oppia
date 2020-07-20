@@ -352,7 +352,7 @@ def main(personal_access_token):
         existing_authors = sorted(
             set(
                 [(name, email) for name, email in release_authors
-                if email in past_authors]))
+                 if email in past_authors]))
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 

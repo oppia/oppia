@@ -684,7 +684,8 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         self.mock_testapp = webtest.TestApp(
             webapp2.WSGIApplication(
                 [webapp2.Route(
-                    '/mock_view_feedback_thread/<thread_id>', self.MockHandler)],
+                    '/mock_view_feedback_thread/<thread_id>',
+                    self.MockHandler)],
                 debug=feconf.DEBUG,
             ))
         self.save_new_valid_exploration(
@@ -1305,7 +1306,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
             webapp2.WSGIApplication(
                 [webapp2.Route(
                     '/mock_delete_exploration/<exploration_id>',
-                                  self.MockHandler)],
+                    self.MockHandler)],
                 debug=feconf.DEBUG,
             ))
         self.save_new_valid_exploration(
@@ -1912,7 +1913,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             webapp2.WSGIApplication(
                 [webapp2.Route(
                     '/mock_edit_topic/<topic_id>', self.MockHandler)],
-                    debug=feconf.DEBUG,
+                debug=feconf.DEBUG,
                 ))
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
@@ -1980,7 +1981,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             webapp2.WSGIApplication(
                 [webapp2.Route(
                     '/mock_edit_story/<story_id>', self.MockHandler)],
-                    debug=feconf.DEBUG,
+                debug=feconf.DEBUG,
                 ))
         self.story_id = story_services.get_new_story_id()
         self.topic_id = topic_services.get_new_topic_id()
@@ -2600,8 +2601,9 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
         self.mock_testapp = webtest.TestApp(
             webapp2.WSGIApplication(
-                [webapp2.Route('/mock_edit_skill/<skill_id>',
-                 self.MockHandler)],
+                [webapp2.Route(
+                    '/mock_edit_skill/<skill_id>',
+                    self.MockHandler)],
                 debug=feconf.DEBUG,
             ))
 
@@ -2804,7 +2806,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
                 '/mock_play_entity/%s/%s' % (
                     feconf.ENTITY_TYPE_EXPLORATION,
                     feconf.DISABLED_EXPLORATION_IDS[0]),
-                    expected_status_int=404)
+                expected_status_int=404)
 
     def test_guest_can_play_exploration_on_published_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2845,14 +2847,14 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_play_entity/%s/%s' % (
                     feconf.ENTITY_TYPE_QUESTION, 'question_id'),
-                            expected_status_int=404)
+                expected_status_int=404)
 
     def test_cannot_play_entity_for_invalid_entity(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_entity/%s/%s' % (
                     'fake_entity_type', 'fake_entity_id'),
-                    expected_status_int=404)
+                expected_status_int=404)
 
 
 class EditEntityDecoratorTests(test_utils.GenericTestBase):

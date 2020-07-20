@@ -194,6 +194,7 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             tokens: Tokens. Object to process tokens.
         """
+        escape_character_indicator = b'\\'
         string_indicator = b'\''
         for (token_type, token, (line_num, _), _, line) in tokens:
             if (
@@ -202,15 +203,21 @@ class HangingIndentChecker(checkers.BaseChecker):
                 line = line.strip()
                 bracket_count = 0
                 line_length = len(line)
+                escape_character_found = False
                 in_string = False
                 for char_num in python_utils.RANGE(line_length):
                     char = line[char_num]
+                    python_utils.PRINT(repr(char))
+                    python_utils.PRINT(in_string)
+                    if (
+                            in_string and (
+                                char == escape_character_indicator or
+                                escape_character_found)):
+                        escape_character_found = not escape_character_found
+                        continue
 
                     if char == string_indicator:
-                        if not (
-                                line[char_num - 1] != b'\\' or
-                                line[char_num - 2] != b'\\'):
-                            in_string = not in_string
+                        in_string = not in_string
 
                     if in_string:
                         continue
@@ -1710,7 +1717,7 @@ class DocstringChecker(checkers.BaseChecker):
                         if (
                                 current_line_indentation != (
                                     args_indentation_in_spaces + 4)
-                                    and not in_freeform_section):
+                                and not in_freeform_section):
                             self.add_message(
                                 '4-space-indentation-in-docstring',
                                 line=line_num + 1)

@@ -374,7 +374,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(
                 suggestion_models.GeneralSuggestionModel
                 .get_in_review_suggestions_in_score_categories(
-                ['category1'], 'author_2')), 1)
+                    ['category1'], 'author_2')), 1)
         self.assertEqual(
             len(
                 suggestion_models.GeneralSuggestionModel

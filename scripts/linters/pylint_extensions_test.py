@@ -32,6 +32,7 @@ from . import pylint_extensions
 import astroid  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint import lint  # isort:skip
+from pylint import utils  # isort:skip
 
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
@@ -49,7 +50,8 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         class TestClass():
             pass
 
-        def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"):
+        def test(test_var_one, test_var_two=4, test_var_three=5,
+                test_var_four="test_checker"):
             test_var_five = test_var_two + test_var_three
             return test_var_five
 
@@ -124,43 +126,77 @@ class HangingIndentCheckerTests(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.HangingIndentChecker)
         checker_test_object.setup_method()
-        node_break_after_hanging_indent = (
-                u"""self.post_json('/ml/trainedclassifierhandler',
+        node_break_after_hanging_indent = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
                 """)
+        node_break_after_hanging_indent.file = filename
+        node_break_after_hanging_indent.path = filename
 
-        message = testutils.Message(
-            msg_id='no-break-after-hanging-indent',
-            line=1
-        )
+        checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_break_after_hanging_indent))
 
-        with checker_test_object.assertAddsMessages(message):
-            checker_test_object.checker.process_tokens(
-                testutils._tokenize_str(node_break_after_hanging_indent))
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-break-after-hanging-indent',
+                line=1
+            ),
+        ):
+            temp_file.close()
 
-        node_with_no_error_message = (
-                u"""\"""Some multiline
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                doc = ([
+                \"""Some multiline
                 docstring.
-                \"""
+                \"""])
                 # Load JSON.
                 master_translation_dict = json.loads(
                 utils.get_file_contents(
                 os.path.join(
                 os.getcwd(), 'assets', 'i18n', 'en.json')))
                 """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
 
         with checker_test_object.assertNoMessages():
-            checker_test_object.checker.process_tokens(
-                testutils._tokenize_str(node_with_no_error_message))
+            temp_file.close()
 
-        node_with_no_error_message = (
-                u"""self.post_json(
-                '/',
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""self.post_json(  # pylint: disable=line-too-long
+                '\'/\'',
                 self.payload, expect_errors=True, expected_status_int=401)""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
 
         with checker_test_object.assertNoMessages():
-            checker_test_object.checker.process_tokens(
-                testutils._tokenize_str(node_with_no_error_message))
+            temp_file.close()
 
 
 class DocstringParameterCheckerTests(unittest.TestCase):
