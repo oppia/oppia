@@ -77,6 +77,8 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   updateInterpolatedValue(key: string, interpolateParams?: Object): void {
     this.interpolatedValue = this.translateService.getInterpolatedString(
       key, interpolateParams);
+    this.interpolatedValue = this.pluralizeInterpolatedValue(
+      this.interpolatedValue, interpolateParams);
 
     // Storing the key to check if the key is same when the transform is invoked
     // again.
@@ -86,6 +88,142 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     // invoked again.
     this.lastParams = interpolateParams;
     this.changeDetectorRef.markForCheck();
+  }
+
+  /**
+   * Pluralizes the interpolatedValue.
+   * @param {string} interpolatedValue - interpolated i18n value
+   * @param {Object} pluralizationParams - key-value pair for pluralization
+   *
+   * A "superficial" function that covers all the exisiting usecases for
+   *   pluralization.
+   * For cases where we have translation where pluralization is requried.
+   * Example:
+   *   I18N_TOPIC_SUMMARY_TILE_LESSONS:
+   *     {lessonCount, plural, =1{1 lesson} other{# lessons}}
+   *
+   * Used in topic-summary-tile.directive.html (lines 13 - 15):
+   *   <span translate="I18N_TOPIC_SUMMARY_TILE_LESSONS"
+   *    translate-values="
+   *      {lessonCount: $ctrl.getTopicSummary().getCanonicalStoryCount()}"
+   *      translate-interpolation="messageformat">
+   *    </span>
+   *
+   * Alternatives:
+   *   1. messageformat library: https://www.npmjs.com/package/messageformat
+   *   Why not used:
+   *     We only had one usecase (plural). messageformat has a lot
+   *     functionality that is not required. The way to use messageformat is to
+   *     require the library in code, can't use import. That would result in
+   *     the entire library being bundled.
+   *
+   * Cases this function covers:
+   *  1> =1{...}
+   *    If the pluralization param is equal to 1 or '1', the function will
+   *    replace that part of the content with the text inside "{ }".
+   *  2> one{...}
+   *    If the pluralization param is equal to 1 or '1', the function will
+   *    replace that part of the content with the text inside "{ }".
+   *    Incase both one{...} and =1{...}, =1{...} will be preferred.
+   *  3> other{...}
+   *    If the pluralization param doesn't match any of those above two cases,
+   *    if will use the content inside other{...}. Any instance of "#" inside
+   *    other{...} will be replaced with the value of pluralization param.
+   * Does not supoort expressions like >, < or =.
+   *
+   * Possible breaking scenarios:
+   * 1> When interpolationParams contain this pattern: {*, plural, ...}
+   * Possible solutions:
+   *   - Use the "not" interpolated string to find the occurance of
+   *     "{*, plural, ...}" but replace the pluralizedValue in the
+   *     interpolated string.
+   *   - Check for such patterns in interpolation params and don't allow it.
+   *
+   * 2> Multiple pluralizations in a sentence:
+   * Possible solution:
+   *   - Do it recursively for each pattern using:
+   *      sting.replace(regex, (
+   *         substring: string, pluralizationKey: string) => {
+   *        ...
+   *      });
+   */
+  pluralizeInterpolatedValue(
+      interpolatedValue: string, pluralizationParams: Object): string {
+    /**
+     * InterpolatedValue: "You have
+     * {lessonCount, plural, =1{1 lesson} other{# lessons}} left."
+     * ^firstCurlyBracIndex   .   .   .   .   .   .   .   ^lastCurlyBracIndex.
+     */
+    let firstCurlyBracIndex = interpolatedValue.indexOf('{');
+    if (firstCurlyBracIndex === -1) {
+      return interpolatedValue;
+    }
+
+    let lastCurlyBracIndex = interpolatedValue.lastIndexOf('}');
+    if (lastCurlyBracIndex === -1) {
+      return interpolatedValue;
+    }
+
+    /**
+     * InterpolatedValue: "You have
+     * {lessonCount, plural, =1{1 lesson} other{# lessons}} left."
+     *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ -> CodeText.
+     */
+    const codeText = interpolatedValue.substring(
+      firstCurlyBracIndex + 1, lastCurlyBracIndex);
+
+    /**
+     * CodeText: lessonCount, plural, =1{1 lesson} other{# lessons}.
+     * .   .   . ^^^^^^^^^^^ -> pluralizationKey
+     */
+    const pluralizationKey = codeText.split(
+      ', plural,')[0];
+    if (pluralizationKey === undefined) {
+      return interpolatedValue;
+    }
+    let pluralizedValue = '';
+    if (
+      +pluralizationParams[pluralizationKey] === 1 &&
+      codeText.indexOf('=1{') > 0) {
+      /**
+       * CodeText: lessonCount, plural, =1{1 lesson} other{# lessons}.
+       * .   .   .   .   .   .   .   .   . ^^^^^^^^ -> pluralizedValue.
+       */
+      pluralizedValue = codeText.split('=1{')[1];
+      pluralizedValue = pluralizedValue.substring(
+        0, pluralizedValue.indexOf('}'));
+    } else if (
+      +pluralizationParams[pluralizationKey] === 1 &&
+      codeText.indexOf('one{') > 0) {
+      /**
+       * CodeText: lessonCount, plural, one{1 lesson} other{# lessons}.
+       * .   .   .   .   .   .   .   .   . ^^^^^^^^ -> pluralizedValue.
+       */
+      pluralizedValue = codeText.split('one{')[1];
+      pluralizedValue = pluralizedValue.substring(
+        0, pluralizedValue.indexOf('}'));
+    } else {
+      /**
+       * CodeText: lessonCount, plural,
+       *   =1{1 lesson} other{# lessons}.
+       * .   .   .   .   .   .^^^^^^^^^ -> pluralizedValue.
+       */
+      pluralizedValue = codeText.split('other{')[1];
+      pluralizedValue = pluralizedValue.substring(
+        0, pluralizedValue.indexOf('}'));
+      /**
+       * PluralizedValue: # lessons
+       * .   .   .   .   .^ -> replace this # with lessonCount.
+       */
+      pluralizedValue = pluralizedValue.replace(
+        '#', pluralizationParams[pluralizationKey]);
+    }
+
+    return (
+      interpolatedValue.substring(0, firstCurlyBracIndex) +
+        pluralizedValue +
+        interpolatedValue.substring(
+          lastCurlyBracIndex + 1, interpolatedValue.length));
   }
 
   /**
@@ -136,6 +274,8 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
       );
     }
 
+    this.interpolatedValue = this.pluralizeInterpolatedValue(
+      this.interpolatedValue, interpolateParams);
     return this.interpolatedValue;
   }
 

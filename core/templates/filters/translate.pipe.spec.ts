@@ -40,7 +40,11 @@ class MockTranslateService {
     I18n_t_1: 'Hello',
     I18n_t_2: 'Hello <[val]>',
     I18n_rogue_1: '<script>alert(\'Oppia\');</script>Hello',
-    I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'
+    I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola',
+    I18n_plural_1: ('You have' +
+     ' {lessonCount, plural, =1{1 lesson} other{# lessons}} left.'),
+    I18n_plural_2: ('You have' +
+     ' {lessonCount, plural, one{1 lesson} other{# lessons}} left.')
   };
 
   getInterpolatedString(key: string,
@@ -92,6 +96,16 @@ describe('TranslatePipe', () => {
     expect(pipe.transform('I18n_t_2', {val: '<script>World</script>'})).toBe(
       'Hello <script>World</script>');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
+    expect(pipe.transform('I18n_plural_1', {lessonCount: 1})).toBe(
+      'You have 1 lesson left.');
+    expect(pipe.transform('I18n_plural_2', {lessonCount: 1})).toBe(
+      'You have 1 lesson left.');
+    expect(pipe.transform('I18n_plural_1', {lessonCount: 12})).toBe(
+      'You have 12 lessons left.');
+    expect(pipe.transform('I18n_plural_1', {lessonCount: '1'})).toBe(
+      'You have 1 lesson left.');
+    expect(pipe.transform('I18n_plural_1', {lessonCount: '12'})).toBe(
+      'You have 12 lessons left.');
     expect(pipe.transform('')).toBe('');
     translateService.onLangChange.emit({newLanguageCode: 'en'});
   });
