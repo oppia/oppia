@@ -24,7 +24,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/editability.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('outcomeDestinationEditor', [
@@ -43,12 +43,12 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
-        'StateEditorService', 'StateGraphLayoutService', 'UserService',
+        'StateEditorService', 'StateGraphLayoutService', 'UserBackendApiService',
         'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
         'PLACEHOLDER_OUTCOME_DEST',
         function(
             $scope, EditorFirstTimeEventsService, FocusManagerService,
-            StateEditorService, StateGraphLayoutService, UserService,
+            StateEditorService, StateGraphLayoutService, UserBackendApiService,
             ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
             PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
@@ -161,12 +161,15 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               ENABLE_PREREQUISITE_SKILLS &&
               StateEditorService.isExplorationWhitelisted());
             ctrl.canEditRefresherExplorationId = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               // We restrict editing of refresher exploration IDs to
               // admins/moderators for now, since the feature is still in
               // development.
               ctrl.canEditRefresherExplorationId = (
                 userInfo.isAdmin() || userInfo.isModerator());
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $scope.$applyAsync();
             });
 
             ctrl.explorationAndSkillIdPattern =

@@ -33,7 +33,7 @@ require(
 require('services/context.service.ts');
 require('services/exploration-features.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('editorNavigation', [
@@ -47,13 +47,13 @@ angular.module('oppia').directive('editorNavigation', [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
         'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
-        'StateTutorialFirstTimeService', 'ThreadDataService', 'UserService',
+        'StateTutorialFirstTimeService', 'ThreadDataService', 'UserBackendApiService',
         'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
             ExplorationWarningsService, RouterService, SiteAnalyticsService,
-            StateTutorialFirstTimeService, ThreadDataService, UserService,
+            StateTutorialFirstTimeService, ThreadDataService, UserBackendApiService,
             WindowDimensionsService) {
           var ctrl = this;
           var taskCount = 0;
@@ -152,8 +152,11 @@ angular.module('oppia').directive('editorNavigation', [
             });
 
             $scope.userIsLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               $scope.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
             });
             $scope.ExplorationRightsService = ExplorationRightsService;
 

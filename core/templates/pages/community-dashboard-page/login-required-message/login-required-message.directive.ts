@@ -17,7 +17,7 @@
  */
 
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').directive('loginRequiredMessage', [
   '$timeout', 'UrlInterpolationService', function(
@@ -33,11 +33,11 @@ angular.module('oppia').directive('loginRequiredMessage', [
         'login-required-message.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'SiteAnalyticsService', 'UserService',
-        function($scope, $window, SiteAnalyticsService, UserService) {
+        '$scope', '$window', 'SiteAnalyticsService', 'UserBackendApiService',
+        function($scope, $window, SiteAnalyticsService, UserBackendApiService) {
           var ctrl = this;
           ctrl.onLoginButtonClicked = function() {
-            UserService.getLoginUrlAsync().then(
+            UserBackendApiService.getLoginUrlAsync().then(
               function(loginUrl) {
                 if (loginUrl) {
                   SiteAnalyticsService.registerStartLoginEvent('loginButton');
@@ -47,6 +47,9 @@ angular.module('oppia').directive('loginRequiredMessage', [
                 } else {
                   $window.location.reload();
                 }
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $scope.$applyAsync();
               }
             );
           };

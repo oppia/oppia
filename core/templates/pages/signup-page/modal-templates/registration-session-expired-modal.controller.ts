@@ -16,16 +16,16 @@
  * @fileoverview Controller for registration session expired modal.
  */
 
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'RegistrationSessionExpiredModalController', [
     '$scope', '$timeout', '$uibModalInstance', '$window',
-    'UserService',
+    'UserBackendApiService',
     function($scope, $timeout, $uibModalInstance, $window,
-        UserService) {
+        UserBackendApiService) {
       $scope.continueRegistration = function() {
-        UserService.getLoginUrlAsync().then(
+        UserBackendApiService.getLoginUrlAsync().then(
           function(loginUrl) {
             if (loginUrl) {
               $timeout(function() {

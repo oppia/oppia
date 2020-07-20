@@ -42,7 +42,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/local-storage.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require(
   'pages/community-dashboard-page/community-dashboard-page.constants.ajs.ts');
@@ -51,12 +51,12 @@ angular.module('oppia').component('communityDashboardPage', {
   template: require('./community-dashboard-page.component.html'),
   controller: [
     'LanguageUtilService', 'LocalStorageService',
-    'TranslationLanguageService', 'UrlInterpolationService', 'UserService',
+    'TranslationLanguageService', 'UrlInterpolationService', 'UserBackendApiService',
     'COMMUNITY_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
     function(
         LanguageUtilService, LocalStorageService,
-        TranslationLanguageService, UrlInterpolationService, UserService,
+        TranslationLanguageService, UrlInterpolationService, UserBackendApiService,
         COMMUNITY_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
       var ctrl = this;
@@ -101,11 +101,11 @@ angular.module('oppia').component('communityDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
 
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+        UserBackendApiService.getProfileImageDataUrlAsync().then(function(dataUrl) {
           ctrl.profilePictureDataUrl = dataUrl;
         });
 
-        UserService.getUserCommunityRightsData().then(
+        UserBackendApiService.getUserCommunityRightsData().then(
           function(userCommunityRights) {
             ctrl.userCanReviewTranslationSuggestionsInLanguages = (
               getLanguageDescriptions(
@@ -128,7 +128,7 @@ angular.module('oppia').component('communityDashboardPage', {
               ctrl.userCanReviewQuestions);
           });
 
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userInfoIsLoading = false;
           if (userInfo.isLoggedIn()) {
             ctrl.userIsLoggedIn = true;

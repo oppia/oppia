@@ -33,7 +33,7 @@ require(
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -53,13 +53,13 @@ angular.module('oppia').directive('feedbackTab', [
         'DateTimeFormatService', 'EditabilityService', 'LoaderService',
         'ExplorationStatesService',
         'SuggestionModalForExplorationEditorService', 'ThreadDataService',
-        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserBackendApiService',
         function(
             $q, $uibModal, AlertsService, ChangeListService,
             DateTimeFormatService, EditabilityService, LoaderService,
             ExplorationStatesService,
             SuggestionModalForExplorationEditorService, ThreadDataService,
-            ThreadStatusDisplayService, UrlInterpolationService, UserService) {
+            ThreadStatusDisplayService, UrlInterpolationService, UserBackendApiService) {
           var ctrl = this;
 
           var _resetTmpMessageFields = function() {
@@ -228,7 +228,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.clearActiveThread();
 
             return $q.all([
-              UserService.getUserInfoAsync().then(
+              UserBackendApiService.getUserInfoAsync().then(
                 userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
               ctrl.fetchUpdatedThreads()
             ]).then(() => LoaderService.hideLoadingScreen());

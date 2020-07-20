@@ -21,7 +21,7 @@ require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require('components/summary-tile/collection-summary-tile.constants.ajs.ts');
 
@@ -50,10 +50,10 @@ angular.module('oppia').directive('collectionSummaryTile', [
         '/components/summary-tile/collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'DateTimeFormatService', 'UserService',
+        'DateTimeFormatService', 'UserBackendApiService',
         'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_VIEWER_URL',
         'COLLECTION_EDITOR_URL', function(
-            DateTimeFormatService, UserService,
+            DateTimeFormatService, UserBackendApiService,
             ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL,
             COLLECTION_EDITOR_URL) {
           var ctrl = this;
@@ -87,7 +87,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
           };
           ctrl.$onInit = function() {
             ctrl.userIsLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             });
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
