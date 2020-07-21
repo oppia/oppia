@@ -2299,8 +2299,8 @@ class EmailMessageMock(python_utils.OBJECT):
             plaintext_body: str. The plaintext body of the email. Must be utf-8
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|str|None. Optional argument. List of bcc emails,
-                single bcc email. Emails must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Emails must be utf-8.
             reply_to: str|None. Optional argument. Reply address formatted like
                 “reply+<reply_id>@<incoming_email_domain_name>
                 reply_id is the unique id of the sender.
@@ -2417,8 +2417,10 @@ class GenericEmailTestBase(GenericTestBase):
         """Gets the entire messages dictionary.
 
         Returns:
-            dict(list(EmailMessageMock)). The dictionary containing all lists of
-            email messages indexed by the recipient emails.
+            dict(str, (list(EmailMessageMock))). The dict keyed by recipient
+            email. Each value contains a list of EmailMessageMock objects
+            corresponding to that recipient email, in other words, all
+            individual emails sent to that specific recipient email.
         """
         return self.emails_dict
 
