@@ -545,6 +545,11 @@ p:last-child {
   font-size: 1em !important;
 }
 
+.oppia-rte-editor {
+  border: none;
+  outline: none;
+}
+
 .oppia-rte-editor p span {
   font-size: 1em !important;
 }

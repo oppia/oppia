@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerStatsObjectFactory, IAnswerStatsBackendDict } from
+import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
 import {
   CyclicStateTransitionsPlaythroughIssue,
@@ -64,7 +64,7 @@ describe('Exploration improvements task registrar service', () => {
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
 
-  let answerStatsBackendDict: IAnswerStatsBackendDict;
+  let answerStatsBackendDict: AnswerStatsBackendDict;
   let cstPlaythroughIssueBackendDict:
     ICyclicStateTransitionsPlaythroughIssueBackendDict;
   let eqPlaythroughIssueBackendDict:
