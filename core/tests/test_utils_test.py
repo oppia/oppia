@@ -434,9 +434,9 @@ class EmailMockTests(test_utils.EmailTestBase):
         email_services.send_email_to_recipients() is correctly swapped to its
         mock version when the testbase extends EmailTestBase.
         """
-        current_function = getattr(email_services, 'send_email_to_recipients')
+        referenced_function = getattr(email_services, 'send_email_to_recipients')
         correct_function = getattr(self, '_send_email_to_recipients')
-        self.assertEqual(current_function, correct_function)
+        self.assertEqual(referenced_function, correct_function)
 
     def test_mock_send_email_to_recipients_sends_correct_emails(self):
         """Test sending email to recipients using mock adds the correct objects
