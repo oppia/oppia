@@ -28,6 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { Subscription } from 'rxjs';
 
 interface ButtonDefinition {
   text: string,
@@ -47,7 +48,7 @@ export class StewardsLandingPageComponent implements OnInit, OnDestroy {
   activeTabName: string;
   buttonDefinitions: ButtonDefinition[];
   windowIsNarrow: boolean;
-  resizeSubscription: any;
+  resizeSubscription: Subscription;
 
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
