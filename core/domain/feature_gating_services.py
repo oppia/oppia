@@ -23,14 +23,18 @@ from constants import constants
 from core import features_registry
 from core.domain import platform_parameter_domain as param_domain
 
-CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
-
 
 # TODO(MegrezZhu): Currently Oppia runs in either of the two modes:
 # dev or prod. There should be another mode 'test' added for QA testing,
 # once it is added, this function needs to be updated to take that into
 # consideration.
 def get_running_mode():
+    """Returns the running mode of Oppia.
+
+    Returns:
+        str. 'dev' if Oppia is running in development mode, 'prod' if in
+        production mode.
+    """
     if constants.DEV_MODE:
         return 'dev'
     else:
@@ -38,6 +42,15 @@ def get_running_mode():
 
 
 def create_evaluation_context_for_client(client_context_dict):
+    """Returns context instance for evaluation, using the information
+    provided by clients.
+
+    Args:
+        client_context_dict: dict. The client side context.
+
+    Returns:
+        EvaluationContext. The context for evaluation.
+    """
     return param_domain.EvaluationContext.create_from_dict(
         client_context_dict=client_context_dict,
         server_context_dict={
@@ -47,6 +60,12 @@ def create_evaluation_context_for_client(client_context_dict):
 
 
 def create_evaluation_context_for_server():
+    """Returns context instance for evaluation without client-side
+    informations.
+
+    Returns:
+        EvaluationContext. The context for evaluation.
+    """
     return param_domain.EvaluationContext.create_from_dict(
         client_context_dict={
             'client_platform': None,
@@ -62,19 +81,45 @@ def create_evaluation_context_for_server():
 
 
 def get_all_feature_flag_setting_dicts():
-    result = []
+    """Returns dict representations of all feature flags.
+
+    Returns:
+        dict. The keys are the feature names and the values are the dict
+        mappings of all fields of the feature flags.
+    """
+    result_dict = {}
     for name in features_registry.ALL_FEATURES_LIST:
         flag_domain = param_domain.Registry.get_platform_parameter(name)
-        result.append(flag_domain.to_dict())
-    return result
+        result_dict[name] = flag_domain.to_dict()
+    return result_dict
 
 
 def get_all_feature_flag_values_for_context(context):
+    """Evaluates and returns the values for all feature flags.
+
+    Args:
+        context: EvaluationContext. The context used for evaluation.
+
+    Returns:
+        dict. The keys are the feature names and the values are boolean
+        results of corresponding flags.
+    """
     return get_feature_flag_values_for_context(
         features_registry.ALL_FEATURES_LIST, context)
 
 
 def get_feature_flag_values_for_context(feature_names, context):
+    """Evaluates and returns the values for specified feature flags.
+
+    Args:
+        feature_names: list(str). The names of feature flags that need to
+            be evaluated.
+        context: EvaluationContext. The context used for evaluation.
+
+    Returns:
+        dict. The keys are the feature names and the values are boolean
+        results of corresponding flags.
+    """
     unknown_feature_names = []
     for feature_name in feature_names:
         if feature_name not in features_registry.ALL_FEATURES_NAMES_SET:
@@ -93,6 +138,15 @@ def get_feature_flag_values_for_context(feature_names, context):
 
 def update_feature_flag_rules(
         feature_name, committer_id, commit_message, new_rule_dicts):
+    """Updates the feature flag's rules.
+
+    Args:
+        feature_name: str. The name of the feature to update.
+        committer_id: str. ID of the committer.
+        commit_message: str. The commit message.
+        new_rule_dicts: list(dist). A list of dict mappings of all fields
+            of PlatformParameterRule object.
+    """
     if feature_name not in features_registry.ALL_FEATURES_NAMES_SET:
         raise Exception('Feature flag not exist: %s.' % feature_name)
 

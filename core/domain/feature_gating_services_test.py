@@ -31,6 +31,8 @@ memcache_services = models.Registry.import_memcache_services()
 
 
 class FeatureGatingServicesTest(test_utils.GenericTestBase):
+    """Test for the feature gating services."""
+
     def setUp(self):
         super(FeatureGatingServicesTest, self).setUp()
 
