@@ -26,7 +26,7 @@ require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
 
 describe('Community dashboard page constants', function() {
-  var COMMUNITY_DASHBOARD_TABS_DETAILS = null;
+  var CONTRIBUTOR_DASHBOARD_TABS_DETAILS = null;
   var tabDetailsTemplate = {
     ariaLabel: 'string',
     tabName: 'string',
@@ -42,13 +42,13 @@ describe('Community dashboard page constants', function() {
     }
   }));
   beforeEach(angular.mock.inject(function($injector) {
-    COMMUNITY_DASHBOARD_TABS_DETAILS = $injector.get(
-      'COMMUNITY_DASHBOARD_TABS_DETAILS');
+    CONTRIBUTOR_DASHBOARD_TABS_DETAILS = $injector.get(
+      'CONTRIBUTOR_DASHBOARD_TABS_DETAILS');
   }));
 
   it('should have expected template for tab details', function() {
-    for (var tabName in COMMUNITY_DASHBOARD_TABS_DETAILS) {
-      var tabDetails = COMMUNITY_DASHBOARD_TABS_DETAILS[tabName];
+    for (var tabName in CONTRIBUTOR_DASHBOARD_TABS_DETAILS) {
+      var tabDetails = CONTRIBUTOR_DASHBOARD_TABS_DETAILS[tabName];
       for (var infoKey in tabDetailsTemplate) {
         expect(tabDetails.hasOwnProperty(infoKey)).toBe(true);
         if (tabDetailsTemplate[infoKey] === 'string') {

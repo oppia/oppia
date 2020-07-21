@@ -22,8 +22,8 @@ import { ContributorDashboardConstants } from
   'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ts';
 
 angular.module('oppia').constant(
-  'COMMUNITY_DASHBOARD_TABS_DETAILS',
-  ContributorDashboardConstants.COMMUNITY_DASHBOARD_TABS_DETAILS
+  'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
+  ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
 );
 
 angular.module('oppia').constant(

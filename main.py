@@ -227,7 +227,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/communityreviewerrightsdatahandler',
         admin.CommunityReviewerRightsDataHandler),
     get_redirect_route(
-        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
 
     get_redirect_route(

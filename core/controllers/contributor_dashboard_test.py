@@ -34,13 +34,13 @@ class ContributorDashboardPageTest(test_utils.GenericTestBase):
     """Test for showing contributor dashboard pages."""
 
     def test_page_with_disabled_contributor_dashboard_leads_to_404(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', False):
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', False):
             self.get_html_response(
-                feconf.COMMUNITY_DASHBOARD_URL, expected_status_int=404)
+                feconf.CONTRIBUTOR_DASHBOARD_URL, expected_status_int=404)
 
     def test_page_with_enabled_contributor_dashboard_loads_correctly(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
-            response = self.get_html_response(feconf.COMMUNITY_DASHBOARD_URL)
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
+            response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
             response.mustcontain(
                 '<contributor-dashboard-page></contributor-dashboard-page>')
 
@@ -141,13 +141,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         }
 
     def test_handler_with_disabled_dashboard_flag(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', False):
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', False):
             self.get_json(
                 '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 params={}, expected_status_int=404)
 
     def test_get_skill_opportunity_data(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
             response = self.get_json(
                 '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 params={})
@@ -162,7 +162,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
             response = self.get_json(
                 '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
@@ -177,7 +177,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
             response = self.get_json(
                 '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en'})
@@ -193,7 +193,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_skill_opportunity_data_pagination(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL, params={})
@@ -220,7 +220,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
@@ -247,7 +247,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data_pagination(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
@@ -273,7 +273,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_with_invalid_language_code(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
@@ -281,14 +281,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=400)
 
     def test_get_translation_opportunity_without_language_code(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_with_invalid_language_code(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
@@ -296,14 +296,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_without_language_code(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_opportunity_for_invalid_opportunity_type(self):
-        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/invalid_opportunity_type' % (

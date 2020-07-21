@@ -261,8 +261,8 @@ def update_contributor_dashboard_status_in_feconf_file(
         enable_contributor_dashboard: bool. Represents whether community
             dashboard is enabled.
     """
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_contributor_dashboard
+    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
+    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = %s' % enable_contributor_dashboard
     common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 

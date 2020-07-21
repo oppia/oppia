@@ -35,8 +35,8 @@ class ContributorDashboardPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         # TODO(#7402): Serve this page statically through app.yaml once
-        # the COMMUNITY_DASHBOARD_ENABLED flag is removed.
-        if not feconf.COMMUNITY_DASHBOARD_ENABLED:
+        # the CONTRIBUTOR_DASHBOARD_ENABLED flag is removed.
+        if not feconf.CONTRIBUTOR_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
         self.render_template('contributor-dashboard-page.mainpage.html')
 
@@ -49,7 +49,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, opportunity_type):
         """Handles GET requests."""
-        if not feconf.COMMUNITY_DASHBOARD_ENABLED:
+        if not feconf.CONTRIBUTOR_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
         search_cursor = self.request.get('cursor', None)
 

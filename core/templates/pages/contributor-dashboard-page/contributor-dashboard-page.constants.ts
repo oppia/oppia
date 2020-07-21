@@ -17,7 +17,7 @@
  */
 
 export class ContributorDashboardConstants {
-  public static COMMUNITY_DASHBOARD_TABS_DETAILS = {
+  public static CONTRIBUTOR_DASHBOARD_TABS_DETAILS = {
     myContributionTab: {
       ariaLabel: 'Check your contributions.',
       tabName: 'My Contributions',
