@@ -143,13 +143,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_handler_with_disabled_dashboard_flag(self):
         with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', False):
             self.get_json(
-                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={}, expected_status_int=404)
 
     def test_get_skill_opportunity_data(self):
         with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
             response = self.get_json(
-                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={})
 
             self.assertEqual(
@@ -164,7 +164,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_translation_opportunity_data(self):
         with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
             response = self.get_json(
-                '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
 
             self.assertEqual(
@@ -179,7 +179,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_voiceover_opportunity_data(self):
         with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
             response = self.get_json(
-                '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en'})
 
             self.assertEqual(len(response['opportunities']), 2)
@@ -198,7 +198,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1)
         ):
             response = self.get_json(
-                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL, params={})
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={})
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 response['opportunities'],
@@ -209,7 +210,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
-                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'cursor': next_cursor})
 
             self.assertEqual(len(response['opportunities']), 1)
@@ -227,7 +228,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1)
         ):
             response = self.get_json(
-                '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
@@ -238,7 +239,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
-                '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi', 'cursor': next_cursor})
 
             self.assertEqual(len(response['opportunities']), 1)
@@ -256,7 +257,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1)
         ):
             response = self.get_json(
-                '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en'})
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
@@ -267,7 +268,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
-                '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en', 'cursor': next_cursor})
 
             self.assertEqual(len(response['opportunities']), 1)
@@ -284,7 +285,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1)
         ):
             self.get_json(
-                '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
@@ -294,7 +295,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1)
         ):
             self.get_json(
-                '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_with_invalid_language_code(self):
@@ -303,7 +304,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1)
         ):
             self.get_json(
-                '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
@@ -313,7 +314,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1)
         ):
             self.get_json(
-                '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_opportunity_for_invalid_opportunity_type(self):
@@ -323,7 +324,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         ):
             self.get_json(
                 '%s/invalid_opportunity_type' % (
-                    feconf.COMMUNITY_OPPORTUNITIES_DATA_URL),
+                    feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
                 expected_status_int=404)
 
 
