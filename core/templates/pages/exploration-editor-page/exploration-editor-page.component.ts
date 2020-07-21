@@ -375,6 +375,14 @@ angular.module('oppia').component('explorationEditorPage', {
             StateTopAnswersStatsService.initAsync(
               ctrl.explorationId, ExplorationStatesService.getStates()
             ).then(function() {
+              ExplorationStatesService.registerOnStateAddedCallback(
+                StateTopAnswersStatsService.onStateAdded);
+              ExplorationStatesService.registerOnStateDeletedCallback(
+                StateTopAnswersStatsService.onStateDeleted);
+              ExplorationStatesService.registerOnStateRenamedCallback(
+                StateTopAnswersStatsService.onStateRenamed);
+              ExplorationStatesService.registerOnStateInteractionSavedCallback(
+                StateTopAnswersStatsService.onStateInteractionSaved);
               ExplorationWarningsService.updateWarnings();
               $scope.$broadcast('refreshStateEditor');
             });
