@@ -58,6 +58,13 @@ export class StewardsLandingPageComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef
   ) {}
 
+  states = [
+    {tabname: 'Parents', name: 'Parent'},
+    {tabname: 'Teachers', name: 'Teacher'},
+    {tabname: 'NGOs', name: 'NGO'},
+    {tabname: 'Volunteers', name: 'Volunteer'}
+  ];
+
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();

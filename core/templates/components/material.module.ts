@@ -22,10 +22,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { MatSelectModule } from '@angular/material/select';
+
 @NgModule({
   imports: [CommonModule, BrowserAnimationsModule,
-    MatButtonModule, MatCardModule
+    MatButtonModule, MatCardModule, MatSelectModule
   ],
-  exports: [BrowserAnimationsModule, MatButtonModule, MatCardModule]
+  exports: [BrowserAnimationsModule, MatButtonModule, MatCardModule,
+    MatSelectModule]
 })
 export class MaterialModule {}

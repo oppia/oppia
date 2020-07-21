@@ -139,17 +139,13 @@
         <div class="column tab-content view-content oppia-stewards-main-content" autoscroll="true">
           <div *ngIf="windowIsNarrow">
             <strong>I AM A ...</strong>
-            <div uib-dropdown class="oppia-stewards-dropdown">
-              <button uib-dropdown-toggle class="btn btn-secondary selection dropdown-toggle" type="button" aria-expanded="false" data-toggle="dropdown">
-                {{ getActiveTabNameInSingularForm() }}
-              </button>
-              <ul uib-dropdown-menu style="width: inherit;">
-                <li><a (click)="setActiveTabName(TAB_NAME_PARENTS)">Parent</a></li>
-                <li><a (click)="setActiveTabName(TAB_NAME_TEACHERS)">Teacher</a></li>
-                <li><a (click)="setActiveTabName(TAB_NAME_NONPROFITS)">Nonprofit</a></li>
-                <li><a (click)="setActiveTabName(TAB_NAME_VOLUNTEERS)">Volunteer</a></li>
-              </ul>
-            </div>
+              <mat-form-field>
+                <mat-select (selectionChange)="setActiveTabName($event.value)" panelClass="oppia-stewards-dropdown ">
+                  <mat-option *ngFor="let state of states" [value]="state.tabname">
+                    {{ state.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
           </div>
 
           <div *ngIf="activeTabName === TAB_NAME_PARENTS">
@@ -378,7 +374,7 @@
   }
 
   .oppia-stewards-dropdown {
-    margin-bottom: 50px;
+    margin-bottom: 1000px;
     margin-top: 12px;
     position: relative;
     width: 80%;
