@@ -57,8 +57,7 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       var _initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
-        ctrl.subtopicId = parseInt(
-          TopicEditorRoutingService.getSubtopicIdFromUrl());
+        ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;
         if (ctrl.topic.getId() && ctrl.subtopic) {
@@ -189,7 +188,8 @@ angular.module('oppia').component('subtopicEditorTab', {
       };
 
       ctrl.showSkillEditOptions = function(index) {
-        ctrl.selectedSkillEditOptionsIndex = index;
+        ctrl.selectedSkillEditOptionsIndex = (
+            (ctrl.selectedSkillEditOptionsIndex === index) ? null : index);
       };
 
       ctrl.removeSkillFromSubtopic = function(skillSummary) {

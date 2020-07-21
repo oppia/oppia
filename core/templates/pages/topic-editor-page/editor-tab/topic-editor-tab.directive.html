@@ -100,7 +100,7 @@
         <div ng-if="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">
           <div class="list-header">
             <span>Name</span>
-            <span class="number-skills-header"># of Skills</span>
+            <span class="number-skills-header"># of Questions</span>
           </div>
           <div class="subtopic-name-header" ng-class="{'skills-valid': !uncategorizedSkillSummaries.length, 'skills-invalid': uncategorizedSkillSummaries.length}">
             <span>Uncategorized Skills</span>
@@ -136,7 +136,7 @@
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
                 <div class="subtopic-edit-options-container edit-options-container">
-                  <span><[subtopic.getSkillSummaries().length]></span>
+                  <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
                   <i class="fa fa-ellipsis-v protractor-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
                   <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
                     <i class="fa fa-trash protractor-test-delete-subtopic-button"></i>
@@ -148,7 +148,7 @@
                 <div ng-if="subtopic.getSkillSummaries().length">
                   <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skills-list-item skill-description-container">
                     <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                     <span class="clickable-item"><[skillSummary.getDescription()]></span>
+                      <span class="clickable-item"><[skillSummary.getDescription()]></span>
                     </a>
                     <div class="edit-options-container">
                       <span><[skillQuestionCountDict[skillSummary.getId()] ]></span>
@@ -313,7 +313,7 @@
   }
 
   .topic-editor .edit-options-container span {
-    margin-right: 28px;
+    margin-right: 38px;
   }
 
   .topic-editor .number-skills-header {
@@ -581,7 +581,7 @@
     }
 
     .topic-editor .uncategorized-skill-option-box {
-      right: 23px;
+      right: 43px;
     }
   }
 </style>

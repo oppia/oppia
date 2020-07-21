@@ -19,7 +19,7 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Subtopic editor tab', function() {
+describe('Subtopic editor tab', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -32,6 +32,7 @@ fdescribe('Subtopic editor tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var ContextService = null;
+  var skillSummary = null;
   var ImageUploadHelperService = null;
   var directive = null;
   var TopicEditorStateService = null;
@@ -71,6 +72,9 @@ fdescribe('Subtopic editor tab', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
+    skillSummary = ShortSkillSummaryObjectFactory.create(
+      'skill_1', 'Description 1');
+    topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
 
@@ -230,9 +234,7 @@ fdescribe('Subtopic editor tab', function() {
     function() {
       var removeSkillSpy = (
         spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
-      var skillSummary = SkillSummaryObjectFactory.create(
-        'skill_1', 'Description 1');
-      ctrl.removeSkillFromTopic(0, skillSummary);
+      ctrl.removeSkillFromTopic(skillSummary);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 

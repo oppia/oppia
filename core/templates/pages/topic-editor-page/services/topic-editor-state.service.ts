@@ -206,7 +206,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
       getSkillQuestionCountDict: function() {
         return _skillQuestionCountDict;
       },
-
       /**
        * Loads, or reloads, the subtopic page stored by this service given a
        * specified topic ID and subtopic ID.

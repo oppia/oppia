@@ -110,7 +110,7 @@
             <span>Unpublish Topic</span>
           </div>
         </div>
-        </div>
+      </div>
       <div class="dropdown-content right-container">
         <div class="dropdown-text" ng-click="saveChanges()">
           <span ng-if="isSaveInProgress()">
@@ -210,47 +210,47 @@
       position: absolute;
       width: 100%;
     }
-    .dropdown-content {
+    topic-editor-navbar .dropdown-content {
       background-color: #FFF;
       border: 1.5px solid #6d6969;
+      border-radius: 5px;
       display: flex;
       flex-wrap: wrap;
-      border-radius: 5px;
       justify-content: space-between;
     }
 
-    .right-container {
+    topic-editor-navbar .right-container {
       background-color: #419889;
       color: #FFF;
     }
 
-    .dropdown-option {
+    topic-editor-navbar .dropdown-option {
       padding: 5px 0;
     }
 
-    .dropdown-icon {
-      border-left: 1.5px solid #6d6969;
-      display: flex;
-      background-color: #e6e6e6;
-      color: #000;
+    topic-editor-navbar .dropdown-icon {
       align-items: center;
+      background-color: #e6e6e6;
+      border-left: 1.5px solid #6d6969;
+      color: #000;
+      display: flex;
       justify-content: center;
       text-align: center;
       width: 20%;
     }
-    .dropdown-text {
+    topic-editor-navbar .dropdown-text {
       padding: 5px 10px;
     }
     topic-editor-navbar .save-options-dropdown {
       width: 52%;
     }
-    .warning-box {
+    topic-editor-navbar .warning-box {
       background-color: #f5f55a;
       border: 1px solid #000;
       bottom: 100%;
       position: absolute;
     }
-    .error-icon {
+    topic-editor-navbar .error-icon {
       background-color: #f5f55a;
     }
   }

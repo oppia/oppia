@@ -1,11 +1,16 @@
 <div class="subtopic-content">
+  <div class="subtopic-header-text">
+    <span class="topic-name"><[$ctrl.topic.getName()]> / </span>
+    <span class="subtopic-name"><[$ctrl.editableTitle]></span>
+  </div>
   <div class="subtopic-content-box">
     <div class="subtopic-left-box">
       <md-card class="subtopic-item-container">
+        <h3 class="subtopic-card-heading">Review Material</h3>
         <div class="oppia-subtopics-list-card">
           <div class="subtopic-title">
             <p>
-              <strong>Subtopic Title</strong>
+              <strong>Title*</strong>
             </p>
             <form class="form-horizontal" role="form">
               <input class="form-control protractor-test-subtopic-title-field"
@@ -27,9 +32,34 @@
               <em>The maximum length of subtopic title is 80 characters.</em>
             </span>
           </div>
+          <div class="subtopic-html">
+            <div  ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
+              <p>
+                <strong>Explanation of the subtopic*</strong>
+                <i class="fa fa-pen edit-icon" ng-if="!$ctrl.schemaEditorIsShown"></i>
+              </p>
+            </div>
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Gives learner a brief overview of how to perform a skill.
+              </i>
+            </span>
+            <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
+              <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
+                                   class="protractor-test-edit-subtopic-page-contents"
+                                   local-value="$ctrl.htmlData">
+              </schema-based-editor>
+              <button class="btn btn-success btn-sm protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()"> Save
+              </button>
+            </div>
+            <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
+              <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">
+              </angular-html-bind>
+            </div>
+          </div>
           <div class="subtopic-thumbnail">
             <p>
-              <strong>Subtopic Thumbnail</strong>
+              <strong>Thumbnail Image*</strong>
             </p>
             <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
                                 update-filename="$ctrl.updateSubtopicThumbnailFilename"
@@ -40,24 +70,6 @@
                                 preview-title="$ctrl.editableTitle"
                                 preview-description-bg-color="'#BE563C'">
             </thumbnail-uploader>
-          </div>
-          <div class="subtopic-html">
-            <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
-              <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
-                                   class="protractor-test-edit-subtopic-page-contents"
-                                   local-value="$ctrl.htmlData">
-              </schema-based-editor>
-              <button class="btn btn-success btn-sm protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()"> Save
-              </button>
-            </div>
-            <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
-              <span class="oppia-placeholder">
-                Give a description or explanation of the subtopic.
-                <i class="fa fa-pen"></i>
-              </span>
-              <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">
-              </angular-html-bind>
-            </div>
           </div>
         </div>
         <div ng-if="!$ctrl.subtopicPreviewCardIsShown" >
@@ -236,7 +248,7 @@
     margin: 20px 0;
   }
   .subtopic-content .subtopic-html {
-    margin: 20px 0;
+    margin: 30px 0;
   }
   .subtopic-content .add-skill-btn {
     background-color: #008098;
@@ -254,21 +266,34 @@
   .subtopic-content .skill-card-header i {
     display: none;
   }
+  .subtopic-content .subtopic-header-text {
+    margin-bottom: 15px;
+    margin-left: 4%;
+  }
+  .subtopic-content .topic-name {
+    color: #707070;
+  }
   .subtopic-content .entity-count {
     align-items: center;
-    background-color: #ffffff;
+    background-color: #FFF;
+    border: 1px solid #aaaac1;
+    border-radius: 6px;
     display: flex;
     flex-wrap: wrap;
-    height: 100px;
+    height: 110px;
     justify-content: center;
   }
   .subtopic-content .skill-count,
   .subtopic-content .question-count,
   .subtopic-content .create-skill-container {
     border-right: 2px solid #aaaac1;
+    cursor: pointer;
     display: inline-block;
     text-align: center;
     width: 33%;
+  }
+  .subtopic-content .edit-icon {
+    color: #595959;
   }
   .subtopic-content .create-skill-container {
     border-right: none;
@@ -278,12 +303,27 @@
   .subtopic-content .story-count-value {
     display: block;
     font-size: 26px;
+    font-weight: bold;
     height: 40px;
   }
   .subtopic-content .create-skill-container i {
-    color: #00645C;
+    color: #419889;
     font-size: 30px;
     width: 100%;
+  }
+  .subtopic-content .create-skill-text {
+    color: #419889;
+  }
+  .subtopic-content .subtopic-card-heading {
+    margin-bottom: 0;
+    margin-left: 30px;
+    margin-top: 35px;
+  }
+  .subtopic-content .subtopic-title p {
+    margin-bottom: 10px;
+  }
+  .subtopic-content .subtopic-item-container {
+      border-radius: 4px;
   }
   @media screen and (max-width: 1100px) {
     .subtopic-content .subtopic-left-box {
@@ -300,6 +340,11 @@
     .subtopic-content .subtopic-left-box,
     .subtopic-content .subtopic-right-box {
       width: 100%;
+    }
+    .subtopic-content .subtopic-card-heading {
+      border-bottom: 2px solid;
+      margin-bottom: 15px;
+      padding-bottom: 4px;
     }
     .subtopic-content .subtopic-item-container {
       margin-top: 10px;

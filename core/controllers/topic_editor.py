@@ -176,11 +176,6 @@ class EditableTopicDataHandler(base.BaseHandler):
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
         skill_id_to_rubrics_dict = {}
-        skill_question_count_dict = {}
-
-        for skill_id in topic.get_all_skill_ids():
-            skill_question_count_dict[skill_id] = (
-                question_services.get_total_question_count_for_skill_ids([skill_id]))
 
         for topic_object in topics:
             skill_id_to_rubrics_dict_local, deleted_skill_ids = (
@@ -210,15 +205,15 @@ class EditableTopicDataHandler(base.BaseHandler):
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
             skill_question_count_dict[skill_id] = (
-            question_services.get_total_question_count_for_skill_ids([skill_id]))
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
-            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict,
-            'skill_question_count_dict': skill_question_count_dict
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)

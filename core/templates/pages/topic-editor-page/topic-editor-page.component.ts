@@ -106,7 +106,22 @@ angular.module('oppia').directive('topicEditorPage', [
             }
           };
           ctrl.selectMainTab = function() {
+            const activeTab = ctrl.getActiveTabName();
+            const subtopicId = (
+              TopicEditorRoutingService.getSubtopicIdFromUrl() ||
+                TopicEditorRoutingService.getLastSubtopicIdVisited());
+            const lastTabVisited = (
+              TopicEditorRoutingService.getLastTabVisited());
+            if (activeTab.startsWith('subtopic') ||
+                lastTabVisited === 'subtopic') {
+              TopicEditorRoutingService.navigateToSubtopicEditorWithId(
+                subtopicId); return;
+            }
             TopicEditorRoutingService.navigateToMainTab();
+          };
+          ctrl.isMainEditorTabSelected = function() {
+            const activeTab = ctrl.getActiveTabName();
+            return activeTab === 'main' || activeTab === 'subtopic_editor';
           };
           ctrl.selectQuestionsTab = function() {
             TopicEditorRoutingService.navigateToQuestionsTab();
@@ -119,7 +134,9 @@ angular.module('oppia').directive('topicEditorPage', [
               } else if (activeTab === 'subtopic_editor') {
                 return 'Subtopic Editor';
               } else if (activeTab === 'subtopic_preview') {
-                return 'Subtopic Viewer';
+                return 'Subtopic Preview';
+              } else if (activeTab === 'questions') {
+                return 'Question Editor';
               }
             }
           };
