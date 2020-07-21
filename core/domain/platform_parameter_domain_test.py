@@ -118,7 +118,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
         self.assertEqual(context.user_locale, 'en-US')
         self.assertEqual(context.mode, 'dev')
 
-    def test_raise_exception_with_invalid_dict(self):
+    def test_create_with_invalid_dict_failure(self):
         with self.assertRaises(Exception):
             parameter_domain.EvaluationContext.create_from_dict(
                 client_context_dict={},
@@ -168,7 +168,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
-    def test_mode_filter(self):
+    def test_evaluate_mode_filter(self):
         filter_dict = {'type': 'mode', 'value': 'dev'}
         filter_domain = (
             parameter_domain
@@ -180,7 +180,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(dev_context))
         self.assertFalse(filter_domain.evaluate(prod_context))
 
-    def test_user_locale_filter(self):
+    def test_evaluate_user_locale_filter(self):
         filter_dict = {'type': 'user_locale', 'value': 'en-US'}
         filter_domain = (
             parameter_domain
@@ -192,7 +192,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(en_context))
         self.assertFalse(filter_domain.evaluate(zh_context))
 
-    def test_client_platform_filter(self):
+    def test_evaluate_client_platform_filter(self):
         filter_dict = {'type': 'client_platform', 'value': 'Linux'}
         filter_domain = (
             parameter_domain
@@ -204,7 +204,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(linux_context))
         self.assertFalse(filter_domain.evaluate(windows_context))
 
-    def test_client_type_filter(self):
+    def test_evaluate_client_type_filter(self):
         filter_dict = {'type': 'client_type', 'value': 'web'}
         filter_domain = (
             parameter_domain
@@ -216,7 +216,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(web_context))
         self.assertFalse(filter_domain.evaluate(native_context))
 
-    def test_browser_type_filter(self):
+    def test_evaluate_browser_type_filter(self):
         filter_dict = {'type': 'browser_type', 'value': 'Chrome'}
         filter_domain = (
             parameter_domain
@@ -228,7 +228,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(chrome_context))
         self.assertFalse(filter_domain.evaluate(firefox_context))
 
-    def test_app_version_filter(self):
+    def test_evaluate_app_version_filter(self):
         filter_dict = {'type': 'app_version', 'value': '1.2.3'}
         filter_domain = (
             parameter_domain
@@ -240,7 +240,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(true_context))
         self.assertFalse(filter_domain.evaluate(false_context))
 
-    def test_app_version_filter_with_eq_comparison(self):
+    def test_evaluate_app_version_filter_with_eq_comparison(self):
         filter_dict = {'type': 'app_version', 'value': '1.2.3'}
         filter_domain = (
             parameter_domain
@@ -259,7 +259,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
 
-    def test_app_version_filter_with_gt_comparison(self):
+    def test_evaluate_app_version_filter_with_gt_comparison(self):
         filter_dict = {'type': 'app_version', 'value': '>1.2.3'}
         filter_domain = (
             parameter_domain
@@ -271,7 +271,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
 
-    def test_app_version_filter_with_gte_comparison(self):
+    def test_evaluate_app_version_filter_with_gte_comparison(self):
         filter_dict = {'type': 'app_version', 'value': '>=1.2.3'}
         filter_domain = (
             parameter_domain
@@ -283,7 +283,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
 
-    def test_app_version_filter_with_lt_comparison(self):
+    def test_evaluate_app_version_filter_with_lt_comparison(self):
         filter_dict = {'type': 'app_version', 'value': '<1.2.3'}
         filter_domain = (
             parameter_domain
@@ -295,7 +295,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
 
-    def test_app_version_filter_with_lte_comparison(self):
+    def test_evaluate_app_version_filter_with_lte_comparison(self):
         filter_dict = {'type': 'app_version', 'value': '<=1.2.3'}
         filter_domain = (
             parameter_domain
@@ -307,7 +307,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
 
-    def test_app_version_filter_with_invalid_expr(self):
+    def test_evaluate_app_version_filter_with_invalid_expr_failure(self):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.create_from_dict(
@@ -330,7 +330,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 ))
             filter_domain.validate()
 
-    def test_filter_with_invalid_type(self):
+    def test_validate_filter_with_invalid_type_raises_exception(self):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.create_from_dict(
@@ -340,7 +340,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             utils.ValidationError, 'Unsupported filter type'):
             filter_domain.validate()
 
-    def test_filter_with_multiple_values(self):
+    def test_evaluate_filter_with_multiple_values(self):
         filter_dict = {'type': 'mode', 'value': ['dev', 'prod']}
         filter_domain = (
             parameter_domain
@@ -355,7 +355,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(prod_context))
         self.assertFalse(filter_domain.evaluate(test_context))
 
-    def test_app_version_filter_with_multiple_values(self):
+    def test_evaluate_app_version_filter_with_multiple_values(self):
         filter_dict = {'type': 'app_version', 'value': ['1.2.3', '1.2.4']}
         filter_domain = (
             parameter_domain
@@ -369,7 +369,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.5.3')))
 
-    def test_app_version_filter_with_no_version_in_context(self):
+    def test_evaluate_app_version_filter_with_no_version_in_context(self):
         filter_dict = {'type': 'app_version', 'value': ['1.2.3', '1.2.4']}
         filter_domain = (
             parameter_domain
@@ -543,7 +543,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         self.assertIsInstance(
             parameter.metadata, parameter_domain.PlatformParameterMetadata)
 
-    def test_validate_last_default_rule(self):
+    def test_validate_without_last_default_rule_raises_exception(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'must not have any filter'):
             parameter = parameter_domain.PlatformParameter.create_from_dict({
@@ -564,7 +564,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             })
             parameter.validate()
 
-    def test_validate_data_type_not_supported(self):
+    def test_validate_with_unsupported_data_type_raises_exception(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Unsupported data type'):
             parameter = parameter_domain.PlatformParameter.create_from_dict({
@@ -589,7 +589,8 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             })
             parameter.validate()
 
-    def test_validate_consistent_data_type_in_rules(self):
+    def test_validate_with_inconsistent_data_type_in_rules_raises_exception(
+            self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected bool'):
             parameter = parameter_domain.PlatformParameter.create_from_dict({
@@ -643,7 +644,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             para_dict)
         self.assertDictEqual(parameter.to_dict(), para_dict)
 
-    def test_evaluate(self):
+    def test_evaluate_in_dev(self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -679,6 +680,28 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
 
+    def test_evaluate_in_prod(self):
+        parameter = parameter_domain.PlatformParameter.create_from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'mode',
+                            'value': 'dev'
+                        }
+                    ],
+                    'value_when_matched': '222'
+                },
+                {
+                    'filters': [],
+                    'value_when_matched': '111'
+                }
+            ],
+        })
+
         prod_context = parameter_domain.EvaluationContext.create_from_dict(
             client_context_dict={
                 'client_platform': 'Android',
@@ -693,7 +716,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
 
-    def test_validate_correct_feature_flags(self):
+    def test_validate_feature(self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -715,7 +738,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         })
         parameter.validate()
 
-    def test_validate_feature_flags_with_invalid_type(self):
+    def test_validate_feature_with_invalid_type_raises_exception(self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -735,7 +758,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             utils.ValidationError, 'must be bool'):
             parameter.validate()
 
-    def test_validate_feature_flags_with_invalid_stage(self):
+    def test_validate_feature_with_invalid_stage_raises_exception(self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -755,7 +778,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid feature stage'):
             parameter.validate()
 
-    def test_validate_feature_flags_with_no_mode_filter(self):
+    def test_validate_feature_with_no_mode_filter_raises_exception(self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -775,7 +798,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             utils.ValidationError, 'must have a mode filter'):
             parameter.validate()
 
-    def test_validate_dev_feature_flags_enabled_for_inappropriate_env(self):
+    def test_validate_dev_feature_for_inappropriate_env_raises_exception(self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -800,7 +823,8 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             utils.ValidationError, 'cannot be enabled in test'):
             parameter.validate()
 
-    def test_validate_test_feature_flags_enabled_for_inappropriate_env(self):
+    def test_validate_test_feature_for_inappropriate_env_raises_exception(
+            self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -860,7 +884,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         self.assertIsNotNone(config_models.PlatformParameterModel.get(
             parameter.name, strict=False))
 
-    def test_update_with_validation_error(self):
+    def test_update_incorrect_rules_failure(self):
         parameter = parameter_domain.PlatformParameter.create_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -938,7 +962,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
-    def test_create_platform_parameter_with_invalid_type(self):
+    def test_create_platform_parameter_with_invalid_type_failure(self):
         with self.assertRaisesRegexp(
             Exception, 'Unsupported data type'):
             parameter_domain.Registry.create_platform_parameter(
@@ -986,13 +1010,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             parameter_domain.Registry.get_platform_parameter(
                 parameter_name))
 
-    def test_create_platform_parameter_with_the_same_name(self):
+    def test_create_platform_parameter_with_the_same_name_failure(self):
         parameter_name = 'parameter_a'
         self.create_example_parameter_with_name(parameter_name)
         with self.assertRaisesRegexp(Exception, 'already exists'):
             self.create_example_parameter_with_name(parameter_name)
 
-    def test_get_non_existing_parameter(self):
+    def test_get_non_existing_parameter_failure(self):
         with self.assertRaisesRegexp(Exception, 'not found'):
             parameter_domain.Registry.get_platform_parameter('parameter_a')
 

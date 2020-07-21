@@ -128,12 +128,12 @@ class EvaluationContext(python_utils.OBJECT):
             object.
         """
         return cls(
-            client_platform=client_context_dict['client_platform'],
-            client_type=client_context_dict['client_type'],
-            browser_type=client_context_dict['browser_type'],
-            app_version=client_context_dict['app_version'],
-            user_locale=client_context_dict['user_locale'],
-            mode=server_context_dict['mode'],
+            client_platform=client_context_dict.get('client_platform'),
+            client_type=client_context_dict.get('client_type'),
+            browser_type=client_context_dict.get('browser_type'),
+            app_version=client_context_dict.get('app_version'),
+            user_locale=client_context_dict.get('user_locale'),
+            mode=server_context_dict.get('mode'),
         )
 
 
