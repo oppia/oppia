@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { AnswerClassificationService } from
-  'pages/exploration-player-page/services/answer-classification.service';
-import { AnswerStats } from
-  'domain/exploration/AnswerStatsObjectFactory';
-import { InteractionRulesRegistryService } from
-  'services/interaction-rules-registry.service';
-import { StateTopAnswersStatsBackendApiService } from
-  'services/state-top-answers-stats-backend-api.service';
-import { States } from 'domain/exploration/StatesObjectFactory';
-
 /**
  * @fileoverview Factory for maintaining the statistics of the top answers for
  * each state of an exploration.
  */
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { AnswerStats } from
+  'domain/exploration/AnswerStatsObjectFactory';
+import { States } from 'domain/exploration/StatesObjectFactory';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
+import { StateTopAnswersStatsBackendApiService } from
+  'services/state-top-answers-stats-backend-api.service';
 
 export class AnswerStatsEntry {
   constructor(
@@ -36,7 +36,9 @@ export class AnswerStatsEntry {
       public readonly interactionId: string) {}
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({
+  providedIn: 'root'
+})
 export class StateTopAnswersStatsService {
   private initStarted: boolean;
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
@@ -90,37 +92,37 @@ export class StateTopAnswersStatsService {
     return this.initPromise;
   }
 
-  getStateNamesWithStats() {
+  getStateNamesWithStats(): string[] {
     return [...this.topAnswersStatsByStateName.keys()];
   }
 
-  hasStateStats(stateName: string) {
+  hasStateStats(stateName: string): boolean {
     return this.topAnswersStatsByStateName.has(stateName);
   }
 
-  getStateStats(stateName: string) {
+  getStateStats(stateName: string): AnswerStats[] {
     if (!this.hasStateStats(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
-    return this.topAnswersStatsByStateName.get(stateName).answers;
+    return [...this.topAnswersStatsByStateName.get(stateName).answers];
   }
 
-  getUnresolvedStateStats(stateName: string) {
+  getUnresolvedStateStats(stateName: string): AnswerStats[] {
     return this.getStateStats(stateName).filter(a => !a.isAddressed);
   }
 
-  onStateAdded(stateName: string) {
+  onStateAdded(stateName: string): void {
     this.topAnswersStatsByStateName.set(
       stateName, new AnswerStatsEntry([], null));
   }
 
-  onStateDeleted(stateName: string) {
+  onStateDeleted(stateName: string): void {
     // ES2016 Map uses delete as a method name despite it being a reserved word.
     // eslint-disable-next-line dot-notation
     this.topAnswersStatsByStateName.delete(stateName);
   }
 
-  onStateRenamed(oldStateName: string, newStateName: string) {
+  onStateRenamed(oldStateName: string, newStateName: string): void {
     this.topAnswersStatsByStateName.set(
       newStateName, this.topAnswersStatsByStateName.get(oldStateName));
     // ES2016 Map uses delete as a method name despite it being a reserved word.
@@ -128,11 +130,11 @@ export class StateTopAnswersStatsService {
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 
-  onStateInteractionSaved(stateName: string) {
+  onStateInteractionSaved(stateName: string): void {
     this.refreshAddressedInfo(stateName);
   }
 
-  private refreshAddressedInfo(stateName: string) {
+  private refreshAddressedInfo(stateName: string): void {
     if (!this.topAnswersStatsByStateName.has(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }

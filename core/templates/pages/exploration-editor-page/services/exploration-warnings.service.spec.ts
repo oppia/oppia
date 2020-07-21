@@ -18,6 +18,10 @@
 
 import { fakeAsync } from '@angular/core/testing';
 
+import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
@@ -26,7 +30,7 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStats, AnswerStatsObjectFactory } from
+import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
@@ -68,8 +72,6 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { StateTopAnswersStats } from
-  'domain/statistics/state-top-answers-stats-object.factory';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/graph-data.service');
