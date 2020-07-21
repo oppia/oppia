@@ -20,8 +20,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { AnswerStats, AnswerStatsObjectFactory, IAnswerStatsBackendDict } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { ServicesConstants } from 'services/services.constants';
 import {
   StateTopAnswersStats,
@@ -31,60 +29,20 @@ import {
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-export interface StateAnswerStatsBackendResponse {
-  'answers': {[stateName: string]: IAnswerStatsBackendDict[]};
-  'interaction_ids': {[stateName: string]: string};
-}
-
-export class StateAnswerStatsResponse {
-  constructor(
-      public readonly answerStats: ReadonlyMap<string, AnswerStats[]>,
-      public readonly interactionIds: ReadonlyMap<string, string>) {}
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class StateTopAnswersStatsBackendApiService {
   constructor(
-<<<<<<< HEAD
-    private answerStatsObjectFactory: AnswerStatsObjectFactory,
-    private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+      private http: HttpClient,
+      private stateTopAnswersStatsObjectFactory:
+        StateTopAnswersStatsObjectFactory,
+      private urlInterpolationService: UrlInterpolationService) {}
 
-  async fetchStatsAsync(expId: string): Promise<StateAnswerStatsResponse> {
-    return this.http.get<StateAnswerStatsBackendResponse>(
-      this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STATE_ANSWER_STATS_URL, {
-          exploration_id: expId
-        })).toPromise()
-      .then(response => new StateAnswerStatsResponse(
-        new Map(Object.entries(response.answers).map(
-          ([stateName, answerStatsBackendDicts]) => [
-            stateName,
-            answerStatsBackendDicts.map(
-              d => this.answerStatsObjectFactory.createFromBackendDict(d))
-          ])),
-        new Map(Object.entries(response.interaction_ids))));
-=======
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient,
-    private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory
-  ) {}
-
-  _fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
+  async fetchStatsAsync(expId: string): Promise<StateTopAnswersStats> {
     return this.http.get<StateTopAnswersStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STATE_ANSWER_STATS_URL,
-        {exploration_id: explorationId}
-      )
-    ).toPromise().then(backendDict => this.stateTopAnswersStatsObjectFactory
-      .createFromBackendDict(backendDict));
-  }
-
-  fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
-    return this._fetchStats(explorationId);
->>>>>>> upstream/develop
+        ServicesConstants.STATE_ANSWER_STATS_URL, {exploration_id: expId}))
+      .toPromise().then(
+        d => this.stateTopAnswersStatsObjectFactory.createFromBackendDict(d));
   }
 }
 

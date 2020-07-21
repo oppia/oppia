@@ -1412,8 +1412,8 @@ export class UpgradedServices {
     upgradedServices['StateTopAnswersStatsBackendApiService'] =
       new StateTopAnswersStatsBackendApiService(
         upgradedServices['HttpClient'],
+        upgradedServices['StateTopAnswersStatsObjectFactory'],
         upgradedServices['UrlInterpolationService']);
-        upgradedServices['StateTopAnswersStatsObjectFactory']);
     upgradedServices['StatsReportingBackendApiService'] =
       new StatsReportingBackendApiService(
         upgradedServices['ContextService'],

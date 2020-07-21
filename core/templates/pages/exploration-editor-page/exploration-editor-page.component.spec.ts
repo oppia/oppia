@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -41,6 +41,8 @@ import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
@@ -348,16 +350,16 @@ describe('Exploration editor page component', function() {
         });
 
       it('should get state top answers stats after initing exploration page',
-        function() {
-          var stateTopAnswersStatsBackendDict = {};
+        fakeAsync(function() {
           spyOn(ers, 'isPublic').and.returnValue(true);
-          spyOn(stasbas, 'fetchStats').and
-            .returnValue($q.resolve(stateTopAnswersStatsBackendDict));
+          spyOn(stasbas, 'fetchStatsAsync').and
+            .returnValue(Promise.resolve(new StateTopAnswersStats({}, {})));
           $scope.$apply();
+          flushMicrotasks();
 
           expect(ews.updateWarnings)
             .toHaveBeenCalled();
-        });
+        }));
 
       it('should navigate to feedback tab', function() {
         spyOn(rs, 'isLocationSetToNonStateEditorTab').and

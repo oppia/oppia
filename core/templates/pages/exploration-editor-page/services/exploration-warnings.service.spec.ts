@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ExplorationWarningsService.
  */
 
+import { fakeAsync } from '@angular/core/testing';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
@@ -24,7 +26,7 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
+import { AnswerStatsObjectFactory, AnswerStats } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
@@ -66,6 +68,8 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/graph-data.service');
@@ -78,6 +82,7 @@ describe('Exploration Warnings Service', function() {
   var ExplorationWarningsService = null;
   var ExplorationStatesService = null;
   var StateTopAnswersStatsService = null;
+  var StateTopAnswersStatsBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -173,6 +178,8 @@ describe('Exploration Warnings Service', function() {
     beforeEach(angular.mock.inject(function($injector) {
       ExplorationWarningsService = $injector.get('ExplorationWarningsService');
       ExplorationStatesService = $injector.get('ExplorationStatesService');
+      StateTopAnswersStatsBackendApiService = $injector.get(
+        'StateTopAnswersStatsBackendApiService');
       StateTopAnswersStatsService = $injector.get(
         'StateTopAnswersStatsService');
     }));
@@ -517,7 +524,7 @@ describe('Exploration Warnings Service', function() {
       });
 
     it('should update warnings when state top answers stats is initiated',
-      function() {
+      fakeAsync(async function() {
         ExplorationStatesService.init({
           Hola: {
             content: {
@@ -573,18 +580,14 @@ describe('Exploration Warnings Service', function() {
             },
           }
         });
-        StateTopAnswersStatsService.init({
-          answers: {
-            Hola: [{
-              answer: 'hola',
-              frequency: 7,
-              isAddressed: false
-            }]
-          },
-          interactionIds: {
-            Hola: 'TextInput'
-          },
-        });
+        spyOn(StateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
+          .and.returnValue(Promise.resolve(
+            new StateTopAnswersStats(
+              {Hola: [new AnswerStats('hola', 'hola', 7, false)]},
+              {Hola: 'TextInput'})));
+        await StateTopAnswersStatsService.initAsync(
+          'expId', ExplorationStatesService.getStates());
+
         ExplorationWarningsService.updateWarnings();
 
         expect(ExplorationWarningsService.getWarnings()).toEqual([{
@@ -620,7 +623,7 @@ describe('Exploration Warnings Service', function() {
               ' question type.'
             ]
           });
-      });
+      }));
 
     it('should update warnings when state name is not equal to the default' +
     ' outcome destination', function() {
