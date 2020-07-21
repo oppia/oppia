@@ -30,7 +30,7 @@ describe('Community dashboard page', function() {
   var $q = null;
   var $rootScope = null;
   var LocalStorageService = null;
-  var UserService = null;
+  var UserBackendApiService = null;
   var TranslationLanguageService = null;
   var userProfileImage = 'profile-data-url';
   var userCommunityRights = {
@@ -48,7 +48,7 @@ describe('Community dashboard page', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
-    UserService = $injector.get('UserService');
+    UserBackendApiService = $injector.get('UserBackendApiService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     ctrl = $componentController('communityDashboardPage');
@@ -66,11 +66,11 @@ describe('Community dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and.returnValue(
         $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserCommunityRightsData').and.returnValue(
+      spyOn(UserBackendApiService, 'getUserCommunityRightsData').and.returnValue(
         $q.resolve(userCommunityRights));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
       $rootScope.$apply();
@@ -137,11 +137,11 @@ describe('Community dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and.returnValue(
         $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserCommunityRightsData').and.returnValue(
+      spyOn(UserBackendApiService, 'getUserCommunityRightsData').and.returnValue(
         $q.resolve(userCommunityRights));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
       $rootScope.$apply();
