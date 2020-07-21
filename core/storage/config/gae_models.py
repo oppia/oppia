@@ -108,7 +108,7 @@ class PlatformParameterModel(base_models.VersionedModel):
             rule_dicts: list(dict). List of dict mappings of rule objects.
 
         Returns:
-            PlatformParameterModel. the created PlatformParameterModel
+            PlatformParameterModel. The created PlatformParameterModel
             instance.
         """
         return cls(id=param_name, rules=rule_dicts)
