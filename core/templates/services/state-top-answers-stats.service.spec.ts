@@ -262,7 +262,7 @@ describe('StateTopAnswersStatsService', () => {
     stateTopAnswersStatsService.onStateRenamed('Hola', 'Bonjour');
 
     expect(stateTopAnswersStatsService.getStateStats('Bonjour'))
-      .toBe(oldStats);
+      .toEqual(oldStats);
 
     expect(() => stateTopAnswersStatsService.getStateStats('Hola'))
       .toThrowError('Hola does not exist.');
