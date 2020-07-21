@@ -601,8 +601,8 @@
               <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
                 <span ng-if="thread.totalMessageCount > 1">
                   <span ng-if="thread.authorSecondLastMessage">
-                    <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
-                    <span ng-if="!thread.secondLastMessageRead">
+                    <span ng-if="thread.secondLastMessageIsRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
+                    <span ng-if="!thread.secondLastMessageIsRead">
                       <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
                     </span>
                   </span>
@@ -613,8 +613,8 @@
                   </span>
                 </span>
                 <span ng-if="thread.authorLastMessage">
-                  <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
-                  <span ng-if="!thread.lastMessageRead">
+                  <span ng-if="thread.lastMessageIsRead"><[thread.authorLastMessage | truncate:7]></span>
+                  <span ng-if="!thread.lastMessageIsRead">
                     <strong><[thread.authorLastMessage | truncate:7]></strong>
                   </span>
                 </span>
@@ -624,12 +624,12 @@
                 <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
               </td>
               <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
-                <span ng-if="thread.totalMessageCount > 1 && thread.secondLastMessageRead && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
-                <span class="protractor-test-feedback-exploration" ng-if="thread.totalMessageCount === 1 && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
-                <span ng-if="thread.totalMessageCount === 1 && !thread.lastMessageRead">
+                <span ng-if="thread.totalMessageCount > 1 && thread.secondLastMessageIsRead && thread.lastMessageIsRead"><[thread.explorationTitle]> -</span>
+                <span class="protractor-test-feedback-exploration" ng-if="thread.totalMessageCount === 1 && thread.lastMessageIsRead"><[thread.explorationTitle]> -</span>
+                <span ng-if="thread.totalMessageCount === 1 && !thread.lastMessageIsRead">
                   <strong><[thread.explorationTitle]> -</strong>
                 </span>
-                <span ng-if="thread.totalMessageCount > 1 && (!thread.lastMessageRead || !thread.secondLastMessageRead)">
+                <span ng-if="thread.totalMessageCount > 1 && (!thread.lastMessageIsRead || !thread.secondLastMessageIsRead)">
                   <strong><[thread.explorationTitle]> -</strong>
                 </span>
                 <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
@@ -815,7 +815,7 @@
   .oppia-learner-dashboard-submenu {
     background-color: #fff;
     border: 1px solid #d0d0d0;
-    color: #8c8c8c;
+    color: #757575;
     cursor: pointer;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 16px;
@@ -823,7 +823,7 @@
   }
 
   .oppia-learner-dashboard-section-active {
-    background-color: #009688;
+    background-color: #018477;
     color: white;
   }
 
@@ -940,7 +940,7 @@
   }
 
   .oppia-learner-dashboard-main-content-title {
-    color: #009688;
+    color: #076962;
     display: inline-block;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 1.3em;
@@ -1118,7 +1118,7 @@
   }
 
   .oppia-dashboard-tooltip-text {
-    background-color: #009688;
+    background-color: #018477;
     border-radius: 6px;
     bottom: 97%;
     color: #fff;
