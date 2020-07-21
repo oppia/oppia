@@ -1067,7 +1067,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     commit_type = ndb.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
     # The commit message associated with this snapshot.
-    commit_message = ndb.TextProperty(indexed=True)
+    commit_message = ndb.StringProperty(indexed=True)
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
