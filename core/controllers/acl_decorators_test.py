@@ -3056,3 +3056,42 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
+
+
+# class ManageOwnProfileTests(test_utils.GenericTestBase):
+#     """Tests for decorator can_manage_own_profile."""
+
+#     banned_user = 'banneduser'
+#     banned_user_email = 'banned@example.com'
+#     username = 'user'
+#     user_email = 'user@example.com'
+
+#     class MockHandler(base.BaseHandler):
+#         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+#         @acl_decorators.can_manage_own_profile
+#         def get(self):
+#             return self.render_json({'success': 1})
+
+#     def setUp(self):
+#         super(ManageOwnProfileTests, self).setUp()
+#         self.signup(self.banned_user_email, self.banned_user)
+#         self.signup(self.user_email, self.username)
+#         self.set_banned_users([self.banned_user])
+#         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+#             [webapp2.Route('/mock/', self.MockHandler)],
+#             debug=feconf.DEBUG,
+#         ))
+
+#     def test_banned_user_cannot_update_preferences(self):
+#         self.login(self.banned_user_email)
+#         with self.swap(self, 'testapp', self.mock_testapp):
+#             self.get_json('/mock/', expected_status_int=401)
+#         self.logout()
+
+#     def test_normal_user_can_manage_preferences(self):
+#         self.login(self.user_email)
+#         with self.swap(self, 'testapp', self.mock_testapp):
+#             response = self.get_json('/mock/')
+#         self.assertEqual(response['success'], 1)
+#         self.logout()
