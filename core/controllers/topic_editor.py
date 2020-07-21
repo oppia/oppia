@@ -225,6 +225,11 @@ class EditableTopicDataHandler(base.BaseHandler):
         self._require_valid_version(version, topic.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if len(commit_message) > 1000:
+            raise self.InvalidInputException(
+                'Commit messages must be at most 1000 characters.')
+
         topic_and_subtopic_page_change_dicts = self.payload.get(
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []

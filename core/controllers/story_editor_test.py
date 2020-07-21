@@ -332,7 +332,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
-            change_cmd, csrf_token=csrf_token, expected_status_int=500)
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             json_response['error'],

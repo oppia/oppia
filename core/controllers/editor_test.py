@@ -1579,6 +1579,63 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             params={'v': 'invalid_version'}, expected_status_int=404)
         self.logout()
+    
+    def test_put_with_long_commit_message_raises_error(self):
+        # Create several users.
+        self.signup(
+            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exploration.states['State A'].update_interaction_id('TextInput')
+        exploration.states['State 2'].update_interaction_id('TextInput')
+        exploration.states['State 3'].update_interaction_id('TextInput')
+
+        csrf_token = self.get_new_csrf_token()
+
+        # Owner adds rights for other users.
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_manager.ROLE_EDITOR
+            }, csrf_token=csrf_token)
+        self.logout()
+    
+        self.login(self.COLLABORATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Check that collaborator can add a new state called 'State 4'.
+        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        response_dict = self.put_json(
+            add_url,
+            {
+                'version': exploration.version,
+                'commit_message': 'a' * 1001,
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'Commit messages must be at most 1000 characters.')
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)

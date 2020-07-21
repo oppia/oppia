@@ -125,6 +125,11 @@ class ExplorationHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if len(commit_message) > 1000:
+            raise self.InvalidInputException(
+                'Commit messages must be at most 1000 characters.')
+
         change_list_dict = self.payload.get('change_list')
         change_list = [
             exp_domain.ExplorationChange(change) for change in change_list_dict]

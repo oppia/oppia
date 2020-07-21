@@ -176,6 +176,11 @@ class EditableSkillDataHandler(base.BaseHandler):
         _require_valid_version(version, skill.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if len(commit_message) > 1000:
+            raise self.InvalidInputException(
+                'Commit messages must be at most 1000 characters.')
+
         change_dicts = self.payload.get('change_dicts')
         change_list = [
             skill_domain.SkillChange(change_dict)

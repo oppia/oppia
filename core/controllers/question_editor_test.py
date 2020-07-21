@@ -652,6 +652,29 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             expected_status_int=200)
         self.logout()
+    
+    def test_put_with_long_commit_message_fails(self):
+        payload = {}
+        new_question_data = self._create_valid_question_data('DEF')
+        change_list = [{
+            'cmd': 'update_question_property',
+            'property_name': 'question_state_data',
+            'new_value': new_question_data.to_dict(),
+            'old_value': self.question.question_state_data.to_dict()
+        }]
+        payload['change_list'] = change_list
+        payload['commit_message'] = 'a' * 1001
+
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response_json = self.put_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+            payload,
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response_json['error'],
+            'Commit messages must be at most 1000 characters.')
 
     def test_put_with_admin_email_allows_question_editing(self):
         payload = {}

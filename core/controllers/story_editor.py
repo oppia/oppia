@@ -90,6 +90,15 @@ class EditableStoryDataHandler(base.BaseHandler):
         self._require_valid_version(version, story.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if commit_message is None:
+            raise self.InvalidInputException(
+                'Expected a commit message but received none.')
+
+        if len(commit_message) > 1000:
+            raise self.InvalidInputException(
+                'Commit messages must be at most 1000 characters.')
+
         change_dicts = self.payload.get('change_dicts')
         change_list = [
             story_domain.StoryChange(change_dict)

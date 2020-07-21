@@ -121,6 +121,9 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                                                  ' own suggestion.')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
+            if len(self.payload.get('commit_message')) > 1000:
+                raise self.InvalidInputException(
+                    'Commit messages must be at most 1000 characters.')
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))

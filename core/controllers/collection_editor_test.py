@@ -217,6 +217,38 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertEqual(2, json_response['collection']['version'])
 
         self.logout()
+    
+    def test_cannot_put_long_commit_message(self):
+        """Check that putting a long commit message is denied."""
+        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
+        self.set_collection_editors(whitelisted_usernames)
+
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.owner_id)
+        rights_manager.assign_role_for_collection(
+            self.admin, self.COLLECTION_ID, self.editor_id,
+            rights_manager.ROLE_EDITOR)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+
+        self.login(self.EDITOR_EMAIL)
+
+        long_message_dict = self.json_dict.copy()
+        long_message_dict['commit_message'] = 'a' * 1001
+
+        # Call get handler to return the csrf token.
+        csrf_token = self.get_new_csrf_token()
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
+                self.COLLECTION_ID),
+            long_message_dict, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters.'
+        )
+
+        self.logout()
 
     def test_collection_rights_handler(self):
         collection_id = 'collection_id'

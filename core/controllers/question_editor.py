@@ -221,6 +221,11 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         if not commit_message:
             raise self.PageNotFoundException
+
+        if len(commit_message) > 1000:
+            raise self.InvalidInputException(
+                'Commit messages must be at most 1000 characters.')
+
         if not self.payload.get('change_list'):
             raise self.PageNotFoundException
         change_list = [

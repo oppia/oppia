@@ -90,6 +90,11 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         _require_valid_version(version, collection.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if len(commit_message) > 1000:
+            raise self.InvalidInputException(
+                'Commit messages must be at most 1000 characters.')
+
         change_list = self.payload.get('change_list')
 
         collection_services.update_collection(
