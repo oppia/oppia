@@ -57,9 +57,9 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       var _initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
-        ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
-        ctrl.subtopic = ctrl.topic.getSubtopicById(
-          parseInt(ctrl.subtopicId));
+        ctrl.subtopicId = parseInt(
+          TopicEditorRoutingService.getSubtopicIdFromUrl());
+        ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
@@ -73,6 +73,8 @@ angular.module('oppia').component('subtopicEditorTab', {
               $scope.$applyAsync();
             });
           }
+          ctrl.skillQuestionCountDict = (
+            TopicEditorStateService.getSkillQuestionCountDict());
           ctrl.editableTitle = ctrl.subtopic.getTitle();
           ctrl.editableThumbnailFilename = (
             ctrl.subtopic.getThumbnailFilename());
@@ -184,6 +186,26 @@ angular.module('oppia').component('subtopicEditorTab', {
 
       ctrl.togglePreviewSkillCard = function() {
         ctrl.skillsListIsShown = !ctrl.skillsListIsShown;
+      };
+
+      ctrl.showSkillEditOptions = function(index) {
+        ctrl.selectedSkillEditOptionsIndex = index;
+      };
+
+      ctrl.removeSkillFromSubtopic = function(skillSummary) {
+        ctrl.selectedSkillEditOptionsIndex = -1;
+        TopicUpdateService.removeSkillFromSubtopic(
+          ctrl.topic, ctrl.subtopicId, skillSummary);
+        _initEditor();
+      };
+
+      ctrl.removeSkillFromTopic = function(skillSummary) {
+        ctrl.selectedSkillEditOptionsIndex = -1;
+        TopicUpdateService.removeSkillFromSubtopic(
+          ctrl.topic, ctrl.subtopicId, skillSummary);
+        TopicUpdateService.removeUncategorizedSkill(
+          ctrl.topic, skillSummary);
+        _initEditor();
       };
 
       ctrl.$onInit = function() {

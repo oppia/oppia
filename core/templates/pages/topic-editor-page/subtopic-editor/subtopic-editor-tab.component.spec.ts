@@ -19,7 +19,7 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Subtopic editor tab', function() {
+fdescribe('Subtopic editor tab', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -216,6 +216,31 @@ describe('Subtopic editor tab', function() {
       ctrl.updateHtmlData();
       expect(updateSubtopicSpy).toHaveBeenCalled();
     });
+
+  it('should call the TopicUpdateService if skill is removed from subtopic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromSubtopic(0, null);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if skill is removed from topic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      var skillSummary = SkillSummaryObjectFactory.create(
+        'skill_1', 'Description 1');
+      ctrl.removeSkillFromTopic(0, skillSummary);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should set skill edit options index', function() {
+    ctrl.showSkillEditOptions(10);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(10);
+    ctrl.showSkillEditOptions(20);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(20);
+  });
 
   it('should toggle skills list preview', function() {
     expect(ctrl.skillsListIsShown).toEqual(true);

@@ -165,6 +165,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
+            _skillQuestionCountDict = (
+              newBackendTopicObject.skillQuestionCountDict);
             _updateGroupedSkillSummaries(
               newBackendTopicObject.groupedSkillSummaries);
             _updateTopic(
@@ -199,6 +201,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
 
       getGroupedSkillSummaries: function() {
         return angular.copy(_groupedSkillSummaries);
+      },
+
+      getSkillQuestionCountDict: function() {
+        return _skillQuestionCountDict;
       },
 
       /**

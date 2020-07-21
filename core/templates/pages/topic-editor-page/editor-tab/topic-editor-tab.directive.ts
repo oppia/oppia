@@ -89,6 +89,8 @@ angular.module('oppia').directive('topicEditorTab', [
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
+            $scope.skillQuestionCountDict = (
+              TopicEditorStateService.getSkillQuestionCountDict());
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
