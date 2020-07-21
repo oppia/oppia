@@ -652,7 +652,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             expected_status_int=200)
         self.logout()
-    
+
     def test_put_with_long_commit_message_fails(self):
         payload = {}
         new_question_data = self._create_valid_question_data('DEF')
