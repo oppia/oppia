@@ -27,7 +27,6 @@ from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import state_domain
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
