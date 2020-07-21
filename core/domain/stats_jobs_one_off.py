@@ -202,7 +202,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return RecomputeStatisticsOneOffJob.ENTITY_CLASSES_TO_MAP_OVER
 
     @classmethod
-    def prepare_map(cls, item):  # pylint: disable=too-many-return-statements
+    def prepare_map(cls, item):
         """Returns a tuple that represents the given model instance, so that it
         can be processed by the MapReduce pipeline.
 
@@ -246,63 +246,67 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'is_feedback_useful': item.is_feedback_useful
                 })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_STATE_HIT,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
+            event_dict = {
+                'event_type': feconf.EVENT_TYPE_STATE_HIT,
+                'version': item.exploration_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-            return (
-                item.exp_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
+            event_dict = {
+                'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
+                'version': item.exp_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
         elif isinstance(
                 item, stats_models.StartExplorationEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
+            event_dict = {
+                'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
+                'version': item.exploration_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
         elif isinstance(
                 item, stats_models.ExplorationActualStartEventLogEntryModel):
-            return (
-                item.exp_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
+            event_dict = {
+                'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+                'version': item.exp_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
+            event_dict = {
+                'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                'version': item.exploration_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
+
+        if (
+                isinstance(
+                    item, (
+                        stats_models.CompleteExplorationEventLogEntryModel,
+                        stats_models.StartExplorationEventLogEntryModel,
+                        stats_models.StateHitEventLogEntryModel))):
+            return (item.exploration_id, event_dict)
+
+        elif (
+                isinstance(item, (
+                    stats_models.SolutionHitEventLogEntryModel,
+                    stats_models.ExplorationActualStartEventLogEntryModel))):
+            return (item.exp_id, event_dict)
 
     @staticmethod
     def map(item):

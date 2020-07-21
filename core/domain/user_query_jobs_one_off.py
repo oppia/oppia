@@ -46,12 +46,13 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [user_models.UserSettingsModel]
 
     @staticmethod
-    def map(user_settings_model):  # pylint: disable=too-many-return-statements
+    def map(user_settings_model):
         query_id = (
             jobs.BaseMapReduceOneOffJobManager.get_mapper_param('query_id'))
         query_model = user_models.UserQueryModel.get(query_id)
         user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions_compare = False
 
         if (user_id == query_model.submitter_id or
                 user_services.is_at_least_moderator(user_id)):
@@ -82,24 +83,31 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 return
 
         if query_model.created_at_least_n_exps is not None:
-            if (len(user_contributions.created_exploration_ids) <
-                    query_model.created_at_least_n_exps):
-                return
+            user_contributions_compare = (
+                len(user_contributions.created_exploration_ids) <
+                query_model.created_at_least_n_exps) or (
+                    user_contributions_compare)
 
         if query_model.created_fewer_than_n_exps is not None:
-            if (len(user_contributions.created_exploration_ids) >=
-                    query_model.created_fewer_than_n_exps):
-                return
+            user_contributions_compare = (
+                len(user_contributions.created_exploration_ids) >=
+                query_model.created_fewer_than_n_exps) or (
+                    user_contributions_compare)
 
         if query_model.edited_at_least_n_exps is not None:
-            if (len(user_contributions.edited_exploration_ids) <
-                    query_model.edited_at_least_n_exps):
-                return
+            user_contributions_compare = (
+                len(user_contributions.edited_exploration_ids) <
+                query_model.edited_at_least_n_exps) or (
+                    user_contributions_compare)
 
         if query_model.edited_fewer_than_n_exps is not None:
-            if (len(user_contributions.edited_exploration_ids) >=
-                    query_model.edited_fewer_than_n_exps):
-                return
+            user_contributions_compare = (
+                len(user_contributions.edited_exploration_ids) >=
+                query_model.edited_fewer_than_n_exps) or (
+                    user_contributions_compare)
+
+        if user_contributions_compare:
+            return
 
         yield (query_id, user_id)
 
