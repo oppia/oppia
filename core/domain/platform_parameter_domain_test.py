@@ -133,7 +133,9 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             self, client_platform='Android',
             client_type='native', browser_type='n/a', app_version='1.2.3',
             user_locale='en-US', mode='dev'):
-        """not ready."""
+        """Creates and returns an EvaluationContext using the given
+        arguments.
+        """
         return parameter_domain.EvaluationContext.create_from_dict(
             client_context_dict={
                 'client_platform': client_platform,
@@ -905,7 +907,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         memcache_services.delete_multi(memcache_keys)
 
     def create_example_parameter_with_name(self, name):
-        """not ready."""
+        """Creates and returns an example parameter with the given name."""
         parameter_domain.Registry.create_platform_parameter_from_dict({
             'name': name,
             'description': 'for test',
@@ -939,7 +941,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_create_platform_parameter_with_invalid_type(self):
         with self.assertRaisesRegexp(
             Exception, 'Unsupported data type'):
-            parameter = parameter_domain.Registry.create_platform_parameter(
+            parameter_domain.Registry.create_platform_parameter(
                 name='parameter_a',
                 description='test',
                 data_type='Invalid'

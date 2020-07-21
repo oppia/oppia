@@ -329,7 +329,6 @@ class PlatformParameterRule(python_utils.OBJECT):
     """Domain object for rules in platform parameters."""
 
     def __init__(self, filters, value_when_matched):
-        """not ready."""
         self._filters = filters
         self._value_when_matched = value_when_matched
 
@@ -426,7 +425,6 @@ class PlatformParameterMetadata(python_utils.OBJECT):
     """Domain object for metadatas of platform parameters."""
 
     def __init__(self, is_feature, stage):
-        """not ready."""
         self._is_feature = is_feature
         self._stage = stage
 
@@ -551,6 +549,7 @@ class PlatformParameter(python_utils.OBJECT):
 
         Args:
             committer_id: str. ID of the committer.
+            commit_message: str. The commit message.
             new_rule_dicts: list(dist). A list of dict mappings of all fields
                 of PlatformParameterRule object, used for creating
                 PlatformParameterRule instances.
@@ -727,7 +726,20 @@ class Registry(python_utils.OBJECT):
     def create_platform_parameter(
             cls, name, description, data_type, is_feature=False,
             feature_stage=None):
-        """not ready."""
+        """Creates, registers and returns a platform parameter.
+
+        Args:
+            name: str. The name of the platform parameter.
+            description: str. The description of the platform parameter.
+            data_type: str. The data type of the platform parameter, must be
+                one of the following: 'bool', 'number', 'string'.
+            is_feature: bool. True if the platform parameter is a feature flag.
+            feature_stage: str|None. The stage of the feature, required if
+                'is_feature' is True.
+
+        Returns:
+            PlatformParameter. The created platform parameter.
+        """
         default = None
         if data_type == 'bool':
             default = False
@@ -737,6 +749,11 @@ class Registry(python_utils.OBJECT):
             default = ''
         else:
             raise Exception('Unsupported data type %s.' % data_type)
+        if is_feature and feature_stage is None:
+            raise Exception(
+                'feature_stage must be specified when is_feature '
+                'is set to True.')
+
         parameter_dict = {
             'name': name,
             'description': description,
@@ -762,7 +779,7 @@ class Registry(python_utils.OBJECT):
 
         Args:
             name: str. The name of the platform parameter.
-            instance: *. The instance of the platform parameter.
+            instance: PlatformParameter. The instance of the platform parameter.
         """
         if cls.parameter_registry.get(name):
             raise Exception('Parameter with name %s already exists.' % name)
@@ -777,7 +794,8 @@ class Registry(python_utils.OBJECT):
             name: str. The name of the platform parameter.
 
         Returns:
-            instance. The instance of the specified platform parameter.
+            PlatformParameter. The instance of the specified platform
+            parameter.
         """
         parameter_from_cache = cls.load_platform_parameter_from_memcache(
             name)
@@ -803,10 +821,18 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def update_platform_parameter(
-            cls, name, committer_id, commit_message, update_dict):
-        """not ready."""
+            cls, name, committer_id, commit_message, new_rule_dicts):
+        """Updates the platform parameter.
+
+        Args:
+            name: str. The name of the platform parameter to update.
+            committer_id: str. ID of the committer.
+            commit_message: str. The commit message.
+            new_rule_dicts: list(dist). A list of dict mappings of all fields
+                of PlatformParameterRule object.
+        """
         parameter = cls.get_platform_parameter(name)
-        parameter.update(committer_id, commit_message, update_dict)
+        parameter.update(committer_id, commit_message, new_rule_dicts)
 
         memcache_services.delete(PlatformParameter.get_memcache_key(name))
 
@@ -815,13 +841,21 @@ class Registry(python_utils.OBJECT):
         """Return a list of all the platform parameter names.
 
         Returns:
-            list. The list of all platform parameter names.
+            list(str). The list of all platform parameter names.
         """
         return list(cls.parameter_registry)
 
     @classmethod
     def evaluate_all_platform_parameters(cls, context):
-        """not ready."""
+        """Evaluate all platform parameters with the given context.
+
+        Args:
+            context: EvaluationContext. The context for evaluation.
+
+        Returns:
+            dict. The keys are the platform parameter names and the values are
+            results of evaluation of the corresponding parameters.
+        """
         result_dict = {}
         for parameter_name in cls.get_all_platform_parameter_names():
             parameter = cls.get_platform_parameter(parameter_name)
@@ -830,7 +864,16 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def create_platform_parameter_from_dict(cls, parameter_dict):
-        """not ready."""
+        """Creates, registers and returns a platform parameter using the given
+        dict representation of a platform parameter.
+
+        Args:
+            parameter_dict: dict. A dict mapping of all fields of
+                PlatformParameter object.
+
+        Returns:
+            PlatformParameter. The created platform parameter.
+        """
         parameter = PlatformParameter.create_from_dict(parameter_dict)
 
         cls.init_platform_parameter(parameter.name, parameter)
@@ -839,7 +882,15 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def load_platform_parameter_from_storage(cls, name):
-        """not ready."""
+        """Loads platform parameter from storage.
+
+        Args:
+            name: str. The name of the platform parameter.
+
+        Returns:
+            PlatformParameter|None. The loaded instance, None if it's not found
+            in storage.
+        """
         parameter_model = config_models.PlatformParameterModel.get(
             name, strict=False)
         if parameter_model:
@@ -856,7 +907,15 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def load_platform_parameter_from_memcache(cls, name):
-        """not ready."""
+        """Loads cached platform parameter from memcache.
+
+        Args:
+            name: str. The name of the platform parameter.
+
+        Returns:
+            PlatformParameter|None. The loaded instance, None if it's not found
+            in cache.
+        """
         memcache_key = PlatformParameter.get_memcache_key(name)
         cached_parameter = memcache_services.get_multi([memcache_key]).get(
             memcache_key)
