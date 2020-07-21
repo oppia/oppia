@@ -53,13 +53,15 @@ angular.module('oppia').directive('feedbackTab', [
         'DateTimeFormatService', 'EditabilityService', 'LoaderService',
         'ExplorationStatesService',
         'SuggestionModalForExplorationEditorService', 'ThreadDataService',
-        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserBackendApiService',
+        'ThreadStatusDisplayService', 'UrlInterpolationService',
+        'UserBackendApiService',
         function(
             $q, $uibModal, AlertsService, ChangeListService,
             DateTimeFormatService, EditabilityService, LoaderService,
             ExplorationStatesService,
             SuggestionModalForExplorationEditorService, ThreadDataService,
-            ThreadStatusDisplayService, UrlInterpolationService, UserBackendApiService) {
+            ThreadStatusDisplayService, UrlInterpolationService,
+            UserBackendApiService) {
           var ctrl = this;
 
           var _resetTmpMessageFields = function() {

@@ -73,11 +73,11 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
-  'UrlInterpolationService', 'UserExplorationPermissionsService',
-  'UserBackendApiService',
+  'UrlInterpolationService', 'UserBackendApiService',
+  'UserExplorationPermissionsService',
   function(
-      UrlInterpolationService, UserExplorationPermissionsService,
-      UserBackendApiService) {
+      UrlInterpolationService, UserBackendApiService,
+      UserExplorationPermissionsService) {
     return {
       restrict: 'E',
       scope: {

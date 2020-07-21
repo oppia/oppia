@@ -51,13 +51,13 @@ angular.module('oppia').component('communityDashboardPage', {
   template: require('./community-dashboard-page.component.html'),
   controller: [
     'LanguageUtilService', 'LocalStorageService',
-    'TranslationLanguageService', 'UrlInterpolationService', 'UserBackendApiService',
-    'COMMUNITY_DASHBOARD_TABS_DETAILS',
+    'TranslationLanguageService', 'UrlInterpolationService',
+    'UserBackendApiService', 'COMMUNITY_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
     function(
         LanguageUtilService, LocalStorageService,
-        TranslationLanguageService, UrlInterpolationService, UserBackendApiService,
-        COMMUNITY_DASHBOARD_TABS_DETAILS,
+        TranslationLanguageService, UrlInterpolationService,
+        UserBackendApiService, COMMUNITY_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
       var ctrl = this;
 
@@ -101,9 +101,10 @@ angular.module('oppia').component('communityDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
 
-        UserBackendApiService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
-        });
+        UserBackendApiService.getProfileImageDataUrlAsync().then(
+          function(dataUrl) {
+            ctrl.profilePictureDataUrl = dataUrl;
+          });
 
         UserBackendApiService.getUserCommunityRightsData().then(
           function(userCommunityRights) {

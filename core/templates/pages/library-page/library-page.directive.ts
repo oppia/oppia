@@ -271,60 +271,61 @@ angular.module('oppia').directive('libraryPage', [
               $http.get('/libraryindexhandler').then(function(response) {
                 ctrl.libraryGroups =
                 response.data.activity_summary_dicts_by_category;
-                UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
-                  ctrl.activitiesOwned = {explorations: {}, collections: {}};
-                  if (userInfo.isLoggedIn()) {
-                    $http.get('/creatordashboardhandler/data')
-                      .then(function(response) {
-                        ctrl.libraryGroups.forEach(function(libraryGroup) {
-                          var activitySummaryDicts = (
-                            libraryGroup.activity_summary_dicts);
+                UserBackendApiService.getUserInfoAsync().then(
+                  function(userInfo) {
+                    ctrl.activitiesOwned = {explorations: {}, collections: {}};
+                    if (userInfo.isLoggedIn()) {
+                      $http.get('/creatordashboardhandler/data')
+                        .then(function(response) {
+                          ctrl.libraryGroups.forEach(function(libraryGroup) {
+                            var activitySummaryDicts = (
+                              libraryGroup.activity_summary_dicts);
 
-                          var ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                          var ACTIVITY_TYPE_COLLECTION = 'collection';
-                          activitySummaryDicts.forEach(function(
-                              activitySummaryDict) {
-                            if (activitySummaryDict.activity_type === (
-                              ACTIVITY_TYPE_EXPLORATION)) {
-                              ctrl.activitiesOwned.explorations[
-                                activitySummaryDict.id] = false;
-                            } else if (activitySummaryDict.activity_type === (
-                              ACTIVITY_TYPE_COLLECTION)) {
-                              ctrl.activitiesOwned.collections[
-                                activitySummaryDict.id] = false;
-                            } else {
-                              $log.error('INVALID ACTIVITY TYPE: Activity' +
-                              '(id: ' + activitySummaryDict.id +
-                              ', name: ' + activitySummaryDict.title +
-                              ', type: ' + activitySummaryDict.activity_type +
-                              ') has an invalid activity type, which could ' +
-                              'not be recorded as an exploration or a ' +
-                              'collection.'
-                              );
-                            }
+                            var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                            var ACTIVITY_TYPE_COLLECTION = 'collection';
+                            activitySummaryDicts.forEach(function(
+                                activitySummaryDict) {
+                              if (activitySummaryDict.activity_type === (
+                                ACTIVITY_TYPE_EXPLORATION)) {
+                                ctrl.activitiesOwned.explorations[
+                                  activitySummaryDict.id] = false;
+                              } else if (activitySummaryDict.activity_type === (
+                                ACTIVITY_TYPE_COLLECTION)) {
+                                ctrl.activitiesOwned.collections[
+                                  activitySummaryDict.id] = false;
+                              } else {
+                                $log.error('INVALID ACTIVITY TYPE: Activity' +
+                                '(id: ' + activitySummaryDict.id +
+                                ', name: ' + activitySummaryDict.title +
+                                ', type: ' + activitySummaryDict.activity_type +
+                                ') has an invalid activity type, which could ' +
+                                'not be recorded as an exploration or a ' +
+                                'collection.'
+                                );
+                              }
+                            });
+
+                            response.data.explorations_list
+                              .forEach(function(ownedExplorations) {
+                                ctrl.activitiesOwned.explorations[
+                                  ownedExplorations.id] = true;
+                              });
+
+                            response.data.collections_list
+                              .forEach(function(ownedCollections) {
+                                ctrl.activitiesOwned.collections[
+                                  ownedCollections.id] = true;
+                              });
                           });
-
-                          response.data.explorations_list
-                            .forEach(function(ownedExplorations) {
-                              ctrl.activitiesOwned.explorations[
-                                ownedExplorations.id] = true;
-                            });
-
-                          response.data.collections_list
-                            .forEach(function(ownedCollections) {
-                              ctrl.activitiesOwned.collections[
-                                ownedCollections.id] = true;
-                            });
+                          LoaderService.hideLoadingScreen();
                         });
-                        LoaderService.hideLoadingScreen();
-                      });
-                  } else {
-                    LoaderService.hideLoadingScreen();
-                  }
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the controller is migrated to angular.
-                  $rootScope.$apply();
-                });
+                    } else {
+                      LoaderService.hideLoadingScreen();
+                    }
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the controller is migrated to angular.
+                    $rootScope.$apply();
+                  });
 
                 $rootScope.$broadcast(
                   'preferredLanguageCodesLoaded',

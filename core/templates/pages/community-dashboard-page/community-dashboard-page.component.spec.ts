@@ -66,10 +66,10 @@ describe('Community dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserBackendApiService, 'getUserCommunityRightsData').and.returnValue(
-        $q.resolve(userCommunityRights));
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and
+        .returnValue($q.resolve(userProfileImage));
+      spyOn(UserBackendApiService, 'getUserCommunityRightsData').and
+        .returnValue($q.resolve(userCommunityRights));
       spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
@@ -137,10 +137,10 @@ describe('Community dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserBackendApiService, 'getUserCommunityRightsData').and.returnValue(
-        $q.resolve(userCommunityRights));
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and
+        .returnValue($q.resolve(userProfileImage));
+      spyOn(UserBackendApiService, 'getUserCommunityRightsData').and
+        .returnValue($q.resolve(userCommunityRights));
       spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();

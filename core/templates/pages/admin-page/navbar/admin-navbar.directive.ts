@@ -78,9 +78,10 @@ angular.module('oppia').directive('adminNavbar', [
 
         ctrl.$onInit = function() {
           ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-          UserBackendApiService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            ctrl.profilePictureDataUrl = dataUrl;
-          });
+          UserBackendApiService.getProfileImageDataUrlAsync().then(
+            function(dataUrl) {
+              ctrl.profilePictureDataUrl = dataUrl;
+            });
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);

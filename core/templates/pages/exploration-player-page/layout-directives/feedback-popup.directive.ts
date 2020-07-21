@@ -44,11 +44,13 @@ angular.module('oppia').directive('feedbackPopup', [
       controller: [
         '$scope', '$element', '$filter', '$http', '$log', '$timeout',
         'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
-        'PlayerPositionService', 'UserBackendApiService', 'WindowDimensionsService',
+        'PlayerPositionService', 'UserBackendApiService',
+        'WindowDimensionsService',
         function(
             $scope, $element, $filter, $http, $log, $timeout,
             AlertsService, BackgroundMaskService, FocusManagerService,
-            PlayerPositionService, UserBackendApiService, WindowDimensionsService) {
+            PlayerPositionService, UserBackendApiService,
+            WindowDimensionsService) {
           var ctrl = this;
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +

@@ -430,12 +430,13 @@ angular.module('oppia').component('learnerDashboardPage', {
         };
         ctrl.PAGE_SIZE = 8;
         ctrl.Math = window.Math;
-        UserBackendApiService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $scope.$applyAsync();
-        });
+        UserBackendApiService.getProfileImageDataUrlAsync().then(
+          function(dataUrl) {
+            ctrl.profilePictureDataUrl = dataUrl;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $scope.$applyAsync();
+          });
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.username = '';

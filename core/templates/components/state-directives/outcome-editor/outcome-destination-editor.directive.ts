@@ -43,9 +43,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
-        'StateEditorService', 'StateGraphLayoutService', 'UserBackendApiService',
-        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
-        'PLACEHOLDER_OUTCOME_DEST',
+        'StateEditorService', 'StateGraphLayoutService',
+        'UserBackendApiService', 'ENABLE_PREREQUISITE_SKILLS',
+        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
             $scope, EditorFirstTimeEventsService, FocusManagerService,
             StateEditorService, StateGraphLayoutService, UserBackendApiService,

@@ -45,14 +45,14 @@ angular.module('oppia').directive('topNavigationBar', [
         '$http', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
         'I18nLanguageCodeService', 'NavigationService', 'SidebarStatusService',
-        'SiteAnalyticsService', 'UserBackendApiService', 'WindowDimensionsService',
-        'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
+        'SiteAnalyticsService', 'UserBackendApiService',
+        'WindowDimensionsService', 'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
             $http, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
             I18nLanguageCodeService, NavigationService, SidebarStatusService,
-            SiteAnalyticsService, UserBackendApiService, WindowDimensionsService,
-            LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
+            SiteAnalyticsService, UserBackendApiService,
+            WindowDimensionsService, LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -286,12 +286,13 @@ angular.module('oppia').directive('topNavigationBar', [
               // once the controller is migrated to angular.
               $scope.$applyAsync();
             });
-            UserBackendApiService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-              ctrl.profilePictureDataUrl = dataUrl;
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $scope.$applyAsync();
-            });
+            UserBackendApiService.getProfileImageDataUrlAsync().then(
+              function(dataUrl) {
+                ctrl.profilePictureDataUrl = dataUrl;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $scope.$applyAsync();
+              });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
               ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
