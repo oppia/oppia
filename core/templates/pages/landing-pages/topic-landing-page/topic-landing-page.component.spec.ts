@@ -97,7 +97,7 @@ describe('Topic Landing Page', () => {
 
   it('should click get started button', fakeAsync(() => {
     windowRef.nativeWindow.location.pathname = '/math/ratios';
-    var analyticsSpy = spyOn(
+    let analyticsSpy = spyOn(
       siteAnalyticsService, 'registerOpenCollectionFromLandingPageEvent')
       .and.callThrough();
     // Get collection id from ratios.
@@ -106,7 +106,7 @@ describe('Topic Landing Page', () => {
     windowRef.nativeWindow.location.href = '';
     component.onClickGetStartedButton();
 
-    var ratiosCollectionId = '53gXGLIR044l';
+    let ratiosCollectionId = '53gXGLIR044l';
     expect(analyticsSpy).toHaveBeenCalledWith(ratiosCollectionId);
     tick(150);
     fixture.detectChanges();
@@ -134,7 +134,7 @@ describe('Topic Landing Page', () => {
   }));
 
   it('should return correct lesson quality image src', function() {
-    var imageSrc = component.getLessonQualityImageSrc('someImage.png');
+    let imageSrc = component.getLessonQualityImageSrc('someImage.png');
     expect(imageSrc).toBe('/assets/images/landing/someImage.png');
 
     imageSrc = component.getLessonQualityImageSrc('someOtherImage.png');

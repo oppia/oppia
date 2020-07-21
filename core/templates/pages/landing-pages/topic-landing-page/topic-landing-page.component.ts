@@ -21,17 +21,17 @@ require('base-components/base-content.directive.ts');
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { TopicLandingPageConstants } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
 import { PageTitleService } from 'services/page-title.service';
-import { TopicLandingPageConstants } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
 
 
-interface ILessonsQuality {
+interface LessonsQuality {
   title: string;
   description: string;
   imagePngFilename: string;
@@ -39,7 +39,7 @@ interface ILessonsQuality {
   imageAlt: string;
 }
 
-interface ITopicData {
+interface TopicData {
   topicTitle: string,
   topicTagline: string,
   collectionId: string,
@@ -55,8 +55,8 @@ export class TopicLandingPageComponent implements OnInit {
   backgroundBannerUrl: string = null;
   lessonInDevicesPngImageSrc: string = null;
   lessonInDevicesWebpImageSrc: string = null;
-  lessonsQualities: ILessonsQuality[] = null;
-  topicData: ITopicData = null;
+  lessonsQualities: Array<LessonsQuality> = null;
+  topicData: TopicData = null;
   topicTitle: string = null;
 
   constructor(
@@ -65,7 +65,7 @@ export class TopicLandingPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef) {}
 
-  getLessonQualities(): ILessonsQuality[] {
+  getLessonQualities(): Array<LessonsQuality> {
     return [{
       title: 'Fun storytelling',
       description: (
