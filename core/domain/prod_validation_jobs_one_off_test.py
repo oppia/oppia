@@ -11952,8 +11952,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(
@@ -12142,8 +12142,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             intro_state = exploration.states['Introduction']
             end_state = exploration.states['End']
 
-            intro_state.update_interaction_id('TextInput')
-            end_state.update_interaction_id('EndExploration')
+            self.set_interaction_for_state(intro_state, 'TextInput')
+            self.set_interaction_for_state(end_state, 'EndExploration')
 
             default_outcome = state_domain.Outcome(
                 'End', state_domain.SubtitledHtml(
@@ -12333,8 +12333,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(
@@ -12492,8 +12492,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(

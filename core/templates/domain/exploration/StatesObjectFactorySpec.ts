@@ -173,7 +173,7 @@ describe('States Object Factory', () => {
         customization_args: {
           placeholder: {
             value: {
-              content_id: 'custarg_placeholder_0',
+              content_id: 'ca_placeholder_0',
               unicode_str: ''
             }
           },
@@ -205,7 +205,7 @@ describe('States Object Factory', () => {
       written_translations: {
         translations_mapping: {
           content: {},
-          custarg_placeholder_0: {},
+          ca_placeholder_0: {},
           default_outcome: {}
         }
       }
@@ -417,7 +417,7 @@ describe('States Object Factory', () => {
           customization_args: {
             placeholder: {
               value: {
-                content_id: 'custarg_placeholder_3',
+                content_id: 'ca_placeholder_3',
                 unicode_str: ''
               }
             },
@@ -451,7 +451,7 @@ describe('States Object Factory', () => {
         written_translations: {
           translations_mapping: {
             content: {},
-            custarg_placeholder_3: {},
+            ca_placeholder_3: {},
             default_outcome: {},
             feedback_1: {},
             hint_1: {},

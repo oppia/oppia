@@ -81,7 +81,7 @@ describe('Extracting Image file names in the state service', () => {
             customization_args: {
               buttonText: {
                 value: {
-                  content_id: 'custarg_buttonText_0',
+                  content_id: 'ca_buttonText_0',
                   unicode_str: 'Continue'
                 }
               }
@@ -95,7 +95,7 @@ describe('Extracting Image file names in the state service', () => {
           written_translations: {
             translations_mapping: {
               content: {},
-              custarg_buttonText_0: {},
+              ca_buttonText_0: {},
               default_outcome: {}
             }
           },
@@ -164,12 +164,12 @@ describe('Extracting Image file names in the state service', () => {
             customization_args: {
               choices: {
                 value: [{
-                  content_id: 'custarg_choices_3',
+                  content_id: 'ca_choices_3',
                   html: '<p> Go to ItemSelection <oppia-noninteractive-image' +
                   ' filepath-with-value="&amp;quot;sIMultipleChoice1.png&amp;' +
                   'quot;"></oppia-noninteractive-image></p>'
                 }, {
-                  content_id: 'custarg_choices_4',
+                  content_id: 'ca_choices_4',
                   html: '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
                   ' filepath-with-value="&amp;quot;sIMultipleChoice2.png&amp;' +
                   'quot;"></oppia-noninteractive-image></p>'
@@ -230,8 +230,8 @@ describe('Extracting Image file names in the state service', () => {
           written_translations: {
             translations_mapping: {
               content: {},
-              custarg_choices_3: {},
-              custarg_choices_4: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
               default_outcome: {},
               feedback_1: {},
               feedback_2: {}
@@ -277,12 +277,12 @@ describe('Extracting Image file names in the state service', () => {
               },
               choices: {
                 value: [{
-                  content_id: 'custarg_choices_3',
+                  content_id: 'ca_choices_3',
                   html: '<p><oppia-noninteractive-image filepath-with-value=' +
                   '"&amp;quot;s4Choice1.png&amp;quot;">' +
                   '</oppia-noninteractive-image></p>'
                 }, {
-                  content_id: 'custarg_choices_4',
+                  content_id: 'ca_choices_4',
                   html: '<p><oppia-noninteractive-image filepath-with-value=' +
                   '"&amp;quot;s4Choice2.png&amp;quot;">' +
                   '</oppia-noninteractive-image></p>'
@@ -347,8 +347,8 @@ describe('Extracting Image file names in the state service', () => {
           written_translations: {
             translations_mapping: {
               content: {},
-              custarg_choices_3: {},
-              custarg_choices_4: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
               default_outcome: {},
               feedback_1: {},
               feedback_2: {}
@@ -589,7 +589,7 @@ describe('Extracting Image file names in the state service', () => {
               },
               placeholder: {
                 value: {
-                  content_id: 'custarg_placeholder_3',
+                  content_id: 'ca_placeholder_3',
                   unicode_str: ''
                 }
               }
@@ -653,7 +653,7 @@ describe('Extracting Image file names in the state service', () => {
           written_translations: {
             translations_mapping: {
               content: {},
-              custarg_placeholder_3: {},
+              ca_placeholder_3: {},
               default_outcome: {},
               feedback_1: {},
               feedback_2: {},

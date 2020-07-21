@@ -324,7 +324,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder_0
+        content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -344,14 +344,14 @@ next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 """),
         'State B': ("""classifier_model_id: null
@@ -364,7 +364,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder_0
+        content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -384,14 +384,14 @@ next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
@@ -404,7 +404,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder_0
+        content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -424,14 +424,14 @@ next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -446,7 +446,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder_0
+        content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -466,14 +466,14 @@ next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 """)
 
@@ -525,7 +525,7 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'custarg_placeholder_0',
+                                'content_id': 'ca_placeholder_0',
                                 'unicode_str': ''
                             }
                         },
@@ -553,7 +553,7 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'custarg_placeholder_0',
+                                'content_id': 'ca_placeholder_0',
                                 'unicode_str': ''
                             }
                         },
@@ -581,7 +581,7 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'custarg_placeholder_0',
+                                'content_id': 'ca_placeholder_0',
                                 'unicode_str': ''
                             }
                         },

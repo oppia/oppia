@@ -119,7 +119,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'new_value': explorations[index].id
                 })], 'Changes.')
 
-        # The content_count is 3 for the expected dicts below since a valid
+        # The content_count is 4 for the expected dicts below since a valid
         # exploration with EndExploration is created above, so the content in
         # the last state is also included in the count.
         self.expected_opportunity_dict_1 = {
@@ -127,7 +127,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'topic_name': 'topic',
             'story_title': 'title 0',
             'chapter_title': 'Node1',
-            'content_count': 3,
+            'content_count': 4,
             'translation_counts': {}
         }
 

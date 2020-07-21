@@ -66,7 +66,7 @@ describe('ContinueValidationService', () => {
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
     customizationArguments = {
       buttonText: {
-        value: new SubtitledUnicode('Some Button Text', 'custarg_buttonText')
+        value: new SubtitledUnicode('Some Button Text', 'ca_buttonText')
       }
     };
   });
@@ -78,7 +78,7 @@ describe('ContinueValidationService', () => {
       expect(warnings).toEqual([]);
 
       customizationArguments.buttonText.value = (
-        new SubtitledUnicode('', 'custarg_buttonText'));
+        new SubtitledUnicode('', 'ca_buttonText'));
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([{

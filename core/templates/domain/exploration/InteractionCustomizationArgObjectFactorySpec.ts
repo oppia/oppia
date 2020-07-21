@@ -40,8 +40,8 @@ describe('Interaction customization arg object factory', () => {
      'to backend dict', () => {
     const caBackendDict = {
       value: [
-        {html: '<p>Choice 1</p>', content_id: 'custarg_choices_0'},
-        {html: '<p>Choice 2</p>', content_id: 'custarg_choices_1'}
+        {html: '<p>Choice 1</p>', content_id: 'ca_choices_0'},
+        {html: '<p>Choice 2</p>', content_id: 'ca_choices_1'}
       ]
     };
 
@@ -57,8 +57,8 @@ describe('Interaction customization arg object factory', () => {
     );
 
     expect(ca).toEqual(new InteractionCustomizationArg([
-      new SubtitledHtml('<p>Choice 1</p>', 'custarg_choices_0'),
-      new SubtitledHtml('<p>Choice 2</p>', 'custarg_choices_1'),
+      new SubtitledHtml('<p>Choice 1</p>', 'ca_choices_0'),
+      new SubtitledHtml('<p>Choice 2</p>', 'ca_choices_1'),
     ]));
 
     expect(ca.toBackendDict()).toEqual(caBackendDict);
@@ -70,14 +70,14 @@ describe('Interaction customization arg object factory', () => {
       value: [{
         content: {
           unicode_str: 'first',
-          content_id: 'custarg_dummyCustArg_content_0'
+          content_id: 'ca_dummyCustArg_content_0'
         },
         show: true
       },
       {
         content: {
           unicode_str: 'second',
-          content_id: 'custarg_dummyCustArg_content_1'
+          content_id: 'ca_dummyCustArg_content_1'
         },
         show: true
       }]
@@ -106,10 +106,10 @@ describe('Interaction customization arg object factory', () => {
     );
 
     expect(ca).toEqual(new InteractionCustomizationArg([{
-      content: new SubtitledUnicode('first', 'custarg_dummyCustArg_content_0'),
+      content: new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
       show: true
     }, {
-      content: new SubtitledUnicode('second', 'custarg_dummyCustArg_content_1'),
+      content: new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
       show: true
     }]));
 

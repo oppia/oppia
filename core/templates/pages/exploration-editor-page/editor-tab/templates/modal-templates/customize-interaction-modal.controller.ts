@@ -298,7 +298,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           traverseSchemaAndAssignContentIds(
             caValues[name].value,
             caSpec.schema,
-            `custarg_${name}`);
+            `ca_${name}`);
         }
       }
     };

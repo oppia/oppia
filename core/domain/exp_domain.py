@@ -571,8 +571,7 @@ class Exploration(python_utils.OBJECT):
                 if idict['solution'] else None)
 
             customization_args = (
-                state_domain.
-                InteractionInstance.
+                state_domain.InteractionInstance.
                 convert_customization_args_dict_to_customization_args(
                     idict['id'],
                     idict['customization_args']
@@ -2122,7 +2121,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_textangular,
-                old_interaction_customization_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2142,7 +2141,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_caption_attr_to_image,
-                old_interaction_customization_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2161,7 +2160,7 @@ class Exploration(python_utils.OBJECT):
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict, html_validation_service.convert_to_ckeditor,
-                old_interaction_customization_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2185,7 +2184,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags,
-                old_interaction_customization_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
@@ -2452,7 +2451,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_math_content_to_math_rte_components,
-                old_interaction_customization_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
 
         return states_dict
 
@@ -2490,29 +2489,35 @@ class Exploration(python_utils.OBJECT):
                 for lang_code in translations_mapping[content_id]:
                     translations_mapping[
                         content_id][lang_code]['data_format'] = 'html'
+                    translations_mapping[
+                        content_id][lang_code]['translation'] = (
+                            translations_mapping[content_id][lang_code]['html'])
+                    del translations_mapping[content_id][lang_code]['html']
 
             next_content_id_index = max_existing_content_id_index + 1
 
             all_new_content_ids = []
             interaction_id = state_dict['interaction']['id']
             if interaction_id is not None:
-                ca = state_dict['interaction']['customization_args']
+                ca_dict = state_dict['interaction']['customization_args']
+                # We need to retrieve an cached version of interaction_specs in
+                # the case that interaction_specs.json changes in the future.
                 ca_specs = [
                     domain.CustomizationArgSpec(
-                        x['name'],
-                        x['description'],
-                        x['schema'],
-                        x['default_value']
-                    ) for x in (
+                        caSpecDict['name'],
+                        caSpecDict['description'],
+                        caSpecDict['schema'],
+                        caSpecDict['default_value']
+                    ) for caSpecDict in (
                         interaction_registry.Registry
-                        .get_all_specs_for_state_version(35)[
+                        .get_all_specs_for_state_schema_version(35)[
                             interaction_id]['customization_arg_specs']
                     )
                 ]
 
                 if (interaction_id == 'PencilCodeEditor' and
-                        'initial_code' in ca):
-                    ca['initialCode'] = ca['initial_code']
+                        'initial_code' in ca_dict):
+                    ca_dict['initialCode'] = ca_dict['initial_code']
 
                 obj_type_to_subtitled_dict_key = {
                     'SubtitledUnicode': 'unicode_str',
@@ -2523,35 +2528,39 @@ class Exploration(python_utils.OBJECT):
                     new_content_ids = []
 
                     schema = ca_spec.schema
-                    schema_obj_type = schema.get('obj_type')
                     ca_name = ca_spec.name
-                    content_id_prefix = 'custarg_%s_' % ca_name
+                    content_id_prefix = 'ca_%s_' % ca_name
 
-                    if schema_obj_type in obj_type_to_subtitled_dict_key:
-                        # Case where cust arg value is a string, and needs to be
-                        # migrated to SubtitledHtml or SubtitledUnicode.
-                        content_id = '%s%i' % (
-                            content_id_prefix,
-                            next_content_id_index)
-                        new_content_ids.append(content_id)
-                        next_content_id_index += 1
+                    if schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM:
+                        schema_obj_type = schema['obj_type']
+                        if schema_obj_type in obj_type_to_subtitled_dict_key:
+                            # Case where cust arg value is a string, and needs
+                            # to be migrated to SubtitledHtml or
+                            # SubtitledUnicode.
+                            content_id = '%s%i' % (
+                                content_id_prefix,
+                                next_content_id_index)
+                            new_content_ids.append(content_id)
+                            next_content_id_index += 1
 
-                        subtitled_dict_key = (
-                            obj_type_to_subtitled_dict_key[schema_obj_type])
-                        if ca_name in ca:
-                            ca[ca_name]['value'] = {
-                                'content_id': content_id,
-                                subtitled_dict_key: ca[ca_name]['value']
-                            }
-                        else:
-                            default_value = ca_spec.default_value[
-                                subtitled_dict_key]
-                            ca[ca_name] = {
-                                'value': {
+                            subtitled_dict_key = (
+                                obj_type_to_subtitled_dict_key[schema_obj_type]
+                            )
+                            if ca_name in ca_dict:
+                                ca_dict[ca_name]['value'] = {
                                     'content_id': content_id,
-                                    subtitled_dict_key: default_value
+                                    subtitled_dict_key:
+                                        ca_dict[ca_name]['value']
                                 }
-                            }
+                            else:
+                                default_value = ca_spec.default_value[
+                                    subtitled_dict_key]
+                                ca_dict[ca_name] = {
+                                    'value': {
+                                        'content_id': content_id,
+                                        subtitled_dict_key: default_value
+                                    }
+                                }
                     elif (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
                           (schema['items']['type'] ==
                            schema_utils.SCHEMA_TYPE_CUSTOM) and
@@ -2559,23 +2568,36 @@ class Exploration(python_utils.OBJECT):
                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
                         # Case where cust arg value is a list of strings, and
                         # needs to be migrated to a list of SubtitledHtml dicts.
-                        value = ca[ca_name]['value'] if ca_name in ca else ['']
+                        use_default_value = ca_name not in ca_dict
+
+                        value = (ca_spec.default_value if use_default_value
+                            else ca_dict[ca_name]['value'])
                         new_value = []
 
-                        for html in value:
+                        for i, html in enumerate(value):
                             content_id = '%s%i' % (
                                 content_id_prefix,
                                 next_content_id_index)
                             new_content_ids.append(content_id)
                             next_content_id_index += 1
-                            new_value.append({
-                                'content_id': content_id,
-                                'html': html
-                            })
 
-                        ca[ca_name]['value'] = new_value
-                    elif ca_name not in ca:
-                        ca[ca_name] = {'value': ca_spec.default_value}
+                            if use_default_value and i == 0:
+                                # If we use default value, then the first
+                                # value is already a SubtitledHtml dict and we
+                                # just need to assign a content_id.
+                                new_value.append({
+                                    'content_id': content_id,
+                                    'html': value[0]['html']
+                                })
+                            else:
+                                new_value.append({
+                                    'content_id': content_id,
+                                    'html': html
+                                })
+
+                        ca_dict[ca_name]['value'] = new_value
+                    elif ca_name not in ca_dict:
+                        ca_dict[ca_name] = {'value': ca_spec.default_value}
 
                     all_new_content_ids.extend(new_content_ids)
 
@@ -2583,7 +2605,7 @@ class Exploration(python_utils.OBJECT):
                  .validate_customization_args_and_values(
                      'interaction',
                      interaction_id,
-                     ca,
+                     ca_dict,
                      ca_specs)
                 )
 

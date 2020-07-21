@@ -125,10 +125,13 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_id('DragAndDropSortInput')
 
         customization_args_dict1 = {
-            'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_1'
+            }]}
         }
 
         answer_group_list1 = [{
@@ -152,10 +155,13 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_1'
+            }]}
         }
 
         answer_group_list2 = [{
@@ -293,10 +299,13 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('DragAndDropSortInput')
 
         customization_args_dict = {
-            'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_1'
+            }]}
         }
 
         answer_group_list = [{
@@ -362,14 +371,15 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        state1.update_interaction_id('MultipleChoiceInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-
         customization_args_dict1 = {
-            'choices': {'value': [
-                '<p>This is value1 for MultipleChoiceInput</p>',
-                '<p>This is value2 for MultipleChoiceInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         answer_group_list1 = [{
@@ -392,6 +402,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state1.update_interaction_id('MultipleChoiceInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -408,12 +419,20 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for MultipleChoiceInput</p>',
-                '<p>This is value2 for MultipleChoiceInput</p>',
-                '<p>This is value3 for MultipleChoiceInput</p>',
-                '<p>This is value4 for MultipleChoiceInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }, {
+                'html': '<p>This is value3 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_2'
+            }, {
+                'html': '<p>This is value4 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_3'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         answer_group_list2 = [{
@@ -439,6 +458,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state2.update_interaction_id('MultipleChoiceInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_interaction_answer_groups(answer_group_list2)
 
@@ -473,10 +493,14 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('MultipleChoiceInput')
 
         customization_args_dict = {
-            'choices': {'value': [
-                '<p>This is value1 for MultipleChoiceInput</p>',
-                '<p>This is value2 for MultipleChoiceInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         answer_group_list = [{
@@ -1181,7 +1205,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(self.albert_id, exploration)
         self.assertEqual(
@@ -1371,14 +1395,16 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        state1.update_interaction_id('ItemSelectionInput')
-        state2.update_interaction_id('ItemSelectionInput')
-
         customization_args_dict1 = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
         }
 
         answer_group_list1 = [{
@@ -1408,6 +1434,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state1.update_interaction_id('ItemSelectionInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1423,10 +1450,13 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]}
         }
 
         answer_group_list2 = [{
@@ -1456,6 +1486,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state2.update_interaction_id('ItemSelectionInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_interaction_answer_groups(answer_group_list2)
 
@@ -1488,10 +1519,15 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('ItemSelectionInput')
 
         customization_args_dict = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
         }
 
         answer_group_list = [{
@@ -2234,12 +2270,19 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    invalid_html_content1,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    '<p>4</p>'
-                ]
+                'value': [{
+                    'html': invalid_html_content1,
+                    'content_id': 'ca_choices_0'
+                }, {
+                    'html': '<p>2</p>',
+                    'content_id': 'ca_choices_1'
+                }, {
+                    'html': '<p>3</p>',
+                    'content_id': 'ca_choices_2'
+                }, {
+                    'html': '<p>4</p>',
+                    'content_id': 'ca_choices_3'
+                }]
             }
         }
 
@@ -2420,12 +2463,19 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    valid_html_content,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    '<p>4</p>'
-                ]
+                'value': [{
+                    'html': valid_html_content,
+                    'content_id': 'ca_choices_0'
+                }, {
+                    'html': '<p>2</p>',
+                    'content_id': 'ca_choices_1'
+                }, {
+                    'html': '<p>3</p>',
+                    'content_id': 'ca_choices_2'
+                }, {
+                    'html': '<p>4</p>',
+                    'content_id': 'ca_choices_3'
+                }]
             }
         }
         # Since the Old math-schema with raw_latex attribute is no longer valid,
@@ -2493,12 +2543,19 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    '<p>1</p>',
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    '<p>4</p>'
-                ]
+                'value': [{
+                    'html': '<p>1</p>',
+                    'content_id': 'ca_choices_0'
+                }, {
+                    'html': '<p>2</p>',
+                    'content_id': 'ca_choices_1'
+                }, {
+                    'html': '<p>3</p>',
+                    'content_id': 'ca_choices_2'
+                }, {
+                    'html': '<p>4</p>',
+                    'content_id': 'ca_choices_3'
+                }]
             }
         }
 
@@ -2585,7 +2642,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         with self.swap(html_cleaner, 'clean', lambda html: html):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
-            state1.update_interaction_id('DragAndDropSortInput')
+            self.set_interaction_for_state(state1, 'DragAndDropSortInput')
             state1.update_interaction_customization_args(
                 customization_args_dict)
             state1.update_interaction_answer_groups([answer_group_dict])
@@ -2733,7 +2790,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
             state2.update_content(
                 state_domain.SubtitledHtml.from_dict(content2_dict))
-            state2.update_interaction_id('DragAndDropSortInput')
+            self.set_interaction_for_state(state2, 'DragAndDropSortInput')
             state2.update_interaction_answer_groups(
                 [answer_group_dict])
             exp_services.save_new_exploration(self.albert_id, exploration)

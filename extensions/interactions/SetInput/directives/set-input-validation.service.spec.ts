@@ -60,7 +60,7 @@ describe('SetInputValidationService', () => {
 
     goodCustomizationArgs = {
       buttonText: {
-        value: new SubtitledUnicode('Add Item', 'custarg_buttonText')
+        value: new SubtitledUnicode('Add Item', 'ca_buttonText')
       }
     };
 

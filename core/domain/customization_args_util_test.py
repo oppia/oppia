@@ -35,11 +35,21 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         ca_continue_specs = interaction_registry.Registry.get_interaction_by_id(
             'Continue').customization_arg_specs
         complete_customization_args = {
-            'buttonText': {'value': 'Please Continue'}
+            'buttonText': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': 'Please Continue'
+                }
+            }
         }
 
         complete_customization_args_with_extra_arg = {
-            'buttonText': {'value': 'Please Continue'},
+            'buttonText': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': 'Please Continue'
+                }
+            },
             'extraArg': {'value': ''}
         }
 
@@ -82,14 +92,24 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''}
+            'customPlaceholder': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': ''
+                }
+            }
         }
 
         expected_complete_customization_args_with_extra_arg = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''},
+            'customPlaceholder': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': ''
+                }
+            },
             'extraArg': {'value': ''}
         }
 
@@ -249,6 +269,21 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'customPlaceholder': {'value': 12}
         }
 
+        complete_customization_args_with_invalid_arg_type = {
+            'requireSimplestForm': {'value': False},
+            'allowImproperFraction': {'value': True},
+            'allowNonzeroIntegerPart': {'value': False},
+            'customPlaceholder': {'value': 12}
+        }
+
+        complete_customization_args_with_extra_arg = {
+            'requireSimplestForm': {'value': False},
+            'allowImproperFraction': {'value': True},
+            'allowNonzeroIntegerPart': {'value': False},
+            'customPlaceholder': {'value': ''},
+            'extraArg': {'value': ''}
+        }
+
         expected_customization_args_after_validation = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
@@ -263,17 +298,17 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # The next four checks are for cases where customization args dict
         # does not contain some of the required specs.
 
-        # Check if no error is produced for valid customization args.
-        customization_args_util.validate_customization_args_and_values(
-            'interaction',
-            'FractionInput',
-            incomplete_customization_args,
-            ca_fraction_input_specs
-        )
-        self.assertEqual(
-            expected_customization_args_after_validation,
-            incomplete_customization_args
-        )
+        # Check if error is produced for missing customization args.
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Customization argument is missing key: allowImproperFraction'
+        ):
+            customization_args_util.validate_customization_args_and_values(
+                'interaction',
+                'FractionInput',
+                incomplete_customization_args,
+                ca_fraction_input_specs
+            )
 
         # Check if error is produced when arg name is invalid.
         with self.assertRaisesRegexp(
@@ -292,7 +327,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
-                incomplete_customization_args_with_extra_arg,
+                complete_customization_args_with_extra_arg,
                 ca_fraction_input_specs
             )
             self.assertEqual(len(observed_log_messages), 2)
@@ -312,12 +347,17 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         customization_args_util.validate_customization_args_and_values(
             'interaction',
             'FractionInput',
-            incomplete_customization_args_with_invalid_arg_type,
+            complete_customization_args_with_invalid_arg_type,
             ca_fraction_input_specs
         )
         self.assertEqual(
-            expected_customization_args_after_validation_with_invalid_arg_type,
-            incomplete_customization_args_with_invalid_arg_type
+            complete_customization_args_with_invalid_arg_type,
+            {
+                'requireSimplestForm': {'value': False},
+                'allowImproperFraction': {'value': True},
+                'allowNonzeroIntegerPart': {'value': False},
+                'customPlaceholder': {'value': 12}
+            }
         )
 
         # A general check to see if error are produced when customization args

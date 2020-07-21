@@ -112,7 +112,7 @@ describe('Interaction object factory', () => {
       customization_args: {
         placeholder: {
           value: {
-            content_id: 'custarg_placeholder_0',
+            content_id: 'ca_placeholder_0',
             unicode_str: 'Enter text'
           }
         },
@@ -131,7 +131,7 @@ describe('Interaction object factory', () => {
 
     expect(testInteraction.customizationArgs).toEqual({
       placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
+        new SubtitledUnicode('Enter text', 'ca_placeholder_0')
       ),
       rows: new InteractionCustomizationArg(1)
     });
@@ -230,13 +230,13 @@ describe('Interaction object factory', () => {
 
     const newCustomizationArgs = {
       placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('New', 'custarg_placeholder_1')
+        new SubtitledUnicode('New', 'ca_placeholder_1')
       ),
       rows: { value: 2 }
     };
     expect(testInteraction.customizationArgs).toEqual({
       placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('Enter text', 'custarg_placeholder_0')
+        new SubtitledUnicode('Enter text', 'ca_placeholder_0')
       ),
       rows: new InteractionCustomizationArg(1)
     });
@@ -342,10 +342,10 @@ describe('Interaction object factory', () => {
         choices: {
           value: [{
             html: '<p>Choice 1</p>',
-            content_id: 'custarg_choices_0'
+            content_id: 'ca_choices_0'
           }, {
             html: '<p>Choice 2</p>',
-            content_id: 'custarg_choices_1'
+            content_id: 'ca_choices_1'
           }]
         }
       },
@@ -368,10 +368,10 @@ describe('Interaction object factory', () => {
         choices: {
           value: [{
             html: '<p>Choice 1</p>',
-            content_id: 'custarg_choices_0'
+            content_id: 'ca_choices_0'
           }, {
             html: '<p>Choice 2</p>',
-            content_id: 'custarg_choices_1'
+            content_id: 'ca_choices_1'
           }]
         }
       },
@@ -399,10 +399,10 @@ describe('Interaction object factory', () => {
         choices: {
           value: [{
             html: '<p>Choice 1</p>',
-            content_id: 'custarg_choices_0'
+            content_id: 'ca_choices_0'
           }, {
             html: '<p>Choice 2</p>',
-            content_id: 'custarg_choices_1'
+            content_id: 'ca_choices_1'
           }]
         }
       },

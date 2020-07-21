@@ -1218,11 +1218,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': '',
+                        'data_format': 'html',
+                        'translation': '',
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 }
@@ -1232,11 +1234,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': expected_html_content,
+                        'data_format': 'html',
+                        'translation': expected_html_content,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 }

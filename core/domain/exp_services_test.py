@@ -235,10 +235,10 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                 {
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_0',
+                            'content_id': 'ca_choices_0',
                             'html': '<p>Option A</p>'
                         }, {
-                            'content_id': 'custarg_choices_1',
+                            'content_id': 'ca_choices_1',
                             'html': '<p>Option B</p>'
                         }]
                     },
@@ -1453,7 +1453,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }
         customization_args_dict2 = {
             'choices': {'value': [{
-                'content_id': 'custarg_choices_0',
+                'content_id': 'ca_choices_0',
                 'html': (
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1462,7 +1462,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
                 )
             }, {
-                'content_id': 'custarg_choices_1',
+                'content_id': 'ca_choices_1',
                 'html': (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1475,7 +1475,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }
         customization_args_dict3 = {
             'choices': {'value': [{
-                'content_id': 'custarg_choices_0',
+                'content_id': 'ca_choices_0',
                 'html': (
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1484,7 +1484,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
-                'content_id': 'custarg_choices_1',
+                'content_id': 'ca_choices_1',
                 'html': (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1493,7 +1493,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
             }, {
-                'content_id': 'custarg_choices_2',
+                'content_id': 'ca_choices_2',
                 'html': (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
@@ -1661,7 +1661,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_0
+            content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -1681,14 +1681,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
   New state:
     classifier_model_id: null
@@ -1701,7 +1701,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_0
+            content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -1721,14 +1721,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -1763,7 +1763,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_0
+            content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -1783,14 +1783,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
   Renamed state:
     classifier_model_id: null
@@ -1803,7 +1803,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_0
+            content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -1823,14 +1823,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -1876,7 +1876,7 @@ title: A title
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'custarg_placeholder_0',
+                                'content_id': 'ca_placeholder_0',
                                 'unicode_str': ''
                             }
                         },
@@ -1944,7 +1944,7 @@ title: A title
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'custarg_placeholder_0',
+                                'content_id': 'ca_placeholder_0',
                                 'unicode_str': ''
                             }
                         },
@@ -2015,7 +2015,7 @@ title: A title
             'new_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'custarg_placeholder_0',
+                        'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
                 },
@@ -2084,7 +2084,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder_0
+        content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -2104,14 +2104,14 @@ next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -2127,7 +2127,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder_0
+        content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -2147,14 +2147,14 @@ next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 """)
     }
@@ -2171,7 +2171,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: custarg_placeholder_0
+        content_id: ca_placeholder_0
         unicode_str: ''
     rows:
       value: 1
@@ -2191,14 +2191,14 @@ next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
-    custarg_placeholder_0: {}
     default_outcome: {}
 """)
     }
@@ -2237,7 +2237,7 @@ written_translations:
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'custarg_placeholder_0',
+                                'content_id': 'ca_placeholder_0',
                                 'unicode_str': ''
                             }
                         },
@@ -2289,7 +2289,7 @@ written_translations:
             'new_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'custarg_placeholder_0',
+                        'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
                 },
@@ -2547,10 +2547,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 {
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_0',
+                            'content_id': 'ca_choices_0',
                             'html': '<p>Option A</p>'
                         }, {
-                            'content_id': 'custarg_choices_1',
+                            'content_id': 'ca_choices_1',
                             'html': '<p>Option B</p>'
                         }]
                     },
@@ -2575,10 +2575,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 {
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_0',
+                            'content_id': 'ca_choices_0',
                             'html': '<p>Option A</p>'
                         }, {
-                            'content_id': 'custarg_choices_1',
+                            'content_id': 'ca_choices_1',
                             'html': '<p>Option B</p>'
                         }]
                     },
@@ -2590,9 +2590,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         choices = exploration.init_state.interaction.customization_args[
             'choices'].value
         self.assertEqual(choices[0].html, '<p>Option A</p>')
-        self.assertEqual(choices[0].content_id, 'custarg_choices_0')
+        self.assertEqual(choices[0].content_id, 'ca_choices_0')
         self.assertEqual(choices[1].html, '<p>Option B</p>')
-        self.assertEqual(choices[1].content_id, 'custarg_choices_1')
+        self.assertEqual(choices[1].content_id, 'ca_choices_1')
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
@@ -2612,7 +2612,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 {
                     'placeholder': {
                         'value': {
-                            'content_id': 'custarg_placeholder_0',
+                            'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
                     },
@@ -2657,7 +2657,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 {
                     'placeholder': {
                         'value': {
-                            'content_id': 'custarg_placeholder_0',
+                            'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
                     },
@@ -2678,10 +2678,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 {
                     'choices': {
                         'value': [{
-                            'content_id': 'custarg_choices_0',
+                            'content_id': 'ca_choices_0',
                             'html': '<p>Option A</p>'
                         }, {
-                            'content_id': 'custarg_choices_1',
+                            'content_id': 'ca_choices_1',
                             'html': '<p>Option B</p>'
                         }]
                     },
@@ -2727,10 +2727,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     {
                         'choices': {
                             'value': [{
-                                'content_id': 'custarg_choices_0',
+                                'content_id': 'ca_choices_0',
                                 'html': '<p>Option A</p>'
                             }, {
-                                'content_id': 'custarg_choices_1',
+                                'content_id': 'ca_choices_1',
                                 'html': '<p>Option B</p>'
                             }]
                         },
@@ -2889,7 +2889,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     }
                 },
                 'default_outcome': {},
-                'custarg_placeholder_0': {}
+                'ca_placeholder_0': {}
             }
         }
         exp_services.update_exploration(
@@ -3208,7 +3208,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'new_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'custarg_placeholder_0',
+                        'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
                 },
@@ -3297,7 +3297,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'new_value': {
                 'placeholder': {
                     'value': {
-                        'content_id': 'custarg_placeholder_0',
+                        'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
                 },
@@ -4026,7 +4026,7 @@ states:
       customization_args:
         buttonText:
           value:
-            content_id: custarg_buttonText
+            content_id: ca_buttonText
             unicode_str: Continue
       default_outcome:
         dest: END
@@ -4044,14 +4044,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_buttonText: {}
         content: {}
-        custarg_buttonText: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_buttonText: {}
         content: {}
-        custarg_buttonText: {}
         default_outcome: {}
 states_schema_version: %d
 tags: []
@@ -4681,19 +4681,19 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [
                     {
-                        'content_id': 'custarg_choices_0',
+                        'content_id': 'ca_choices_0',
                         'html': '<p>state customization arg html 1</p>'
                     },
                     {
-                        'content_id': 'custarg_choices_1',
+                        'content_id': 'ca_choices_1',
                         'html': '<p>state customization arg html 2</p>'
                     },
                     {
-                        'content_id': 'custarg_choices_2',
+                        'content_id': 'ca_choices_2',
                         'html': '<p>state customization arg html 3</p>'
                     },
                     {
-                        'content_id': 'custarg_choices_3',
+                        'content_id': 'ca_choices_3',
                         'html': '<p>state customization arg html 4</p>'
                     }
                 ]
@@ -4717,15 +4717,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                 'choices': {
                     'value': [
                         {
-                            'content_id': 'custarg_choices_0',
+                            'content_id': 'ca_choices_0',
                             'html': '<p>1</p>'
                         },
                         {
-                            'content_id': 'custarg_choices_1',
+                            'content_id': 'ca_choices_1',
                             'html': '<p>2</p>'
                         },
                         {
-                            'content_id': 'custarg_choices_2',
+                            'content_id': 'ca_choices_2',
                             'html': (
                                 '<oppia-noninteractive-math raw_latex-with'
                                 '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
@@ -4734,7 +4734,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                             )
                         },
                         {
-                            'content_id': 'custarg_choices_3',
+                            'content_id': 'ca_choices_3',
                             'html': '<p>4</p>'
                         }
                     ]

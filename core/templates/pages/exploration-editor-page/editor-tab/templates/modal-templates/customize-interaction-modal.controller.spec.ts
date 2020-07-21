@@ -388,8 +388,8 @@ describe('Customize Interaction Modal Controller', function() {
       $scope.save();
       expect(stateCustomizationArgsService.displayed).toEqual({
         choices: new InteractionCustomizationArg([
-          new SubtitledHtml('<p>1</p>', 'custarg_choices_0'),
-          new SubtitledHtml('<p>2</p>', 'custarg_choices_1')
+          new SubtitledHtml('<p>1</p>', 'ca_choices_0'),
+          new SubtitledHtml('<p>2</p>', 'ca_choices_1')
         ]),
         showChoicesInShuffledOrder: new InteractionCustomizationArg(false)
       });
@@ -511,12 +511,12 @@ describe('Customize Interaction Modal Controller', function() {
       expect(stateCustomizationArgsService.displayed).toEqual({
         dummyCustArg: new InteractionCustomizationArg([{
           content:
-            new SubtitledUnicode('first', 'custarg_dummyCustArg_content_0'),
+            new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
           show: true
         },
         {
           content:
-            new SubtitledUnicode('second', 'custarg_dummyCustArg_content_1'),
+            new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
           show: true
         }])
       });

@@ -325,7 +325,8 @@ class Question(python_utils.OBJECT):
         """
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.add_math_content_to_math_rte_components)
+            html_validation_service.add_math_content_to_math_rte_components,
+            state_uses_old_interaction_cust_args_schema=True)
         return question_state_dict
 
     @classmethod

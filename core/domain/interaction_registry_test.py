@@ -124,13 +124,13 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(all_specs, specs_from_json)
 
     def test_interaction_specs_customization_arg_specs_names_are_valid(self):
-        """Test to ensure that the all customization argument names are in
+        """Test to ensure that all customization argument names are in
         interaction specs only include alphabetic letters and are
         lowerCamelCase. This is because these properties are involved in the
         generation of content_id's for customization arguments.
         """
         all_specs = interaction_registry.Registry.get_all_specs()
-        names_in_schema = []
+        ca_names_in_schema = []
 
         def traverse_schema_to_find_names(schema):
             """Recursively traverses the schema to find all name fields.
@@ -139,61 +139,63 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 schema: dict. The schema to traverse.
             """
             if 'name' in schema:
-                names_in_schema.append(schema['name'])
+                ca_names_in_schema.append(schema['name'])
 
             schema_type = schema['type']
             if schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 traverse_schema_to_find_names(schema['items'])
             elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
-                    names_in_schema.append(schema_property['name'])
+                    ca_names_in_schema.append(schema_property['name'])
                     traverse_schema_to_find_names(schema_property['schema'])
 
         for interaction_id in all_specs:
             for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
-                names_in_schema.append(ca_spec['name'])
+                ca_names_in_schema.append(ca_spec['name'])
                 traverse_schema_to_find_names(ca_spec['schema'])
 
-        for name in names_in_schema:
+        for name in ca_names_in_schema:
             self.assertTrue(name.isalpha())
             self.assertTrue(name[0].islower())
 
     def test_interaction_specs_customization_arg_default_values_are_valid(self):
-        """Test to ensure that the all customization argument default values
+        """Test to ensure that all customization argument default values
         that contain content_id's are properly set to None.
         """
         all_specs = interaction_registry.Registry.get_all_specs()
 
-        def traverse_schema_and_find_subtitled_content(value, schema):
+        def traverse_schema_to_find_and_validate_subtitled_content(
+                value, schema):
             """Recursively traverse the schema to find SubtitledHtml or
-            SubtitledUnicode in value.
+            SubtitledUnicode contained or nested in value.
 
             Args:
                 value: *. The value of the customization argument.
                 schema: dict. The customization argument schema.
             """
             schema_type = schema['type']
-            schema_obj_type = schema.get('obj_type')
 
-            if (
-                    (schema_obj_type ==
-                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
-                    (schema_obj_type ==
-                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
-            ):
-                self.assertIsNone(value['content_id'])
+            if schema_type == schema_utils.SCHEMA_TYPE_CUSTOM:
+                schema_obj_type = schema['obj_type']
+                if (
+                        (schema_obj_type ==
+                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
+                        (schema_obj_type ==
+                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                ):
+                    self.assertIsNone(value['content_id'])
             elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
-                    traverse_schema_and_find_subtitled_content(
+                    traverse_schema_to_find_and_validate_subtitled_content(
                         x, schema['items'])
             elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
-                    traverse_schema_and_find_subtitled_content(
+                    traverse_schema_to_find_and_validate_subtitled_content(
                         x[schema_property.name],
                         schema_property['schema']
                     )
 
         for interaction_id in all_specs:
             for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
-                traverse_schema_and_find_subtitled_content(
+                traverse_schema_to_find_and_validate_subtitled_content(
                     ca_spec['default_value'], ca_spec['schema'])

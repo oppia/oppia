@@ -1153,17 +1153,18 @@ tags: []
                 contentId: str. The content_id generated so far.
             """
             schema_type = schema['type']
-            schema_obj_type = schema.get('obj_type')
 
-            if (
-                    (schema_obj_type ==
-                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
-                    (schema_obj_type ==
-                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
-            ):
-                value['content_id'] = '%s_%i' % (
-                    contentId, next_content_id_index_dict['value'])
-                next_content_id_index_dict['value'] += 1
+            if schema_type == schema_utils.SCHEMA_TYPE_CUSTOM:
+                schema_obj_type = schema['obj_type']
+                if (
+                        (schema_obj_type ==
+                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) or
+                        (schema_obj_type ==
+                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                ):
+                    value['content_id'] = '%s_%i' % (
+                        contentId, next_content_id_index_dict['value'])
+                    next_content_id_index_dict['value'] += 1
             elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
                     traverse_schema_and_assign_content_ids(
@@ -1187,7 +1188,7 @@ tags: []
             traverse_schema_and_assign_content_ids(
                 ca_value,
                 ca_spec.schema,
-                'custarg_%s' % ca_name
+                'ca_%s' % ca_name
             )
             customization_args[ca_name] = {'value': ca_value}
 
@@ -2327,7 +2328,7 @@ class AppEngineTestBase(TestBase):
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': 'custarg_placeholder',
+                    'content_id': 'ca_placeholder',
                     'unicode_str': 'Enter text here'
                 }
             },

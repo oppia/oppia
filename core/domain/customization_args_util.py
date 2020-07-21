@@ -82,6 +82,7 @@ def validate_customization_args_and_values(
 
     Raises:
         ValidationError: The given 'customization_args' is not valid.
+        ValidationError: Customization arguments is missing key.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -109,11 +110,12 @@ def validate_customization_args_and_values(
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
         if ca_spec.name not in customization_args:
-            raise Exception(
+            raise utils.ValidationError(
                 'Customization argument is missing key: %s' % ca_spec.name)
         try:
-            # Use apply_custom_validators=False here so that SubtitledHtml's
-            # html properly gets validated.
+            # Use apply_custom_validators=False so that SubtitledHtml's
+            # html is validated with the HTML schema rather than a custom
+            # SubtitledHtml validator on objects.py.
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
                     customization_args[ca_spec.name]['value'],

@@ -203,6 +203,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -221,7 +222,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
-          value: Continue
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
       default_outcome:
         dest: END
         feedback:
@@ -234,14 +237,17 @@ states:
       hints: []
       id: Continue
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_buttonText_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_buttonText_0: {}
         content: {}
         default_outcome: {}
 states_schema_version: %d

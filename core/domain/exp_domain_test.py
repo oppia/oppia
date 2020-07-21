@@ -1196,7 +1196,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
 
-        # Adds 1 to content count to exploration (custarg_placeholder_0)
+        # Adds 1 to content count to exploration (ca_placeholder_0)
         self.set_interaction_for_state(init_state, 'TextInput')
 
         answer_group_dict = {
@@ -5789,7 +5789,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -5809,15 +5809,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -5855,7 +5855,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_0
+            content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -5875,14 +5875,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -6352,7 +6352,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6372,15 +6372,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6507,7 +6507,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6527,15 +6527,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6573,7 +6573,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6596,15 +6596,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
 states_schema_version: 35
@@ -6685,7 +6685,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6705,15 +6705,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6751,7 +6751,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6779,16 +6779,16 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
         solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         hint_1: {}
         solution: {}
@@ -6852,7 +6852,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -6872,15 +6872,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6922,7 +6922,7 @@ states:
           value: true
         customPlaceholder:
           value:
-            content_id: custarg_customPlaceholder_0
+            content_id: ca_customPlaceholder_0
             unicode_str: ''
         requireSimplestForm:
           value: false
@@ -6942,14 +6942,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_customPlaceholder_0: {}
         content: {}
-        custarg_customPlaceholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_customPlaceholder_0: {}
         content: {}
-        custarg_customPlaceholder_0: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -7041,7 +7041,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -7061,15 +7061,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -7645,7 +7645,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_0
+            content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -7670,15 +7670,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
         solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
         solution: {}
   state2:
@@ -7725,9 +7725,9 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: custarg_choices_3
+          - content_id: ca_choices_3
             html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - content_id: custarg_choices_4
+          - content_id: ca_choices_4
             html: <p>This is value2 for <br>MultipleChoice</p>
         showChoicesInShuffledOrder:
           value: false
@@ -7755,9 +7755,9 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
-        custarg_choices_3: {}
-        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
         feedback_2: {}
@@ -7766,9 +7766,9 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
-        custarg_choices_3: {}
-        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
         feedback_2: {}
@@ -7810,11 +7810,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: custarg_choices_2
+          - content_id: ca_choices_2
             html: <p>This is value1 for ItemSelection</p>
-          - content_id: custarg_choices_3
+          - content_id: ca_choices_3
             html: <p>This is value2 for ItemSelection</p>
-          - content_id: custarg_choices_4
+          - content_id: ca_choices_4
             html: <p>This is value3 for ItemSelection</p>
         maxAllowableSelectionCount:
           value: 1
@@ -7836,19 +7836,19 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
-        custarg_choices_2: {}
-        custarg_choices_3: {}
-        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
-        custarg_choices_2: {}
-        custarg_choices_3: {}
-        custarg_choices_4: {}
         default_outcome: {}
         feedback_1: {}
 states_schema_version: 35
@@ -8010,7 +8010,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_2
+            content_id: ca_placeholder_2
             unicode_str: ''
         rows:
           value: 1
@@ -8030,15 +8030,15 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
-        custarg_placeholder_2: {}
         default_outcome: {}
         feedback_1: {}
   END:
@@ -8076,7 +8076,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: custarg_placeholder_0
+            content_id: ca_placeholder_0
             unicode_str: ''
         rows:
           value: 1
@@ -8096,14 +8096,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
-        custarg_placeholder_0: {}
         default_outcome: {}
 states_schema_version: 35
 tags: []
@@ -8277,8 +8277,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict1 = {
             'placeholder': {
                 'value': {
-                    'content_id': None,
-                    'unicode_str': '<p>This is value1 for MultipleChoice</p>'
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Enter here.'
                 }
             },
             'rows': {'value': 1}
@@ -8286,11 +8286,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict2 = {
             'choices': {'value': [
                 {
-                    'content_id': None,
+                    'content_id': 'ca_choices_0',
                     'html': '<p>This is value1 for MultipleChoice</p>'
                 },
                 {
-                    'content_id': None,
+                    'content_id': 'ca_choices_1',
                     'html': '<p>This is value2 for MultipleChoice</p>'
                 }
             ]},
@@ -8299,15 +8299,15 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict3 = {
             'choices': {'value': [
                 {
-                    'content_id': None,
+                    'content_id': 'ca_choices_0',
                     'html': '<p>This is value1 for ItemSelection</p>'
                 },
                 {
-                    'content_id': None,
+                    'content_id': 'ca_choices_1',
                     'html': '<p>This is value2 for ItemSelection</p>'
                 },
                 {
-                    'content_id': None,
+                    'content_id': 'ca_choices_2',
                     'html': '<p>This is value3 for ItemSelection</p>'
                 }
             ]},
@@ -8317,11 +8317,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict4 = {
             'choices': {'value': [
                 {
-                    'content_id': None,
+                    'content_id': 'ca_choices_0',
                     'html': '<p>This is value1 for DragAndDropSortInput</p>'
                 },
                 {
-                    'content_id': None,
+                    'content_id': 'ca_choices_1',
                     'html': '<p>This is value2 for DragAndDropSortInput</p>'
                 }
             ]},

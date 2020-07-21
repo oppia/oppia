@@ -108,7 +108,7 @@ describe('Exploration improvements task registrar service', () => {
         customization_args: {
           placeholder: {
             value: {
-              content_id: 'custarg_placeholder_0',
+              content_id: 'ca_placeholder_0',
               unicode_str: ''
             }
           },

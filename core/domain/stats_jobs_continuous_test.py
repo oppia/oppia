@@ -128,6 +128,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': first_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -135,6 +149,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': second_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
                 })], 'Add new state')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -228,6 +256,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': first_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': first_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
                 })], 'Update interaction type')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -282,6 +324,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': first_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -289,6 +345,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': second_state_name,
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': True}
+                    }
                 })], 'Add new state')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -447,7 +517,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'verb')
 
-            # Change the interaction ID.
+            # Change the interaction.
             exp_services.update_exploration('fake@user.com', exp_id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -647,6 +717,20 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': init_state_name,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
                 })], 'Change to TextInput')
 
             # Submit another number-like answer.
@@ -757,6 +841,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'SetInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'ca_buttonText_0',
+                                'unicode_str': 'Enter here'
+                            }
+                        },
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -764,6 +861,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'SetInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'ca_buttonText_0',
+                                'unicode_str': 'Enter here'
+                            }
+                        },
+                    }
                 })], 'Add new state')
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
