@@ -2366,15 +2366,16 @@ class GenericEmailTestBase(GenericTestBase):
             plaintext_body: str. The plaintext body of the email. Must be utf-8
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. List of bcc emails. Must be utf-8.
-            reply_to: str|None. Reply address formatted like
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Must be utf-8.
+            reply_to: str|None. Optional Argument. Reply address formatted like
                 “reply+<reply_id>@<incoming_email_domain_name>
                 reply_id is the unique id of the sender.
-            recipient_variables: dict|None. If batch sending requires
-                differentiating each email based on the recipient, we assign a
-                unique id to each recipient, including info relevant to that
-                recipient so that we can reference it when composing the email
-                like so:
+            recipient_variables: dict|None. Optional Argument.
+                If batch sending requires differentiating each email based on
+                the recipient, we assign a unique id to each recipient,
+                including info relevant to that recipient so that we can
+                reference it when composing the email like so:
                     recipient_variables =
                         {"bob@example.com": {"first":"Bob", "id":1},
                         "alice@example.com": {"first":"Alice", "id":2}}
