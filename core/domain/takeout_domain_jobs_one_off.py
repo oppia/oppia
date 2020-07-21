@@ -62,8 +62,19 @@ class SnapshotMetadataCommitMsgOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         item.put(update_last_updated_time=False)
-        yield ('SUCCESS', 1)
+        model_name = item.__class__.__name__
+        model_id = item.id
+        identifier_message = '%s with id %s' % (model_name, model_id)
+        if (len(item.commit_message) < 1200):
+            yield ('LESS_THAN_1200', identifier_message)
+        elif (len(item.commit_message) <= 1500):
+            yield ('BETWEEN_1200_AND_1500', identifier_message)
+        else:
+            yield ('GREATER_THAN_1500', identifier_message)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        if (key == 'LESS_THAN_1200'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
