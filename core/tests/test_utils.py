@@ -478,144 +478,144 @@ class TestBase(unittest.TestCase):
 
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
-        auto_tts_enabled: true
-        blurb: ''
-        category: Category
-        correctness_feedback_enabled: false
-        init_state_name: %s
-        language_code: en
-        objective: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: %s
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: %d
+states:
+  %s:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: %s
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-        param_specs: {}
-        schema_version: %d
-        states:
-          %s:
-            classifier_model_id: null
-            content:
-              content_id: content
-              html: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: %s
-                feedback:
-                  content_id: default_outcome
-                  html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              hints: []
-              id: null
-              solution: null
-            param_changes: []
-            recorded_voiceovers:
-              voiceovers_mapping:
-                content: {}
-                default_outcome: {}
-            solicit_answer_details: false
-            written_translations:
-              translations_mapping:
-                content: {}
-                default_outcome: {}
-          New state:
-            classifier_model_id: null
-            content:
-              content_id: content
-              html: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: New state
-                feedback:
-                  content_id: default_outcome
-                  html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              hints: []
-              id: null
-              solution: null
-            param_changes: []
-            recorded_voiceovers:
-              voiceovers_mapping:
-                content: {}
-                default_outcome: {}
-            solicit_answer_details: false
-            written_translations:
-              translations_mapping:
-                content: {}
-                default_outcome: {}
-        states_schema_version: %d
-        tags: []
-        title: Title
-        """) % (
-            feconf.DEFAULT_INIT_STATE_NAME,
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: %d
+tags: []
+title: Title
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     SAMPLE_UNTITLED_YAML_CONTENT = (
         """author_notes: ''
-        blurb: ''
-        default_skin: conversation_v1
-        init_state_name: %s
-        language_code: en
-        objective: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: %s
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: %d
+states:
+  %s:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: %s
+        feedback: []
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-        param_specs: {}
-        schema_version: %d
-        states:
-          %s:
-            content:
-            - type: text
-              value: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: %s
-                feedback: []
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              fallbacks: []
-              id: null
-            param_changes: []
-          New state:
-            content:
-            - type: text
-              value: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: New state
-                feedback: []
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              fallbacks: []
-              id: null
-            param_changes: []
-        states_schema_version: %d
-        tags: []
-        """) % (
-            feconf.DEFAULT_INIT_STATE_NAME,
-            exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        refresher_exploration_id: null
+      fallbacks: []
+      id: null
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback: []
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      fallbacks: []
+      id: null
+    param_changes: []
+states_schema_version: %d
+tags: []
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the

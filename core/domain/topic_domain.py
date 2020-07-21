@@ -1316,16 +1316,18 @@ class Topic(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         if from_index >= len(self.subtopics) or from_index < 0:
             raise Exception('Expected from_index value to be with-in bounds.')

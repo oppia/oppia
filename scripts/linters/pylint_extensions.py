@@ -197,6 +197,8 @@ class HangingIndentChecker(checkers.BaseChecker):
         escape_character_indicator = b'\\'
         string_indicator = b'\''
         for (token_type, token, (line_num, _), _, line) in tokens:
+            # Check if the token type is an operator and is either
+            # left parenthesis '(' or a right parenthesis ')'.
             if (
                     token_type == tokenize.OP and (
                         token == b'(' or token == b')')):
@@ -207,6 +209,11 @@ class HangingIndentChecker(checkers.BaseChecker):
                 in_string = False
                 for char_num in python_utils.RANGE(line_length):
                     char = line[char_num]
+                    # Check if we are inside a string and if escape
+                    # character found ('\') do not process that character and
+                    # the character follows because next character might be
+                    # an escaped single quote \' and it thinks that the string
+                    # ended but that will not be the case.
                     if (
                             in_string and (
                                 char == escape_character_indicator or
@@ -214,19 +221,27 @@ class HangingIndentChecker(checkers.BaseChecker):
                         escape_character_found = not escape_character_found
                         continue
 
+                    # Check if we found the string indicator and flip the
+                    # in_string boolean.
                     if char == string_indicator:
                         in_string = not in_string
 
+                    # Ignore anything inside a string.
                     if in_string:
                         continue
 
+                    # Check if character is a left parenthesis and increase
+                    # bracket_count by 1.
                     if char == b'(':
                         if bracket_count == 0:
                             position = char_num
                         bracket_count += 1
+                    # Check if the character is a right parenthesis and
+                    # decrease bracket_count by 1.
                     elif char == b')' and bracket_count > 0:
                         bracket_count -= 1
                 if bracket_count > 0 and position + 1 < line_length:
+                    # Allows the use of [, ], {, }, after the parenthesis.
                     separators = set('[]{} ')
                     if (
                             line[line_length - 1] in separators and
@@ -234,6 +249,10 @@ class HangingIndentChecker(checkers.BaseChecker):
                         continue
 
                     split_line = line.split()
+                    # If there is a comment after the parenthesis and
+                    # bracket_count is equal then skip that line because
+                    # this line only has nothing after the parenthesis.
+                    # Example: func(  # comment.
                     if '#' in split_line and bracket_count == 1:
                         continue
                     self.add_message(

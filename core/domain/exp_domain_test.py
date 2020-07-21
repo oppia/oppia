@@ -7249,7 +7249,8 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: '<p>This is test </p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">
+      html: '<p>This is test </p><oppia-noninteractive-math
+        raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">
         </oppia-noninteractive-math>'
     content_ids_to_audio_translations:
       content: {}
@@ -7402,7 +7403,8 @@ states:
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
                 alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></i>Here is the image2
-                <div><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+                <div><oppia-noninteractive-image
+                    caption-with-value="&amp;quot;&amp;quot;"
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
                 alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></div>
