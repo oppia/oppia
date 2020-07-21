@@ -219,9 +219,9 @@ describe('User Backend Api Service', () => {
     var newProfileImageDataurl = '/avatar/x.png';
     userBackendApiService.setProfileImageDataUrlAsync(
       newProfileImageDataurl).then((response) => {
-        expect(response.profile_picture_data_url).toBe(
-          newProfileImageDataurl);
-      }
+      expect(response.profile_picture_data_url).toBe(
+        newProfileImageDataurl);
+    }
     );
     var req = httpTestingController.expectOne('/preferenceshandler/data');
     expect(req.request.method).toEqual('PUT');
