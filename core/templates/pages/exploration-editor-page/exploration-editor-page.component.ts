@@ -138,6 +138,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
+require('services/exploration-improvements.service.ts');
 require('services/page-title.service.ts');
 require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
@@ -157,6 +158,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
     'ExplorationFeaturesBackendApiService', 'ExplorationFeaturesService',
+    'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationRightsService',
@@ -178,6 +180,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
         ExplorationCorrectnessFeedbackService, ExplorationDataService,
         ExplorationFeaturesBackendApiService, ExplorationFeaturesService,
+        ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
@@ -243,14 +246,13 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
             ContextService.getExplorationId()),
           ThreadDataService.getOpenThreadsCountAsync()
-        ]).then(function(combinedData) {
-          var [explorationData, featuresData, openThreadsCount] =
-            combinedData;
+        ]).then(function([explorationData, featuresData, openThreadsCount]) {
           if (explorationData.exploration_is_linked_to_story) {
             ContextService.setExplorationIsLinkedToStory();
           }
 
           ExplorationFeaturesService.init(explorationData, featuresData);
+          ExplorationImprovementsService.initAsync(ctrl.explorationId);
 
           ExplorationStatesService.init(explorationData.states);
 
@@ -421,10 +423,9 @@ angular.module('oppia').component('explorationEditorPage', {
         });
       };
 
-      ctrl.isImprovementsTabEnabled = function() {
-        return ExplorationFeaturesService.isInitialized() &&
-          ExplorationFeaturesService.isImprovementsTabEnabled();
-      };
+      ctrl.isImprovementsTabEnabled = false;
+      $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
+        .then(isEnabled => ctrl.isImprovementsTabEnabled = isEnabled);
 
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({

@@ -1301,8 +1301,8 @@ export class UpgradedServices {
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationFeaturesBackendApiService'] =
       new ExplorationFeaturesBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],

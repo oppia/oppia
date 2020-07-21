@@ -16,13 +16,18 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
   'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
+import {
+  ExplorationImprovementsBackendApiService,
+  ExplorationImprovementsConfig
+} from 'services/exploration-improvements-backend-api.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LoaderService } from 'services/loader.service';
 import { ParamChangesObjectFactory } from
@@ -56,7 +61,6 @@ describe('Exploration editor page component', function() {
   var cs = null;
   var es = null;
   var efbas = null;
-  var efs = null;
   var ers = null;
   var ets = null;
   var ews = null;
@@ -68,6 +72,8 @@ describe('Exploration editor page component', function() {
   var sas = null;
   var tds = null;
   var ueps = null;
+  var eis = null;
+  var eibas = null;
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -168,6 +174,7 @@ describe('Exploration editor page component', function() {
         EditabilityService,
         ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService,
+        ExplorationImprovementsBackendApiService,
         PageTitleService,
         LoaderService,
         ParamChangesObjectFactory,
@@ -196,7 +203,6 @@ describe('Exploration editor page component', function() {
     cs = $injector.get('ContextService');
     es = $injector.get('EditabilityService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
-    efs = $injector.get('ExplorationFeaturesService');
     ers = $injector.get('ExplorationRightsService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
@@ -208,6 +214,8 @@ describe('Exploration editor page component', function() {
     sas = $injector.get('SiteAnalyticsService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
+    eis = $injector.get('ExplorationImprovementsService');
+    eibas = $injector.get('ExplorationImprovementsBackendApiService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage');
@@ -235,6 +243,8 @@ describe('Exploration editor page component', function() {
           .and.returnValue($q.resolve({}));
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(0));
+        spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
+          new ExplorationImprovementsConfig(true, 0, 0, 0)));
 
         explorationData.is_version_of_draft_valid = false;
 
@@ -313,6 +323,8 @@ describe('Exploration editor page component', function() {
           .and.returnValue($q.resolve({}));
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(1));
+        spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
+          new ExplorationImprovementsConfig(true, 0, 0, 0)));
 
         explorationData.is_version_of_draft_valid = true;
 
@@ -337,14 +349,14 @@ describe('Exploration editor page component', function() {
             '/createhandler/download/' + explorationId);
           expect(ctrl.revertExplorationUrl).toBe(
             '/createhandler/revert/' + explorationId);
-          expect(ctrl.areExplorationWarningsVisible).toBe(false);
+          expect(ctrl.areExplorationWarningsVisible).toBeFalse();
 
-          expect(ctrl.currentUserIsAdmin).toBe(true);
-          expect(ctrl.currentUserIsModerator).toBe(true);
+          expect(ctrl.currentUserIsAdmin).toBeTrue();
+          expect(ctrl.currentUserIsModerator).toBeTrue();
           expect(ctrl.currentUser).toEqual(explorationData.user);
           expect(ctrl.currentVersion).toBe(explorationData.version);
 
-          expect(ctrl.tutorialInProgress).toBe(false);
+          expect(ctrl.tutorialInProgress).toBeFalse();
         });
 
       it('should get state top answers stats after initing exploration page',
@@ -410,7 +422,7 @@ describe('Exploration editor page component', function() {
           result: $q.resolve(explorationId)
         });
 
-        expect(ctrl.tutorialInProgress).toBe(false);
+        expect(ctrl.tutorialInProgress).toBeFalse();
 
         ctrl.showWelcomeExplorationModal();
         $scope.$apply();
@@ -420,12 +432,12 @@ describe('Exploration editor page component', function() {
         expect(rs.navigateToMainTab).toHaveBeenCalled();
         $timeout.flush();
 
-        expect(ctrl.tutorialInProgress).toBe(true);
+        expect(ctrl.tutorialInProgress).toBeTrue();
 
         ctrl.onSkipTutorial();
         expect(sas.registerSkipTutorialEvent)
           .toHaveBeenCalledWith(explorationId);
-        expect(ctrl.tutorialInProgress).toBe(false);
+        expect(ctrl.tutorialInProgress).toBeFalse();
       });
 
       it('should accept tutorial when closing welcome exploration modal and' +
@@ -435,7 +447,7 @@ describe('Exploration editor page component', function() {
           result: $q.resolve(explorationId)
         });
 
-        expect(ctrl.tutorialInProgress).toBe(false);
+        expect(ctrl.tutorialInProgress).toBeFalse();
 
         ctrl.showWelcomeExplorationModal();
         $scope.$apply();
@@ -445,34 +457,12 @@ describe('Exploration editor page component', function() {
         expect(rs.navigateToMainTab).toHaveBeenCalled();
         $timeout.flush();
 
-        expect(ctrl.tutorialInProgress).toBe(true);
+        expect(ctrl.tutorialInProgress).toBeTrue();
 
         ctrl.onFinishTutorial();
         expect(sas.registerFinishTutorialEvent)
           .toHaveBeenCalledWith(explorationId);
-        expect(ctrl.tutorialInProgress).toBe(false);
-      });
-
-      it('should check if improvements tab is enabled', function() {
-        var isInitializedSpy = spyOn(
-          efs, 'isInitialized');
-        var isImprovementsTabEnabledSpy = spyOn(
-          efs, 'isImprovementsTabEnabled');
-        isInitializedSpy.and.returnValue(true);
-        isImprovementsTabEnabledSpy.and.returnValue(true);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(true);
-
-        isInitializedSpy.and.returnValue(false);
-        isImprovementsTabEnabledSpy.and.returnValue(true);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(false);
-
-        isInitializedSpy.and.returnValue(true);
-        isImprovementsTabEnabledSpy.and.returnValue(false);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(false);
-
-        isInitializedSpy.and.returnValue(false);
-        isImprovementsTabEnabledSpy.and.returnValue(false);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(false);
+        expect(ctrl.tutorialInProgress).toBeFalse();
       });
 
       it('should decline tutorial when dismissing welcome exploration modal',
@@ -481,24 +471,24 @@ describe('Exploration editor page component', function() {
             result: $q.reject(explorationId)
           });
 
-          expect(ctrl.tutorialInProgress).toBe(false);
+          expect(ctrl.tutorialInProgress).toBeFalse();
 
           ctrl.showWelcomeExplorationModal();
           $scope.$apply();
 
           expect(sas.registerDeclineTutorialModalEvent)
             .toHaveBeenCalled();
-          expect(ctrl.tutorialInProgress).toBe(false);
+          expect(ctrl.tutorialInProgress).toBeFalse();
         });
 
       it('should toggle exploration warning visibility', function() {
-        expect(ctrl.areExplorationWarningsVisible).toBe(false);
+        expect(ctrl.areExplorationWarningsVisible).toBeFalse();
 
         ctrl.toggleExplorationWarningVisibility();
-        expect(ctrl.areExplorationWarningsVisible).toBe(true);
+        expect(ctrl.areExplorationWarningsVisible).toBeTrue();
 
         ctrl.toggleExplorationWarningVisibility();
-        expect(ctrl.areExplorationWarningsVisible).toBe(false);
+        expect(ctrl.areExplorationWarningsVisible).toBeFalse();
       });
 
       it('should get exploration url', function() {
@@ -711,4 +701,48 @@ describe('Exploration editor page component', function() {
         });
       });
     });
+
+  describe('when user permission is false and draft changes are true', () => {
+    var userPermissions = {
+      canEdit: false
+    };
+
+    beforeEach(function() {
+      getPermissionsSpy = spyOn(ueps, 'getPermissionsAsync');
+      spyOnAllFunctions(sas);
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setPageTitle').and.callThrough();
+
+      getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeatures')
+        .and.returnValue($q.resolve({}));
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
+      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
+        new ExplorationImprovementsConfig(true, 0, 0, 0)));
+
+      explorationData.is_version_of_draft_valid = true;
+    });
+
+    it('should check if improvements tab is disabled', fakeAsync(function() {
+      spyOn(eis, 'isImprovementsTabEnabledAsync')
+        .and.returnValue(Promise.resolve(false));
+
+      ctrl.$onInit();
+      flushMicrotasks();
+
+      expect(ctrl.isImprovementsTabEnabled).toBeFalse();
+    }));
+
+    it('should check if improvements tab is enabled', fakeAsync(function() {
+      spyOn(eis, 'isImprovementsTabEnabledAsync')
+        .and.returnValue(Promise.resolve(true));
+
+      ctrl.$onInit();
+      flushMicrotasks();
+
+      expect(ctrl.isImprovementsTabEnabled).toBeTrue();
+    }));
+  });
 });

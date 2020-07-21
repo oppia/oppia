@@ -43,6 +43,13 @@ export interface IExplorationImprovementsHistoryResponseBackendDict {
   'more': boolean;
 }
 
+export interface ExplorationImprovementsConfigBackendDict {
+  'is_improvements_tab_enabled': boolean;
+  'high_bounce_rate_task_state_bounce_rate_creation_threshold': number;
+  'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number;
+  'high_bounce_rate_task_minimum_exploration_starts': number;
+}
+
 export class ExplorationImprovementsResponse {
   constructor(
       public readonly openTasks: ExplorationTask[],
@@ -54,6 +61,16 @@ export class ExplorationImprovementsHistoryResponse {
       public readonly results: ExplorationTask[],
       public readonly cursor: string,
       public readonly more: boolean) {}
+}
+
+export class ExplorationImprovementsConfig {
+  constructor(
+      public readonly isImprovementsTabEnabled: boolean,
+      public readonly highBounceRateTaskStateBounceRateCreationThreshold:
+        number,
+      public readonly highBounceRateTaskStateBounceRateObsoletionThreshold:
+        number,
+      public readonly highBounceRateTaskMinimumExplorationStarts: number) {}
 }
 
 @Injectable({providedIn: 'root'})
@@ -110,6 +127,23 @@ export class ExplorationImprovementsBackendApiService {
           d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
         backendDict.cursor,
         backendDict.more));
+  }
+
+  async getConfigAsync(
+      expId: string): Promise<ExplorationImprovementsConfig> {
+    const explorationImprovementsConfigUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_CONFIG_URL, {
+          exploration_id: expId
+        }));
+    const backendDict = (
+      await this.http.get<ExplorationImprovementsConfigBackendDict>(
+        explorationImprovementsConfigUrl).toPromise());
+    return new ExplorationImprovementsConfig(
+      backendDict.is_improvements_tab_enabled,
+      backendDict.high_bounce_rate_task_state_bounce_rate_creation_threshold,
+      backendDict.high_bounce_rate_task_state_bounce_rate_obsoletion_threshold,
+      backendDict.high_bounce_rate_task_minimum_exploration_starts);
   }
 }
 

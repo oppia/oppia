@@ -139,7 +139,7 @@
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
         </a>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="isImprovementsTabEnabled()">
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="isImprovementsTabEnabled">
         <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
@@ -231,7 +231,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}"
+  <li ng-if="isLargeScreen && isImprovementsTabEnabled" ng-class="{'active': getActiveTabName() === 'improvements'}"
       class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">

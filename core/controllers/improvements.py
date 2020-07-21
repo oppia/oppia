@@ -21,6 +21,7 @@ import datetime
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import improvements_domain
 from core.domain import improvements_services
@@ -108,4 +109,36 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
             'results': [t.to_dict() for t in results],
             'cursor': new_urlsafe_start_cursor,
             'more': more,
+        })
+
+
+class ExplorationImprovementsConfigHandler(base.BaseHandler):
+    """Handles fetching the configuration of exploration tasks.
+
+    NOTE: Only exploration creators and editors can interface with tasks.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exploration_id):
+        """Handles GET requests for exploration improvements' configuration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        self.render_json({
+            'is_improvements_tab_enabled': (
+                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value),
+            'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
+                config_domain
+                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
+                .value),
+            'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (
+                config_domain
+                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
+                .value),
+            'high_bounce_rate_task_minimum_exploration_starts': (
+                config_domain.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS
+                .value),
         })

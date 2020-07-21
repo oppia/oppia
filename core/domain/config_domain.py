@@ -115,6 +115,10 @@ FLOAT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_FLOAT
 }
 
+INT_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_INT
+}
+
 
 class ConfigPropertyChange(change_domain.BaseChange):
     """Domain object for changes made to a config property object.
@@ -372,3 +376,22 @@ FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
     LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
     'Featured Translation Languages', []
 )
+
+HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
+    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
+    FLOAT_SCHEMA,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    0.20)
+
+HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
+    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
+    FLOAT_SCHEMA,
+    'The bounce-rate a state must fall under to discard its improvement task.',
+    0.20)
+
+HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
+    'high_bounce_rate_task_minimum_exploration_starts',
+    INT_SCHEMA,
+    'The minimum times an exploration is started before it can generate high '
+    'bounce-rate improvements tasks.',
+    100)
