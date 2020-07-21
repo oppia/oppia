@@ -217,8 +217,8 @@ describe('User Backend Api Service', () => {
 
   it('should set a profile image data url', fakeAsync(() => {
     var newProfileImageDataurl = '/avatar/x.png';
-    userBackendApiService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
-      (response) => {
+    userBackendApiService.setProfileImageDataUrlAsync(
+      newProfileImageDataurl).then((response) => {
         expect(response.profile_picture_data_url).toBe(
           newProfileImageDataurl);
       }
