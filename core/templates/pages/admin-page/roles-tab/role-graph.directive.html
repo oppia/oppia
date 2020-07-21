@@ -137,7 +137,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success protractor-test-reviewer-role-success"
+          <button type="submit" class="btn btn-success protractor-test-reviewer-role-success-button"
                   ng-disabled="!$ctrl.formData.viewCommunityReviewers.isValid()"
                   value="view role">
             View Role
@@ -175,14 +175,14 @@
           <div class="d-xl-inline-flex form-group">
             <label for="add-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control protractor-add-reviewer-name">
+              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control protractor-test-add-reviewer-name">
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group">
             <label for="add-community-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select id="add-community-reviewer" ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.addCommunityReviewer.category" class="form-control protractor-select-reviewer-role">
+              <select id="add-community-reviewer" ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.addCommunityReviewer.category" class="form-control protractor-test-select-reviewer-role">
               </select>
             </div>
           </div>
@@ -198,7 +198,7 @@
             </div>
           </div>
           <button type="submit"
-                  class="btn btn-success protractor-add-reviewer-form-submit"
+                  class="btn btn-success protractor-test-add-reviewer-form-submit-button"
                   ng-disabled="!$ctrl.formData.addCommunityReviewer.isValid()"
                   value="update role">Add Reviewer
           </button>

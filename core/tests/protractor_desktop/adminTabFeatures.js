@@ -56,7 +56,7 @@ describe('Admin Page', function() {
 
     await adminPage.get();
     await adminPage.addReviewer('newQuestionReviewer', 'QUESTION');
-    await adminPage.getReviewersAssignedToRole('question');
+    await adminPage.showReviewersAssignedToRole('question');
     await adminPage.expectReviewerUsernamesStrToMatch(
       'Usernames: ["newQuestionReviewer"]');
     await users.logout();
