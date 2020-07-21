@@ -32,8 +32,8 @@
   </div>
 
   <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
-    <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
-    </schema-based-editor>
+    <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
+    <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html"></schema-based-editor>
     <div style="margin-top: 2px;">
       <button type="button"
               class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-translation"
