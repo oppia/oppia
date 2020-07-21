@@ -29,7 +29,7 @@ import { QuestionBackendDict } from
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 
-interface PretestQuestionsBackendResposne {
+interface PretestQuestionsBackendResponse {
   'pretest_question_dicts': QuestionBackendDict[];
 }
 
@@ -56,7 +56,7 @@ export class PretestQuestionBackendApiService {
         story_id: storyId,
       });
 
-    this.http.get<PretestQuestionsBackendResposne>(
+    this.http.get<PretestQuestionsBackendResponse>(
       pretestDataUrl
     ).toPromise().then(data => {
       var pretestQuestionDicts = (
