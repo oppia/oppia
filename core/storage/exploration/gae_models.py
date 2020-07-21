@@ -243,7 +243,7 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     """Temporary Storage model for storing information useful while
     generating images for math rich-text components in explorations.
 
-    TODO (#9952): This model needs to removed once we generate SVG images for
+    TODO(#9952): This model needs to removed once we generate SVG images for
     all the math rich text componets in old explorations.
 
     The id of each instance is the id of the corresponding exploration.
@@ -261,9 +261,9 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     # raw_latex value.
     estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
         indexed=True, required=True)
-    # Set of latex values without an SVG saved from all the math-rich text
-    # components of the exploration.
-    latex_values_without_svg = ndb.StringProperty(repeated=True)
+    # List of unique LaTeX strings without an SVG saved from all the math-rich
+    # text components of the exploration.
+    latex_strings_without_svg = ndb.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():

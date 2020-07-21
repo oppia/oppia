@@ -92,7 +92,7 @@ def extract_html_from_draft_change_list(draft_change_list):
 
     Args:
         draft_change_list: list(ExplorationChange). The list of
-            ExplorationChange domain objects to upgrade.
+            ExplorationChange domain objects from which to extract the HTML.
 
     Returns:
         list(str). The list of html content strings.
@@ -117,10 +117,10 @@ def extract_html_from_draft_change_list(draft_change_list):
                 html_list += new_value['choices']['value']
         elif (change.property_name ==
               exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-            written_translations_object = (
+            written_translations = (
                 state_domain.WrittenTranslations.from_dict(new_value))
             html_in_written_translations = (
-                written_translations_object.get_all_html_content_strings())
+                written_translations.get_all_html_content_strings())
             html_list += html_in_written_translations
 
         elif (change.property_name ==
@@ -154,10 +154,10 @@ def extract_html_from_draft_change_list(draft_change_list):
 
         elif (change.property_name ==
               exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-            for answer_group in new_value:
-                answer_group_object = (
-                    state_domain.AnswerGroup.from_dict(answer_group))
-                html_list += answer_group_object.get_all_html_content_strings()
+            for answer_group_dict in new_value:
+                answer_group = (
+                    state_domain.AnswerGroup.from_dict(answer_group_dict))
+                html_list += answer_group.get_all_html_content_strings()
     return html_list
 
 

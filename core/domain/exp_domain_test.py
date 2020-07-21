@@ -8384,21 +8384,21 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
             exploration_math_rich_text_info.to_dict(), {
                 'exp_id': 'exp_id1',
                 'math_images_generation_required': True,
-                'latex_values_without_svg': ['abc', 'x']
+                'latex_strings_without_svg': ['abc', 'x']
             })
 
-    def test_validate_when_latex_values_not_list(self):
+    def test_validate_when_latex_strings_not_list(self):
         with self.assertRaisesRegexp(
             Exception,
-            'Expected latex_values to be a list, received '
+            'Expected latex_strings to be a list, received '
             'invalid_latex_format'):
             exp_domain.ExplorationMathRichTextInfo(
                 'exp_id1', True, 'invalid_latex_format')
 
-    def test_validate_when_each_latex_values_are_string(self):
+    def test_validate_when_each_latex_strings_are_string(self):
         with self.assertRaisesRegexp(
             Exception,
-            'Expected each element in the list of latex values to be a str, '
+            'Expected each element in the list of latex strings to be a str, '
             'received 3'):
             exp_domain.ExplorationMathRichTextInfo('exp_id1', True, ['x^2', 3])
 
@@ -8424,13 +8424,13 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_math_rich_text_info.get_svg_size_in_bytes(), 8000)
 
-    def test_get_longest_latex_value(self):
+    def test_get_longest_latex_expression(self):
         exploration_math_rich_text_info = (
             exp_domain.ExplorationMathRichTextInfo(
                 'exp_id1', True, ['x^2 + 2ax', 'x']))
 
         self.assertEqual(
-            exploration_math_rich_text_info.get_longest_latex_value(),
+            exploration_math_rich_text_info.get_longest_latex_expression(),
             'x^2 + 2ax')
 
 

@@ -6074,21 +6074,21 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         self.model_instance_0 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='0',
-                latex_values_without_svg=['+,+,+,+'],
+                latex_strings_without_svg=['+,+,+,+'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_0.put()
         self.model_instance_1 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='1',
-                latex_values_without_svg=['+,+,+,+'],
+                latex_strings_without_svg=['+,+,+,+'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_1.put()
         self.model_instance_2 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='2',
-                latex_values_without_svg=['+,+,+,+'],
+                latex_strings_without_svg=['+,+,+,+'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_2.put()
@@ -6102,20 +6102,20 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
         run_job_and_check_output(self, expected_output)
 
-    def test_model_with_latex_values_not_matching_exploration(self):
+    def test_model_with_latex_strings_not_matching_exploration(self):
         self.model_instance_2 = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='2',
-                latex_values_without_svg=['+,+,+,+', 'x^2'],
+                latex_strings_without_svg=['+,+,+,+', 'x^2'],
                 math_images_generation_required=True,
                 estimated_max_size_of_images_in_bytes=7000))
         self.model_instance_2.put()
         expected_output = [
             (
-                u'[u\'failed validation check for latex values check of Explo'
+                u'[u\'failed validation check for latex strings check of Explo'
                 'rationMathRichTextInfoModel\', '
-                '[u\'Entity id %s: Latex values in the model does not match '
-                'latex values in the exploration model\']]') % (
+                '[u\'Entity id %s: latex strings in the model does not match '
+                'latex strings in the exploration model\']]') % (
                     self.model_instance_2.id,
                 ),
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
@@ -6158,7 +6158,7 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         model_instance = (
             exp_models.ExplorationMathRichTextInfoModel(
                 id='3',
-                latex_values_without_svg=['+,+,+,+'],
+                latex_strings_without_svg=['+,+,+,+'],
                 math_images_generation_required=False,
                 estimated_max_size_of_images_in_bytes=7000))
         model_instance.put()
@@ -6172,12 +6172,12 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
 
         # We need to swap the return value of the method
-        # get_latext_values_without_svg_from_html because
-        # normally this method returns latex values from math-tags without
+        # get_latet_strings_without_svg_from_html because
+        # normally this method returns LaTeX strings from math-tags without
         # filenames.
         with self.swap(
             html_validation_service,
-            'get_latext_values_without_svg_from_html',
+            'get_latet_strings_without_svg_from_html',
             lambda html: ['+,+,+,+']):
             run_job_and_check_output(self, expected_output, sort=True)
 

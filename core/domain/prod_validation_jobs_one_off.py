@@ -3022,13 +3022,13 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
                 'exploration_ids', exp_models.ExplorationModel, [item.id])]
 
     @classmethod
-    def _validate_latex_values_info(
+    def _validate_latex_strings_info(
             cls, item, field_name_to_external_model_references):
-        """Validate that latex values and other related information in the
+        """Validate that LaTeX strings and other related information in the
         model is valid and matches the corresponding exploration.
-        The latex values present in this model is valid if the latex values
+        The LaTeX strings present in this model is valid if the LaTeX strings
         without SVG filenames in the exploration matches this list, also the
-        estimated SVG size of these latex values should be same. We also verify
+        estimated SVG size of these LaTeX strings should be same. We also verify
         that the field 'math_images_generation_required' is valid by checking
         each 'svg_filename' field in the actual exploration.
 
@@ -3067,23 +3067,23 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
                 html_strings_in_exploration += (
                     ''.join(state.get_all_html_content_strings()))
 
-            latex_values_without_svg = (
+            latex_strings_without_svg = (
                 html_validation_service.
-                get_latext_values_without_svg_from_html(
+                get_latet_strings_without_svg_from_html(
                     html_strings_in_exploration))
             math_rich_text_info = (
                 exp_domain.ExplorationMathRichTextInfo(
                     exploration_model.id,
                     item.math_images_generation_required,
-                    latex_values_without_svg))
+                    latex_strings_without_svg))
             approx_size_of_math_svgs_bytes = (
                 math_rich_text_info.get_svg_size_in_bytes())
 
-            if latex_values_without_svg != item.latex_values_without_svg:
+            if latex_strings_without_svg != item.latex_strings_without_svg:
                 cls._add_error(
-                    'latex values check',
-                    'Entity id %s: Latex values in the model does not match '
-                    'latex values in the exploration model' % (
+                    'latex strings check',
+                    'Entity id %s: latex strings in the model does not match '
+                    'latex strings in the exploration model' % (
                         item.id))
             if (approx_size_of_math_svgs_bytes !=
                     item.estimated_max_size_of_images_in_bytes):
@@ -3113,7 +3113,7 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
-        return [cls._validate_latex_values_info]
+        return [cls._validate_latex_strings_info]
 
 
 class QuestionSkillLinkModelValidator(BaseModelValidator):

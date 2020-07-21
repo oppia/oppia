@@ -1672,9 +1672,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertTrue(
                 python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
 
-    def test_extract_latex_values_when_all_math_tags_have_empty_svg_filename(
+    def test_extract_latex_strings_when_all_math_tags_have_empty_svg_filename(
             self):
-        """Test that get_latext_values_without_svg_from_html
+        """Test that get_latet_strings_without_svg_from_html
         extracts filenames when all math tags have empty filename field.
         """
         html_string = (
@@ -1695,13 +1695,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
         list_of_latex = (
             html_validation_service.
-            get_latext_values_without_svg_from_html(
+            get_latet_strings_without_svg_from_html(
                 html_string))
         self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
 
-    def test_extract_latex_values_when_math_tags_have_non_empty_svg_filename(
+    def test_extract_latex_strings_when_math_tags_have_non_empty_svg_filename(
             self):
-        """Test that get_latext_values_without_svg_from_html
+        """Test that get_latet_strings_without_svg_from_html
         extracts filenames when some math tags have non emoty filename field.
         """
 
@@ -1724,12 +1724,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         expected_list_of_latex = ['\\sqrt{x}', '\\frac{x}{y}']
         list_of_latex = (
             html_validation_service.
-            get_latext_values_without_svg_from_html(
+            get_latet_strings_without_svg_from_html(
                 html_string))
         self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
 
-    def test_extract_latex_values_when_no_math_tags_are_present(self):
-        """Test that get_latext_values_without_svg_from_html
+    def test_extract_latex_strings_when_no_math_tags_are_present(self):
+        """Test that get_latet_strings_without_svg_from_html
         when there are no math tags present in the HTML.
         """
         html_string_with_no_math = (
@@ -1739,7 +1739,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             html_validation_service.
-            get_latext_values_without_svg_from_html(
+            get_latet_strings_without_svg_from_html(
                 html_string_with_no_math), [])
 
     def test_extract_svg_filenames_in_math_rte_components(self):

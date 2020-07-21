@@ -408,11 +408,11 @@ class DraftChangeMathRichTextAuditOneOffJob(
                     draft_upgrade_services.
                     extract_html_from_draft_change_list(
                         final_draft_change_list))
-                latex_values = (
+                latex_strings = (
                     html_validation_service.
-                    get_latext_values_without_svg_from_html(
+                    get_latet_strings_without_svg_from_html(
                         html_string))
-                if len(latex_values) > 0:
+                if len(latex_strings) > 0:
                     yield (
                         DraftChangeMathRichTextAuditOneOffJob.
                         _SUCCESS_KEY, item.exploration_id)

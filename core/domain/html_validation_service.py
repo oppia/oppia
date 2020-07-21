@@ -923,21 +923,21 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
-def get_latext_values_without_svg_from_html(html_string):
-    """Extract latex values from math rich-text components whose svg_filename
+def get_latet_strings_without_svg_from_html(html_string):
+    """Extract LaTeX strings from math rich-text components whose svg_filename
     field is empty.
 
     Args:
         html_string: str. The HTML string.
 
     Returns:
-        list(str). list of unique latex values of math-tags without svg
+        list(str). List of unique LaTeX strings of math-tags without svg
         filename.
     """
 
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    latex_values = set()
+    latex_strings = set()
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
             json.loads(unescape_html(
@@ -947,10 +947,10 @@ def get_latext_values_without_svg_from_html(html_string):
         svg_filename = (
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
-            latex_values.add(raw_latex)
+            latex_strings.add(raw_latex)
 
-    unique_latex_values = list(latex_values)
-    return unique_latex_values
+    unique_latex_strings = list(latex_strings)
+    return unique_latex_strings
 
 
 def extract_svg_filenames_in_math_rte_components(html_string):
