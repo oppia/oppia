@@ -121,11 +121,11 @@ class ExplorationImprovementsConfigHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests for exploration improvements' configuration.
 
         Args:
-            exploration_id: str. The ID of the exploration.
+            unused_exploration_id: str. The ID of the exploration.
         """
         self.render_json({
             'is_improvements_tab_enabled': (

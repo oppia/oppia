@@ -531,12 +531,12 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
             ])
 
 
-class ExplorationImprovementsHistoryHandlerTests(test_utils.GenericTestBase):
+class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID = 'eid'
 
     def setUp(self):
-        super(ExplorationImprovementsHistoryHandlerTests, self).setUp()
+        super(ExplorationImprovementsConfigHandlerTests, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -588,7 +588,7 @@ class ExplorationImprovementsHistoryHandlerTests(test_utils.GenericTestBase):
     def test_custom_high_bounce_rate_creation_threshold(self):
         self.set_config_property(
             (config_domain
-                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD),
+             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD),
             new_config_value=0.35)
 
         with self.login_context(self.OWNER_EMAIL):
@@ -602,7 +602,7 @@ class ExplorationImprovementsHistoryHandlerTests(test_utils.GenericTestBase):
     def test_custom_high_bounce_rate_obsoletion_threshold(self):
         self.set_config_property(
             (config_domain
-                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
+             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
             new_config_value=0.05)
 
         with self.login_context(self.OWNER_EMAIL):
