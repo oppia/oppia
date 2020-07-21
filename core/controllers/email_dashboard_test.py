@@ -47,49 +47,46 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.set_admins([self.SUBMITTER_USERNAME])
 
     def test_that_handler_works_correctly(self):
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with swap_api, swap_domain:
-            self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_new_csrf_token()
-            self.post_json(
-                '/emaildashboarddatahandler', {
-                    'data': {
-                        'has_not_logged_in_for_n_days': 2,
-                        'inactive_in_last_n_days': 5,
-                        'created_at_least_n_exps': 1,
-                        'created_fewer_than_n_exps': None,
-                        'edited_at_least_n_exps': None,
-                        'edited_fewer_than_n_exps': 2
-                    }}, csrf_token=csrf_token)
-            self.logout()
+        self.login(self.SUBMITTER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/emaildashboarddatahandler', {
+                'data': {
+                    'has_not_logged_in_for_n_days': 2,
+                    'inactive_in_last_n_days': 5,
+                    'created_at_least_n_exps': 1,
+                    'created_fewer_than_n_exps': None,
+                    'edited_at_least_n_exps': None,
+                    'edited_fewer_than_n_exps': 2
+                }}, csrf_token=csrf_token)
+        self.logout()
 
-            query_models = user_models.UserQueryModel.query().fetch()
+        query_models = user_models.UserQueryModel.query().fetch()
 
-            # Check that model is stored.
-            self.assertEqual(len(query_models), 1)
-            query_model = query_models[0]
+        # Check that model is stored.
+        self.assertEqual(len(query_models), 1)
+        query_model = query_models[0]
 
-            # Check that correct information is stored in model.
-            self.assertEqual(query_model.has_not_logged_in_for_n_days, 2)
-            self.assertEqual(query_model.inactive_in_last_n_days, 5)
-            self.assertEqual(query_model.created_at_least_n_exps, 1)
-            self.assertEqual(query_model.edited_fewer_than_n_exps, 2)
-            self.assertIsNone(query_model.edited_at_least_n_exps)
-            self.assertIsNone(query_model.created_fewer_than_n_exps)
-            self.assertEqual(query_model.submitter_id, self.submitter_id)
+        # Check that correct information is stored in model.
+        self.assertEqual(query_model.has_not_logged_in_for_n_days, 2)
+        self.assertEqual(query_model.inactive_in_last_n_days, 5)
+        self.assertEqual(query_model.created_at_least_n_exps, 1)
+        self.assertEqual(query_model.edited_fewer_than_n_exps, 2)
+        self.assertIsNone(query_model.edited_at_least_n_exps)
+        self.assertIsNone(query_model.created_fewer_than_n_exps)
+        self.assertEqual(query_model.submitter_id, self.submitter_id)
 
-            # Check that MR job has been enqueued.
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-                self.process_and_flush_pending_tasks()
+        # Check that MR job has been enqueued.
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
 
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
-                0)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
 
     def test_query_status_check_handler_with_invalid_query_id_raises_400(
             self):
@@ -733,7 +730,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 to=self.USER_A_EMAIL)
             messages_b = self._get_sent_email_messages(
                 to=self.USER_B_EMAIL)
-            self.assertTrue((len(messages_a) == 1) or (len(messages_b) == 1))
+            self.assertEqual(sorted([len(messages_a), len(messages_b)]), [0, 1])
 
     def test_that_no_emails_are_sent_if_query_is_canceled(self):
         self.login(self.SUBMITTER_EMAIL)

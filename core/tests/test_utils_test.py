@@ -428,13 +428,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
 class EmailMockTests(test_utils.EmailTestBase):
     """Class for testing EmailTestBase."""
 
-    def test_override_run_swaps_contexts(self):
-        """Assert that the feconf context swaps that wrap the default run
-        function correctly swaps the contexts.
-        """
-        self.assertEqual(feconf.MAILGUN_API_KEY, 'key')
-        self.assertEqual(feconf.MAILGUN_DOMAIN_NAME, 'name')
-
     def test_mock_send_email_to_recipients_sends_correct_emails(self):
         """Test sending email to recipients using mock adds the correct objects
         to emails_dict.
@@ -453,7 +446,10 @@ class EmailMockTests(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(
             to='b@b.com')
         all_messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), len(all_messages))
+
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(len(all_messages), 1)
+        self.assertEqual(all_messages['b@b.com'], messages)
         self.assertEqual(
             messages[0].subject,
             'Hola 😂 - invitation to collaborate'.encode(encoding='utf-8'))

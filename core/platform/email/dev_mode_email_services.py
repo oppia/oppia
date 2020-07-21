@@ -29,8 +29,8 @@ def send_email_to_recipients(
         sender_email, recipient_emails, subject,
         plaintext_body, html_body, bcc=None, reply_to=None,
         recipient_variables=None):
-    """Logs sent email details to terminal console in DEV_MODE, to model
-    sending out an email.
+    """Prints information about sent emails to the terminal console, in order
+    to model sending an email in development mode.
 
     Args:
         sender_email: str. The email address of the sender. This should be in
@@ -43,15 +43,16 @@ def send_email_to_recipients(
             be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
-        bcc: list(str)|None. List of bcc emails. Format must be utf-8.
-        reply_to: str|None. Reply address formatted like
+        bcc: list(str)|None. Optional argument. List of bcc emails. Format must
+            be utf-8.
+        reply_to: str|None. Optional argument. Reply address formatted like
             “reply+<reply_id>@<incoming_email_domain_name>
             reply_id is the unique id of the sender. Format must be utf-8.
-        recipient_variables: dict|None. If batch sending requires
-            differentiating each email based on the recipient, we assign a
-            unique id to each recipient, including info relevant to that
-            recipient so that we can reference it when composing the email
-            like so:
+        recipient_variables: dict|None. Optional argument. If batch sending
+            requires differentiating each email based on the recipient, we
+            assign a unique id to each recipient, including info relevant to
+            that recipient so that we can reference it when composing the
+            email like so:
                 recipient_variables =
                     {"bob@example.com": {"first":"Bob", "id":1},
                      "alice@example.com": {"first":"Alice", "id":2}}

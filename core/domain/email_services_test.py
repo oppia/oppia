@@ -68,21 +68,16 @@ class EmailServicesTest(test_utils.EmailTestBase):
         send_email_exception = (
             self.assertRaisesRegexp(
                 Exception, 'This app cannot send emails to users.'))
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with mailgun_api, mailgun_domain, send_email_exception, (
-            self.swap(constants, 'DEV_MODE', False)):
+        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
 
     def test_send_mail_data_properly_sent(self):
         """Verifies that the data sent in send_mail is correct."""
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        with mailgun_api, mailgun_domain, allow_emailing:
+        with allow_emailing:
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
@@ -97,11 +92,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the bcc admin flag is working properly in
         send_mail.
         """
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        with mailgun_api, mailgun_domain, allow_emailing:
+        with allow_emailing:
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)
@@ -112,12 +105,10 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     def test_reply_to_id_flag(self):
         """Verifies that the reply_to_id flag is working properly."""
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         reply_id = 123
 
-        with mailgun_api, mailgun_domain, allow_emailing:
+        with allow_emailing:
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html',
@@ -137,9 +128,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         send_email_exception = (
             self.assertRaisesRegexp(
                 Exception, 'This app cannot send emails to users.'))
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with mailgun_api, mailgun_domain, send_email_exception, (
+        with send_email_exception, (
             self.swap(constants, 'DEV_MODE', False)):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
@@ -149,12 +138,10 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the data sent in send_bulk_mail is correct
            for each user in the recipient list.
         """
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
 
-        with mailgun_api, mailgun_domain, allow_emailing:
+        with allow_emailing:
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
@@ -221,33 +208,30 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Test that unsuccessful status codes returned raises an exception."""
 
         email_exception = self.assertRaisesRegexp(
-            Exception, 'Bulk email failed to send. Please check your ' +
-            'email service provider.')
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+            Exception, 'Bulk email failed to send. Please try again later or' +
+            ' contact us to report a bug at https://www.oppia.org/contact.')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        swap_send_email_to_recipients = self.swap(
+            platform_email_services, 'send_email_to_recipients',
+            lambda *_: False)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
 
-        with mailgun_api, mailgun_domain, allow_emailing, email_exception, (
-            self.swap(
-                platform_email_services, 'send_email_to_recipients',
-                lambda *_: False)):
+        with allow_emailing, email_exception, swap_send_email_to_recipients:
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
 
         email_exception = self.assertRaisesRegexp(
             Exception, (
-                'Email to %s failed to send. Please check your ' +
-                'email service provider.') % feconf.ADMIN_EMAIL_ADDRESS)
-        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
-        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+                'Email to %s failed to send. Please try again later or ' +
+                'contact us to report a bug at ' +
+                'https://www.oppia.org/contact.') % feconf.ADMIN_EMAIL_ADDRESS)
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        swap_send_email_to_recipients = self.swap(
+            platform_email_services, 'send_email_to_recipients',
+            lambda *_: False)
 
-        with mailgun_api, mailgun_domain, allow_emailing, email_exception, (
-            self.swap(
-                platform_email_services, 'send_email_to_recipients',
-                lambda *_: False)):
+        with allow_emailing, email_exception, swap_send_email_to_recipients:
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)

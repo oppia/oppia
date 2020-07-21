@@ -67,9 +67,7 @@ class EmailTests(test_utils.GenericTestBase):
             ' environment.')
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with allow_emailing, swap_api, swap_domain, (
+        with allow_emailing, (
             self.swap(logging, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
@@ -126,9 +124,7 @@ class EmailTests(test_utils.GenericTestBase):
             ' environment.')
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-        with allow_emailing, swap_api, swap_domain, (
+        with allow_emailing, (
             self.swap(logging, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS,

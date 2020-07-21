@@ -76,6 +76,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
 
         email_preferences_model.subscription_notifications = False
         email_preferences_model.put()
+
         with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
             email_subscription_services.inform_subscribers(
                 self.editor_id, 'A', 'Title')
@@ -83,16 +84,13 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             # Make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.
             messages = (
-                self._get_sent_email_messages(
-                    to=self.NEW_USER_EMAIL))
+                self._get_sent_email_messages(to=self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
             messages = (
-                self._get_sent_email_messages(
-                    to=self.NEW_USER_EMAIL))
+                self._get_sent_email_messages(to=self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
             messages = (
-                self._get_sent_email_messages(
-                    to=self.USER_EMAIL_2))
+                self._get_sent_email_messages(to=self.USER_EMAIL_2))
             self.assertEqual(len(messages), 0)
 
             # Make sure correct email models are stored.

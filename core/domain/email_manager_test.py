@@ -2380,8 +2380,8 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
     def test_can_send_emails_is_false_logs_error(self):
-        """When feconf.CAN_SEND_EMAILS is false, send_rejected_voiceover should
-        log an error.
+        """When feconf.CAN_SEND_EMAILS is false,
+        send_rejected_voiceover_application_email(*args) should log an error.
         """
         observed_log_messages = []
 
@@ -2395,9 +2395,8 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
                 'A rejection message!')
 
             expected_log_message = 'This app cannot send emails to users.'
-
-            self.assertTrue(
-                observed_log_messages[0].startswith(expected_log_message))
+            self.assertEqual(
+                observed_log_messages, [expected_log_message])
 
 
 class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):

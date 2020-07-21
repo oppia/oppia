@@ -42,15 +42,15 @@ def send_email_to_recipients(
         plaintext_body: str. The plaintext body of the email. Must be utf-8
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Must be utf-8.
-        bcc: list(str)|None. List of bcc emails.
-        reply_to: str|None. Reply address formatted like
+        bcc: list(str)|None. Optional argument. List of bcc emails.
+        reply_to: str|None. Optional argument. Reply address formatted like
             “reply+<reply_id>@<incoming_email_domain_name>
             reply_id is the unique id of the sender.
-        recipient_variables: dict|None. If batch sending requires
-            differentiating each email based on the recipient, we assign a
-            unique id to each recipient, including info relevant to that
-            recipient so that we can reference it when composing the email
-            like so:
+        recipient_variables: dict|None. Optional argument. If batch sending
+            requires differentiating each email based on the recipient, we
+            assign a unique id to each recipient, including info relevant to
+            that recipient so that we can reference it when composing the
+            email like so:
                 recipient_variables =
                     {"bob@example.com": {"first":"Bob", "id":1},
                      "alice@example.com": {"first":"Alice", "id":2}}
@@ -60,14 +60,13 @@ def send_email_to_recipients(
                 latest/user_manual.html#batch-sending
 
     Raises:
-        Exception: If the mailgun api key is not stored in
+        Exception: The mailgun api key is not stored in
             feconf.MAILGUN_API_KEY.
-        Exception: If the mailgun domain name is not stored in
+        Exception: The mailgun domain name is not stored in
             feconf.MAILGUN_DOMAIN_NAME.
 
     Returns:
-        bool. Whether the email is "sent" successfully, contingent on the
-        mailgun API returning a status code of 200.
+        bool. Whether the email is sent successfully.
     """
     if not feconf.MAILGUN_API_KEY:
         raise Exception('Mailgun API key is not available.')

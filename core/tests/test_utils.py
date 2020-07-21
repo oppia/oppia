@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import contextlib
 import copy
 import datetime
@@ -2280,25 +2281,56 @@ class AppEngineTestBase(TestBase):
 GenericTestBase = AppEngineTestBase
 
 
+class EmailMessageMock(python_utils.OBJECT):
+    """Mock for core.platform.models email services messages."""
+
+    def __init__(
+            self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Inits a mock email message with all the necessary data.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
+            recipient_email: str. The email address of the recipient.
+                Must be utf-8.
+            subject: str. The subject line of the email, Must be utf-8.
+            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity. Must be utf-8.
+            bcc: list(str)|str|None. Optional argument. List of bcc emails,
+                single bcc email. Emails must be utf-8.
+            reply_to: str|None. Optional argument. Reply address formatted like
+                “reply+<reply_id>@<incoming_email_domain_name>
+                reply_id is the unique id of the sender.
+            recipient_variables: dict|None. Optional argument. If batch sending
+                requires differentiating each email based on the recipient, we
+                assign a unique id to each recipient, including info relevant to
+                that recipient so that we can reference it when composing the
+                email like so:
+                    recipient_variables =
+                        {"bob@example.com": {"first":"Bob", "id":1},
+                        "alice@example.com": {"first":"Alice", "id":2}}
+                    subject = 'Hey, %recipient.first%’
+                More info about this format at:
+                https://documentation.mailgun.com/en/
+                    latest/user_manual.html#batch-sending
+        """
+        self.sender = sender_email
+        self.to = recipient_email
+        self.subject = subject
+        self.body = plaintext_body
+        self.html = html_body
+        self.bcc = bcc
+        self.reply_to = reply_to
+        self.recipient_variables = recipient_variables
+
+
 class GenericEmailTestBase(GenericTestBase):
     """Base class for tests requiring email services."""
 
-    class EmailMessageMock(python_utils.OBJECT):
-        """Mock for core.platform.models email services messages."""
-
-        def __init__(
-                self, sender_email, recipient_email, subject, plaintext_body,
-                html_body, bcc=None, reply_to=None, recipient_variables=None):
-            self.sender = sender_email
-            self.to = recipient_email
-            self.subject = subject
-            self.body = plaintext_body
-            self.html = html_body
-            self.bcc = bcc
-            self.reply_to = reply_to
-            self.recipient_variables = recipient_variables
-
-    emails_dict = {}
+    emails_dict = collections.defaultdict(list)
 
     def run(self, result=None):
         """Adds a context swap on top of the test_utils.run() method so that
@@ -2306,11 +2338,9 @@ class GenericEmailTestBase(GenericTestBase):
         a mailgun api key, mailgun domain name and mocked version of
         send_email_to_recipients().
         """
-        with self.swap(feconf, 'MAILGUN_API_KEY', 'key'), (
-            self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'name')), (
-                self.swap(
-                    email_services, 'send_email_to_recipients',
-                    self._send_email_to_recipients)):
+        with self.swap(
+            email_services, 'send_email_to_recipients',
+            self._send_email_to_recipients):
             super(EmailTestBase, self).run(result=result)
 
     def setUp(self):
@@ -2319,7 +2349,7 @@ class GenericEmailTestBase(GenericTestBase):
 
     def _wipe_emails_dict(self):
         """Reset email dictionary for a new test."""
-        self.emails_dict = {}
+        self.emails_dict = collections.defaultdict(list)
 
     def _send_email_to_recipients(
             self, sender_email, recipient_emails, subject, plaintext_body,
@@ -2361,14 +2391,12 @@ class GenericEmailTestBase(GenericTestBase):
         if bcc:
             bcc_emails = bcc[0] if len(bcc) == 1 else bcc
 
-        new_email = self.EmailMessageMock(
+        new_email = EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
             recipient_variables=(
                 recipient_variables if (recipient_variables) else None))
         for recipient_email in recipient_emails:
-            if recipient_email not in self.emails_dict:
-                self.emails_dict[recipient_email] = []
             self.emails_dict[recipient_email].append(new_email)
         return True
 
@@ -2379,13 +2407,18 @@ class GenericEmailTestBase(GenericTestBase):
             to: str. The recipient email address.
 
         Returns:
-            list(EmailMessageMock). Returns the list of email messages
-            corresponding to that recipient email.
+            list(EmailMessageMock). The list of email messages corresponding to
+            that recipient email.
         """
         return self.emails_dict[to] if to in self.emails_dict else []
 
     def _get_all_sent_email_messages(self):
-        """Gets the entire messages dictionary."""
+        """Gets the entire messages dictionary.
+
+        Returns:
+            dict(list(EmailMessageMock)). The dictionary containing all lists of
+            email messages indexed by the recipient emails.
+        """
         return self.emails_dict
 
 

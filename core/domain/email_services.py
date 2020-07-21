@@ -77,7 +77,7 @@ def get_feedback_thread_reply_info_by_user_and_thread_ids(user_id, thread_id):
     return get_feedback_thread_reply_info_from_model(model)
 
 
-def get_incoming_email_address(reply_to_id):
+def _get_incoming_email_address(reply_to_id):
     """Gets the incoming email address. The client is responsible for recording
     any audit logs.
 
@@ -90,7 +90,7 @@ def get_incoming_email_address(reply_to_id):
     return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 
 
-def is_email_valid(email_address):
+def _is_email_valid(email_address):
     """Determines whether an email address is invalid.
 
     Args:
@@ -110,7 +110,7 @@ def is_email_valid(email_address):
     return re.search(regex, email_address)
 
 
-def is_sender_email_valid(sender_email):
+def _is_sender_email_valid(sender_email):
     """Gets the sender_email address and validates that it is of the form
     'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
 
@@ -120,17 +120,12 @@ def is_sender_email_valid(sender_email):
     Returns:
         bool. Whether the sender_email is valid.
     """
-    # Checks the case where sender_email is of the form 'Jane <EMAIL>'.
-    sender_email_with_only_first_name_regex = (
-        r'^[a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})' +
-        '(]?)>$')
-    # Checks the case where sender_email is of the form 'Jane Doe <EMAIL>'.
-    sender_email_with_full_name_regex = (
-        r'^[a-zA-Z._]+ [a-zA-Z._]+ <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}' +
-        r'|[0-9]{1,3})(]?)>$')
-    return is_email_valid(sender_email) or (
-        re.search(sender_email_with_only_first_name_regex, sender_email)) or (
-            re.search(sender_email_with_full_name_regex, sender_email))
+    # Regex for 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
+    sender_email_regex = (
+        r'^[a-zA-Z._][a-zA-Z._ ]* <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|' +
+        r'[0-9]{1,3})(]?)>$')
+    return _is_email_valid(sender_email) or (
+        re.search(sender_email_regex, sender_email))
 
 
 def send_mail(
@@ -159,34 +154,35 @@ def send_mail(
     Raises:
         Exception: The configuration in feconf.py forbids emails from being
             sent.
-        Exception: If any recipient email addresses are malformed.
-        Exception: If any sender email addresses are malformed.
-        Exception: If the email was not sent correctly. In other words, the
+        Exception: Any recipient email addresses are malformed.
+        Exception: Any sender email addresses are malformed.
+        Exception: The email was not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
-    if not is_email_valid(recipient_email):
+    if not _is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
 
-    if not is_sender_email_valid(sender_email):
+    if not _is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
-    bcc = [feconf.ADMIN_EMAIL_ADDRESS] if (bcc_admin) else None
+    bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
     reply_to = (
-        get_incoming_email_address(reply_to_id)
+        _get_incoming_email_address(reply_to_id)
         if reply_to_id else '')
-    resp = platform_email_services.send_email_to_recipients(
+    response = platform_email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject.encode(encoding='utf-8'),
         plaintext_body.encode(encoding='utf-8'),
         html_body.encode(encoding='utf-8'), bcc, reply_to, None)
-    if not resp:
+    if not response:
         raise Exception(
-            ('Email to %s failed to send. Please check your email service ' +
-             'provider.') % recipient_email)
+            ('Email to %s failed to send. Please try again later or ' +
+             'contact us to report a bug at ' +
+             'https://www.oppia.org/contact.') % recipient_email)
 
 
 def send_bulk_mail(
@@ -211,9 +207,9 @@ def send_bulk_mail(
     Raises:
         Exception: The configuration in feconf.py forbids emails from being
             sent.
-        Exception: If any recipient email addresses are malformed.
-        Exception: If any sender email addresses are malformed.
-        Exception: If the email was not sent correctly. In other words, the
+        Exception: Any recipient email addresses are malformed.
+        Exception: Any sender email addresses are malformed.
+        Exception: The email was not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
@@ -221,19 +217,19 @@ def send_bulk_mail(
         raise Exception('This app cannot send emails to users.')
 
     for recipient_email in recipient_emails:
-        if not is_email_valid(recipient_email):
+        if not _is_email_valid(recipient_email):
             raise ValueError(
                 'Malformed recipient email address: %s' % recipient_email)
 
-    if not is_sender_email_valid(sender_email):
+    if not _is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
 
-    resp = platform_email_services.send_email_to_recipients(
+    response = platform_email_services.send_email_to_recipients(
         sender_email, recipient_emails, subject.encode(encoding='utf-8'),
         plaintext_body.encode(encoding='utf-8'),
         html_body.encode(encoding='utf-8'))
-    if not resp:
+    if not response:
         raise Exception(
-            'Bulk email failed to send. Please check your email' +
-            ' service provider.')
+            'Bulk email failed to send. Please try again later or contact us ' +
+            'to report a bug at https://www.oppia.org/contact.')
