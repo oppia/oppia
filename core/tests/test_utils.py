@@ -2419,7 +2419,7 @@ class GenericEmailTestBase(GenericTestBase):
         Returns:
             dict(str, (list(EmailMessageMock))). The dict keyed by recipient
             email. Each value contains a list of EmailMessageMock objects
-            corresponding to that recipient email, in other words, all
+            corresponding to that recipient email; in other words, all
             individual emails sent to that specific recipient email.
         """
         return self.emails_dict

@@ -33,6 +33,7 @@ import python_utils
 import utils
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
+email_services = models.Registry.import_email_services()
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -427,6 +428,15 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
 class EmailMockTests(test_utils.EmailTestBase):
     """Class for testing EmailTestBase."""
+
+    def test_override_run_swaps_contexts(self):
+        """Test that the current_function
+        email_services.send_email_to_recipients() is correctly swapped to its
+        mock version when the testbase extends EmailTestBase.
+        """
+        currrent_function = getattr(email_services, 'send_email_to_recipients')
+        correct_function = getattr(self, '_send_email_to_recipients')
+        self.assertEqual(currrent_function, correct_function)
 
     def test_mock_send_email_to_recipients_sends_correct_emails(self):
         """Test sending email to recipients using mock adds the correct objects
