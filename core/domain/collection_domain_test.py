@@ -38,14 +38,14 @@ import utils
 
 SAMPLE_YAML_CONTENT = (
     """category: A category
-    language_code: en
-    nodes:
-    - exploration_id: an_exploration_id
-    objective: An objective
-    schema_version: %d
-    tags: []
-    title: A title
-    """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+language_code: en
+nodes:
+- exploration_id: an_exploration_id
+objective: An objective
+schema_version: %d
+tags: []
+title: A title
+""") % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
 class CollectionChangeTests(test_utils.GenericTestBase):
@@ -717,119 +717,119 @@ class SchemaMigrationUnitTests(test_utils.GenericTestBase):
 
     YAML_CONTENT_V1 = (
         """category: A category
-        nodes:
-        - acquired_skills:
-          - Skill1
-          - Skill2
-          exploration_id: Exp1
-          prerequisite_skills: []
-        - acquired_skills: []
-          exploration_id: Exp2
-          prerequisite_skills:
-          - Skill1
-        objective: ''
-        schema_version: 1
-        title: A title
-        """)
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
+  exploration_id: Exp1
+  prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - Skill1
+objective: ''
+schema_version: 1
+title: A title
+""")
     YAML_CONTENT_V2 = (
         """category: A category
-        language_code: en
-        nodes:
-        - acquired_skills:
-          - Skill1
-          - Skill2
-          exploration_id: Exp1
-          prerequisite_skills: []
-        - acquired_skills: []
-          exploration_id: Exp2
-          prerequisite_skills:
-          - Skill1
-        objective: ''
-        schema_version: 2
-        tags: []
-        title: A title
-        """)
+language_code: en
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
+  exploration_id: Exp1
+  prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - Skill1
+objective: ''
+schema_version: 2
+tags: []
+title: A title
+""")
     YAML_CONTENT_V3 = (
         """category: A category
-        language_code: en
-        nodes:
-        - acquired_skills:
-          - Skill1
-          - Skill2
-          exploration_id: Exp1
-          prerequisite_skills: []
-        - acquired_skills: []
-          exploration_id: Exp2
-          prerequisite_skills:
-          - Skill1
-        objective: ''
-        schema_version: 2
-        tags: []
-        title: A title
-        """)
+language_code: en
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
+  exploration_id: Exp1
+  prerequisite_skills: []
+- acquired_skills: []
+  exploration_id: Exp2
+  prerequisite_skills:
+  - Skill1
+objective: ''
+schema_version: 2
+tags: []
+title: A title
+""")
     YAML_CONTENT_V4 = (
         """category: A category
-        language_code: en
-        next_skill_id: 2
-        nodes:
-        - acquired_skill_ids:
-          - skill0
-          - skill1
-          exploration_id: Exp1
-          prerequisite_skill_ids: []
-        - acquired_skill_ids: []
-          exploration_id: Exp2
-          prerequisite_skill_ids:
-          - skill0
-        objective: ''
-        schema_version: 4
-        skills:
-          skill0:
-            name: Skill1
-            question_ids: []
-          skill1:
-            name: Skill2
-            question_ids: []
-        tags: []
-        title: A title
-        """)
+language_code: en
+next_skill_id: 2
+nodes:
+- acquired_skill_ids:
+  - skill0
+  - skill1
+  exploration_id: Exp1
+  prerequisite_skill_ids: []
+- acquired_skill_ids: []
+  exploration_id: Exp2
+  prerequisite_skill_ids:
+  - skill0
+objective: ''
+schema_version: 4
+skills:
+  skill0:
+    name: Skill1
+    question_ids: []
+  skill1:
+    name: Skill2
+    question_ids: []
+tags: []
+title: A title
+""")
     YAML_CONTENT_V5 = (
         """category: A category
-        language_code: en
-        next_skill_index: 2
-        nodes:
-        - acquired_skill_ids:
-          - skill0
-          - skill1
-          exploration_id: Exp1
-          prerequisite_skill_ids: []
-        - acquired_skill_ids: []
-          exploration_id: Exp2
-          prerequisite_skill_ids:
-          - skill0
-        objective: ''
-        schema_version: 5
-        skills:
-          skill0:
-            name: Skill1
-            question_ids: []
-          skill1:
-            name: Skill2
-            question_ids: []
-        tags: []
-        title: A title
-        """)
+language_code: en
+next_skill_index: 2
+nodes:
+- acquired_skill_ids:
+  - skill0
+  - skill1
+  exploration_id: Exp1
+  prerequisite_skill_ids: []
+- acquired_skill_ids: []
+  exploration_id: Exp2
+  prerequisite_skill_ids:
+  - skill0
+objective: ''
+schema_version: 5
+skills:
+  skill0:
+    name: Skill1
+    question_ids: []
+  skill1:
+    name: Skill2
+    question_ids: []
+tags: []
+title: A title
+""")
     YAML_CONTENT_V6 = (
         """category: A category
-        language_code: en
-        nodes:
-        - exploration_id: Exp1
-        - exploration_id: Exp2
-        objective: ''
-        schema_version: 6
-        tags: []
-        title: A title
-        """)
+language_code: en
+nodes:
+- exploration_id: Exp1
+- exploration_id: Exp2
+objective: ''
+schema_version: 6
+tags: []
+title: A title
+""")
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V6
 

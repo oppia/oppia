@@ -207,8 +207,6 @@ class HangingIndentChecker(checkers.BaseChecker):
                 in_string = False
                 for char_num in python_utils.RANGE(line_length):
                     char = line[char_num]
-                    python_utils.PRINT(repr(char))
-                    python_utils.PRINT(in_string)
                     if (
                             in_string and (
                                 char == escape_character_indicator or

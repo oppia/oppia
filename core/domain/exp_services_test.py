@@ -3653,8 +3653,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         # Check actual summaries equal expected summaries.
         self.assertEqual(
-            list(actual_summaries.keys()),
-            list(expected_summaries.keys()))
+            list(actual_summaries.keys()), list(expected_summaries.keys()))
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
@@ -4432,9 +4431,10 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                     'value': [
                         '<p>1</p>',
                         '<p>2</p>',
-                        '<oppia-noninteractive-math raw_latex-with-value="&am'
-                        'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                        'uot;"></oppia-noninteractive-math>',
+                        (
+                            '<oppia-noninteractive-math raw_latex-with-value='
+                            '"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
+                            '&amp;quot;"></oppia-noninteractive-math>'),
                         '<p>4</p>'
                     ]
                 },

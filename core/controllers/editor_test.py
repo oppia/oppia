@@ -316,150 +316,150 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     SAMPLE_JSON_CONTENT = {
         'State A': (
             """classifier_model_id: null
-            content:
-              content_id: content
-              html: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args:
-                placeholder:
-                  value: ''
-                rows:
-                  value: 1
-              default_outcome:
-                dest: State A
-                feedback:
-                  content_id: default_outcome
-                  html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              hints: []
-              id: TextInput
-              solution: null
-            param_changes: []
-            recorded_voiceovers:
-              voiceovers_mapping:
-                content: {}
-                default_outcome: {}
-            solicit_answer_details: false
-            written_translations:
-              translations_mapping:
-                content: {}
-                default_outcome: {}
-            """),
+content:
+  content_id: content
+  html: ''
+interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
+  customization_args:
+    placeholder:
+      value: ''
+    rows:
+      value: 1
+  default_outcome:
+    dest: State A
+    feedback:
+      content_id: default_outcome
+      html: ''
+    labelled_as_correct: false
+    missing_prerequisite_skill_id: null
+    param_changes: []
+    refresher_exploration_id: null
+  hints: []
+  id: TextInput
+  solution: null
+param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
+solicit_answer_details: false
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
+"""),
         'State B': (
             """classifier_model_id: null
-            content:
-              content_id: content
-              html: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args:
-                placeholder:
-                  value: ''
-                rows:
-                  value: 1
-              default_outcome:
-                dest: State B
-                feedback:
-                  content_id: default_outcome
-                  html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              hints: []
-              id: TextInput
-              solution: null
-            param_changes: []
-            recorded_voiceovers:
-              voiceovers_mapping:
-                content: {}
-                default_outcome: {}
-            solicit_answer_details: false
-            written_translations:
-              translations_mapping:
-                content: {}
-                default_outcome: {}
-            """),
+content:
+  content_id: content
+  html: ''
+interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
+  customization_args:
+    placeholder:
+      value: ''
+    rows:
+      value: 1
+  default_outcome:
+    dest: State B
+    feedback:
+      content_id: default_outcome
+      html: ''
+    labelled_as_correct: false
+    missing_prerequisite_skill_id: null
+    param_changes: []
+    refresher_exploration_id: null
+  hints: []
+  id: TextInput
+  solution: null
+param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
+solicit_answer_details: false
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
+"""),
         feconf.DEFAULT_INIT_STATE_NAME: (
             """classifier_model_id: null
-            content:
-              content_id: content
-              html: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args:
-                placeholder:
-                  value: ''
-                rows:
-                  value: 1
-              default_outcome:
-                dest: %s
-                feedback:
-                  content_id: default_outcome
-                  html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              hints: []
-              id: TextInput
-              solution: null
-            param_changes: []
-            recorded_voiceovers:
-              voiceovers_mapping:
-                content: {}
-                default_outcome: {}
-            solicit_answer_details: false
-            written_translations:
-              translations_mapping:
-                content: {}
-                default_outcome: {}
-            """) % feconf.DEFAULT_INIT_STATE_NAME
+content:
+  content_id: content
+  html: ''
+interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
+  customization_args:
+    placeholder:
+      value: ''
+    rows:
+      value: 1
+  default_outcome:
+    dest: %s
+    feedback:
+      content_id: default_outcome
+      html: ''
+    labelled_as_correct: false
+    missing_prerequisite_skill_id: null
+    param_changes: []
+    refresher_exploration_id: null
+  hints: []
+  id: TextInput
+  solution: null
+param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
+solicit_answer_details: false
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
+""") % feconf.DEFAULT_INIT_STATE_NAME
     }
 
     SAMPLE_STATE_STRING = (
         """classifier_model_id: null
-        content:
-          content_id: content
-          html: ''
-        interaction:
-          answer_groups: []
-          confirmed_unclassified_answers: []
-          customization_args:
-            placeholder:
-              value: ''
-            rows:
-              value: 1
-          default_outcome:
-            dest: State A
-            feedback:
-              content_id: default_outcome
-              html: ''
-            labelled_as_correct: false
-            missing_prerequisite_skill_id: null
-            param_changes: []
-            refresher_exploration_id: null
-          hints: []
-          id: TextInput
-          solution: null
-        param_changes: []
-        recorded_voiceovers:
-          voiceovers_mapping:
-            content: {}
-            default_outcome: {}
-        solicit_answer_details: false
-        written_translations:
-          translations_mapping:
-            content: {}
-            default_outcome: {}
-        """)
+content:
+  content_id: content
+  html: ''
+interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
+  customization_args:
+    placeholder:
+      value: ''
+    rows:
+      value: 1
+  default_outcome:
+    dest: State A
+    feedback:
+      content_id: default_outcome
+      html: ''
+    labelled_as_correct: false
+    missing_prerequisite_skill_id: null
+    param_changes: []
+    refresher_exploration_id: null
+  hints: []
+  id: TextInput
+  solution: null
+param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
+solicit_answer_details: false
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
+""")
 
     def test_can_not_download_exploration_with_disabled_exp_id(self):
         download_url = '/createhandler/download/5'
@@ -1846,10 +1846,11 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
                     'Thanks!<br>'
                     '%s (Oppia moderator)<br><br>'
                     'You can change your email preferences via the '
-                    '<a href="https://www.example.com">Preferences</a> page.' %
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME))
+                    '<a href="https://www.example.com">Preferences</a> '
+                    'page.' % (
+                        self.EDITOR_USERNAME,
+                        new_email_body,
+                        self.MODERATOR_USERNAME)))
 
             self.logout()
 
