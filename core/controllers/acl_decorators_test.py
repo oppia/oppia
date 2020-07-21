@@ -1196,8 +1196,8 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class ManageOwnProfileTests(test_utils.GenericTestBase):
-    """Tests for decorator can_manage_own_profile."""
+class ManageOwnAccountTests(test_utils.GenericTestBase):
+    """Tests for decorator can_manage_own_account."""
 
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
@@ -1207,12 +1207,12 @@ class ManageOwnProfileTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_manage_own_profile
+        @acl_decorators.can_manage_own_account
         def get(self):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(ManageOwnProfileTests, self).setUp()
+        super(ManageOwnAccountTests, self).setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
         self.set_banned_users([self.banned_user])

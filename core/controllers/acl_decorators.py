@@ -449,19 +449,19 @@ def can_send_moderator_emails(handler):
     return test_can_send_moderator_emails
 
 
-def can_manage_own_profile(handler):
-    """Decorator to check whether user can manage their profile.
+def can_manage_own_account(handler):
+    """Decorator to check whether user can manage their account.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if the user
-        has permission to manage their profile.
+        has permission to manage their account.
     """
 
-    def test_can_manage_profile(self, **kwargs):
-        """Checks if the user is logged in and can manage their profile.
+    def test_can_manage_account(self, **kwargs):
+        """Checks if the user is logged in and can manage their account.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -472,19 +472,19 @@ def can_manage_own_profile(handler):
         Raises:
             NotLoggedInException: The user is not logged in.
             UnauthorizedUserException: The user does not have credentials to
-                manage profile or preferences.
+                manage account or preferences.
         """
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_PROFILE in self.user.actions:
+        if role_services.ACTION_MANAGE_ACCOUNT in self.user.actions:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
-            'You do not have credentials to manage profile or preferences.')
-    test_can_manage_profile.__wrapped__ = True
+            'You do not have credentials to manage account or preferences.')
+    test_can_manage_account.__wrapped__ = True
 
-    return test_can_manage_profile
+    return test_can_manage_account
 
 
 def can_access_admin_page(handler):
