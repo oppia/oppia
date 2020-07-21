@@ -73,6 +73,25 @@
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Generate SVGs for exploration</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.generateSvgsForExplorations()">
+      <div class="form-group row">
+        <input type="submit" value="Generate">
+      </div>
+    </form>
+  </div>
+  <h3>Save the SVGs for exploration</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.saveSvgsToBackend()">
+      <div class="form-group row">
+        <input type="submit" value="Save">
+      </div>
+    </form>
+  </div>
+
+</md-card>
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Update username</h3>
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.updateUsername()">

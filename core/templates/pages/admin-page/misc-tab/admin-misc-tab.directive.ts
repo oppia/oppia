@@ -19,17 +19,20 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
+require('services/image-upload-helper.service.ts');
+require('services/alerts.service.ts');
+require('mathjaxConfig.ts');
 require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
-  'MAX_USERNAME_LENGTH',
+  '$http', '$window', 'AdminTaskManagerService', 'AlertsService',
+  'ImageUploadHelperService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window, AdminTaskManagerService, UrlInterpolationService,
-      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL,
-      MAX_USERNAME_LENGTH) {
+      $http, $window, AdminTaskManagerService, AlertsService,
+      ImageUploadHelperService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
       scope: {},
@@ -46,7 +49,7 @@ angular.module('oppia').directive('adminMiscTab', [
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
         var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-
+        var ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler';
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
@@ -159,6 +162,65 @@ angular.module('oppia').directive('adminMiscTab', [
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);
             });
+        };
+
+        var convertLatexToSvgFile = function(latexValue) {
+          let html = MathJax.tex2svg(latexValue);
+          var svg = html.getElementsByTagName('svg')[0].outerHTML;
+          var cleanedSvgString = (
+            ImageUploadHelperService.cleanMathExpressionSvgString(
+              svg));
+          var dimensions = (
+            ImageUploadHelperService.
+              extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
+          var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
+          var invalidTagsAndAttributes = (
+            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+          var tags = invalidTagsAndAttributes.tags;
+          var attrs = invalidTagsAndAttributes.attrs;
+          if (tags.length === 0 && attrs.length === 0) {
+            var resampledFile = (
+              ImageUploadHelperService.convertImageDataToImageFile(dataURI));
+            return ({
+              file: resampledFile,
+              dimensions: dimensions
+            });
+          } else {
+            AlertsService.addWarning('SVG failed validation.');
+          }
+        };
+        var latexMapping = {};
+        ctrl.generateSvgsForExplorations = function() {
+          $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
+            function(response) {
+              for (var expId in response.data.result) {
+                var latexValues = response.data.result[expId];
+                latexMapping[expId] = {};
+                for (var i = 0; i < latexValues.length; i++) {
+                  var svgFile = convertLatexToSvgFile(latexValues[i]);
+                  latexMapping[expId][latexValues[i]] = svgFile;
+                }
+              }
+              ctrl.setStatusMessage('Latex values loaded.');
+            });
+        };
+        ctrl.saveSvgsToBackend = function() {
+          let body = new FormData();
+          for (var expId in latexMapping) {
+            for (var latexValue in latexMapping[expId]) {
+              body.set(latexValue, latexMapping[expId][latexValue].file);
+              delete latexMapping[expId][latexValue].file;
+            }
+          }
+          body.append(
+            'payload', JSON.stringify({latexMapping: latexMapping}));
+          $http.post(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER, (body), {
+            headers: {
+              'Content-Type': undefined
+            }
+          }).then(function(response) {
+            ctrl.setStatusMessage('Successfully Saved SVGs.');
+          });
         };
 
         ctrl.updateUsername = function() {

@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import datetime
+import functools
 import logging
 import math
 import os
@@ -42,8 +43,10 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
+from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rights_manager
@@ -1791,3 +1794,184 @@ def save_multi_exploration_math_rich_text_info_model(
 
     exp_models.ExplorationMathRichTextInfoModel.put_multi(
         exploration_math_rich_text_info_models)
+
+
+def generate_html_change_list_for_state(state_name, state_dict):
+    """Returns the change lists for all the html fields in the state dict.
+
+    Args:
+        state_name: str. The name of the state.
+        state_dict: dict. The dict representation of State object.
+
+    Returns:
+        list(ExplorationChange). The generated change list.
+    """
+    change_lists_after_application_of_conversion_fn = []
+    change_lists_after_application_of_conversion_fn.append(
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'new_value': state_dict['interaction']['customization_args']
+        }))
+    change_lists_after_application_of_conversion_fn.append(
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'new_value': state_dict['content']
+        }))
+
+    change_lists_after_application_of_conversion_fn.append(
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+            'new_value': state_dict['written_translations']
+        }))
+
+    change_lists_after_application_of_conversion_fn.append(
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'new_value': state_dict['interaction']['default_outcome']
+        }))
+    change_lists_after_application_of_conversion_fn.append(
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+            'new_value': state_dict['interaction']['hints']
+        }))
+
+    change_lists_after_application_of_conversion_fn.append(
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+            'new_value': state_dict['interaction']['solution']
+        }))
+
+    change_lists_after_application_of_conversion_fn.append(
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': state_dict['interaction']['answer_groups']
+        }))
+
+    return change_lists_after_application_of_conversion_fn
+
+
+def get_latex_values_and_exp_ids_for_generating_svgs():
+    """Returns the change lists for all the html fields in the state dict.
+
+    Returns:
+        dict(str, list). The dict having each key as an exp_id and value
+        as a list of latex values.
+    """
+
+    latex_values_mapping = {}
+    exploration_math_rich_text_info_models = (
+        exp_models.ExplorationMathRichTextInfoModel.get_all())
+    size_of_svgs_in_batch = 0
+    for model in exploration_math_rich_text_info_models:
+        if model.math_images_generation_required:
+            latex_values_mapping[model.id] = model.latex_values_without_svg
+            size_of_svgs_in_batch += (
+                model.estimated_max_size_of_images_in_bytes)
+            if size_of_svgs_in_batch > feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES:
+                return latex_values_mapping
+    return latex_values_mapping
+
+
+def update_explorations_with_math_svgs(user_id, exp_id, image_data):
+    """Saves an SVG for each latex value without an SVG in an exploration
+    and updates the exploration. Also the corresponding valid draft changes are
+    updated.
+
+    Args:
+        image_data: dict. The dictionary having all the image data like latex
+            value and dimensions which will be used for generating and assigning
+            filenames.
+        user_id: str. The ID of the commiter.
+        exp_id: str. The ID of the exploration to update.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    html_strings_after_conversion = ''
+    change_lists = []
+    for state_name, state in exploration.states.items():
+        add_svg_filenames_for_latex_values_in_html_string = (
+            functools.partial(
+                html_validation_service.
+                add_svg_filenames_for_latex_values_in_html_string, image_data))
+        converted_state_dict = (
+            state_domain.State.convert_html_fields_in_state(
+                state.to_dict(),
+                add_svg_filenames_for_latex_values_in_html_string))
+        converted_state = state_domain.State.from_dict(converted_state_dict)
+        html_strings_after_conversion += (
+            ''.join(converted_state.get_all_html_content_strings()))
+        change_lists.extend(
+            generate_html_change_list_for_state(
+                state_name, converted_state_dict))
+
+    filenames_mapping = (
+        html_validation_service.
+        extract_svg_filename_latex_mapping_in_math_rte_components(
+            html_strings_after_conversion))
+
+    for filename, raw_latex in filenames_mapping:
+        image_file = image_data[raw_latex]['file']
+        image_validation_error_message_suffix = (
+            'SVG image provided for latex %s failed validation' % raw_latex)
+        if not image_file:
+            logging.error(
+                'Image not provided for filename %s' % (filename))
+            raise Exception(
+                'No image data provided for file with name %s. %s'
+                % (filename, image_validation_error_message_suffix))
+        try:
+            file_format = (
+                image_validation_services.validate_image_and_filename(
+                    image_file, filename))
+        except utils.ValidationError as e:
+            e = '%s %s' % (e, image_validation_error_message_suffix)
+            raise Exception(e)
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        fs_services.save_original_and_compressed_versions_of_image(
+            filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id, image_file,
+            'image', image_is_compressible)
+
+
+    update_exploration(
+        user_id, exp_id, change_lists, 'added SVG images for math tags.')
+
+    exploration_user_data_model = (
+        user_models.ExplorationUserDataModel.get_all().filter(
+            user_models.ExplorationUserDataModel.exploration_id == exp_id))
+    exploration_version_before_update = exploration.version
+    user_models_to_update = []
+    for model in exploration_user_data_model:
+        if model.draft_change_list:
+            continue
+        if model.draft_change_list_exp_version is None:
+            continue
+        draft_change_list = model.draft_changes
+        if model.draft_change_list_exp_version == (
+                exploration_version_before_update):
+            html_in_draft_change = (
+                draft_upgrade_services.extract_html_from_draft_change_list(
+                    draft_change_list))
+            if len(
+                    html_validation_service.
+                    get_latext_values_without_svg_from_html(
+                        html_in_draft_change)) == 0:
+                model.draft_change_list_exp_version += 1
+                user_models_to_update.append(model)
+
+    user_models.ExplorationUserDataModel.put_multi(user_models_to_update)

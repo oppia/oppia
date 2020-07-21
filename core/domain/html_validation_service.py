@@ -19,8 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import json
 import logging
+import random
+import string
 import xml
 
 import bs4
@@ -850,6 +853,115 @@ def add_dimensions_to_image_tags(exp_id, html_string):
                 (exp_id, image['filepath-with-value'].encode('utf-8')))
             raise e
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+
+
+def generate_math_svgs_filename(height, width, vertical_padding):
+    """Generates a random filename for a math SVG based on the given
+    dimensions.
+
+    Args:
+        height: str. Height of the image.
+        width: str. Width of the image.
+        vertical_padding: str. The vertical padding required for the SVG when
+            displayed inline.
+
+    Returns:
+        str. The name of the SVG file with its dimensions in it.
+    """
+
+    random_string = (
+        ''.join(
+            random.choice(
+                string.ascii_lowercase + string.digits) for _ in (
+                    python_utils.RANGE(10))))
+    date_object = datetime.datetime.utcnow()
+    year = python_utils.UNICODE(date_object.year)
+    month = python_utils.UNICODE(date_object.month)[-2:]
+    day = python_utils.UNICODE(date_object.day)[-2:]
+    hour = python_utils.UNICODE(date_object.hour)[-2:]
+    minute = python_utils.UNICODE(date_object.minute)[-2:]
+    second = python_utils.UNICODE(date_object.second)[-2:]
+    date_time_string = (
+        year + month + day + hour + minute + second + random_string)
+
+    filename = (
+        'mathImg_' + date_time_string + '_height_' + height + '_width_' +
+        width + '_vertical_' + python_utils.UNICODE(vertical_padding) + '.' +
+        'svg')
+    return filename
+
+
+def add_svg_filenames_for_latex_values_in_html_string(image_data, html_string):
+    """Adds the filenames for math rich-text components with empty svg_filename
+    field based on the given images data.
+
+    Args:
+        image_data: dict. The dictionary having all the image data like latex
+            value and dimensions which will be used for generating and assigning
+            filenames.
+        html_string: str. HTML string to modify.
+
+    Returns:
+        str. Updated HTML string with all Math component tags having a filename.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        raw_latex = (
+            objects.UnicodeString.normalize(math_content_dict['raw_latex']))
+        svg_filename = (
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+        if svg_filename == '':
+            dimensions = image_data[raw_latex]['dimensions']
+            filename = (
+                generate_math_svgs_filename(
+                    dimensions['height'], dimensions['width'],
+                    dimensions['verticalPadding']))
+            math_content_dict = {
+                'raw_latex': raw_latex,
+                'svg_filename': objects.UnicodeString.normalize(filename)
+            }
+            normalized_math_content_dict = (
+                objects.MathExpressionContent.normalize(math_content_dict))
+            math_tag['math_content-with-value'] = (
+                escape_html(
+                    json.dumps(normalized_math_content_dict, sort_keys=True)))
+
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+
+
+def extract_svg_filename_latex_mapping_in_math_rte_components(html_string):
+    """Extracts the svg_filenames along with the corresponding raw_latex
+    value from all the math-rich text components in an HTML string.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(tuple(str, str)).
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    filenames_mapping = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        svg_filename = math_content_dict['svg_filename']
+        if svg_filename != '':
+            normalized_svg_filename = (
+                objects.UnicodeString.normalize(svg_filename))
+            normalized_raw_latex = (
+                objects.UnicodeString.normalize(math_content_dict['raw_latex']))
+
+            filenames_mapping.append(
+                (normalized_svg_filename, normalized_raw_latex))
+    return filenames_mapping
 
 
 def get_filename_with_dimensions(old_filename, exp_id):

@@ -31,6 +31,8 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -4538,3 +4540,276 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_changes._customization_args,
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
+
+
+class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
+    """Unit tests for function used in generation of SVGs for math rich-text
+    components in explorations.
+    """
+
+    def setUp(self):
+        super(ExplorationUpdationWithMathSvgsUnitTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_exploration_is_updated_with_math_svgs_when_image_data_is_valid(
+            self):
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content1,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    valid_html_content2
+                ]
+            }
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        image_data = {
+            '+,+,+,+': {
+                'file': svg_file_1,
+                'dimensions': {
+                    'height': '1d429',
+                    'width': '1d33',
+                    'verticalPadding': '0d241'
+                }
+            },
+            '\\frac{x}{y}': {
+                'file': svg_file_2,
+                'dimensions': {
+                    'height': '1d525',
+                    'width': '3d33',
+                    'verticalPadding': '0d241'
+                }
+            }
+        }
+        exp_services.update_explorations_with_math_svgs(
+            self.admin_id, 'exp_id1', image_data)
+        update_exploration = exp_fetchers.get_exploration_by_id('exp_id1')
+        updated_html_string = ''
+        for state in update_exploration.states.values():
+            updated_html_string += (
+                ''.join(state.get_all_html_content_strings()))
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(updated_html_string))
+
+        self.assertEqual(len(filenames), 3)
+        for filename in filenames:
+            file_system_class = (
+                fs_services.get_entity_file_system_class())
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+            filepath = 'image/%s' % filename
+            self.assertTrue(fs.isfile(filepath))
+
+
+    def test_updation_fails_when_image_file_is_not_provided(self):
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content1,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    valid_html_content2
+                ]
+            }
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        image_data = {
+            '+,+,+,+': {
+                'file': svg_file_1,
+                'dimensions': {
+                    'height': '1d429',
+                    'width': '1d33',
+                    'verticalPadding': '0d241'
+                }
+            },
+            '\\frac{x}{y}': {
+                'file': None,
+                'dimensions': {
+                    'height': '1d525',
+                    'width': '3d33',
+                    'verticalPadding': '0d241'
+                }
+            }
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'No image data provided for file with name '):
+            exp_services.update_explorations_with_math_svgs(
+                self.admin_id, 'exp_id1', image_data)
+
+    def test_updation_fails_when_svg_file_is_invalid(self):
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content1,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    valid_html_content2
+                ]
+            }
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        invalid_svg_file = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><invalid tag stroke="currentColor" fill="c'
+            'urrentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">'
+            '<path stroke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442'
+            ' 2864Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 3'
+            '8T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 15'
+            '3 504 145284 52 289Z"/></g></svg>'
+        )
+
+        image_data = {
+            '+,+,+,+': {
+                'file': svg_file_1,
+                'dimensions': {
+                    'height': '1d429',
+                    'width': '1d33',
+                    'verticalPadding': '0d241'
+                }
+            },
+            '\\frac{x}{y}': {
+                'file': invalid_svg_file,
+                'dimensions': {
+                    'height': '1d525',
+                    'width': '3d33',
+                    'verticalPadding': '0d241'
+                }
+            }
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'Image not recognized SVG image provided for latex \\\\frac{x}{y}'
+            ' failed validation'):
+            exp_services.update_explorations_with_math_svgs(
+                self.admin_id, 'exp_id1', image_data)

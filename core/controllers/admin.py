@@ -56,6 +56,7 @@ import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class AdminPage(base.BaseHandler):
@@ -586,6 +587,34 @@ class AdminHandler(base.BaseHandler):
                 exploration_ids_to_publish)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
+
+
+class AdminMathSvgImageGenerationHandler(base.BaseHandler):
+    """Handler updating Explorations having math rich-text components with
+    math SVGs.
+    """
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        latex_values_mapping = (
+            exp_services.get_latex_values_and_exp_ids_for_generating_svgs())
+        self.render_json({
+            'result': latex_values_mapping
+        })
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        data = self.payload.get('latexMapping')
+        for exp_id, latex_values_dict in data.items():
+            for latex_value in latex_values_dict.keys():
+                data[exp_id][latex_value]['file'] = (
+                    self.request.get(latex_value))
+        for exp_id in data.keys():
+            exp_services.update_explorations_with_math_svgs(
+                self.user_id, exp_id, data[exp_id])
+        self.render_json({
+            'result': 'successfully updated'
+        })
 
 
 class AdminRoleHandler(base.BaseHandler):

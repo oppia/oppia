@@ -112,11 +112,16 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           if (node.tagName.toLowerCase() === 'svg') {
             node.removeAttribute('xmlns:xlink');
             node.removeAttribute('role');
+            node.removeAttribute('aria-hidden');
             node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            cleanedSvgString = node.outerHTML;
+          } else if (node.tagName.toLowerCase() === 'g') {
+            node.removeAttribute('data-mml-node');
+            node.removeAttribute('data-mjx-texclass');
+          } else if (node.tagName.toLowerCase() === 'path') {
+            node.removeAttribute('data-c');
           }
         });
-        return cleanedSvgString;
+        return doc.documentElement.outerHTML;
       },
 
       extractDimensionsFromMathExpressionSvgString: function(svgString) {
@@ -143,9 +148,12 @@ angular.module('oppia').factory('ImageUploadHelperService', [
                 '.', 'd'));
             // This attribute is useful for the vertical allignment of the
             // Math SVG while displaying inline with other text.
-            dimensions.verticalPadding = (
-              (node.getAttribute('style').match(/\d+\.\d+/g)[0]).replace(
-                '.', 'd'));
+            var styleValue = node.getAttribute('style').match(/\d+\.\d+/g);
+            if (styleValue) {
+              dimensions.verticalPadding = styleValue[0].replace('.', 'd');
+            } else {
+              dimensions.verticalPadding = 0;
+            }
           }
         });
         return dimensions;
