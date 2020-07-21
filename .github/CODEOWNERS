@@ -12,6 +12,7 @@
 # - You do not need to assign yourself as a codeowner (unless you are a project
 #   lead listed on the page above).
 
+
 # Blanket codeowners
 # This is for the case when new files are created in any directories that aren't
 # covered as a whole, since in these cases, codeowners are not recognized for
@@ -21,15 +22,17 @@
 # (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
 /core/controllers/ @aks681
 /core/domain/ @DubeySandeep
-/core/templates/services/ @nithusha21
-/core/templates/pages/ @seanlip
+/core/templates/components/ @bansalnitish
 /core/templates/domain/ @kevintab95
+/core/templates/pages/ @seanlip
+/core/templates/services/ @nithusha21
 /extensions/ @vojtechjelinek
 /scripts/ @ankita240796
 
-/core/templates/components/ @bansalnitish
+
 # Android team
 /core/domain/android_validation_constants*.py @BenHenning
+
 
 # Angular Migration team
 /core/templates/components/shared-component.module.ts @bansalnitish @srijanreddy98
