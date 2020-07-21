@@ -26,5 +26,7 @@ require('pages/topic-editor-page/topic-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
+require(
+  'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
 require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
 require('pages/topic-editor-page/topic-editor-page.component.ts');

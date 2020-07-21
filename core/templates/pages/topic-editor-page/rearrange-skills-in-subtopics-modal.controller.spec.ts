@@ -39,7 +39,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     $uibModalInstance = $injector.get('$uibModal');

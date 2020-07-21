@@ -82,7 +82,7 @@ describe('Topic editor tab directive', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     EntityCreationService = $injector.get('EntityCreationService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');

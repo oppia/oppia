@@ -25,7 +25,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { IInteractionAnswer } from
   'interactions/answer-defs';
 
-export interface IAnswerStatsBackendDict {
+export interface AnswerStatsBackendDict {
   answer: IInteractionAnswer;
   frequency: number;
 }
@@ -78,7 +78,7 @@ export class AnswerStats {
   }
 
   /** @returns {answer, frequency: number} */
-  toBackendDict(): IAnswerStatsBackendDict {
+  toBackendDict(): AnswerStatsBackendDict {
     return {
       answer: cloneDeep(this.answer),
       frequency: this.frequency
@@ -100,7 +100,7 @@ export class AnswerStatsObjectFactory {
    * @returns {AnswerStats}
    */
   createFromBackendDict(
-      backendDict: IAnswerStatsBackendDict): AnswerStats {
+      backendDict: AnswerStatsBackendDict): AnswerStats {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?
