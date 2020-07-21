@@ -115,12 +115,11 @@ angular.module('oppia').directive('topicEditorPage', [
             if (TopicEditorStateService.hasLoadedTopic()) {
               const activeTab = ctrl.getActiveTabName();
               if (activeTab === 'main') {
-                return (
-                  `Topic Editor: ${ctrl.topic.getName()} ` +
-                  `(v${ctrl.topic.getVersion()})`);
-              }
-              if (activeTab.startsWith('subtopic')) {
+                return 'Topic Editor';
+              } else if (activeTab === 'subtopic_editor') {
                 return 'Subtopic Editor';
+              } else if (activeTab === 'subtopic_preview') {
+                return 'Subtopic Viewer';
               }
             }
           };
