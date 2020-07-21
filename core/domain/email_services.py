@@ -106,7 +106,9 @@ def _is_email_valid(email_address):
     if not stripped_address:
         return False
     # Regex for a valid email.
-    regex = r'^.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$'
+    # Matches any characters before the at sign, a series of characters until a
+    # . and must end with a series of characters after the period.
+    regex = r'^.+@[a-zA-Z0-9-.]+\.([a-zA-Z]+|[0-9]+)$'
     return re.search(regex, email_address)
 
 
@@ -121,9 +123,10 @@ def _is_sender_email_valid(sender_email):
         bool. Whether the sender_email is valid.
     """
     # Regex for 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
+    # Matches a name and then an email in the angle brackets.
+    # Email regex explained in _is_email_valid().
     sender_email_regex = (
-        r'^[a-zA-Z._][a-zA-Z._ ]* <.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|' +
-        r'[0-9]{1,3})(]?)>$')
+        r'^[a-zA-Z._][a-zA-Z._ ]* <^.+@[a-zA-Z0-9-.]+\.([a-zA-Z]+|[0-9]+)>$')
     return _is_email_valid(sender_email) or (
         re.search(sender_email_regex, sender_email))
 
