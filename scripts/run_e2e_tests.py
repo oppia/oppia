@@ -262,7 +262,8 @@ def update_contributor_dashboard_status_in_feconf_file(
             dashboard is enabled.
     """
     pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
-    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = %s' % enable_contributor_dashboard
+    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = %s' % (
+        enable_contributor_dashboard)
     common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 
