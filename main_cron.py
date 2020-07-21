@@ -34,8 +34,7 @@ URLS = [
     main.get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     main.get_redirect_route(
-        r'/cron/users/user_deletion',
-        cron.CronFullyCompleteUserDeletionHandler),
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
     main.get_redirect_route(
         r'/cron/users/fully_complete_user_deletion',
         cron.CronFullyCompleteUserDeletionHandler),
