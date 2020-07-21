@@ -469,8 +469,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_exploration_handler_with_long_commit_mesage(self):
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -492,7 +490,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             response['error'],
             'Commit messages must be at most 1000 characters.'
         )
-        
+
     def test_accept_suggestion(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 

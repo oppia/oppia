@@ -347,7 +347,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
-    
+
     def test_editable_topic_handler_put_fails_with_long_commit_message(self):
         change_cmd = {
             'version': 2,

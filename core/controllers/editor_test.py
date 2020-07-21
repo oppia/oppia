@@ -1579,7 +1579,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             params={'v': 'invalid_version'}, expected_status_int=404)
         self.logout()
-    
+
     def test_put_with_long_commit_message_raises_error(self):
         # Create several users.
         self.signup(
@@ -1609,7 +1609,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token=csrf_token)
         self.logout()
-    
+
         self.login(self.COLLABORATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 

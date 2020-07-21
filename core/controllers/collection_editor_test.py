@@ -217,7 +217,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertEqual(2, json_response['collection']['version'])
 
         self.logout()
-    
+
     def test_cannot_put_long_commit_message(self):
         """Check that putting a long commit message is denied."""
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
