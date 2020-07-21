@@ -43,20 +43,20 @@ CHROME_DRIVER_VERSION = '77.0.3865.40'
 class MockProcessClass(python_utils.OBJECT):
 
     def __init__(self, clean_shutdown=True):
-    """Mock process
+        """Mock process
 
-    Attributes:
-        poll_count: int. The number of times poll() has been called.
-        signals_received: list. List of received signals (as ints) in
-            order of receipt.
-        kill_count: int. Number of times kill() has been called.
-        poll_return: bool. The return value for poll().
-        clean_shutdown: bool. Whether to shut down when signal.SIGINT
-            signal is received.
+        Attributes:
+            poll_count: int. The number of times poll() has been called.
+            signals_received: list. List of received signals (as ints) in
+                order of receipt.
+            kill_count: int. Number of times kill() has been called.
+            poll_return: bool. The return value for poll().
+            clean_shutdown: bool. Whether to shut down when signal.SIGINT
+                signal is received.
 
-    Args:
-        clean_shutdown: bool. Whether to shut down when SIGINT received.
-    """
+        Args:
+            clean_shutdown: bool. Whether to shut down when SIGINT received.
+        """
         self.poll_count = 0
         self.signals_received = []
         self.kill_count = 0
