@@ -1234,7 +1234,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
         line = node.as_string()
-        if re.search(br'[^/]/[^/]', line):
+        if re.search(br'[^/]/[^/]', line) and not b'\'' in line:
             self.add_message(
                 'division-operator-used', node=node)
 
