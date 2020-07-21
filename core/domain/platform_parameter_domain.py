@@ -26,12 +26,12 @@ class PlatformParameterChange(change_domain.BaseChange):
     """Domain object for changes made to a platform parameter object.
 
     The allowed commands, together with the attributes:
-        - 'replace_parameter_rules' (with new_rules)
+        - 'edit_rules' (with new_rules)
     """
 
-    CMD_REPLACE_PARAMETER_RULES = 'edit_rules'
+    CMD_EDIT_RULES = 'edit_rules'
     ALLOWED_COMMANDS = [{
-        'name': CMD_REPLACE_PARAMETER_RULES,
+        'name': CMD_EDIT_RULES,
         'required_attribute_names': ['new_rules'],
         'optional_attribute_names': []
     }]

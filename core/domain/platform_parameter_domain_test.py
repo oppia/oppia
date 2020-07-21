@@ -28,7 +28,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     VALID_CMD_NAME = (
         parameter_domain
         .PlatformParameterChange
-        .CMD_REPLACE_PARAMETER_RULES)
+        .CMD_EDIT_RULES)
 
     def test_param_change_object_with_missing_cmd_raises_exception(self):
         with self.assertRaisesRegexp(
