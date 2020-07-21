@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -85,7 +87,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def post(self):
         """Post handler for query."""
-        data = self.payload['data']
+        data = self.request.get('data')
         kwargs = {key: data[key] for key in data if data[key] is not None}
         self._validate(kwargs)
 
