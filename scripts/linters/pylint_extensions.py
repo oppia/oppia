@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks.
+presubmit checks. Next message id would be C0028.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -89,6 +89,45 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'in function call.'
         ),
     }
+
+    def _check_argname_for_nonkeyword_arg(
+            self, node, called, callable_name, keyword_args,
+            keyword_args_in_funcdef):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            called: astroid.Call. The function call object.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            callable_name: str. Name of method type.
+            keyword_args_in_funcdef: list(str). Name of all keyword arguments in
+                function definition.
+        """
+        for arg in keyword_args:
+            # If there is *args and **kwargs in the function definition skip the
+            # check because we can use keywords arguments in function call even
+            # if **kwargs is present in the function definition. See Example:
+            # Function def -> def func(entity_id, *args, **kwargs):
+            # Function call -> func(entity_id='1', a=1, b=2, c=3)
+            # By parsing calling method we get
+            # keyword_arguments = entity_id, a, b, c.
+            # From the function definition, we will get keyword_arguments = []
+            # Now we do not have a way to identify which one is a keyword
+            # argument and which one is not.
+            if not called.args.kwarg and callable_name != 'constructor':
+                if not arg in keyword_args_in_funcdef:
+                    # This try/except block tries to get the function
+                    # name.
+                    try:
+                        func_name = node.func.attrname
+                    except AttributeError:
+                        func_name = node.func.name
+
+                    self.add_message(
+                        'arg-name-for-non-keyword-arg', node=node,
+                        args=(repr(arg), callable_name, func_name))
 
     def visit_call(self, node):
         """Visits each function call in a lint check.
@@ -176,29 +215,8 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                             func_name))
                     num_positional_args_unused -= 1
 
-        for arg in keyword_args:
-            # If there is *args and **kwargs in the function definition skip the
-            # check because we can use keywords arguments in function call even
-            # if **kwargs is present in the function definition. See Example:
-            # Function def -> def func(entity_id, *args, **kwargs):
-            # Function call -> func(entity_id='1', a=1, b=2, c=3)
-            # By parsing calling method we get
-            # keyword_arguments = entity_id, a, b, c.
-            # From the function definition, we will get keyword_arguments = []
-            # Now we do not have a way to identify which one is a keyword
-            # argument and which one is not.
-            if not called.args.kwarg and callable_name != 'constructor':
-                if not arg in keyword_args_in_funcdef:
-                    # This try/except block tries to get the function
-                    # name.
-                    try:
-                        func_name = node.func.attrname
-                    except AttributeError:
-                        func_name = node.func.name
-
-                    self.add_message(
-                        'arg-name-for-non-keyword-arg', node=node,
-                        args=(repr(arg), callable_name, func_name))
+        self._check_argname_for_nonkeyword_arg(
+            node, called, callable_name, keyword_args, keyword_args_in_funcdef)
 
 
 class HangingIndentChecker(checkers.BaseChecker):
