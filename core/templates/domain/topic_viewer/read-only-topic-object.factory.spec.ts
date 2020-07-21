@@ -18,8 +18,8 @@
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
 describe('Read only topic object Factory', () => {
@@ -28,8 +28,8 @@ describe('Read only topic object Factory', () => {
 
   beforeEach(() => {
     readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
-      new SkillSummaryObjectFactory());
+      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
+      new ShortSkillSummaryObjectFactory());
 
     let sampleTopicDataDict = {
       topic_name: 'topic_name',
