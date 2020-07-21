@@ -170,6 +170,72 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v34_dict_to_v35_dict(self):
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            '<p>1</p>',
+                            '<p>2</p>'
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
+            })
+        ]
+
+        self.create_and_migrate_new_exploration('34', '35')
+        migrated_draft_change_list = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list, 1, 2, self.EXP_ID))
+        
+        self.assertEqual(len(migrated_draft_change_list), 3)
+
+        self.assertEqual(
+            migrated_draft_change_list[0].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput'
+            }).to_dict())
+        
+        self.assertEqual(
+            migrated_draft_change_list[1].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            {'content_id': 'ca_choices_0', 'html': '<p>1</p>'},
+                            {'content_id': 'ca_choices_1', 'html': '<p>2</p>'}
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
+            }).to_dict())
+
+        self.assertEqual(
+            migrated_draft_change_list[2].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'next_content_id_index',
+                'new_value': 2
+            }).to_dict())
+    
+
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
@@ -367,14 +433,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-        exp_services.update_exploration(
-            self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
-            'Ran Exploration Migration job.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.create_and_migrate_new_exploration('33', '34')
         migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list, 1, exploration.version, self.EXP_ID))
+                draft_change_list, 1, 2, self.EXP_ID))
         self.assertEqual(
             migrated_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({

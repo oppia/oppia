@@ -1005,8 +1005,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(question.question_state_data_schema_version, 33)
 
         cust_args = question.question_state_data.interaction.customization_args
-        self.assertEqual(cust_args['choices']['value'], '')
-        self.assertEqual(cust_args['showChoicesInShuffledOrder']['value'], True)
+        self.assertEqual(cust_args['choices'].value, '')
+        self.assertEqual(cust_args['showChoicesInShuffledOrder'].value, True)
 
     def test_migrate_question_state_from_v33_to_v34(self):
         feedback_html_content = (

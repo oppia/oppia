@@ -136,7 +136,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'topic_name': 'topic',
             'story_title': 'title 1',
             'chapter_title': 'Node1',
-            'content_count': 3,
+            'content_count': 4,
             'translation_counts': {}
         }
 

@@ -608,6 +608,9 @@ class Playthrough(python_utils.OBJECT):
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type))
 
+        # Populate issue_customization_args with missing keys before validating.
+        # Populating missing keys used to be a subprocess of validation but
+        # has been decoupled.
         self.issue_customization_args = (
             customization_args_util.get_full_customization_args(
                 self.issue_customization_args,
@@ -744,6 +747,9 @@ class ExplorationIssue(python_utils.OBJECT):
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type))
 
+        # Populate issue_customization_args with missing keys before validating.
+        # Populating missing keys used to be a subprocess of validation but
+        # has been decoupled.
         self.issue_customization_args = (
             customization_args_util.get_full_customization_args(
                 self.issue_customization_args,

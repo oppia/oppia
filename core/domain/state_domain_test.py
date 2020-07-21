@@ -311,35 +311,34 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('owner_id', exploration)
 
         html_list = state.get_all_html_content_strings()
-
         self.assertEqual(
             html_list,
             [
-                '<p>state written_translation ca_choices_2-hi</p>',
-                '<p>state written_translation ca_choices_2-en</p>',
                 '<p>state written_translation solution-hi</p>',
                 '<p>state written_translation solution-en</p>',
                 '<p>state written_translation content-hi</p>',
                 '<p>state written_translation content-en</p>',
-                '<p>state written_translation ca_choices_3-hi</p>',
-                '<p>state written_translation ca_choices_3-en</p>',
-                '<p>state written_translation ca_choices_0-hi</p>',
-                '<p>state written_translation ca_choices_0-en</p>',
-                '<p>state written_translation ca_choices_1-hi</p>',
-                '<p>state written_translation ca_choices_1-en</p>',
+                '<p>state written_translation feedback-hi</p>',
+                '<p>state written_translation feedback-en</p>',
                 '<p>state written_translation hint_1-hi</p>',
                 '<p>state written_translation hint_1-en</p>',
                 '<p>state written_translation outcome-hi</p>',
                 '<p>state written_translation outcome-en</p>',
-                '<p>state written_translation feedback-hi</p>',
-                '<p>state written_translation feedback-en</p>',
+                '<p>state written_translation ca_choices_0-hi</p>',
+                '<p>state written_translation ca_choices_0-en</p>',
+                '<p>state written_translation ca_choices_1-hi</p>',
+                '<p>state written_translation ca_choices_1-en</p>',
+                '<p>state written_translation ca_choices_2-hi</p>',
+                '<p>state written_translation ca_choices_2-en</p>',
+                '<p>state written_translation ca_choices_3-hi</p>',
+                '<p>state written_translation ca_choices_3-en</p>',
                 '<p>State Feedback</p>',
                 '<p>IsEqualToOrdering rule_spec htmls</p>',
                 '<p>HasElementXAtPositionY rule_spec html</p>',
                 '<p>y input for HasElementXAtPositionY rule_spec </p>',
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
-                 'pec htmls</p>'), '',
+                '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_spec htmls</p>',
+                '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
                 '<p>state customization arg html 1</p>',
@@ -1549,21 +1548,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': html_with_old_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_old_math_schema,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': html_with_old_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_old_math_schema,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1573,21 +1576,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': html_with_new_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_new_math_schema,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': html_with_new_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_new_math_schema,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }

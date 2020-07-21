@@ -126,16 +126,18 @@ class SubtitledUnicode(BaseObject):
     """SubtitledUnicode class."""
 
     description = 'An Subtitled string.'
-    default_value = {'unicode_str': '', 'content_id': ''}
+    default_value = {'unicode_str': '', 'content_id': None}
 
     SCHEMA = {
         'type': 'dict',
         'properties': [{
             'name': 'unicode_str',
-            'schema': UnicodeString.SCHEMA,
+            'schema': UnicodeString.SCHEMA
         }, {
             'name': 'content_id',
-            'schema': UnicodeString.SCHEMA
+            'schema': {
+                'type': 'optional_unicode'
+            }
         }]
     }
 
@@ -154,7 +156,7 @@ class SubtitledHtml(BaseObject):
     """SubtitledHtml class."""
 
     description = 'An subtitled html string.'
-    default_value = {'html': '', 'content_id': ''}
+    default_value = {'html': '', 'content_id': None}
 
     SCHEMA = {
         'type': 'dict',
@@ -163,7 +165,9 @@ class SubtitledHtml(BaseObject):
             'schema': Html.SCHEMA,
         }, {
             'name': 'content_id',
-            'schema': UnicodeString.SCHEMA
+            'schema': {
+                'type': 'optional_unicode'
+            }
         }]
     }
 

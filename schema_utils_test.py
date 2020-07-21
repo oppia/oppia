@@ -53,9 +53,11 @@ SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
+SCHEMA_TYPE_OPTIONAL_UNICODE = schema_utils.SCHEMA_TYPE_OPTIONAL_UNICODE
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
-    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
+    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE,
+    SCHEMA_TYPE_OPTIONAL_UNICODE]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
@@ -69,6 +71,14 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
 #     https://github.com/oppia/oppia/wiki/Schema-Based-Forms
 UI_CONFIG_SPECS = {
     SCHEMA_TYPE_BOOL: {},
+    SCHEMA_TYPE_CUSTOM: {
+        'hide_complex_extensions': {
+            'type': SCHEMA_TYPE_BOOL,
+        },
+        'placeholder': {
+            'type': SCHEMA_TYPE_UNICODE,
+        }
+    },
     SCHEMA_TYPE_DICT: {},
     SCHEMA_TYPE_FLOAT: {},
     SCHEMA_TYPE_HTML: {
@@ -248,7 +258,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [])
+            [SCHEMA_KEY_UI_CONFIG])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(

@@ -121,8 +121,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        state1.update_interaction_id('DragAndDropSortInput')
-        state2.update_interaction_id('DragAndDropSortInput')
 
         customization_args_dict1 = {
             'choices': {'value': [{
@@ -131,7 +129,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             }, {
                 'html': '<p>This is value2 for DragAndDropSortInput</p>',
                 'content_id': 'ca_choices_1'
-            }]}
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_list1 = [{
@@ -161,7 +160,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             }, {
                 'html': '<p>This is value2 for DragAndDropSortInput</p>',
                 'content_id': 'ca_choices_1'
-            }]}
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_list2 = [{
@@ -225,6 +225,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state1.update_interaction_id('DragAndDropSortInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -243,6 +244,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             .get_output(job_id))
         self.assertEqual(actual_output, [])
 
+        state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_interaction_answer_groups(answer_group_list2)
 
@@ -305,7 +307,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             }, {
                 'html': '<p>This is value2 for DragAndDropSortInput</p>',
                 'content_id': 'ca_choices_1'
-            }]}
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_list = [{
@@ -1061,8 +1064,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(
@@ -1137,8 +1140,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         )]
         self.assertEqual(actual_output, expected_output)
 
-        exploration.states['Introduction'].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['Introduction'], 'TextInput')
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1456,7 +1459,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             }, {
                 'html': '<p>This is value2 for ItemSelection</p>',
                 'content_id': 'ca_choices_1'
-            }]}
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
         }
 
         answer_group_list2 = [{
@@ -2283,7 +2288,8 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
                     'html': '<p>4</p>',
                     'content_id': 'ca_choices_3'
                 }]
-            }
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_dict = {
@@ -2333,31 +2339,37 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': invalid_html_content1,
+                        'data_format': 'html',
+                        'translation': invalid_html_content1,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': invalid_html_content2,
+                        'data_format': 'html',
+                        'translation': invalid_html_content2,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': invalid_html_content2,
+                        'data_format': 'html',
+                        'translation': invalid_html_content2,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -2476,7 +2488,8 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
                     'html': '<p>4</p>',
                     'content_id': 'ca_choices_3'
                 }]
-            }
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
         # Since the Old math-schema with raw_latex attribute is no longer valid,
         # it gets cleaned by html_cleaner. We need to prevent this for testing
@@ -2556,7 +2569,8 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                     'html': '<p>4</p>',
                     'content_id': 'ca_choices_3'
                 }]
-            }
+            },
+            'allowMultipleItemsInSamePosition': {'value': False}
         }
 
         answer_group_dict = {
@@ -2606,31 +2620,37 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': valid_html_content,
+                        'data_format': 'html',
+                        'translation': valid_html_content,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': valid_html_content,
+                        'data_format': 'html',
+                        'translation': valid_html_content,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': valid_html_content,
+                        'data_format': 'html',
+                        'translation': valid_html_content,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -2642,7 +2662,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         with self.swap(html_cleaner, 'clean', lambda html: html):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
-            self.set_interaction_for_state(state1, 'DragAndDropSortInput')
+            state1.update_interaction_id('DragAndDropSortInput')
             state1.update_interaction_customization_args(
                 customization_args_dict)
             state1.update_interaction_answer_groups([answer_group_dict])

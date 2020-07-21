@@ -23,6 +23,7 @@ import datetime
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
@@ -328,6 +329,13 @@ class Question(python_utils.OBJECT):
             html_validation_service.add_math_content_to_math_rte_components,
             state_uses_old_interaction_cust_args_schema=True)
         return question_state_dict
+
+    @classmethod
+    def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
+        states = {'question_state': question_state_dict}
+        converted_states = (
+            exp_domain.Exploration._convert_states_v34_dict_to_v35_dict(states))
+        return converted_states['question_state']
 
     @classmethod
     def update_state_from_model(

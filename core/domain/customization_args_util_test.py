@@ -339,8 +339,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 )
             )
             self.assertEqual(
-                expected_customization_args_after_validation,
-                incomplete_customization_args_with_extra_arg
+                complete_customization_args_with_extra_arg,
+                expected_customization_args_after_validation
             )
 
         # Check if no error is produced when arg type is not valid.

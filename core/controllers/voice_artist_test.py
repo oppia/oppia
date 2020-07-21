@@ -50,6 +50,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',

@@ -305,8 +305,8 @@ class TestBase(unittest.TestCase):
                 'labelled_as_correct': True
             },
             'customization_args': {
-                u'rows': 1,
-                u'placeholder': u'Enter text here'
+                u'rows': {u'value': 1},
+                u'placeholder': {u'value': u'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': u'TextInput',
@@ -1135,8 +1135,7 @@ tags: []
         next_content_id_index as needed.
         """
 
-        # Since nonlocal is not available in python2, we wrap
-        # next_content_id_index in a dict so that modifying it in the
+        # We wrap next_content_id_index in a dict so that modifying it in the
         # inner function modifies the value.
         next_content_id_index_dict = {
             'value': state.next_content_id_index
