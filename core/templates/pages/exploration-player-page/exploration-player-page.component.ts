@@ -15,6 +15,7 @@
 /**
  * @fileoverview Component for the explaration player page.
  */
+import 'mousetrap'
 
 require('base-components/base-content.directive.ts');
 require(
@@ -35,10 +36,10 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
-    'ContextService', 'PageTitleService',
+    'ContextService', '$timeout', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService',
     function(
-        ContextService, PageTitleService,
+        ContextService, $timeout, PageTitleService,
         ReadOnlyExplorationBackendApiService) {
       var ctrl = this;
       ctrl.$onInit = function() {
@@ -58,6 +59,60 @@ angular.module('oppia').component('explorationPlayerPage', {
               'content', response.exploration.objective);
           });
       };
+      
+      var moveFocusToBackButton = function() {
+        Mousetrap.bind('k', function() {
+          var previous_button = document.getElementById('backButtonId');
+          
+          if (previous_button != null) {
+            previous_button.focus();
+          }
+          else {
+            var interaction = <HTMLElement>document.querySelector('.conversation-skin-inline-interaction');
+            if (interaction != null) {
+              interaction.focus();
+            }
+          }
+          
+          return false;
+        });
+      };
+
+      var moveFocusToNextButton = function() {
+        Mousetrap.bind('j', function() {
+          var next_button = <HTMLElement>document.querySelector('.protractor-test-next-button')
+          
+          if (next_button != null) {
+            next_button.focus();
+          }
+          else {
+            var interaction = <HTMLElement>document.querySelector('.conversation-skin-inline-interaction');
+            if (interaction != null) {
+              interaction.focus();
+            }
+          }
+          
+          console.log("running..");
+          return false;
+        });
+      };
+
+
+      var moveFocusToSkipButton = function() {
+        Mousetrap.bind('s', function() {
+          var skip_button = document.getElementById('skipToMainContentId');
+
+          if (skip_button != null) {
+            skip_button.focus();
+          }
+          
+          return false;
+        });
+      };
+
+      $timeout(moveFocusToSkipButton);
+      $timeout(moveFocusToBackButton);
+      $timeout(moveFocusToNextButton);
     }
   ]
 });

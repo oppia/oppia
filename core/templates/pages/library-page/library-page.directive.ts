@@ -15,6 +15,7 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
+import 'mousetrap';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -193,6 +194,27 @@ angular.module('oppia').directive('libraryPage', [
             }
           };
 
+          var moveFocusToSearch = function() {
+            Mousetrap.bind('/', function() {
+              document.getElementById('searchBar').focus();
+              return false;
+            });
+          };
+
+          var moveFocusToCategory = function() {
+            Mousetrap.bind('c', function() {
+              document.getElementById('categoryBar').focus();
+              return false;
+            });
+          };
+
+          var moveFocusToSkipButton = function() {
+            Mousetrap.bind('s', function() {
+              document.getElementById('skipToMainContentId').focus();
+              return false;
+            });
+          };
+
           // The following loads explorations belonging to a particular group.
           // If fullResultsUrl is given it loads the page corresponding to
           // the url. Otherwise, it will initiate a search query for the
@@ -330,6 +352,10 @@ angular.module('oppia').directive('libraryPage', [
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
                 $timeout(initCarousels, 390);
+                $timeout(moveFocusToSearch);
+                $timeout(moveFocusToCategory);
+                $timeout(moveFocusToSkipButton);
+
 
 
                 // Check if actual and expected widths are the same.
@@ -379,6 +405,7 @@ angular.module('oppia').directive('libraryPage', [
             if (ctrl.resizeSubscription) {
               ctrl.resizeSubscription.unsubscribe();
             }
+
           };
         }
       ]

@@ -19,15 +19,33 @@
 
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
+var ExplorationPlayerPage = require(
+  '../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
+  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var libraryPage = null;
+  var explorationPlayerPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
+
+  var reloadExploration = async function(name) {
+    // Reload the welcome.yaml exploration 
+    await browser.get('admin');
+    await browser.sleep(7000);
+    var reloadButton = element(by.css('.protractor-test-reload-exploration-button'));
+    await reloadButton.click();
+    await browser.switchTo().alert().accept();
+    await browser.waitForAngular();
+  };
 
   it('should skip to the main content element', async function() {
     await libraryPage.get();
@@ -39,6 +57,146 @@ describe('screenreader and keyboard user accessibility features', function() {
     expect(await mainContent.getAttribute('id')).toEqual(
       await (await browser.driver.switchTo().activeElement())
         .getAttribute('id'));
+  });
+  
+  it('should move focus to skip to main content button in community-library page', async function() {
+    await libraryPage.get();
+    await browser.actions().sendKeys("s").perform();
+    var skipButton = element(by.css('.protractor-test-skip-link'));
+    expect(await skipButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    expect(await skipButton.getAttribute('id')).not.toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+
+    await browser.actions().sendKeys("s").perform();
+    expect(await skipButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    
+      });
+
+  it('should move focus to the search bar in community-library page', async function() {
+    await libraryPage.get();
+    await browser.actions().sendKeys("/").perform();
+    var searchBar = element(by.css('.protractor-test-search-input'));
+    expect(await searchBar.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    expect(await searchBar.getAttribute('id')).not.toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    
+    await browser.actions().sendKeys("/").perform();
+    expect(await searchBar.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+  });
+
+  it('should move focus to the category bar in community-library page', async function() {
+    await libraryPage.get();
+    await browser.actions().sendKeys("c").perform();
+    var categoryBar = element(by.css('.protractor-test-search-bar-dropdown-toggle'));
+    expect(await categoryBar.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    expect(await categoryBar.getAttribute('id')).not.toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    
+    await browser.actions().sendKeys("c").perform();
+    expect(await categoryBar.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+  });
+
+  it('should move focus to skip to main content button in exploration player', async function() {
+    // Create a user and login
+    await users.createUser('user11@accessibility.com', 'user11accessibility');
+    await users.login('user11@accessibility.com', true);
+    // Create a test exploration.
+    await reloadExploration('welcome.yaml');
+    await libraryPage.get();
+    await libraryPage.findExploration('Welcome to Oppia!');
+    await libraryPage.playExploration('Welcome to Oppia!');
+
+    await browser.actions().sendKeys("s").perform();
+    var skipButton = element(by.css('.protractor-test-skip-link'));
+    expect(await skipButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    expect(await skipButton.getAttribute('id')).not.toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+
+    await browser.actions().sendKeys("s").perform();
+    expect(await skipButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+  });
+
+  it('should move focus to next and back buttons in exploration player', async function() {
+    await libraryPage.get();
+    await libraryPage.findExploration('Welcome to Oppia!');
+    await libraryPage.playExploration('Welcome to Oppia!');
+
+    await explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput', 'It\'s translated from a different language.');
+    await explorationPlayerPage.clickThroughToNextCard();
+    
+    await browser.sleep(7000);
+    await browser.waitForAngular();
+    
+    // Should move the focus to the back button and navigate to the previous card
+    await browser.actions().sendKeys("k").perform();
+    var backButton = element(by.css('#backButtonId'));
+    expect(await backButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+
+    await browser.actions().sendKeys("k").perform();
+    expect(await backButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    await browser.actions().sendKeys(protractor.Key.ENTER).perform();
+    await browser.sleep(7000);
+
+    // Should move the focus to the next button and navigate to the next card
+    var nextButton = element(by.css('.protractor-test-next-button'));
+    await browser.actions().sendKeys("j").perform();
+    expect(await nextButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+
+    await browser.actions().sendKeys("j").perform();
+    expect(await nextButton.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
+    await browser.actions().sendKeys(protractor.Key.ENTER).perform();
+    await browser.sleep(7000);
+    
+    // Should safely exit out of the exploration
+    await oppiaLogo.click();
+    await general.acceptAlert();
   });
 
   afterEach(async function() {
