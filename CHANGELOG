@@ -4,7 +4,7 @@ v3.0.0 (29 Jun 2020)
 ------------------------
 Contributor Pages
 * Fix #9417: No difficulty level to select for questions while creating question suggestion (#9436)
-* Fix #9375: Adds custom entity context for the translations in contributor dashboard (#9386)
+* Fix #9375: Adds custom entity context for the translations in community dashboard (#9386)
 
 Lesson analytics
 * Introduce SortedTiles visualization for statistics (#9481)
@@ -102,7 +102,7 @@ Developer experience
 * Update to LaCE CODEOWNERS (#9399)
 * Add QA Team Codeowner for all E2E Files (#9396)
 * Fix #9325: Broaden the types of classes run by scripts.run_backend_tests and addition of tests for pylint_extensions (#9393)
-* Removes codeowner for contributor dashboard project (#9369)
+* Removes codeowner for community dashboard project (#9369)
 * Routine upgrade of libs (#9359)
 * Transfer codeowners (#9355)
 * Fix #9331: Added typescript checks to pre push hook  (#9334)
@@ -161,14 +161,14 @@ Miscellaneous
 * Migrate to mailchimp (#9412)
 * Fix part of #6271: Modify add_misconception to accept object instead of dict (#9351)
 * Milestone 1.1: Added nerdamer library with typedefs. (#9305)
-* Disable contributor dashboard (#9534)
+* Disable community dashboard (#9534)
 * Bump react-dom from 16.1.1 to 16.1.2 (#9406)
 
 
 v2.9.3 (20 May 2020)
 ------------------------
 Contributor Pages
-* Fix #9018: Capitalizes the tab name in contributor dashboard page (#9089)
+* Fix #9018: Capitalizes the tab name in community dashboard page (#9089)
 
 Bug fixes
 * Fix question versioning (#9318)
@@ -308,12 +308,12 @@ Learner/Creator Pages
 * Add the skillreview RTE element to explorations in stories (#8617)
 
 Contributor Pages
-* Fix #9018: Capitalize the tab name in contributor dashboard page (#9089)
+* Fix #9018: Capitalize the tab name in community dashboard page (#9089)
 * Fix #9003, #9013: Display fully un-truncated text for skill description in Submit Question tab and show placeholder for empty rubric explanation (#9058)
-* Fix #7402, #8166: Enable contributor dashboard page (#8957)
+* Fix #7402, #8166: Enable community dashboard page (#8957)
 * Reviewer assignment functionality for community contribution (#8862)
 * Fix #8249: Surface skill difficulty/rubrics in question suggestion flow (#8353)
-* Fix not loading opportunities in the contributor dashboard. (#8948)
+* Fix not loading opportunities in the community dashboard. (#8948)
 
 Lesson analytics
 * Fix #7335: Use cached thread message summary to render improvement tasks (#8658)
@@ -560,7 +560,7 @@ Translations
 Miscellaneous
 * Add swap to Google Fonts link (#8554)
 * Fix #8518: Add Security.txt (#8533)
-* Adds codeowner for contributor dashboard and translation project (#8494)
+* Adds codeowner for community dashboard and translation project (#8494)
 * Update installation section of README (#8486)
 * Removed obsolete todo from PromoBar (#8457)
 * Tidy up feedback services (#8282)
@@ -662,7 +662,7 @@ QA Team
 * Milestone 1 (3rd PR) - Increase coverage for learner-answer-details-data.service.ts (#8180)
 * Add sourceMap on tsconfig in order to fix test coverage issues (#8213)
 * Milestone 1 (2nd PR) - Increase coverage for easy tests  (#8164)
-* Add simple e2e test for contributor dashboard page. (#8162)
+* Add simple e2e test for community dashboard page. (#8162)
 * Milestone 1 (1st PR) - Increase coverage for easy tests (#8136)
 
 Miscellaneous
@@ -785,7 +785,7 @@ Bug fixes
 * Fixes 7939: Admin navbar misplaced fix (#7940)
 * Fix #7926: Add polyfill for navigator.mediaDevices.getUserMedia (#7933)
 * Fix #7906: Adds a check for errorCallback (#7927)
-* Resolves ckeditor.js 404 issue on the contributor dashboard page  (#7924)
+* Resolves ckeditor.js 404 issue on the community dashboard page  (#7924)
 * Fix #7342:  Replace ctrl.stateName with updated state name value (#7907)
 * Fix #7691: Card Basic Setting Alignment Fixed (#7904)
 * Fix #7784: Add type as a second parameter when contructing a blob (#7785)
@@ -843,7 +843,7 @@ Community contribution and dashboard
 * Fix #7994: Add frontend SkillOpportunity and ExplorationOpportunity object class (#8063)
 * Services required for voiceover application  (#7857)
 * Fix part of #7471: Backend changes for question suggestion integration (#7819)
-* Fix part of #6776: Frontend changes for listing skill opportunities on the Contributor Dashboard page. (#7602)
+* Fix part of #6776: Frontend changes for listing skill opportunities on the Community Dashboard page. (#7602)
 
 New structures
 * Allowed empty misconception notes in skill editor (#8131)
@@ -1092,7 +1092,7 @@ Translations
 
 Community contribution and dashboard
 * Fix #7383: Add functionality to regenerate exploration opportunity summary models. (#7426)
-* Basic contributor dashboard with translation and voiceover opportunity. (#7109)
+* Basic community dashboard with translation and voiceover opportunity. (#7109)
 
 New structures
 * Fix new structures editor UI issues (#7666)
