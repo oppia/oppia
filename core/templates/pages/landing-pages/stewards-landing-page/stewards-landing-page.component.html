@@ -139,13 +139,13 @@
         <div class="column tab-content view-content oppia-stewards-main-content" autoscroll="true">
           <div *ngIf="windowIsNarrow">
             <strong>I AM A ...</strong>
-              <mat-form-field>
-                <mat-select (selectionChange)="setActiveTabName($event.value)" panelClass="oppia-stewards-dropdown ">
-                  <mat-option *ngFor="let state of states" [value]="state.tabname">
-                    {{ state.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+            <mat-form-field>
+              <mat-select (selectionChange)="setActiveTabName($event.value)" panelClass="oppia-stewards-dropdown ">
+                <mat-option *ngFor="let state of states" [value]="state.tabname">
+                  {{ state.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
 
           <div *ngIf="activeTabName === TAB_NAME_PARENTS">
