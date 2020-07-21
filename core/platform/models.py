@@ -231,7 +231,7 @@ class _Gae(Platform):
             from core.platform.email import dev_mode_email_services
             return dev_mode_email_services
         elif (feconf.EMAIL_SERVICE_PROVIDER ==
-                feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+              feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:

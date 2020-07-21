@@ -2315,7 +2315,7 @@ class EmailMessageMock(python_utils.OBJECT):
                     subject = 'Hey, %recipient.first%’
                 More info about this format at:
                 https://documentation.mailgun.com/en/
-                    latest/user_manual.html#batch-sending
+                    latest/user_manual.html#batch-sending.
         """
         self.sender = sender_email
         self.to = recipient_email
