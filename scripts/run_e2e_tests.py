@@ -39,8 +39,9 @@ OPPIA_SERVER_PORT = 8181
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 # Path relative to current working directory where portserver socket
-# will be created.
-PORTSERVER_SOCKET_PATH = 'portserver.socket'
+# file will be created.
+PORTSERVER_SOCKET_FILEPATH = os.path.join(
+    os.getcwd(), 'portserver.socket')
 KILL_PORTSERVER_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
@@ -441,7 +442,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         '--log_level=%s --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
             GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
-        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_PATH},
+        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
         shell=True)
     SUBPROCESSES.append(p)
 
@@ -477,7 +478,7 @@ def get_chrome_driver_version():
 def start_portserver():
     """Start a portserver in a subprocess.
 
-    The portserver listens at PORTSERVER_SOCKET_PATH and allocates free
+    The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
     ports to clients. This prevents race conditions when two clients
     request ports in quick succession. The local Google App Engine
     server that we use to serve the development version of Oppia uses
@@ -496,7 +497,7 @@ def start_portserver():
         'python', '-m',
         '.'.join(['scripts', 'run_portserver']),
         '--portserver_unix_socket_address',
-        PORTSERVER_SOCKET_PATH,
+        PORTSERVER_SOCKET_FILEPATH,
     ])
     return process
 

@@ -43,12 +43,12 @@ CHROME_DRIVER_VERSION = '77.0.3865.40'
 class MockProcessClass(python_utils.OBJECT):
 
     def __init__(self, clean_shutdown=True):
-        """Mock process
+        """Create a mock process object.
 
         Attributes:
             poll_count: int. The number of times poll() has been called.
-            signals_received: list. List of received signals (as ints) in
-                order of receipt.
+            signals_received: list(int). List of received signals (as
+                ints) in order of receipt.
             kill_count: int. Number of times kill() has been called.
             poll_return: bool. The return value for poll().
             clean_shutdown: bool. Whether to shut down when signal.SIGINT
@@ -88,6 +88,9 @@ class MockProcessClass(python_utils.OBJECT):
         Mocks receiving a process signal. If a SIGINT signal is received
         (e.g. from ctrl-C) and self.clean_shutdown is True, then we set
         self.poll_return to False to mimic the process shutting down.
+
+        Args:
+            signal_number: int. The number of the received signal.
         """
         self.signals_received.append(signal_number)
         if signal_number == signal.SIGINT and self.clean_shutdown:

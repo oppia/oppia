@@ -109,13 +109,13 @@ def _bind(port, socket_type, socket_protocol):
     Args:
         port: int. The port number to bind to, or 0 to have the OS pick
             a free port.
-        socket_type: int. The type of the socket (ex:
+        socket_type: int. The type of the socket (e.g.:
             socket.SOCK_STREAM).
-        socket_protocol: int. The protocol of the socket (ex:
+        socket_protocol: int. The protocol of the socket (e.g.:
             socket.IPPROTO_TCP).
 
     Returns:
-        int. The port number on success or None on failure.
+        int|None. The port number on success or None on failure.
     """
     got_socket = False
     for family in (socket.AF_INET6, socket.AF_INET):
@@ -144,7 +144,7 @@ def _is_port_free(port):
         port: int. Port to check.
 
     Returns:
-        bool. Whether it is free to use for both TCP and UDP.
+        bool. Whether the port is free to use for both TCP and UDP.
     """
     return _bind(port, *_PROTOCOLS[0]) and _bind(port, *_PROTOCOLS[1])
 
@@ -223,7 +223,7 @@ class _PortPool(python_utils.OBJECT):
         return len(self._port_queue)
 
     def get_port_for_process(self, pid):
-        """Allocates port.
+        """Allocates a port for the given process.
 
         Args:
             pid: int. ID for process to allocate port to.
@@ -286,8 +286,8 @@ class _PortServerRequestHandler(python_utils.OBJECT):
         """Initialize a new port server.
 
         Args:
-            ports_to_serve: list. A sequence of unique port numbers to
-                test and offer up to clients.
+            ports_to_serve: list(int). A sequence of unique port numbers
+                to test and offer up to clients.
         """
         self._port_pool = _PortPool()
         self._total_allocations = 0
@@ -371,7 +371,7 @@ def _parse_port_ranges(pool_str):
         pool_str: str. The N-P,X-Y description of port ranges.
 
     Returns:
-        set. The port numbers in the port ranges.
+        set(int). The port numbers in the port ranges.
     """
     ports = set()
     for range_str in pool_str.split(','):
