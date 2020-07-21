@@ -55,7 +55,7 @@ export class TopicLandingPageComponent implements OnInit {
   backgroundBannerUrl: string = null;
   lessonInDevicesPngImageSrc: string = null;
   lessonInDevicesWebpImageSrc: string = null;
-  lessonsQualities: Array<LessonsQuality> = null;
+  lessonsQualities: LessonsQuality[] = null;
   topicData: TopicData = null;
   topicTitle: string = null;
 
@@ -65,7 +65,7 @@ export class TopicLandingPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef) {}
 
-  getLessonQualities(): Array<LessonsQuality> {
+  getLessonQualities(): LessonsQuality[] {
     return [{
       title: 'Fun storytelling',
       description: (
