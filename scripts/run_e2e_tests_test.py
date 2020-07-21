@@ -744,7 +744,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[{
                 'env': {
                     'PORTSERVER_ADDRESS':
-                        run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                        run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 },
                 'shell': True,
             }])
@@ -765,7 +765,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_kwargs=[{
                 'env': {
                     'PORTSERVER_ADDRESS':
-                        run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                        run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 },
                 'shell': True,
             }])
@@ -880,10 +880,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    'python',
-                    'scripts/run_portserver.py',
+                    'python', '-m',
+                    'scripts.run_portserver',
                     '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
                     common.NODE_BIN_PATH,
@@ -994,10 +994,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    'python',
-                    'scripts/run_portserver.py',
+                    'python', '-m',
+                    'scripts.run_portserver',
                     '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
                     common.NODE_BIN_PATH,
@@ -1132,10 +1132,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    'python',
-                    'scripts/run_portserver.py',
+                    'python', '-m',
+                    'scripts.run_portserver',
                     '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
                     common.NODE_BIN_PATH,
@@ -1250,10 +1250,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    'python',
-                    'scripts/run_portserver.py',
+                    'python', '-m',
+                    'scripts.run_portserver',
                     '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_PATH,
+                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
                     common.NODE_BIN_PATH,
@@ -1316,6 +1316,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         # therefore needs to be killed.
         self.assertEqual(
             process.poll_count,
-            run_e2e_tests.KILL_PORTSERVER_TIMEOUT + 1
+            run_e2e_tests.KILL_PORTSERVER_TIMEOUT_SECS + 1
         )
         self.assertEqual(process.signals_received, [signal.SIGINT])
