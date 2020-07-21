@@ -282,6 +282,7 @@
 /core/templates/pages/exploration-editor-page/improvements-tab/ @seanlip
 /core/templates/pages/exploration-editor-page/statistics-tab/ @seanlip
 /core/templates/services/exploration-improvements-backend-api.service*.ts @seanlip
+/core/templates/services/exploration-improvements-task-registry.service*.ts @seanlip
 /core/templates/services/exploration-stats.service*.ts @seanlip
 /core/templates/services/exploration-stats-backend-api.service*.ts @seanlip
 /core/templates/services/improvements.service*.ts @seanlip
@@ -455,6 +456,9 @@
 /core/templates/directives/mathjax-bind.directive.ts @aks681 @kevintab95
 /core/templates/mathjaxConfig.ts @aks681 @kevintab95
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681 @kevintab95
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @shavavo @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @shavavo @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @shavavo @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681 @kevintab95
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681 @kevintab95
