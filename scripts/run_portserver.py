@@ -65,7 +65,14 @@ _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
 
 
 def _get_process_command_line(pid):
-    """Get the command for a process."""
+    """Get the command for a process.
+
+    Args:
+        pid: int. The process ID.
+
+    Returns:
+        str. The command that started the process.
+    """
     try:
         with python_utils.open_file(
             '/proc/{}/cmdline'.format(pid), 'rt'
@@ -76,7 +83,14 @@ def _get_process_command_line(pid):
 
 
 def _get_process_start_time(pid):
-    """Get the start time for a process."""
+    """Get the start time for a process.
+
+    Args:
+        pid: int. The process ID.
+
+    Returns:
+        str. The time when the process started.
+    """
     try:
         with python_utils.open_file(
             '/proc/{}/stat'.format(pid), 'rt'
@@ -136,7 +150,14 @@ def _is_port_free(port):
 
 
 def _should_allocate_port(pid):
-    """Determine whether to allocate a port for a process id."""
+    """Determine whether to allocate a port for a process id.
+
+    Args:
+        pid: int. The process ID.
+
+    Returns:
+        bool. Whether or not to allocate a port to the process.
+    """
     if pid <= 0:
         logging.info('Not allocating a port to invalid pid')
         return False
@@ -194,7 +215,11 @@ class _PortPool(python_utils.OBJECT):
         self.ports_checked_for_last_request = 0
 
     def num_ports(self):
-        """Get the number of ports in the pool."""
+        """Get the number of ports in the pool.
+
+        Returns:
+            int. The number of ports in the pool.
+        """
         return len(self._port_queue)
 
     def get_port_for_process(self, pid):
@@ -237,7 +262,11 @@ class _PortPool(python_utils.OBJECT):
         return 0
 
     def add_port_to_free_pool(self, port):
-        """Add a new port to the free pool for allocation."""
+        """Add a new port to the free pool for allocation.
+
+        Args:
+            port: int. The port number to add to the pool.
+        """
         if port < 1 or port > 65535:
             raise ValueError(
                 'Port must be in the [1, 65535] range, not %d.' % port)
@@ -316,7 +345,11 @@ class _PortServerRequestHandler(python_utils.OBJECT):
 
 
 def _parse_command_line():
-    """Configure and parse our command line flags."""
+    """Configure and parse our command line flags.
+
+    Returns:
+        Namespace. The parsed arguments.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--portserver_static_pool',
@@ -332,7 +365,14 @@ def _parse_command_line():
 
 
 def _parse_port_ranges(pool_str):
-    """Given a 'N-P,X-Y' description of port ranges, return a set of ints."""
+    """Given a 'N-P,X-Y' description of port ranges, return a set of ints.
+
+    Args:
+        pool_str: str. The N-P,X-Y description of port ranges.
+
+    Returns:
+        set. The port numbers in the port ranges.
+    """
     ports = set()
     for range_str in pool_str.split(','):
         try:

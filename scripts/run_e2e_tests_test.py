@@ -41,26 +41,57 @@ CHROME_DRIVER_VERSION = '77.0.3865.40'
 
 
 class MockProcessClass(python_utils.OBJECT):
+
     def __init__(self, clean_shutdown=True):
+    """Mock process
+
+    Attributes:
+        poll_count: int. The number of times poll() has been called.
+        signals_received: list. List of received signals (as ints) in
+            order of receipt.
+        kill_count: int. Number of times kill() has been called.
+        poll_return: bool. The return value for poll().
+        clean_shutdown: bool. Whether to shut down when signal.SIGINT
+            signal is received.
+
+    Args:
+        clean_shutdown: bool. Whether to shut down when SIGINT received.
+    """
         self.poll_count = 0
         self.signals_received = []
         self.kill_count = 0
         self.poll_return = True
         self.clean_shutdown = clean_shutdown
 
-    # pylint: disable=missing-docstring
     def kill(self):
+        """Increment kill_count.
+
+        Mocks the process being killed.
+        """
         self.kill_count += 1
 
     def poll(self):
+        """Increment poll_count.
+
+        Mocks checking whether the process is still alive.
+
+        Returns:
+            bool. The value of self.poll_return, which mocks whether the
+            process is still alive.
+        """
         self.poll_count += 1
         return self.poll_return
 
     def send_signal(self, signal_number):
+        """Append signal to self.signals_received.
+
+        Mocks receiving a process signal. If a SIGINT signal is received
+        (e.g. from ctrl-C) and self.clean_shutdown is True, then we set
+        self.poll_return to False to mimic the process shutting down.
+        """
         self.signals_received.append(signal_number)
         if signal_number == signal.SIGINT and self.clean_shutdown:
             self.poll_return = False
-    # pylint: enable=missing-docstring
 
 
 class RunE2ETestsTests(test_utils.GenericTestBase):

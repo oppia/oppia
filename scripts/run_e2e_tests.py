@@ -38,8 +38,10 @@ GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
+# Path relative to current working directory where portserver socket
+# will be created.
 PORTSERVER_SOCKET_PATH = 'portserver.socket'
-KILL_PORTSERVER_TIMEOUT = 10
+KILL_PORTSERVER_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
@@ -477,13 +479,18 @@ def start_portserver():
 
     The portserver listens at PORTSERVER_SOCKET_PATH and allocates free
     ports to clients. This prevents race conditions when two clients
-    request ports in quick succession. The Google Appengine we use to
-    serve the development version of Oppia uses python_portpicker, which
-    is compatible with the portserver this function starts, to request
-    ports.
+    request ports in quick succession. The local Google App Engine
+    server that we use to serve the development version of Oppia uses
+    python_portpicker, which is compatible with the portserver this
+    function starts, to request ports.
+
+    By "compatible" we mean that python_portpicker requests a port by
+    sending a request consisting of the PID of the requesting process
+    and expects a response consisting of the allocated port number. This
+    is the interface provided by this portserver.
 
     Returns:
-        The Popen subprocess object.
+        subprocess.Popen. The Popen subprocess object.
     """
     process = subprocess.Popen([
         'python', '-m',
@@ -497,17 +504,17 @@ def start_portserver():
 def cleanup_portserver(portserver_process):
     """Shut down the portserver.
 
-    We wait KILL_PORTSERVER_TIMEOUT seconds for the portserver to
+    We wait KILL_PORTSERVER_TIMEOUT_SECS seconds for the portserver to
     shut down after sending CTRL-C (SIGINT). The portserver is configured
     to shut down cleanly upon receiving this signal. If the server fails
     to shut down, we kill the process.
 
     Args:
-        portserver_process: The Popen subprocess object for the
-            portserver.
+        portserver_process: subprocess.Popen. The Popen subprocess
+            object for the portserver.
     """
     portserver_process.send_signal(signal.SIGINT)
-    for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT):
+    for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT_SECS):
         time.sleep(1)
         if not portserver_process.poll():
             break
