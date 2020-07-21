@@ -354,7 +354,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                     // TODO(#8521): Remove the use of $rootScope.$apply()
                     // once the controller is migrated to angular.
                     $rootScope.$apply();
-                });
+                  });
               },
               function() {
                 // TODO(bhenning): Handle not being able to load the collection.

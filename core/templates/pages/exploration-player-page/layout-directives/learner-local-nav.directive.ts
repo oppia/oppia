@@ -57,15 +57,15 @@ angular.module('oppia').directive('learnerLocalNav', [
         'ExplorationEngineService', 'ExplorationPlayerStateService',
         'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
-        'UrlInterpolationService', 'UserBackendApiService', 'FEEDBACK_POPOVER_PATH',
-        'FLAG_EXPLORATION_URL_TEMPLATE',
+        'UrlInterpolationService', 'UserBackendApiService',
+        'FEEDBACK_POPOVER_PATH', 'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
             $http, $uibModal, AlertsService, LoaderService,
             ExplorationEngineService, ExplorationPlayerStateService,
             FocusManagerService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
-            UrlInterpolationService, UserBackendApiService, FEEDBACK_POPOVER_PATH,
-            FLAG_EXPLORATION_URL_TEMPLATE) {
+            UrlInterpolationService, UserBackendApiService,
+            FEEDBACK_POPOVER_PATH, FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
