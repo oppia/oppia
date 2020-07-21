@@ -16,6 +16,7 @@
  * @fileoverview Component for landing page.
  */
 
+require('base-components/base-content.directive.ts');
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -44,6 +45,7 @@ interface ITopicData {
   collectionId: string,
   chapters: string[]
 }
+
 @Component({
   selector: 'topic-landing-page',
   templateUrl: './topic-landing-page.component.html',
@@ -54,7 +56,7 @@ export class TopicLandingPageComponent implements OnInit {
   lessonInDevicesPngImageSrc: string = null;
   lessonInDevicesWebpImageSrc: string = null;
   lessonsQualities: ILessonsQuality[] = null;
-  topicData = null;
+  topicData: ITopicData = null;
   topicTitle: string = null;
 
   constructor(
