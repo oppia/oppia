@@ -47,6 +47,11 @@
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-bezier"
+                ng-class="{'disabled' : !($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())}" ng-click="$ctrl.createQuadraticBezier()"
+                tooltip-placement="right" uib-tooltip="Quadratic Bezier curve" ng-disabled="!($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())">
+          <i class="fas fa-bezier-curve bezier-curve"></i>
+        </button>
         <div class="vert-bottom-toolbar">
           <div>
             <div class="color-well">
@@ -82,14 +87,14 @@
                     ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectUndoStack.length}"
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isUndoEnabled()}"
                     ng-click="$ctrl.onUndo()"
-                    ng-disabled="!$ctrl.objectUndoStack.length">
+                    ng-disabled="!$ctrl.isUndoEnabled()">
               <i class="fas fa-undo"></i>
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectRedoStack.length}"
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isRedoEnabled()}"
                     ng-click="$ctrl.onRedo()"
-                    ng-disabled="!$ctrl.objectRedoStack.length">
+                    ng-disabled="!$ctrl.isRedoEnabled()">
               <i class="fas fa-redo"></i>
             </button>
           </div>
@@ -97,7 +102,8 @@
                   ng-disabled="!$ctrl.objectIsSelected">
             Remove
           </button>
-          <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()">
+          <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()"
+                  ng-disabled="!$ctrl.isClearEnabled()">
             Clear
           </button>
         </div>
@@ -112,6 +118,9 @@
       </div>
       <div class="info-tag" ng-if="$ctrl.isDrawModePolygon() && !$ctrl.isTouchDevice">
         Double click to complete the polygon.
+      </div>
+      <div class="info-tag" ng-if="$ctrl.isDrawModeBezier()">
+        Click the bezier curve button to complete the diagram.
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
@@ -295,6 +304,10 @@
     margin: 2px;
     padding: 0;
     text-align: center;
+  }
+
+  .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
+    font-size: 21px;
   }
 
   .svg-editor .vertical-toolbar .tooltip-inner {
