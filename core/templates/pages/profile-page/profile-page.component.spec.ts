@@ -33,7 +33,7 @@ describe('Profile page', function() {
   var $scope = null;
   var ctrl = null;
   var $q = null;
-  var UserService = null;
+  var UserBackendApiService = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
   var $log = null;
@@ -72,7 +72,7 @@ describe('Profile page', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
-    UserService = $injector.get('UserService');
+    UserBackendApiService = $injector.get('UserBackendApiService');
     CsrfTokenService = $injector.get('CsrfTokenService');
     DateTimeFormatService = $injector.get('DateTimeFormatService');
     $log = $injector.get('$log');
@@ -229,7 +229,7 @@ describe('Profile page', function() {
     it('should not change subscription status and change to login page',
       function() {
         var loginUrl = 'login-url';
-        spyOn(UserService, 'getLoginUrlAsync').and.returnValue(
+        spyOn(UserBackendApiService, 'getLoginUrlAsync').and.returnValue(
           $q.resolve(loginUrl));
 
         ctrl.changeSubscriptionStatus();
@@ -241,7 +241,7 @@ describe('Profile page', function() {
     it('should not change subscription status and reload the page when login' +
       ' page is not provided', function() {
       spyOn(windowRefMock.nativeWindow.location, 'reload').and.callThrough();
-      spyOn(UserService, 'getLoginUrlAsync').and.returnValue(
+      spyOn(UserBackendApiService, 'getLoginUrlAsync').and.returnValue(
         $q.resolve(null));
 
       ctrl.changeSubscriptionStatus();

@@ -27,7 +27,7 @@ describe('Create Activity Modal Controller', function() {
   var $uibModalInstance = null;
   var CollectionCreationService = null;
   var ExplorationCreationService = null;
-  var UserService = null;
+  var UserBackendApiService = null;
 
   var userInfo = {
     canCreateCollections: () => true
@@ -45,12 +45,12 @@ describe('Create Activity Modal Controller', function() {
     var $rootScope = $injector.get('$rootScope');
     CollectionCreationService = $injector.get('CollectionCreationService');
     ExplorationCreationService = $injector.get('ExplorationCreationService');
-    UserService = $injector.get('UserService');
+    UserBackendApiService = $injector.get('UserBackendApiService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+    spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve(userInfo));
 
     $scope = $rootScope.$new();

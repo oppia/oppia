@@ -33,7 +33,7 @@ describe('Preferences Controller', function() {
   var $timeout = null;
   var $uibModal = null;
   var CsrfService = null;
-  var UserService = null;
+  var UserBackendApiService = null;
   var userInfo = {
     getUsername: () => 'myUsername',
     email: () => 'myusername@email.com'
@@ -65,7 +65,7 @@ describe('Preferences Controller', function() {
     $uibModal = $injector.get('$uibModal');
 
     CsrfService = $injector.get('CsrfTokenService');
-    UserService = $injector.get('UserService');
+    UserBackendApiService = $injector.get('UserBackendApiService');
 
     spyOn(CsrfService, 'getTokenAsync').and.returnValue(
       $q.resolve('sample-csrf-token'));
@@ -74,7 +74,7 @@ describe('Preferences Controller', function() {
       $rootScope: $rootScope
     });
 
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+    spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve(userInfo));
     $httpBackend.expectGET('/preferenceshandler/data').respond({
       can_receive_email_updates: false,
@@ -239,7 +239,7 @@ describe('Preferences Controller', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve(newPicture)
     });
-    spyOn(UserService, 'setProfileImageDataUrlAsync').and.returnValue(
+    spyOn(UserBackendApiService, 'setProfileImageDataUrlAsync').and.returnValue(
       $q.resolve());
 
     ctrl.showEditProfilePictureModal();
