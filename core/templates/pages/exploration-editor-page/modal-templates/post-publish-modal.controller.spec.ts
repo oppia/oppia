@@ -62,7 +62,10 @@ describe('Post Publish Modal Controller', function() {
   it('should add range from a click event', function() {
     var removeAllRanges = jasmine.createSpy('removeAllRanges');
     var addRange = jasmine.createSpy('addRange');
-    spyOn(window, 'getSelection').and.returnValue(<any>{
+    // TS ignore is used here because we are faking the getSelection function
+    // for this test.
+    // @ts-ignore
+    spyOn(window, 'getSelection').and.returnValue({
       removeAllRanges: removeAllRanges,
       addRange: addRange
     });

@@ -24,8 +24,14 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { QuestionBackendDict } from
+  'domain/question/QuestionObjectFactory';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
+
+interface PretestQuestionsBackendResposne {
+  'pretest_question_dicts': QuestionBackendDict[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -37,8 +43,8 @@ export class PretestQuestionBackendApiService {
   ) {}
 
   _fetchPretestQuestions(explorationId: string, storyId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: QuestionBackendDict[]) => void,
+      errorCallback: (reason?: Object) => void): void {
     if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
       successCallback([]);
       return;
@@ -50,7 +56,9 @@ export class PretestQuestionBackendApiService {
         story_id: storyId,
       });
 
-    this.http.get(pretestDataUrl).toPromise().then((data: any) => {
+    this.http.get<PretestQuestionsBackendResposne>(
+      pretestDataUrl
+    ).toPromise().then(data => {
       var pretestQuestionDicts = (
         cloneDeep(data.pretest_question_dicts));
       if (successCallback) {
@@ -64,7 +72,7 @@ export class PretestQuestionBackendApiService {
   }
 
   fetchPretestQuestions(explorationId: string,
-      storyId: string): Promise<Object> {
+      storyId: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchPretestQuestions(explorationId, storyId, resolve, reject);
     });

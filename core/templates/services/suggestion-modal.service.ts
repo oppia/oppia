@@ -49,6 +49,7 @@ export class SuggestionModalService {
   // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
   // 'any' since '$uibModalInstance' is a AngularJS native object and does not
   // have a TS interface.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   acceptSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
     $uibModalInstance.close(paramDict);
   }
@@ -56,6 +57,7 @@ export class SuggestionModalService {
   // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
   // 'any' since '$uibModalInstance' is a AngularJS native object and does not
   // have a TS interface.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rejectSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
     $uibModalInstance.close(paramDict);
   }
@@ -63,6 +65,7 @@ export class SuggestionModalService {
   // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
   // 'any' since '$uibModalInstance' is a AngularJS native object and does not
   // have a TS interface.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cancelSuggestion($uibModalInstance: any): void {
     $uibModalInstance.dismiss('cancel');
   }
