@@ -22,7 +22,3 @@ require(
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
-
-require(
-  'pages/landing-pages/stewards-landing-page/' +
-  'stewards-landing-page.component.ts');

@@ -12,106 +12,169 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Unit tests for stewardsLandingPage.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, async, TestBed, tick, fakeAsync } from
+  '@angular/core/testing';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { StewardsLandingPageComponent } from
+  'pages/landing-pages/stewards-landing-page/stewards-landing-page.component';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
-import { UrlService } from
-  'services/contextual/url.service';
-import { of } from 'rxjs';
 
-require(
-  'pages/landing-pages/stewards-landing-page/' +
-  'stewards-landing-page.component.ts');
+import { of, Observable } from 'rxjs';
 
-describe('Stewards Landing Page', function() {
-  var $scope = null, ctrl = null;
-  var $timeout = null;
-  var SiteAnalyticsService = null;
-  var windowRef = new WindowRef();
-  var windowDimensions = new WindowDimensionsService(windowRef);
+class MockUrlService {
+  getPathname(): string {
+    return '/parents';
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRef);
-    $provide.value('WindowDimensionsService', windowDimensions);
-    $provide.value('UrlService', new UrlService(windowRef));
-    $provide.value('UrlService', {
-      getPathname: function() {
-        return '/parents';
+class MockWindowRef {
+  _window = {
+    location: {
+      _pathname: '',
+      _href: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      get pathname() {
+        return this._pathname;
+      },
+      set pathname(val) {
+        this._pathname = val;
       }
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $timeout = $injector.get('$timeout');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
+    },
+    _innerWidth: 0,
+    get innerWidth() {
+      return this._innerWidth;
+    },
+    set innerWidth(val) {
+      this._innerWidth = val;
+    }
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('stewardsLandingPage', {
-      $scope: $scope
-    });
+
+class MockWindowDimensionsService {
+  constructor(
+    private windowRef: MockWindowRef
+  ) {}
+  getWidth(): number {
+    return this.windowRef.nativeWindow.innerWidth;
+  }
+  getResizeEvent(): Observable<Event> {
+    return of(new Event('resize'));
+  }
+  isWindowNarrow(): boolean {
+    let NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
+    return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
+  }
+}
+
+
+let component: StewardsLandingPageComponent;
+let fixture: ComponentFixture<StewardsLandingPageComponent>;
+
+describe('Stewards Landing Page', () => {
+  let siteAnalyticsService: SiteAnalyticsService = null;
+  let windowRef: MockWindowRef;
+  let windowDimensions: MockWindowDimensionsService;
+
+  beforeEach(async(() => {
+    windowRef = new MockWindowRef();
+    windowDimensions = new MockWindowDimensionsService(windowRef);
+    TestBed.configureTestingModule({
+      declarations: [StewardsLandingPageComponent],
+      providers: [
+        SiteAnalyticsService,
+        UrlInterpolationService,
+        { provide: UrlService, useClass: MockUrlService },
+        { provide: WindowRef, useValue: windowRef },
+        { provide: WindowDimensionsService, useValue: windowDimensions }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
   }));
 
-  afterEach(function() {
-    ctrl.$onDestroy();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StewardsLandingPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should change to parents tab', function() {
-    ctrl.$onInit();
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
 
-    var activeTabName = 'Parents';
-    ctrl.setActiveTabName(activeTabName);
+  it('should change to parents tab', () => {
+    component.ngOnInit();
 
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
+    const activeTabName = 'Parents';
+    component.setActiveTabName(activeTabName);
+
+    expect(component.activeTabName).toBe(activeTabName);
+    expect(component.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
       href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
     }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
+    expect(component.isActiveTab(activeTabName)).toBe(true);
+    expect(component.isActiveTab('Teachers')).toBe(false);
+    expect(component.isActiveTab('NGOs')).toBe(false);
+    expect(component.isActiveTab('Volunteers')).toBe(false);
 
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Parent');
+    expect(component.getActiveTabNameInSingularForm()).toBe('Parent');
   });
 
-  it('should change to teachers tab', function() {
-    ctrl.$onInit();
+  it('should change to teachers tab', () => {
+    component.ngOnInit();
 
-    var activeTabName = 'Teachers';
-    ctrl.setActiveTabName(activeTabName);
+    const activeTabName = 'Teachers';
+    component.setActiveTabName(activeTabName);
 
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
+    expect(component.activeTabName).toBe(activeTabName);
+    expect(component.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
       href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
     }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
+    expect(component.isActiveTab(activeTabName)).toBe(true);
+    expect(component.isActiveTab('Parents')).toBe(false);
+    expect(component.isActiveTab('NGOs')).toBe(false);
+    expect(component.isActiveTab('Volunteers')).toBe(false);
 
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Teacher');
+    expect(component.getActiveTabNameInSingularForm()).toBe('Teacher');
   });
 
-  it('should change to nonprofits tab', function() {
-    ctrl.$onInit();
+  it('should change to nonprofits tab', () => {
+    component.ngOnInit();
 
-    var activeTabName = 'NGOs';
-    ctrl.setActiveTabName(activeTabName);
+    const activeTabName = 'NGOs';
+    component.setActiveTabName(activeTabName);
 
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
+    expect(component.activeTabName).toBe(activeTabName);
+    expect(component.buttonDefinitions).toEqual([{
       text: 'Get Involved',
       href: (
         'https://www.oppiafoundation.org/partnerships#get-in-touch')
@@ -119,133 +182,115 @@ describe('Stewards Landing Page', function() {
       text: 'Browse Lessons',
       href: '/community-library'
     }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
+    expect(component.isActiveTab(activeTabName)).toBe(true);
+    expect(component.isActiveTab('Teachers')).toBe(false);
+    expect(component.isActiveTab('Parents')).toBe(false);
+    expect(component.isActiveTab('Volunteers')).toBe(false);
 
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Nonprofit');
+    expect(component.getActiveTabNameInSingularForm()).toBe('Nonprofit');
   });
 
-  it('should change to volunteers tab', function() {
-    ctrl.$onInit();
+  it('should change to volunteers tab', () => {
+    component.ngOnInit();
 
-    var activeTabName = 'Volunteers';
-    ctrl.setActiveTabName(activeTabName);
+    const activeTabName = 'Volunteers';
+    component.setActiveTabName(activeTabName);
 
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
+    expect(component.activeTabName).toBe(activeTabName);
+    expect(component.buttonDefinitions).toEqual([{
       text: 'Browse Volunteer Opportunities',
       href: 'https://www.oppiafoundation.org/volunteer'
     }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
+    expect(component.isActiveTab(activeTabName)).toBe(true);
+    expect(component.isActiveTab('Teachers')).toBe(false);
+    expect(component.isActiveTab('Parents')).toBe(false);
+    expect(component.isActiveTab('NGOs')).toBe(false);
 
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Volunteer');
+    expect(component.getActiveTabNameInSingularForm()).toBe('Volunteer');
   });
 
-  it('should not change button definitions when tab is invalid', function() {
-    ctrl.$onInit();
+  it('should not change button definitions when tab is invalid', () => {
+    component.ngOnInit();
 
-    var activeTabName = 'Invalid';
-    expect(function() {
-      ctrl.setActiveTabName(activeTabName);
+    const activeTabName = 'Invalid';
+    expect(() => {
+      component.setActiveTabName(activeTabName);
     }).toThrowError('Invalid tab name: ' + activeTabName);
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
+    expect(component.activeTabName).toBe(activeTabName);
+    expect(component.isActiveTab(activeTabName)).toBe(true);
+    expect(component.isActiveTab('Parents')).toBe(false);
+    expect(component.isActiveTab('Teachers')).toBe(false);
+    expect(component.isActiveTab('NGOs')).toBe(false);
+    expect(component.isActiveTab('Volunteers')).toBe(false);
 
-    expect(function() {
-      ctrl.getActiveTabNameInSingularForm();
+    expect(() => {
+      component.getActiveTabNameInSingularForm();
     }).toThrowError('Invalid active tab name: ' + activeTabName);
   });
 
-  it('should click on active button', function() {
-    ctrl.$onInit();
-    var stewardsLandingPageEventSpy = spyOn(
-      SiteAnalyticsService, 'registerStewardsLandingPageEvent').and
+  it('should click on active button', fakeAsync(() => {
+    component.ngOnInit();
+    const stewardsLandingPageEventSpy = spyOn(
+      siteAnalyticsService, 'registerStewardsLandingPageEvent').and
       .callThrough();
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
-    });
 
-    var activeTabName = 'Parents';
-    var buttonDefinition = {
+    windowRef.nativeWindow.location.href = '';
+
+    const activeTabName = 'Parents';
+    const buttonDefinition = {
       text: 'Browse Lessons',
       href: '/community-library'
     };
-    ctrl.setActiveTabName(activeTabName);
-    ctrl.onClickButton(buttonDefinition);
-    $timeout.flush(1000);
+    component.setActiveTabName(activeTabName);
+    component.onClickButton(buttonDefinition);
+    tick(150);
+    fixture.detectChanges();
 
     expect(stewardsLandingPageEventSpy).toHaveBeenCalledWith(
       activeTabName, buttonDefinition.text);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(windowRef.nativeWindow.location).toBe(buttonDefinition.href);
-  });
+    expect(component.isActiveTab(activeTabName)).toBe(true);
+    expect(windowRef.nativeWindow.location.href).toBe(buttonDefinition.href);
+  }));
 
-  it('should get static image url', function() {
-    expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(
+  it('should get static image url', () => {
+    expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should get static subject image url', function() {
-    expect(ctrl.getStaticSubjectImageUrl('subject-file-name')).toBe(
+  it('should get static subject image url', () => {
+    expect(component.getStaticSubjectImageUrl('subject-file-name')).toBe(
       '/assets/images/subjects/subject-file-name.svg');
   });
 
-  it('should set up active tab when init is called', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/parents'
-      },
-      innerWidth: 100
-    });
-    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
-      of(new Event('resize')));
-    ctrl.$onInit();
+  it('should set up active tab when init is called', () => {
+    windowRef.nativeWindow.location.pathname = '/parents';
+    windowRef.nativeWindow.innerWidth = 100;
+    component.ngOnInit();
 
-    expect(ctrl.activeTabName).toBe('Parents');
-    expect(ctrl.isActiveTab('Parents')).toBe(true);
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Parent');
-    expect(ctrl.buttonDefinitions).toEqual([{
+    expect(component.activeTabName).toBe('Parents');
+    expect(component.isActiveTab('Parents')).toBe(true);
+    expect(component.getActiveTabNameInSingularForm()).toBe('Parent');
+    expect(component.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
       href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
     }]);
-    expect(ctrl.windowIsNarrow).toBe(true);
+    expect(component.windowIsNarrow).toBe(true);
   });
 
-  it('should check evalutes window is narrow on resize event', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: ''
-      },
-      innerWidth: 998
-    });
-    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
-      of(new Event('resize')));
-    ctrl.$onInit();
-    expect(ctrl.windowIsNarrow).toBe(false);
+  it('should check evalutes window is narrow on resize event', () => {
+    windowRef.nativeWindow.location.pathname = '';
+    windowRef.nativeWindow.innerWidth = 998;
+    component.ngOnInit();
+    expect(component.windowIsNarrow).toBe(false);
   });
 
-  it('should evalutes window is not narrow on resize event', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: ''
-      },
-      innerWidth: 768
-    });
-    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
-      of(new Event('resize')));
-    ctrl.$onInit();
-    expect(ctrl.windowIsNarrow).toBe(true);
+  it('should evalutes window is not narrow on resize event', () => {
+    windowRef.nativeWindow.location.pathname = '';
+    windowRef.nativeWindow.innerWidth = 768;
+    component.ngOnInit();
+    expect(component.windowIsNarrow).toBe(true);
   });
 });

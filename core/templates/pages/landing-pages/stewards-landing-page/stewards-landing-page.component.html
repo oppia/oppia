@@ -5,9 +5,9 @@
         <div class="row">
           <div class="col-sm-6 col-sm-push-6" style="height: auto; z-index: 20;">
             <picture>
-              <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.webp')]>">
-              <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.png')]>">
-              <img ng-src="<[$ctrl.getStaticImageUrl('/general/partner.png')]>" class="oppia-stewards-landing-image">
+              <source type="image/webp" [srcset]="getStaticImageUrl('/general/partner.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/general/partner.png')">
+              <img [src]="getStaticImageUrl('/general/partner.png')" class="oppia-stewards-landing-image">
             </picture>
           </div>
           <div class="col-sm-6 col-sm-pull-6" style="z-index: 20">
@@ -15,8 +15,8 @@
               <h1 class="oppia-stewards-landing-h1">Get involved.</h1>
               <h2 class="oppia-stewards-landing-h2" style="padding-right: 15px;">Support from educators, NGOs and student volunteers makes Oppia possible. Help increase student access to Oppia.</h2>
               <div>
-                <span ng-repeat="buttonDefinition in $ctrl.buttonDefinitions track by $index">
-                  <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="$ctrl.onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+                <span *ngFor="let buttonDefinition of buttonDefinitions; index as i">
+                  <button class="btn oppia-stewards-button" [ngClass]="{'oppia-stewards-button-primary': i === 0, 'oppia-stewards-button-secondary': i > 0}" (click)="onClickButton(buttonDefinition)">{{ buttonDefinition.text }}</button>
                 </span>
               </div>
             </div>
@@ -25,99 +25,99 @@
       </div>
       <div class="oppia-stewards-landing-background-icon-row-container">
         <div class="oppia-stewards-landing-background-icon-row" style="margin-top: 20px">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Cooking')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Government')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Architecture')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('History')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Microbiology')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Engineering')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Humor')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Combinatorics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Cooking')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Government')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Architecture')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('History')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Microbiology')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Engineering')" class="oppia-stewards-landing-background-icon" alt="">
 
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algorithms')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Economics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Computing')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Reading')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Art')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Creativity')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Physics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Language')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chess')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Astronomy')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Algorithms')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Economics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Computing')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Reading')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Art')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Creativity')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Physics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Language')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Arithmetic')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Chess')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Astronomy')" class="oppia-stewards-landing-background-icon" alt="">
 
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Religion')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Mathematics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Philosophy')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Cooking')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Government')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Architecture')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Religion')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Mathematics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Philosophy')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Humor')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Combinatorics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Cooking')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Government')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Architecture')" class="oppia-stewards-landing-background-icon" alt="">
         </div>
 
         <div class="oppia-stewards-landing-background-icon-row">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Genetics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Space')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algebra')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Music')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chemistry')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Poetry')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Puzzles')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Calculus')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Genetics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Space')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Algebra')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Music')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Chemistry')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Poetry')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Puzzles')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Calculus')" class="oppia-stewards-landing-background-icon" alt="">
 
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Business')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Geography')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Biology')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Genetics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Space')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algebra')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Music')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chemistry')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Poetry')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Puzzles')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Calculus')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Business')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Geography')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Biology')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Genetics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Space')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Algebra')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Music')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Chemistry')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Poetry')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Puzzles')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Calculus')" class="oppia-stewards-landing-background-icon" alt="">
 
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Business')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Geography')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Biology')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Genetics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Space')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algebra')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Music')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chemistry')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Business')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Geography')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Biology')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Genetics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Space')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Algebra')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Music')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Chemistry')" class="oppia-stewards-landing-background-icon" alt="">
         </div>
 
         <div class="oppia-stewards-landing-background-icon-row">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Economics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algorithms')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Creativity')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Astronomy')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chess')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Language')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Physics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Economics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Algorithms')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Creativity')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Astronomy')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Chess')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Arithmetic')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Language')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Physics')" class="oppia-stewards-landing-background-icon" alt="">
 
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Philosophy')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Mathematics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Religion')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Cooking')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Engineering')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Microbiology')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('History')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Architecture')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Government')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Combinatorics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Humor')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Philosophy')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Mathematics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Religion')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Cooking')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Engineering')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Microbiology')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('History')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Architecture')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Government')" class="oppia-stewards-landing-background-icon" alt="">
 
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Art')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Reading')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Computing')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Economics')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algorithms')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Creativity')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Astronomy')]>" class="oppia-stewards-landing-background-icon" alt="">
-          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chess')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Art')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Reading')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Computing')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Economics')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Algorithms')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Creativity')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Astronomy')" class="oppia-stewards-landing-background-icon" alt="">
+          <img [src]="getStaticSubjectImageUrl('Chess')" class="oppia-stewards-landing-background-icon" alt="">
         </div>
       </div>
     </div>
@@ -127,32 +127,32 @@
     <section style="padding: 30px;">
       <!--A container to make a grid with a fixed column-->
       <main class="row" style="display: flex;">
-        <div class="column oppia-stewards-sidebar" ng-if="!$ctrl.windowIsNarrow">
+        <div class="column oppia-stewards-sidebar" *ngIf="!windowIsNarrow">
           <ul class="primary">
-            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_PARENTS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_PARENTS)">Parents</a></li>
-            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_TEACHERS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_TEACHERS)">Teachers</a></li>
-            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_NONPROFITS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_NONPROFITS)">NGOs</a></li>
-            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_VOLUNTEERS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_VOLUNTEERS)">Volunteers</a></li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_PARENTS)}"><a (click)="setActiveTabName(TAB_NAME_PARENTS)">Parents</a></li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_TEACHERS)}"><a (click)="setActiveTabName(TAB_NAME_TEACHERS)">Teachers</a></li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_NONPROFITS)}"><a (click)="setActiveTabName(TAB_NAME_NONPROFITS)">NGOs</a></li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_VOLUNTEERS)}"><a (click)="setActiveTabName(TAB_NAME_VOLUNTEERS)">Volunteers</a></li>
           </ul>
         </div>
 
         <div class="column tab-content view-content oppia-stewards-main-content" autoscroll="true">
-          <div ng-if="$ctrl.windowIsNarrow">
+          <div *ngIf="windowIsNarrow">
             <strong>I AM A ...</strong>
             <div uib-dropdown class="oppia-stewards-dropdown">
               <button uib-dropdown-toggle class="btn btn-secondary selection dropdown-toggle" type="button" aria-expanded="false" data-toggle="dropdown">
-                <[$ctrl.getActiveTabNameInSingularForm()]>
+                {{ getActiveTabNameInSingularForm() }}
               </button>
               <ul uib-dropdown-menu style="width: inherit;">
-                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_PARENTS)">Parent</a></li>
-                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_TEACHERS)">Teacher</a></li>
-                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_NONPROFITS)">Nonprofit</a></li>
-                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_VOLUNTEERS)">Volunteer</a></li>
+                <li><a (click)="setActiveTabName(TAB_NAME_PARENTS)">Parent</a></li>
+                <li><a (click)="setActiveTabName(TAB_NAME_TEACHERS)">Teacher</a></li>
+                <li><a (click)="setActiveTabName(TAB_NAME_NONPROFITS)">Nonprofit</a></li>
+                <li><a (click)="setActiveTabName(TAB_NAME_VOLUNTEERS)">Volunteer</a></li>
               </ul>
             </div>
           </div>
 
-          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_PARENTS">
+          <div *ngIf="activeTabName === TAB_NAME_PARENTS">
             <h2>Help your child learn with our free, engaging lessons</h2>
             <p>
               Oppia is a digital library of academic lessons that teaches
@@ -184,7 +184,7 @@
             </p>
           </div>
 
-          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_TEACHERS">
+          <div *ngIf="activeTabName === TAB_NAME_TEACHERS">
             <h2>
               Oppia's free, personalized lessons are a great way to support student learning
             </h2>
@@ -227,7 +227,7 @@
             </p>
           </div>
 
-          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_NONPROFITS">
+          <div *ngIf="activeTabName === TAB_NAME_NONPROFITS">
             <h2>
               Let's work together to make compelling educational
               content available to everyone
@@ -276,7 +276,7 @@
             </p>
           </div>
 
-          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_VOLUNTEERS">
+          <div *ngIf="activeTabName === TAB_NAME_VOLUNTEERS">
             <h2>
               Help improve access to high-quality education for students
               around the world
@@ -308,8 +308,8 @@
           </div>
 
           <div class="oppia-stewards-main-content-buttons">
-            <span ng-repeat="buttonDefinition in $ctrl.buttonDefinitions track by $index">
-              <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="$ctrl.onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+            <span *ngFor="let buttonDefinition of buttonDefinitions; index as i">
+              <button class="btn oppia-stewards-button" [ngClass]="{'oppia-stewards-button-primary': i === 0, 'oppia-stewards-button-secondary': i > 0}" (click)="onClickButton(buttonDefinition)">{{ buttonDefinition.text }}</button>
             </span>
           </div>
         </div>

@@ -18,131 +18,159 @@
 
 require('base-components/base-content.directive.ts');
 
-angular.module('oppia').component('stewardsLandingPage', {
-  template: require('./stewards-landing-page.component.html'),
-  controller: [
-    '$scope', '$timeout', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
-    'WindowRef',
-    function(
-        $scope, $timeout, SiteAnalyticsService,
-        UrlInterpolationService, UrlService, WindowDimensionsService,
-        WindowRef) {
-      var ctrl = this;
-      ctrl.setActiveTabName = function(newActiveTabName) {
-        ctrl.activeTabName = newActiveTabName;
-        ctrl.buttonDefinitions = getButtonDefinitions(newActiveTabName);
-      };
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-      ctrl.isActiveTab = function(tabName) {
-        return ctrl.activeTabName === tabName;
-      };
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-      ctrl.getActiveTabNameInSingularForm = function() {
-        if (ctrl.activeTabName === ctrl.TAB_NAME_PARENTS) {
-          return 'Parent';
-        } else if (ctrl.activeTabName === ctrl.TAB_NAME_TEACHERS) {
-          return 'Teacher';
-        } else if (ctrl.activeTabName === ctrl.TAB_NAME_NONPROFITS) {
-          return 'Nonprofit';
-        } else if (ctrl.activeTabName === ctrl.TAB_NAME_VOLUNTEERS) {
-          return 'Volunteer';
-        } else {
-          throw new Error('Invalid active tab name: ' + ctrl.activeTabName);
-        }
-      };
+interface ButtonDefinition {
+  text: string,
+  href: string
+}
 
-      var getButtonDefinitions = function(tabName) {
-        if (tabName === ctrl.TAB_NAME_PARENTS ||
-            tabName === ctrl.TAB_NAME_TEACHERS) {
-          return [{
-            text: 'Browse Lessons',
-            href: '/community-library'
-          }, {
-            text: 'Subscribe to our Newsletter',
-            href: 'https://eepurl.com/g5v9Df'
-          }];
-        } else if (tabName === ctrl.TAB_NAME_NONPROFITS) {
-          return [{
-            text: 'Get Involved',
-            href: (
-              'https://www.oppiafoundation.org/partnerships#get-in-touch')
-          }, {
-            text: 'Browse Lessons',
-            href: '/community-library'
-          }];
-        } else if (tabName === ctrl.TAB_NAME_VOLUNTEERS) {
-          // TODO(sll): Add "Get in Touch" link that points to contact form.
-          return [{
-            text: 'Browse Volunteer Opportunities',
-            href: 'https://www.oppiafoundation.org/volunteer'
-          }];
-        } else {
-          throw new Error('Invalid tab name: ' + tabName);
-        }
-      };
+@Component({
+  selector: 'stewards-landing-page',
+  templateUrl: './stewards-landing-page.component.html',
+  styleUrls: []
+})
+export class StewardsLandingPageComponent implements OnInit, OnDestroy {
+  TAB_NAME_PARENTS: string;
+  TAB_NAME_TEACHERS: string;
+  TAB_NAME_NONPROFITS: string;
+  TAB_NAME_VOLUNTEERS: string;
+  activeTabName: string;
+  buttonDefinitions: ButtonDefinition[];
+  windowIsNarrow: boolean;
+  resizeSubscription: any;
 
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
+  constructor(
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
+    private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef
+  ) {}
 
-      ctrl.getStaticSubjectImageUrl = function(subjectName) {
-        return UrlInterpolationService.getStaticImageUrl('/subjects/' +
-          subjectName + '.svg');
-      };
-
-      ctrl.onClickButton = function(buttonDefinition) {
-        SiteAnalyticsService.registerStewardsLandingPageEvent(
-          ctrl.activeTabName, buttonDefinition.text);
-        $timeout(function() {
-          WindowRef.nativeWindow.location = buttonDefinition.href;
-        }, 150);
-      };
-
-      // Note: This should be kept in sync with the CSS media query on
-      // stewards-landing-page.mainpage.html.
-      var isWindowNarrow = function(windowWidthPx) {
-        return windowWidthPx <= 890;
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.TAB_NAME_PARENTS = 'Parents';
-        ctrl.TAB_NAME_TEACHERS = 'Teachers';
-        ctrl.TAB_NAME_NONPROFITS = 'NGOs';
-        ctrl.TAB_NAME_VOLUNTEERS = 'Volunteers';
-        // Set the initial tab name based on the URL; default to
-        // TAB_NAME_PARENTS.
-        var initialPathname = UrlService.getPathname();
-        ctrl.activeTabName = ctrl.TAB_NAME_PARENTS;
-        var URL_PATTERNS_TO_TAB_NAMES = {
-          '/parents': ctrl.TAB_NAME_PARENTS,
-          '/teachers': ctrl.TAB_NAME_TEACHERS,
-          '/partners': ctrl.TAB_NAME_NONPROFITS,
-          '/nonprofits': ctrl.TAB_NAME_NONPROFITS,
-          '/volunteers': ctrl.TAB_NAME_VOLUNTEERS
-        };
-        for (var urlPattern in URL_PATTERNS_TO_TAB_NAMES) {
-          if (initialPathname.indexOf(urlPattern) === 0) {
-            ctrl.activeTabName = URL_PATTERNS_TO_TAB_NAMES[urlPattern];
-            break;
-          }
-        }
-        ctrl.buttonDefinitions = getButtonDefinitions(ctrl.activeTabName);
-        ctrl.windowIsNarrow = isWindowNarrow(
-          WindowDimensionsService.getWidth());
-        ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-          subscribe(evt => {
-            ctrl.windowIsNarrow = isWindowNarrow(
-              WindowDimensionsService.getWidth());
-            $scope.$applyAsync();
-          });
-      };
-
-      ctrl.$onDestroy = function() {
-        if (ctrl.resizeSubscription) {
-          ctrl.resizeSubscription.unsubscribe();
-        }
-      };
+  ngOnDestroy(): void {
+    if (this.resizeSubscription) {
+      this.resizeSubscription.unsubscribe();
     }
-  ]
-});
+  }
+
+  ngOnInit(): void {
+    this.TAB_NAME_PARENTS = 'Parents';
+    this.TAB_NAME_TEACHERS = 'Teachers';
+    this.TAB_NAME_NONPROFITS = 'NGOs';
+    this.TAB_NAME_VOLUNTEERS = 'Volunteers';
+    // Set the initial tab name based on the URL; default to
+    // TAB_NAME_PARENTS.
+    const initialPathname = this.urlService.getPathname();
+    this.activeTabName = this.TAB_NAME_PARENTS;
+    const URL_PATTERNS_TO_TAB_NAMES = {
+      '/parents': this.TAB_NAME_PARENTS,
+      '/teachers': this.TAB_NAME_TEACHERS,
+      '/partners': this.TAB_NAME_NONPROFITS,
+      '/nonprofits': this.TAB_NAME_NONPROFITS,
+      '/volunteers': this.TAB_NAME_VOLUNTEERS
+    };
+    for (var urlPattern in URL_PATTERNS_TO_TAB_NAMES) {
+      if (initialPathname.indexOf(urlPattern) === 0) {
+        this.activeTabName = URL_PATTERNS_TO_TAB_NAMES[urlPattern];
+        break;
+      }
+    }
+    this.buttonDefinitions = this.getButtonDefinitions(this.activeTabName);
+    this.windowIsNarrow = this.isWindowNarrow(
+      this.windowDimensionsService.getWidth());
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent().
+      subscribe(evt => {
+        this.windowIsNarrow = this.isWindowNarrow(
+          this.windowDimensionsService.getWidth());
+      });
+  }
+
+  setActiveTabName(newActiveTabName: string): void {
+    this.activeTabName = newActiveTabName;
+    this.buttonDefinitions = this.getButtonDefinitions(newActiveTabName);
+  }
+
+  isActiveTab(tabName: string): boolean {
+    return this.activeTabName === tabName;
+  }
+
+  getActiveTabNameInSingularForm(): string {
+    if (this.activeTabName === this.TAB_NAME_PARENTS) {
+      return 'Parent';
+    } else if (this.activeTabName === this.TAB_NAME_TEACHERS) {
+      return 'Teacher';
+    } else if (this.activeTabName === this.TAB_NAME_NONPROFITS) {
+      return 'Nonprofit';
+    } else if (this.activeTabName === this.TAB_NAME_VOLUNTEERS) {
+      return 'Volunteer';
+    } else {
+      throw new Error('Invalid active tab name: ' + this.activeTabName);
+    }
+  }
+
+  getButtonDefinitions(tabName: string): ButtonDefinition[] {
+    if (tabName === this.TAB_NAME_PARENTS ||
+        tabName === this.TAB_NAME_TEACHERS) {
+      return [{
+        text: 'Browse Lessons',
+        href: '/community-library'
+      }, {
+        text: 'Subscribe to our Newsletter',
+        href: 'https://eepurl.com/g5v9Df'
+      }];
+    } else if (tabName === this.TAB_NAME_NONPROFITS) {
+      return [{
+        text: 'Get Involved',
+        href: (
+          'https://www.oppiafoundation.org/partnerships#get-in-touch')
+      }, {
+        text: 'Browse Lessons',
+        href: '/community-library'
+      }];
+    } else if (tabName === this.TAB_NAME_VOLUNTEERS) {
+      // TODO(sll): Add "Get in Touch" link that points to contact form.
+      return [{
+        text: 'Browse Volunteer Opportunities',
+        href: 'https://www.oppiafoundation.org/volunteer'
+      }];
+    } else {
+      throw new Error('Invalid tab name: ' + tabName);
+    }
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getStaticSubjectImageUrl(subjectName: string): string {
+    return this.urlInterpolationService.getStaticImageUrl('/subjects/' +
+      subjectName + '.svg');
+  }
+
+  onClickButton(buttonDefinition: ButtonDefinition): void {
+    this.siteAnalyticsService.registerStewardsLandingPageEvent(
+      this.activeTabName, buttonDefinition.text);
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = buttonDefinition.href;
+    }, 150);
+  }
+
+  // Note: This should be kept in sync with the CSS media query on
+  // stewards-landing-page.mainpage.html.
+  isWindowNarrow(windowWidthPx: number): boolean {
+    return windowWidthPx <= 890;
+  }
+}
+
+angular.module('oppia').directive('stewardsLandingPage', downgradeComponent(
+  {component: StewardsLandingPageComponent}));
