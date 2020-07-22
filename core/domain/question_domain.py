@@ -329,6 +329,30 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_states_v34_dict_to_v35_dict(cls, question_state_dict):
+        """Converts from version 34 to 35. Version 35 adds a new
+        customization arg to ImageClickInput which allows
+        content description for every region which is required
+        for reading out to accessibility users.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'ImageClickInput':
+            regions = question_state_dict[
+                'interaction']['customization_args'][
+                    'imageAndRegions']['value']['labeledRegions']
+            for region in regions:
+                region['regionDescription'] = ''
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
