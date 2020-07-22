@@ -150,10 +150,7 @@ angular.module('oppia').component('stateTranslationEditor', {
       };
       ctrl.$onInit = function() {
         $scope.HTML_SCHEMA = {
-          type: 'html',
-          ui_config: {
-            hide_complex_extensions: 'true'
-          }
+          type: 'html'
         };
         $scope.$on('activeContentIdChanged', function() {
           initEditor();

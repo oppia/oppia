@@ -31,9 +31,9 @@ describe('exploration features backend api service', () => {
   var ERROR_STATUS_CODE = 500;
 
   var sampleDataResults = {
-    is_improvements_tab_enabled: true,
-    is_exploration_whitelisted: true,
-    always_ask_learners_for_answer_details: false
+    isImprovementsTabEnabled: true,
+    isExplorationWhitelisted: true,
+    alwaysAskLearnersForAnswerDetails: false
   };
 
   beforeEach(() => {
