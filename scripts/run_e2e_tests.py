@@ -465,7 +465,8 @@ def get_chrome_driver_version():
                 '--chrome_driver_version flag. To determine the chromedriver '
                 'version to be used, please follow the instructions mentioned '
                 'in the following URL:\n'
-                'https://chromedriver.chromium.org/downloads/version-selection')
+                'https://chromedriver.chromium.org/downloads/version-selection'
+            )
     else:
         try:
             proc = subprocess.Popen(
