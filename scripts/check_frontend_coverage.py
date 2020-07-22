@@ -283,6 +283,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'playthrough-issues.directive.ts',
     'Polyfills.ts',
     'practice-tab.directive.ts',
+    'preferences-page.component.ts',
     'pretest-question-backend-api.service.ts',
     'preview-tab.directive.ts',
     'profile-link-image.directive.ts',
