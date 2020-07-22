@@ -72,7 +72,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             skill_services.get_merged_skill_ids())
         topic_rights_dict = topic_services.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
-            if topic_rights_dict[topic_summary['id']]:
+            if topic_summary['id'] in topic_rights_dict:
                 topic_rights = topic_rights_dict[topic_summary['id']]
                 if topic_rights:
                     topic_summary['is_published'] = (
@@ -81,6 +81,13 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                         topic_services.check_can_edit_topic(
                             self.user, topic_rights)
                     )
+            else:
+                logging.error(
+                    'Found topic without any rights model\n' +
+                    'INFO:\n' +
+                    'topic_id: %s\n' +
+                    'topic_name: %s\n' % (
+                        topic_summary['id'], topic_summary['name']))
 
         all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
         all_classroom_names = [
@@ -258,20 +265,12 @@ class NewTopicHandler(base.BaseHandler):
 
         try:
             topic_domain.Topic.require_valid_name(name)
-        except:
-            raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name)
-        new_topic_id = topic_services.get_new_topic_id()
-        topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, abbreviated_name, description)
-        topic_services.save_new_topic(self.user_id, topic)
-
-        try:
             file_format = image_validation_services.validate_image_and_filename(
                 raw_image, thumbnail_filename)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
+        new_topic_id = topic_services.get_new_topic_id()
         entity_id = new_topic_id
         filename_prefix = 'thumbnail'
 
@@ -280,6 +279,10 @@ class NewTopicHandler(base.BaseHandler):
         fs_services.save_original_and_compressed_versions_of_image(
             thumbnail_filename, feconf.ENTITY_TYPE_TOPIC, entity_id, raw_image,
             filename_prefix, image_is_compressible)
+
+        topic = topic_domain.Topic.create_default_topic(
+            new_topic_id, name, abbreviated_name, description)
+        topic_services.save_new_topic(self.user_id, topic)
 
         topic_services.update_topic_and_subtopic_pages(
             self.user_id, new_topic_id, [topic_domain.TopicChange({
