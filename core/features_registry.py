@@ -16,6 +16,10 @@
 
 """Feature flags registry."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+
 # Names of feature objects defined in domain/platform_parameter_domain.py
 # should be added to one of the following lists, features flags not added
 # here won't be available.
