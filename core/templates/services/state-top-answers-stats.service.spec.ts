@@ -280,9 +280,10 @@ describe('StateTopAnswersStatsService', () => {
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .toContain(joC({answer: 'adios'}));
 
-    states.getState('Hola').interaction.answerGroups[0].rules.push(
+    const updatedState = states.getState('Hola');
+    updatedState.interaction.answerGroups[0].rules.push(
       ruleObjectFactory.createNew('Contains', {x: 'adios'}));
-    stateTopAnswersStatsService.onStateInteractionSaved('Hola');
+    stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .not.toContain(joC({answer: 'adios'}));
@@ -300,10 +301,11 @@ describe('StateTopAnswersStatsService', () => {
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .not.toContain(joC({answer: 'hola'}));
 
-    states.getState('Hola').interaction.answerGroups[0].rules = [
+    const updatedState = states.getState('Hola');
+    updatedState.interaction.answerGroups[0].rules = [
       ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
     ];
-    stateTopAnswersStatsService.onStateInteractionSaved('Hola');
+    stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .toContain(joC({answer: 'hola'}));

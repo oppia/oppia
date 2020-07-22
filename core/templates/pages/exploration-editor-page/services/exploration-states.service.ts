@@ -313,7 +313,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveInteractionId: function(stateName, newInteractionId) {
         saveStateProperty(stateName, 'widget_id', newInteractionId);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
@@ -324,7 +324,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'widget_customization_args', newCustomizationArgs);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
       },
       getInteractionAnswerGroupsMemento: function(stateName) {
@@ -333,7 +333,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
@@ -344,7 +344,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'confirmed_unclassified_answers', newAnswers);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
       },
       getInteractionDefaultOutcomeMemento: function(stateName) {

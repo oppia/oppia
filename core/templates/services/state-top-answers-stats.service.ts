@@ -29,6 +29,7 @@ import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
+import { State } from 'domain/state/StateObjectFactory';
 
 export class AnswerStatsEntry {
   constructor(
@@ -42,7 +43,6 @@ export class AnswerStatsEntry {
 export class StateTopAnswersStatsService {
   private initializationHasStarted: boolean;
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
-  private states: States;
 
   private resolveInitPromise: () => void;
   private rejectInitPromise: (_) => void;
@@ -55,7 +55,6 @@ export class StateTopAnswersStatsService {
         StateTopAnswersStatsBackendApiService) {
     this.initializationHasStarted = false;
     this.topAnswersStatsByStateName = new Map();
-    this.states = null;
     this.initPromise = new Promise((resolve, reject) => {
       this.resolveInitPromise = resolve;
       this.rejectInitPromise = reject;
@@ -70,7 +69,6 @@ export class StateTopAnswersStatsService {
     if (!this.initializationHasStarted) {
       this.initializationHasStarted = true;
       try {
-        this.states = states;
         const {answers, interactionIds} = (
           await this.stateTopAnswersStatsBackendApiService.fetchStatsAsync(
             explorationId));
@@ -78,7 +76,7 @@ export class StateTopAnswersStatsService {
           this.topAnswersStatsByStateName.set(
             stateName, new AnswerStatsEntry(
               answers[stateName], interactionIds[stateName]));
-          this.refreshAddressedInfo(stateName);
+          this.refreshAddressedInfo(states.getState(stateName));
         }
         this.resolveInitPromise();
       } catch (error) {
@@ -130,25 +128,26 @@ export class StateTopAnswersStatsService {
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 
-  onStateInteractionSaved(stateName: string): void {
-    this.refreshAddressedInfo(stateName);
+  onStateInteractionSaved(updatedState: State): void {
+    this.refreshAddressedInfo(updatedState);
   }
 
-  private refreshAddressedInfo(stateName: string): void {
+  private refreshAddressedInfo(updatedState: State): void {
+    const stateName = updatedState.name;
+
     if (!this.topAnswersStatsByStateName.has(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
 
     const stateStats = this.topAnswersStatsByStateName.get(stateName);
-    const state = this.states.getState(stateName);
 
-    if (stateStats.interactionId !== state.interaction.id) {
+    if (stateStats.interactionId !== updatedState.interaction.id) {
       this.topAnswersStatsByStateName.set(
-        stateName, new AnswerStatsEntry([], state.interaction.id));
+        stateName, new AnswerStatsEntry([], updatedState.interaction.id));
     } else {
       stateStats.answers.forEach(a => a.isAddressed = (
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          stateName, state, a.answer,
+          stateName, updatedState, a.answer,
           this.interactionRulesRegistryService.getRulesServiceByInteractionId(
             stateStats.interactionId))));
     }

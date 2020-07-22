@@ -17,6 +17,8 @@
  *               help tab in the navbar.
  */
 
+import { State } from 'domain/state/StateObjectFactory';
+
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
@@ -374,15 +376,21 @@ angular.module('oppia').component('explorationEditorPage', {
             // because they are not needed to interact with the editor.
             StateTopAnswersStatsService.initAsync(
               ctrl.explorationId, ExplorationStatesService.getStates()
-            ).then(function() {
+            ).then(() => {
               ExplorationStatesService.registerOnStateAddedCallback(
-                StateTopAnswersStatsService.onStateAdded);
+                (stateName: string) => (
+                  StateTopAnswersStatsService.onStateAdded(stateName)));
               ExplorationStatesService.registerOnStateDeletedCallback(
-                StateTopAnswersStatsService.onStateDeleted);
+                (stateName: string) => (
+                  StateTopAnswersStatsService.onStateDeleted(stateName)));
               ExplorationStatesService.registerOnStateRenamedCallback(
-                StateTopAnswersStatsService.onStateRenamed);
+                (oldStateName: string, newStateName: string) => (
+                  StateTopAnswersStatsService.onStateRenamed(
+                    oldStateName, newStateName)));
               ExplorationStatesService.registerOnStateInteractionSavedCallback(
-                StateTopAnswersStatsService.onStateInteractionSaved);
+                (updatedState: State) => (
+                  StateTopAnswersStatsService.onStateInteractionSaved(
+                    updatedState)));
               ExplorationWarningsService.updateWarnings();
               $scope.$broadcast('refreshStateEditor');
             });
