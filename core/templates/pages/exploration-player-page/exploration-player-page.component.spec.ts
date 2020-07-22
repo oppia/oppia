@@ -108,11 +108,4 @@ describe('Exploration player page', function() {
     expect(elementDescriptionProperty.attr('content')).toBe(
       exploration.objective);
   });
-
-  it('Bind keyboard shortcuts to actions',
-    function() {
-      ctrl.moveFocusToBackButton();
-      ctrl.moveFocusToNextButton();
-      ctrl.moveFocusToSkipButton();
-    });
 });
