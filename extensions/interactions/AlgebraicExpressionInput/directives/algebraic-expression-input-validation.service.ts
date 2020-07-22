@@ -39,6 +39,12 @@ export class AlgebraicExpressionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  getCustomizationArgsWarnings(
+      customizationArgs: IAlgebraicExpressionInputCustomizationArgs): IWarning[] {
+    // TODO(juansaba): Implement customization args validations.
+    return [];
+  }
+
   getAllWarnings(
       stateName: string,
       customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
@@ -46,6 +52,9 @@ export class AlgebraicExpressionInputValidationService {
     let warningsList = [];
     let algebraicRulesService = (
       new AlgebraicExpressionInputRulesService());
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(

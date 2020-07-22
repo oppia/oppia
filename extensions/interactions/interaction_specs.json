@@ -882,7 +882,17 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "AlgebraicExpressionInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [
+      {
+        "description": "Letters that the learner will see in the on-screen keyboard.",
+        "name": "customOskLetters",
+        "schema": {
+          "obj_type": "CustomOskLetters",
+          "type": "custom"
+        },
+        "default_value": []
+      }
+    ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {

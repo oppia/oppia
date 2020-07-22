@@ -5300,6 +5300,17 @@ export = {
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
   ],
 
+  // Greek symbols allowed in math interactions.
+  "GREEK_SYMBOLS_LOWERCASE": [
+    "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
+    "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω"
+  ],
+
+  "GREEK_SYMBOLS_UPPERCASE": [
+    "Α", "Β", "Γ", "Δ", "Ε", "Ζ", "Η", "Θ", "Ι", "Κ", "Λ", "Μ", "Ν", "Ξ", "Π",
+    "Ρ", "Σ", "Τ", "Υ", "Φ", "Χ", "Ψ", "Ω"
+  ],
+
   // Functions allowed in math interactions.
   "MATH_FUNCTION_NAMES": [
     "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
