@@ -1594,26 +1594,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exploration.states['State 3'].update_interaction_id('TextInput')
 
         csrf_token = self.get_new_csrf_token()
 
-        # Owner adds rights for other users.
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self.login(self.COLLABORATOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        # Check that collaborator can add a new state called 'State 4'.
         add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
             add_url,

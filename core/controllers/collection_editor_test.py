@@ -220,17 +220,11 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
     def test_cannot_put_long_commit_message(self):
         """Check that putting a long commit message is denied."""
-        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
-        self.set_collection_editors(whitelisted_usernames)
-
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
-        rights_manager.assign_role_for_collection(
-            self.admin, self.COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
-        self.login(self.EDITOR_EMAIL)
+        self.login(self.OWNER_EMAIL)
 
         long_message_dict = self.json_dict.copy()
         long_message_dict['commit_message'] = (
