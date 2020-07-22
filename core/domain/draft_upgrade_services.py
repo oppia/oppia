@@ -21,15 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
-from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import html_validation_service
-from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
-from extensions import domain
 import python_utils
-import schema_utils
 import utils
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -38,26 +34,20 @@ import utils
 
 
 def try_upgrading_draft_to_exp_version(
-        draft_change_list, current_draft_version, to_exp_version,
-        exploration_dict):
+        draft_change_list, current_draft_version, to_exp_version, exp_id):
     """Try upgrading a list of ExplorationChange domain objects to match the
     latest exploration version.
-
     For now, this handles the scenario where all commits between
     current_draft_version and to_exp_version migrate only the state schema.
-
     Args:
         draft_change_list: list(ExplorationChange). The list of
             ExplorationChange domain objects to upgrade.
         current_draft_version: int. Current draft version.
         to_exp_version: int. Target exploration version.
-        exploration_dict: dict. The exploration dict at the current exploration
-            schema version.
-
+        exp_id: str. Exploration id.
     Returns:
         list(ExplorationChange) or None. A list of ExplorationChange domain
         objects after upgrade or None if upgrade fails.
-
     Raises:
         InvalidInputException. current_draft_version is greater than
             to_exp_version.
@@ -68,7 +58,6 @@ def try_upgrading_draft_to_exp_version(
     if current_draft_version == to_exp_version:
         return
 
-    exp_id = exploration_dict['id']
     exp_versions = list(
         python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
     commits_list = (
@@ -89,7 +78,10 @@ def try_upgrading_draft_to_exp_version(
             logging.warning('%s is not implemented' % conversion_fn_name)
             return
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
-        draft_change_list = conversion_fn(draft_change_list, exploration_dict)
+        try:
+            draft_change_list = conversion_fn(draft_change_list)
+        except:
+            return
         upgrade_times += 1
     return draft_change_list
 
@@ -98,220 +90,29 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _convert_states_v34_dict_to_v35_dict(
-            cls, draft_change_list, exploration_dict):
-        """Converts draft change list from version 34 to 35. Version 35 adds
-        translation support for interaction customization arguments. This
-        migration converts customization arguments in changes with the property
-        STATE_PROPERTY_INTERACTION_CUST_ARGS, by converting unicode to
-        SubtitledUnicode and html to SubtitledHtml where appropriate.
-        It also populates missing customization argument keys, removes extra
-        customization arguments, normalizes customization arguments against its
-        schema, and changes PencilCodeEditor's customization argument name from
-        initial_code to initialCode. Additionally, ExplorationChanges are
-        appended at the end to set the next content id index.
+    def _convert_states_v34_dict_to_v35_dict(cls, unused_draft_change_list):
+        """Converts draft change list from version 34 to 35. 
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
+            unused_draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            exploration_dict: dict. The Exploration dict, which is the current
-                exploration schema version.
 
-        Returns:
-            list(ExplorationChange). The converted draft_change_list.
+        Raises:
+            Exception. Conversion cannot be complete.
         """
-        new_draft_change_list = []
-
-        # Track next_content_id_index for each state. Initiate based on
-        # content_id's already in exploration states.
-        state_name_to_next_content_id_index = {}
-        for state_name in exploration_dict['states']:
-            state = exploration_dict['states'][state_name]
-            # Find maximum existing content_id index.
-            max_existing_content_id_index = -1
-            translations_mapping = (
-                state['written_translations']['translations_mapping'])
-            for content_id in translations_mapping:
-                content_id_suffix = content_id.split('_')[-1]
-                if content_id_suffix.isdigit():
-                    max_existing_content_id_index = max(
-                        max_existing_content_id_index,
-                        int(content_id_suffix)
-                    )
-            state_name_to_next_content_id_index[state_name] = (
-                max_existing_content_id_index + 1)
-
-        state_names_with_interactions = [
-            state_name
-            for state_name in exploration_dict['states'].keys()
-            if exploration_dict[
-                'states'][state_name]['interaction']['id'] is not None
-        ]
-
-        # Track the currently set interaction_id for each state as we iterate
-        # over the change list. Initialize it with the current interaction_id
-        # already in the state.
-        state_name_to_current_interaction_id = {
-            state_name: exploration_dict[
-                'states'][state_name]['interaction']['id']
-            for state_name in state_names_with_interactions
-        }
-
-        for i, change in enumerate(draft_change_list):
-            state_name = change.state_name
-
-            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ID):
-                # Track interaction_id.
-                state_name_to_current_interaction_id[state_name] = (
-                    change.new_value)
-            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                  change.property_name ==
-                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                # Migrate customization arguments.
-                interaction_id = (
-                    state_name_to_current_interaction_id.get(state_name))
-
-                if interaction_id is None:
-                    raise Exception(
-                        'An customization argument is being set without' +
-                        ' the interaction_id set.')
-
-                ca_dict = change.new_value
-                # We retrieve an cached version of interaction_specs
-                # in the case that interaction_specs.json changes in the
-                # future.
-                ca_specs = [
-                    domain.CustomizationArgSpec(
-                        caSpecDict['name'],
-                        caSpecDict['description'],
-                        caSpecDict['schema'],
-                        caSpecDict['default_value']
-                    ) for caSpecDict in (
-                        interaction_registry.Registry
-                        .get_all_specs_for_state_schema_version(35)[
-                            interaction_id]['customization_arg_specs']
-                    )
-                ]
-
-                if (interaction_id == 'PencilCodeEditor' and
-                        'initial_code' in ca_dict):
-                    ca_dict['initialCode'] = ca_dict['initial_code']
-
-                obj_type_to_subtitled_dict_key = {
-                    'SubtitledUnicode': 'unicode_str',
-                    'SubtitledHtml': 'html'
-                }
-
-                for ca_spec in ca_specs:
-                    schema = ca_spec.schema
-                    ca_name = ca_spec.name
-                    content_id_prefix = 'ca_%s_' % ca_name
-
-                    if schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM:
-                        schema_obj_type = schema['obj_type']
-                        if schema_obj_type in obj_type_to_subtitled_dict_key:
-                            # Case where cust arg value is a string, and needs
-                            # to be migrated to SubtitledHtml or
-                            # SubtitledUnicode.
-                            content_id = '%s%i' % (
-                                content_id_prefix,
-                                state_name_to_next_content_id_index[state_name])
-                            state_name_to_next_content_id_index[state_name] += 1
-
-                            subtitled_dict_key = (
-                                obj_type_to_subtitled_dict_key[schema_obj_type]
-                            )
-                            if ca_name in ca_dict:
-                                ca_dict[ca_name]['value'] = {
-                                    'content_id': content_id,
-                                    subtitled_dict_key:
-                                        ca_dict[ca_name]['value']
-                                }
-                            else:
-                                default_value = ca_spec.default_value[
-                                    subtitled_dict_key]
-                                ca_dict[ca_name] = {
-                                    'value': {
-                                        'content_id': content_id,
-                                        subtitled_dict_key: default_value
-                                    }
-                                }
-                    elif (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                          (schema['items']['type'] ==
-                           schema_utils.SCHEMA_TYPE_CUSTOM) and
-                          (schema['items']['obj_type'] ==
-                           schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
-                        # Case where cust arg value is a list of strings, and
-                        # needs to be migrated to a list of SubtitledHtml dicts.
-                        use_default_value = ca_name not in ca_dict
-
-                        value = (ca_spec.default_value if use_default_value
-                                 else ca_dict[ca_name]['value'])
-                        new_value = []
-
-                        for j, html in enumerate(value):
-                            content_id = '%s%i' % (
-                                content_id_prefix,
-                                state_name_to_next_content_id_index[state_name])
-                            state_name_to_next_content_id_index[state_name] += 1
-
-                            if use_default_value and j == 0:
-                                # If we use default value, then the first
-                                # value is already a SubtitledHtml dict and we
-                                # just need to assign a content_id.
-                                new_value.append({
-                                    'content_id': content_id,
-                                    'html': value[0]['html']
-                                })
-                            else:
-                                new_value.append({
-                                    'content_id': content_id,
-                                    'html': html
-                                })
-
-                        ca_dict[ca_name]['value'] = new_value
-                    elif ca_name not in ca_dict:
-                        ca_dict[ca_name] = {'value': ca_spec.default_value}
-
-                (customization_args_util
-                 .validate_customization_args_and_values(
-                    'interaction',
-                    interaction_id,
-                    ca_dict,
-                    ca_specs)
-                )
-
-            new_draft_change_list.append(change)
-
-        # Append STATE_PROPERTY_NEXT_CONTENT_ID_INDEX changes at end for each
-        # state encountered while upgrading customization argument changes.
-        for state_name in state_name_to_next_content_id_index:
-            new_draft_change_list.append(
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': state_name,
-                    'new_value': state_name_to_next_content_id_index[state_name]
-                })
-            )
-
-        return new_draft_change_list
+        # This conversion depends on getting an exploration state of v34. Since
+        # we do not support passing a exploration state of a given version
+        # into draft conversion functions as of yet, we throw an Exception to
+        # indicate that the conversion cannot be complete.
+        raise Exception('Conversion cannot be complete.')
 
     @classmethod
-    def _convert_states_v33_dict_to_v34_dict(
-            cls, draft_change_list, unused_exploration_dict):
+    def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):
         """Converts draft change list from state version 33 to 34. State
         version 34 adds the new schema for Math components.
-
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: dict. The Exploration dict, which
-                is the current exploration schema version.
-
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
@@ -338,16 +139,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             conversion_fn(value))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                for content_id, language_code_to_written_translation in (
-                        new_value['translations_mapping'].items()):
-                    for language_code in (
-                            language_code_to_written_translation.keys()):
-                        new_value['translations_mapping'][
-                            content_id][language_code]['html'] = (
-                                conversion_fn(new_value[
-                                    'translations_mapping'][content_id][
-                                        language_code]['html'])
-                            )
+                new_value = (
+                    state_domain.WrittenTranslations.
+                    convert_html_in_written_translations(
+                        new_value, conversion_fn))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                 new_value = (
@@ -399,18 +194,13 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         return draft_change_list
 
     @classmethod
-    def _convert_states_v32_dict_to_v33_dict(
-            cls, draft_change_list, unused_exploration_dict):
+    def _convert_states_v32_dict_to_v33_dict(cls, draft_change_list):
         """Converts draft change list from state version 32 to 33. State
         version 33 adds showChoicesInShuffledOrder boolean variable to the
         MultipleChoiceInput interaction.
-
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: dict. The Exploration dict, which
-                is the current exploration schema version.
-
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
@@ -432,37 +222,27 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         return draft_change_list
 
     @classmethod
-    def _convert_states_v31_dict_to_v32_dict(
-            cls, draft_change_list, unused_exploration_dict):
+    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
         """Converts draft change list from state version 31 to 32. State
         version 32 adds a customization arg for the "Add" button text
         in SetInput interaction, for which there should be no changes
         to drafts.
-
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: dict. The Exploration dict, which
-                is the current exploration schema version.
-
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
         return draft_change_list
 
     @classmethod
-    def _convert_states_v30_dict_to_v31_dict(
-            cls, draft_change_list, unused_exploration_dict):
+    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
         Version 31 adds the duration_secs float for the Voiceover
         section of state.
-
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: dict. The Exploration dict, which
-                is the current exploration schema version.
-
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
@@ -490,18 +270,13 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         return draft_change_list
 
     @classmethod
-    def _convert_states_v29_dict_to_v30_dict(
-            cls, draft_change_list, unused_exploration_dict):
+    def _convert_states_v29_dict_to_v30_dict(cls, draft_change_list):
         """Converts draft change list from state version 29 to 30. State
         version 30 replaces tagged_misconception_id with
         tagged_skill_misconception_id.
-
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: dict. The Exploration dict, which
-                is the current exploration schema version.
-
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
@@ -524,36 +299,26 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         return draft_change_list
 
     @classmethod
-    def _convert_states_v28_dict_to_v29_dict(
-            cls, draft_change_list, unused_exploration_dict):
+    def _convert_states_v28_dict_to_v29_dict(cls, draft_change_list):
         """Converts draft change list from state version 28 to 29. State
         version 29 adds solicit_answer_details boolean variable to the
         state, for which there should be no changes to drafts.
-
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: dict. The Exploration dict, which
-                is the current exploration schema version.
-
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
         return draft_change_list
 
     @classmethod
-    def _convert_states_v27_dict_to_v28_dict(
-            cls, draft_change_list, unused_exploration_dict):
+    def _convert_states_v27_dict_to_v28_dict(cls, draft_change_list):
         """Converts draft change list from state version 27 to 28. State
         version 28 replaces content_ids_to_audio_translations with
         recorded_voiceovers.
-
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: dict. The Exploration dict, which
-                is the current exploration schema version.
-
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """

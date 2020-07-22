@@ -1698,7 +1698,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_upgrade_services.try_upgrading_draft_to_exp_version(
                         draft_change_list,
                         exp_user_data.draft_change_list_exp_version,
-                        exploration.version, exploration.to_dict()))
+                        exploration.version, exploration.id))
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
