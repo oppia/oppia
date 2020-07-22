@@ -32,6 +32,7 @@ from core.platform import models
     models.NAMES.topic, models.NAMES.question
 ])
 
+
 class SnapshotMetadataCommitMsgAuditOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that audits the commit_message field of the
