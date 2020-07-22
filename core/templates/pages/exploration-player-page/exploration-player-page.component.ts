@@ -57,7 +57,7 @@ angular.module('oppia').component('explorationPlayerPage', {
               'content', response.exploration.title);
             angular.element('meta[property="og:description"]').attr(
               'content', response.exploration.objective);
-            });
+          });
         var moveFocusToBackButton = function() {
           Mousetrap.bind('k', function() {
             var previousButton = document.getElementById('backButtonId');
@@ -98,7 +98,7 @@ angular.module('oppia').component('explorationPlayerPage', {
         var moveFocusToSkipButton = function() {
           Mousetrap.bind('s', function() {
             var skipButton = document.getElementById('skipToMainContentId');
-  
+
             if (skipButton !== null) {
               skipButton.focus();
             }
