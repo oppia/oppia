@@ -502,6 +502,8 @@ var ExplorationEditorMainTab = function() {
       'stateEditContent taking too long to appear to set content');
     await stateEditContent.click();
     var stateEditorTag = element(by.tagName('state-content-editor'));
+    await waitFor.visibilityOf(
+      stateEditorTag, 'State editor tag not showing up');
     var stateContentEditor = stateEditorTag.element(
       by.css('.protractor-test-state-content-editor'));
     await waitFor.visibilityOf(

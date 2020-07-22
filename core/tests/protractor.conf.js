@@ -292,7 +292,7 @@ exports.config = {
     // a failed run.
     // TODO(sll): Switch this option on by default, once the above issues are
     // fixed.
-    var _ADD_SCREENSHOT_REPORTER = false;
+    var _ADD_SCREENSHOT_REPORTER = true;
 
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
