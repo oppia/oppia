@@ -105,13 +105,31 @@
           <div class="subtopic-name-header" ng-class="{'skills-valid': !uncategorizedSkillSummaries.length, 'skills-invalid': uncategorizedSkillSummaries.length}">
             <span>Uncategorized Skills</span>
           </div>
-          <div ng-repeat="skillSummary in uncategorizedSkillSummaries" class="subtopic-skill skills-list-item protractor-test-skill-item">
+          <div ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index" class="subtopic-skill skills-list-item protractor-test-skill-item">
             <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
               <span class="clickable-item"><[skillSummary.getDescription()]></span>
             </a>
-            <i class="fa fa-trash" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></i>
+            <i class="fa fa-ellipsis-v" ng-click="toggleUncategorizedSkillOptions($index)"></i>
+            <div class="uncategorized-skill-option-box"
+                 ng-if="uncategorizedEditOptionsIndex === $index"
+                 ng-mouseleave="toggleUncategorizedSkillOptions(null)"
+                 ng-click="toggleUncategorizedSkillOptions(null)">
+              <div class="uncategorized-skill-edit-option" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
+                <i class="fa fa-trash"></i>
+                <span>Delete skill</span>
+              </div>
+              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSubtopicAssignment(null, skillSummary)">
+                <i class="fa fa-trash"></i>
+                <span>Assign to Subtopic</span>
+              </div>
+            </div>
           </div>
-          <div ng-repeat="subtopic in subtopics track by $index" ng-init="subtopicIndex = $index">
+          <div ng-repeat="subtopic in subtopics track by $index"
+               ng-init="subtopicIndex = $index"
+               dnd-list="subtopics"
+               dnd-dragstart="onRearrangeSubtopicStart($index)"
+               dnd-drop="onRearrangeSubtopicEnd($index)"
+               dnd-draggable="subtopic">
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
@@ -125,19 +143,28 @@
                 </div>
               </div>
               <div ng-if="subtopicCardSelectedIndexes[subtopicIndex]">
-                <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skill-description-container">
-                  <span class="clickable-item"><[skillSummary.getDescription()]></span>
-                  <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
-                  <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)">
-                    <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
-                      <i class="fa fa-trash"></i>
-                      <span>Remove from subtopic</span>
-                    </div>
-                    <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
-                      <i class="fa fa-trash"></i>
-                      <span>Remove from topic</span>
+                <div ng-if="subtopic.getSkillSummaries().length">
+                  <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skill-description-container">
+                    <span class="clickable-item"><[skillSummary.getDescription()]></span>
+                    <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
+                    <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)" ng-click="showSkillEditOptions(null)">
+                      <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-trash"></i>
+                        <span>Remove from subtopic</span>
+                      </div>
+                      <div class="skill-edit-option" ng-click="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-trash"></i>
+                        <span>Change Subtopic</span>
+                      </div>
+                      <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-trash"></i>
+                        <span>Remove from topic</span>
+                      </div>
                     </div>
                   </div>
+                </div>
+                <div ng-if="!subtopic.getSkillSummaries().length">
+                  <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
                 </div>
               </div>
             </div>
@@ -262,9 +289,11 @@
   }
 
   .topic-editor .skills-list-item {
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    position: relative;
   }
 
   .topic-editor .skills-list-item a {
@@ -369,11 +398,32 @@
     z-index: 1;
   }
 
+  .topic-editor .uncategorized-skill-option-box {
+    background-color: #e1dcdc;
+    border: 1px solid #000;
+    padding: 0;
+    position: absolute;
+    right: 7px;
+    width: 210px;
+    z-index: 1;
+  }
+
   .topic-editor .skill-edit-option {
     border-bottom: 1px solid #000;
     cursor: pointer;
     font-size: 15px;
     padding: 5px;
+  }
+
+  .topic-editor .uncategorized-skill-edit-option {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+  }
+
+  .topic-editor .edit-option-assign {
+    border-bottom: none;
   }
 
   .topic-editor .remove-from-topic-option {
@@ -406,6 +456,7 @@
   }
 
   .topic-editor .skill-description-container {
+    align-items: center;
     display: flex;
     justify-content: space-between;
     position: relative;
@@ -491,6 +542,26 @@
 
     .topic-editor .add-subtopic-btn {
       width: 50%;
+    }
+
+    .topic-editor .reassign-button {
+      display: none;
+    }
+
+    .topic-editor .subtopic-reassign-header {
+      width: 100%;
+    }
+
+    .topic-editor .skill-option-box {
+      right: 21px;
+    }
+
+    .topic-editor .subtopic-edit-options {
+      right: 13px;
+    }
+
+    .topic-editor .uncategorized-skill-option-box {
+      right: 23px;
     }
   }
 </style>
