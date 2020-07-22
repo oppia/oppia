@@ -332,6 +332,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.addNewDestinationNode = function() {
+            // Create new node
             var nodeTitles =
               $scope.story.getStoryContents().getNodes().map(function(node) {
                 return node.getTitle();
@@ -349,8 +350,8 @@ angular.module('oppia').directive('storyNodeEditor', [
               var nextNodeId =
                 $scope.story.getStoryContents().getNextNodeId();
               StoryUpdateService.addStoryNode($scope.story, title);
-              StoryUpdateService.addDestinationNodeIdToNode(
-                $scope.story, $scope.getId(), nextNodeId);
+              // StoryUpdateService.addDestinationNodeIdToNode(
+              //   $scope.story, $scope.getId(), nextNodeId);
               _init();
               _recalculateAvailableNodes();
               $rootScope.$broadcast(

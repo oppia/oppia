@@ -512,6 +512,22 @@ angular.module('oppia').factory('StoryUpdateService', [
             StoryEditorStateService.setExpIdsChanged();
           });
       },
+      /**
+       * Removes a destination node id from a node of a story and records the
+       * change in the undo/redo service.
+       */
+      rearrangeNodeInStory: function(
+          story, fromIndex, toIndex) {
+        _applyStoryContentsPropertyChange(
+          story, 'node', fromIndex, toIndex,
+          function(changeDict, story) {
+            // ---- Apply ----
+            story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
+          }, function(changeDict, story) {
+            // ---- Undo ----
+            story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
+          });
+      },
 
       /**
        * Adds a prerequisite skill id to a node of a story and records the

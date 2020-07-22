@@ -59,22 +59,7 @@ export class StoryContents {
   }
 
   getLinearNodesList(): StoryNode[] {
-    var linearList = [];
-    var currentIndex = this.getNodeIndex(this._initialNodeId);
-    while (true) {
-      var node = this._nodes[currentIndex];
-      linearList.push(node);
-      if (node.getDestinationNodeIds().length === 0) {
-        break;
-      } else {
-        currentIndex = this.getNodeIndex(node.getDestinationNodeIds()[0]);
-      }
-    }
-    return linearList;
-  }
-
-  getDisconnectedNodes(): StoryNode[] {
-    return this._disconnectedNodes;
+    return this._nodes.slice();
   }
 
   getNextNodeId(): string {
@@ -93,6 +78,12 @@ export class StoryContents {
       }
     }
     return null;
+  }
+
+  rearrangeNodeInStory(fromIndex, toIndex) {
+    const nodeToMove = this._nodes[fromIndex];
+    this._nodes.splice(fromIndex, 1);
+    this._nodes.splice(toIndex, 0, nodeToMove);
   }
 
   getNodeIdsToTitleMap(nodeIds: string[]): {} {

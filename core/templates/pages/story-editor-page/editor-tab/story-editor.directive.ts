@@ -83,8 +83,6 @@ angular.module('oppia').directive('storyEditor', [
               $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
               $scope.linearNodesList =
                 $scope.storyContents.getLinearNodesList();
-              $scope.disconnectedNodes =
-                $scope.storyContents.getDisconnectedNodes();
             }
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
@@ -127,6 +125,17 @@ angular.module('oppia').directive('storyEditor', [
             }
             _initEditor();
             $scope.$broadcast('recalculateAvailableNodes');
+          };
+
+          $scope.onMoveChapterStart = function(index, node) {
+            $scope.dragStartIndex = index;
+            $scope.nodeBeingDragged = node;
+          };
+
+          $scope.rearrangeNodeInStory = function(toIndex) {
+            StoryUpdateService.rearrangeNodeInStory(
+              $scope.story, $scope.dragStartIndex, toIndex);
+            _initEditor();
           };
 
           $scope.deleteNode = function(nodeId) {
