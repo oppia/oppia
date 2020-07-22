@@ -388,12 +388,12 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
             int. The approximate size of Math SVGs in bytes.
         """
 
-        # The approximate size for an SVG image for a LaTeX with one character
-        # is around 1000 Kb. But, when the number of characters increases the
-        # size of SVG per character reduces. For example: If the size of SVG
-        # for the character 'a' is 1000 bytes, the size of SVG for 'abc' will
-        # be less than 3000 bytes. So the below approximation to find the
-        # size will give us the maximum size.
+        # The approximate size for an SVG image for a LaTeX expression with one
+        # character is around 1000 Kb. But, when the number of characters
+        # increases the size of SVG per character reduces. For example: If the
+        # size of SVG for the character 'a' is 1000 bytes, the size of SVG for
+        # 'abc' will be less than 3000 bytes. So the below approximation to
+        # find the size will give us the maximum size.
         size_in_bytes = 0
         for latex_string in self.latex_strings_without_svg:
             # The characters in special LaTeX keywords like 'frac' and 'sqrt'
@@ -405,11 +405,11 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         return size_in_bytes
 
     def get_longest_latex_expression(self):
-        """Returns the longest LaTeX string by length among the LaTeX strings in
-        the object.
+        """Returns the longest LaTeX string among the LaTeX strings in the
+        object.
 
         Returns:
-            str. The largest LaTeX string.
+            str. The longest LaTeX string.
         """
         return max(self.latex_strings_without_svg, key=len)
 

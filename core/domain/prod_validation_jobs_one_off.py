@@ -3069,7 +3069,7 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
 
             latex_strings_without_svg = (
                 html_validation_service.
-                get_latet_strings_without_svg_from_html(
+                get_latex_strings_without_svg_from_html(
                     html_strings_in_exploration))
             math_rich_text_info = (
                 exp_domain.ExplorationMathRichTextInfo(

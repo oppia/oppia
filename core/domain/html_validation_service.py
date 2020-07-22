@@ -923,7 +923,7 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
-def get_latet_strings_without_svg_from_html(html_string):
+def get_latex_strings_without_svg_from_html(html_string):
     """Extract LaTeX strings from math rich-text components whose svg_filename
     field is empty.
 

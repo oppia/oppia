@@ -410,7 +410,7 @@ class DraftChangeMathRichTextAuditOneOffJob(
                         final_draft_change_list))
                 latex_strings = (
                     html_validation_service.
-                    get_latet_strings_without_svg_from_html(
+                    get_latex_strings_without_svg_from_html(
                         html_string))
                 if len(latex_strings) > 0:
                     yield (

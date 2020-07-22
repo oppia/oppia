@@ -8395,7 +8395,7 @@ class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
             exp_domain.ExplorationMathRichTextInfo(
                 'exp_id1', True, 'invalid_latex_format')
 
-    def test_validate_when_each_latex_strings_are_string(self):
+    def test_validate_when_each_latex_expressions_are_not_strings(self):
         with self.assertRaisesRegexp(
             Exception,
             'Expected each element in the list of latex strings to be a str, '

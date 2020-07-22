@@ -566,7 +566,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJob(
                 ''.join(state.get_all_html_content_strings()))
         list_of_latex_strings_without_svg = (
             html_validation_service.
-            get_latet_strings_without_svg_from_html(
+            get_latex_strings_without_svg_from_html(
                 html_strings_in_exploration))
         if len(list_of_latex_strings_without_svg) > 0:
             yield (
