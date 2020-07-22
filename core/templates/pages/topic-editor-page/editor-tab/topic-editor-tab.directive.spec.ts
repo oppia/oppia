@@ -60,6 +60,7 @@ describe('Topic editor tab directive', function() {
     $scope = $rootScope.$new();
     ContextService = $injector.get('ContextService');
     $uibModalInstance = $injector.get('$uibModal');
+    $q = $injector.get('$q');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     directive = $injector.get('topicEditorTabDirective')[0];
@@ -101,10 +102,10 @@ describe('Topic editor tab directive', function() {
       EntityCreationService: EntityCreationService
     });
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    topic = TopicObjectFactory.createInterstitialTopic();
     skillSummary = SkillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
     subtopic._skillSummaries = [skillSummary];
-    topic = TopicObjectFactory.createInterstitialTopic();
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
     story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');

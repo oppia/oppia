@@ -344,35 +344,6 @@ angular.module('oppia').directive('topicEditorTab', [
             });
           };
 
-          $scope.toggleUncategorizedSkillOptions = function(index) {
-            $scope.uncategorizedEditOptionsIndex = index;
-          };
-
-          $scope.changeSubtopicAssignment = function(
-              oldSubtopicId, skillSummary) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                      'change-subtopic-assignment-modal.template.html'),
-              backdrop: true,
-              resolve: {
-                subtopics: () => $scope.subtopics
-              },
-              controller: 'ChangeSubtopicAssignmentModalController'
-            }).result.then(function(newSubtopicId) {
-              if (oldSubtopicId === newSubtopicId) {
-                return;
-              }
-              TopicUpdateService.moveSkillToSubtopic(
-                $scope.topic, oldSubtopicId, newSubtopicId,
-                skillSummary);
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
-
           $scope.onRearrangeSubtopicStart = function(fromIndex) {
             $scope.fromIndex = fromIndex;
           };
