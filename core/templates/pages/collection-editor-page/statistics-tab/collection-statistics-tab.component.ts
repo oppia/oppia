@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the statistics tab of the collection editor.
+ * @fileoverview Component for the statistics tab of the collection editor.
  */
 
 import { Component } from '@angular/core';
