@@ -122,7 +122,3 @@ describe('Exploration player page', function() {
       exploration.objective);
   });
 });
-
-
-
-
