@@ -235,7 +235,7 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateInteractionSaved', function() {
-      fit('callsback when answer groups of a state are saved', function() {
+      it('callsback when answer groups of a state are saved', function() {
         var spy = jasmine.createSpy('callback');
         spyOn(ChangeListService, 'editStateProperty');
 
