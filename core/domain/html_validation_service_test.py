@@ -1691,13 +1691,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
             ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
 
-        expected_list_of_latex = [
+        expected_list_of_latex_strings = [
             '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
-        list_of_latex = (
+        list_of_latex_string = (
             html_validation_service.
             get_latex_strings_without_svg_from_html(
                 html_string))
-        self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_latex_strings))
 
     def test_extract_latex_strings_when_math_tags_have_non_empty_svg_filename(
             self):
@@ -1721,12 +1723,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         # Here '+,+,+,+(x^2)' won't be extracted because the corresponding
         # math tag has a non-empty svg_filename field.
-        expected_list_of_latex = ['\\sqrt{x}', '\\frac{x}{y}']
-        list_of_latex = (
+        expected_list_of_latex_strings = ['\\sqrt{x}', '\\frac{x}{y}']
+        list_of_latex_string = (
             html_validation_service.
             get_latex_strings_without_svg_from_html(
                 html_string))
-        self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_latex_strings))
 
     def test_extract_latex_strings_when_no_math_tags_are_present(self):
         """Test that get_latex_strings_without_svg_from_html
