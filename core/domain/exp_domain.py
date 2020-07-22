@@ -2606,7 +2606,7 @@ class Exploration(python_utils.OBJECT):
                         ca_value = default_value
                         ca_value['content_id'] = generate_content_id()
                         return ca_value
-                    
+
                     return [{
                         'content_id': generate_content_id(),
                         'html': ca_value_element
@@ -2654,11 +2654,11 @@ class Exploration(python_utils.OBJECT):
                 all_new_content_ids.extend(new_content_ids)
 
             (customization_args_util
-                .validate_customization_args_and_values(
-                    'interaction',
-                    interaction_id,
-                    ca_dict,
-                    ca_specs)
+             .validate_customization_args_and_values(
+                 'interaction',
+                 interaction_id,
+                 ca_dict,
+                 ca_specs)
             )
 
             state_dict['next_content_id_index'] = (

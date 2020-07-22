@@ -528,14 +528,14 @@ class Question(python_utils.OBJECT):
 
             (customization_args_util
              .validate_customization_args_and_values(
-                'interaction',
-                interaction_id,
-                ca_dict,
-                ca_specs)
+                 'interaction',
+                 interaction_id,
+                 ca_dict,
+                 ca_specs)
             )
 
         question_state_dict['next_content_id_index'] = (
-                next_content_id_index_dict['value'])
+            next_content_id_index_dict['value'])
         for new_content_id in all_new_content_ids:
             question_state_dict[
                 'written_translations'][

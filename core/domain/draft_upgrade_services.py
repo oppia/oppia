@@ -39,6 +39,7 @@ def try_upgrading_draft_to_exp_version(
     latest exploration version.
     For now, this handles the scenario where all commits between
     current_draft_version and to_exp_version migrate only the state schema.
+
     Args:
         draft_change_list: list(ExplorationChange). The list of
             ExplorationChange domain objects to upgrade.
