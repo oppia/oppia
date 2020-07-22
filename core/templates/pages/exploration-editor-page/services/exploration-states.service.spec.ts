@@ -235,14 +235,15 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateInteractionSaved', function() {
-      it('callsback when answer groups of a state are saved', function() {
+      fit('callsback when answer groups of a state are saved', function() {
         var spy = jasmine.createSpy('callback');
         spyOn(ChangeListService, 'editStateProperty');
 
         ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
         ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
 
-        expect(spy).toHaveBeenCalledWith('Hola');
+        expect(spy)
+          .toHaveBeenCalledWith(ExplorationStatesService.getState('Hola'));
       });
     });
   });
