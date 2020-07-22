@@ -113,14 +113,11 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
 
 
 class ExplorationImprovementsConfigHandler(base.BaseHandler):
-    """Handles fetching the configuration of exploration tasks.
-
-    NOTE: Only exploration creators and editors can interface with tasks.
-    """
+    """Handles fetching the configuration of exploration tasks."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         self.render_json({
             'exploration_id': exploration_id,
