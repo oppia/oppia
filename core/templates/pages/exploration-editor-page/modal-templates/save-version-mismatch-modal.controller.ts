@@ -16,6 +16,10 @@
  * @fileoverview Controller for version mismatch modal.
  */
 
+require(
+  'pages/exploration-editor-page/changes-in-human-readable-form/' +
+  'changes-in-human-readable-form.component.ts');
+
 angular.module('oppia').controller('SaveVersionMismatchModalController', [
   '$log', '$scope', '$timeout', 'ExplorationDataService',
   'LostChangeObjectFactory', 'WindowRef', 'lostChanges',
