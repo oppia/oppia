@@ -307,7 +307,7 @@ class BaseModel(ndb.Model):
 
         Args:
             entity_name: The name of the entity. Coerced to a utf-8 encoded
-                string. Defaults to ''.
+                string.
 
         Returns:
             str. New unique id for this entity class.
@@ -730,7 +730,8 @@ class VersionedModel(BaseModel):
         Raises:
             Exception: This model instance has been already deleted.
         """
-        versioned_models = cls.get_multi(entity_ids)
+        versioned_models = cls.get_multi(
+            entity_ids, include_deleted=force_deletion)
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []
