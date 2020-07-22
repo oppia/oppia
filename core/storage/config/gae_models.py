@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models relating to configuration properties."""
+"""Models relating to configuration properties and platform parameters."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -88,6 +88,7 @@ class PlatformParameterModel(base_models.VersionedModel):
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
     rules = ndb.JsonProperty(repeated=True)
+    rule_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -100,15 +101,28 @@ class PlatformParameterModel(base_models.VersionedModel):
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def create(cls, param_name, rule_dicts):
+    def create(cls, param_name, rule_dicts, rule_schema_version):
         """Creates a PlatformParameterModel instance.
 
         Args:
-            param_name: str. The context for evaluation.
-            rule_dicts: list(dict). List of dict mappings of rule objects.
+            param_name: str. The name of the parameter, which is immutable.
+            rule_dicts: list(dict). List of dict representation of
+                PlatformParameterRule objects, which have the following
+                structure:
+                    - value_when_matched: *. The result of the rule when it's
+                        matched.
+                    - filters: list(dict). List of dict representation of
+                        PlatformParameterFilter objects, having the following
+                        structure:
+                            - type: str. The type of the filter.
+                            - value: *. The value of the filter to match
+                                against.
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel
             instance.
         """
-        return cls(id=param_name, rules=rule_dicts)
+        return cls(
+            id=param_name,
+            rules=rule_dicts,
+            rule_schema_version=rule_schema_version)

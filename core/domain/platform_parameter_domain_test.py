@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the config variable registry."""
+"""Tests for the domain objects relating to platform parameters."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -25,6 +25,8 @@ import utils
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
+    """Test for the platformParameterChange class."""
+
     CMD_EDIT_RULES = (
         parameter_domain
         .PlatformParameterChange
