@@ -53,10 +53,10 @@ angular.module('oppia').directive('editorNavigation', () => ({
         return taskCount;
       };
 
-      $scope.isImprovementsTabEnabled = false;
+      $scope.improvementsTabIsEnabled = false;
       $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
         .then(improvementsTabIsEnabled => {
-          $scope.isImprovementsTabEnabled = improvementsTabIsEnabled;
+          $scope.improvementsTabIsEnabled = improvementsTabIsEnabled;
         });
 
       $scope.showUserHelpModal = function() {

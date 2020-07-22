@@ -392,6 +392,6 @@ HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
 HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
     'high_bounce_rate_task_minimum_exploration_starts',
     INT_SCHEMA,
-    'The minimum times an exploration is started before it can generate high '
-    'bounce-rate improvements tasks.',
+    'The minimum number of times an exploration is started before it can '
+    'generate high bounce-rate improvements tasks.',
     100)

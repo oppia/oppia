@@ -26,7 +26,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
   'ExplorationImprovementsBackendApiService',
   function(ExplorationImprovementsBackendApiService) {
     /** @private */
-    let initStarted: boolean = false;
+    let initializationHasStarted: boolean = false;
     /** @private */
     let resolveInitPromise: () => void;
     /** @private */
@@ -41,8 +41,8 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
 
     return {
       async initAsync(explorationId: string): Promise<void> {
-        if (!initStarted) {
-          initStarted = true;
+        if (!initializationHasStarted) {
+          initializationHasStarted = true;
           try {
             config = (
               await ExplorationImprovementsBackendApiService.getConfigAsync(
