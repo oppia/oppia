@@ -2197,3 +2197,68 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+
+class UserAuthModelTest(test_utils.GenericTestBase):
+    """Tests for UserAuthModel class."""
+
+    def setUp(self):
+        super(UserAuthModelTest, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_1_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_2_ID,
+            gae_id=self.USER_2_GAE_ID,
+            email=self.USER_2_EMAIL,
+            role=self.USER_2_ROLE,
+            deleted=True
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_3_ID,
+            gae_id=self.USER_3_GAE_ID,
+            gae_user_id=self.USER_3_GAE_ID,
+            email=self.USER_3_EMAIL,
+            role=self.USER_3_ROLE,
+            username=self.GENERIC_USERNAME,
+            normalized_username=self.GENERIC_USERNAME,
+            last_agreed_to_terms=self.GENERIC_DATE,
+            last_started_state_editor_tutorial=self.GENERIC_DATE,
+            last_started_state_translation_tutorial=self.GENERIC_DATE,
+            last_logged_in=self.GENERIC_DATE,
+            last_created_an_exploration=self.GENERIC_DATE,
+            last_edited_an_exploration=self.GENERIC_DATE,
+            profile_picture_data_url=self.GENERIC_IMAGE_URL,
+            default_dashboard='learner',
+            creator_dashboard_display_pref='card',
+            user_bio=self.GENERIC_USER_BIO,
+            subject_interests=self.GENERIC_SUBJECT_INTERESTS,
+            first_contribution_msec=1,
+            preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
+            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
+            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
+        ).put()
+
+    def test_get_new_id_method_returns_unique_ids(self):
+        ids = set([])
+        for _ in python_utils.RANGE(100):
+            new_id = user_models.UserSettingsModel.get_new_id('')
+            self.assertNotIn(new_id, ids)
+            user_models.UserSettingsModel(
+                id=new_id, gae_id='gae_id', email='some@email.com').put()
+            ids.add(new_id)
+
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.UserSettingsModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.UserSettingsModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.UserSettingsModel.get_new_id('exploration')

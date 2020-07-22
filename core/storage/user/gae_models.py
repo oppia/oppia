@@ -2167,3 +2167,32 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+
+class UserAuthModel(base_models.BaseModel):
+    """Stores the authentication details for a particular user.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # Authentication detail for google sign in using GAE
+    gae_id = ndb.StringProperty(indexed=True, repeated=True)
+    # user id of the user
+    user_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_by_auth_id(cls, auth_service, auth_id):
+        """Fetch a user entry by the auth_id of a given auth service.
+
+        Args:
+            auth_service: str. Name of the auth service being used.
+            auth_id: str. Authentication detail for the corresponding
+                authentication service.
+
+        Returns:
+            UserAuthModel. The UserAuthModel instance which has the same
+            auth_id for the given auth service for a particular user.
+        """
+
+        if auth_type_name == "gae":
+            return cls.query(cls.gae_id == auth_id).get()
