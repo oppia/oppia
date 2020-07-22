@@ -42,14 +42,14 @@ describe('screenreader and keyboard user accessibility features', function() {
     // Reload the welcome.yaml exploration.
     await browser.get('admin');
     await waitFor.pageToFullyLoad();
-    // waitFor.pageToFullyLoad() does not fully load admin page.
-    // browser.sleep is used instead for now.
+    // WaitFor.pageToFullyLoad() does not fully load admin page.
+    // Browser.sleep is used instead for now.
     // eslint-disable-next-line
     await browser.sleep(6000);
     var reloadButton = element(by.css(
       '.protractor-test-reload-exploration-button'));
     await reloadButton.click();
-    await general.acceptAlert()
+    await general.acceptAlert();
   };
 
   it('should skip to the main content element', async function() {
@@ -64,7 +64,7 @@ describe('screenreader and keyboard user accessibility features', function() {
         .getAttribute('id'));
   });
 
-  it('should move focus to the skip button in the library page', 
+  it('should move focus to the skip button in the library page',
     async function() {
       await libraryPage.get();
       await browser.actions().sendKeys('s').perform();
@@ -85,7 +85,7 @@ describe('screenreader and keyboard user accessibility features', function() {
           .getAttribute('id'));
     });
 
-  it('should move focus to the search bar in the library page', 
+  it('should move focus to the search bar in the library page',
     async function() {
       await libraryPage.get();
       await browser.actions().sendKeys('/').perform();
@@ -99,7 +99,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       expect(await searchBar.getAttribute('id')).not.toEqual(
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
-      
+
       await browser.actions().sendKeys('/').perform();
       expect(await searchBar.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
@@ -110,7 +110,8 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await libraryPage.get();
       await browser.actions().sendKeys('c').perform();
-      var categoryBar = element(by.css('.protractor-test-search-bar-dropdown-toggle'));
+      var categoryBar = element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle'));
       expect(await categoryBar.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
@@ -120,7 +121,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       expect(await categoryBar.getAttribute('id')).not.toEqual(
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
-      
+
       await browser.actions().sendKeys('c').perform();
       expect(await categoryBar.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
@@ -165,10 +166,10 @@ describe('screenreader and keyboard user accessibility features', function() {
       await explorationPlayerPage.submitAnswer(
         'MultipleChoiceInput', 'It\'s translated from a different language.');
       await explorationPlayerPage.clickThroughToNextCard();
-      
+
       await waitFor.pageToFullyLoad();
 
-      // Should move the focus to the back button and navigate to the previous card.
+      // Should use shortcut to navigate to previous card.
       await browser.actions().sendKeys('k').perform();
       var backButton = element(by.css('#backButtonId'));
       expect(await backButton.getAttribute('id')).toEqual(
@@ -185,13 +186,13 @@ describe('screenreader and keyboard user accessibility features', function() {
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
       await waitFor.pageToFullyLoad();
 
-      // Should move the focus to the next button and navigate to the next card.
+      // Should use shortcut to navigate to next card.
       var nextButton = element(by.css('.protractor-test-next-button'));
       await browser.actions().sendKeys('j').perform();
       expect(await nextButton.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
-      
+
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
 
@@ -201,7 +202,7 @@ describe('screenreader and keyboard user accessibility features', function() {
           .getAttribute('id'));
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
       await waitFor.pageToFullyLoad();
-      
+
       // Should safely exit out of the exploration.
       await oppiaLogo.click();
       await general.acceptAlert();

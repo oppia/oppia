@@ -101,8 +101,8 @@ angular.module('oppia').component('explorationPlayerPage', {
       var moveFocusToSkipButton = function() {
         Mousetrap.bind('s', function() {
           var skipButton = document.getElementById('skipToMainContentId');
-          
-          if (skipButton != null) {
+
+          if (skipButton !== null) {
             skipButton.focus();
           }
 
