@@ -91,7 +91,7 @@ def _get_incoming_email_address(reply_to_id):
 
 
 def _is_email_valid(email_address):
-    """Determines whether an email address is invalid.
+    """Determines whether an email address is valid.
 
     Args:
         email_address: str. Email address to check.
@@ -106,8 +106,8 @@ def _is_email_valid(email_address):
     if not stripped_address:
         return False
     # Regex for a valid email.
-    # Matches any characters before the at sign, a series of characters until a
-    # . and must end with a series of characters after the period.
+    # Matches any characters before the "@" sign, a series of characters until
+    # a ".", and then a series of characters after the period.
     regex = r'^.+@[a-zA-Z0-9-.]+\.([a-zA-Z]+|[0-9]+)$'
     return re.search(regex, email_address)
 
@@ -122,13 +122,15 @@ def _is_sender_email_valid(sender_email):
     Returns:
         bool. Whether the sender_email is valid.
     """
-    # Regex for 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
-    # Matches a name and then an email in the angle brackets.
-    # Email regex explained in _is_email_valid().
-    sender_email_regex = (
-        r'^[a-zA-Z._][a-zA-Z._ ]* <^.+@[a-zA-Z0-9-.]+\.([a-zA-Z]+|[0-9]+)>$')
-    return _is_email_valid(sender_email) or (
-        re.search(sender_email_regex, sender_email))
+    split_sender_email = sender_email.split(' ')
+    if len(split_sender_email) < 2:
+        return _is_email_valid(sender_email)
+
+    email_address = split_sender_email[-1]
+    if not email_address.startswith('<') or not email_address.endswith('>'):
+        return False
+
+    return _is_email_valid(email_address[1:-1])
 
 
 def send_mail(
