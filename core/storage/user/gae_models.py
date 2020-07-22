@@ -2228,5 +2228,5 @@ class UserAuthModel(base_models.BaseModel):
             particular user mapped to the given auth_id and the auth service.
         """
 
-        if auth_type_name == "gae":
+        if auth_service == 'gae':
             return cls.query(cls.gae_id == auth_id).get()
