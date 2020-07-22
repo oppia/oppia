@@ -20,13 +20,13 @@ require(
   'pages/collection-editor-page/editor-tab/collection-editor-tab.directive.ts');
 require(
   'pages/collection-editor-page/history-tab/' +
-  'collection-history-tab.directive.ts');
+  'collection-history-tab.component.ts');
 require(
   'pages/collection-editor-page/settings-tab/' +
-  'collection-settings-tab.directive.ts');
+  'collection-settings-tab.component.ts');
 require(
   'pages/collection-editor-page/statistics-tab/' +
-  'collection-statistics-tab.directive.ts');
+  'collection-statistics-tab.component.ts');
 
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');

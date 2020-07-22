@@ -49,6 +49,19 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { ServicesConstants } from 'services/services.constants';
 
+import { CollectionHistoryTabComponent } from
+  'pages/collection-editor-page/history-tab/collection-history-tab.component';
+import { CollectionStatisticsTabComponent } from
+  'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+import { CollectionSettingsTabComponent } from
+  'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
+import { CollectionPermissionsCard } from
+  'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
+import { CollectionDetailsEditor } from
+  'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
+
+
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -56,10 +69,18 @@ import { ServicesConstants } from 'services/services.constants';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionStatisticsTabComponent,
+    CollectionSettingsTabComponent,
+    CollectionPermissionsCard,
+    CollectionDetailsEditor
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionStatisticsTabComponent,
+    CollectionSettingsTabComponent,
   ],
   providers: [
     AppConstants,
