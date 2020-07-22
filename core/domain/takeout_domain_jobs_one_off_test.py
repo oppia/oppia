@@ -33,7 +33,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
     """Tests for the one-off commit message indexing job."""
 
     def _run_one_off_job(self):
