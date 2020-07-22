@@ -15130,7 +15130,9 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
             param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
-            ])
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         self.job_class = (
@@ -15215,7 +15217,9 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
             param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
-            ])
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(self.admin_id, '', [])
 
         user_models.UserSettingsModel(
@@ -15350,7 +15354,9 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
-            ])
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(self.admin_id, '', [])
 
         user_models.UserSettingsModel(
