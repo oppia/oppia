@@ -68,7 +68,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           ctrl.value, AlgebraicExpressionInputRulesService);
       };
 
-      ctrl.setShowOSK = function() {
+      ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
       };
 

@@ -60,7 +60,7 @@ angular.module('oppia').component('numericExpressionEditor', {
         return true;
       };
 
-      ctrl.setShowOSK = function() {
+      ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
       };
 

@@ -55,7 +55,7 @@ angular.module('oppia').component('algebraicExpressionEditor', {
         return true;
       };
 
-      ctrl.setShowOSK = function() {
+      ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
       };
 

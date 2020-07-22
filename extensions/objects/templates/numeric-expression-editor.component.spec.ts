@@ -103,7 +103,7 @@ describe('NumericExpressionEditor', function() {
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
-    ctrl.setShowOSK();
+    ctrl.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
   });
 });

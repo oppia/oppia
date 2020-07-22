@@ -23,6 +23,8 @@ require('services/guppy-initialization.service.ts');
 
 angular.module('oppia').component('onScreenKeyboard', {
   bindings: {
+    // These will be used after a customization arg has been added to the
+    // math interactions.
     customizable: '=',
     customLetters: '='
   },
