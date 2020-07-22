@@ -111,22 +111,6 @@ angular.module('oppia').directive('storyEditor', [
               $scope.story.getStoryContents().getInitialNodeId() === nodeId);
           };
 
-          $scope.markAsInitialNode = function(nodeId) {
-            if ($scope.isInitialNode(nodeId)) {
-              return;
-            }
-            StoryUpdateService.setInitialNodeId($scope.story, nodeId);
-            var nodes = this.storyContents.getNodes();
-            for (var i = 0; i < nodes.length; i++) {
-              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
-                StoryUpdateService.removeDestinationNodeIdFromNode(
-                  $scope.story, nodes[i].getId(), nodeId);
-              }
-            }
-            _initEditor();
-            $scope.$broadcast('recalculateAvailableNodes');
-          };
-
           $scope.onMoveChapterStart = function(index, node) {
             $scope.dragStartIndex = index;
             $scope.nodeBeingDragged = node;
@@ -161,7 +145,7 @@ angular.module('oppia').directive('storyEditor', [
             });
           };
 
-          $scope.createNode = function() {
+          $scope.addNode = function() {
             var nodeTitles = $scope.linearNodesList.map(function(node) {
               return node.getTitle();
             });

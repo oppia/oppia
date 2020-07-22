@@ -567,12 +567,6 @@ class StoryContents(python_utils.OBJECT):
                             ' was unlocked.' % node_id)
                     nodes_queue.append(node_id)
 
-            for index, node_visited in enumerate(is_node_visited):
-                if not node_visited:
-                    raise utils.ValidationError(
-                        'The node with id %s is disconnected from the '
-                        'story graph.' % self.nodes[index].id)
-
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.

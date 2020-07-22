@@ -104,22 +104,13 @@
       </md-card>
     </div>
 
-    <div class="chapter-list-container" ng-if="linearNodesList.length > 0">
+    <div class="chapter-list-container">
       <md-card class="oppia-page-card oppia-long-text content-card">
-        <div class="story-nodes-title">
-          <label for="storyNodes" class="form-heading">Chapters</label>
-          <div ng-if="nodes.length > 0">
-            Select Initial Chapter
-            <select class="form-control protractor-test-initial-chapter-select"
-                    ng-model="initialNodeId"
-                    ng-if="nodes.length > 0"
-                    ng-options="node.getId() as node.getTitle() for node in nodes"
-                    ng-click="markAsInitialNode(initialNodeId)">
-            </select>
-          </div>
-        </div>
         <div class="story-node-editor">
           <div class="story-nodes-container">
+            <button ng-click="addNode()" class="protractor-test-add-chapter-button">
+              Add Chapter
+            </button>
             <div ng-repeat="node in linearNodesList track by $index">
               <md-card class="story-editor-node"
                        ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"

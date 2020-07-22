@@ -17,6 +17,8 @@
  * in Protractor tests.
  */
 
+var dragAndDropScript = require('html-dnd').code;
+var action = require('../protractor_utils/action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
@@ -43,16 +45,11 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-commit-message-input'));
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
-  var createInitialChapterButton = element(
-    by.css('.protractor-test-create-chapter-button'));
+  var createChapterButton = element(by.css('.protractor-test-add-chapter-button'));
   var newChapterTitleField = element(
     by.css('.protractor-test-new-chapter-title-field'));
   var confirmChapterCreationButton = element(
     by.css('.protractor-test-confirm-chapter-creation-button'));
-  var addDestinationChapterButton = element(
-    by.css('.protractor-test-add-destination-chapter-button'));
-  var deleteDestinationChapterButton = element(
-    by.css('.protractor-test-remove-destination-button'));
   var destinationSelect = element(
     by.css('.protractor-test-destination-select'));
   var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
@@ -64,12 +61,13 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-publish-story-button'));
   var unpublishStoryButton = element(
     by.css('.protractor-test-unpublish-story-button'));
+  var dragAndDrop = async function(fromElement, toElement) {
+    await browser.executeScript(dragAndDropScript, fromElement, toElement);
+  };
 
   /*
    * CHAPTER
    */
-  var initialChapterSelect = element(
-    by.css('.protractor-test-initial-chapter-select'));
   var explorationIdInput = element(
     by.css('.protractor-test-exploration-id-input'));
   var explorationIdSaveButton = element(
@@ -152,29 +150,40 @@ var StoryEditorPage = function() {
     await confirmDeleteChapterButton.click();
   };
 
-  this.createNewDestinationChapter = async function(title) {
-    await browser.actions().mouseMove(addDestinationChapterButton).perform();
-    await waitFor.elementToBeClickable(
-      addDestinationChapterButton,
-      'Add destination chapter button takes too long to be clickable.');
-    await addDestinationChapterButton.click();
-    await waitFor.visibilityOf(
-      newChapterTitleField,
-      'New Chapter modal takes too long to appear.');
-    await newChapterTitleField.sendKeys(title);
+  this.createNewChapter = async function(title) {
+    await general.scrollToTop();
+    await action.click(
+      'Create chapter button takes too long to be clickable.',
+      createChapterButton);
+    await action.sendKeys(
+      'New chapter title field', newChapterTitleField, title);
     await confirmChapterCreationButton.click();
     await general.scrollToTop();
   };
 
-  this.removeDestination = async function() {
-    await deleteDestinationChapterButton.click();
+  this.expectChaptersListToBe = async function(chapters) {
+    var i = 0;
+    await this.expectNumberOfChaptersToBe(chapters.length);
+    for (i = 0;i < chapters.length;i++) {
+      expect(await chapterTitles.get(i).getText()).toEqual(chapters[i]);
+    }
   };
 
-  this.selectDestinationChapterByName = async function(chapterName) {
-    var destinationOption = destinationSelect.element(
-      by.cssContainingText('option', chapterName));
-    await destinationOption.click();
-  };
+  this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
+    for (var i = 0;i < await chapterTitles.count(); i++) {
+      if (await chapterTitles.get(i).getText() === chapter1) {
+        break;
+      }
+    }
+    var toMove = chapterTitles.get(i);
+    for (var i = 0; i < await chapterTitles.count(); i++) {
+      if (await chapterTitles.get(i).getText() === chapter2) {
+        break;
+      }
+    }
+    var target = chapterTitles.get(i);
+    await dragAndDrop(toMove, target);
+  });
 
   this.expectDestinationToBe = async function(chapterName) {
     var pattern = '\s*' + chapterName + '\s*';
@@ -183,21 +192,6 @@ var StoryEditorPage = function() {
 
   this.expectNumberOfChaptersToBe = async function(count) {
     expect(await chapterTitles.count()).toEqual(count);
-  };
-
-  this.createInitialChapter = async function(title) {
-    await waitFor.elementToBeClickable(
-      createInitialChapterButton,
-      'Create Initial Chapter button takes too long to be clickable.');
-    await createInitialChapterButton.click();
-    await waitFor.visibilityOf(
-      newChapterTitleField,
-      'New Chapter modal takes too long to appear.');
-    await newChapterTitleField.sendKeys(title);
-    await confirmChapterCreationButton.click();
-    await waitFor.invisibilityOf(
-      confirmChapterCreationButton,
-      'New Chapter modal takes too long to disappear.');
   };
 
   this.expectNotesToBe = async function(richTextInstructions) {
@@ -261,10 +255,6 @@ var StoryEditorPage = function() {
   this.expectSaveStoryDisabled = async function() {
     return expect(
       await saveStoryButton.getAttribute('disabled')).toEqual('true');
-  };
-
-  this.expectDisplayUnreachableChapterWarning = async function() {
-    return expect(await disconnectedChapterWarning.isPresent()).toBe(true);
   };
 
   this.setChapterExplorationId = async function(explorationId) {
@@ -413,12 +403,6 @@ var StoryEditorPage = function() {
 
   this.expectPrerequisiteSkillDescriptionCardCount = async function(number) {
     expect(await prerequisiteSkillDescriptionCard.count()).toBe(number);
-  };
-
-  this.selectInitialChapterByName = async function(name) {
-    var initialChapterOption = initialChapterSelect.element(
-      by.cssContainingText('option', name));
-    await initialChapterOption.click();
   };
 
   this.expectWarningInIndicator = async function(warning) {

@@ -45,8 +45,6 @@ export class StoryContents {
     this._storyNodeObjectFactoryInstance = storyNodeObjectFactoryInstance;
   }
 
-  _disconnectedNodes: StoryNode[] = [];
-
   getIncrementedNodeId(nodeId: string): string {
     var index = parseInt(
       nodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
@@ -120,7 +118,6 @@ export class StoryContents {
   }
 
   validate(): string[] {
-    this._disconnectedNodes = [];
     var issues: string[] = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
@@ -228,14 +225,6 @@ export class StoryContents {
             }
           );
           nodesQueue.push(nodeId);
-        }
-      }
-      for (var i = 0; i < nodeIsVisited.length; i++) {
-        if (!nodeIsVisited[i]) {
-          this._disconnectedNodes.push(nodes[i]);
-          issues.push(
-            'There is no way to get to the chapter with title ' +
-            nodeTitles[i] + ' from any other chapter');
         }
       }
     }
