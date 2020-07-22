@@ -152,14 +152,14 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertEqual(all_jobs[0].job_type, 'UserDeletionOneOffJob')
         self.logout()
 
-    def test_cron_verify_user_deletion_handler(self):
+    def test_cron_fully_complete_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.testapp_swap:
-            self.get_html_response('/cron/users/verify_user_deletion')
+            self.get_html_response('/cron/users/fully_complete_user_deletion')
 
         self.assertEqual(
             self.count_jobs_in_taskqueue(
@@ -167,7 +167,8 @@ class CronJobTests(test_utils.GenericTestBase):
 
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
         self.assertEqual(len(all_jobs), 1)
-        self.assertEqual(all_jobs[0].job_type, 'VerifyUserDeletionOneOffJob')
+        self.assertEqual(
+            all_jobs[0].job_type, 'FullyCompleteUserDeletionOneOffJob')
         self.logout()
 
     def test_cron_exploration_recommendations_handler(self):

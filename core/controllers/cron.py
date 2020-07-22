@@ -103,14 +103,16 @@ class CronUserDeletionHandler(base.BaseHandler):
             wipeout_jobs_one_off.UserDeletionOneOffJob.create_new())
 
 
-class CronVerifyUserDeletionHandler(base.BaseHandler):
-    """Handler for running the user deletion verification one off job."""
+class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
+    """Handler for running the fully complete user deletion one off job."""
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.create_new())
+        wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(
+            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
+            .create_new()
+        )
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):

@@ -102,11 +102,21 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             subtopics=[], next_subtopic_id=1)
 
         self.save_new_story(
-            canonical_story_id, self.admin_id, 'title', 'description',
-            'note', topic_id)
+            canonical_story_id,
+            self.admin_id,
+            topic_id,
+            title='title',
+            description='description',
+            notes='note'
+        )
         self.save_new_story(
-            additional_story_id, self.admin_id, 'another title',
-            'another description', 'another note', topic_id)
+            additional_story_id,
+            self.admin_id,
+            topic_id,
+            title='another title',
+            description='another description',
+            notes='another note'
+        )
 
         topic_services.publish_story(
             topic_id, canonical_story_id, self.admin_id)

@@ -57,12 +57,13 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
         self.save_new_story(
-            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
-        self.save_new_story(
-            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_3,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 3',
+            description='Description 3')
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)

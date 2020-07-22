@@ -69,6 +69,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
     def test_is_user_id_correct(self):
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SYSTEM_COMMITTER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertFalse(
             user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
@@ -543,28 +551,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gae_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
-        exploration_ids = ['exp_id']
-        collection_ids = ['col_id']
 
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_services.mark_user_for_deletion(
-            user_id, exploration_ids, collection_ids)
+        user_services.mark_user_for_deletion(user_id)
 
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertTrue(user_settings.deleted)
-
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(user_id))
-        self.assertEqual(
-            pending_deletion_model.email, user_settings.email)
-        self.assertFalse(
-            pending_deletion_model.deletion_complete)
-        self.assertEqual(
-            pending_deletion_model.exploration_ids, exploration_ids)
-        self.assertEqual(
-            pending_deletion_model.collection_ids, collection_ids)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -1250,6 +1244,25 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_user_id(self):
+        self.user_settings.user_id = 'uid_' + 'a' * 31 + 'A'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'uid_' + 'a' * 31
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 

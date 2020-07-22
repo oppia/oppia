@@ -146,9 +146,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_story(
-            story_id, admin_id, 'Title', 'Description', 'Notes',
-            topic_id)
+        self.save_new_story(story_id, admin_id, topic_id)
         self.save_new_topic(
             topic_id, admin_id, name='Name',
             description='Description', canonical_story_ids=[story_id],
