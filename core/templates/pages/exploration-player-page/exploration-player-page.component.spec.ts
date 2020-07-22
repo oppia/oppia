@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
+import 'mousetrap';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -96,8 +98,19 @@ describe('Exploration player page', function() {
       'meta[property="og:description"]').and.returnValue(
       elementDescriptionProperty);
 
+    spyOn(document, 'getElementById').and.callFake(function() {
+      return document.createElement('button');
+    });
+
+    spyOn(document, 'querySelector').and.callFake(function() {
+      return document.createElement('button');
+    });
+
     ctrl.$onInit();
     $scope.$apply();
+    Mousetrap.trigger('k');
+    Mousetrap.trigger('j');
+    Mousetrap.trigger('s');
 
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
       'Exploration Title - Oppia');
@@ -109,3 +122,7 @@ describe('Exploration player page', function() {
       exploration.objective);
   });
 });
+
+
+
+

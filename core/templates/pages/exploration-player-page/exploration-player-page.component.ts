@@ -64,13 +64,7 @@ angular.module('oppia').component('explorationPlayerPage', {
 
             if (previousButton !== null) {
               previousButton.focus();
-            } else {
-              var interaction = <HTMLElement>document.querySelector(
-                '.conversation-skin-inline-interaction');
-              if (interaction !== null) {
-                interaction.focus();
-              }
-            }
+            } 
 
             return false;
           });
@@ -83,13 +77,7 @@ angular.module('oppia').component('explorationPlayerPage', {
 
             if (nextButton !== null) {
               nextButton.focus();
-            } else {
-              var interaction = <HTMLElement>document.querySelector(
-                '.conversation-skin-inline-interaction');
-              if (interaction !== null) {
-                interaction.focus();
-              }
-            }
+            } 
 
             return false;
           });
@@ -107,9 +95,9 @@ angular.module('oppia').component('explorationPlayerPage', {
           });
         };
 
-        $timeout(moveFocusToSkipButton);
-        $timeout(moveFocusToBackButton);
-        $timeout(moveFocusToNextButton);
+        $timeout(moveFocusToSkipButton());
+        $timeout(moveFocusToBackButton());
+        $timeout(moveFocusToNextButton());
       };
     }
   ]
