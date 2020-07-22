@@ -49,14 +49,14 @@ angular.module('oppia').directive('feedbackTab', [
         'feedback-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$q', '$uibModal', 'AlertsService', 'ChangeListService',
+        '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
         'DateTimeFormatService', 'EditabilityService', 'LoaderService',
         'ExplorationStatesService',
         'SuggestionModalForExplorationEditorService', 'ThreadDataService',
         'ThreadStatusDisplayService', 'UrlInterpolationService',
         'UserBackendApiService',
         function(
-            $q, $uibModal, AlertsService, ChangeListService,
+            $q, $rootScope, $uibModal, AlertsService, ChangeListService,
             DateTimeFormatService, EditabilityService, LoaderService,
             ExplorationStatesService,
             SuggestionModalForExplorationEditorService, ThreadDataService,
@@ -231,7 +231,12 @@ angular.module('oppia').directive('feedbackTab', [
 
             return $q.all([
               UserBackendApiService.getUserInfoAsync().then(
-                userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
+                userInfo => {
+                  ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$apply();
+                }),
               ctrl.fetchUpdatedThreads()
             ]).then(() => LoaderService.hideLoadingScreen());
           };

@@ -50,12 +50,12 @@ require(
 angular.module('oppia').component('communityDashboardPage', {
   template: require('./community-dashboard-page.component.html'),
   controller: [
-    'LanguageUtilService', 'LocalStorageService',
+    '$rootScope', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserBackendApiService', 'COMMUNITY_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
     function(
-        LanguageUtilService, LocalStorageService,
+        $rootScope, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserBackendApiService, COMMUNITY_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
@@ -104,6 +104,9 @@ angular.module('oppia').component('communityDashboardPage', {
         UserBackendApiService.getProfileImageDataUrlAsync().then(
           function(dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           });
 
         UserBackendApiService.getUserCommunityRightsData().then(
@@ -127,6 +130,9 @@ angular.module('oppia').component('communityDashboardPage', {
               ctrl.userCanReviewVoiceoverSuggestionsInLanguages
                 .length > 0 ||
               ctrl.userCanReviewQuestions);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           });
 
         UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
@@ -138,6 +144,9 @@ angular.module('oppia').component('communityDashboardPage', {
             ctrl.userIsLoggedIn = false;
             ctrl.username = '';
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         });
 
         ctrl.languageCode = (

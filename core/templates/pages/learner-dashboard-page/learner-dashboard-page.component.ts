@@ -49,8 +49,8 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$scope', '$uibModal', '$window', 'AlertsService',
-    'LoaderService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+    '$http', '$q', '$rootScope', '$scope', '$uibModal', '$window',
+    'AlertsService', 'LoaderService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
     'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
     'LearnerDashboardBackendApiService', 'UrlInterpolationService',
@@ -61,8 +61,8 @@ angular.module('oppia').component('learnerDashboardPage', {
     'FeedbackMessageSummaryObjectFactory',
     'SuggestionModalForLearnerDashboardService', 'UserBackendApiService',
     function(
-        $http, $q, $scope, $uibModal, $window, AlertsService,
-        LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+        $http, $q, $rootScope, $scope, $uibModal, $window,
+        AlertsService, LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
         ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
         SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
         LearnerDashboardBackendApiService, UrlInterpolationService,
@@ -435,7 +435,7 @@ angular.module('oppia').component('learnerDashboardPage', {
             ctrl.profilePictureDataUrl = dataUrl;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
-            $scope.$applyAsync();
+            $rootScope.$apply();
           });
 
         LoaderService.showLoadingScreen('Loading');
@@ -445,7 +445,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.username = userInfo.getUsername();
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
-          $scope.$applyAsync();
+          $rootScope.$apply();
         });
 
         var dashboardDataPromise = (

@@ -42,13 +42,13 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         'outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
-        'StateEditorService', 'StateGraphLayoutService',
+        '$rootScope', '$scope', 'EditorFirstTimeEventsService',
+        'FocusManagerService', 'StateEditorService', 'StateGraphLayoutService',
         'UserBackendApiService', 'ENABLE_PREREQUISITE_SKILLS',
         'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $scope, EditorFirstTimeEventsService, FocusManagerService,
-            StateEditorService, StateGraphLayoutService,
+            $rootScope, $scope, EditorFirstTimeEventsService,
+            FocusManagerService, StateEditorService, StateGraphLayoutService,
             UserBackendApiService, ENABLE_PREREQUISITE_SKILLS,
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
@@ -169,7 +169,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                 userInfo.isAdmin() || userInfo.isModerator());
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $scope.$applyAsync();
+              $rootScope.$apply();
             });
 
             ctrl.explorationAndSkillIdPattern =

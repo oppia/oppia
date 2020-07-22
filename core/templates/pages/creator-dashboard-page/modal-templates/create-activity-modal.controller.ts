@@ -22,10 +22,10 @@ require('services/user-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').controller('CreateActivityModalController', [
-  '$scope', '$uibModalInstance', 'CollectionCreationService',
+  '$rootScope', '$scope', '$uibModalInstance', 'CollectionCreationService',
   'ExplorationCreationService', 'UrlInterpolationService',
   'UserBackendApiService',
-  function($scope, $uibModalInstance, CollectionCreationService,
+  function($rootScope, $scope, $uibModalInstance, CollectionCreationService,
       ExplorationCreationService, UrlInterpolationService,
       UserBackendApiService) {
     UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
@@ -33,7 +33,7 @@ angular.module('oppia').controller('CreateActivityModalController', [
         userInfo.canCreateCollections());
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the controller is migrated to angular.
-      $scope.$applyAsync();
+      $rootScope.$apply();
     });
 
     $scope.chooseExploration = function() {

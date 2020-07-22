@@ -42,15 +42,15 @@ angular.module('oppia').directive('feedbackPopup', [
       scope: {},
       template: require('./feedback-popup.directive.html'),
       controller: [
-        '$scope', '$element', '$filter', '$http', '$log', '$timeout',
-        'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
-        'PlayerPositionService', 'UserBackendApiService',
-        'WindowDimensionsService',
+        '$rootScope', '$scope', '$element', '$filter', '$http', '$log',
+        '$timeout', 'AlertsService', 'BackgroundMaskService',
+        'FocusManagerService', 'PlayerPositionService',
+        'UserBackendApiService', 'WindowDimensionsService',
         function(
-            $scope, $element, $filter, $http, $log, $timeout,
-            AlertsService, BackgroundMaskService, FocusManagerService,
-            PlayerPositionService, UserBackendApiService,
-            WindowDimensionsService) {
+            $rootScope, $scope, $element, $filter, $http, $log,
+            $timeout, AlertsService, BackgroundMaskService,
+            FocusManagerService, PlayerPositionService,
+            UserBackendApiService, WindowDimensionsService) {
           var ctrl = this;
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +
@@ -140,7 +140,7 @@ angular.module('oppia').directive('feedbackPopup', [
               $scope.isLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $scope.$applyAsync();
+              $rootScope.$apply();
             });
             $scope.feedbackSubmitted = false;
             // We generate a random id since there may be multiple popover

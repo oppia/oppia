@@ -33,8 +33,10 @@ angular.module('oppia').directive('loginRequiredMessage', [
         'login-required-message.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'SiteAnalyticsService', 'UserBackendApiService',
-        function($scope, $window, SiteAnalyticsService, UserBackendApiService) {
+        '$rootScope', '$scope', '$window', 'SiteAnalyticsService',
+        'UserBackendApiService',
+        function($rootScope, $scope, $window, SiteAnalyticsService,
+          UserBackendApiService) {
           var ctrl = this;
           ctrl.onLoginButtonClicked = function() {
             UserBackendApiService.getLoginUrlAsync().then(
@@ -49,7 +51,7 @@ angular.module('oppia').directive('loginRequiredMessage', [
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
-                $scope.$applyAsync();
+                $rootScope.$apply();
               }
             );
           };

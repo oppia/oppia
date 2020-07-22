@@ -53,14 +53,14 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$uibModal', 'AlertsService', 'LoaderService',
+        '$http', '$rootScope', '$uibModal', 'AlertsService', 'LoaderService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
         'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserBackendApiService',
         'FEEDBACK_POPOVER_PATH', 'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $uibModal, AlertsService, LoaderService,
+            $http, $rootScope, $uibModal, AlertsService, LoaderService,
             ExplorationEngineService, ExplorationPlayerStateService,
             FocusManagerService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
@@ -126,6 +126,9 @@ angular.module('oppia').directive('learnerLocalNav', [
             UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
               LoaderService.hideLoadingScreen();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
             });
           };
         }

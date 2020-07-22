@@ -37,7 +37,8 @@ angular.module('oppia').directive('adminNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['UserBackendApiService', function(UserBackendApiService) {
+      controller: ['$rootScope', 'UserBackendApiService',
+      function($rootScope, UserBackendApiService) {
         var ctrl = this;
         ctrl.showTab = function() {
           return AdminRouterService.showTab();
@@ -81,6 +82,9 @@ angular.module('oppia').directive('adminNavbar', [
           UserBackendApiService.getProfileImageDataUrlAsync().then(
             function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
             });
 
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -101,6 +105,9 @@ angular.module('oppia').directive('adminNavbar', [
                 username: ctrl.username
               })
             );
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           });
 
           ctrl.logoutUrl = LOGOUT_URL;

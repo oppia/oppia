@@ -50,10 +50,10 @@ angular.module('oppia').directive('collectionSummaryTile', [
         '/components/summary-tile/collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'DateTimeFormatService', 'UserBackendApiService',
+        '$rootScope', 'DateTimeFormatService', 'UserBackendApiService',
         'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_VIEWER_URL',
         'COLLECTION_EDITOR_URL', function(
-            DateTimeFormatService, UserBackendApiService,
+            $rootScope, DateTimeFormatService, UserBackendApiService,
             ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL,
             COLLECTION_EDITOR_URL) {
           var ctrl = this;
@@ -89,6 +89,9 @@ angular.module('oppia').directive('collectionSummaryTile', [
             ctrl.userIsLoggedIn = null;
             UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
             });
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
             ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;

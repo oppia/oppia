@@ -34,9 +34,9 @@ angular.module('oppia').directive('searchResults', [
         '/pages/library-page/search-results/search-results.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$q', '$timeout', '$window', 'LoaderService',
+        '$q', '$rootScope', '$scope', '$timeout', '$window', 'LoaderService',
         'SiteAnalyticsService', 'UserBackendApiService',
-        function($scope, $q, $timeout, $window, LoaderService,
+        function($q, $rootScope, $scope, $timeout, $window, LoaderService,
             SiteAnalyticsService, UserBackendApiService) {
           var ctrl = this;
 
@@ -61,7 +61,7 @@ angular.module('oppia').directive('searchResults', [
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $scope.$applyAsync();
+              $rootScope.$apply();
             });
 
             // Called when the first batch of search results is retrieved from

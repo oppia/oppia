@@ -42,13 +42,13 @@ angular.module('oppia').directive('topNavigationBar', [
         '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$scope', '$timeout', '$translate', '$window',
+        '$http', '$rootScope', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
         'I18nLanguageCodeService', 'NavigationService', 'SidebarStatusService',
         'SiteAnalyticsService', 'UserBackendApiService',
         'WindowDimensionsService', 'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
-            $http, $scope, $timeout, $translate, $window,
+            $http, $rootScope, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
             I18nLanguageCodeService, NavigationService, SidebarStatusService,
             SiteAnalyticsService, UserBackendApiService,
@@ -86,7 +86,7 @@ angular.module('oppia').directive('topNavigationBar', [
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
-                $scope.$applyAsync();
+                $rootScope.$apply();
               }
             );
           };
@@ -284,14 +284,14 @@ angular.module('oppia').directive('topNavigationBar', [
               }
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $scope.$applyAsync();
+              $rootScope.$apply();
             });
             UserBackendApiService.getProfileImageDataUrlAsync().then(
               function(dataUrl) {
                 ctrl.profilePictureDataUrl = dataUrl;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
-                $scope.$applyAsync();
+                $rootScope.$apply();
               });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {

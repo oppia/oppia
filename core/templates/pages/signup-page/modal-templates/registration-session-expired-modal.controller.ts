@@ -20,9 +20,9 @@ require('services/user-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'RegistrationSessionExpiredModalController', [
-    '$scope', '$timeout', '$uibModalInstance', '$window',
+    '$rootScope', '$scope', '$timeout', '$uibModalInstance', '$window',
     'UserBackendApiService',
-    function($scope, $timeout, $uibModalInstance, $window,
+    function($rootScope, $scope, $timeout, $uibModalInstance, $window,
         UserBackendApiService) {
       $scope.continueRegistration = function() {
         UserBackendApiService.getLoginUrlAsync().then(
@@ -34,6 +34,9 @@ angular.module('oppia').controller(
             } else {
               $window.location.reload();
             }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           }
         );
         $uibModalInstance.dismiss('cancel');

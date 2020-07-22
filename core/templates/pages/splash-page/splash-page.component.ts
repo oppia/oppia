@@ -25,9 +25,9 @@ require('services/user-backend-api.service.ts');
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$timeout', 'SiteAnalyticsService', 'LoaderService',
+    '$rootScope', '$timeout', 'SiteAnalyticsService', 'LoaderService',
     'UrlInterpolationService', 'UserBackendApiService', 'WindowRef',
-    function($timeout, SiteAnalyticsService, LoaderService,
+    function($rootScope, $timeout, SiteAnalyticsService, LoaderService,
         UrlInterpolationService, UserBackendApiService, WindowRef) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
@@ -68,6 +68,9 @@ angular.module('oppia').component('splashPage', {
         UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$apply();
         });
       };
     }
