@@ -93,34 +93,41 @@ angular.module('oppia').directive('editorNavigation', () => ({
       this.$onInit = () => {
         $scope.ExplorationRightsService = ExplorationRightsService;
 
-        $scope.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
+        this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
         this.resizeSubscription = (
           WindowDimensionsService.getResizeEvent().subscribe(evt => {
-            $scope.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
+            this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
             $scope.$applyAsync();
           }));
+        $scope.isScreenLarge = () => this.screenIsLarge;
 
-        $scope.postTutorialHelpPopoverIsShown = false;
+        this.postTutorialHelpPopoverIsShown = false;
         $scope.$on('openPostTutorialHelpPopover', () => {
-          if ($scope.screenIsLarge) {
-            $scope.postTutorialHelpPopoverIsShown = true;
-            $timeout(() => $scope.postTutorialHelpPopoverIsShown = false, 4000);
+          if (this.screenIsLarge) {
+            this.postTutorialHelpPopoverIsShown = true;
+            $timeout(() => {
+              this.postTutorialHelpPopoverIsShown = false;
+            }, 4000);
           } else {
-            $scope.postTutorialHelpPopoverIsShown = false;
+            this.postTutorialHelpPopoverIsShown = false;
           }
         });
+        $scope.isPostTutorialHelpPopoverShown = (
+          () => this.postTutorialHelpPopoverIsShown);
 
-        $scope.improvementsTabIsEnabled = false;
+        this.improvementsTabIsEnabled = false;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
           .then(improvementsTabIsEnabled => {
-            $scope.improvementsTabIsEnabled = improvementsTabIsEnabled;
+            this.improvementsTabIsEnabled = improvementsTabIsEnabled;
           });
+        $scope.isImprovementsTabEnabled = () => this.improvementsTabIsEnabled;
 
-        $scope.userIsLoggedIn = null;
+        this.userIsLoggedIn = false;
         $q.when(UserService.getUserInfoAsync())
           .then(userInfo => {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            this.userIsLoggedIn = userInfo.isLoggedIn();
           });
+        $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };
 
       this.$onDestroy = () => {

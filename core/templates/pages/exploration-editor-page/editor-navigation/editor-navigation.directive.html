@@ -111,14 +111,14 @@
           </li>
         </ul>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'translation'}">
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isUserLoggedIn()" ng-class="{'active': getActiveTabName() === 'translation'}">
         <a href="#" uib-tooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE029;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
         </a>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'preview'}">
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isUserLoggedIn()" ng-class="{'active': getActiveTabName() === 'preview'}">
         <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE037;</i>
@@ -139,7 +139,7 @@
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
         </a>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="improvementsTabIsEnabled">
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="isImprovementsTabEnabled()">
         <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
@@ -194,7 +194,7 @@
     </ul>
   </li>
 
-  <li ng-if="userIsLoggedIn" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}"
+  <li ng-if="isUserLoggedIn()" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}"
       class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Translations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-translation-tab">
@@ -202,7 +202,7 @@
     </a>
   </li>
 
-  <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}"
+  <li ng-if="isUserLoggedIn()" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}"
       class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
@@ -210,7 +210,7 @@
     </a>
   </li>
 
-  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'settings'}"
+  <li ng-if="isScreenLarge()" ng-class="{'active': getActiveTabName() === 'settings'}"
       class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
@@ -218,7 +218,7 @@
     </a>
   </li>
 
-  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'stats'}"
+  <li ng-if="isScreenLarge()" ng-class="{'active': getActiveTabName() === 'stats'}"
       class="nav-item d-none d-lg-block">
     <a  href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
@@ -226,7 +226,7 @@
     </a>
   </li>
 
-  <li ng-if="screenIsLarge && improvementsTabIsEnabled" ng-class="{'active': getActiveTabName() === 'improvements'}"
+  <li ng-if="isScreenLarge() && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}"
       class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
@@ -234,7 +234,7 @@
     </a>
   </li>
 
-  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'history'}" class="nav-item d-none d-lg-block">
+  <li ng-if="isScreenLarge()" ng-class="{'active': getActiveTabName() === 'history'}" class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
        disabled="ExplorationRightsService.isCloned()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-history-tab">
@@ -242,7 +242,7 @@
     </a>
   </li>
 
-  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'feedback'}" class="nav-item d-none d-lg-block">
+  <li ng-if="isScreenLarge()" ng-class="{'active': getActiveTabName() === 'feedback'}" class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
       <i class="material-icons">&#xE87F;</i>
@@ -254,8 +254,8 @@
     </div>
   </li>
 
-  <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown float-right ng-cloak">
-    <li uib-dropdown class="nav-item d-none d-lg-block uib-dropdown uib-popover" popover-is-open="postTutorialHelpPopoverIsShown"
+  <div ng-if="isUserLoggedIn()" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown float-right ng-cloak">
+    <li uib-dropdown class="nav-item d-none d-lg-block uib-dropdown uib-popover" popover-is-open="isPostTutorialHelpPopoverShown()"
         popover-placement="bottom" popover-trigger="'none'"
         uib-popover="To get help in the future, click here!">
       <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
