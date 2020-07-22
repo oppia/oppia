@@ -233,8 +233,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.login(self.EDITOR_EMAIL)
 
         long_message_dict = self.json_dict.copy()
-        long_message_dict['commit_message'] = ('a' *
-            (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1))
+        long_message_dict['commit_message'] = (
+            'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1))
 
         # Call get handler to return the csrf token.
         csrf_token = self.get_new_csrf_token()

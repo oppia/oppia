@@ -33,15 +33,16 @@ from core.platform import models
 ])
 
 class SnapshotMetadataCommitMsgAuditOneOffJob(
-    jobs.BaseMapReduceOneOffJobManager):
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that audits the commit_message field of the
     BaseSnapshotMetadataModels to determine frequency of string sizes.
     """
+
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(SnapshotMetadataCommitMsgAuditOneOffJob, cls).enqueue(
             job_id, shard_count=8)
-    
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
@@ -79,7 +80,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
 
 
 class SnapshotMetadataCommitMsgMigrationOneOffJob(
-    jobs.BaseMapReduceOneOffJobManager):
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that indexes the commit_message field of the
     BaseSnapshotMetadataModels.
     """

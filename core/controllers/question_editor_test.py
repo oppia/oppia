@@ -663,8 +663,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'old_value': self.question.question_state_data.to_dict()
         }]
         payload['change_list'] = change_list
-        payload['commit_message'] = ('a' *
-            (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1))
+        payload['commit_message'] = (
+            'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1))
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
