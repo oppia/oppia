@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,39 +13,35 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the navbar breadcrumb of the story viewer.
+ * @fileoverview Component for a topic tile.
  */
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
-require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/url.service.ts');
 
-angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
+angular.module('oppia').directive('topicSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        getTopicSummary: '&topicSummary'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story-viewer-page/navbar-breadcrumb/' +
-        'story-viewer-navbar-breadcrumb.directive.html'),
+        '/components/summary-tile/topic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
-        function($rootScope, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
+      controller: ['TOPIC_VIEWER_URL_TEMPLATE',
+        function(TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.getTopicUrl = function() {
+          ctrl.getTopicLink = function() {
             return UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.topicName
+                topic_name: ctrl.getTopicSummary().getName()
               });
           };
 
-          ctrl.$onInit = function() {
-            $rootScope.$on('storyData', function(evt, data) {
-              ctrl.topicName = data.topicName;
-              ctrl.storyTitle = data.storyTitle;
-            });
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
         }
       ]
