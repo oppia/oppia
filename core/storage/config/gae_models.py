@@ -117,6 +117,7 @@ class PlatformParameterModel(base_models.VersionedModel):
                             - type: str. The type of the filter.
                             - value: *. The value of the filter to match
                                 against.
+            rule_schema_version: int. The schema version for the rule dicts.
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel

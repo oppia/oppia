@@ -6212,7 +6212,7 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
     def _get_custom_validation_functions(cls):
         return [cls._validate_user_settings_with_same_id_not_exist]
 
-        
+
 class PlatformParameterModelValidator(BaseModelValidator):
     """Class for validating PlatformParameterModel."""
 
