@@ -18,7 +18,7 @@
  */
 
 import { ExplorationImprovementsConfig } from
-  'services/exploration-improvements-backend-api.service';
+  'domain/improvements/exploration-improvements-config-object.factory';
 
 require('services/exploration-improvements-backend-api.service.ts');
 
@@ -50,7 +50,6 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
             resolveInitPromise();
           } catch (error) {
             rejectInitPromise(error);
-            throw error;
           }
         }
         return initPromise;

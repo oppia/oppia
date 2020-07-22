@@ -21,16 +21,20 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import {
-  ExplorationTaskObjectFactory,
   ExplorationTaskBackendDict,
+  ExplorationTaskObjectFactory,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import {
+  ExplorationImprovementsBackendApiService,
   ExplorationImprovementsHistoryResponse,
   ExplorationImprovementsResponse,
-  ExplorationImprovementsBackendApiService,
+  IExplorationImprovementsHistoryResponseBackendDict,
   IExplorationImprovementsResponseBackendDict,
-  IExplorationImprovementsHistoryResponseBackendDict
 } from 'services/exploration-improvements-backend-api.service';
+import {
+  ExplorationImprovementsConfig,
+  ExplorationImprovementsConfigBackendDict,
+} from 'domain/improvements/exploration-improvements-config-object.factory';
 
 describe('Exploration stats backend api service', () => {
   let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
@@ -187,5 +191,26 @@ describe('Exploration stats backend api service', () => {
 
     expect(onSuccess).toHaveBeenCalled();
     expect(onFailure).not.toHaveBeenCalled();
+  }));
+
+  it('should return an ExplorationImprovementsConfig', fakeAsync(async() => {
+    const response = (
+      explorationImprovementsBackendApiService.getConfigAsync('eid'));
+
+    const req = (
+      httpTestingController.expectOne('/improvements/config/exploration/eid'));
+    expect(req.request.method).toEqual('GET');
+    req.flush(<ExplorationImprovementsConfigBackendDict> {
+      exploration_id: 'eid',
+      exploration_version: 1,
+      is_improvements_tab_enabled: true,
+      high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.25,
+      high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.20,
+      high_bounce_rate_task_minimum_exploration_starts: 100,
+    });
+    flushMicrotasks();
+
+    expect(await response).toEqual(
+      new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));
   }));
 });

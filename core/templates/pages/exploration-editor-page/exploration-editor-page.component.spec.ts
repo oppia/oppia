@@ -18,34 +18,32 @@
 
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { StateEditorService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
   'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import {
-  ExplorationImprovementsBackendApiService,
-  ExplorationImprovementsConfig
-} from 'services/exploration-improvements-backend-api.service';
-import { PageTitleService } from 'services/page-title.service';
 import { LoaderService } from 'services/loader.service';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
+import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
@@ -174,7 +172,6 @@ describe('Exploration editor page component', function() {
         EditabilityService,
         ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService,
-        ExplorationImprovementsBackendApiService,
         PageTitleService,
         LoaderService,
         ParamChangesObjectFactory,
@@ -244,7 +241,8 @@ describe('Exploration editor page component', function() {
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(0));
         spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-          new ExplorationImprovementsConfig(true, 0, 0, 0)));
+          new ExplorationImprovementsConfig(
+            explorationId, 1, true, 0.25, 0.20, 100)));
 
         explorationData.is_version_of_draft_valid = false;
 
@@ -324,7 +322,8 @@ describe('Exploration editor page component', function() {
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(1));
         spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-          new ExplorationImprovementsConfig(true, 0, 0, 0)));
+          new ExplorationImprovementsConfig(
+            explorationId, 1, true, 0.25, 0.20, 100)));
 
         explorationData.is_version_of_draft_valid = true;
 
@@ -720,7 +719,8 @@ describe('Exploration editor page component', function() {
         .and.returnValue($q.resolve({}));
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-        new ExplorationImprovementsConfig(true, 0, 0, 0)));
+        new ExplorationImprovementsConfig(
+          explorationId, 1, true, 0.25, 0.20, 100)));
 
       explorationData.is_version_of_draft_valid = true;
     });

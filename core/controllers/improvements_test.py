@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import config_domain
+from core.domain import exp_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.platform import models
@@ -566,6 +567,29 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
     def test_get_with_non_creator_returns_401_error(self):
         with self.login_context(self.VIEWER_EMAIL):
             self.get_json(self.get_url(), expected_status_int=401)
+
+    def test_get_returns_exploration_id(self):
+        self.set_config_property(
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=False)
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertEqual(json_response['exploration_id'], self.EXP_ID)
+
+    def test_get_returns_exploration_version(self):
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertEqual(json_response['exploration_version'], 1)
+
+        # Update to version 2.
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, None, '')
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertEqual(json_response['exploration_version'], 2)
 
     def test_improvements_tab_disabled(self):
         self.set_config_property(

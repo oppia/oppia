@@ -29,6 +29,11 @@ import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import {
+  ExplorationImprovementsConfig,
+  ExplorationImprovementsConfigBackendDict,
+  ExplorationImprovementsConfigObjectFactory,
+} from 'domain/improvements/exploration-improvements-config-object.factory';
 
 export interface IExplorationImprovementsResponseBackendDict {
   'open_tasks': ExplorationTaskBackendDict[];
@@ -41,13 +46,6 @@ export interface IExplorationImprovementsHistoryResponseBackendDict {
   'results': ExplorationTaskBackendDict[];
   'cursor': string;
   'more': boolean;
-}
-
-export interface ExplorationImprovementsConfigBackendDict {
-  'is_improvements_tab_enabled': boolean;
-  'high_bounce_rate_task_state_bounce_rate_creation_threshold': number;
-  'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number;
-  'high_bounce_rate_task_minimum_exploration_starts': number;
 }
 
 export class ExplorationImprovementsResponse {
@@ -63,20 +61,12 @@ export class ExplorationImprovementsHistoryResponse {
       public readonly more: boolean) {}
 }
 
-export class ExplorationImprovementsConfig {
-  constructor(
-      public readonly isImprovementsTabEnabled: boolean,
-      public readonly highBounceRateTaskStateBounceRateCreationThreshold:
-        number,
-      public readonly highBounceRateTaskStateBounceRateObsoletionThreshold:
-        number,
-      public readonly highBounceRateTaskMinimumExplorationStarts: number) {}
-}
-
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsBackendApiService {
   constructor(
       private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
+      private explorationImprovementsConfigObjectFactory:
+        ExplorationImprovementsConfigObjectFactory,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
@@ -136,14 +126,11 @@ export class ExplorationImprovementsBackendApiService {
         ImprovementsConstants.EXPLORATION_IMPROVEMENTS_CONFIG_URL, {
           exploration_id: expId
         }));
-    const backendDict = (
-      await this.http.get<ExplorationImprovementsConfigBackendDict>(
-        explorationImprovementsConfigUrl).toPromise());
-    return new ExplorationImprovementsConfig(
-      backendDict.is_improvements_tab_enabled,
-      backendDict.high_bounce_rate_task_state_bounce_rate_creation_threshold,
-      backendDict.high_bounce_rate_task_state_bounce_rate_obsoletion_threshold,
-      backendDict.high_bounce_rate_task_minimum_exploration_starts);
+    return this.http.get<ExplorationImprovementsConfigBackendDict>(
+      explorationImprovementsConfigUrl
+    ).toPromise().then(backendDict =>
+      this.explorationImprovementsConfigObjectFactory.createFromBackendDict(
+        backendDict));
   }
 }
 

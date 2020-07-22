@@ -15,10 +15,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import {
-  ExplorationImprovementsBackendApiService,
-  ExplorationImprovementsConfig,
-} from 'services/exploration-improvements-backend-api.service';
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
+import { ExplorationImprovementsBackendApiService } from
+  'services/exploration-improvements-backend-api.service';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.
@@ -43,7 +43,7 @@ describe('ExplorationImprovementsService', function() {
     fakeAsync(async() => {
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
         .and.returnValue(Promise.resolve(new ExplorationImprovementsConfig(
-          true, 0, 0, 0)));
+          'eid', 1, true, 0.25, 0.20, 100)));
 
       explorationImprovementsService.initAsync('eid');
       flushMicrotasks();
@@ -57,7 +57,7 @@ describe('ExplorationImprovementsService', function() {
     fakeAsync(async() => {
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
         .and.returnValue(Promise.resolve(new ExplorationImprovementsConfig(
-          false, 0, 0, 0)));
+          'eid', 1, false, 0.25, 0.20, 100)));
 
       explorationImprovementsService.initAsync('eid');
       flushMicrotasks();
@@ -66,4 +66,22 @@ describe('ExplorationImprovementsService', function() {
         await explorationImprovementsService.isImprovementsTabEnabledAsync()
       ).toBeFalse();
     }));
+
+  it('should propagate errors from the backend', fakeAsync(async() => {
+    const error = new Error('Whoops!');
+    spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
+      .and.throwError(error);
+
+    const onSuccess = jasmine.createSpy('onSuccess');
+    const onFailure = jasmine.createSpy('onFailure', reason => {
+      expect(reason).toBe(error);
+    });
+
+    const promise = explorationImprovementsService.initAsync('eid')
+      .then(onSuccess, onFailure);
+    flushMicrotasks();
+    await promise;
+    expect(onSuccess).not.toHaveBeenCalled();
+    expect(onFailure).toHaveBeenCalled();
+  }));
 });
