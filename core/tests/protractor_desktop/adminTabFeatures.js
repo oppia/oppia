@@ -55,7 +55,7 @@ describe('Admin Page', function() {
     await adminPage.expectUsernamesToMatch(['collectionEditor1']);
 
     await adminPage.get();
-    await adminPage.addReviewer('newQuestionReviewer', 'QUESTION');
+    await adminPage.addReviewer('newQuestionReviewer', 'question');
     await adminPage.showReviewersAssignedToRole('question');
     await adminPage.expectReviewerUsernamesStrToMatch(
       'Usernames: ["newQuestionReviewer"]');
