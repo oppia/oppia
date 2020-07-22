@@ -2172,7 +2172,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 class UserAuthModel(base_models.BaseModel):
     """Stores the authentication details for a particular user.
 
-    Instances of this class are keyed by the user id.
+    Instances of this class are keyed by user id.
     """
 
     # Authentication detail for sign in using google id (GAE)
