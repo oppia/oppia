@@ -405,7 +405,6 @@ angular.module('oppia').directive('libraryPage', [
             if (ctrl.resizeSubscription) {
               ctrl.resizeSubscription.unsubscribe();
             }
-
           };
         }
       ]

@@ -15,7 +15,7 @@
 /**
  * @fileoverview Component for the explaration player page.
  */
-import 'mousetrap'
+import 'mousetrap';
 
 require('base-components/base-content.directive.ts');
 require(
@@ -59,40 +59,40 @@ angular.module('oppia').component('explorationPlayerPage', {
               'content', response.exploration.objective);
           });
       };
-      
+
       var moveFocusToBackButton = function() {
         Mousetrap.bind('k', function() {
-          var previous_button = document.getElementById('backButtonId');
-          
-          if (previous_button != null) {
-            previous_button.focus();
-          }
-          else {
-            var interaction = <HTMLElement>document.querySelector('.conversation-skin-inline-interaction');
-            if (interaction != null) {
+          var previousButton = document.getElementById('backButtonId');
+
+          if (previousButton !== null) {
+            previousButton.focus();
+          } else {
+            var interaction = <HTMLElement>document.querySelector(
+              '.conversation-skin-inline-interaction');
+            if (interaction !== null) {
               interaction.focus();
             }
           }
-          
+
           return false;
         });
       };
 
       var moveFocusToNextButton = function() {
         Mousetrap.bind('j', function() {
-          var next_button = <HTMLElement>document.querySelector('.protractor-test-next-button')
-          
-          if (next_button != null) {
-            next_button.focus();
-          }
-          else {
-            var interaction = <HTMLElement>document.querySelector('.conversation-skin-inline-interaction');
-            if (interaction != null) {
+          var nextButton = <HTMLElement>document.querySelector(
+            '.protractor-test-next-button');
+
+          if (nextButton !== null) {
+            nextButton.focus();
+          } else {
+            var interaction = <HTMLElement>document.querySelector(
+              '.conversation-skin-inline-interaction');
+            if (interaction !== null) {
               interaction.focus();
             }
           }
-          
-          console.log("running..");
+
           return false;
         });
       };
@@ -100,12 +100,12 @@ angular.module('oppia').component('explorationPlayerPage', {
 
       var moveFocusToSkipButton = function() {
         Mousetrap.bind('s', function() {
-          var skip_button = document.getElementById('skipToMainContentId');
-
-          if (skip_button != null) {
-            skip_button.focus();
-          }
+          var skipButton = document.getElementById('skipToMainContentId');
           
+          if (skipButton != null) {
+            skipButton.focus();
+          }
+
           return false;
         });
       };
