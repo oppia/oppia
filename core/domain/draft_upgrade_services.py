@@ -23,7 +23,6 @@ import logging
 
 from core.domain import customization_args_util
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
@@ -109,7 +108,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         It also populates missing customization argument keys, removes extra
         customization arguments, normalizes customization arguments against its
         schema, and changes PencilCodeEditor's customization argument name from
-        initial_code to initialCode. Additionally, ExplorationChange's are
+        initial_code to initialCode. Additionally, ExplorationChanges are
         appended at the end to set the next content id index.
 
         Args:
@@ -142,14 +141,15 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             state_name_to_next_content_id_index[state_name] = (
                 max_existing_content_id_index + 1)
 
-        state_names_with_interactions = filter(
-            lambda state_name: (
-               exploration_dict[
-                   'states'][state_name]['interaction']['id'] is not None),
-            exploration_dict['states'].keys()
-        )
+        state_names_with_interactions = [
+            state_name
+            for state_name in exploration_dict['states'].keys()
+            if exploration_dict[
+                'states'][state_name]['interaction']['id'] is not None
+        ]
+
         # Track the currently set interaction_id for each state as we iterate
-        # over the change list. Initialize it with the current interaction_id 
+        # over the change list. Initialize it with the current interaction_id
         # already in the state.
         state_name_to_current_interaction_id = {
             state_name: exploration_dict[
@@ -167,16 +167,17 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 state_name_to_current_interaction_id[state_name] = (
                     change.new_value)
             elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 # Migrate customization arguments.
                 interaction_id = (
                     state_name_to_current_interaction_id.get(state_name))
 
                 if interaction_id is None:
-                    raise Exception('An customization argument is being set ' +
-                        'without the interaction_id set.')
-           
+                    raise Exception(
+                        'An customization argument is being set without' +
+                        ' the interaction_id set.')
+
                 ca_dict = change.new_value
                 # We retrieve an cached version of interaction_specs
                 # in the case that interaction_specs.json changes in the
@@ -238,25 +239,25 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                                     }
                                 }
                     elif (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                        (schema['items']['type'] ==
-                        schema_utils.SCHEMA_TYPE_CUSTOM) and
-                        (schema['items']['obj_type'] ==
-                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
+                          (schema['items']['type'] ==
+                           schema_utils.SCHEMA_TYPE_CUSTOM) and
+                          (schema['items']['obj_type'] ==
+                           schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
                         # Case where cust arg value is a list of strings, and
                         # needs to be migrated to a list of SubtitledHtml dicts.
                         use_default_value = ca_name not in ca_dict
 
                         value = (ca_spec.default_value if use_default_value
-                            else ca_dict[ca_name]['value'])
+                                 else ca_dict[ca_name]['value'])
                         new_value = []
 
-                        for i, html in enumerate(value):
+                        for j, html in enumerate(value):
                             content_id = '%s%i' % (
                                 content_id_prefix,
                                 state_name_to_next_content_id_index[state_name])
                             state_name_to_next_content_id_index[state_name] += 1
 
-                            if use_default_value and i == 0:
+                            if use_default_value and j == 0:
                                 # If we use default value, then the first
                                 # value is already a SubtitledHtml dict and we
                                 # just need to assign a content_id.
@@ -275,7 +276,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         ca_dict[ca_name] = {'value': ca_spec.default_value}
 
                 (customization_args_util
-                .validate_customization_args_and_values(
+                 .validate_customization_args_and_values(
                     'interaction',
                     interaction_id,
                     ca_dict,
@@ -308,7 +309,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: Exploration. The Exploration dict, which
+            unused_exploration_dict: dict. The Exploration dict, which
                 is the current exploration schema version.
 
         Returns:
@@ -407,8 +408,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-                unused_exploration_dict: Exploration. The exploration dict,
-                containing states of schema v33.
+            unused_exploration_dict: dict. The Exploration dict, which
+                is the current exploration schema version.
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
@@ -441,7 +442,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: Exploration. The Exploration dict, which
+            unused_exploration_dict: dict. The Exploration dict, which
                 is the current exploration schema version.
 
         Returns:
@@ -459,7 +460,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: Exploration. The Exploration dict, which
+            unused_exploration_dict: dict. The Exploration dict, which
                 is the current exploration schema version.
 
         Returns:
@@ -498,7 +499,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: Exploration. The Exploration domain object.
+            unused_exploration_dict: dict. The Exploration dict, which
+                is the current exploration schema version.
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
@@ -531,7 +533,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: Exploration. The Exploration dict, which
+            unused_exploration_dict: dict. The Exploration dict, which
                 is the current exploration schema version.
 
         Returns:
@@ -549,7 +551,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
-            unused_exploration_dict: Exploration. The Exploration dict, which
+            unused_exploration_dict: dict. The Exploration dict, which
                 is the current exploration schema version.
 
         Returns:

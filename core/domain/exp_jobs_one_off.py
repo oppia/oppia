@@ -428,7 +428,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     for choice in state.interaction.customization_args[
                         'choices'].value
                 ]
-                
+
                 for group in state.interaction.answer_groups:
                     for rule_spec in group.rule_specs:
                         for rule_item in rule_spec.inputs['x']:

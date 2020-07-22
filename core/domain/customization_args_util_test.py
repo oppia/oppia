@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
@@ -244,12 +242,6 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         incomplete_customization_args_with_invalid_arg_name = {
             'requireSimplestForm': {'value': False},
             False: {'value': False},
-        }
-
-        incomplete_customization_args_with_extra_arg = {
-            'requireSimplestForm': {'value': False},
-            'allowNonzeroIntegerPart': {'value': False},
-            'extraArg': {'value': ''}
         }
 
         incomplete_customization_args_with_invalid_arg_type = {

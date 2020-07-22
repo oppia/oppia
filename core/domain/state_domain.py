@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
+import itertools
 import json
 import logging
 
@@ -31,7 +32,6 @@ from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
-import itertools
 import python_utils
 import schema_utils
 import utils
@@ -858,7 +858,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         ca_specs = interaction_registry.Registry.get_interaction_by_id(
             interaction_id).customization_arg_specs
-        
+
         customization_args = {
             spec.name: InteractionCustomizationArg.from_customization_arg_dict(
                 customization_args_dict[spec.name],
@@ -1015,11 +1015,10 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         if schema_type == schema_utils.SCHEMA_TYPE_CUSTOM:
             schema_obj_type = schema['obj_type']
             if (
-                schema_obj_type ==
-                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE or
-                schema_obj_type ==
-                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
-            ):
+                    schema_obj_type ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE or
+                    schema_obj_type ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML):
                 value = conversion_fn(value, schema_obj_type)
         elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
             value = [
@@ -2945,7 +2944,7 @@ class State(python_utils.OBJECT):
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
 
-        
+
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to
             # properly convert html, since past state schema v35,

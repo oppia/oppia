@@ -23,7 +23,6 @@ from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -991,7 +990,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-    
+
         question = question_fetchers.get_question_from_model(question_model)
         self.assertEqual(
             question.question_state_data_schema_version,
@@ -1155,7 +1154,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'classifier_model_id': None
         }
-        
+
         question_model = (
             question_models.QuestionModel(
                 id='question_id',

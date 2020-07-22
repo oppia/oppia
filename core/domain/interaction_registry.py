@@ -126,7 +126,7 @@ class Registry(python_utils.OBJECT):
 
         Raises:
             Exception: No interaction specs json file found for the given state
-            schema version.
+                schema version.
         """
         if (state_schema_version not in
                 cls._state_schema_version_to_interaction_specs):
@@ -139,7 +139,7 @@ class Registry(python_utils.OBJECT):
                     specs_from_json = json.loads(f.read())
             except:
                 raise Exception(
-                    'No specs json file found for state schema v%i' % \
+                    'No specs json file found for state schema v%i' %
                     state_schema_version)
 
             cls._state_schema_version_to_interaction_specs[

@@ -207,7 +207,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list, 1, 2, exploration_dict))
-        
+
         self.assertEqual(len(migrated_draft_change_list), 3)
 
         self.assertEqual(
@@ -218,7 +218,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             }).to_dict())
-        
+
         self.assertEqual(
             migrated_draft_change_list[1].to_dict(),
             exp_domain.ExplorationChange({
@@ -244,7 +244,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'next_content_id_index',
                 'new_value': 3
             }).to_dict())
-    
 
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (

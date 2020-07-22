@@ -2572,7 +2572,7 @@ class Exploration(python_utils.OBJECT):
                         use_default_value = ca_name not in ca_dict
 
                         value = (ca_spec.default_value if use_default_value
-                            else ca_dict[ca_name]['value'])
+                                 else ca_dict[ca_name]['value'])
                         new_value = []
 
                         for i, html in enumerate(value):

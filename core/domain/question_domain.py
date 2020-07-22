@@ -24,7 +24,6 @@ import datetime
 from constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
-from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
@@ -335,6 +334,23 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
+        """Converts from version 34 to 35. Version 35 adds translation support
+        for interaction customization arguments. This migration converts
+        customization arguments whose schemas have been changed from unicode to
+        SubtitledUnicode or html to SubtitledHtml. It also populates missing
+        customization argument keys on all interactions, removes extra
+        customization arguments, normalizes customization arguments against
+        its schema, and changes PencilCodeEditor's customization argument
+        name from initial_code to initialCode.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
         # Find maximum existing content_id index.
         max_existing_content_id_index = -1
         translations_mapping = question_state_dict[
@@ -422,16 +438,16 @@ class Question(python_utils.OBJECT):
                                 }
                             }
                 elif (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                        (schema['items']['type'] ==
-                        schema_utils.SCHEMA_TYPE_CUSTOM) and
-                        (schema['items']['obj_type'] ==
-                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
+                      (schema['items']['type'] ==
+                       schema_utils.SCHEMA_TYPE_CUSTOM) and
+                      (schema['items']['obj_type'] ==
+                       schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
                     # Case where cust arg value is a list of strings, and
                     # needs to be migrated to a list of SubtitledHtml dicts.
                     use_default_value = ca_name not in ca_dict
 
                     value = (ca_spec.default_value if use_default_value
-                        else ca_dict[ca_name]['value'])
+                             else ca_dict[ca_name]['value'])
                     new_value = []
 
                     for i, html in enumerate(value):
@@ -462,11 +478,11 @@ class Question(python_utils.OBJECT):
                 all_new_content_ids.extend(new_content_ids)
 
             (customization_args_util
-                .validate_customization_args_and_values(
-                    'interaction',
-                    interaction_id,
-                    ca_dict,
-                    ca_specs)
+             .validate_customization_args_and_values(
+                'interaction',
+                interaction_id,
+                ca_dict,
+                ca_specs)
             )
 
         question_state_dict['next_content_id_index'] = next_content_id_index
