@@ -90,6 +90,48 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         ),
     }
 
+    def _check_non_explicit_keyword_args(
+            self, node, name, callable_name, keyword_args,
+            num_positional_args_unused, num_mandatory_parameters):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            name: str. Name of the keyword argument.
+            callable_name: str. Name of method type.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            num_positional_args_unused: int. Number of unused positional
+                arguments.
+            num_mandatory_parameters: int. Number of mandatory parameters.
+
+        Returns:
+            int. Number of unused positional arguments.
+        """
+        display_name = repr(name)
+
+        if name not in keyword_args and (
+                num_positional_args_unused > (
+                    num_mandatory_parameters)) and (
+                        callable_name != 'constructor'):
+            # This try/except block tries to get the function
+            # name. Since each node may differ, multiple
+            # blocks have been used.
+            try:
+                func_name = node.func.attrname
+            except AttributeError:
+                func_name = node.func.name
+
+            self.add_message(
+                'non-explicit-keyword-args', node=node,
+                args=(
+                    display_name,
+                    callable_name,
+                    func_name))
+            num_positional_args_unused -= 1
+        return num_positional_args_unused
+
     def _check_argname_for_nonkeyword_arg(
             self, node, called, callable_name, keyword_args,
             keyword_args_in_funcdef):
@@ -192,28 +234,11 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         # been called explicitly.
         for [(name, defval), _] in parameters:
             if defval:
-                display_name = repr(name)
                 keyword_args_in_funcdef.append(name)
-
-                if name not in keyword_args and (
-                        num_positional_args_unused > (
-                            num_mandatory_parameters)) and (
-                                callable_name != 'constructor'):
-                    # This try/except block tries to get the function
-                    # name. Since each node may differ, multiple
-                    # blocks have been used.
-                    try:
-                        func_name = node.func.attrname
-                    except AttributeError:
-                        func_name = node.func.name
-
-                    self.add_message(
-                        'non-explicit-keyword-args', node=node,
-                        args=(
-                            display_name,
-                            callable_name,
-                            func_name))
-                    num_positional_args_unused -= 1
+                num_positional_args_unused = (
+                    self._check_non_explicit_keyword_args(
+                        node, name, callable_name, keyword_args,
+                        num_positional_args_unused, num_mandatory_parameters))
 
         self._check_argname_for_nonkeyword_arg(
             node, called, callable_name, keyword_args, keyword_args_in_funcdef)
