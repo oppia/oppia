@@ -22,6 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core import jobs
 from core.platform import models
 
+import python_utils
+
 (
     base_models, config_models, collection_models, exploration_models,
     skill_models, story_models, topic_models,
@@ -115,7 +117,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
             model_name = item.__class__.__name__
             model_id = item.id
             identifier_message = '%s with id %s failed with error: %s' % (
-                model_name, model_id, str(e))
+                model_name, model_id, python_utils.convert_to_bytes(e))
             yield ('FAILURE', identifier_message)
         else:
             yield ('SUCCESS', 1)

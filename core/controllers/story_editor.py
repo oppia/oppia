@@ -97,7 +97,8 @@ class EditableStoryDataHandler(base.BaseHandler):
 
         if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
             raise self.InvalidInputException(
-                'Commit messages must be at most %s characters.' % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                'Commit messages must be at most %s characters.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_dicts = self.payload.get('change_dicts')
         change_list = [
