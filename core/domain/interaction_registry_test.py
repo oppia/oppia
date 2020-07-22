@@ -127,7 +127,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         """Test to ensure that all customization argument names are in
         interaction specs only include alphabetic letters and are
         lowerCamelCase. This is because these properties are involved in the
-        generation of content_id's for customization arguments.
+        generation of content_id's for customization arguments. Recursion is
+        required because names can be nested within type: dict inside a schema.
         """
         all_specs = interaction_registry.Registry.get_all_specs()
         ca_names_in_schema = []

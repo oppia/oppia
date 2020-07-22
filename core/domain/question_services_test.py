@@ -23,6 +23,7 @@ from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -623,7 +624,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
 
-    def test_migrate_question_state_from_v29_to_v30(self):
+    def test_migrate_question_state_from_v29_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -707,18 +708,15 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 30)
-
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 30)
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(answer_groups[0].tagged_skill_misconception_id, None)
 
-    def test_migrate_question_state_from_v30_to_v31(self):
+    def test_migrate_question_state_from_v30_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -810,16 +808,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 31)
-
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 31)
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(question.question_state_data
                          .recorded_voiceovers.to_dict(), {
                              'voiceovers_mapping': {
+                                 'ca_placeholder_0': {},
                                  'content': {
                                      'en': {
                                          'filename': 'test.mp3',
@@ -827,7 +823,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                                          'needs_update': False,
                                          'duration_secs': 0.0}}}})
 
-    def test_migrate_question_state_from_v31_to_v32(self):
+    def test_migrate_question_state_from_v31_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -904,18 +900,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 32)
-
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 32)
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         cust_args = question.question_state_data.interaction.customization_args
-        self.assertEqual(cust_args['buttonText']['value'], 'Add item')
+        self.assertEqual(
+            cust_args['buttonText'].value.unicode_str,
+            'Add item')
 
-    def test_migrate_question_state_from_v32_to_v33(self):
+    def test_migrate_question_state_from_v32_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -955,7 +950,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ''
+                        'value': []
                     }
                 },
                 'default_outcome': {
@@ -996,19 +991,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 33)
-
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 33)
+    
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         cust_args = question.question_state_data.interaction.customization_args
-        self.assertEqual(cust_args['choices'].value, '')
+        self.assertEqual(cust_args['choices'].value, [])
         self.assertEqual(cust_args['showChoicesInShuffledOrder'].value, True)
 
-    def test_migrate_question_state_from_v33_to_v34(self):
+    def test_migrate_question_state_from_v33_to_latest(self):
         feedback_html_content = (
             '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-value="'
             '&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -1102,16 +1095,90 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 34)
-
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 34)
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         migrated_answer_group = (
             question.question_state_data.interaction.answer_groups[0])
         self.assertEqual(
             migrated_answer_group.outcome.feedback.html,
             expected_feeedback_html_content)
+
+    def test_migrate_question_state_from_v34_to_latest(self):
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'choices': {
+                        'value': ['<p>Choice 1</p>']
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': True
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': {},
+                'id': 'MultipleChoiceInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state_dict,
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=34))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        migrated_customization_args = (
+            question.question_state_data.interaction.customization_args)
+        self.assertEqual(
+            migrated_customization_args['choices'].value[0].to_dict(),
+            {'content_id': 'ca_choices_0', 'html': '<p>Choice 1</p>'})

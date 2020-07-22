@@ -4810,7 +4810,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
         draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long
-            classmethod(lambda cls, changelist: changelist))
+            classmethod(lambda cls, changelist, exploration: changelist))
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)

@@ -2337,6 +2337,10 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         }
         written_translations_dict = {
             'translations_mapping': {
+                'ca_choices_0': {},
+                'ca_choices_1': {},
+                'ca_choices_2': {},
+                'ca_choices_3': {},
                 'content': {
                     'en': {
                         'data_format': 'html',
@@ -2618,6 +2622,10 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         }
         written_translations_dict = {
             'translations_mapping': {
+                'ca_choices_0': {},
+                'ca_choices_1': {},
+                'ca_choices_2': {},
+                'ca_choices_3': {},
                 'content': {
                     'en': {
                         'data_format': 'html',

@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-/* eslint-disable max-len */
 import { StateEditorService } from
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 

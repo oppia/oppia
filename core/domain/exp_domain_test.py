@@ -2644,8 +2644,10 @@ states:
       customization_args:
         placeholder:
           value: ''
-        rows:
-          value: 1
+        postCode:
+          value: ''
+        preCode:
+          value: ''
         language:
           value: ''
       default_outcome:
@@ -3681,10 +3683,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
           value: ''
-        rows:
-          value: 1
+        requireSimplestForm:
+          value: false
       default_outcome:
         dest: END
         feedback:
@@ -4500,10 +4506,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
+        highlightRegionsOnHover:
+          value: false
         imageAndRegions:
           value:
             imagePath: s1ImagePath.png

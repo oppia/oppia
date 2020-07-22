@@ -31,6 +31,7 @@ from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
+import itertools
 import python_utils
 import schema_utils
 import utils
@@ -1010,11 +1011,16 @@ class InteractionCustomizationArg(python_utils.OBJECT):
             dict. The converted customization dict.
         """
         schema_type = schema['type']
-        schema_obj_type = schema.get('obj_type', None)
 
-        if (schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE or
-                schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML):
-            value = conversion_fn(value, schema_obj_type)
+        if schema_type == schema_utils.SCHEMA_TYPE_CUSTOM:
+            schema_obj_type = schema['obj_type']
+            if (
+                schema_obj_type ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE or
+                schema_obj_type ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
+            ):
+                value = conversion_fn(value, schema_obj_type)
         elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
             value = [
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
@@ -2529,20 +2535,6 @@ class State(python_utils.OBJECT):
         Args:
             interaction_id: str. The new interaction id to set.
         """
-        if self.interaction.id is not None:
-            old_content_id_list = []
-            for ca_name in self.interaction.customization_args:
-                old_content_id_list.extend(
-                    self.interaction.customization_args[ca_name]
-                    .get_content_ids()
-                )
-
-            self._update_content_ids_in_assets(old_content_id_list, [])
-            # Set customization arguments to blank so that the following
-            # set customization arguments command does not clear the same
-            # content_id's again.
-            self.interaction.customization_args = {}
-
         self.interaction.id = interaction_id
 
         # TODO(sll): This should also clear interaction.answer_groups (except
@@ -2568,28 +2560,20 @@ class State(python_utils.OBJECT):
             InteractionInstance.
             convert_customization_args_dict_to_customization_args(
                 self.interaction.id,
-                customization_args_dict
-            )
+                customization_args_dict)
         )
 
-        if self.interaction.id is not None:
-            # If interaction id is None, content_id's have already been removed
-            # in update_interaction_id.
-            old_content_id_list = []
-            new_content_id_list = []
+        old_content_id_list = list(itertools.chain.from_iterable([
+            self.interaction.customization_args[ca_name].get_content_ids()
+            for ca_name in self.interaction.customization_args]))
 
-            for ca_name in self.interaction.customization_args:
-                old_content_id_list.extend(
-                    self.interaction.customization_args[
-                        ca_name].get_content_ids()
-                )
+        self.interaction.customization_args = customization_args
+        new_content_id_list = list(itertools.chain.from_iterable([
+            self.interaction.customization_args[ca_name].get_content_ids()
+            for ca_name in self.interaction.customization_args]))
 
-            for ca_name in customization_args:
-                new_content_id_list.extend(
-                    customization_args[ca_name].get_content_ids())
-            self.interaction.customization_args = customization_args
-            self._update_content_ids_in_assets(
-                old_content_id_list, new_content_id_list)
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(self, answer_groups_list):
         """Update the list of AnswerGroup in IteractioInstancen domain object.

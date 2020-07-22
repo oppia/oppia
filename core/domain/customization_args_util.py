@@ -62,8 +62,7 @@ def validate_customization_args_and_values(
     out in 'ca_specs_to_validate_against'. 'item_name' and 'item_type' are
     used to populate any error messages that arise during validation.
     Note that this may modify the given customization_args dict, if it has
-    extra keys. It also normalizes any HTML in the
-    customization_args dict.
+    extra keys. It also normalizes any HTML in the customization_args dict.
 
     Args:
         item_name: str. This is always 'interaction'.
@@ -82,7 +81,8 @@ def validate_customization_args_and_values(
 
     Raises:
         ValidationError: The given 'customization_args' is not valid.
-        ValidationError: Customization arguments is missing key.
+        ValidationError: The given 'customization_args' is missing at least one
+            key.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -92,20 +92,16 @@ def validate_customization_args_and_values(
             'Expected customization args to be a dict, received %s'
             % customization_args)
 
-    # Validate and clean up the customization args.
-    # Remove extra keys.
+    # Check for extra invalid keys.
     extra_args = []
     for arg_name in customization_args.keys():
         if not isinstance(arg_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
         if arg_name not in ca_spec_names:
-            extra_args.append(arg_name)
-            logging.warning(
+            raise utils.ValidationError(
                 '%s %s does not support customization arg %s.'
                 % (item_name.capitalize(), item_type, arg_name))
-    for extra_arg in extra_args:
-        del customization_args[extra_arg]
 
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
@@ -113,9 +109,10 @@ def validate_customization_args_and_values(
             raise utils.ValidationError(
                 'Customization argument is missing key: %s' % ca_spec.name)
         try:
-            # Use apply_custom_validators=False so that SubtitledHtml's
-            # html is validated with the HTML schema rather than a custom
-            # SubtitledHtml validator on objects.py.
+            # Since SubtitledHtml is a custom object in objects.py,
+            # we use apply_custom_validators=False so that SubtitledHtml's
+            # html is validated with the HTML schema rather than the
+            # SubtitledHtml custom validator from objects.py.
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
                     customization_args[ca_spec.name]['value'],

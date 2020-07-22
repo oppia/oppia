@@ -2518,6 +2518,7 @@ class Exploration(python_utils.OBJECT):
                 if (interaction_id == 'PencilCodeEditor' and
                         'initial_code' in ca_dict):
                     ca_dict['initialCode'] = ca_dict['initial_code']
+                    del ca_dict['initial_code']
 
                 obj_type_to_subtitled_dict_key = {
                     'SubtitledUnicode': 'unicode_str',

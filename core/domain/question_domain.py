@@ -23,14 +23,17 @@ import datetime
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
+from extensions import domain
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
@@ -332,10 +335,150 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
-        states = {'question_state': question_state_dict}
-        converted_states = (
-            exp_domain.Exploration._convert_states_v34_dict_to_v35_dict(states))
-        return converted_states['question_state']
+        # Find maximum existing content_id index.
+        max_existing_content_id_index = -1
+        translations_mapping = question_state_dict[
+            'written_translations']['translations_mapping']
+        for content_id in translations_mapping:
+            content_id_suffix = content_id.split('_')[-1]
+            if content_id_suffix.isdigit():
+                max_existing_content_id_index = max(
+                    max_existing_content_id_index,
+                    int(content_id_suffix)
+                )
+            for lang_code in translations_mapping[content_id]:
+                translations_mapping[
+                    content_id][lang_code]['data_format'] = 'html'
+                translations_mapping[
+                    content_id][lang_code]['translation'] = (
+                        translations_mapping[content_id][lang_code]['html'])
+                del translations_mapping[content_id][lang_code]['html']
+
+        next_content_id_index = max_existing_content_id_index + 1
+
+        all_new_content_ids = []
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id is not None:
+            ca_dict = question_state_dict['interaction']['customization_args']
+            # We need to retrieve an cached version of interaction_specs in
+            # the case that interaction_specs.json changes in the future.
+            ca_specs = [
+                domain.CustomizationArgSpec(
+                    caSpecDict['name'],
+                    caSpecDict['description'],
+                    caSpecDict['schema'],
+                    caSpecDict['default_value']
+                ) for caSpecDict in (
+                    interaction_registry.Registry
+                    .get_all_specs_for_state_schema_version(35)[
+                        interaction_id]['customization_arg_specs']
+                )
+            ]
+
+            if (interaction_id == 'PencilCodeEditor' and
+                    'initial_code' in ca_dict):
+                ca_dict['initialCode'] = ca_dict['initial_code']
+
+            obj_type_to_subtitled_dict_key = {
+                'SubtitledUnicode': 'unicode_str',
+                'SubtitledHtml': 'html'
+            }
+
+            for ca_spec in ca_specs:
+                new_content_ids = []
+
+                schema = ca_spec.schema
+                ca_name = ca_spec.name
+                content_id_prefix = 'ca_%s_' % ca_name
+
+                if schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM:
+                    schema_obj_type = schema['obj_type']
+                    if schema_obj_type in obj_type_to_subtitled_dict_key:
+                        # Case where cust arg value is a string, and needs
+                        # to be migrated to SubtitledHtml or
+                        # SubtitledUnicode.
+                        content_id = '%s%i' % (
+                            content_id_prefix,
+                            next_content_id_index)
+                        new_content_ids.append(content_id)
+                        next_content_id_index += 1
+
+                        subtitled_dict_key = (
+                            obj_type_to_subtitled_dict_key[schema_obj_type]
+                        )
+                        if ca_name in ca_dict:
+                            ca_dict[ca_name]['value'] = {
+                                'content_id': content_id,
+                                subtitled_dict_key:
+                                    ca_dict[ca_name]['value']
+                            }
+                        else:
+                            default_value = ca_spec.default_value[
+                                subtitled_dict_key]
+                            ca_dict[ca_name] = {
+                                'value': {
+                                    'content_id': content_id,
+                                    subtitled_dict_key: default_value
+                                }
+                            }
+                elif (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                        (schema['items']['type'] ==
+                        schema_utils.SCHEMA_TYPE_CUSTOM) and
+                        (schema['items']['obj_type'] ==
+                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)):
+                    # Case where cust arg value is a list of strings, and
+                    # needs to be migrated to a list of SubtitledHtml dicts.
+                    use_default_value = ca_name not in ca_dict
+
+                    value = (ca_spec.default_value if use_default_value
+                        else ca_dict[ca_name]['value'])
+                    new_value = []
+
+                    for i, html in enumerate(value):
+                        content_id = '%s%i' % (
+                            content_id_prefix,
+                            next_content_id_index)
+                        new_content_ids.append(content_id)
+                        next_content_id_index += 1
+
+                        if use_default_value and i == 0:
+                            # If we use default value, then the first
+                            # value is already a SubtitledHtml dict and we
+                            # just need to assign a content_id.
+                            new_value.append({
+                                'content_id': content_id,
+                                'html': value[0]['html']
+                            })
+                        else:
+                            new_value.append({
+                                'content_id': content_id,
+                                'html': html
+                            })
+
+                    ca_dict[ca_name]['value'] = new_value
+                elif ca_name not in ca_dict:
+                    ca_dict[ca_name] = {'value': ca_spec.default_value}
+
+                all_new_content_ids.extend(new_content_ids)
+
+            (customization_args_util
+                .validate_customization_args_and_values(
+                    'interaction',
+                    interaction_id,
+                    ca_dict,
+                    ca_specs)
+            )
+
+        question_state_dict['next_content_id_index'] = next_content_id_index
+        for new_content_id in all_new_content_ids:
+            question_state_dict[
+                'written_translations'][
+                    'translations_mapping'][new_content_id] = {}
+            question_state_dict[
+                'recorded_voiceovers'][
+                    'voiceovers_mapping'][new_content_id] = {}
+
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(

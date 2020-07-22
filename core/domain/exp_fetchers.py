@@ -177,7 +177,6 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_states_schema(
             versioned_exploration_states, exploration_model.id)
-
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,

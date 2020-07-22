@@ -524,6 +524,12 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'NumericInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {},
                 })], 'Change to NumericInput')
 
             exp = exp_fetchers.get_exploration_by_id(exp_id)
@@ -702,6 +708,12 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'NumericInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {},
                 })], 'Change to NumericInput')
 
             # Submit an answer to the numeric interaction.

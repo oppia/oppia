@@ -135,11 +135,6 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
     def test_validate_customization_args_and_values(self):
         """Test validate customization args and values method."""
 
-        observed_log_messages = []
-
-        def mock_logging_function(msg, *_):
-            observed_log_messages.append(msg)
-
         ca_item_selection_specs = (
             interaction_registry.Registry.get_interaction_by_id(
                 'ItemSelectionInput').customization_arg_specs
@@ -209,24 +204,18 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.swap(logging, 'warning', mock_logging_function):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            (
+                'Interaction ItemSelectionInput does not support '
+                'customization arg extraArg.'
+            )
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'ItemSelectionInput',
                 complete_customization_args_with_extra_arg,
                 ca_item_selection_specs
-            )
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                (
-                    'Interaction ItemSelectionInput does not support '
-                    'customization arg extraArg.'
-                )
-            )
-            self.assertEqual(
-                expected_customization_args_after_validation,
-                complete_customization_args_with_extra_arg
             )
 
         # Check if no error is produced when arg type is not valid.
@@ -323,24 +312,18 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.swap(logging, 'warning', mock_logging_function):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            (
+                'Interaction FractionInput does not support customization '
+                'arg extraArg.'
+            )
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
                 complete_customization_args_with_extra_arg,
                 ca_fraction_input_specs
-            )
-            self.assertEqual(len(observed_log_messages), 2)
-            self.assertEqual(
-                observed_log_messages[1],
-                (
-                    'Interaction FractionInput does not support customization '
-                    'arg extraArg.'
-                )
-            )
-            self.assertEqual(
-                complete_customization_args_with_extra_arg,
-                expected_customization_args_after_validation
             )
 
         # Check if no error is produced when arg type is not valid.

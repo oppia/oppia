@@ -54,18 +54,20 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(DraftUpgradeUnitTests, self).setUp()
         self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+        self.exploration_dict = (
+            exp_fetchers.get_exploration_by_id(self.EXP_ID).to_dict())
 
     def test_try_upgrade_with_no_version_difference(self):
         self.assertIsNone(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID))
+                self.DRAFT_CHANGELIST, 1, 1, self.exploration_dict))
 
     def test_try_upgrade_raises_exception_if_versions_are_invalid(self):
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
             'Current draft version is greater than the exploration version.'):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                self.DRAFT_CHANGELIST, 2, 1, self.EXP_ID)
+                self.DRAFT_CHANGELIST, 2, 1, self.exploration_dict)
 
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
@@ -74,7 +76,8 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
+                self.DRAFT_CHANGELIST, 1, exploration.version,
+                self.exploration_dict))
 
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self):
         exp_services.update_exploration(
@@ -84,7 +87,8 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
+                self.DRAFT_CHANGELIST, 1, exploration.version,
+                self.exploration_dict))
 
     def test_try_upgrade_failure_due_to_unimplemented_upgrade_methods(self):
         exp_services.update_exploration(
@@ -94,7 +98,8 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
+                self.DRAFT_CHANGELIST, 1, exploration.version,
+                self.exploration_dict))
 
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
@@ -125,6 +130,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 exploration (eg. '29').
             target_schema_version: string. The schema version to upgrade
                 the exploration to (eg. '30').
+
+        Returns:
+            dict. Exploration dict of the created exploration.
         """
 
         # Create an exploration change list with the command that will migrate
@@ -160,6 +168,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     exploration.states_schema_version),
                 target_schema_version)
 
+        return exploration.to_dict()
+
     def test_convert_to_latest_schema_version_implemented(self):
         state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
@@ -174,12 +184,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         draft_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state2',
+                'state_name': 'Introduction',
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state2',
+                'state_name': 'Introduction',
                 'property_name': 'widget_customization_args',
                 'new_value': {
                     'choices': {
@@ -193,10 +203,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        self.create_and_migrate_new_exploration('34', '35')
+        exploration_dict = self.create_and_migrate_new_exploration('34', '35')
         migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list, 1, 2, self.EXP_ID))
+                draft_change_list, 1, 2, exploration_dict))
         
         self.assertEqual(len(migrated_draft_change_list), 3)
 
@@ -204,7 +214,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state2',
+                'state_name': 'Introduction',
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             }).to_dict())
@@ -213,13 +223,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list[1].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state2',
+                'state_name': 'Introduction',
                 'property_name': 'widget_customization_args',
                 'new_value': {
                     'choices': {
                         'value': [
-                            {'content_id': 'ca_choices_0', 'html': '<p>1</p>'},
-                            {'content_id': 'ca_choices_1', 'html': '<p>2</p>'}
+                            {'content_id': 'ca_choices_1', 'html': '<p>1</p>'},
+                            {'content_id': 'ca_choices_2', 'html': '<p>2</p>'}
                         ]
                     },
                     'showChoicesInShuffledOrder': {'value': True}
@@ -230,9 +240,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list[2].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state2',
+                'state_name': 'Introduction',
                 'property_name': 'next_content_id_index',
-                'new_value': 2
+                'new_value': 3
             }).to_dict())
     
 
@@ -433,10 +443,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        self.create_and_migrate_new_exploration('33', '34')
+        exploration_dict = self.create_and_migrate_new_exploration('33', '34')
         migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list, 1, 2, self.EXP_ID))
+                draft_change_list, 1, 2, exploration_dict))
         self.assertEqual(
             migrated_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({
@@ -727,12 +737,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
         # Migrate exploration to state schema version 33.
-        self.create_and_migrate_new_exploration('32', '33')
+        exploration_dict = self.create_and_migrate_new_exploration('32', '33')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema.
         migrated_draft_change_list_v33 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v32, 1, 2, self.EXP_ID)
+                draft_change_list_v32, 1, 2, exploration_dict)
         )
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
@@ -756,7 +766,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
         # Migrate exploration to state schema version 32.
-        self.create_and_migrate_new_exploration('31', '32')
+        exploration_dict = self.create_and_migrate_new_exploration('31', '32')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema. In this case there are no changes to the
         # draft change list since version 32 adds a customization arg
@@ -764,7 +774,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # exploration, for which there should be no changes to drafts.
         migrated_draft_change_list_v32 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v31, 1, 2, self.EXP_ID)
+                draft_change_list_v31, 1, 2, exploration_dict)
         )
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
@@ -818,12 +828,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
         # Migrate exploration to state schema version 31.
-        self.create_and_migrate_new_exploration('30', '31')
+        exploration_dict = self.create_and_migrate_new_exploration('30', '31')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema.
         migrated_draft_change_list_v31 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v30, 1, 2, self.EXP_ID)
+                draft_change_list_v30, 1, 2, exploration_dict)
         )
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
@@ -907,12 +917,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
         # Migrate exploration to state schema version 30.
-        self.create_and_migrate_new_exploration('29', '30')
+        exploration_dict = self.create_and_migrate_new_exploration('29', '30')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema.
         migrated_draft_change_list_v30 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v29, 1, 2, self.EXP_ID)
+                draft_change_list_v29, 1, 2, exploration_dict)
         )
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
@@ -936,7 +946,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
         # Migrate exploration to state schema version 29.
-        self.create_and_migrate_new_exploration('28', '29')
+        exploration_dict = self.create_and_migrate_new_exploration('28', '29')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema. In this case there are no change to the
         # draft change list since version 29 adds the
@@ -944,7 +954,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # state, for which there should be no changes to drafts.
         migrated_draft_change_list_v29 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v28, 1, 2, self.EXP_ID)
+                draft_change_list_v28, 1, 2, exploration_dict)
         )
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
@@ -977,12 +987,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
         # Migrate exploration to state schema version 28.
-        self.create_and_migrate_new_exploration('27', '28')
+        exploration_dict = self.create_and_migrate_new_exploration('27', '28')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema.
         migrated_draft_change_list_v28 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v27, 1, 2, self.EXP_ID)
+                draft_change_list_v27, 1, 2, exploration_dict)
         )
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
