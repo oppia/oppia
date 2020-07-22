@@ -73,7 +73,7 @@ def open_access(handler):
 
 
 def can_play_exploration(handler):
-    """Decorator to check whether a user can play given exploration.
+    """Decorator to check whether user can play given exploration.
 
     Args:
         handler: function. The function to be decorated.
