@@ -468,8 +468,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertFalse(
+            wipeout_service.verify_user_deleted(
+                wipeout_service.get_pending_deletion_request(self.user_2_id)))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
@@ -761,8 +762,9 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(
+            wipeout_service.verify_user_deleted(
+                wipeout_service.get_pending_deletion_request(self.user_1_id)))
 
     def test_verification_is_unsuccessful_when_deletion_failed(self):
         wipeout_service.delete_user(
@@ -779,10 +781,12 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
             'Add node.'
         )
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertFalse(
+            wipeout_service.verify_user_deleted(
+                wipeout_service.get_pending_deletion_request(self.user_2_id)))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(
+            wipeout_service.verify_user_deleted(
+                wipeout_service.get_pending_deletion_request(self.user_2_id)))

@@ -165,10 +165,11 @@ def verify_user_deleted(pending_deletion_request):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    return all((
-        _verify_user_models_deleted(pending_deletion_request.user_id),
-        _verify_story_models_pseudonymized(pending_deletion_request.user_id)
-    ))
+    return all(
+        (
+            _verify_user_models_deleted(pending_deletion_request.user_id),
+            _verify_story_models_pseudonymized(pending_deletion_request.user_id)
+        ))
 
 
 def _delete_user_models(user_id):
@@ -324,8 +325,10 @@ def _verify_story_models_pseudonymized(user_id):
         bool. True if all the story models were correctly pseudonymized, False
         otherwise.
     """
-    return not any((
-        story_models.StoryModel.has_reference_to_user_id(user_id),
-        story_models.StoryCommitLogEntryModel.has_reference_to_user_id(user_id),
-        story_models.StorySummaryModel.has_reference_to_user_id(user_id),
-    ))
+    return not any(
+        (
+            story_models.StoryModel.has_reference_to_user_id(user_id),
+            story_models.StoryCommitLogEntryModel.has_reference_to_user_id(
+                user_id),
+            story_models.StorySummaryModel.has_reference_to_user_id(user_id),
+        ))
