@@ -32,16 +32,62 @@ from core.platform import models
     models.NAMES.topic, models.NAMES.question
 ])
 
+class SnapshotMetadataCommitMsgAuditOneOffJob(
+    jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits the commit_message field of the
+    BaseSnapshotMetadataModels to determine frequency of string sizes.
+    """
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(SnapshotMetadataCommitMsgAuditOneOffJob, cls).enqueue(
+            job_id, shard_count=8)
+    
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            config_models.ConfigPropertySnapshotMetadataModel,
+            collection_models.CollectionRightsSnapshotMetadataModel,
+            collection_models.CollectionSnapshotMetadataModel,
+            exploration_models.ExplorationRightsSnapshotMetadataModel,
+            exploration_models.ExplorationSnapshotMetadataModel,
+            skill_models.SkillSnapshotMetadataModel,
+            story_models.StorySnapshotMetadataModel,
+            topic_models.SubtopicPageSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotMetadataModel,
+            topic_models.TopicSnapshotMetadataModel,
+            question_models.QuestionSnapshotMetadataModel,
+        ]
 
-class SnapshotMetadataCommitMsgOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that indexes the commit_msg field of the
+    @staticmethod
+    def map(item):
+        model_name = item.__class__.__name__
+        model_id = item.id
+        identifier_message = '%s with id %s' % (model_name, model_id)
+        if len(item.commit_message) < 1200:
+            yield ('LESS_THAN_1200', identifier_message)
+        elif len(item.commit_message) <= 1500:
+            yield ('BETWEEN_1200_AND_1500', identifier_message)
+        else:
+            yield ('GREATER_THAN_1500', identifier_message)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'LESS_THAN_1200':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class SnapshotMetadataCommitMsgMigrationOneOffJob(
+    jobs.BaseMapReduceOneOffJobManager):
+    """Job that indexes the commit_message field of the
     BaseSnapshotMetadataModels.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(SnapshotMetadataCommitMsgOneOffJob, cls).enqueue(
-            job_id, shard_count=64)
+        super(SnapshotMetadataCommitMsgMigrationOneOffJob, cls).enqueue(
+            job_id, shard_count=8)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -61,20 +107,13 @@ class SnapshotMetadataCommitMsgOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        item.put(update_last_updated_time=False)
-        model_name = item.__class__.__name__
-        model_id = item.id
-        identifier_message = '%s with id %s' % (model_name, model_id)
-        if len(item.commit_message) < 1200:
-            yield ('LESS_THAN_1200', identifier_message)
-        elif len(item.commit_message) <= 1500:
-            yield ('BETWEEN_1200_AND_1500', identifier_message)
+        try:
+            item.put(update_last_updated_time=False)
+        except Exception as e:
+            yield ('FAILURE' + e.strerror, 1)
         else:
-            yield ('GREATER_THAN_1500', identifier_message)
+            yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):
-        if key == 'LESS_THAN_1200':
-            yield (key, len(values))
-        else:
-            yield (key, values)
+        yield (key, len(values))

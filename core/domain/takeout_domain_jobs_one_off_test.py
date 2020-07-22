@@ -32,17 +32,18 @@ from google.appengine.ext import ndb
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
+class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
+    test_utils.GenericTestBase):
     """Tests for the one-off commit message indexing job."""
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
             takeout_domain_jobs_one_off
-            .SnapshotMetadataCommitMsgOneOffJob.create_new())
+            .SnapshotMetadataCommitMsgMigrationOneOffJob.create_new())
         (
             takeout_domain_jobs_one_off
-            .SnapshotMetadataCommitMsgOneOffJob.enqueue(job_id))
+            .SnapshotMetadataCommitMsgMigrationOneOffJob.enqueue(job_id))
 
         self.assertEqual(
             self.count_jobs_in_taskqueue(
@@ -85,12 +86,7 @@ class SnapshotMetadataCommitMsgOneOffJobTests(test_utils.GenericTestBase):
         model_class(
             id='model_id-1', committer_id='committer_id', commit_type='create',
             commit_message='test1').put()
-        model_class(
-            id='model_id-2', committer_id='committer_id2', commit_type='create',
-            commit_message='a' * 1201).put()
-        model_class(
-            id='model_id-3', committer_id='committer_id3', commit_type='create',
-            commit_message='a' * 1501).put()
+
         # Ensure the model is created.
         queried_models = model_class.query(
             model_class.committer_id == 'committer_id'

@@ -1619,7 +1619,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             add_url,
             {
                 'version': exploration.version,
-                'commit_message': 'a' * 1001,
+                'commit_message':
+                    'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1),
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
