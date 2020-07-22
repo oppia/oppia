@@ -36,7 +36,7 @@ angular.module('oppia').directive('loginRequiredMessage', [
         '$rootScope', '$scope', '$window', 'SiteAnalyticsService',
         'UserBackendApiService',
         function($rootScope, $scope, $window, SiteAnalyticsService,
-          UserBackendApiService) {
+            UserBackendApiService) {
           var ctrl = this;
           ctrl.onLoginButtonClicked = function() {
             UserBackendApiService.getLoginUrlAsync().then(

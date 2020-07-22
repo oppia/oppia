@@ -38,84 +38,84 @@ angular.module('oppia').directive('adminNavbar', [
         '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', 'UserBackendApiService',
-      function($rootScope, UserBackendApiService) {
-        var ctrl = this;
-        ctrl.showTab = function() {
-          return AdminRouterService.showTab();
-        };
-        ctrl.isActivitiesTabOpen = function() {
-          return AdminRouterService.isActivitiesTabOpen();
-        };
-        ctrl.isJobsTabOpen = function() {
-          return AdminRouterService.isJobsTabOpen();
-        };
-        ctrl.isConfigTabOpen = function() {
-          return AdminRouterService.isConfigTabOpen();
-        };
-        ctrl.isRolesTabOpen = function() {
-          return AdminRouterService.isRolesTabOpen();
-        };
-        ctrl.isMiscTabOpen = function() {
-          return AdminRouterService.isMiscTabOpen();
-        };
-        ctrl.onMouseoverProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().addClass('open');
-          ctrl.profileDropdownIsActive = true;
-        };
+        function($rootScope, UserBackendApiService) {
+          var ctrl = this;
+          ctrl.showTab = function() {
+            return AdminRouterService.showTab();
+          };
+          ctrl.isActivitiesTabOpen = function() {
+            return AdminRouterService.isActivitiesTabOpen();
+          };
+          ctrl.isJobsTabOpen = function() {
+            return AdminRouterService.isJobsTabOpen();
+          };
+          ctrl.isConfigTabOpen = function() {
+            return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isRolesTabOpen = function() {
+            return AdminRouterService.isRolesTabOpen();
+          };
+          ctrl.isMiscTabOpen = function() {
+            return AdminRouterService.isMiscTabOpen();
+          };
+          ctrl.onMouseoverProfilePictureOrDropdown = function(evt) {
+            angular.element(evt.currentTarget).parent().addClass('open');
+            ctrl.profileDropdownIsActive = true;
+          };
 
-        ctrl.onMouseoutProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().removeClass('open');
-          ctrl.profileDropdownIsActive = false;
-        };
-        ctrl.onMouseoverDropdownIconOrMenu = function(evt) {
-          angular.element(evt.currentTarget).parent().addClass('open');
-          ctrl.dropdownMenuisActive = true;
-        };
+          ctrl.onMouseoutProfilePictureOrDropdown = function(evt) {
+            angular.element(evt.currentTarget).parent().removeClass('open');
+            ctrl.profileDropdownIsActive = false;
+          };
+          ctrl.onMouseoverDropdownIconOrMenu = function(evt) {
+            angular.element(evt.currentTarget).parent().addClass('open');
+            ctrl.dropdownMenuisActive = true;
+          };
 
-        ctrl.onMouseoutDropdownIconOrMenu = function(evt) {
-          angular.element(evt.currentTarget).parent().removeClass('open');
-          ctrl.dropdownMenuisActive = false;
-        };
+          ctrl.onMouseoutDropdownIconOrMenu = function(evt) {
+            angular.element(evt.currentTarget).parent().removeClass('open');
+            ctrl.dropdownMenuisActive = false;
+          };
 
-        ctrl.$onInit = function() {
-          ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-          UserBackendApiService.getProfileImageDataUrlAsync().then(
-            function(dataUrl) {
-              ctrl.profilePictureDataUrl = dataUrl;
+          ctrl.$onInit = function() {
+            ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
+            UserBackendApiService.getProfileImageDataUrlAsync().then(
+              function(dataUrl) {
+                ctrl.profilePictureDataUrl = dataUrl;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$apply();
+              });
+
+            ctrl.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
+
+            ctrl.username = '';
+            ctrl.isModerator = null;
+            ctrl.isSuperAdmin = null;
+            ctrl.profileUrl = '';
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.username = userInfo.getUsername();
+              ctrl.isModerator = userInfo.isModerator();
+              ctrl.isSuperAdmin = userInfo.isSuperAdmin();
+
+              ctrl.profileUrl = (
+                UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
+                  username: ctrl.username
+                })
+              );
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
               $rootScope.$apply();
             });
 
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
+            ctrl.logoutUrl = LOGOUT_URL;
+
+            ctrl.profileDropdownIsActive = false;
+            ctrl.dropdownMenuisActive = false;
           };
-
-          ctrl.username = '';
-          ctrl.isModerator = null;
-          ctrl.isSuperAdmin = null;
-          ctrl.profileUrl = '';
-          UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
-            ctrl.isModerator = userInfo.isModerator();
-            ctrl.isSuperAdmin = userInfo.isSuperAdmin();
-
-            ctrl.profileUrl = (
-              UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
-                username: ctrl.username
-              })
-            );
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$apply();
-          });
-
-          ctrl.logoutUrl = LOGOUT_URL;
-
-          ctrl.profileDropdownIsActive = false;
-          ctrl.dropdownMenuisActive = false;
-        };
-      }]
+        }]
     };
   }
 ]);
