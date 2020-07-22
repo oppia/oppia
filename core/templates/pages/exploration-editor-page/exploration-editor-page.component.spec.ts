@@ -731,6 +731,7 @@ describe('Exploration editor page component', function() {
 
       ctrl.$onInit();
       flushMicrotasks();
+      $scope.$apply();
 
       expect(ctrl.isImprovementsTabEnabled).toBeFalse();
     }));
@@ -741,6 +742,7 @@ describe('Exploration editor page component', function() {
 
       ctrl.$onInit();
       flushMicrotasks();
+      $scope.$apply();
 
       expect(ctrl.isImprovementsTabEnabled).toBeTrue();
     }));

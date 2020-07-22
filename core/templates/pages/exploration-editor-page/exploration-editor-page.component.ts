@@ -604,7 +604,9 @@ angular.module('oppia').component('explorationEditorPage', {
         // Confirm whether the improvements tab can be rendered.
         ctrl.isImprovementsTabEnabled = false;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
-          .then(isEnabled => ctrl.isImprovementsTabEnabled = isEnabled);
+          .then(improvementsTabIsEnabled => {
+            ctrl.isImprovementsTabEnabled = improvementsTabIsEnabled;
+          });
 
         // Replace the ng-joyride template with one that uses <[...]>
         // interpolators instead of/ {{...}} interpolators.
