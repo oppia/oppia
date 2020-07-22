@@ -2385,7 +2385,7 @@ class GenericEmailTestBase(GenericTestBase):
                     latest/user_manual.html#batch-sending
 
         Returns:
-            bool. Whether the emails are sent succesfully.
+            bool. Whether the emails are sent successfully.
         """
         bcc_emails = None
 
