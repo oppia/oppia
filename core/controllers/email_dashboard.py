@@ -214,6 +214,7 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
 
 class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
     """Handler for testing bulk email before sending it.
+
     This handler sends a test email to submitter of query before it is sent to
     qualfied users in bulk.
     """
