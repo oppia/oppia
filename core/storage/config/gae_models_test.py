@@ -71,8 +71,13 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model = config_models.PlatformParameterModel.create(
             param_name='parameter_name',
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
         )
         self.assertEqual(param_model.id, 'parameter_name')
+        self.assertEqual(
+            param_model.rule_schema_version,
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION)
         self.assertEqual(
             param_model.rules,
             [{'filters': [], 'value_when_matched': False}])
@@ -84,6 +89,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
             rule_dicts=rule_dicts,
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
@@ -117,6 +124,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
             rule_dicts=rule_dicts,
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
@@ -132,6 +141,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
             rule_dicts=rule_dicts,
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
         )
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 

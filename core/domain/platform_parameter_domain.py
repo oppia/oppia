@@ -23,6 +23,7 @@ import re
 
 from core.domain import change_domain
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -36,12 +37,12 @@ class PlatformParameterChange(change_domain.BaseChange):
     """Domain object for changes made to a platform parameter object.
 
     The allowed commands, together with the attributes:
-        - 'replace_parameter_rules' (with new_rules)
+        - 'edit_rules' (with new_rules)
     """
 
-    CMD_REPLACE_PARAMETER_RULES = 'edit_rules'
+    CMD_EDIT_RULES = 'edit_rules'
     ALLOWED_COMMANDS = [{
-        'name': CMD_REPLACE_PARAMETER_RULES,
+        'name': CMD_EDIT_RULES,
         'required_attribute_names': ['new_rules'],
         'optional_attribute_names': []
     }]
@@ -128,12 +129,12 @@ class EvaluationContext(python_utils.OBJECT):
             object.
         """
         return cls(
-            client_platform=client_context_dict['client_platform'],
-            client_type=client_context_dict['client_type'],
-            browser_type=client_context_dict['browser_type'],
-            app_version=client_context_dict['app_version'],
-            user_locale=client_context_dict['user_locale'],
-            mode=server_context_dict['mode'],
+            client_platform=client_context_dict.get('client_platform'),
+            client_type=client_context_dict.get('client_type'),
+            browser_type=client_context_dict.get('browser_type'),
+            app_version=client_context_dict.get('app_version'),
+            user_locale=client_context_dict.get('user_locale'),
+            mode=server_context_dict.get('mode'),
         )
 
 
@@ -337,7 +338,7 @@ class PlatformParameterRule(python_utils.OBJECT):
         """Returns the filters of the rule.
 
         Returns:
-            list(PlatformParameterFilter). the filters of the rule.
+            list(PlatformParameterFilter). The filters of the rule.
         """
         return self._filters
 
@@ -402,17 +403,26 @@ class PlatformParameterRule(python_utils.OBJECT):
             filter_domain_object.validate()
 
     @classmethod
-    def create_from_dict(cls, rule_dict):
+    def create_from_dict(cls, rule_dict, schema_version):
         """Returns an PlatformParameterRule object from a dict.
 
         Args:
             rule_dict: dict. A dict mapping of all fields of
                 PlatformParameterRule object.
+            schema_version: int. The schema version for the rule dict.
 
         Returns:
             PlatformParameterRule. The corresponding PlatformParameterRule
             domain object.
         """
+        if (schema_version !=
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION):
+            raise Exception(
+                'Expected platform parameter rule schema version to be %s, '
+                'received %s.' % (
+                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                    schema_version))
+
         return cls(
             filters=[
                 PlatformParameterFilter.create_from_dict(filter_dict)
@@ -444,7 +454,7 @@ class PlatformParameterMetadata(python_utils.OBJECT):
         """Returns the stage of the feature flag.
 
         Returns:
-            str. the stage of the feature flag.
+            str. The stage of the feature flag.
         """
         return self._stage
 
@@ -492,11 +502,22 @@ class PlatformParameter(python_utils.OBJECT):
 
     ALLOWED_FEATURE_STAGE = ['dev', 'test', 'prod']
 
-    def __init__(self, name, description, data_type, rules, metadata):
+    PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
+
+    def __init__(
+            self, name, description, data_type, rules,
+            rule_schema_version, metadata):
+        if re.match(self.PARAMETER_NAME_REGEXP, name) is None:
+            raise Exception(
+                'Invalid parameter name, expected to match regexp %s, '
+                'got %s.' % (
+                    self.PARAMETER_NAME_REGEXP, name))
+
         self._name = name
         self._description = description
         self._data_type = data_type
         self._rules = rules
+        self._rule_schema_version = rule_schema_version
         self._metadata = metadata
 
     @property
@@ -504,7 +525,7 @@ class PlatformParameter(python_utils.OBJECT):
         """Returns the name of the platform parameter.
 
         Returns:
-            str. the name of the platform parameter.
+            str. The name of the platform parameter.
         """
         return self._name
 
@@ -513,7 +534,7 @@ class PlatformParameter(python_utils.OBJECT):
         """Returns the description of the platform parameter.
 
         Returns:
-            str. the description of the platform parameter.
+            str. The description of the platform parameter.
         """
         return self._description
 
@@ -522,7 +543,7 @@ class PlatformParameter(python_utils.OBJECT):
         """Returns the data type of the platform parameter.
 
         Returns:
-            str. the data type of the platform parameter.
+            str. The data type of the platform parameter.
         """
         return self._data_type
 
@@ -531,16 +552,25 @@ class PlatformParameter(python_utils.OBJECT):
         """Returns the rules of the platform parameter.
 
         Returns:
-            list(PlatformParameterRules). the rules of the platform parameter.
+            list(PlatformParameterRules). The rules of the platform parameter.
         """
         return self._rules
+
+    @property
+    def rule_schema_version(self):
+        """Returns the schema version of the rules.
+
+        Returns:
+            int. The schema version of the rules.
+        """
+        return self._rule_schema_version
 
     @property
     def metadata(self):
         """Returns the metadata of the platform parameter.
 
         Returns:
-            PlatformParameterMetadata. the metadata of the platform parameter.
+            PlatformParameterMetadata. The metadata of the platform parameter.
         """
         return self._metadata
 
@@ -555,8 +585,16 @@ class PlatformParameter(python_utils.OBJECT):
                 PlatformParameterRule instances.
 
         Returns:
-            PlatformParameter. the instance with updated rules.
+            PlatformParameter. The instance with updated rules.
         """
+        # Create a temporary param instance with new rules for validation,
+        # if the new rules are invalid, an exception will be raised in
+        # validate() method.
+        param_dict = self.to_dict()
+        param_dict['rules'] = new_rule_dicts
+        updated_param = self.create_from_dict(param_dict)
+        updated_param.validate()
+
         # Set value in datastore.
         model_instance = config_models.PlatformParameterModel.get(
             self._name, strict=False)
@@ -564,19 +602,15 @@ class PlatformParameter(python_utils.OBJECT):
             model_instance = config_models.PlatformParameterModel.create(
                 param_name=self._name,
                 rule_dicts=[rule.to_dict() for rule in self._rules],
+                rule_schema_version=(
+                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION)
             )
 
-        updated_para = self.create_from_dict({
-            'name': self._name,
-            'description': self._description,
-            'data_type': self._data_type,
-            'rules': new_rule_dicts,
-            'metadata': self._metadata.to_dict(),
-        })
-        updated_para.validate()
-
         self._rules = [
-            PlatformParameterRule.create_from_dict(rule_dict)
+            PlatformParameterRule.create_from_dict(
+                rule_dict=rule_dict,
+                schema_version=self._rule_schema_version,
+            )
             for rule_dict in new_rule_dicts]
         model_instance.rules = [rule.to_dict() for rule in self._rules]
 
@@ -584,7 +618,7 @@ class PlatformParameter(python_utils.OBJECT):
             committer_id,
             commit_message,
             [{
-                'cmd': PlatformParameterChange.CMD_REPLACE_PARAMETER_RULES,
+                'cmd': PlatformParameterChange.CMD_EDIT_RULES,
                 'new_rules': new_rule_dicts
             }]
         )
@@ -638,6 +672,7 @@ class PlatformParameter(python_utils.OBJECT):
             'description': self._description,
             'data_type': self._data_type,
             'rules': [rule.to_dict() for rule in self._rules],
+            'rule_schema_version': self._rule_schema_version,
             'metadata': self._metadata.to_dict()
         }
 
@@ -679,11 +714,11 @@ class PlatformParameter(python_utils.OBJECT):
                             'production environment.')
 
     @classmethod
-    def create_from_dict(cls, para_dict):
+    def create_from_dict(cls, param_dict):
         """Returns an PlatformParameter object from a dict.
 
         Args:
-            para_dict: dict. A dict mapping of all fields of
+            param_dict: dict. A dict mapping of all fields of
                 PlatformParameter object.
 
         Returns:
@@ -691,14 +726,16 @@ class PlatformParameter(python_utils.OBJECT):
             object.
         """
         return cls(
-            name=para_dict['name'],
-            description=para_dict['description'],
-            data_type=para_dict['data_type'],
+            name=param_dict['name'],
+            description=param_dict['description'],
+            data_type=param_dict['data_type'],
             rules=[
-                PlatformParameterRule.create_from_dict(rule_dict)
-                for rule_dict in para_dict['rules']],
+                PlatformParameterRule.create_from_dict(
+                    rule_dict, param_dict['rule_schema_version'])
+                for rule_dict in param_dict['rules']],
+            rule_schema_version=param_dict['rule_schema_version'],
             metadata=PlatformParameterMetadata.create_from_dict(
-                para_dict.get('metadata', {})),
+                param_dict.get('metadata', {})),
         )
 
     @staticmethod
@@ -764,10 +801,12 @@ class Registry(python_utils.OBJECT):
                     'value_when_matched': default,
                 }
             ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'metadata': {
                 'is_feature': is_feature,
                 'stage': feature_stage,
-            }
+            },
         }
         parameter = cls.create_platform_parameter_from_dict(parameter_dict)
         return parameter
@@ -900,6 +939,7 @@ class Registry(python_utils.OBJECT):
                 'description': parameter_with_init_settings.description,
                 'data_type': parameter_with_init_settings.data_type,
                 'rules': parameter_model.rules,
+                'rule_schema_version': parameter_model.rule_schema_version,
                 'metadata': parameter_with_init_settings.metadata.to_dict(),
             })
         else:

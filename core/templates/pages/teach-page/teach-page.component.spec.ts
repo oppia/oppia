@@ -15,112 +15,184 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-import { WindowRef } from 'services/contextual/window-ref.service';
 
-require('pages/teach-page/teach-page.component.ts');
+import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
+import { ComponentFixture, TestBed, async, fakeAsync, tick } from
+  '@angular/core/testing';
+
+import { TeachPageComponent } from './teach-page.component';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { TranslateService } from 'services/translate.service';
+
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
+
+class MockTranslateService {
+  languageCode = 'es';
+  use(newLanguageCode: string): string {
+    this.languageCode = newLanguageCode;
+    return this.languageCode;
+  }
+}
+
+class MockI18nLanguageCodeService {
+  codeChangeEventEmiiter = new EventEmitter<string>();
+  getCurrentI18nLanguageCode() {
+    return 'en';
+  }
+
+  get onI18nLanguageCodeChange() {
+    return this.codeChangeEventEmiiter;
+  }
+}
+
+// Mocking window object here because changing location.href causes the
+// full page to reload. Page reloads raise an error in karma.
+class MockWindowRef {
+  _window = {
+    location: {
+      _hash: '',
+      _hashChange: null,
+      _href: '',
+      get hash() {
+        return this._hash;
+      },
+      set hash(val) {
+        this._hash = val;
+        if (this._hashChange === null) {
+          return;
+        }
+        this._hashChange();
+      },
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      reload: (val) => val
+    },
+    get onhashchange() {
+      return this.location._hashChange;
+    },
+
+    set onhashchange(val) {
+      this.location._hashChange = val;
+    }
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
+class MockSiteAnalyticsService {
+  registerApplyToTeachWithOppiaEvent(): void {
+    return;
+  }
+}
+
+let component: TeachPageComponent;
+let fixture: ComponentFixture<TeachPageComponent>;
 
 describe('Teach Page', function() {
-  var $scope = null, ctrl = null;
-  var $timeout = null;
-  var SiteAnalyticsService = null;
-  var windowRef = new WindowRef();
+  let windowRef: MockWindowRef;
+  let siteAnalyticsService = null;
+  let i18n = null;
+  let translate = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRef);
+  beforeEach(async(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      declarations: [TeachPageComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
+        { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
+        { provide: TranslateService, useClass: MockTranslateService },
+        UrlInterpolationService,
+        { provide: WindowRef, useValue: windowRef }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    i18n = TestBed.get(I18nLanguageCodeService);
+    translate = TestBed.get(TranslateService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
   }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $timeout = $injector.get('$timeout');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    ctrl = $componentController('teachPage', {
-      $rootScope: $scope
-    });
-  }));
-
-  afterEach(function() {
-    // Property onhashchange and location.hash are reassigned because it shares
-    // same memory reference to all test blocks and the controller itself
-    // because $provide.value of WindowRef refers to windowRef as well.
-    // Once location.hash or onhashchange is setted in the controller,
-    // the value will be only available in the test block itself, not affecting
-    // others test block.
-    windowRef.nativeWindow.onhashchange = null;
-    windowRef.nativeWindow.location.hash = '';
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TeachPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should click on teach tab', function(done) {
-    ctrl.$onInit();
-    expect(ctrl.activeTabName).toBe('teach');
+  it('should click on teach tab', () => {
+    component.ngOnInit();
+    expect(component.activeTabName).toBe('teach');
 
-    ctrl.onTabClick('teach');
-
-    // Function setTimeout is being used here in order to wait onhashchange
-    // event to finish. setTimeout is executed only after call stack is empty.
-    // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
-    setTimeout(function() {
-      expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-      expect(ctrl.activeTabName).toBe('teach');
-      done();
-    });
-  });
-
-  it('should click on participation tab', function(done) {
-    ctrl.$onInit();
-    expect(ctrl.activeTabName).toBe('teach');
-
-    ctrl.onTabClick('participation');
-
-    // Function setTimeout is being used here in order to wait onhashchange
-    // event to finish. setTimeout is executed only after call stack is empty.
-    // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
-    setTimeout(function() {
-      expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-      expect(ctrl.activeTabName).toBe('participation');
-      done();
-    });
-  });
-
-  it('should activate teach tab on init', function() {
-    windowRef.nativeWindow.location.hash = '#teach';
-
-    ctrl.$onInit();
+    component.onTabClick('teach');
 
     expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(ctrl.activeTabName).toBe('teach');
+    expect(component.activeTabName).toBe('teach');
   });
 
-  it('should activate participation tab on init', function() {
+  it('should click on participation tab', (() => {
+    component.ngOnInit();
+    expect(component.activeTabName).toBe('teach');
+
+    component.onTabClick('participation');
+    expect(windowRef.nativeWindow.location.hash).toBe('#participation');
+    expect(component.activeTabName).toBe('participation');
+  }));
+
+  it('should activate teach tab on init', () => {
+    windowRef.nativeWindow.location.hash = '#teach';
+
+    component.ngOnInit();
+
+    expect(windowRef.nativeWindow.location.hash).toBe('#teach');
+    expect(component.activeTabName).toBe('teach');
+  });
+
+  it('should activate participation tab on init', () => {
     windowRef.nativeWindow.location.hash = '#participation';
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
     expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-    expect(ctrl.activeTabName).toBe('participation');
+    expect(component.activeTabName).toBe('participation');
   });
 
-  it('should get static image url', function() {
-    expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(
+  it('should get static image url', () => {
+    expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should apply to teach with oppia', function() {
-    var applyToTeachWithOppiaEventSpy = spyOn(
-      SiteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
+  it('should apply to teach with oppia', fakeAsync(() => {
+    const applyToTeachWithOppiaEventSpy = spyOn(
+      siteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
       .and.callThrough();
 
-    ctrl.$onInit();
+    component.ngOnInit();
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
+      location: {
+        href: ''
+      }
     });
-    ctrl.onApplyToTeachWithOppia('/login');
-    $timeout.flush(150);
-
-    expect(windowRef.nativeWindow.location).toBe(
+    component.onApplyToTeachWithOppia();
+    tick(150);
+    fixture.detectChanges();
+    expect(windowRef.nativeWindow.location.href).toBe(
       'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
     expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-  });
+  }));
 });

@@ -15054,6 +15054,71 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
 
+class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(PseudonymizedUserModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        self.model_instance = (
+            user_models.PseudonymizedUserModel(
+                id=user_models.PseudonymizedUserModel.get_new_id('')))
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.PseudonymizedUserModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated PseudonymizedUserModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of PseudonymizedUserModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PseudonymizedUserModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_model_not_same_id_as_user(self):
+        user_models.UserSettingsModel(
+            id=self.model_instance.id,
+            gae_id='224169184123',
+            email='email@email.com',
+            username='username').put()
+
+        expected_output = [(
+            '[u\'failed validation check for deleted user settings of '
+            'PseudonymizedUserModel\', '
+            '[u\'Entity id %s: User settings model exists\']]'
+        ) % self.model_instance.id]
+
+        run_job_and_check_output(self, expected_output)
+
+
 class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -15065,7 +15130,9 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
             param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
-            ])
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         self.job_class = (
@@ -15150,7 +15217,9 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
             param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
-            ])
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(self.admin_id, '', [])
 
         user_models.UserSettingsModel(
@@ -15285,7 +15354,9 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             param_name='parameter_model_1',
             rule_dicts=[
                 {'filters': [], 'value_when_matched': True}
-            ])
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(self.admin_id, '', [])
 
         user_models.UserSettingsModel(

@@ -214,7 +214,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             expected_dict = {
                 'story_title': 'Title',
                 'story_description': 'Description',
-                'story_nodes': [self.node_2, self.node_1, self.node_3]
+                'story_nodes': [self.node_2, self.node_1, self.node_3],
+                'topic_name': 'Topic'
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
