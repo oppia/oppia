@@ -779,18 +779,12 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State1: x+y-z\', '
-            u'u\'exp_id0 State7: (arcsin(A)*cos(B) + cos(A)*arcsin(B))/'
-            u'(cos(A)*arccos(B) - arcsin(A)*sin(B))\', u\'exp_id0 '
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 '
+            u'State1: x+y-z\', u\'exp_id0 State7: (arcsin(A)*cos(B) + cos(A)*'
+            u'arcsin(B))/(cos(A)*arccos(B) - arcsin(A)*sin(B))\', u\'exp_id0 '
             u'State4: sqrt(x/y)\']]',
             u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', u\'exp_id0 State5: '
             u'\\xe2\\xe9\\xee\\xf4\\xfc\']]',
-            u'[u\'ERROR\', [u\'There are some invalid inputs that need to be '
-            u'resolved before running the upgrade job. Please check the '
-            u'output values of the Invalid key for more info.\', u\'There are '
-            u'some invalid inputs that need to be resolved before running the '
-            u'upgrade job. Please check the output values of the Invalid key '
-            u'for more info.\']]',
             u'[u\'MathEquationInput\', [u\'exp_id0 State2: y=m*x+c\', '
             u'u\'exp_id0 State6: (sin(theta))^2 + (cos(theta))^2 = 1\']]',
             u'[u\'NumericExpressionInput\', [u\'exp_id0 State9: '
@@ -1008,12 +1002,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
 
         expected_output = [
-            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State1: x+y-z\']]',
-            u'[u\'ERROR\', [u\'The exploration with ID: exp_id0 and state '
-            u'name: State1 contains inputs that correspond to multiple '
-            u'different types: MathEquationInput, AlgebraicExpressionInput. '
-            u'Please resolve this before running the upgrade '
-            u'job.\']]',
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 '
+            u'State1: x+y-z\']]',
             u'[u\'MathEquationInput\', [u\'exp_id0 State1: y=mx+c\']]']
 
         self.assertEqual(actual_output, expected_output)
@@ -1195,13 +1185,11 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2'])
+        exploration.add_states(['State1'])
 
         state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
 
         state1.update_interaction_id('MathExpressionInput')
-        state2.update_interaction_id('MathExpressionInput')
 
         answer_group_list1 = [{
             'rule_specs': [{
@@ -1227,31 +1215,6 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_answer_groups(answer_group_list1)
-
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x+y'}
-            }, {
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x+y=c'}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state2.update_interaction_answer_groups(answer_group_list2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         exploration_yaml_before_job_run = exploration.to_yaml()
@@ -1265,16 +1228,8 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State2: x+y\']]',
-            u'[u\'Invalid\', [u\'exp_id0 State1: x<y>z\']]', u'[u\'ERROR\', '
-            u'[u\'The exploration with ID: exp_id0 and state name: State2 '
-            u'contains inputs that correspond to multiple different types: '
-            u'MathEquationInput, AlgebraicExpressionInput. Please resolve '
-            u'this before running the upgrade job.\', u\'There are some '
-            u'invalid inputs that need to be resolved before running the '
-            u'upgrade job. Please check the output values of the Invalid key '
-            u'for more info.\']]', u'[u\'MathEquationInput\', [u\'exp_id0 '
-            u'State2: x+y=c\', u\'exp_id0 State1: x+y=c\']]']
+            u'[u\'Invalid\', [u\'exp_id0 State1: x<y>z\']]',
+            u'[u\'MathEquationInput\', [u\'exp_id0 State1: x+y=c\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -1319,16 +1274,84 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
                     'new_value': updated_answer_group_list1
                 })], 'Fixed invalid inputs.')
 
-        updated_answer_group_list2 = [{
+        job_id = (
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.create_new())
+        exp_jobs_one_off.MathExpressionUpgradeOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
+                job_id))
+
+        expected_output = [
+            u'[u\'MathEquationInput\', '
+            u'[u\'exp_id0 State1: x=y+z\', u\'exp_id0 State1: x+y=c\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
+        exploration = exp_fetchers.get_exploration_by_id('exp_id0')
+
+        self.assertEqual(
+            exploration.get_interaction_id_by_state_name('State1'),
+            'MathEquationInput')
+
+    def test_answer_groups_with_multiple_types_are_fixed(self):
+        """Checks that each answer group has only a single type of rule input.
+        If an answer group has multiple types of rule inputs, they are deleted
+        with precedence given as equations > algebraic expressions > numeric
+        expressions.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        state1.update_interaction_id('MathExpressionInput')
+        state2.update_interaction_id('MathExpressionInput')
+        state3.update_interaction_id('MathExpressionInput')
+
+        # Math Equation and Algebraic Expression.
+        answer_group_list1 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x=y'}
+                'inputs': {'x': 'x+y-z'}
             }, {
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x+y=c'}
+                'inputs': {'x': 'x+y=z'}
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Algebraic Expression and Numeric Expression.
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'm*x+c'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': '(sqrt(2.5+3))^2'}
+            }],
+            'outcome': {
+                'dest': 'State1',
                 'feedback': {
                     'content_id': 'feedback',
                     'html': '<p>Outcome for state2</p>'
@@ -1342,14 +1365,41 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
-        exp_services.update_exploration(
-            feconf.MIGRATION_BOT_USER_ID, self.VALID_EXP_ID, [
-                exp_domain.ExplorationChange({
-                    'cmd': 'edit_state_property',
-                    'state_name': 'State2',
-                    'property_name': 'answer_groups',
-                    'new_value': updated_answer_group_list2
-                })], 'Fixed invalid inputs.')
+        state2.update_interaction_answer_groups(answer_group_list2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # All 3 rule types.
+        answer_group_list3 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': '3.5+4/2'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'y=3.5+4/2'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': '3.5*x+4/2'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'y=mx+c'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state3</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state3.update_interaction_answer_groups(answer_group_list3)
+        exp_services.save_new_exploration(self.albert_id, exploration)
 
         job_id = (
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.create_new())
@@ -1360,10 +1410,16 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionUpgradeOneOffJob.get_output(
                 job_id))
 
+        # The rule input should be deleted such that each state has a single
+        # type of rule input.
         expected_output = [
-            u'[u\'MathEquationInput\', '
-            u'[u\'exp_id0 State2: x=y\', u\'exp_id0 State2: x+y=c\', '
-            u'u\'exp_id0 State1: x=y+z\', u\'exp_id0 State1: x+y=c\']]']
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 '
+            u'State2: m*x+c\', u\'exp_id0 State1: x+y-z\', u\'exp_id0 State3: '
+            u'3.5*x+4/2\']]',
+            u'[u\'MathEquationInput\', [u\'exp_id0 State1: x+y=z\', '
+            u'u\'exp_id0 State3: y=3.5+4/2\', u\'exp_id0 State3: y=mx+c\']]',
+            u'[u\'NumericExpressionInput\', [u\'exp_id0 State2: (sqrt(2.5+3))'
+            u'^2\', u\'exp_id0 State3: 3.5+4/2\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -1374,8 +1430,88 @@ class MathExpressionUpgradeOneOffJobTests(test_utils.GenericTestBase):
             'MathEquationInput')
         self.assertEqual(
             exploration.get_interaction_id_by_state_name('State2'),
+            'AlgebraicExpressionInput')
+        self.assertEqual(
+            exploration.get_interaction_id_by_state_name('State3'),
             'MathEquationInput')
 
+        expected_new_answer_group_dict1 = {
+            'rule_specs': [{
+                'rule_type': 'MatchesExactlyWith',
+                'inputs': {'x': 'x+y=z', 'y': 'both'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        actual_new_answer_group_dict_1 = (
+            exploration.states['State1'].interaction.answer_groups[0].to_dict())
+
+        self.assertEqual(
+            expected_new_answer_group_dict1, actual_new_answer_group_dict_1)
+
+        expected_new_answer_group_dict2 = {
+            'rule_specs': [{
+                'rule_type': 'MatchesExactlyWith',
+                'inputs': {'x': 'm*x+c'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        actual_new_answer_group_dict_2 = (
+            exploration.states['State2'].interaction.answer_groups[0].to_dict())
+
+        self.assertEqual(
+            expected_new_answer_group_dict2, actual_new_answer_group_dict_2)
+
+        expected_new_answer_group_dict3 = {
+            'rule_specs': [{
+                'rule_type': 'MatchesExactlyWith',
+                'inputs': {'x': 'y=3.5+4/2', 'y': 'both'}
+            }, {
+                'rule_type': 'MatchesExactlyWith',
+                'inputs': {'x': 'y=mx+c', 'y': 'both'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state3</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        actual_new_answer_group_dict_3 = (
+            exploration.states['State3'].interaction.answer_groups[0].to_dict())
+
+        self.assertEqual(
+            expected_new_answer_group_dict3, actual_new_answer_group_dict_3)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""

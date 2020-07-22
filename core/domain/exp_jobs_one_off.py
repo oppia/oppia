@@ -269,7 +269,6 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             exploration = exp_fetchers.get_exploration_from_model(item)
             for state_name, state in exploration.states.items():
                 if state.interaction.id == 'MathExpressionInput':
-                    types_of_inputs = set()
                     for group in state.interaction.answer_groups:
                         for rule_spec in group.rule_specs:
                             rule_input = ltt.latex_to_text(
@@ -285,34 +284,14 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             elif is_valid_math_equation(rule_input):
                                 type_of_input = _TYPE_VALID_MATH_EQUATION
 
-                            types_of_inputs.add(type_of_input)
-
                             output_values = '%s %s: %s' % (
                                 item.id, state_name, rule_input)
 
                             yield (type_of_input, output_values.encode('utf-8'))
 
-                    if _TYPE_INVALID_EXPRESSION in types_of_inputs:
-                        yield ('ERROR', (
-                            'There are some invalid inputs that need to be '
-                            'resolved before running the upgrade job. Please '
-                            'check the output values of the Invalid key for '
-                            'more info.'))
-                    elif len(types_of_inputs) > 1:
-                        yield ('ERROR', (
-                            'The exploration with ID: %s and state name: %s '
-                            'contains inputs that correspond to multiple '
-                            'different types: %s. Please resolve this before '
-                            'running the upgrade job.' % (
-                                item.id, state_name,
-                                ', '.join(list(types_of_inputs)))))
-
     @staticmethod
     def reduce(key, values):
-        if key in (
-                _TYPE_VALID_ALGEBRAIC_EXPRESSION,
-                _TYPE_VALID_MATH_EQUATION,
-                _TYPE_VALID_NUMERIC_EXPRESSION):
+        if key != _TYPE_INVALID_EXPRESSION:
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
@@ -378,21 +357,30 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                         new_answer_groups.append(new_answer_group.to_dict())
 
-                    if _TYPE_INVALID_EXPRESSION in types_of_inputs:
-                        yield ('ERROR', (
-                            'There are some invalid inputs that need to be '
-                            'resolved before running the upgrade job. Please '
-                            'check the output values of the Invalid key for '
-                            'more info.'))
-                    elif len(types_of_inputs) > 1:
-                        yield ('ERROR', (
-                            'The exploration with ID: %s and state name: %s '
-                            'contains inputs that correspond to multiple '
-                            'different types: %s. Please resolve this before '
-                            'running the upgrade job.' % (
-                                item.id, state_name,
-                                ', '.join(list(types_of_inputs)))))
-                    else:
+                    if _TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                        # If at least one rule input is an equation, we remove
+                        # all other rule inputs that are expressions.
+                        if _TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                            for group in new_answer_groups:
+                                new_rule_specs = []
+                                for rule_spec in group['rule_specs']:
+                                    if is_valid_math_equation(
+                                            rule_spec['inputs']['x']):
+                                        new_rule_specs.append(rule_spec)
+                                group['rule_specs'] = new_rule_specs
+                        # Otherwise, if at least one rule_input is an algebraic
+                        # expression, we remove all other rule inputs that are
+                        # numeric expressions.
+                        elif _TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                                types_of_inputs):
+                            for group in new_answer_groups:
+                                new_rule_specs = []
+                                for rule_spec in group['rule_specs']:
+                                    if is_valid_algebraic_expression(
+                                            rule_spec['inputs']['x']):
+                                        new_rule_specs.append(rule_spec)
+                                group['rule_specs'] = new_rule_specs
+
                         # This changelist is supposed to mimic this change if
                         # it were done via the frontend. Since there is no way
                         # to directly change the interaction ID of a state
@@ -426,10 +414,7 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key in (
-                _TYPE_VALID_ALGEBRAIC_EXPRESSION,
-                _TYPE_VALID_MATH_EQUATION,
-                _TYPE_VALID_NUMERIC_EXPRESSION):
+        if key != _TYPE_INVALID_EXPRESSION:
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
