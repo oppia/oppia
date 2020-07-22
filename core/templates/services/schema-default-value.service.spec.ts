@@ -124,7 +124,7 @@ describe('Schema Default Value Service', () => {
     };
     expect(
       sdvs.getDefaultValue(schema)
-    ).toEqual(new SubtitledHtml('', ''));
+    ).toEqual(new SubtitledHtml('', null));
   });
 
   it('should get default value if schema type is custom with obj_type as ' +
@@ -135,7 +135,7 @@ describe('Schema Default Value Service', () => {
     };
     expect(
       sdvs.getDefaultValue(schema)
-    ).toEqual(new SubtitledUnicode('', ''));
+    ).toEqual(new SubtitledUnicode('', null));
   });
 
   it('should get default value if schema type is custom', () => {
