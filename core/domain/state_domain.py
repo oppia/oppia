@@ -455,6 +455,10 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             dict. A dict mapping all fields of InteractionInstance instance.
         """
+
+        # customization_args_dict here indicates a dict that maps to
+        # customization argument dict, the dict representation of
+        # InteractionCustomizationArg.
         customization_args_dict = {}
         if self.id:
             for ca_name in self.customization_args:
@@ -963,11 +967,11 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         return cls(ca_value, ca_schema)
 
     def get_content_ids(self):
-        """Get all content_id's from SubtitledHtml and SubtitledUnicode in the
+        """Get all content_ids from SubtitledHtml and SubtitledUnicode in the
         customization argument.
 
         Returns:
-            list(str). A list of content_id's.
+            list(str). A list of content_ids.
         """
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
@@ -2213,7 +2217,7 @@ class State(python_utils.OBJECT):
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
             next_content_id_index: int. The next content_id index to use for
-                generation of new content_id's.
+                generation of new content_ids.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
