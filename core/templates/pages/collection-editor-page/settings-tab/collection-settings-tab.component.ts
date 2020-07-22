@@ -13,21 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the statistics tab of the collection editor.
+ * @fileoverview Controller for the settings tab of the collection editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').directive('collectionStatisticsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/statistics-tab/' +
-        'collection-statistics-tab.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+@Component({
+  selector: 'collection-settings-tab',
+  templateUrl: './collection-settings-tab.component.html',
+  styleUrls: []
+})
+export class CollectionSettingsTabComponent {
+  constructor() {}
+}
+
+angular.module('oppia').directive('collectionSettingsTab', downgradeComponent(
+  {component: CollectionSettingsTabComponent}));
