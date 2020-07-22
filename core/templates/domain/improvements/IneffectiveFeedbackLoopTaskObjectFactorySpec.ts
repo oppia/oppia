@@ -128,6 +128,7 @@ describe('Ineffective feedback loop task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
+        // @ts-ignore Suppress compile-time error for testing.
         task_type: '???',
         target_type: 'state',
         target_id: 'Introduction',
