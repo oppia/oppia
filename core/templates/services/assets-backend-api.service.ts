@@ -263,65 +263,12 @@ export class AssetsBackendApiService {
       });
   }
 
-<<<<<<< HEAD
   private _getAudioUploadUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       this.AUDIO_UPLOAD_URL_TEMPLATE,
       {exploration_id: explorationId}
     );
   }
-=======
-    var _saveMathExpresionImage = function(
-        resampledFile, filename, entityType, entityId, successCallback,
-        errorCallback) {
-      let form = new FormData();
-      form.append('image', resampledFile);
-      form.append('payload', JSON.stringify({
-        filename: filename,
-        filename_prefix: 'image'
-      }));
-      var imageUploadUrlTemplate = (
-        '/createhandler/imageupload/<entity_type>/<entity_id>'
-      );
-      CsrfTokenService.getTokenAsync().then(function(token) {
-        form.append('csrf_token', token);
-        $.ajax({
-          url: UrlInterpolationService.interpolateUrl(
-            imageUploadUrlTemplate, {
-              entity_type: entityType,
-              entity_id: entityId
-            }
-          ),
-          data: form,
-          processData: false,
-          contentType: false,
-          type: 'POST',
-          dataFilter: removeXSSIPrefix,
-          dataType: 'text'
-        }).done(function(data) {
-          if (successCallback) {
-            successCallback(data);
-          }
-        }).fail(function(data) {
-          // Remove the XSSI prefix.
-          var parsedResponse = removeXSSIPrefix(data.responseText);
-          if (errorCallback) {
-            errorCallback(parsedResponse);
-          }
-        });
-      });
-    };
-    var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
-      var urlTemplate = null;
-      urlTemplate = ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
-      return UrlInterpolationService.interpolateUrl(
-        urlTemplate, {
-          entity_id: entityId,
-          entity_type: entityType,
-          filename: filename
-        });
-    };
->>>>>>> 3cd0b8e5aba8d02541a783710327a254bf7bcd9f
 
   private _isAssetCurrentlyBeingRequested(
       filename: string, assetType: string): boolean {
@@ -397,72 +344,8 @@ export class AssetsBackendApiService {
 
   getAssetsFilesCurrentlyBeingRequested(): PendingRequestsType {
     return {
-<<<<<<< HEAD
       audio: this._audioFilesCurrentlyBeingRequested,
       image: this._imageFilesCurrentlyBeingRequested
-=======
-      loadAudio: function(explorationId, filename) {
-        return $q(function(resolve, reject) {
-          if (_isCached(filename)) {
-            resolve(AudioFileObjectFactory.createNew(
-              filename, assetsCache[filename]));
-          } else {
-            _fetchFile(
-              ENTITY_TYPE.EXPLORATION, explorationId, filename,
-              ASSET_TYPE_AUDIO, resolve, reject);
-          }
-        });
-      },
-      loadImage: function(entityType, entityId, filename) {
-        return $q(function(resolve, reject) {
-          if (_isCached(filename)) {
-            resolve(ImageFileObjectFactory.createNew(
-              filename, assetsCache[filename]));
-          } else {
-            _fetchFile(entityType, entityId, filename, ASSET_TYPE_IMAGE,
-              resolve, reject);
-          }
-        });
-      },
-      saveAudio: function(explorationId, filename, rawAssetData) {
-        return $q(function(resolve, reject) {
-          _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
-        });
-      },
-      saveMathExpresionImage: function(
-          resampledFile, filename, entityType, entityId) {
-        return $q(function(resolve, reject) {
-          _saveMathExpresionImage(
-            resampledFile, filename, entityType, entityId, resolve, reject);
-        });
-      },
-      isCached: function(filename) {
-        return _isCached(filename);
-      },
-      getAudioDownloadUrl: function(entityType, entityId, filename) {
-        return _getDownloadUrl(
-          entityType, entityId, filename, ASSET_TYPE_AUDIO);
-      },
-      abortAllCurrentAudioDownloads: function() {
-        _abortAllCurrentDownloads(ASSET_TYPE_AUDIO);
-      },
-      abortAllCurrentImageDownloads: function() {
-        _abortAllCurrentDownloads(ASSET_TYPE_IMAGE);
-      },
-      getAssetsFilesCurrentlyBeingRequested: function() {
-        return { audio: _audioFilesCurrentlyBeingRequested,
-          image: _imageFilesCurrentlyBeingRequested
-        };
-      },
-      getImageUrlForPreview: function(entityType, entityId, filename) {
-        return _getDownloadUrl(
-          entityType, entityId, filename, ASSET_TYPE_IMAGE);
-      },
-      getThumbnailUrlForPreview: function(entityType, entityId, filename) {
-        return _getDownloadUrl(
-          entityType, entityId, filename, ASSET_TYPE_THUMBNAIL);
-      }
->>>>>>> 3cd0b8e5aba8d02541a783710327a254bf7bcd9f
     };
   }
 
