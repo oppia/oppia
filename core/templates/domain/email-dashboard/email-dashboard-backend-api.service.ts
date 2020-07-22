@@ -85,21 +85,17 @@ export class EmailDashboardBackendApiService {
 
   submitQuery(data: IQueryData): Promise<EmailDashboardQuery> {
     const postData = {
-      data: {
-        has_not_logged_in_for_n_days: data.hasNotLoggedInForNDays,
-        inactive_in_last_n_days: data.inactiveInLastNDays,
-        created_at_least_n_exps: data.createdAtLeastNExps,
-        created_fewer_than_n_exps: data.createdFewerThanNExps,
-        edited_at_least_n_exps: data.editedAtLeastNExps,
-        edited_fewer_than_n_exps: data.editedFewerThanNExps
-      }
+      has_not_logged_in_for_n_days: data.hasNotLoggedInForNDays,
+      inactive_in_last_n_days: data.inactiveInLastNDays,
+      created_at_least_n_exps: data.createdAtLeastNExps,
+      created_fewer_than_n_exps: data.createdFewerThanNExps,
+      edited_at_least_n_exps: data.editedAtLeastNExps,
+      edited_fewer_than_n_exps: data.editedFewerThanNExps
     };
 
-    let body = new FormData();
-    body.append('payload', JSON.stringify(postData));
-
     return this.http.post<IEmailDashboardQueryBackendDict>(
-      this.QUERY_DATA_URL, body).toPromise().then(data => {
+      this.QUERY_DATA_URL, {
+        data: postData}).toPromise().then(data => {
       let queryObject = this.queryObjectFactory.createFromBackendDict(data);
       return queryObject;
     });

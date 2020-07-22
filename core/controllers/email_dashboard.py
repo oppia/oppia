@@ -85,7 +85,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def post(self):
         """Post handler for query."""
-        data = self.payload['data']
+        data = self.request.get('data')
         kwargs = {key: data[key] for key in data if data[key] is not None}
         self._validate(kwargs)
 
