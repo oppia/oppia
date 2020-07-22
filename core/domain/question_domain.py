@@ -370,7 +370,7 @@ class Question(python_utils.OBJECT):
                         translations_mapping[content_id][lang_code]['html'])
                 del translations_mapping[content_id][lang_code]['html']
 
-        interaction_id = state_dict['interaction']['id']
+        interaction_id = question_state_dict['interaction']['id']
         if interaction_id is None:
             question_state_dict['next_content_id_index'] = (
                 max_existing_content_id_index + 1)
@@ -383,7 +383,7 @@ class Question(python_utils.OBJECT):
         }
         all_new_content_ids = []
 
-        ca_dict = state_dict['interaction']['customization_args']
+        ca_dict = question_state_dict['interaction']['customization_args']
         # We need to retrieve an cached version of interaction_specs in
         # the case that interaction_specs.json changes in the future.
         ca_specs = [
