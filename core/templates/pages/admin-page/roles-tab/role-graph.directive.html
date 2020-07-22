@@ -119,7 +119,7 @@
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.viewCommunityReviewers.category)">
+               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.viewCommunityReviewers.category) && $ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-model="$ctrl.formData.viewCommunityReviewers.languageCode"
