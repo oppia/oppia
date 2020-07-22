@@ -2175,23 +2175,57 @@ class UserAuthModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # Authentication detail for google sign in using GAE
+    # Authentication detail for sign in using google id (GAE)
     gae_id = ndb.StringProperty(indexed=True, repeated=True)
-    # user id of the user
-    user_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information
+        relevant to one user account.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not need to exported as it hold authentication details
+        relavant only for backend, and does not contain any information
+        relevant to the user for data export.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserAuthModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserAuthModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserAuthModel refers to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
 
     @classmethod
     def get_by_auth_id(cls, auth_service, auth_id):
-        """Fetch a user entry by the auth_id of a given auth service.
+        """Fetch a user entry by auth_id of a particular auth service.
 
         Args:
-            auth_service: str. Name of the auth service being used.
-            auth_id: str. Authentication detail for the corresponding
+            auth_service: str. Name of the auth service.
+            auth_id: str. Authentication detail corresponding to the
                 authentication service.
 
         Returns:
-            UserAuthModel. The UserAuthModel instance which has the same
-            auth_id for the given auth service for a particular user.
+            UserAuthModel. The UserAuthModel instance having a
+            particular user mapped to the given auth_id and the auth service.
         """
 
         if auth_type_name == "gae":
