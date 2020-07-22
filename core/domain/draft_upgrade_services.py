@@ -93,8 +93,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     @classmethod
     def _convert_states_v34_dict_to_v35_dict(cls, draft_change_list):
         """Converts draft change list from state version 34 to 35. State
-        version 35 add a contentDescription to ImageWithRegion in 
-        ImageClickInput interaction, for which there should be no 
+        version 35 add a contentDescription to ImageWithRegion in
+        ImageClickInput interaction, for which there should be no
         changes to drafts.
 
         Args:
