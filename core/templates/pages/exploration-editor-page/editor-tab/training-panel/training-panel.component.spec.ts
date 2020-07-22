@@ -36,13 +36,10 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
 
 describe('Training Panel Component', function() {
   var ctrl = null;
   var $scope = null;
-  var explorationHtmlFormatterService = null;
   var explorationStatesService = null;
   var generateContentIdService = null;
   var responsesService = null;
@@ -112,8 +109,6 @@ describe('Training Panel Component', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    explorationHtmlFormatterService = TestBed.get(
-      ExplorationHtmlFormatterService);
     generateContentIdService = TestBed.get(GenerateContentIdService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
@@ -154,24 +149,25 @@ describe('Training Panel Component', function() {
     });
 
     $scope = $rootScope.$new();
-    $scope.answer = {};
-    $scope.classification = {
-      answerGroupIndex: 0,
-      newOutcome: {}
-    };
-    $scope.onFinishTraining = () => {};
-    $scope.addingNewResponse = () => {};
     ctrl = $componentController('trainingPanel', {
       $scope: $scope,
       StateInteractionIdService: stateInteractionIdService,
       StateCustomizationArgsService: stateCustomizationArgsService
+    }, {
+      answer: {},
+      classification: {
+        answerGroupIndex: 0,
+        newOutcome: {}
+      },
+      onFinishTraining: () => {},
+      addingNewResponse: null
     });
     ctrl.$onInit();
   }));
 
   it('should evaluates $scope properties after controller initialization',
     function() {
-      expect($scope.addingNewResponse).toBe(false);
+      expect(ctrl.addingNewResponse).toBe(false);
       expect($scope.allOutcomes.length).toBe(2);
       expect($scope.selectedAnswerGroupIndex).toBe(0);
       expect($scope.answerTemplate).toBe(
@@ -195,12 +191,12 @@ describe('Training Panel Component', function() {
 
   it('should start to add new response and then cancel it', function() {
     $scope.beginAddingNewResponse();
-    expect($scope.addingNewResponse).toBe(true);
-    expect($scope.classification.newOutcome.feedback.getContentId()).toBe(
+    expect(ctrl.addingNewResponse).toBe(true);
+    expect(ctrl.classification.newOutcome.feedback.getContentId()).toBe(
       'feedback_1');
 
     $scope.cancelAddingNewResponse();
-    expect($scope.addingNewResponse).toBe(false);
-    expect($scope.classification.newOutcome).toBe(null);
+    expect(ctrl.addingNewResponse).toBe(false);
+    expect(ctrl.classification.newOutcome).toBe(null);
   });
 });

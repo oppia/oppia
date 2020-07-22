@@ -57,7 +57,7 @@ angular.module('oppia').component('trainingPanel', {
       var _updateAnswerTemplate = function() {
         $scope.answerTemplate = (
           ExplorationHtmlFormatterService.getAnswerHtml(
-            $scope.answer, StateInteractionIdService.savedMemento,
+            ctrl.answer, StateInteractionIdService.savedMemento,
             StateCustomizationArgsService.savedMemento));
       };
 
@@ -77,34 +77,34 @@ angular.module('oppia').component('trainingPanel', {
       $scope.beginAddingNewResponse = function() {
         var contentId = GenerateContentIdService.getNextId(
           _getExistingOutcomeContentIds(), COMPONENT_NAME_FEEDBACK);
-        $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
+        ctrl.classification.newOutcome = OutcomeObjectFactory.createNew(
           StateEditorService.getActiveStateName(), contentId, '', []);
-        $scope.addingNewResponse = true;
+        ctrl.addingNewResponse = true;
       };
 
       $scope.cancelAddingNewResponse = function() {
-        $scope.addingNewResponse = false;
-        $scope.classification.newOutcome = null;
+        ctrl.addingNewResponse = false;
+        ctrl.classification.newOutcome = null;
       };
 
       $scope.selectAnswerGroupIndex = function(index) {
         $scope.selectedAnswerGroupIndex = index;
-        $scope.classification.answerGroupIndex = index;
+        ctrl.classification.answerGroupIndex = index;
         if (index > ResponsesService.getAnswerGroupCount()) {
-          $scope.classification.newOutcome = $scope.allOutcomes[index];
+          ctrl.classification.newOutcome = $scope.allOutcomes[index];
         }
       };
 
       $scope.confirmNewFeedback = function() {
-        if ($scope.classification.newOutcome) {
+        if (ctrl.classification.newOutcome) {
           // Push the new outcome at the end of the existing outcomes.
-          $scope.allOutcomes.push($scope.classification.newOutcome);
+          $scope.allOutcomes.push(ctrl.classification.newOutcome);
           $scope.selectAnswerGroupIndex($scope.allOutcomes.length - 1);
-          $scope.addingNewResponse = false;
+          ctrl.addingNewResponse = false;
         }
       };
       ctrl.$onInit = function() {
-        $scope.addingNewResponse = false;
+        ctrl.addingNewResponse = false;
 
         var _stateName = StateEditorService.getActiveStateName();
         var _state = ExplorationStatesService.getState(_stateName);
@@ -113,7 +113,7 @@ angular.module('oppia').component('trainingPanel', {
         $scope.$watch('answer', _updateAnswerTemplate);
         _updateAnswerTemplate();
         $scope.selectedAnswerGroupIndex = (
-          $scope.classification.answerGroupIndex);
+          ctrl.classification.answerGroupIndex);
       };
     }
   ]
