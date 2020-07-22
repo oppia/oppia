@@ -48,7 +48,8 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
             skillIdToDescriptionDict: angular.copy(
               response.data.skill_id_to_description_dict),
             skillQuestionCountDict: {
-              ...response.data.skill_question_count_dict},
+              ...response.data.skill_question_count_dict
+            },
             skillIdToRubricsDict: angular.copy(
               response.data.skill_id_to_rubrics_dict)
           });
