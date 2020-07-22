@@ -54,63 +54,62 @@ angular.module('oppia').component('explorationPlayerPage', {
             angular.element('meta[itemprop="description"]').attr(
               'content', response.exploration.objective);
             angular.element('meta[property="og:title"]').attr(
-              'content', response.exploration.title)
+              'content', response.exploration.title);
             angular.element('meta[property="og:description"]').attr(
               'content', response.exploration.objective);
             });
-          var moveFocusToBackButton = function() {
-            Mousetrap.bind('k', function() {
-              var previousButton = document.getElementById('backButtonId');
-    
-              if (previousButton !== null) {
-                previousButton.focus();
-              } else {
-                var interaction = <HTMLElement>document.querySelector(
-                  '.conversation-skin-inline-interaction');
-                if (interaction !== null) {
-                  interaction.focus();
-                }
+        var moveFocusToBackButton = function() {
+          Mousetrap.bind('k', function() {
+            var previousButton = document.getElementById('backButtonId');
+
+            if (previousButton !== null) {
+              previousButton.focus();
+            } else {
+              var interaction = <HTMLElement>document.querySelector(
+                '.conversation-skin-inline-interaction');
+              if (interaction !== null) {
+                interaction.focus();
               }
-    
-              return false;
-            });
-          };
-    
-          var moveFocusToNextButton = function() {
-            Mousetrap.bind('j', function() {
-              var nextButton = <HTMLElement>document.querySelector(
-                '.protractor-test-next-button');
-    
-              if (nextButton !== null) {
-                nextButton.focus();
-              } else {
-                var interaction = <HTMLElement>document.querySelector(
-                  '.conversation-skin-inline-interaction');
-                if (interaction !== null) {
-                  interaction.focus();
-                }
+            }
+
+            return false;
+          });
+        };
+
+        var moveFocusToNextButton = function() {
+          Mousetrap.bind('j', function() {
+            var nextButton = <HTMLElement>document.querySelector(
+              '.protractor-test-next-button');
+
+            if (nextButton !== null) {
+              nextButton.focus();
+            } else {
+              var interaction = <HTMLElement>document.querySelector(
+                '.conversation-skin-inline-interaction');
+              if (interaction !== null) {
+                interaction.focus();
               }
-    
-              return false;
-            });
-          };
-    
-    
-          var moveFocusToSkipButton = function() {
-            Mousetrap.bind('s', function() {
-              var skipButton = document.getElementById('skipToMainContentId');
-    
-              if (skipButton !== null) {
-                skipButton.focus();
-              }
-    
-              return false;
-            });
-          };
-    
-          $timeout(moveFocusToSkipButton);
-          $timeout(moveFocusToBackButton);
-          $timeout(moveFocusToNextButton);
+            }
+
+            return false;
+          });
+        };
+
+        var moveFocusToSkipButton = function() {
+          Mousetrap.bind('s', function() {
+            var skipButton = document.getElementById('skipToMainContentId');
+  
+            if (skipButton !== null) {
+              skipButton.focus();
+            }
+
+            return false;
+          });
+        };
+
+        $timeout(moveFocusToSkipButton);
+        $timeout(moveFocusToBackButton);
+        $timeout(moveFocusToNextButton);
       };
     }
   ]
