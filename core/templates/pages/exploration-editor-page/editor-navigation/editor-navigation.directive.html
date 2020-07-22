@@ -145,11 +145,6 @@
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
         </a>
-        <div ng-show="getOpenTaskCount()" uib-tooltip="Open Tasks" tooltip-placement="bottom" class="oppia-exploration-open-threads-indicator-dropdown">
-          <span class="oppia-exploration-open-threads-count">
-            <[getOpenTaskCount()]>
-          </span>
-        </div>
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'history'}">
         <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
@@ -215,7 +210,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'settings'}"
+  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'settings'}"
       class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
@@ -223,7 +218,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'stats'}"
+  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'stats'}"
       class="nav-item d-none d-lg-block">
     <a  href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
@@ -231,20 +226,15 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && improvementsTabIsEnabled" ng-class="{'active': getActiveTabName() === 'improvements'}"
+  <li ng-if="screenIsLarge && improvementsTabIsEnabled" ng-class="{'active': getActiveTabName() === 'improvements'}"
       class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
       <i class="material-icons">trending_up</i>
     </a>
-    <div ng-show="getOpenTaskCount()" uib-tooltip="Open Tasks" tooltip-placement="bottom" class="oppia-exploration-open-threads-indicator">
-      <span class="oppia-exploration-open-threads-count protractor-test-improvements-tab-task-count">
-        <[getOpenTaskCount()]>
-      </span>
-    </div>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'history'}" class="nav-item d-none d-lg-block">
+  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'history'}" class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
        disabled="ExplorationRightsService.isCloned()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-history-tab">
@@ -252,7 +242,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'feedback'}" class="nav-item d-none d-lg-block">
+  <li ng-if="screenIsLarge" ng-class="{'active': getActiveTabName() === 'feedback'}" class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
       <i class="material-icons">&#xE87F;</i>
@@ -265,7 +255,7 @@
   </li>
 
   <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown float-right ng-cloak">
-    <li uib-dropdown class="nav-item d-none d-lg-block uib-dropdown uib-popover" popover-is-open="popoverControlObject.postTutorialHelpPopoverIsShown"
+    <li uib-dropdown class="nav-item d-none d-lg-block uib-dropdown uib-popover" popover-is-open="postTutorialHelpPopoverIsShown"
         popover-placement="bottom" popover-trigger="'none'"
         uib-popover="To get help in the future, click here!">
       <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
