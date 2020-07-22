@@ -34,7 +34,7 @@ angular.module('oppia').directive('topicEditorNavbarBreadcrumb', [
         function(
             $scope, TopicEditorStateService, TopicEditorRoutingService) {
           var ctrl = this;
-          $scope.enableBackToTopic = function() {
+          $scope.canNavigateToTopicEditorPage = function() {
             const activeTab = TopicEditorRoutingService.getActiveTabName();
             return (activeTab.startsWith('subtopic') ||
                 TopicEditorRoutingService.getLastTabVisited() === 'subtopic');

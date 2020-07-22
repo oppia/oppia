@@ -189,7 +189,7 @@ angular.module('oppia').component('subtopicEditorTab', {
 
       ctrl.showSkillEditOptions = function(index) {
         ctrl.selectedSkillEditOptionsIndex = (
-            (ctrl.selectedSkillEditOptionsIndex === index) ? null : index);
+            (ctrl.selectedSkillEditOptionsIndex === index) ? -1 : index);
       };
 
       ctrl.removeSkillFromSubtopic = function(skillSummary) {

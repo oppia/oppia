@@ -54,15 +54,15 @@
 </ul>
 <div class="topic-nav-mobile">
   <div class="topic-navbar-mobile-tabs">
-    <div class="dropdown-container">
-      <div class="dropdown-options" ng-if="showNavigationOptions">
-        <div class="dropdown-option" ng-click="selectMainTab()">
+    <div class="topic-nav-dropdown-container">
+      <div class="topic-nav-topic-nav-dropdown-options" ng-if="showNavigationOptions">
+        <div class="topic-nav-dropdown-option" ng-click="selectMainTab()">
           <i class="material-icons">&#xE254;</i><span>Editor</span>
         </div>
-        <div class="dropdown-option" ng-click="selectQuestionsTab()">
+        <div class="topic-nav-dropdown-option" ng-click="selectQuestionsTab()">
           <i class="material-icons">&#xE254;</i><span>Questions</span>
         </div>
-        <div class="dropdown-option" ng-click="openTopicViewer()">
+        <div class="topic-nav-dropdown-option" ng-click="openTopicViewer()">
           <i class="material-icons">&#xE037;</i><span>Preview</span>
         </div>
       </div>
@@ -79,24 +79,24 @@
           </div>
         </div>
       </div>
-      <div class="dropdown-content">
-        <div class="dropdown-text" ng-click="toggleWarningText()">
+      <div class="topic-nav-dropdown-content">
+        <div class="topic-nav-dropdown-text" ng-click="toggleWarningText()">
           <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
           <span><[activeTab]></span>
           <span ng-if="getTotalWarningsCount()"><[getTotalWarningsCount()]> <i class="fa fa-exclamation-triangle error-icon"></i></span>
         </div>
-        <div class="dropdown-icon" ng-click="toggleNavigationOptions()">
+        <div class="topic-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
           <i class="fa fa-arrow-up"></i>
         </div>
       </div>
     </div>
-    <div class="dropdown-container save-options-dropdown">
-      <div class="dropdown-options" ng-if="showTopicEditOptions">
-        <div class="dropdown-option" ng-click="discardChanges()">
+    <div class="topic-nav-dropdown-container save-options-dropdown">
+      <div class="topic-nav-topic-nav-dropdown-options" ng-if="showTopicEditOptions">
+        <div class="topic-nav-dropdown-option" ng-click="discardChanges()">
           <i class="material-icons">&#xE254;</i>
           <span>Discard Changes</span>
         </div>
-        <div class="dropdown-option">
+        <div class="topic-nav-dropdown-option">
           <div ng-if="!topicRights.isPublished()"
                ng-click="publishTopic()"
                ng-disabled="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
@@ -111,8 +111,8 @@
           </div>
         </div>
       </div>
-      <div class="dropdown-content right-container">
-        <div class="dropdown-text" ng-click="saveChanges()">
+      <div class="topic-nav-dropdown-content right-container">
+        <div class="topic-nav-dropdown-text" ng-click="saveChanges()">
           <span ng-if="isSaveInProgress()">
             <span>Saving</span>
           </span>
@@ -123,7 +123,7 @@
             (<[getChangeListLength()]>)
           </span>
         </div>
-        <div class="dropdown-icon" ng-click="toggleTopicEditOptions()">
+        <div class="topic-nav-dropdown-icon" ng-click="toggleTopicEditOptions()">
           <i class="fa fa-arrow-up"></i>
         </div>
       </div>
@@ -198,19 +198,19 @@
     .publish-button-container button {
       width: 100%;
     }
-    topic-editor-navbar .dropdown-container {
+    topic-editor-navbar .topic-nav-dropdown-container {
       position: relative;
       text-align: left;
       width: 45%;
     }
-    topic-editor-navbar .dropdown-options {
+    topic-editor-navbar .topic-nav-topic-nav-dropdown-options {
       background-color: #FFF;
       border: 1px solid #000;
       bottom: 100%;
       position: absolute;
       width: 100%;
     }
-    topic-editor-navbar .dropdown-content {
+    topic-editor-navbar .topic-nav-dropdown-content {
       background-color: #FFF;
       border: 1.5px solid #6d6969;
       border-radius: 5px;
@@ -224,11 +224,11 @@
       color: #FFF;
     }
 
-    topic-editor-navbar .dropdown-option {
+    topic-editor-navbar .topic-nav-dropdown-option {
       padding: 5px 0;
     }
 
-    topic-editor-navbar .dropdown-icon {
+    topic-editor-navbar .topic-nav-dropdown-icon {
       align-items: center;
       background-color: #e6e6e6;
       border-left: 1.5px solid #6d6969;
@@ -238,7 +238,7 @@
       text-align: center;
       width: 20%;
     }
-    topic-editor-navbar .dropdown-text {
+    topic-editor-navbar .topic-nav-dropdown-text {
       padding: 5px 10px;
     }
     topic-editor-navbar .save-options-dropdown {

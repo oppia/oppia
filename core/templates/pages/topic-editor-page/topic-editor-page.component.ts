@@ -115,7 +115,8 @@ angular.module('oppia').directive('topicEditorPage', [
             if (activeTab.startsWith('subtopic') ||
                 lastTabVisited === 'subtopic') {
               TopicEditorRoutingService.navigateToSubtopicEditorWithId(
-                subtopicId); return;
+                subtopicId);
+              return;
             }
             TopicEditorRoutingService.navigateToMainTab();
           };

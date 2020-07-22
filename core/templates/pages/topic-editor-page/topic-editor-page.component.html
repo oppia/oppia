@@ -19,7 +19,7 @@
           <span class="oppia-editor-warnings-count">
             <[$ctrl.getTotalWarningsCount()]>
           </span>
-          <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu topic-warning-container oppia-editor-warnings-box oppia-editor-warnings-box-block">
+          <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu topic-warning-container oppia-editor-warnings-box">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text"
                 ng-repeat="issue in $ctrl.validationIssues track by $index">
@@ -71,9 +71,6 @@
   topic-editor-page .topic-editor-main {
     margin-bottom: 50px;
     margin-top: 110px;
-  }
-  .topic-editor-main .oppia-editor-warnings-box-block {
-    display: block;
   }
   topic-editor-page .navbar-helper {
     background-color: #00609C;
