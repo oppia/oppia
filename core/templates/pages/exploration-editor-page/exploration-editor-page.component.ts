@@ -252,7 +252,6 @@ angular.module('oppia').component('explorationEditorPage', {
           }
 
           ExplorationFeaturesService.init(explorationData, featuresData);
-          ExplorationImprovementsService.initAsync(ctrl.explorationId);
 
           ExplorationStatesService.init(explorationData.states);
 
@@ -385,6 +384,8 @@ angular.module('oppia').component('explorationEditorPage', {
             ).then(StateTopAnswersStatsService.init).then(function() {
               ExplorationWarningsService.updateWarnings();
               $scope.$broadcast('refreshStateEditor');
+            }).then(() => {
+              ExplorationImprovementsService.initAsync(ctrl.explorationId);
             });
           }
         });
