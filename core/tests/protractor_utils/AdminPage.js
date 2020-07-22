@@ -48,7 +48,8 @@ var AdminPage = function() {
     '.protractor-test-unfinished-one-off-jobs-id');
 
   // Adding a new community reviewer.
-  var addReviewerName = element(by.css('.protractor-test-add-reviewer-name'));
+  var addReviewerName = element(by.css(
+    '.protractor-test-add-reviewer-username'));
   var selectReviewerRole = element(by.css(
     '.protractor-test-select-reviewer-role'));
   var addReviewerFormSubmitButton = element(by.css(
@@ -60,7 +61,7 @@ var AdminPage = function() {
   var reviewerRoleValueOption = element(by.css(
     '.protractor-test-reviewer-role-value'));
   var viewReviewerRoleButton = element(by.css(
-    '.protractor-test-reviewer-role-success-button'));
+    '.protractor-test-view-reviewer-role-button'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
