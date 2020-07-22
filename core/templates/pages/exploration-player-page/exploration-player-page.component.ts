@@ -64,7 +64,7 @@ angular.module('oppia').component('explorationPlayerPage', {
 
             if (previousButton !== null) {
               previousButton.focus();
-            } 
+            }
 
             return false;
           });
@@ -77,7 +77,7 @@ angular.module('oppia').component('explorationPlayerPage', {
 
             if (nextButton !== null) {
               nextButton.focus();
-            } 
+            }
 
             return false;
           });
