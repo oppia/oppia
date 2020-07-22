@@ -136,6 +136,22 @@ def get_feature_flag_values_for_context(feature_names, context):
     return result_dict
 
 
+def get_feature_flag_value(feature_name):
+    """Evaluates and returns the values of the feature flag, using context
+    from the server only.
+
+    Args:
+        feature_name: str. The name of the feature flag that needs to
+            be evaluated.
+
+    Returns:
+        bool. The value of the feature flag, True if it's enabled.
+    """
+    context = create_evaluation_context_for_server()
+    values_dict = get_feature_flag_values_for_context([feature_name], context)
+    return values_dict[feature_name]
+
+
 def update_feature_flag_rules(
         feature_name, committer_id, commit_message, new_rule_dicts):
     """Updates the feature flag's rules.

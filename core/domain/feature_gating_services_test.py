@@ -123,10 +123,10 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
             self.assertIsNone(context.user_locale)
 
     def test_get_all_feature_flag_setting_dicts(self):
-        expected_dicts = [
-            self.param_1.to_dict(),
-            self.param_2.to_dict(),
-        ]
+        expected_dicts = {
+            self.param_1.name: self.param_1.to_dict(),
+            self.param_2.name: self.param_2.to_dict(),
+        }
         self.assertEqual(
             feature_services.get_all_feature_flag_setting_dicts(),
             expected_dicts)
@@ -168,6 +168,13 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
             feature_services.get_feature_flag_values_for_context(
                 ['feature_that_does_not_exist'],
                 context)
+
+    def test_get_feature_flag_value(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            self.assertFalse(
+                feature_services.get_feature_flag_value(self.param_1.name))
+            self.assertTrue(
+                feature_services.get_feature_flag_value(self.param_2.name))
 
     def test_update_feature_flag_rules(self):
         feature_services.update_feature_flag_rules(
