@@ -66,7 +66,7 @@ def send_email_to_recipients(
             feconf.MAILGUN_DOMAIN_NAME.
 
     Returns:
-        bool. Whether the email is sent successfully.
+        bool. Whether the emails are sent successfully.
     """
     if not feconf.MAILGUN_API_KEY:
         raise Exception('Mailgun API key is not available.')

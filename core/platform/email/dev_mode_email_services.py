@@ -62,7 +62,7 @@ def send_email_to_recipients(
                 latest/user_manual.html#batch-sending
 
     Returns:
-        bool. Whether the email is "sent" successfully.
+        bool. Whether the emails are "sent" successfully.
     """
 
     # Show the first 3 emails in the recipient list.

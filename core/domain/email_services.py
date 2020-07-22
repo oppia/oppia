@@ -159,8 +159,8 @@ def send_mail(
     Raises:
         Exception: The configuration in feconf.py forbids emails from being
             sent.
-        Exception: Any recipient email addresses are malformed.
-        Exception: Any sender email addresses are malformed.
+        Exception: Any recipient email address is malformed.
+        Exception: Any sender email address is malformed.
         Exception: The email was not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
@@ -213,8 +213,8 @@ def send_bulk_mail(
         Exception: The configuration in feconf.py forbids emails from being
             sent.
         Exception: Any recipient email addresses are malformed.
-        Exception: Any sender email addresses are malformed.
-        Exception: The email was not sent correctly. In other words, the
+        Exception: Any sender email address is malformed.
+        Exception: The emails were not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
