@@ -13,8 +13,26 @@
 #   lead listed on the page above).
 
 
+# Blanket codeowners
+# This is for the case when new files are created in any directories that aren't
+# covered as a whole, since in these cases, codeowners are not recognized for
+# those files when reviewing, even if the PR does add it. Unless new
+# files/folders are created in the following directories, these codeowners would
+# be superseded by the relevant codeowners mentioned elsewhere in this file.
+# (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
+/core/controllers/ @aks681
+/core/domain/ @DubeySandeep
+/core/templates/components/ @bansalnitish
+/core/templates/domain/ @kevintab95
+/core/templates/pages/ @seanlip
+/core/templates/services/ @nithusha21
+/extensions/ @vojtechjelinek
+/scripts/ @ankita240796
+
+
 # Android team
 /core/domain/android_validation_constants*.py @BenHenning
+
 
 # Angular Migration team
 /core/templates/components/shared-component.module.ts @bansalnitish @srijanreddy98
@@ -539,8 +557,7 @@
 # User Data Takeout.
 /core/domain/takeout_domain.py @vojtechjelinek @seanlip
 /core/domain/takeout_service*.py @vojtechjelinek @seanlip
-/core/domain/wipeout_jobs_one_off*.py @vojtechjelinek @seanlip
-/core/domain/wipeout_service*.py @vojtechjelinek @seanlip
+/core/domain/wipeout_*.py @vojtechjelinek @seanlip
 
 
 # User’s profile page.
