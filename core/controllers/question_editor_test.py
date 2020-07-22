@@ -664,7 +664,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = (
-            'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1))
+            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()

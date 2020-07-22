@@ -351,7 +351,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
     def test_editable_topic_handler_put_fails_with_long_commit_message(self):
         change_cmd = {
             'version': 2,
-            'commit_message': 'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1),
+            'commit_message': 'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
             'topic_and_subtopic_page_change_dicts': [{
                 'cmd': 'update_topic_property',
                 'property_name': 'name',

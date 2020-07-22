@@ -91,9 +91,9 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         commit_message = self.payload.get('commit_message')
 
-        if len(commit_message) > feconf.MAX_LENGTH_OF_COMMIT_MESSAGES:
+        if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
             raise self.InvalidInputException(
-                'Commit messages must be at most 1000 characters.')
+                'Commit messages must be at most %s characters.' % feconf.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_list = self.payload.get('change_list')
 

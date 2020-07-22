@@ -484,7 +484,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion_to_accept['suggestion_id']), {
                 'action': u'accept',
                 'commit_message':
-                    u'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1),
+                    u'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
                 'review_message': u'Accepted'
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(

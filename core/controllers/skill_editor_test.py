@@ -280,7 +280,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         put_payload_copy = self.put_payload.copy()
         put_payload_copy['commit_message'] = (
-            'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1))
+            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
         json_response = self.put_json(
             self.url, put_payload_copy, csrf_token=csrf_token,
             expected_status_int=400)

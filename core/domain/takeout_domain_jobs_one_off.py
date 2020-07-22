@@ -42,7 +42,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(SnapshotMetadataCommitMsgAuditOneOffJob, cls).enqueue(
-            job_id, shard_count=8)
+            job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -89,7 +89,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(SnapshotMetadataCommitMsgMigrationOneOffJob, cls).enqueue(
-            job_id, shard_count=8)
+            job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -112,10 +112,17 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
         try:
             item.put(update_last_updated_time=False)
         except Exception as e:
-            yield ('FAILURE' + e.strerror, 1)
+            model_name = item.__class__.__name__
+            model_id = item.id
+            identifier_message = '%s with id %s failed with error: %s' % (
+                model_name, model_id, str(e))
+            yield ('FAILURE', identifier_message)
         else:
             yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        if key == 'FAILURE':
+            yield (key, values)
+        else:
+            yield (key, len(values))

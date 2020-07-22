@@ -1620,7 +1620,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             {
                 'version': exploration.version,
                 'commit_message':
-                    'a' * (feconf.MAX_LENGTH_OF_COMMIT_MESSAGES + 1),
+                    'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
