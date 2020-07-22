@@ -1,6 +1,9 @@
-<div class="topic-editor-main">
-  <div class="navbar-helper">
-    <div class="navbar-tabs">
+<div class="navbar-helper">
+  <div class="navbar-tabs">
+    <div class="navbar-text">
+      <[$ctrl.getNavbarText()]>
+    </div>
+    <div class="navbar-icons">
       <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getTotalWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>" class="nav-item icon">
         <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="$ctrl.selectMainTab()"
            class="nav-link navbar-tab protractor-test-edit-topic-tab">
@@ -28,7 +31,6 @@
             </li>
           </ul>
         </div>
-
       </li>
 
       <li ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon">
@@ -44,6 +46,8 @@
       </li>
     </div>
   </div>
+</div>
+<div class="topic-editor-main">
   <div ng-if="$ctrl.getActiveTabName() === 'main' && $ctrl.getEntityType() === 'topic'">
     <topic-editor-tab></topic-editor-tab>
   </div>
@@ -62,44 +66,73 @@
 </div>
 
 <style>
+  topic-editor-page .topic-editor-main {
+    margin-bottom: 50px;
+    margin-top: 110px;
+  }
   .topic-editor-main .oppia-editor-warnings-box-block {
     display: block;
   }
-
-  .topic-editor-main .navbar-helper {
+  topic-editor-page .navbar-helper {
     background-color: #00609C;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     height: 70px;
     margin-bottom: 20px;
+    position: fixed;
     text-align: center;
+    top: 56px;
     width: 100%;
+    z-index: 10;
   }
-
-  .topic-editor-main .navbar-tabs {
+  topic-editor-page .navbar-tabs {
     display: flex;
     flex-wrap: wrap;
     height: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     text-align: center;
   }
-
-  .topic-editor-main .navbar-tab {
+  topic-editor-page .navbar-tab {
     margin: 8px 25px 0;
   }
-
-  .topic-editor-main .navbar-tab i {
+  topic-editor-page .navbar-tab i {
     color: #FFFFFF;
     display: block;
     font-size: 30px;
     width: 100%;
   }
-
-  .topic-editor-main .navbar-tab span {
+  topic-editor-page .navbar-tab span {
     color: #FFFFFF;
     font-size: 12px;
   }
-
-  .topic-editor-main .oppia-editor-warnings-box {
+  topic-editor-page .oppia-editor-warnings-box {
     max-width: none;
+  }
+  topic-editor-page .navbar-text {
+    align-items: center;
+    color: #FFF;
+    display: flex;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    justify-content: center;
+    text-align: center;
+    width: 40%;
+  }
+  topic-editor-page .navbar-icons {
+    display: flex;
+  }
+
+  @media screen and (max-width: 800px) {
+    topic-editor-page .navbar-helper {
+      position: inherit;
+    }
+    topic-editor-page .navbar-tabs {
+      justify-content: center;
+    }
+    topic-editor-page .navbar-text {
+      display: none;
+    }
+    topic-editor-page .topic-editor-main {
+      margin-top: 40px;
+    }
   }
 </style>

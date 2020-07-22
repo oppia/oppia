@@ -31,6 +31,9 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+    'change-subtopic-assignment-modal.template.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -139,6 +142,7 @@ angular.module('oppia').directive('topicEditorTab', [
               backdrop: true,
               windowClass: 'rearrange-skills-modal',
               controller: 'RearrangeSkillsInSubtopicsModalController',
+              controllerAs: '$ctrl',
               size: 'xl'
             }).result.then(function() {
               _initEditor();
@@ -297,6 +301,35 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.subtopicEditOptionsAreShown = index;
           };
 
+          $scope.toggleUncategorizedSkillOptions = function(index) {
+            $scope.uncategorizedEditOptionsIndex = index;
+          };
+
+          $scope.changeSubtopicAssignment = function(
+              oldSubtopicId, skillSummary) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic-editor-page/modal-templates/' +
+                      'change-subtopic-assignment-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                subtopics: () => $scope.subtopics
+              },
+              controller: 'ChangeSubtopicAssignmentModalController'
+            }).result.then(function(newSubtopicId) {
+              if (oldSubtopicId === newSubtopicId) {
+                return;
+              }
+              TopicUpdateService.moveSkillToSubtopic(
+                $scope.topic, oldSubtopicId, newSubtopicId,
+                skillSummary);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
+          };
+
           $scope.onRearrangeSubtopicStart = function(fromIndex) {
             $scope.fromIndex = fromIndex;
           };
@@ -316,8 +349,9 @@ angular.module('oppia').directive('topicEditorTab', [
               return;
             }
             $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {};
-            $scope.selectedSkillEditOptionsIndex[subtopicIndex][skillIndex] = (
-              true);
+            $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {
+              [skillIndex]: true
+            };
           };
 
           ctrl.$onInit = function() {

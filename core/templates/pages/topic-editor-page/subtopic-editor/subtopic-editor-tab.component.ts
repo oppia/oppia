@@ -65,10 +65,12 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
           ctrl.skillIds = ctrl.subtopic.getSkillIds();
+          ctrl.questionCount = 0;
           if (ctrl.skillIds.length) {
             QuestionBackendApiService.fetchTotalQuestionCountForSkillIds(
               ctrl.skillIds).then((questionCount) => {
               ctrl.questionCount = questionCount;
+              $scope.$applyAsync();
             });
           }
           ctrl.editableTitle = ctrl.subtopic.getTitle();

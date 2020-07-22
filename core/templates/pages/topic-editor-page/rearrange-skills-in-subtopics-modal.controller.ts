@@ -31,26 +31,28 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
 angular.module('oppia').controller(
   'RearrangeSkillsInSubtopicsModalController', [
-    '$controller', '$scope', '$uibModalInstance', 'TopicEditorStateService',
+    '$controller', '$scope', '$uibModalInstance', 'SubtopicValidationService',
+    'TopicEditorStateService',
     'TopicUpdateService', 'UrlInterpolationService',
     'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
     function(
-        $controller, $scope, $uibModalInstance, TopicEditorStateService,
-        TopicUpdateService, UrlInterpolationService,
+        $controller, $scope, $uibModalInstance, SubtopicValidationService,
+        TopicEditorStateService, TopicUpdateService, UrlInterpolationService,
         EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance
       });
+      var ctrl = this;
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       var _initEditor = function() {
-        $scope.topic = TopicEditorStateService.getTopic();
-        $scope.subtopics = $scope.topic.getSubtopics();
-        $scope.uncategorizedSkillSummaries = (
-          $scope.topic.getUncategorizedSkillSummaries());
+        ctrl.topic = TopicEditorStateService.getTopic();
+        ctrl.subtopics = ctrl.topic.getSubtopics();
+        ctrl.uncategorizedSkillSummaries = (
+          ctrl.topic.getUncategorizedSkillSummaries());
       };
 
-      $scope.getSkillEditorUrl = function(skillId) {
+      ctrl.getSkillEditorUrl = function(skillId) {
         return UrlInterpolationService.interpolateUrl(
           SKILL_EDITOR_URL_TEMPLATE, {
             skillId: skillId
@@ -65,9 +67,9 @@ angular.module('oppia').controller(
        * @param {SkillSummary} skillSummary - The summary of the skill that
        *    is to be moved.
        */
-      $scope.onMoveSkillStart = function(oldSubtopicId, skillSummary) {
-        $scope.skillSummaryToMove = skillSummary;
-        $scope.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
+      ctrl.onMoveSkillStart = function(oldSubtopicId, skillSummary) {
+        ctrl.skillSummaryToMove = skillSummary;
+        ctrl.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
       };
 
       /**
@@ -75,28 +77,49 @@ angular.module('oppia').controller(
        *    skill is to be moved, or null if the destination is the
        *    uncategorized section.
        */
-      $scope.onMoveSkillEnd = function(newSubtopicId) {
-        if (newSubtopicId === $scope.oldSubtopicId) {
+      ctrl.onMoveSkillEnd = function(newSubtopicId) {
+        if (newSubtopicId === ctrl.oldSubtopicId) {
           return;
         }
 
         if (newSubtopicId === null) {
           TopicUpdateService.removeSkillFromSubtopic(
-            $scope.topic, $scope.oldSubtopicId, $scope.skillSummaryToMove);
+            ctrl.topic, ctrl.oldSubtopicId, ctrl.skillSummaryToMove);
         } else {
           TopicUpdateService.moveSkillToSubtopic(
-            $scope.topic, $scope.oldSubtopicId, newSubtopicId,
-            $scope.skillSummaryToMove);
+            ctrl.topic, ctrl.oldSubtopicId, newSubtopicId,
+            ctrl.skillSummaryToMove);
         }
         _initEditor();
       };
 
-      $scope.init = function() {
+
+      ctrl.updateSubtopicTitle = function(subtopicId) {
+        if (!SubtopicValidationService.checkValidSubtopicName(
+          ctrl.editableName)) {
+          ctrl.errorMsg = 'A subtopic with this title already exists';
+          return;
+        }
+
+        TopicUpdateService.setSubtopicTitle(
+          ctrl.topic, subtopicId, ctrl.editableName);
+        ctrl.editNameOfSubtopicWithId(null);
+      };
+
+      ctrl.editNameOfSubtopicWithId = function(subtopicId) {
+        if (!subtopicId) {
+          ctrl.editableName = '';
+        }
+        ctrl.selectedSubtopicId = subtopicId;
+      };
+
+      ctrl.init = function() {
+        ctrl.editableName = '';
         $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
         $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
         _initEditor();
       };
-      $scope.init();
+      ctrl.init();
     }
   ]
 );
