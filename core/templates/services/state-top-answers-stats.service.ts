@@ -40,7 +40,7 @@ export class AnswerStatsEntry {
   providedIn: 'root'
 })
 export class StateTopAnswersStatsService {
-  private initStarted: boolean;
+  private initializationHasStarted: boolean;
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
   private states: States;
 
@@ -53,7 +53,7 @@ export class StateTopAnswersStatsService {
       private interactionRulesRegistryService: InteractionRulesRegistryService,
       private stateTopAnswersStatsBackendApiService:
         StateTopAnswersStatsBackendApiService) {
-    this.initStarted = false;
+    this.initializationHasStarted = false;
     this.topAnswersStatsByStateName = new Map();
     this.states = null;
     this.initPromise = new Promise((resolve, reject) => {
@@ -67,8 +67,8 @@ export class StateTopAnswersStatsService {
    * state this exploration contains.
    */
   async initAsync(explorationId: string, states: States): Promise<void> {
-    if (!this.initStarted) {
-      this.initStarted = true;
+    if (!this.initializationHasStarted) {
+      this.initializationHasStarted = true;
       try {
         this.states = states;
         const {answers, interactionIds} = (
