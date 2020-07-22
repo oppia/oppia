@@ -195,7 +195,8 @@ angular.module('oppia').directive('questionPlayer', [
               <source type="image/png" 
               srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
               <img alt=""
-              "class="action-button-icon" src="
+                  "class="action-button-icon" 
+                   src="
               ${getStaticImageUrl('/icons/rocket@2x.png')}"/>
               </picture>`;
             } else if (actionButtonType === 'RETRY_SESSION') {
