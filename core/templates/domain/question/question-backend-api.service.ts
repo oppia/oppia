@@ -165,6 +165,8 @@ export class QuestionBackendApiService {
   /**
    * Checks if given input is a list and has all strings
    */
+  // The type of list is unknown because it can be anything
+  // and if this function returns true. The type of list becomes string[].
   private isListOfStrings(list: unknown): list is string[] {
     if (!Array.isArray(list)) {
       return false;
@@ -177,7 +179,9 @@ export class QuestionBackendApiService {
   /**
    * Checks if given input is an integer
    */
-  private isInt(n: unknown): boolean {
+  // The type of n is unknown because it can be anything
+  // and if this function returns true. The type of n becomes number.
+  private isInt(n: unknown): n is number {
     return typeof n === 'number' && n % 1 === 0;
   }
 
