@@ -1583,7 +1583,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 invalid_cases[0]['html_content'])
 
         with self.assertRaisesRegexp(
-            Exception, 'Invalid raw_latex value found in the math tag'):
+            Exception, 'Invalid raw_latex string found in the math tag'):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[1]['html_content'])
 
@@ -1702,7 +1702,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     def test_extract_latex_strings_when_math_tags_have_non_empty_svg_filename(
             self):
         """Test that get_latex_strings_without_svg_from_html
-        extracts filenames when some math tags have non emoty filename field.
+        extracts filenames when some math tags have non empty filename field.
         """
 
         html_string = (

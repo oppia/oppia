@@ -258,7 +258,7 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
         indexed=True, required=True)
     # Approximate maximum size of Math rich-text components SVG images that
     # would be generated for the exploration according to the length of
-    # raw_latex value.
+    # raw_latex string.
     estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
         indexed=True, required=True)
     # List of unique LaTeX strings without an SVG saved from all the math-rich

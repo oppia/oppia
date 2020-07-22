@@ -931,7 +931,7 @@ def get_latex_strings_without_svg_from_html(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        list(str). List of unique LaTeX strings of math-tags without svg
+        list(str). List of unique LaTeX strings from math-tags without svg
         filename.
     """
 
@@ -1006,7 +1006,7 @@ def add_math_content_to_math_rte_components(html_string):
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
                 error_message = (
-                    'Invalid raw_latex value found in the math tag : %s' % (
+                    'Invalid raw_latex string found in the math tag : %s' % (
                         python_utils.UNICODE(e)))
                 raise Exception(error_message)
             math_content_dict = {

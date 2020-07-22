@@ -2997,13 +2997,6 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
 
     def test_one_off_job_fails_with_invalid_exploration(self):
         """Test the audit job fails when there is an invalid exploration."""
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3012,7 +3005,6 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
         exploration_model.language_code = 'invalid_language_code'
         exploration_model.commit(
             self.albert_id, 'Changed language_code.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
 
         job_id = (
             exp_jobs_one_off
