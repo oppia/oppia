@@ -309,15 +309,17 @@ describe('Router Service', () => {
   });
 
   it('should navigate to improvements tab ', fakeAsync(() => {
+    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
       .and.returnValue(Promise.resolve(true));
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToImprovementsTab();
-    $rootScope.$apply();
+    $rootScope.$apply(); // Apply the change of active tab.
+    flushMicrotasks(); // Flush pending promise chains.
+    $rootScope.$apply(); // Apply any new changes made to the active tab.
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-    expect(RouterService.getActiveTabName()).toBe('improvements');
+    expect(RouterService.getActiveTabName()).toEqual('improvements');
 
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
     $rootScope.$apply();
@@ -332,22 +334,20 @@ describe('Router Service', () => {
       });
       spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
         .and.returnValue(isImprovementsTabEnabledPromise);
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
       RouterService.navigateToImprovementsTab();
-      $rootScope.$apply();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+      $rootScope.$apply(); // Apply the change of active tab.
 
-      // Promise hasn't resolved yet, no redirect should have occurred.
+      // Promise hasn't been fulfilled yet, should still be on improvements tab.
       expect(RouterService.getActiveTabName()).toEqual('improvements');
       expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
 
-      // Promise has resolved, should be redirected because improvements tab is
-      // not enabled.
       resolveIsImprovementsTabEnabledPromise(false);
-      flushMicrotasks();
-      $rootScope.$apply();
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
 
+      // Promise has been fulfilled, should be redirected to main tab since
+      // we've confirmed the improvements tab is not enabled.
       expect(RouterService.getActiveTabName()).toEqual('main');
       expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
     }));
@@ -358,8 +358,9 @@ describe('Router Service', () => {
       .and.returnValue(Promise.resolve(false));
 
     RouterService.navigateToImprovementsTab();
-    $rootScope.$apply();
-    flushMicrotasks();
+    $rootScope.$apply(); // Apply the change of active tab.
+    flushMicrotasks(); // Flush pending promise chains.
+    $rootScope.$apply(); // Apply any new changes made to the active tab.
 
     expect(RouterService.getActiveTabName()).toEqual('main');
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
@@ -376,15 +377,16 @@ describe('Router Service', () => {
         .and.returnValue(isImprovementsTabEnabledPromise);
 
       RouterService.navigateToImprovementsTab();
-      $rootScope.$apply();
-      flushMicrotasks();
+      $rootScope.$apply(); // Apply the change of active tab.
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
 
       expect(RouterService.getActiveTabName()).toEqual('improvements');
       expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
 
       resolveIsImprovementsTabEnabledPromise(true);
-      $rootScope.$apply();
-      flushMicrotasks();
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
 
       expect(RouterService.getActiveTabName()).toEqual('improvements');
       expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
@@ -399,27 +401,26 @@ describe('Router Service', () => {
       });
       spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
         .and.returnValue(isImprovementsTabEnabledPromise);
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
       RouterService.navigateToImprovementsTab();
-      $rootScope.$apply();
+      $rootScope.$apply(); // Apply the change of active tab.
 
-      // 1st check to isInitialized returned false. Should see no changes yet.
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+      // Promise hasn't been fulfilled yet, should still be on improvements tab.
       expect(RouterService.getActiveTabName()).toEqual('improvements');
 
-      // Navigate to stats tab before initialization.
       RouterService.navigateToStatsTab();
-      $rootScope.$apply();
+      $rootScope.$apply(); // Apply the change of active tab.
+
+      // Have navigated to stats tab before promise was fulfilled.
+      expect(RouterService.getActiveTabName()).toEqual('stats');
 
       resolveIsImprovementsTabEnabledPromise(false);
-      flushMicrotasks();
-      $rootScope.$apply();
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
 
-      // 2nd check to isInitialized returns true, but user has navigated away
-      // from the improvements tab. They should not be redirected to main tab.
-      expect(RouterService.getActiveTabName()).toBe('stats');
-      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+      // Promise has been fulfilled, but user has navigated away from the
+      // improvements tab. They should *not* have been redirected to main tab.
+      expect(RouterService.getActiveTabName()).toEqual('stats');
     }));
 
   it('should navigate to settings tab ', () => {

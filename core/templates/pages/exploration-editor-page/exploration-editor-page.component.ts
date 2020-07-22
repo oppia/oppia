@@ -423,10 +423,6 @@ angular.module('oppia').component('explorationEditorPage', {
         });
       };
 
-      ctrl.isImprovementsTabEnabled = false;
-      $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
-        .then(isEnabled => ctrl.isImprovementsTabEnabled = isEnabled);
-
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -604,6 +600,11 @@ angular.module('oppia').component('explorationEditorPage', {
               ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
             }
           });
+
+        // Confirm whether the improvements tab can be rendered.
+        ctrl.isImprovementsTabEnabled = false;
+        $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
+          .then(isEnabled => ctrl.isImprovementsTabEnabled = isEnabled);
 
         // Replace the ng-joyride template with one that uses <[...]>
         // interpolators instead of/ {{...}} interpolators.
