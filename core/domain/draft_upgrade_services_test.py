@@ -118,6 +118,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         Creates an exploration and migrates its state schema from version
         current_schema_version to target_schema_version. Asserts that the
         exploration was successfully migrated.
+
         Args:
             current_schema_version: string. The current schema version of the
                 exploration (eg. '29').

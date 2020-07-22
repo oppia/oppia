@@ -1681,7 +1681,7 @@ class WrittenTranslations(python_utils.OBJECT):
             for language_code in (
                     language_code_to_written_translation.keys()):
                 if (written_translations_dict['translations_mapping'][
-                    content_id][language_code]['data_format'] ==
+                        content_id][language_code]['data_format'] ==
                         WrittenTranslation.DATA_FORMAT_HTML):
                     written_translations_dict['translations_mapping'][
                         content_id][language_code]['translation'] = (

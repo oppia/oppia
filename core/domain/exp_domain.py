@@ -2534,20 +2534,23 @@ class Exploration(python_utils.OBJECT):
             for ca_spec in ca_specs:
                 schema = ca_spec.schema
                 ca_name = ca_spec.name
-                content_id_prefix = 'ca_%s_' % ca_name
                 new_content_ids = []
+                content_id_prefix = 'ca_%s_' % ca_name
 
                 def generate_content_id():
                     """Generate a content_id using content_id_prefix and
                     next_content_id_index from outer scope.
                     """
+                    # Let inner function access cell variables content_id_prefix
+                    # and next_content_id_index_dict.
+                    # pylint: disable=cell-var-from-loop
                     content_id = '%s%i' % (
                         content_id_prefix,
                         next_content_id_index_dict['value'])
                     next_content_id_index_dict['value'] += 1
                     new_content_ids.append(content_id)
                     return content_id
-                
+
                 def convert_str_to_subtitled_content(
                         ca_value, default_value, obj_type):
                     """Convert a string to a SubtitledString or
@@ -2563,7 +2566,7 @@ class Exploration(python_utils.OBJECT):
                         obj_type: str. Either 'SubtitledUnicode' or
                             'SubtitledHtml'. Indicates which key to use in
                             the return object.
-                    
+
                     Returns:
                         dict. A SubtitledHtml or SubtitledUnicode dict.
                     """
@@ -2581,7 +2584,7 @@ class Exploration(python_utils.OBJECT):
                         'content_id': generate_content_id(),
                         subtitled_dict_key: ca_value
                     }
-                
+
                 def convert_str_list_to_subtitled_content_list(
                         ca_value, default_value):
                     """Convert a list of html strings into a list of
@@ -2595,7 +2598,7 @@ class Exploration(python_utils.OBJECT):
                             be populated with its default value.
                         default_value: *. The default value of the
                             customization argument.
-                    
+
                     Returns:
                         list(dict). A list of SubtitledHtml dicts.
                     """
@@ -2622,9 +2625,9 @@ class Exploration(python_utils.OBJECT):
                 is_subtitled_html_list_spec = (
                     schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
                     (schema['items']['type'] ==
-                        schema_utils.SCHEMA_TYPE_CUSTOM) and
+                     schema_utils.SCHEMA_TYPE_CUSTOM) and
                     (schema['items']['obj_type'] ==
-                        schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML))
+                     schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML))
 
                 if is_subtitled_html_spec or is_subtitled_unicode_spec:
                     if ca_name not in ca_dict:

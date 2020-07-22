@@ -1125,8 +1125,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
