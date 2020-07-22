@@ -1145,7 +1145,11 @@ def delete_exploration_summaries(exploration_ids):
             deleted.
     """
     summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
-    exp_models.ExpSummaryModel.delete_multi(summary_models)
+    existing_summary_models = [
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
+    exp_models.ExpSummaryModel.delete_multi(existing_summary_models)
 
 
 def revert_exploration(

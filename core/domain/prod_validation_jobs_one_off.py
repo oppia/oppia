@@ -6186,6 +6186,35 @@ class PlaythroughModelValidator(BaseModelValidator):
         return [cls._validate_reference]
 
 
+class PseudonymizedUserModelValidator(BaseUserModelValidator):
+    """Class for validating PseudonymizedUserModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^pid_[a-z]{32}$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {}
+
+    @classmethod
+    def _validate_user_settings_with_same_id_not_exist(cls, item):
+        """Validates that the UserSettingsModel with the same ID as this model
+        does not exist.
+
+        Args:
+            item: PseudonymizedUserModel. PseudonymizedUserModel to validate.
+        """
+        user_model = user_models.UserSettingsModel.get_by_id(item.id)
+        if user_model is not None:
+            cls.errors['deleted user settings'].append(
+                'Entity id %s: User settings model exists' % (item.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_user_settings_with_same_id_not_exist]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -6323,6 +6352,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator),
     stats_models.PlaythroughModel: PlaythroughModelValidator,
+    user_models.PseudonymizedUserModel: PseudonymizedUserModelValidator
 }
 
 
@@ -7172,3 +7202,11 @@ class PlaythroughModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.PlaythroughModel]
+
+
+class PseudonymizedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PseudonymizedUserModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.PseudonymizedUserModel]

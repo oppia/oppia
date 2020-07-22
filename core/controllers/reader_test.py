@@ -267,9 +267,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
-        self.save_new_story(
-            story_id, 'user', 'Title', 'Description', 'Notes', topic_id
-        )
+        self.save_new_story(story_id, 'user', topic_id)
         topic_services.add_canonical_story('user', topic_id, story_id)
 
         changelist = [
