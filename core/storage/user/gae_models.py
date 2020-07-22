@@ -784,7 +784,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        # TODO(#9143): Apply deletion policy also to creator_ids.
+        ndb.delete_multi(
+            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -860,7 +861,8 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        # TODO(#9143): Apply deletion policy also to subscriber_ids.
+        ndb.delete_multi(
+            cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
