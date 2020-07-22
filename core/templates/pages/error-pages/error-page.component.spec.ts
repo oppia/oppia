@@ -56,8 +56,6 @@ let fixture: ComponentFixture<ErrorPageComponent>;
 
 describe('Error page', () => {
   let pageTitle = null;
-  let i18n = null;
-  let translate = null;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -73,8 +71,6 @@ describe('Error page', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    i18n = TestBed.get(I18nLanguageCodeService);
-    translate = TestBed.get(TranslateService);
     pageTitle = TestBed.get(PageTitleService);
   }));
 
