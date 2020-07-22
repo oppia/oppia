@@ -152,49 +152,43 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$http', '$log', '$q', '$scope', '$templateCache',
-    '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
-    'ChangeListService', 'ContextService', 'EditabilityService',
-    'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
-    'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
-    'ExplorationFeaturesBackendApiService', 'ExplorationFeaturesService',
-    'ExplorationImprovementsService',
+    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
+    'AutosaveInfoModalsService', 'ChangeListService', 'ContextService',
+    'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
+    'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
+    'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
+    'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
-    'ExplorationTitleService', 'ExplorationWarningsService',
-    'GraphDataService', 'PageTitleService', 'LoaderService',
-    'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-    'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
+    'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
+    'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
+    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService', 'StateEditorService',
     'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
     'StateTutorialFirstTimeService', 'ThreadDataService',
     'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService',
-    'EVENT_EXPLORATION_PROPERTY_CHANGED',
+    'UserExplorationPermissionsService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
-        $http, $log, $q, $scope, $templateCache,
-        $timeout, $uibModal, $window, AutosaveInfoModalsService,
-        ChangeListService, ContextService, EditabilityService,
-        ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
-        ExplorationCorrectnessFeedbackService, ExplorationDataService,
-        ExplorationFeaturesBackendApiService, ExplorationFeaturesService,
-        ExplorationImprovementsService,
+        $q, $scope, $templateCache, $timeout, $uibModal,
+        AutosaveInfoModalsService, ChangeListService, ContextService,
+        EditabilityService, ExplorationAutomaticTextToSpeechService,
+        ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
+        ExplorationDataService, ExplorationFeaturesBackendApiService,
+        ExplorationFeaturesService, ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
-        ExplorationTitleService, ExplorationWarningsService,
-        GraphDataService, PageTitleService, LoaderService,
-        ParamChangesObjectFactory, ParamSpecsObjectFactory,
-        PlaythroughIssuesService, RouterService, SiteAnalyticsService,
+        ExplorationTitleService, ExplorationWarningsService, GraphDataService,
+        PageTitleService, LoaderService, ParamChangesObjectFactory,
+        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService, StateEditorService,
         StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
         StateTutorialFirstTimeService, ThreadDataService,
         UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService,
-        EVENT_EXPLORATION_PROPERTY_CHANGED) {
+        UserExplorationPermissionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -602,7 +596,6 @@ angular.module('oppia').component('explorationEditorPage', {
             }
           });
 
-        // Confirm whether the improvements tab can be rendered.
         ctrl.isImprovementsTabEnabled = false;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
           .then(improvementsTabIsEnabled => {

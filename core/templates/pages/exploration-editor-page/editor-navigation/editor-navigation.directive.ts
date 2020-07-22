@@ -27,10 +27,10 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/context.service.ts');
-require('services/contextual/window-dimensions.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('editorNavigation', () => ({
   restrict: 'E',

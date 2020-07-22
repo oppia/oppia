@@ -21,6 +21,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
+  ExplorationImprovementsConfig,
+  ExplorationImprovementsConfigBackendDict,
+  ExplorationImprovementsConfigObjectFactory,
+} from 'domain/improvements/exploration-improvements-config-object.factory';
+import {
   ExplorationTask,
   ExplorationTaskBackendDict,
   ExplorationTaskObjectFactory
@@ -29,11 +34,6 @@ import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import {
-  ExplorationImprovementsConfig,
-  ExplorationImprovementsConfigBackendDict,
-  ExplorationImprovementsConfigObjectFactory,
-} from 'domain/improvements/exploration-improvements-config-object.factory';
 
 export interface IExplorationImprovementsResponseBackendDict {
   'open_tasks': ExplorationTaskBackendDict[];

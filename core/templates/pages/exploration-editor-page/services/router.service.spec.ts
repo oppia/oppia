@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for RouterService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
-import $ from 'jquery';
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import $ from 'jquery';
+
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Router Service', () => {
   var RouterService = null;

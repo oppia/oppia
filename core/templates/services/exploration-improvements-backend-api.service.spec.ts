@@ -21,6 +21,10 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import {
+  ExplorationImprovementsConfig,
+  ExplorationImprovementsConfigBackendDict,
+} from 'domain/improvements/exploration-improvements-config-object.factory';
+import {
   ExplorationTaskBackendDict,
   ExplorationTaskObjectFactory,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
@@ -31,10 +35,6 @@ import {
   IExplorationImprovementsHistoryResponseBackendDict,
   IExplorationImprovementsResponseBackendDict,
 } from 'services/exploration-improvements-backend-api.service';
-import {
-  ExplorationImprovementsConfig,
-  ExplorationImprovementsConfigBackendDict,
-} from 'domain/improvements/exploration-improvements-config-object.factory';
 
 describe('Exploration stats backend api service', () => {
   let explorationTaskObjectFactory: ExplorationTaskObjectFactory;

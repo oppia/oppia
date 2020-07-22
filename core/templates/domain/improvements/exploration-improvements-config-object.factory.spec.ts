@@ -37,9 +37,9 @@ describe('ExplorationImprovementsConfigObjectFactory', function() {
       exploration_id: 'eid',
       exploration_version: 1,
       is_improvements_tab_enabled: true,
-      high_bounce_rate_task_minimum_exploration_starts: 350,
       high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.6,
       high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.5,
+      high_bounce_rate_task_minimum_exploration_starts: 350,
     };
 
     expect(

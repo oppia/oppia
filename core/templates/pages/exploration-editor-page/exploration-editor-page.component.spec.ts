@@ -35,10 +35,10 @@ import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
-import { ExplorationFeaturesBackendApiService } from
-  'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
+import { ExplorationFeaturesBackendApiService } from
+  'services/exploration-features-backend-api.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';

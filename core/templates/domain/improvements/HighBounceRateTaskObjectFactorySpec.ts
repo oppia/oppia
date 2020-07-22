@@ -20,10 +20,10 @@ import { TestBed } from '@angular/core/testing';
 
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
-import { ExplorationStatsObjectFactory, ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
+import { ExplorationStatsObjectFactory, ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 
 describe('High bounce rate task', function() {
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;

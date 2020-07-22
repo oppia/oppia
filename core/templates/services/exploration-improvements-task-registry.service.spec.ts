@@ -20,6 +20,26 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import {
+  ExplorationTask,
+  ExplorationTaskType,
+  ExplorationTaskBackendDict,
+  ExplorationTaskObjectFactory
+} from 'domain/improvements/ExplorationTaskObjectFactory';
+import { HighBounceRateTask } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { IneffectiveFeedbackLoopTask } from
+  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from
+  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { SuccessiveIncorrectAnswersTask } from
+  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
+import { IStateBackendDict } from 'domain/state/StateObjectFactory';
+import { ExplorationStatsObjectFactory, IExplorationStatsBackendDict } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
@@ -27,34 +47,13 @@ import {
   IEarlyQuitPlaythroughIssueBackendDict,
   IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssueObjectFactory,
+  PlaythroughIssueObjectFactory
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsObjectFactory, IExplorationStatsBackendDict } from
-  'domain/statistics/ExplorationStatsObjectFactory';
-import {
-  ExplorationTask,
-  ExplorationTaskType,
-  ExplorationTaskBackendDict,
-  ExplorationTaskObjectFactory,
-} from 'domain/improvements/ExplorationTaskObjectFactory';
-import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
-import { IStateBackendDict } from
-  'domain/state/StateObjectFactory';
 import { IStateStatsBackendDict } from
   'domain/statistics/StateStatsObjectFactory';
-import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { StatesObjectFactory } from
-  'domain/exploration/StatesObjectFactory';
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
+
 
 describe('Exploration improvements task registrar service', () => {
   let explorationImprovementsTaskRegistryService:
