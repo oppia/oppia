@@ -122,11 +122,6 @@ class ExplorationImprovementsConfigHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
-        """Handles GET requests for exploration improvements' configuration.
-
-        Args:
-            unused_exploration_id: str. The ID of the exploration.
-        """
         self.render_json({
             'exploration_id': exploration_id,
             'exploration_version': (
