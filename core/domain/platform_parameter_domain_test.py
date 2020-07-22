@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the platform parameter domain classes."""
+"""Tests for the domain objects relating to platform parameters."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -32,12 +32,12 @@ memcache_services = models.Registry.import_memcache_services()
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
-    """Test for the PlatformParameterChange."""
+    """Test for the PlatformParameterChange class."""
 
     VALID_CMD_NAME = (
         parameter_domain
         .PlatformParameterChange
-        .CMD_REPLACE_PARAMETER_RULES)
+        .CMD_EDIT_RULES)
 
     def test_param_change_object_with_missing_cmd_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -56,7 +56,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
                 'The following required attributes are missing: '
                 'new_rules')):
             parameter_domain.PlatformParameterChange({
-                'cmd': self.VALID_CMD_NAME
+                'cmd': self.CMD_EDIT_RULES
             })
 
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
@@ -65,7 +65,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             parameter_domain.PlatformParameterChange({
-                'cmd': self.VALID_CMD_NAME,
+                'cmd': self.CMD_EDIT_RULES,
                 'new_rules': [],
                 'invalid': 'invalid'
             })
@@ -73,18 +73,18 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_with_valid_data(self):
         param_change_object = (
             parameter_domain.PlatformParameterChange({
-                'cmd': self.VALID_CMD_NAME,
+                'cmd': self.CMD_EDIT_RULES,
                 'new_rules': []
             }))
 
         self.assertEqual(
-            param_change_object.cmd, self.VALID_CMD_NAME)
+            param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(
             param_change_object.new_rules, [])
 
     def test_to_dict(self):
         param_change_dict = {
-            'cmd': self.VALID_CMD_NAME,
+            'cmd': self.CMD_EDIT_RULES,
             'new_rules': []
         }
         param_change_object = (

@@ -25,10 +25,9 @@ import { ITaskEntryBackendDict, TaskEntry } from
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
-export class IneffectiveFeedbackLoopTask extends TaskEntry {
-  public readonly taskType: 'ineffective_feedback_loop';
-
-  constructor(backendDict: ITaskEntryBackendDict) {
+export class IneffectiveFeedbackLoopTask extends TaskEntry<
+    'ineffective_feedback_loop'> {
+  constructor(backendDict: ITaskEntryBackendDict<'ineffective_feedback_loop'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -101,7 +100,8 @@ export class IneffectiveFeedbackLoopTaskObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict): IneffectiveFeedbackLoopTask {
+      backendDict: ITaskEntryBackendDict<'ineffective_feedback_loop'>
+  ): IneffectiveFeedbackLoopTask {
     return new IneffectiveFeedbackLoopTask(backendDict);
   }
 }

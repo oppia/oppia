@@ -36,13 +36,13 @@ require(
   'editor-navigation.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.directive.ts');
+  'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.directive.ts');
+  'exploration-title-editor.component.ts');
 require(
   'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(
@@ -58,7 +58,7 @@ require(
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
-  'improvements-tab.directive.ts');
+  'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require(
@@ -313,7 +313,7 @@ angular.module('oppia').component('explorationEditorPage', {
             });
 
           StateEditorService.updateExplorationWhitelistedStatus(
-            featuresData.is_exploration_whitelisted);
+            featuresData.isExplorationWhitelisted);
 
           GraphDataService.recompute();
 

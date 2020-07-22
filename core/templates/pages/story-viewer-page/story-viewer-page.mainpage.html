@@ -109,6 +109,10 @@
         width: 40px;
       }
 
+      .oppia-lesson-icon-unavailable {
+        border: #bdbdbd 3px solid;
+      }
+
       .oppia-story-viewer-title {
         color: #00645C;
         font-family: Capriola, Roboto, Arial, sans-serif;
@@ -263,6 +267,11 @@
     <oppia-root>
       <div ng-controller="Base">
         <base-content>
+          <navbar-pre-logo-action>
+            <story-viewer-navbar-pre-logo-action>
+            </story-viewer-navbar-pre-logo-action>
+          </navbar-pre-logo-action>
+
           <navbar-breadcrumb>
             <story-viewer-navbar-breadcrumb>
             </story-viewer-navbar-breadcrumb>

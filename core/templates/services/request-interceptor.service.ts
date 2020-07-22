@@ -45,7 +45,7 @@ export class MockCsrfTokenService {
         let actualData = data.substring(5);
         return JSON.parse(actualData);
       },
-    }).then(function(response: any) {
+    }).then(function(response: {token: string}) {
       return response.token;
     });
   }
