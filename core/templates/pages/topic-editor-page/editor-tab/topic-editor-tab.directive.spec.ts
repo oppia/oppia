@@ -60,7 +60,6 @@ describe('Topic editor tab directive', function() {
     $scope = $rootScope.$new();
     ContextService = $injector.get('ContextService');
     $uibModalInstance = $injector.get('$uibModal');
-    $q = $injector.get('$q');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     directive = $injector.get('topicEditorTabDirective')[0];
