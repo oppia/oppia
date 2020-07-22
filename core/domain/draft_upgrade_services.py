@@ -91,6 +91,22 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v34_dict_to_v35_dict(cls, draft_change_list):
+        """Converts draft change list from state version 34 to 35. State
+        version 35 add a contentDescription to ImageWithRegion in 
+        ImageClickInput interaction, for which there should be no 
+        changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):
         """Converts draft change list from state version 33 to 34. State
         version 34 adds the new schema for Math components.

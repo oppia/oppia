@@ -366,7 +366,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                       ctrl.rectWidth,
                       ctrl.rectHeight
                     )
-                  }
+                  },
+                  regionDescription: ''
                 };
                 ctrl.value.labeledRegions.push(newRegion);
                 ctrl.selectedRegion = (

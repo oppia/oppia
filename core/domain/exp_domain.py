@@ -2435,9 +2435,10 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
-        """Converts from version 34 to 35. Version 34 adds a new
+        """Converts from version 34 to 35. Version 35 adds a new
         customization arg to ImageClickInput which allows
-        content description for every region.
+        content description for every region which is required
+        for reading out to accessibility users.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
