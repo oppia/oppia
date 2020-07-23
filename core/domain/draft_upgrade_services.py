@@ -104,9 +104,42 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        print('\n'*10)
-        print(draft_change_list)
-        print('\n'*10)
+        # types_of_inputs = set()
+        for i, change in enumerate(draft_change_list):
+            print('\n'*10)
+            print(change.to_dict())
+            print('\n'*10)
+        #     if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+        #         if change.property_name == (
+        #                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+        #             for answer_group in change.new_value:
+        #                 for rule_spec in answer_group.rule_specs:
+        #                     rule_input = ltt.latex_to_text(
+        #                         rule_spec['inputs']['x'])
+        #                     rule_input = exp_domain.clean_math_expression(
+        #                         rule_input)
+                            
+        #                     type_of_input = exp_domain.TYPE_INVALID_EXPRESSION
+        #                     if is_valid_algebraic_expression(rule_input):
+        #                         type_of_input = (
+        #                             exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+        #                     elif is_valid_numeric_expression(rule_input):
+        #                         type_of_input = (
+        #                             exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
+        #                     elif is_valid_math_equation(rule_input):
+        #                         type_of_input = (
+        #                             exp_domain.TYPE_VALID_MATH_EQUATION)
+
+        #                     types_of_inputs.add(type_of_input)
+
+        #                     if type_of_input != (
+        #                             exp_domain.TYPE_INVALID_EXPRESSION):
+        #                         rule_spec['inputs']['x'] = rule_input
+        #                         if type_of_input == (
+        #                                 exp_domain.TYPE_VALID_MATH_EQUATION):
+        #                             rule_spec['inputs']['y'] = 'both'
+        #                         rule_spec['rule_type'] = 'MatchesExactlyWith'
+
         return draft_change_list
 
     @classmethod
