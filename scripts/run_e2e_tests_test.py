@@ -318,7 +318,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
 
         with is_port_open_swap, sleep_swap:
-            run_e2e_tests.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_open(1)
         self.assertEqual(mock_is_port_open.wait_time, 11)
         self.assertEqual(mock_sleep.called_times, 10)
 
@@ -338,10 +338,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
-            run_e2e_tests.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_open(1)
         self.assertEqual(
             mock_sleep.sleep_time,
-            run_e2e_tests.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
+            common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
     def test_run_webpack_compilation_success(self):
         def mock_isdir(unused_dirname):
@@ -866,7 +866,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
@@ -980,7 +980,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
@@ -1118,7 +1118,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
@@ -1236,7 +1236,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
