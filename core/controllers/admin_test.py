@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
+from core import features_registry
 from core import jobs
 from core import jobs_registry
 from core import jobs_test
@@ -29,6 +30,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
+from core.domain import platform_parameter_domain
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -702,6 +704,48 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(recommendations_services.get_topic_similarity(
             'Art', 'Biology'), 0.2)
 
+        self.logout()
+
+    def test_update_feature_flag_rules(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_domain.Registry.create_feature_flag(
+            name='test_feature_1',
+            description='feature for test.',
+            stage='dev',
+        )
+        new_rule_dicts = [
+            {
+                'filters': [{'type': 'mode', 'value': 'dev'}],
+                'value_when_matched': True
+            },
+            {'filters': [], 'value_when_matched': False},
+        ]
+
+        feature_list_ctx = self.swap(
+            features_registry, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            features_registry, 'ALL_FEATURES_NAMES_SET', set([feature.name]))
+        with feature_list_ctx, feature_set_ctx:
+            response_dict = self.get_json('/adminhandler')
+            self.assertEqual(
+                response_dict['feature_flags'],
+                {feature.name: feature.to_dict()})
+
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'message': 'test update feature',
+                }, csrf_token=csrf_token)
+
+            response_dict = self.get_json('/adminhandler')
+            rules = response_dict['feature_flags'][feature.name]['rules']
+            self.assertEqual(rules, new_rule_dicts)
+
+        platform_parameter_domain.Registry.parameter_registry.pop(feature.name)
         self.logout()
 
 
