@@ -19,12 +19,10 @@
 import { TestBed } from '@angular/core/testing';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { ThreadStatusDisplayService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { AlertsService } from 'services/alerts.service';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
+import { DateTimeFormatService } from 'services/date-time-format.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -33,20 +31,20 @@ describe('Feedback Tab Component', function() {
   var $uibModal = null;
   var alertsService = null;
   var changeListService = null;
+  var dateTimeFormatService = null;
   var editabilityService = null;
   var explorationStatesService = null;
   var suggestionModalForExplorationEditorService = null;
   var suggestionThreadObjectFactory = null;
   var threadDataService = null;
-  var threadStatusDisplayService = null;
   var userService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
+    dateTimeFormatService = TestBed.get(DateTimeFormatService);
     suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
-    threadStatusDisplayService = TestBed.get(ThreadStatusDisplayService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -310,7 +308,8 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should open show suggestion modal', function() {
-    spyOn(threadDataService, 'getThread').and.returnValue(
+    var getThreadSpy = spyOn(threadDataService, 'getThread');
+    getThreadSpy.and.returnValue(
       suggestionThreadObjectFactory.createFromBackendDicts({
         status: 'Open',
         subject: '',
@@ -342,10 +341,42 @@ describe('Feedback Tab Component', function() {
 
     spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
       .and.callFake(function(suggestionType, obj) {
-        obj.setActiveThread('1');
+        obj.setActiveThread('0');
       });
+
+    getThreadSpy.and.returnValue(
+      suggestionThreadObjectFactory.createFromBackendDicts({
+        status: 'Review',
+        subject: '',
+        summary: '',
+        original_author_username: 'Username1',
+        last_updated_msecs: 0,
+        message_count: 1,
+        thread_id: '2',
+        last_nonempty_message_author: 'Message 1',
+        last_nonempty_message_text: 'Message 2'
+      }, {
+        suggestion_type: 'edit_exploration_state_content',
+        suggestion_id: '2',
+        target_type: '',
+        target_id: '',
+        status: '',
+        author_name: '',
+        change: {
+          state_name: '',
+          new_value: '',
+          old_value: '',
+        },
+        last_updated_msecs: 0
+      }));
     ctrl.showSuggestionModal();
     $scope.$apply();
+
+    expect(
+      suggestionModalForExplorationEditorService.showSuggestionModal)
+      .toHaveBeenCalled();
+    expect(ctrl.tmpMessage.status).toBe('Review');
+    expect(ctrl.tmpMessage.text).toBe('');
   });
 
   it('should create a new thread when closing create new thread modal',
@@ -397,6 +428,9 @@ describe('Feedback Tab Component', function() {
   });
 
   it('shoud get locale date time string', function() {
+    // This method is being spied to avoid any timezone issues.
+    spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
+      .returnValue('11/21/14');
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
     var NOW_MILLIS = 1416563100000;
     expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
