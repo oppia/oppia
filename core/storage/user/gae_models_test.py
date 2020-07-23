@@ -2274,7 +2274,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
         # Test that calling apply_deletion_policy with no existing model
         # doesn't fail.
         user_models.UserAuthModel.apply_deletion_policy(
-            self.NONEXISTENT_USER_ID)       
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -2298,22 +2298,19 @@ class UserAuthModelTests(test_utils.GenericTestBase):
 
     def test_get_by_auth_id_for_single_element_in_auth_id_attribute(self):
         self.assertEqual(
-            user_models.UserAuthModel
-            .get_by_id(self.USER_1_ID),
+            user_models.UserAuthModel.get_by_id(self.USER_1_ID),
             user_models.UserAuthModel
             .get_by_auth_id(constants.GAE_ID_AUTH, self.USER_1_GAE_ID[0])
         )
 
     def test_get_by_auth_id_for_list_in_auth_id_attribute(self):
         self.assertEqual(
-            user_models.UserAuthModel
-            .get_by_id(self.USER_2_ID),
+            user_models.UserAuthModel.get_by_id(self.USER_2_ID),
             user_models.UserAuthModel
             .get_by_auth_id(constants.GAE_ID_AUTH, self.USER_2_GAE_IDs[0])
         )
         self.assertEqual(
-            user_models.UserAuthModel
-            .get_by_id(self.USER_2_ID),
+            user_models.UserAuthModel.get_by_id(self.USER_2_ID),
             user_models.UserAuthModel
             .get_by_auth_id(constants.GAE_ID_AUTH, self.USER_2_GAE_IDs[1])
         )
