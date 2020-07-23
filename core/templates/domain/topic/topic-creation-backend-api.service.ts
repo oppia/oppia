@@ -25,11 +25,8 @@ import { IImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 
-export interface ITopicCreationBackend {
-  name: string;
-  thumbnailBgColor: string;
-  description: string;
-  filename: string;
+interface TopicCreationResponse {
+  topicId: string;
 }
 
 @Injectable({
@@ -39,11 +36,11 @@ export class TopicCreationBackendApiService {
   constructor(private http: HttpClient) { }
 
   _createTopic(
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback:(reason?: any) => void,
+      successCallback: (value?: TopicCreationResponse) => void,
+      errorCallback:(reason?: string) => void,
       topic: NewlyCreatedTopic, imagesData: IImageData[],
       bgColor: string): void {
-    let postData: ITopicCreationBackend = {
+    let postData = {
       name: topic.name,
       description: topic.description,
       thumbnailBgColor: bgColor,
@@ -54,9 +51,9 @@ export class TopicCreationBackendApiService {
     body.append('payload', JSON.stringify(postData));
     body.append('image', imagesData[0].imageBlob);
 
-    this.http.post(
+    this.http.post<TopicCreationResponse>(
       '/topic_editor_handler/create_new', body).toPromise()
-      .then((response: { topicId: string }) => {
+      .then(response => {
         if (successCallback) {
           successCallback({
             topicId: response.topicId
@@ -71,11 +68,12 @@ export class TopicCreationBackendApiService {
 
   createTopic(
       topic: NewlyCreatedTopic, imagesData: IImageData[],
-      bgColor: string): PromiseLike<Object> {
+      bgColor: string): Promise<TopicCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createTopic(resolve, reject, topic, imagesData, bgColor);
     });
   }
 }
+
 angular.module('oppia').factory('TopicCreationBackendApiService',
   downgradeInjectable(TopicCreationBackendApiService));
