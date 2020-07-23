@@ -102,9 +102,10 @@ DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
 DELETED_SKILL_REJECT_MESSAGE = 'The associated skill no longer exists.'
 
 # The message to be shown when rejecting a translation suggestion that is
-# associated with an exploration, which is associated with a story that is
-# being deleted.
-DELETED_STORY_REJECT_MESSAGE = 'The associated story no longer exists.'
+# associated with an exploration that no longer corresponds to the story.
+# The story could be deleted or the exploration could have been
+# removed from the story.
+INVALID_STORY_REJECT_MESSAGE = 'The associated story no longer exists.'
 
 # The amount to increase the score of the author by after successfuly getting an
 # accepted suggestion.
