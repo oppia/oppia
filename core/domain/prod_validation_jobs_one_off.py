@@ -1884,7 +1884,7 @@ class ConfigPropertyModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*$'
+        return r'^[A-Za-z0-9_]{1,100}$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1910,7 +1910,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1936,7 +1936,7 @@ class ConfigPropertySnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
