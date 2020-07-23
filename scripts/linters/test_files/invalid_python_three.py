@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python file with valid syntax, used by scripts/linters/
+"""Python file with invalid syntax, used by scripts/linters/
 python_linter_test.py. This file doesnot import from __future__.
 """
 
