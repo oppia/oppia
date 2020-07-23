@@ -38,6 +38,9 @@ angular.module('oppia').component('onScreenKeyboard', {
 
       ctrl.currentTab = 'mainTab';
       ctrl.allLetters = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+      ctrl.functions = [
+        'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
+        'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
 
       ctrl.activateGuppy = function() {
         guppyInstance.activate();

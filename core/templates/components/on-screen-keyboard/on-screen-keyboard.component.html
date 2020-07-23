@@ -6,7 +6,7 @@
     <button ng-class="($ctrl.currentTab === 'functionsTab') ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab('functionsTab')">
       f(x)
     </button>
-    <button ng-class="($ctrl.currentTab === 'lettersTab') ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab('lettersTab')">
+    <button ng-if="!$ctrl.customizable" ng-class="($ctrl.currentTab === 'lettersTab') ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab('lettersTab')">
       abc
     </button>
     <button class="oppia-osk-btn-hide" ng-click="$ctrl.hideOSK()">
@@ -49,20 +49,7 @@
     <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('abs')">||</button>
     <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-exponent-2.svg')]>" class="oppia-osk-btn-shortcut" alt="^2" ng-click="$ctrl.exponent('2')">
     <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-exponent-3.svg')]>" class="oppia-osk-btn-shortcut" alt="^3" ng-click="$ctrl.exponent('3')">
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('log')">log</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('ln')">ln</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('sin')">sin</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('cos')">cos</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('tan')">tan</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('sec')">sec</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('csc')">csc</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('cot')">cot</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('arcsin')">arcsin</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('arccos')">arccos</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('arctan')">arctan</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('sinh')">sinh</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('cosh')">cosh</button>
-    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertSymbol('tanh')">tanh</button>
+    <button class="oppia-osk-btn-function" ng-click="$ctrl.insertString(function)" ng-repeat="function in $ctrl.functions"><[function]></button>
     <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.backspace()">
   </div>
   <div class="oppia-osk-letters-tab" ng-if="$ctrl.currentTab==='lettersTab'">
