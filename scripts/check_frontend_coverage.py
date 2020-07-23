@@ -286,7 +286,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'preview-tab.directive.ts',
     'profile-link-image.directive.ts',
     'profile-link-text.directive.ts',
-    'profile-page-navbar.directive.ts',
+    'profile-page-navbar.component.ts',
     'progress-nav.directive.ts',
     'promo-bar.directive.ts',
     'promo-bar.service.ts',
