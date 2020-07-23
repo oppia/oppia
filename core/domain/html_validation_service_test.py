@@ -1760,14 +1760,17 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         # Here '+,+,+,+(x^2)' won't be extracted because the corresponding
         # math tag has a non-empty svg_filename field.
-        expected_list_of_latex_strings = [b'\\sqrt{x}', b'\\frac{x}{y}']
+        expected_list_of_latex_strings = ['\\sqrt{x}', '\\frac{x}{y}']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
         list_of_latex_string = (
             html_validation_service.
             get_latex_strings_without_svg_from_html(
                 html_string))
         self.assertEqual(
             sorted(list_of_latex_string),
-            sorted(expected_list_of_latex_strings))
+            sorted(expected_list_of_encoded_latex_strings))
 
     def test_extract_latex_strings_when_no_math_tags_are_present(self):
         """Test that get_latex_strings_without_svg_from_html
