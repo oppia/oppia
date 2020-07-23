@@ -17,51 +17,45 @@
  * any learner answer info.
  */
 
-import {ExplorationDataService} from
-  './exploration-data.service';
-import {UrlInterpolationService} from
-  '../../../domain/utilities/url-interpolation.service';
-import {LearnerAnswerInfo} from
-  '../../../domain/statistics/LearnerAnswerInfoObjectFactory';
-import {LearnerAnswerDetails} from
-  '../../../domain/statistics/LearnerAnswerDetailsObjectFactory';
-import {downgradeInjectable} from
-  '@angular/upgrade/static';  
-import {Injectable} from
-  '@angular/core';
-import {HttpClient} from
-  '@angular/common/http';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
+import { ExplorationDataService } from
+  'exploration-data.service';
+import { LearnerAnswerDetails } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfo } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 @Injectable( {
   providedIn: 'root'
 })
 export class LearnerAnswerDetailsDataService {
-  
   constructor(
     private explorationDataService:ExplorationDataService,
-    private urlInterpolationService: UrlInterpolationService,
     private http:HttpClient,
-  ){
-    
-  }
-    _expId;
-    _data;
+    private urlInterpolationService: UrlInterpolationService,
+  ){}
+    _expId: string;
+    _data: [];
     learnerAnswerInfoData=null;
-    LEARNER_ANSWER_INFO_DATA_URL=(
+    LEARNER_ANSWER_INFO_DATA_URL = (
       '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
       '<entity_id>'
     );
 
-   private _fetchLearnerAnswerInfoData=()=>{
-      var learnerAnswerInfoDataUrl=this.urlInterpolationService.interpolateUrl(
+   private _fetchLearnerAnswerInfoData(){
+      const learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
         this.LEARNER_ANSWER_INFO_DATA_URL, {
         entity_type : 'exploration',
         entity_id : this._expId
         });
-        return this.http.get(learnerAnswerInfoDataUrl);
+        return this.http.get(learnerAnswerInfoDataUrl).toPromise();
     }
-    private _deleteLearnerAnswerInfo=(entityId, stateName, learnerAnswerInfoId)=>{
-      var learnerAnswerInfoDataUrl=this.urlInterpolationService.interpolateUrl(
+    private _deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId){
+      const learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
         this.LEARNER_ANSWER_INFO_DATA_URL,{
           entity_type:'exploration',
           entity_id:entityId
@@ -80,17 +74,17 @@ export class LearnerAnswerDetailsDataService {
       return this._fetchLearnerAnswerInfoData().toPromise().then(
         (response)=>{
           this.learnerAnswerInfoData = response.body.learner_answer_info_data;
-          for (var i = 0;i < this.learnerAnswerInfoData.length;i++) {
-            var stateName = this.learnerAnswerInfoData[i].state_name;
-            var interactionId = this.learnerAnswerInfoData[i].interaction_id;
-            var customizationArgs = 
+          for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
+            const stateName = this.learnerAnswerInfoData[i].state_name;
+            const interactionId = this.learnerAnswerInfoData[i].interaction_id;
+            const customizationArgs = 
             this.learnerAnswerInfoData[i].customization_args;
-            var learnerAnswerInfoDicts = (
+            const learnerAnswerInfoDicts = (
               this.learnerAnswerInfoData[i].learner_answer_info_dicts
             );
-            var learnerAnswerDetails = (
+            const learnerAnswerDetails = (
               LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
-                this._expId,stateName, interactionId,customizationArgs, 
+                this._expId, stateName, interactionId, customizationArgs,
                 learnerAnswerInfoDicts.map(
                   LearnerAnswerInfo.createFormBackendDict
                 )
@@ -102,7 +96,7 @@ export class LearnerAnswerDetailsDataService {
         }
       );
     }
-    public deleteLearnerAnswerInfo(entityId,stateName,learnerAnswerInfoId) {
+    public deleteLearnerAnswerInfo(entityId,stateName, learnerAnswerInfoId) {
       return this._deleteLearnerAnswerInfo(
         entityId,stateName,learnerAnswerInfoId
       ).toPromise().then((response)=>{

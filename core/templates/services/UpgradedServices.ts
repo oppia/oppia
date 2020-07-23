@@ -749,9 +749,9 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerAnswerDetailsService']=new LearnerAnswerDetailsDataService(
-      upgradedServices['UrlInterPolationService'],
       upgradedServices['ExplorationDataService'],
-      upgradedServices['HttpClient']
+      upgradedServices['HttpClient'],
+      upgradedServices['UrlInterPolationService']
     );
     upgradedServices['LearnerExplorationSummaryObjectFactory'] =
       new LearnerExplorationSummaryObjectFactory();
