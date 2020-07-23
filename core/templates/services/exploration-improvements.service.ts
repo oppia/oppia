@@ -20,6 +20,11 @@
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts')
+require('services/context.service.ts');
 require('services/exploration-improvements-backend-api.service.ts');
 
 angular.module('oppia').factory('ExplorationImprovementsService', [
