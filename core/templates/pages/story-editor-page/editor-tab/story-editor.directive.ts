@@ -145,7 +145,7 @@ angular.module('oppia').directive('storyEditor', [
             });
           };
 
-          $scope.addNode = function() {
+          $scope.createNode = function() {
             var nodeTitles = $scope.linearNodesList.map(function(node) {
               return node.getTitle();
             });

@@ -28,7 +28,7 @@ angular.module('oppia').factory('StoryUpdateService', [
   'UndoRedoService', 'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
-  'INITIAL_NODE_ID', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
+  'INITIAL_NODE_ID', 'NODE', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
   'STORY_NODE_PROPERTY_DESCRIPTION', 'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
   'STORY_NODE_PROPERTY_EXPLORATION_ID',
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
@@ -41,7 +41,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       UndoRedoService, CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
-      INITIAL_NODE_ID, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
+      INITIAL_NODE_ID, NODE, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
       STORY_NODE_PROPERTY_DESCRIPTION, STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       STORY_NODE_PROPERTY_EXPLORATION_ID,
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
@@ -513,13 +513,13 @@ angular.module('oppia').factory('StoryUpdateService', [
           });
       },
       /**
-       * Removes a destination node id from a node of a story and records the
-       * change in the undo/redo service.
+       * Removes a node of a story and records the change in the
+       * undo/redo service.
        */
       rearrangeNodeInStory: function(
           story, fromIndex, toIndex) {
         _applyStoryContentsPropertyChange(
-          story, 'node', fromIndex, toIndex,
+          story, NODE, fromIndex, toIndex,
           function(changeDict, story) {
             // ---- Apply ----
             story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);

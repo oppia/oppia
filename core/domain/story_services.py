@@ -127,7 +127,8 @@ def apply_change_list(story_id, change_list):
                 else:
                     story.mark_node_outline_as_unfinalized(change.node_id)
             elif change.cmd == story_domain.CMD_REARRANGE_STORY_NODE:
-                story.rearrange_node_in_story(change.from_index, change.to_index)
+                story.rearrange_node_in_story(
+                    change.from_index, change.to_index)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
@@ -187,7 +188,8 @@ def apply_change_list(story_id, change_list):
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
                 if change.property_name == story_domain.NODE:
-                    story.rearrange_node_in_story(change.old_value, change.new_value)
+                    story.rearrange_node_in_story(
+                        change.old_value, change.new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):

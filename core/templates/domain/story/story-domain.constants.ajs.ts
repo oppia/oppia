@@ -70,6 +70,8 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant(
   'INITIAL_NODE_ID', StoryDomainConstants.INITIAL_NODE_ID);
+angular.module('oppia').constant(
+  'NODE', StoryDomainConstants.NODE);
 
 angular.module('oppia').constant(
   'STORY_NODE_PROPERTY_TITLE', StoryDomainConstants.STORY_NODE_PROPERTY_TITLE);

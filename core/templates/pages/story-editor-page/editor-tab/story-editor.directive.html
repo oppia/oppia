@@ -107,10 +107,13 @@
     <div class="chapter-list-container">
       <md-card class="oppia-page-card oppia-long-text content-card">
         <div class="story-node-editor">
-          <div class="story-nodes-container">
-            <button ng-click="addNode()" class="protractor-test-add-chapter-button">
+          <div class="chapter-list-card-header">
+            <span>Chapters</span>
+            <button ng-click="createNode()" class="btn add-chapter-btn protractor-test-add-chapter-button">
               Add Chapter
             </button>
+          </div>
+          <div class="story-nodes-container">
             <div ng-repeat="node in linearNodesList track by $index">
               <md-card class="story-editor-node"
                        ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
@@ -300,5 +303,18 @@
   }
   story-editor .story-contain-text {
     font-size: smaller;
+  }
+  story-editor .add-chapter-btn {
+    background-color: #008098;
+    color: #FFFFFF;
+    text-align: left;
+  }
+  .chapter-list-card-header {
+    align-items: center;
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
   }
 </style>

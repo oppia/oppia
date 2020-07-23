@@ -1289,12 +1289,11 @@ class Story(python_utils.OBJECT):
             new_destination_node_ids)
 
     def rearrange_node_in_story(self, from_index, to_index):
-        """Rearranges or moves a canonical story to another position.
+        """Rearranges or moves a node in the story content.
 
         Args:
-            from_index: int. The index of canonical story to move.
-            to_index: int. The index at which to insert the moved canonical
-                story.
+            from_index: int. The index of the node to move.
+            to_index: int. The index at which to insert the moved node.
 
         Raises:
             Exception. Invalid input.
