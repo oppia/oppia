@@ -69,6 +69,14 @@ describe('Exploration player page', function() {
         exploration: exploration
       }));
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    
+    spyOn(document, 'getElementById').and.callFake(function() {
+      return document.createElement('button');
+    });
+
+    spyOn(document, 'querySelector').and.callFake(function() {
+      return document.createElement('button');
+    });
 
     var angularElementSpy = spyOn(angular, 'element');
 
@@ -97,14 +105,6 @@ describe('Exploration player page', function() {
       // in the lints.
       'meta[property="og:description"]').and.returnValue(
       elementDescriptionProperty);
-
-    spyOn(document, 'getElementById').and.callFake(function() {
-      return document.createElement('button');
-    });
-
-    spyOn(document, 'querySelector').and.callFake(function() {
-      return document.createElement('button');
-    });
 
     ctrl.$onInit();
     $scope.$apply();
