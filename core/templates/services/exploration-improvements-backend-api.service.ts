@@ -30,14 +30,14 @@ import { ImprovementsConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-export interface IExplorationImprovementsResponseBackendDict {
+export interface ExplorationImprovementsResponseBackendDict {
   'open_tasks': ExplorationTaskBackendDict[];
   'resolved_task_types_by_state_name': {
     [stateName: string]: string[];
   };
 }
 
-export interface IExplorationImprovementsHistoryResponseBackendDict {
+export interface ExplorationImprovementsHistoryResponseBackendDict {
   'results': ExplorationTaskBackendDict[];
   'cursor': string;
   'more': boolean;
@@ -69,7 +69,7 @@ export class ExplorationImprovementsBackendApiService {
         ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
           exploration_id: expId
         }));
-    return this.http.get<IExplorationImprovementsResponseBackendDict>(
+    return this.http.get<ExplorationImprovementsResponseBackendDict>(
       explorationImprovementsUrl
     ).toPromise().then(
       backendDict => new ExplorationImprovementsResponse(
@@ -102,7 +102,7 @@ export class ExplorationImprovementsBackendApiService {
     if (cursor) {
       params = params.append('cursor', cursor);
     }
-    return this.http.get<IExplorationImprovementsHistoryResponseBackendDict>(
+    return this.http.get<ExplorationImprovementsHistoryResponseBackendDict>(
       explorationImprovementsHistoryUrl, {params}
     ).toPromise().then(
       backendDict => new ExplorationImprovementsHistoryResponse(

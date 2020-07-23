@@ -26,16 +26,16 @@ import { AppConstants } from 'app.constants';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { IBindableVoiceovers, RecordedVoiceovers } from
+import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { IInteractionCustomizationArgs } from
+import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
-export interface IInputResponsePair {
+export interface InputResponsePair {
   learnerInput: string,
   oppiaResponse: string,
   isHint: boolean
@@ -46,14 +46,14 @@ export class StateCard {
   _contentHtml: string;
   _interactionHtml: string;
   _interaction: Interaction;
-  _inputResponsePairs: Array<IInputResponsePair>;
+  _inputResponsePairs: Array<InputResponsePair>;
   _recordedVoiceovers: RecordedVoiceovers;
   _contentId: string;
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
   constructor(
       stateName, contentHtml, interactionHtml, interaction: Interaction,
-      inputResponsePairs: Array<IInputResponsePair>,
+      inputResponsePairs: Array<InputResponsePair>,
       recordedVoiceovers: RecordedVoiceovers, contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
     this._stateName = stateName;
@@ -75,7 +75,7 @@ export class StateCard {
     return this._interaction;
   }
 
-  getVoiceovers(): IBindableVoiceovers {
+  getVoiceovers(): BindableVoiceovers {
     let recordedVoiceovers = this._recordedVoiceovers;
     let contentId = this._contentId;
     if (recordedVoiceovers) {
@@ -140,7 +140,7 @@ export class StateCard {
         interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
   }
 
-  getInteractionCustomizationArgs(): IInteractionCustomizationArgs {
+  getInteractionCustomizationArgs(): InteractionCustomizationArgs {
     let interaction = this.getInteraction();
     if (!interaction) {
       return null;
@@ -168,11 +168,11 @@ export class StateCard {
     return this._inputResponsePairs[index].oppiaResponse;
   }
 
-  getInputResponsePairs(): Array<IInputResponsePair> {
+  getInputResponsePairs(): Array<InputResponsePair> {
     return this._inputResponsePairs;
   }
 
-  getLastInputResponsePair(): IInputResponsePair {
+  getLastInputResponsePair(): InputResponsePair {
     if (this._inputResponsePairs.length === 0) {
       return null;
     }
@@ -193,7 +193,7 @@ export class StateCard {
     return this.getLastInputResponsePair().oppiaResponse;
   }
 
-  addInputResponsePair(inputResponsePair: IInputResponsePair): void {
+  addInputResponsePair(inputResponsePair: InputResponsePair): void {
     this._inputResponsePairs.push(cloneDeep(inputResponsePair));
   }
 

@@ -28,8 +28,8 @@ import {
   ExplorationImprovementsHistoryResponse,
   ExplorationImprovementsResponse,
   ExplorationImprovementsBackendApiService,
-  IExplorationImprovementsResponseBackendDict,
-  IExplorationImprovementsHistoryResponseBackendDict
+  ExplorationImprovementsResponseBackendDict,
+  ExplorationImprovementsHistoryResponseBackendDict
 } from 'services/exploration-improvements-backend-api.service';
 
 describe('Exploration stats backend api service', () => {
@@ -71,7 +71,7 @@ describe('Exploration stats backend api service', () => {
     const req = (
       httpTestingController.expectOne('/improvements/exploration/eid'));
     expect(req.request.method).toEqual('GET');
-    req.flush(<IExplorationImprovementsResponseBackendDict>{
+    req.flush(<ExplorationImprovementsResponseBackendDict>{
       open_tasks: [taskDict],
       resolved_task_types_by_state_name: {Introduction: ['high_bounce_rate']},
     });
@@ -105,7 +105,7 @@ describe('Exploration stats backend api service', () => {
       const req = httpTestingController.expectOne(
         '/improvements/history/exploration/eid');
       expect(req.request.method).toEqual('GET');
-      req.flush(<IExplorationImprovementsHistoryResponseBackendDict>{
+      req.flush(<ExplorationImprovementsHistoryResponseBackendDict>{
         results: [taskDict],
         cursor: 'cursor123',
         more: true,
@@ -142,7 +142,7 @@ describe('Exploration stats backend api service', () => {
     const req = httpTestingController.expectOne(
       '/improvements/history/exploration/eid?cursor=cursor123');
     expect(req.request.method).toEqual('GET');
-    req.flush(<IExplorationImprovementsHistoryResponseBackendDict>{
+    req.flush(<ExplorationImprovementsHistoryResponseBackendDict>{
       results: [taskDict],
       cursor: 'cursor456',
       more: false,

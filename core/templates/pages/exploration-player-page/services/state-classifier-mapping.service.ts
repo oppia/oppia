@@ -22,15 +22,15 @@ import { Injectable } from '@angular/core';
 import { Classifier, ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 
-interface IBackendStateClassifierMapping {
+interface BackendStateClassifierMapping {
   [state: string]: {
     'algorithm_id': string;
-    'classifier_data': IClassifierData;
+    'classifier_data': ClassifierData;
     'data_schema_version': number;
   }
 }
 
-interface IStateClassifierMapping {
+interface StateClassifierMapping {
   [state: string]: Classifier;
 }
 
@@ -39,9 +39,9 @@ interface IStateClassifierMapping {
 })
 export class StateClassifierMappingService {
   constructor(private classifierObjectFactory: ClassifierObjectFactory) {}
-  stateClassifierMapping: IStateClassifierMapping = null;
+  stateClassifierMapping: StateClassifierMapping = null;
 
-  init(backendStateClassifierMapping: IBackendStateClassifierMapping): void {
+  init(backendStateClassifierMapping: BackendStateClassifierMapping): void {
     this.stateClassifierMapping = {};
     var algorithmId, classifierData, dataSchemaVersion;
     for (var stateName in backendStateClassifierMapping) {

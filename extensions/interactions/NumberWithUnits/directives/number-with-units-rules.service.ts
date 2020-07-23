@@ -24,8 +24,8 @@ import { unit } from 'mathjs';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { UtilsService } from 'services/utils.service';
-import { INumberWithUnitsAnswer } from 'interactions/answer-defs';
-import { INumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
+import { NumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
 
 // Rules service for number with units interaction.
 @Injectable({
@@ -40,8 +40,8 @@ export class NumberWithUnitsRulesService {
   }
 
   IsEqualTo(
-      answer: INumberWithUnitsAnswer,
-      inputs: INumberWithUnitsRuleInputs): boolean {
+      answer: NumberWithUnitsAnswer,
+      inputs: NumberWithUnitsRuleInputs): boolean {
     // Returns true only if input is exactly equal to answer.
     var answerObject = this.unitsObjectFactory.fromDict(answer);
     var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
@@ -57,8 +57,8 @@ export class NumberWithUnitsRulesService {
   }
 
   IsEquivalentTo(
-      answer: INumberWithUnitsAnswer,
-      inputs: INumberWithUnitsRuleInputs): boolean {
+      answer: NumberWithUnitsAnswer,
+      inputs: NumberWithUnitsRuleInputs): boolean {
     var answerObject = this.unitsObjectFactory.fromDict(answer);
     var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
     if (answerObject.type === 'fraction') {

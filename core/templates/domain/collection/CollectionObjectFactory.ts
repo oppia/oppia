@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ICollectionNodeBackendDict,
+  CollectionNodeBackendDict,
   CollectionNode,
   CollectionNodeObjectFactory
 } from 'domain/collection/collection-node-object.factory';
@@ -47,7 +47,7 @@ export interface CollectionBackendDict {
   'playthrough_dict': CollectionPlaythroughBackendDict;
   'category': string;
   'version': number;
-  'nodes': ICollectionNodeBackendDict[];
+  'nodes': CollectionNodeBackendDict[];
 }
 
 export class Collection {

@@ -20,19 +20,19 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-export interface IRubricBackend {
+export interface RubricBackend {
   difficulty: string,
   explanations: Array<string>
 }
 
-export interface ISkillCreationBackend {
+export interface SkillCreationBackend {
   description: string,
   'explanation_dict': string,
   'linked_topic_ids': string[],
-  rubrics: IRubricBackend
+  rubrics: RubricBackend
 }
 
-export interface IImageData {
+export interface ImageData {
   filename: string,
   imageBlob: Blob
 }
@@ -66,9 +66,9 @@ export class SkillCreationBackendApiService {
   _createSkill(
       successCallback: (value?: SkillCreationBackendResponse) => void,
       errorCallback:(reason?: string) => void,
-      description: string, rubrics: IRubricBackend, explanation: string,
-      linkedTopicIds: string[], imagesData: IImageData[]): void {
-    let postData:ISkillCreationBackend = {
+      description: string, rubrics: RubricBackend, explanation: string,
+      linkedTopicIds: string[], imagesData: ImageData[]): void {
+    let postData:SkillCreationBackend = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
@@ -97,8 +97,8 @@ export class SkillCreationBackendApiService {
       });
   }
 
-  createSkill(description: string, rubrics: IRubricBackend,
-      explanation: string, linkedTopicIds: string[], imagesData: IImageData[]
+  createSkill(description: string, rubrics: RubricBackend,
+      explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
   ): Promise<SkillCreationBackendResponse> {
     return new Promise((resolve, reject) => {
       this._createSkill(resolve, reject,

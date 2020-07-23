@@ -23,15 +23,15 @@ import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
-  ICyclicStateTransitionsPlaythroughIssueBackendDict,
-  IEarlyQuitPlaythroughIssueBackendDict,
-  IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
+  CyclicStateTransitionsPlaythroughIssueBackendDict,
+  EarlyQuitPlaythroughIssueBackendDict,
+  MultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssueObjectFactory,
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsObjectFactory, IExplorationStatsBackendDict } from
+import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import {
   ExplorationTask,
@@ -41,9 +41,9 @@ import {
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { IStateBackendDict } from
+import { StateBackendDict } from
   'domain/state/StateObjectFactory';
-import { IStateStatsBackendDict } from
+import { StateStatsBackendDict } from
   'domain/statistics/StateStatsObjectFactory';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -66,15 +66,15 @@ describe('Exploration improvements task registrar service', () => {
 
   let answerStatsBackendDict: AnswerStatsBackendDict;
   let cstPlaythroughIssueBackendDict:
-    ICyclicStateTransitionsPlaythroughIssueBackendDict;
+    CyclicStateTransitionsPlaythroughIssueBackendDict;
   let eqPlaythroughIssueBackendDict:
-    IEarlyQuitPlaythroughIssueBackendDict;
-  let expStatsBackendDict: IExplorationStatsBackendDict;
+    EarlyQuitPlaythroughIssueBackendDict;
+  let expStatsBackendDict: ExplorationStatsBackendDict;
   let misPlaythroughIssueBackendDict:
-    IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict;
-  let stateBackendDict: IStateBackendDict;
-  let stateStatsBackendDict: IStateStatsBackendDict;
-  let statesBackendDict: {[stateName: string]: IStateBackendDict};
+    MultipleIncorrectSubmissionsPlaythroughIssueBackendDict;
+  let stateBackendDict: StateBackendDict;
+  let stateStatsBackendDict: StateStatsBackendDict;
+  let statesBackendDict: {[stateName: string]: StateBackendDict};
   let taskBackendDict: ExplorationTaskBackendDict;
 
   const expId = 'eid';

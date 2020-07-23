@@ -17,23 +17,23 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-export interface IConceptCardBackendDict {
-  'explanation': ISubtitledHtmlBackendDict;
-  'worked_examples': IWorkedExampleBackendDict[];
-  'recorded_voiceovers': IRecordedVoiceOverBackendDict;
+export interface ConceptCardBackendDict {
+  'explanation': SubtitledHtmlBackendDict;
+  'worked_examples': WorkedExampleBackendDict[];
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
-  IRecordedVoiceOverBackendDict } from
+  RecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from
+  SubtitledHtml, SubtitledHtmlObjectFactory, SubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import {
-  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict } from
+  WorkedExample, WorkedExampleObjectFactory, WorkedExampleBackendDict } from
   'domain/skill/WorkedExampleObjectFactory';
 
 export class ConceptCard {
@@ -49,7 +49,7 @@ export class ConceptCard {
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
-  toBackendDict(): IConceptCardBackendDict {
+  toBackendDict(): ConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
@@ -130,7 +130,7 @@ export class ConceptCardObjectFactory {
   _generateWorkedExamplesFromBackendDict(
       workedExampleDicts): Array<WorkedExample> {
     return workedExampleDicts.map(
-      (workedExampleDict: IWorkedExampleBackendDict) => {
+      (workedExampleDict: WorkedExampleBackendDict) => {
         return this.workedExampleObjectFactory.createFromBackendDict(
           workedExampleDict);
       });
@@ -154,7 +154,7 @@ export class ConceptCardObjectFactory {
   }
 
   createFromBackendDict(
-      conceptCardBackendDict: IConceptCardBackendDict): ConceptCard {
+      conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         conceptCardBackendDict.explanation),

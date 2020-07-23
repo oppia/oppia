@@ -24,7 +24,7 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
-interface IExplorationLanguageInfo {
+interface ExplorationLanguageInfo {
   /**
    * This inteface is used to keep track of the audio language code (value)
    * and the audio language description to display (displayed) for the
@@ -45,7 +45,7 @@ export class AudioTranslationLanguageService {
   _allAudioLanguageCodesInExploration: Array<string> = null;
   _explorationLanguageCode: string = null;
   _automaticTextToSpeechEnabled: boolean = null;
-  _languagesInExploration: Array<IExplorationLanguageInfo> = [];
+  _languagesInExploration: Array<ExplorationLanguageInfo> = [];
 
   attemptToSetAudioLanguageToExplorationLanguage(): void {
     // We minimize the number of related languages, because we want to
@@ -168,12 +168,12 @@ export class AudioTranslationLanguageService {
   }
 
   /**
-   * @return {Array<IExplorationLanguageInfo>}
-   * An array of IExplorationLanguageInfo objects which consist of audio
+   * @return {Array<ExplorationLanguageInfo>}
+   * An array of ExplorationLanguageInfo objects which consist of audio
    * language codes as well as their displayed language description for
    * the exploration.
    */
-  getLanguageOptionsForDropdown(): Array<IExplorationLanguageInfo> {
+  getLanguageOptionsForDropdown(): Array<ExplorationLanguageInfo> {
     return this._languagesInExploration;
   }
 
