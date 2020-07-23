@@ -64,8 +64,8 @@ export class MockCsrfTokenService {
 export class RequestInterceptor implements HttpInterceptor {
   constructor(private csrf: MockCsrfTokenService) {}
   intercept(
-      request: HttpRequest<any>, next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+      request: HttpRequest<FormData>, next: HttpHandler
+  ): Observable<HttpEvent<FormData>> {
     var csrf = this.csrf;
     try {
       csrf.initializeToken();

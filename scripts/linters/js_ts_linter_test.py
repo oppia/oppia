@@ -60,8 +60,6 @@ VALID_CONSTANT_OUTSIDE_CLASS_AJS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_constant_outside_class.constants.ajs.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
-INVALID_ANY_TYPE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_any_type.ts')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_COMPONENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_two_component.ts')
@@ -114,37 +112,6 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
-
-    def test_invalid_use_of_any_type(self):
-        def mock_compile_all_ts_files():
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_ANY_TYPE_FILEPATH)
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-        excluded_files_swap = self.swap(
-            js_ts_linter, 'FILES_EXCLUDED_FROM_ANY_TYPE_CHECK',
-            [VALID_TS_FILEPATH])
-
-        with self.print_swap, excluded_files_swap, compile_all_ts_files_swap:
-            js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_ANY_TYPE_FILEPATH, VALID_TS_FILEPATH], FILE_CACHE,
-                True).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        self.assert_same_list_elements([
-            '\'any\' type found at line 20. Please do not declare variable'
-            ' as \'any\' type'], self.linter_stdout)
-        self.assert_same_list_elements([
-            '\'any\' type found at line 22. Please do not declare variable'
-            ' as \'any\' type'], self.linter_stdout)
 
     def test_check_extra_js_file_found(self):
         def mock_readlines(unused_self, unused_filepath):

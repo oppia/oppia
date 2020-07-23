@@ -37,7 +37,7 @@ export class TopicCreationBackendApiService {
 
   _createTopic(
       successCallback: (value?: TopicCreationResponse) => void,
-      errorCallback:(reason?: any) => void,
+      errorCallback:(reason?: string) => void,
       topic: NewlyCreatedTopic, imagesData: IImageData[],
       bgColor: string): void {
     let postData = {
