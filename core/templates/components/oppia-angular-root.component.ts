@@ -571,6 +571,8 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from
   'domain/statistics/state-top-answers-stats-object.factory';
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -938,6 +940,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateStatsObjectFactory: StateStatsObjectFactory;
   static stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService;
   static stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory;
+  static stateTopAnswersStatsService: StateTopAnswersStatsService;
   static stateWrittenTranslationsService: StateWrittenTranslationsService;
   static statesObjectFactory: StatesObjectFactory;
   static statsReportingBackendApiService: StatsReportingBackendApiService;
@@ -1252,6 +1255,7 @@ private stateSolutionService: StateSolutionService,
 private stateStatsObjectFactory: StateStatsObjectFactory,
 private stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService,
 private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory,
+private stateTopAnswersStatsService: StateTopAnswersStatsService,
 private stateWrittenTranslationsService: StateWrittenTranslationsService,
 private statesObjectFactory: StatesObjectFactory,
 private statsReportingBackendApiService: StatsReportingBackendApiService,
@@ -1566,6 +1570,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateSolutionService = this.stateSolutionService;
     OppiaAngularRootComponent.stateTopAnswersStatsBackendApiService = this.stateTopAnswersStatsBackendApiService;
     OppiaAngularRootComponent.stateTopAnswersStatsObjectFactory = this.stateTopAnswersStatsObjectFactory;
+    OppiaAngularRootComponent.stateTopAnswersStatsService = this.stateTopAnswersStatsService;
     OppiaAngularRootComponent.stateStatsObjectFactory = this.stateStatsObjectFactory;
     OppiaAngularRootComponent.stateWrittenTranslationsService = this.stateWrittenTranslationsService;
     OppiaAngularRootComponent.statesObjectFactory = this.statesObjectFactory;

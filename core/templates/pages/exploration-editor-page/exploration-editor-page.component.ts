@@ -17,6 +17,8 @@
  *               help tab in the navbar.
  */
 
+import { State } from 'domain/state/StateObjectFactory';
+
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
@@ -157,16 +159,15 @@ angular.module('oppia').component('explorationEditorPage', {
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
-    'ExplorationFeaturesService', 'ExplorationImprovementsService',
-    'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
-    'ExplorationObjectiveService', 'ExplorationParamChangesService',
-    'ExplorationParamSpecsService', 'ExplorationRightsService',
-    'ExplorationStatesService', 'ExplorationTagsService',
-    'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-    'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
-    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
-    'StateClassifierMappingService', 'StateEditorService',
-    'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+    'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+    'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
+    'ExplorationParamChangesService', 'ExplorationParamSpecsService',
+    'ExplorationRightsService', 'ExplorationStatesService',
+    'ExplorationTagsService', 'ExplorationTitleService',
+    'ExplorationWarningsService', 'GraphDataService', 'PageTitleService',
+    'LoaderService', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+    'RouterService', 'SiteAnalyticsService', 'StateClassifierMappingService',
+    'StateEditorService', 'StateTopAnswersStatsService',
     'StateTutorialFirstTimeService', 'ThreadDataService',
     'UrlInterpolationService', 'UserEmailPreferencesService',
     'UserExplorationPermissionsService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
@@ -176,16 +177,15 @@ angular.module('oppia').component('explorationEditorPage', {
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
-        ExplorationFeaturesService, ExplorationImprovementsService,
-        ExplorationInitStateNameService, ExplorationLanguageCodeService,
-        ExplorationObjectiveService, ExplorationParamChangesService,
-        ExplorationParamSpecsService, ExplorationRightsService,
-        ExplorationStatesService, ExplorationTagsService,
-        ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-        PageTitleService, LoaderService, ParamChangesObjectFactory,
-        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
-        StateClassifierMappingService, StateEditorService,
-        StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
+        ExplorationFeaturesService, ExplorationInitStateNameService,
+        ExplorationLanguageCodeService, ExplorationObjectiveService,
+        ExplorationParamChangesService, ExplorationParamSpecsService,
+        ExplorationRightsService, ExplorationStatesService,
+        ExplorationTagsService, ExplorationTitleService,
+        ExplorationWarningsService, GraphDataService, PageTitleService,
+        LoaderService, ParamChangesObjectFactory, ParamSpecsObjectFactory,
+        RouterService, SiteAnalyticsService, StateClassifierMappingService,
+        StateEditorService, StateTopAnswersStatsService,
         StateTutorialFirstTimeService, ThreadDataService,
         UrlInterpolationService, UserEmailPreferencesService,
         UserExplorationPermissionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
@@ -381,6 +381,28 @@ angular.module('oppia').component('explorationEditorPage', {
                 ExplorationWarningsService.updateWarnings();
                 $scope.$broadcast('refreshStateEditor');
               });
+            // Stats are loaded asynchronously after the exploration data
+            // because they are not needed to interact with the editor.
+            StateTopAnswersStatsService.initAsync(
+              ctrl.explorationId, ExplorationStatesService.getStates()
+            ).then(() => {
+              ExplorationStatesService.registerOnStateAddedCallback(
+                (stateName: string) => (
+                  StateTopAnswersStatsService.onStateAdded(stateName)));
+              ExplorationStatesService.registerOnStateDeletedCallback(
+                (stateName: string) => (
+                  StateTopAnswersStatsService.onStateDeleted(stateName)));
+              ExplorationStatesService.registerOnStateRenamedCallback(
+                (oldStateName: string, newStateName: string) => (
+                  StateTopAnswersStatsService.onStateRenamed(
+                    oldStateName, newStateName)));
+              ExplorationStatesService.registerOnStateInteractionSavedCallback(
+                (updatedState: State) => (
+                  StateTopAnswersStatsService.onStateInteractionSaved(
+                    updatedState)));
+              ExplorationWarningsService.updateWarnings();
+              $scope.$broadcast('refreshStateEditor');
+            });
           }
         });
       };
