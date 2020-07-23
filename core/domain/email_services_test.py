@@ -154,7 +154,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Tests that email is not sent if recipient email address is
         malformed.
         """
-        # Case when malformed_recipient_email is None for send_mail.
+        # Case when malformed_recipient_email is None when calling send_mail.
         malformed_recipient_email = None
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
@@ -164,7 +164,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'sender@example.com', malformed_recipient_email,
                 'subject', 'body', 'html')
 
-        # Case when malformed_recipient_email is an empty string for send_mail.
+        # Case when malformed_recipient_email is an empty string when
+        # calling send_mail.
         malformed_recipient_email = ''
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
@@ -184,8 +185,19 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 malformed_sender_email, 'recipient@example.com',
                 'subject', 'body', 'html')
 
-        # Case when sender is malformed for send_bulk_mail.
-        malformed_sender_email = 'email'
+        # Case when the SENDER_EMAIL in brackets of 'SENDER NAME <SENDER_EMAIL>
+        # is malformed when calling send_mail.
+        malformed_sender_email = 'Name <malformed_email>'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            email_services.send_mail(
+                malformed_sender_email, 'recipient@example.com',
+                'subject', 'body', 'html')
+
+        # Case when sender is malformed when calling send_bulk_mail.
+        malformed_sender_email = 'email sender_email'
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
@@ -194,7 +206,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 malformed_sender_email, ['recipient@example.com'],
                 'subject', 'body', 'html')
 
-        # Case when sender is malformed for send_bulk_mail.
+        # Case when sender is malformed when calling send_bulk_mail.
         malformed_recipient_emails = ['a@a.com', 'email.com']
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
