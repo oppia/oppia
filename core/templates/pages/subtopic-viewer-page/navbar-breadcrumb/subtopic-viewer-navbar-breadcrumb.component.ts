@@ -18,15 +18,16 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { SubtopicViewerBackendApiService } from
-  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants.ts';
 import { ReadOnlySubtopicPageData } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+import { SubtopicViewerBackendApiService } from
+  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'subtopic-viewer-navbar-breadcrumb',
@@ -49,7 +50,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
       });
   }
-  getTopicUrl() {
+  getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
         topic_name: this.topicName
