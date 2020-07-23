@@ -637,6 +637,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -1180,6 +1181,8 @@ export class UpgradedServices {
     upgradedServices['StateWrittenTranslationsService'] =
       new StateWrittenTranslationsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StoryEditorNavigationService'] =
+        new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
       new SubtopicPageContentsObjectFactory(
         upgradedServices['RecordedVoiceoversObjectFactory'],

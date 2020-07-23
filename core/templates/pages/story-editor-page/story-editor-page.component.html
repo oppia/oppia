@@ -3,7 +3,13 @@
           ng-click="$ctrl.returnToTopicEditorPage()">
     <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
   </button>
-  <story-editor></story-editor>
+
+  <div ng-if="$ctrl.getActiveTab() === 'story_editor'">
+    <story-editor></story-editor>
+  </div>
+  <div ng-if="$ctrl.getActiveTab() === 'chapter_editor'">
+    <chapter-editor-tab></chapter-editor-tab>
+  </div>
 </div>
 
 <style>
@@ -11,5 +17,8 @@
     margin-bottom: 10px;
     margin-left: 9%;
     margin-top: 1.5%;
+  }
+  story-editor-page .story-editor {
+    margin-bottom: 80px;
   }
 </style>

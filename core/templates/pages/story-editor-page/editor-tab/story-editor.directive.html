@@ -120,10 +120,10 @@
         </div>
         <div class="story-node-editor">
           <div class="story-nodes-container">
-            <div ng-repeat="node in linearNodesList">
+            <div ng-repeat="node in linearNodesList track by $index">
               <md-card class="story-editor-node"
                        ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       ng-click="setNodeToEdit(node.getId())">
+                       ng-click="navigateToChapterWithId(node.getId(), $index)">
                 <div class="story-editor-node-title">
                   <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
                 </div>
@@ -162,26 +162,8 @@
       </md-card>
     </div>
   </div>
-  <md-card class="oppia-page-card oppia-long-text chapter-editor-card">
-    <div class="story-node-editor" ng-if="linearNodesList.length > 0">
-      <div class="node-editor">
-        <div ng-repeat="node in nodes">
-          <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
-                             node-id="node.getId()"
-                             thumbnail-filename="node.getThumbnailFilename()"
-                             thumbnail-bg-color="node.getThumbnailBgColor()"
-                             outline="node.getOutline()"
-                             description="node.getDescription()"
-                             exploration-id="node.getExplorationId()"
-                             outline-finalized="node.getOutlineStatus()"
-                             destination-node-ids="node.getDestinationNodeIds()"
-                             prerequisite-skill-ids="node.getPrerequisiteSkillIds()"
-                             acquired-skill-ids="node.getAcquiredSkillIds()">
-          </story-node-editor>
-        </div>
-      </div>
-    </div>
-    <div ng-if="linearNodesList.length === 0" style="text-align: center;">
+  <md-card ng-if="linearNodesList.length === 0"  class="oppia-page-card oppia-long-text chapter-editor-card">
+    <div>
       <p class="no-chapters-message" style="padding-top: 6px;">
         This story has no chapters.
       </p>

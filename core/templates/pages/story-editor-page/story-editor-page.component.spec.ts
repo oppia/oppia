@@ -133,4 +133,8 @@ describe('Story editor page', function() {
       expect(mockedWindow.open).toHaveBeenCalledWith(
         '/topic_editor/2', '_self');
     });
+
+  it('should return the active tab', function() {
+    expect(ctrl.getActiveTab()).toEqual('story_editor');
+  });
 });

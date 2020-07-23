@@ -50,12 +50,14 @@ angular.module('oppia').directive('storyEditor', [
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
+        'UndoRedoService', 'StoryEditorNavigationService',
+        'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
+            UndoRedoService, StoryEditorNavigationService,
+            EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
             MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
@@ -187,6 +189,11 @@ angular.module('oppia').directive('storyEditor', [
             }
             StoryUpdateService.setStoryNotes($scope.story, newNotes);
             _initEditor();
+          };
+
+          $scope.navigateToChapterWithId = function(id, index) {
+            StoryEditorNavigationService.navigateToChapterEditorWithId(
+              id, index);
           };
 
           $scope.updateStoryDescriptionStatus = function(description) {

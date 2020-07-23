@@ -32,6 +32,9 @@ require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
+require('pages/story-editor-page/services/story-editor-navigation.service');
+require(
+  'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -39,11 +42,13 @@ angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
     '$scope', '$uibModal', '$window', 'PageTitleService',
+    'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
     function(
         $scope, $uibModal, $window, PageTitleService,
+        StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
         UrlInterpolationService, UrlService,
         EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
@@ -78,8 +83,15 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
       };
 
+      ctrl.getActiveTab = function() {
+        return StoryEditorNavigationService.getActiveTab();
+      };
+
       ctrl.$onInit = function() {
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
+        if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
+          StoryEditorNavigationService.navigateToChapterEditor();
+        }
         $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
         $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
       };
