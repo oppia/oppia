@@ -2568,6 +2568,9 @@ class State(python_utils.OBJECT):
         new_content_id_list = list(itertools.chain.from_iterable([
             self.interaction.customization_args[ca_name].get_content_ids()
             for ca_name in self.interaction.customization_args]))
+        if None in new_content_id_list:
+            raise Exception(
+                'content_id from customization argument cannot be None.')
 
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)

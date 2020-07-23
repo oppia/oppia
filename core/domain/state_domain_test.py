@@ -643,6 +643,42 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 Exception,
                 'The rule spec does not belong to a valid format.'):
                 state.get_all_html_content_strings()
+    
+    def test_update_customization_args_with_invalid_content_id(self):
+        """Test the method for updating interaction customization arguments
+        when a content_id is invalid (set to None).
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_customization_args_dict = {
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': None,
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }
+                ]
+            }
+        }
+
+        state.update_interaction_id('ItemSelectionInput')
+        with self.assertRaisesRegexp(
+                Exception,
+                'content_id from customization argument cannot be None.'):
+            state.update_interaction_customization_args(
+                state_customization_args_dict)
 
     def test_rule_spec_with_html_having_invalid_input_variable(self):
         """Test the method for extracting all the HTML from a state
