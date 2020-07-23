@@ -43,7 +43,8 @@ export class PlayerPositionService {
   /**
    * Get the name of the current state.
    * @return {object} a string that shows the name of the current state.
-   * @throws Will throw error if the index of card is out of the range of the transcript.
+   * @throws Will throw error if the index of card
+   *  is out of the range of the transcript.
    */
   getCurrentStateName(): string {
     try {
@@ -85,7 +86,7 @@ export class PlayerPositionService {
   }
 
   /**
-   * record that the user has submitted an answer.
+   * Record that the user has submitted an answer.
    */
   recordAnswerSubmission(): void {
     this.learnerJustSubmittedAnAnswer = true;
@@ -100,7 +101,8 @@ export class PlayerPositionService {
 
   /**
    * Gets whether the learner has just submitted an answer.
-   * @return {boolean} a boolean that shows if the learner has just submitted an answer.
+   * @return {boolean} a boolean that shows if the learner
+   * has just submitted an answer.
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
