@@ -559,15 +559,15 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             self.EXP_ID if exp_id is None else exp_id)
 
-    def test_get_for_public_exploration_as_non_owning_user(self):
+    def test_get_for_public_exploration_as_non_owning_user_fails(self):
         self.publish_exploration(self.owner_id, self.EXP_ID)
         with self.login_context(self.VIEWER_EMAIL):
-            self.get_json(self.get_url())
+            self.get_json(self.get_url(), expected_status_int=401)
 
     def test_get_for_private_exploration_as_non_owning_user_fails(self):
         # Fail to call `publish_exploration`.
         with self.login_context(self.VIEWER_EMAIL):
-            self.get_json(self.get_url(), expected_status_int=404)
+            self.get_json(self.get_url(), expected_status_int=401)
 
     def test_get_for_non_existing_exploration_fails(self):
         with self.login_context(self.OWNER_EMAIL):

@@ -32,7 +32,7 @@ export class ExplorationImprovementsConfig {
   constructor(
       public readonly explorationId: string,
       public readonly explorationVersion: number,
-      public readonly isImprovementsTabEnabled: boolean,
+      public readonly improvementsTabIsEnabled: boolean,
       public readonly highBounceRateTaskStateBounceRateCreationThreshold:
         number,
       public readonly highBounceRateTaskStateBounceRateObsoletionThreshold:

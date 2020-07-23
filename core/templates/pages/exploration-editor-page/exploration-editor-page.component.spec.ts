@@ -27,6 +27,8 @@ import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UserExplorationPermissionsService } from
@@ -234,8 +236,7 @@ describe('Exploration editor page component', function() {
         spyOn(pts, 'setPageTitle').and.callThrough();
 
         getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
-        spyOn(cs, 'getExplorationId').and.returnValue(
-          explorationId);
+        spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
         spyOn(efbas, 'fetchExplorationFeatures')
           .and.returnValue($q.resolve({}));
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
@@ -315,8 +316,7 @@ describe('Exploration editor page component', function() {
         spyOn(pts, 'setPageTitle').and.callThrough();
 
         getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
-        spyOn(cs, 'getExplorationId').and.returnValue(
-          explorationId);
+        spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
         spyOn(efbas, 'fetchExplorationFeatures')
           .and.returnValue($q.resolve({}));
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
@@ -332,8 +332,7 @@ describe('Exploration editor page component', function() {
 
       it('should link exploration to story when initing exploration page',
         function() {
-          spyOn(cs, 'setExplorationIsLinkedToStory').and
-            .callThrough();
+          spyOn(cs, 'setExplorationIsLinkedToStory').and.callThrough();
           $scope.$apply();
 
           expect(cs.setExplorationIsLinkedToStory)
@@ -701,50 +700,65 @@ describe('Exploration editor page component', function() {
       });
     });
 
-  describe('when user permission is false and draft changes are true', () => {
-    var userPermissions = {
-      canEdit: false
-    };
-
-    beforeEach(function() {
-      getPermissionsSpy = spyOn(ueps, 'getPermissionsAsync');
+  describe('Initializaing the improvements tab', () => {
+    beforeEach(() => {
       spyOnAllFunctions(sas);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
 
-      getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
+      spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures')
         .and.returnValue($q.resolve({}));
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
-      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-        new ExplorationImprovementsConfig(
-          explorationId, 1, true, 0.25, 0.20, 100)));
+      spyOn(stasbas, 'fetchStats')
+        .and.returnValue($q.resolve(new StateTopAnswersStats({}, {})));
 
       explorationData.is_version_of_draft_valid = true;
     });
 
-    it('should check if improvements tab is disabled', fakeAsync(function() {
-      spyOn(eis, 'isImprovementsTabEnabledAsync')
-        .and.returnValue(Promise.resolve(false));
+    it('should be disabled when missing edit permissions', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve({canEdit: false}));
+      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
+        new ExplorationImprovementsConfig(
+          explorationId, 1, true, 0.25, 0.20, 100)));
 
       ctrl.$onInit();
       flushMicrotasks();
       $scope.$apply();
 
-      expect(ctrl.isImprovementsTabEnabled).toBeFalse();
+      expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
     }));
 
-    it('should check if improvements tab is enabled', fakeAsync(function() {
-      spyOn(eis, 'isImprovementsTabEnabledAsync')
-        .and.returnValue(Promise.resolve(true));
+    it('should be disabled if backend response matches', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve({canEdit: true}));
+      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
+        new ExplorationImprovementsConfig(
+          explorationId, 1, false, 0.25, 0.20, 100)));
 
       ctrl.$onInit();
       flushMicrotasks();
       $scope.$apply();
 
-      expect(ctrl.isImprovementsTabEnabled).toBeTrue();
+      expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
+    }));
+
+    it('should be enabled if backend response matches', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve({canEdit: true}));
+      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
+        new ExplorationImprovementsConfig(
+          explorationId, 1, true, 0.25, 0.20, 100)));
+
+      ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+      flushMicrotasks();
+
+      expect(ctrl.isImprovementsTabEnabled()).toBeTrue();
     }));
   });
 });

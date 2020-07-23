@@ -249,8 +249,6 @@ angular.module('oppia').component('explorationEditorPage', {
 
           ExplorationStatesService.init(explorationData.states);
 
-          ExplorationImprovementsService.initAsync(ctrl.explorationId);
-
           ExplorationTitleService.init(explorationData.title);
           ExplorationCategoryService.init(explorationData.category);
           ExplorationObjectiveService.init(explorationData.objective);
@@ -372,15 +370,17 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
+          // Statistics and the improvement tasks derived from them are only
+          // relevant when an exploration is published and being played by
+          // learners.
           if (ExplorationRightsService.isPublic()) {
-            // Stats are loaded asynchronously after the exploration data
-            // because they are not needed to interact with the editor.
-            StateTopAnswersStatsBackendApiService.fetchStats(
-              ctrl.explorationId
-            ).then(StateTopAnswersStatsService.init).then(function() {
-              ExplorationWarningsService.updateWarnings();
-              $scope.$broadcast('refreshStateEditor');
-            });
+            StateTopAnswersStatsBackendApiService.fetchStats(ctrl.explorationId)
+              .then(stats => StateTopAnswersStatsService.init(stats))
+              .then(() => ExplorationImprovementsService.initAsync())
+              .then(() => {
+                ExplorationWarningsService.updateWarnings();
+                $scope.$broadcast('refreshStateEditor');
+              });
           }
         });
       };
@@ -596,11 +596,12 @@ angular.module('oppia').component('explorationEditorPage', {
             }
           });
 
-        ctrl.isImprovementsTabEnabled = false;
+        ctrl.improvementsTabIsEnabled = false;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
           .then(improvementsTabIsEnabled => {
-            ctrl.isImprovementsTabEnabled = improvementsTabIsEnabled;
+            ctrl.improvementsTabIsEnabled = improvementsTabIsEnabled;
           });
+        ctrl.isImprovementsTabEnabled = () => ctrl.improvementsTabIsEnabled;
 
         // Replace the ng-joyride template with one that uses <[...]>
         // interpolators instead of/ {{...}} interpolators.

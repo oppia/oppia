@@ -23,10 +23,13 @@ import { ExplorationImprovementsConfig } from
 require('services/exploration-improvements-backend-api.service.ts');
 
 angular.module('oppia').factory('ExplorationImprovementsService', [
-  'ExplorationImprovementsBackendApiService',
-  function(ExplorationImprovementsBackendApiService) {
+  'ContextService', 'ExplorationImprovementsBackendApiService',
+  'UserExplorationPermissionsService',
+  function(
+      ContextService, ExplorationImprovementsBackendApiService,
+      UserExplorationPermissionsService) {
     /** @private */
-    let initializationHasStarted: boolean = false;
+    let initializationHasStarted: boolean;
     /** @private */
     let resolveInitPromise: () => void;
     /** @private */
@@ -38,15 +41,23 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     });
     /** @private */
     let config: ExplorationImprovementsConfig;
+    /** @private */
+    let improvementsTabIsAccessible: boolean;
 
     return {
-      async initAsync(explorationId: string): Promise<void> {
+      async initAsync(): Promise<void> {
         if (!initializationHasStarted) {
           initializationHasStarted = true;
           try {
-            config = (
-              await ExplorationImprovementsBackendApiService.getConfigAsync(
-                explorationId));
+            const expId = ContextService.getExplorationId();
+            const userPermissions = (
+              await UserExplorationPermissionsService.getPermissionsAsync());
+            improvementsTabIsAccessible = userPermissions.canEdit;
+            if (improvementsTabIsAccessible) {
+              config = (
+                await ExplorationImprovementsBackendApiService.getConfigAsync(
+                  expId));
+            }
             resolveInitPromise();
           } catch (error) {
             rejectInitPromise(error);
@@ -57,7 +68,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
 
       async isImprovementsTabEnabledAsync(): Promise<boolean> {
         await initPromise;
-        return config.isImprovementsTabEnabled;
+        return improvementsTabIsAccessible && config.improvementsTabIsEnabled;
       },
     };
   },

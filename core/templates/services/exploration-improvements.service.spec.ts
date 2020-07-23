@@ -15,8 +15,13 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { ExplorationPermissions } from
+  'domain/exploration/exploration-permissions-object.factory';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ContextService } from 'services/context.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
 
@@ -25,27 +30,48 @@ import { ExplorationImprovementsBackendApiService } from
  */
 
 describe('ExplorationImprovementsService', function() {
+  let explorationImprovementsService;
+
+  let contextService: ContextService;
   let explorationImprovementsBackendApiService:
     ExplorationImprovementsBackendApiService;
-  let explorationImprovementsService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
+
+  const expId = 'eid';
+  const newExpImprovementsConfig = (improvementsTabIsEnabled: boolean) => {
+    return new ExplorationImprovementsConfig(
+      expId, 1, improvementsTabIsEnabled, 0.25, 0.20, 100);
+  };
+  const newExpPermissions = (canEdit: boolean) => {
+    return (
+      new ExplorationPermissions(null, null, null, null, null, null, canEdit));
+  };
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject($injector => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    explorationImprovementsBackendApiService = $injector.get(
-      'ExplorationImprovementsBackendApiService');
-    explorationImprovementsService = $injector.get(
-      'ExplorationImprovementsService');
+    contextService = $injector.get('ContextService');
+    explorationImprovementsBackendApiService = (
+      $injector.get('ExplorationImprovementsBackendApiService'));
+    explorationImprovementsService = (
+      $injector.get('ExplorationImprovementsService'));
+    userExplorationPermissionsService = (
+      $injector.get('UserExplorationPermissionsService'));
   }));
+
+  beforeEach(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('eid');
+  });
 
   it('should enable improvements tab based on backend response',
     fakeAsync(async() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
-        .and.returnValue(Promise.resolve(new ExplorationImprovementsConfig(
-          'eid', 1, true, 0.25, 0.20, 100)));
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
 
-      explorationImprovementsService.initAsync('eid');
+      explorationImprovementsService.initAsync();
       flushMicrotasks();
 
       expect(
@@ -55,11 +81,42 @@ describe('ExplorationImprovementsService', function() {
 
   it('should disable improvements tab based on backend response',
     fakeAsync(async() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
-        .and.returnValue(Promise.resolve(new ExplorationImprovementsConfig(
-          'eid', 1, false, 0.25, 0.20, 100)));
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(false)));
 
-      explorationImprovementsService.initAsync('eid');
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeFalse();
+    }));
+
+  it('should disable improvements tab for non-editors when config gives false',
+    fakeAsync(async() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve(newExpPermissions(false)));
+      spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(false)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeFalse();
+    }));
+
+  it('should disable improvements tab for non-editors when config gives true',
+    fakeAsync(async() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve(newExpPermissions(false)));
+      spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+
+      explorationImprovementsService.initAsync();
       flushMicrotasks();
 
       expect(
@@ -69,7 +126,7 @@ describe('ExplorationImprovementsService', function() {
 
   it('should propagate errors from the backend', fakeAsync(async() => {
     const error = new Error('Whoops!');
-    spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
       .and.throwError(error);
 
     const onSuccess = jasmine.createSpy('onSuccess');
@@ -77,7 +134,7 @@ describe('ExplorationImprovementsService', function() {
       expect(reason).toBe(error);
     });
 
-    const promise = explorationImprovementsService.initAsync('eid')
+    const promise = explorationImprovementsService.initAsync()
       .then(onSuccess, onFailure);
     flushMicrotasks();
     await promise;
