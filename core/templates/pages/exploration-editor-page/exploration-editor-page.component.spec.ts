@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -41,6 +41,8 @@ import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
@@ -55,6 +57,7 @@ describe('Exploration editor page component', function() {
   var cls = null;
   var cs = null;
   var es = null;
+  var ess = null;
   var efbas = null;
   var efs = null;
   var ers = null;
@@ -65,6 +68,7 @@ describe('Exploration editor page component', function() {
   var rs = null;
   var ses = null;
   var stasbas = null;
+  var stass = null;
   var sas = null;
   var tds = null;
   var ueps = null;
@@ -198,6 +202,7 @@ describe('Exploration editor page component', function() {
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
     efs = $injector.get('ExplorationFeaturesService');
     ers = $injector.get('ExplorationRightsService');
+    ess = $injector.get('ExplorationStatesService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
     gds = $injector.get('GraphDataService');
@@ -205,6 +210,7 @@ describe('Exploration editor page component', function() {
     rs = $injector.get('RouterService');
     ses = $injector.get('StateEditorService');
     stasbas = $injector.get('StateTopAnswersStatsBackendApiService');
+    stass = $injector.get('StateTopAnswersStatsService');
     sas = $injector.get('SiteAnalyticsService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
@@ -348,16 +354,16 @@ describe('Exploration editor page component', function() {
         });
 
       it('should get state top answers stats after initing exploration page',
-        function() {
-          var stateTopAnswersStatsBackendDict = {};
+        fakeAsync(function() {
           spyOn(ers, 'isPublic').and.returnValue(true);
-          spyOn(stasbas, 'fetchStats').and
-            .returnValue($q.resolve(stateTopAnswersStatsBackendDict));
+          spyOn(stasbas, 'fetchStatsAsync').and
+            .returnValue(Promise.resolve(new StateTopAnswersStats({}, {})));
           $scope.$apply();
+          flushMicrotasks();
 
           expect(ews.updateWarnings)
             .toHaveBeenCalled();
-        });
+        }));
 
       it('should navigate to feedback tab', function() {
         spyOn(rs, 'isLocationSetToNonStateEditorTab').and
@@ -711,4 +717,80 @@ describe('Exploration editor page component', function() {
         });
       });
     });
+
+  describe('Should register stats hooks', () => {
+    var userPermissions = {
+      canEdit: false
+    };
+
+    beforeEach(function() {
+      spyOnAllFunctions(sas);
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve(userPermissions));
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
+      spyOn(ers, 'isPublic').and.returnValue(true);
+      spyOn(stasbas, 'fetchStatsAsync')
+        .and.returnValue(Promise.resolve(new StateTopAnswersStats({}, {})));
+      $scope.$apply();
+
+      explorationData.is_version_of_draft_valid = true;
+
+      ctrl.$onInit();
+    });
+
+    it('should callback state-added method for stats', fakeAsync(() => {
+      let onStateAddedSpy = spyOn(stass, 'onStateAdded');
+      spyOn(cls, 'addState');
+      $scope.$apply();
+      flushMicrotasks();
+
+      ess.addState('Prologue');
+
+      flushMicrotasks();
+      expect(onStateAddedSpy).toHaveBeenCalledWith('Prologue');
+    }));
+
+    it('should callback state-deleted method for stats', fakeAsync(() => {
+      let onStateDeletedSpy = spyOn(stass, 'onStateDeleted');
+      spyOn(cls, 'deleteState');
+      spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
+      $scope.$apply();
+      flushMicrotasks();
+
+      ess.deleteState('Final');
+
+      flushMicrotasks();
+      expect(onStateDeletedSpy).toHaveBeenCalledWith('Final');
+    }));
+
+    it('should callback state-renamed method for stats', fakeAsync(() => {
+      let onStateRenamedSpy = spyOn(stass, 'onStateRenamed');
+      spyOn(cls, 'renameState');
+      $scope.$apply();
+      flushMicrotasks();
+
+      ess.renameState('Introduction', 'Start');
+
+      flushMicrotasks();
+      expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
+    }));
+
+    it('should callback interaction-changed method for stats', fakeAsync(() => {
+      let onStateInteractionSavedSpy = spyOn(stass, 'onStateInteractionSaved');
+      spyOn(cls, 'editStateProperty');
+      $scope.$apply();
+      flushMicrotasks();
+
+      ess.saveInteractionAnswerGroups('Introduction', []);
+
+      flushMicrotasks();
+      expect(onStateInteractionSavedSpy)
+        .toHaveBeenCalledWith(ess.getState('Introduction'));
+    }));
+  });
 });
