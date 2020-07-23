@@ -34,7 +34,6 @@ from core.tests import test_utils
 
 import psutil
 import python_utils
-import release_constants
 
 
 from . import common
@@ -606,20 +605,20 @@ class CommonTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': common.LABEL_FOR_RELEASED_PRS},
+                    {'name': common.LABEL_FOR_CURRENT_RELEASE_PRS}]},
             completed='')
         pull2 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': common.LABEL_FOR_RELEASED_PRS},
+                    {'name': common.LABEL_FOR_CURRENT_RELEASE_PRS}]},
             completed='')
         label = github.Label.Label(
             requester='', headers='',
             attributes={
-                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+                'name': common.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
         # pylint: disable=unused-argument
         def mock_get_issues(unused_self, state, labels):
@@ -645,19 +644,19 @@ class CommonTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': common.LABEL_FOR_CURRENT_RELEASE_PRS}]},
             completed='')
         pull2 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': common.LABEL_FOR_RELEASED_PRS},
+                    {'name': common.LABEL_FOR_CURRENT_RELEASE_PRS}]},
             completed='')
         label = github.Label.Label(
             requester='', headers='',
             attributes={
-                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+                'name': common.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
         # pylint: disable=unused-argument
         def mock_get_issues(unused_self, state, labels):
@@ -679,7 +678,7 @@ class CommonTests(test_utils.GenericTestBase):
                     'have a \'%s\' label. Please ensure that '
                     'they are released before release summary '
                     'generation.') % (
-                        release_constants.LABEL_FOR_RELEASED_PRS)):
+                        common.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
     def test_kill_processes_based_on_regex(self):
