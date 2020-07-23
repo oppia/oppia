@@ -63,6 +63,7 @@ describe('Exploration player page', function() {
   it('should load skill based on its id on url when component is initialized' +
     ' and set angular element content property based on the exploration',
   function() {
+    jasmine.getEnv().allowRespy(true);
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(ReadOnlyExplorationBackendApiService, 'fetchExploration').and
       .returnValue($q.resolve({
@@ -71,11 +72,11 @@ describe('Exploration player page', function() {
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
     spyOn(document, 'getElementById').and.callFake(function() {
-      return document.createElement('button');
+      return document.createElement('button1');
     });
 
     spyOn(document, 'querySelector').and.callFake(function() {
-      return document.createElement('button');
+      return document.createElement('button2');
     });
 
     var angularElementSpy = spyOn(angular, 'element');
