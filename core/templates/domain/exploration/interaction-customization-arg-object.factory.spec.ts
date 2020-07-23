@@ -115,4 +115,50 @@ describe('Interaction customization arg object factory', () => {
 
     expect(ca.toBackendDict()).toEqual(caBackendDict);
   });
+
+  it('should create a InteractionCustomizationArg from dict and get ' +
+     'all content ids for complex nested customization arguments', () => {
+    const caBackendDict = {
+      value: [{
+        content: {
+          unicode_str: 'first',
+          content_id: 'ca_dummyCustArg_content_0'
+        },
+        show: true
+      },
+      {
+        content: {
+          unicode_str: 'second',
+          content_id: 'ca_dummyCustArg_content_1'
+        },
+        show: true
+      }]
+    };
+
+    const ca = icaof.createFromBackendDict(
+      caBackendDict,
+      {
+        type: 'list',
+        items: {
+          type: 'dict',
+          properties: [{
+            name: 'content',
+            schema: {
+              type: 'custom',
+              obj_type: 'SubtitledUnicode'
+            }
+          }, {
+            name: 'show',
+            schema: {
+              type: 'bool'
+            }
+          }]
+        }
+      }
+    );
+
+    expect(ca.getContentIds()).toEqual([
+      'ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1'
+    ]);
+  });
 });
