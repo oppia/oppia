@@ -16,6 +16,7 @@
  * @fileoverview Controller for customize interaction modal.
  */
 
+import { AppConstants } from 'app.constants';
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
@@ -295,7 +296,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           traverseSchemaAndAssignContentIds(
             caValues[name].value,
             caSpec.schema,
-            `ca_${name}`);
+            `${AppConstants.COMPONENT_NAME_CUSTIMOZATION_ARG}_${name}`);
         }
       }
     };

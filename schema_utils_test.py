@@ -201,6 +201,7 @@ VALIDATOR_SPECS = {
     },
 }
 
+
 def _validate_ui_config(schema):
     """Validates the value of a UI configuration."""
     schema_type = schema[SCHEMA_KEY_TYPE]

@@ -643,7 +643,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 Exception,
                 'The rule spec does not belong to a valid format.'):
                 state.get_all_html_content_strings()
-    
+
     def test_update_customization_args_with_invalid_content_id(self):
         """Test the method for updating interaction customization arguments
         when a content_id is invalid (set to None).
@@ -675,8 +675,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state.update_interaction_id('ItemSelectionInput')
         with self.assertRaisesRegexp(
-                Exception,
-                'content_id from customization argument cannot be None.'):
+            Exception,
+            'content_id from customization argument cannot be None.'
+        ):
             state.update_interaction_customization_args(
                 state_customization_args_dict)
 
@@ -1596,7 +1597,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         new_customization_arg_html = '<p>should be in a p tag</p>'
         def customization_arg_conversion_fn(html_string):
             """Conversion function that wraps old_customization_arg_html
-            in p tags, and does not apply any conversions otherwise."""
+            in p tags, and does not apply any conversions otherwise.
+            """
             if html_string == old_customization_arg_html:
                 return '<p>%s</p>' % html_string
             return html_string
@@ -1945,7 +1947,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         new_customization_arg_html = '<p>should be in a p tag</p>'
         def customization_arg_conversion_fn(html_string):
             """Conversion function that wraps old_customization_arg_html
-            in p tags, and does not apply any conversions otherwise."""
+            in p tags, and does not apply any conversions otherwise.
+            """
             if html_string == old_customization_arg_html:
                 return '<p>%s</p>' % html_string
             return html_string
