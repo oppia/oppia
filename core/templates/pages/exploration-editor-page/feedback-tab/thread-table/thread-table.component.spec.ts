@@ -49,7 +49,7 @@ describe('Thread table directive', function() {
       'Not Actionable');
   });
 
-  it('should get locate abbreviated date time string', function() {
+  it('should get locale abbreviated date time string', function() {
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
     var NOW_MILLIS = 1416563100000;
     spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
