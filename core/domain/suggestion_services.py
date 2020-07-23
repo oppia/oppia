@@ -322,6 +322,7 @@ def reject_question_suggestions_with_skill_target_id(skill_id):
             suggestion, feconf.SUGGESTION_BOT_USER_ID,
             suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
+
 def reject_translation_suggestions_with_exp_target_id(exp_id):
     """Rejects all translation suggestions with target ID matching the supplied
     exploration ID. Reviewer ID is set to Oppia Bot.
@@ -342,6 +343,7 @@ def reject_translation_suggestions_with_exp_target_id(exp_id):
         reject_suggestion(
             suggestion, feconf.SUGGESTION_BOT_USER_ID,
             suggestion_models.DELETED_STORY_REJECT_MESSAGE)
+
 
 def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     """Resubmit a rejected suggestion.

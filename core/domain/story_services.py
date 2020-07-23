@@ -527,6 +527,7 @@ def delete_story(committer_id, story_id, force_deletion=False):
             exp_id
         )
 
+
 def delete_story_summary(story_id):
     """Delete a story summary model.
 

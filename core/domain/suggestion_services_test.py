@@ -1071,12 +1071,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             story_id, self.owner_id, title='A story',
             description='Description', notes='Notes',
             corresponding_topic_id=topic_id)
-        
-        # Adds the story to the topic.     
+
+        # Adds the story to the topic.
         topic_services.add_canonical_story(
             self.owner_id, topic_id, story_id)
-        
-        # Adds the exploration to the story.    
+
+        # Adds the exploration to the story.
         story_services.update_story(
             self.owner_id, story_id, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
@@ -1089,7 +1089,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'old_value': None,
                 'new_value': self.EXP_ID
             })], 'Added exploration.')
-        
+
         # Gets the html content in the exploration to be translated.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         content_html = exploration.states['State 1'].content.html
@@ -1112,7 +1112,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.EXP_ID, 1, self.author_id, add_translation_change_dict,
             'test description')
-        
+
         # Checks that there is only one suggestion associated with the
         # exploration.
         suggestions = suggestion_services.query_suggestions(
