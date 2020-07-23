@@ -3071,6 +3071,8 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
                 html_validation_service.
                 get_latex_strings_without_svg_from_html(
                     html_strings_in_exploration))
+            decoded_latex_strings_without_svg = [
+                string.decode('utf-8') for string in latex_strings_without_svg]
             math_rich_text_info = (
                 exp_domain.ExplorationMathRichTextInfo(
                     exploration_model.id,
@@ -3079,7 +3081,8 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
             approx_size_of_math_svgs_bytes = (
                 math_rich_text_info.get_svg_size_in_bytes())
 
-            if latex_strings_without_svg != item.latex_strings_without_svg:
+            if decoded_latex_strings_without_svg != (
+                    item.latex_strings_without_svg):
                 cls._add_error(
                     'latex strings check',
                     'Entity id %s: latex strings in the model does not match '

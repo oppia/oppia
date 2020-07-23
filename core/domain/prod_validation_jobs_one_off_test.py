@@ -6228,6 +6228,35 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_standard_operation_when_latex_strings_have_unicode(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='title1', category='category')
+        exploration.add_states(['FirstState'])
+        exploration_state = exploration.states['FirstState']
+        valid_html_content_with_unicode = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ&'
+            'amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&am'
+            'p;quot;}"></oppia-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content_with_unicode
+        }
+        exploration_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        model_instance = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='exp_id',
+                latex_strings_without_svg=['ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ'],
+                math_images_generation_required=True,
+                estimated_max_size_of_images_in_bytes=46000))
+        model_instance.put()
+        expected_output = [
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 4]']
+        run_job_and_check_output(self, expected_output)
 
 class QuestionSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
