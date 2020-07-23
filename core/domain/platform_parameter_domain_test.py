@@ -76,9 +76,8 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': []
         }
-        param_change_object = (
-            parameter_domain.PlatformParameterChange(
-                param_change_dict))
+        param_change_object = parameter_domain.PlatformParameterChange(
+            param_change_dict)
         self.assertEqual(
             param_change_object.to_dict(),
             param_change_dict)
