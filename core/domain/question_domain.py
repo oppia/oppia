@@ -376,7 +376,7 @@ class Question(python_utils.OBJECT):
                 max_existing_content_id_index + 1)
             return question_state_dict
 
-        class ContentIdCounter(object):
+        class ContentIdCounter(python_utils.OBJECT):
             """This helper class is used to keep track of
             next_content_id_index and new_content_ids, and provides a
             function to generate new content_ids.

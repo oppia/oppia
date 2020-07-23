@@ -67,7 +67,7 @@ export class ExplorationHtmlFormatterService {
       caValues: InteractionCustomizationArgs
   ) : InteractionCustomizationArgsHtml {
     const traverseAndConvertSubtitledContentToString = (
-        value: Array<Object> | Object
+        value: Object[] | Object
     ) => {
       let result: InteractionCustomizationArgsHtmlValue;
 

@@ -49,7 +49,7 @@ export class InteractionCustomizationArg {
 
   toBackendDict(): InteractionCustomizationArgBackendDict {
     const traverseSchemaAndConvertSubtitledToDicts = (
-        value: Array<Object> | Object
+        value: Object[] | Object
     ): InteractionCustomizationArgsBackendDictValue => {
       let result: InteractionCustomizationArgsBackendDictValue;
 
