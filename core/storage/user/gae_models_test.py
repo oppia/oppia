@@ -2218,3 +2218,75 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
             user_models.PseudonymizedUserModel.get_new_id('exploration')
+
+
+class UserAuthModelTests(test_utils.GenericTestBase):
+    """Tests for UserAuthModel."""
+    
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_1_ID = 'user_1_id'
+    USER_1_GAE_ID = 'gae_1_id'
+    USER_2_ID = 'user_2_id'
+    USER_2_GAE_IDs = ['gae_2_id_1','gae_2_id_2']
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserAuthModelTests, self).setUp()
+
+        user_models.UserAuthModel(
+            id=self.USER_1_ID,
+            gae_id=self.USER_1_GAE_ID,
+        ).put()
+        user_models.UserAuthModel(
+            id=self.USER_2_ID,
+            gae_id=self.USER_2_GAE_IDs,
+        ).put()
+
+    def test_get_export_policy(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy_with_single_auth_id(self):
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.UserAuthModel.query(
+                user_models.UserAuthModel.id ==
+                self.USER_1_ID
+            ).get()
+        )
+        
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_apply_deletion_policy_with_list_of_auth_ids(self):
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.USER_2_ID)
+        self.assertIsNone(
+            user_models.UserAuthModel.query(
+                user_models.UserAuthModel.id ==
+                self.USER_2_ID
+            ).get()
+        )
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            user_models.UserAuthModel
+            .has_reference_to_user_id(self.USER_ID)
+        )
+        self.assertTrue(
+            user_models.UserAuthModel
+            .has_reference_to_user_id(self.USER_ID)
+        )
+        self.assertFalse(
+            user_models.UserAuthModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
