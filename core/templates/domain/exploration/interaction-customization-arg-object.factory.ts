@@ -47,6 +47,28 @@ export interface InteractionCustomizationArgBackendDict {
 export class InteractionCustomizationArg {
   constructor(public value: InteractionCustomizationArgsValue) {}
 
+  getContentIds(): string[] {
+    const contentIds = [];
+
+    const traverseSchemaAndRetrieveContentIdsFromSubtitled = (
+        value: Object[] | Object
+    ): void => {
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
+        contentIds.push(value.getContentId());
+      } else if (value instanceof Array) {
+        value.forEach(element =>
+          traverseSchemaAndRetrieveContentIdsFromSubtitled(element));
+      } else if (value instanceof Object) {
+        Object.keys(value).forEach(key => {
+          traverseSchemaAndRetrieveContentIdsFromSubtitled(value[key]);
+        });
+      }
+    };
+
+    traverseSchemaAndRetrieveContentIdsFromSubtitled(this.value);
+    return contentIds;
+  }
+
   toBackendDict(): InteractionCustomizationArgBackendDict {
     const traverseSchemaAndConvertSubtitledToDicts = (
         value: Object[] | Object
