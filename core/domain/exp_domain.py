@@ -2572,6 +2572,7 @@ class Exploration(python_utils.OBJECT):
                     # If at least one rule input is an equation, we remove
                     # all other rule inputs that are expressions.
                     if TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                        new_interaction_id = TYPE_VALID_MATH_EQUATION
                         for group in new_answer_groups:
                             new_rule_specs = []
                             for rule_spec in group['rule_specs']:
@@ -2584,6 +2585,7 @@ class Exploration(python_utils.OBJECT):
                     # numeric expressions.
                     elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
                             types_of_inputs):
+                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
                         for group in new_answer_groups:
                             new_rule_specs = []
                             for rule_spec in group['rule_specs']:
@@ -2591,6 +2593,8 @@ class Exploration(python_utils.OBJECT):
                                         rule_spec['inputs']['x']):
                                     new_rule_specs.append(rule_spec)
                             group['rule_specs'] = new_rule_specs
+                    else:
+                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
 
                     # Removing answer groups that have no rule specs left after
                     # the filtration done above.
@@ -2598,7 +2602,7 @@ class Exploration(python_utils.OBJECT):
                         answer_group for answer_group in new_answer_groups if (
                             len(answer_group['rule_specs']) != 0)]
 
-                    state_dict['interaction']['id'] = list(types_of_inputs)[0]
+                    state_dict['interaction']['id'] = new_interaction_id
                     state_dict['interaction']['answer_groups'] = (
                         new_answer_groups)
 

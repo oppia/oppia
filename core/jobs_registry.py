@@ -60,7 +60,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.MathExpressionValidationOneOffJob,
-    exp_jobs_one_off.MathExpressionUpgradeOneOffJob,
     exp_jobs_one_off.MultipleChoiceInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
