@@ -723,11 +723,11 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+      $scope.$apply();
 
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
-      $scope.$apply();
     });
 
     it('should callback state-added method for stats', fakeAsync(() => {
