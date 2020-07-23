@@ -215,7 +215,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please do not use innerHTML property.',
         'excluded_files': (
             'core/templates/Polyfills.ts',
-            'core/templates/filters/translate.pipe.spec.ts'),
+            'core/templates/filters/translate.pipe.spec.ts',
+            'core/templates/components/ck-editor-helpers/' +
+            'ck-editor-copy-content-service.spec.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {

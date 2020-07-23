@@ -45,7 +45,7 @@ export class MockCsrfTokenService {
         let actualData = data.substring(5);
         return JSON.parse(actualData);
       },
-    }).then(function(response: any) {
+    }).then(function(response: {token: string}) {
       return response.token;
     });
   }
@@ -64,8 +64,8 @@ export class MockCsrfTokenService {
 export class RequestInterceptor implements HttpInterceptor {
   constructor(private csrf: MockCsrfTokenService) {}
   intercept(
-      request: HttpRequest<any>, next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+      request: HttpRequest<FormData>, next: HttpHandler
+  ): Observable<HttpEvent<FormData>> {
     var csrf = this.csrf;
     try {
       csrf.initializeToken();

@@ -17,6 +17,8 @@
  *               help tab in the navbar.
  */
 
+import { State } from 'domain/state/StateObjectFactory';
+
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
@@ -36,13 +38,13 @@ require(
   'editor-navigation.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.directive.ts');
+  'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.directive.ts');
+  'exploration-title-editor.component.ts');
 require(
   'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(
@@ -58,7 +60,7 @@ require(
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
-  'improvements-tab.directive.ts');
+  'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require(
@@ -151,47 +153,41 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$http', '$log', '$q', '$scope', '$rootScope', '$templateCache',
-    '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
-    'ChangeListService', 'ContextService', 'EditabilityService',
-    'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
-    'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
-    'ExplorationFeaturesBackendApiService', 'ExplorationFeaturesService',
-    'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
-    'ExplorationObjectiveService', 'ExplorationParamChangesService',
-    'ExplorationParamSpecsService', 'ExplorationRightsService',
-    'ExplorationStatesService', 'ExplorationTagsService',
-    'ExplorationTitleService', 'ExplorationWarningsService',
-    'GraphDataService', 'PageTitleService', 'LoaderService',
-    'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-    'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
-    'StateClassifierMappingService', 'StateEditorService',
-    'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
+    'AutosaveInfoModalsService', 'ChangeListService', 'ContextService',
+    'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
+    'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
+    'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
+    'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+    'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
+    'ExplorationParamChangesService', 'ExplorationParamSpecsService',
+    'ExplorationRightsService', 'ExplorationStatesService',
+    'ExplorationTagsService', 'ExplorationTitleService',
+    'ExplorationWarningsService', 'GraphDataService', 'PageTitleService',
+    'LoaderService', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+    'RouterService', 'SiteAnalyticsService', 'StateClassifierMappingService',
+    'StateEditorService', 'StateTopAnswersStatsService',
     'StateTutorialFirstTimeService', 'ThreadDataService',
     'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService',
-    'EVENT_EXPLORATION_PROPERTY_CHANGED',
+    'UserExplorationPermissionsService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
-        $http, $log, $q, $scope, $rootScope, $templateCache,
-        $timeout, $uibModal, $window, AutosaveInfoModalsService,
-        ChangeListService, ContextService, EditabilityService,
-        ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
-        ExplorationCorrectnessFeedbackService, ExplorationDataService,
-        ExplorationFeaturesBackendApiService, ExplorationFeaturesService,
-        ExplorationInitStateNameService, ExplorationLanguageCodeService,
-        ExplorationObjectiveService, ExplorationParamChangesService,
-        ExplorationParamSpecsService, ExplorationRightsService,
-        ExplorationStatesService, ExplorationTagsService,
-        ExplorationTitleService, ExplorationWarningsService,
-        GraphDataService, PageTitleService, LoaderService,
-        ParamChangesObjectFactory, ParamSpecsObjectFactory,
-        PlaythroughIssuesService, RouterService, SiteAnalyticsService,
-        StateClassifierMappingService, StateEditorService,
-        StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
+        $q, $scope, $templateCache, $timeout, $uibModal,
+        AutosaveInfoModalsService, ChangeListService, ContextService,
+        EditabilityService, ExplorationAutomaticTextToSpeechService,
+        ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
+        ExplorationDataService, ExplorationFeaturesBackendApiService,
+        ExplorationFeaturesService, ExplorationInitStateNameService,
+        ExplorationLanguageCodeService, ExplorationObjectiveService,
+        ExplorationParamChangesService, ExplorationParamSpecsService,
+        ExplorationRightsService, ExplorationStatesService,
+        ExplorationTagsService, ExplorationTitleService,
+        ExplorationWarningsService, GraphDataService, PageTitleService,
+        LoaderService, ParamChangesObjectFactory, ParamSpecsObjectFactory,
+        RouterService, SiteAnalyticsService, StateClassifierMappingService,
+        StateEditorService, StateTopAnswersStatsService,
         StateTutorialFirstTimeService, ThreadDataService,
         UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService,
-        EVENT_EXPLORATION_PROPERTY_CHANGED) {
+        UserExplorationPermissionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -313,7 +309,7 @@ angular.module('oppia').component('explorationEditorPage', {
             });
 
           StateEditorService.updateExplorationWhitelistedStatus(
-            featuresData.is_exploration_whitelisted);
+            featuresData.isExplorationWhitelisted);
 
           GraphDataService.recompute();
 
@@ -378,9 +374,23 @@ angular.module('oppia').component('explorationEditorPage', {
           if (ExplorationRightsService.isPublic()) {
             // Stats are loaded asynchronously after the exploration data
             // because they are not needed to interact with the editor.
-            StateTopAnswersStatsBackendApiService.fetchStats(
-              ctrl.explorationId
-            ).then(StateTopAnswersStatsService.init).then(function() {
+            StateTopAnswersStatsService.initAsync(
+              ctrl.explorationId, ExplorationStatesService.getStates()
+            ).then(() => {
+              ExplorationStatesService.registerOnStateAddedCallback(
+                (stateName: string) => (
+                  StateTopAnswersStatsService.onStateAdded(stateName)));
+              ExplorationStatesService.registerOnStateDeletedCallback(
+                (stateName: string) => (
+                  StateTopAnswersStatsService.onStateDeleted(stateName)));
+              ExplorationStatesService.registerOnStateRenamedCallback(
+                (oldStateName: string, newStateName: string) => (
+                  StateTopAnswersStatsService.onStateRenamed(
+                    oldStateName, newStateName)));
+              ExplorationStatesService.registerOnStateInteractionSavedCallback(
+                (updatedState: State) => (
+                  StateTopAnswersStatsService.onStateInteractionSaved(
+                    updatedState)));
               ExplorationWarningsService.updateWarnings();
               $scope.$broadcast('refreshStateEditor');
             });
