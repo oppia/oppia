@@ -25,8 +25,11 @@ from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1051,6 +1054,76 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Suggestion should be rejected after corresponding skill is deleted.
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', skill_id)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
+
+    def test_delete_topic_rejects_translation_suggestion(self):
+        
+        # Create test topic to be deleted.
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(topic_id, self.owner_id)
+
+        # A story is created because stories are linked to explorations
+        # and translation suggestions are linked to the explorations.
+        story_id = story_services.get_new_story_id()
+        story = self.save_new_story(
+            story_id, self.owner_id, title='A story',
+             description='Description', notes='Notes',
+             corresponding_topic_id=topic_id)
+
+        # Adds the story to the topic.     
+        topic_services.add_canonical_story(
+            self.owner_id, topic_id, story_id)
+
+        # Adds the exploration to the story.    
+        story_services.update_story(
+            self.owner_id, story_id, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })], 'Added exploration.')
+        
+        # Gets the html content in the exploration to be translated.
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        content_html = exploration.states['State 1'].content.html
+
+        # Creates the add translation dict that's related to the exploration in
+        # the story.
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': content_html,
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        # Creates the translation suggestion asscoiated to the exploration and
+        # the add translation dict.
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.EXP_ID, 1,self.author_id, add_translation_change_dict,
+             'test description')
+        
+        # Checks that there is only one suggestion associated with the
+        # exploration.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+        self.assertEqual(len(suggestions), 1)
+        
+        topic_services.delete_topic(self.author_id, topic_id)
+        
+        # Suggestion should be rejected after corresponding topic is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
