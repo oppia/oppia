@@ -5329,8 +5329,5 @@ export = {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
-  // Name for gae_id based auth method.
-  "GAE_ID_AUTH": "gae",
-
   "DEV_MODE": true
 };

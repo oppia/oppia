@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import types
 
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
@@ -2293,24 +2292,24 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     def test_get_by_auth_id_for_unregistered_auth_id(self):
         self.assertIsNone(
             user_models.UserAuthModel
-            .get_by_auth_id(constants.GAE_ID_AUTH, self.NONREGISTERED_GAE_ID)
+            .get_by_auth_id("gae", self.NONREGISTERED_GAE_ID)
         )
 
     def test_get_by_auth_id_for_single_element_in_auth_id_attribute(self):
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_1_ID),
             user_models.UserAuthModel
-            .get_by_auth_id(constants.GAE_ID_AUTH, self.USER_1_GAE_ID[0])
+            .get_by_auth_id("gae", self.USER_1_GAE_ID[0])
         )
 
     def test_get_by_auth_id_for_list_in_auth_id_attribute(self):
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_2_ID),
             user_models.UserAuthModel
-            .get_by_auth_id(constants.GAE_ID_AUTH, self.USER_2_GAE_IDs[0])
+            .get_by_auth_id("gae", self.USER_2_GAE_IDs[0])
         )
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_2_ID),
             user_models.UserAuthModel
-            .get_by_auth_id(constants.GAE_ID_AUTH, self.USER_2_GAE_IDs[1])
+            .get_by_auth_id("gae", self.USER_2_GAE_IDs[1])
         )
