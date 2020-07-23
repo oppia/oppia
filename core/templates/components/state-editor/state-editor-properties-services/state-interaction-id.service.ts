@@ -16,6 +16,7 @@
  * @fileoverview A data service that stores the current interaction id.
  */
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
