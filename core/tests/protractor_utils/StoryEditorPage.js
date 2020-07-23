@@ -45,7 +45,8 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-commit-message-input'));
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
-  var createChapterButton = element(by.css('.protractor-test-add-chapter-button'));
+  var createChapterButton = element(
+    by.css('.protractor-test-add-chapter-button'));
   var newChapterTitleField = element(
     by.css('.protractor-test-new-chapter-title-field'));
   var confirmChapterCreationButton = element(
@@ -162,9 +163,8 @@ var StoryEditorPage = function() {
   };
 
   this.expectChaptersListToBe = async function(chapters) {
-    var i = 0;
     await this.expectNumberOfChaptersToBe(chapters.length);
-    for (i = 0;i < chapters.length;i++) {
+    for (var i = 0; i < chapters.length; i++) {
       expect(await chapterTitles.get(i).getText()).toEqual(chapters[i]);
     }
   };

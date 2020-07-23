@@ -21,11 +21,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class FileDownloadRequest {
   filename: string;
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
+  // TODO(#9996): Replace 'any' with the exact type. This has kept as
   // 'any' since canceler is a 'Deferred' type object which is native to
   // AngularJS and does not have a type in native typescript.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   canceler: any;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(filename: string, canceler: any) {
     this.filename = filename;
     this.canceler = canceler;
@@ -36,9 +38,10 @@ export class FileDownloadRequest {
   providedIn: 'root'
 })
 export class FileDownloadRequestObjectFactory {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
+  // TODO(#9996): Replace 'any' with the exact type. This has kept as
   // 'any' since canceler is a 'Deferred' type object which is native to
   // AngularJS and does not have a type in native typescript.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createNew(filename: string, canceler: any): FileDownloadRequest {
     return new FileDownloadRequest(filename, canceler);
   }
