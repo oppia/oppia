@@ -23,7 +23,7 @@ require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/topic-summary-tile.component.ts');
+require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('domain/classroom/classroom-backend-api.service.ts');
 require('domain/topic/TopicSummaryObjectFactory.ts');

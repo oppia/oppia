@@ -190,7 +190,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             'DashboardStatsOneOffJob',
             'UserDeletionOneOffJob',
             'UserQueryOneOffJob',
-            'VerifyUserDeletionOneOffJob'
+            'FullyCompleteUserDeletionOneOffJob'
         ]
 
         jobs_registry = importlib.import_module('core.jobs_registry')
