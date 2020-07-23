@@ -111,6 +111,22 @@ export class UrlService {
     throw new Error('Invalid URL for topic');
   }
 
+
+  /**
+   * Gets the subtopic name from the learner's url.
+   * @return {string} the subtopic name.
+   * @throws Will throw an error if the url for practice session is invalid.
+   */
+  getSelectedSubtopicsFromUrl(): string {	 
+    let pathname = this.getPathname();	   
+    let queryStrings = this.getCurrentQueryString().split('=');	   
+    if (pathname.match(/\/practice_session/g) && queryStrings.length === 2) {	   
+      return decodeURIComponent(queryStrings[1]);	   
+    }	
+    throw new Error('Invalid URL for practice session');	
+  }	
+
+
   /**
    * Gets the classroom name from the learner's url.
    * @return {string} the classroom name.
