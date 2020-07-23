@@ -74,9 +74,9 @@ angular.module('oppia').component('barChart', {
 
     // The destroy lifecycle hook is being used here to remove resize event
     // listener because google charts api is only accessible in exploration
-    // editor page. Without this hook, the resize callback may be triggered
-    // by other components that is not in exploration editor page, raising
-    //  an error. This is both for the application itself and unit tests.
+    // editor page. This is for unit test purpose. Without this hook, the
+    // resize callback may be triggered by other specs that is not in
+    // exploration editor page, raising an error.
     ctrl.$onDestroy = function() {
       $(window).off('resize');
     };
