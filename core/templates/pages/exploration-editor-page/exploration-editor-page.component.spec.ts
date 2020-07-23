@@ -685,7 +685,8 @@ describe('Exploration editor page component', function() {
         .and.returnValue(Promise.resolve({improvementsTabIsEnabled: true}));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test.
+      // We need to flush and $apply twice to fire the callback under test. In
+      // practice, this will occur seamlessly.
       flushMicrotasks();
       $scope.$apply();
       flushMicrotasks();
@@ -699,7 +700,8 @@ describe('Exploration editor page component', function() {
         .and.returnValue(Promise.resolve({improvementsTabIsEnabled: false}));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test.
+      // We need to flush and $apply twice to fire the callback under test. In
+      // practice, this will occur seamlessly.
       flushMicrotasks();
       $scope.$apply();
       flushMicrotasks();
