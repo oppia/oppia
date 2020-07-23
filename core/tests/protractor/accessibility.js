@@ -122,7 +122,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should move focus to the skip button in the library page',
     async function() {
-      // Should move the focus to the skip to main content button. 
+      // Should move the focus to the skip to main content button.
       await libraryPage.get();
       await browser.actions().sendKeys('s').perform();
       var skipButton = element(by.css('.protractor-test-skip-link'));
@@ -146,7 +146,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should move focus to the search bar in the library page',
     async function() {
-      // Should move the focus to the search bar. 
+      // Should move the focus to the search bar.
       await libraryPage.get();
       await browser.actions().sendKeys('/').perform();
       var searchBar = element(by.css('.protractor-test-search-input'));
@@ -170,7 +170,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should move focus to the category bar in library page',
     async function() {
-      // Should move the focus to the category bar. 
+      // Should move the focus to the category bar.
       await libraryPage.get();
       await browser.actions().sendKeys('c').perform();
       var categoryBar = element(by.css(
@@ -205,7 +205,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await libraryPage.findExploration('Dummy Exploration');
       await libraryPage.playExploration('Dummy Exploration');
 
-      // Should move the focus to the skip to main content button. 
+      // Should move the focus to the skip to main content button.
       await browser.actions().sendKeys('s').perform();
       var skipButton = element(by.css('.protractor-test-skip-link'));
       expect(await skipButton.getAttribute('id')).toEqual(
@@ -219,7 +219,7 @@ describe('screenreader and keyboard user accessibility features', function() {
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
 
-      // Should move the focus back to the skip to main content button. 
+      // Should move the focus back to the skip to main content button.
       await browser.actions().sendKeys('s').perform();
       expect(await skipButton.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
@@ -235,18 +235,18 @@ describe('screenreader and keyboard user accessibility features', function() {
       await explorationPlayerPage.submitAnswer('Continue', null);
       await waitFor.pageToFullyLoad();
 
-      // Should move the focus to the previous card button. 
+      // Should move the focus to the previous card button.
       await browser.actions().sendKeys('k').perform();
       var backButton = element(by.css('#backButtonId'));
       expect(await backButton.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
 
-      // Should move the focus away from the previous card button. 
+      // Should move the focus away from the previous card button.
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
 
-      // Should move the focus back to the previous card button and press enter. 
+      // Should move the focus back to the previous card button and press enter.
       await browser.actions().sendKeys('k').perform();
       expect(await backButton.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
@@ -254,18 +254,18 @@ describe('screenreader and keyboard user accessibility features', function() {
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
       await waitFor.pageToFullyLoad();
 
-      // Should move the focus to the next card button. 
+      // Should move the focus to the next card button.
       var nextButton = element(by.css('.protractor-test-next-button'));
       await browser.actions().sendKeys('j').perform();
       expect(await nextButton.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
 
-      // Should move the focus away from the next card button. 
+      // Should move the focus away from the next card button.
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
 
-      // Should move the focus back to the next card button and press enter. 
+      // Should move the focus back to the next card button and press enter.
       await browser.actions().sendKeys('j').perform();
       expect(await nextButton.getAttribute('id')).toEqual(
         await (await browser.driver.switchTo().activeElement())
