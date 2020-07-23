@@ -169,6 +169,8 @@ jobs:
           name: Run e2e embedding test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
+      - store_artifacts:
+          path: ../core/protractor-screenshots
       - run:
           name: Run e2e publication test
           command: |
