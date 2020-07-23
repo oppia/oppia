@@ -1,5 +1,136 @@
 {
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "backend": {
+      "backports.functools_lru_cache": {
+        "version": "1.6.1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/ad/2e/aa84668861c3de458c5bcbfb9813f0e26434e2232d3e294469e96efac884/backports.functools_lru_cache-1.6.1.tar.gz#md5=103000b21a8e683647e2ce41929f2a9d",
+        "tarRootDirPrefix": "backports.functools_lru_cache-",
+        "rootDirPrefix": "backports.functools_lru_cache-",
+        "targetDirPrefix": "backports.functools_lru_cache-"
+      },
+      "bleach": {
+        "version": "3.1.5",
+        "downloadFormat": "zip",
+        "url": "https://github.com/jsocol/bleach/archive/v3.1.5.zip",
+        "rootDirPrefix": "bleach-",
+        "targetDirPrefix": "bleach-"
+      },
+      "gaeCloudStorage": {
+        "version": "1.9.22.1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/92/cd/4a8aaeb4bf69c67a6fa06c001fd54c229c2bc811e13d3f4d305e1a8201b0/GoogleAppEngineCloudStorageClient-1.9.22.1.tar.gz",
+        "tarRootDirPrefix": "GoogleAppEngineCloudStorageClient-",
+        "rootDirPrefix": "gae-cloud-storage-",
+        "targetDirPrefix": "gae-cloud-storage-"
+      },
+      "gaeMapReduce": {
+        "version": "1.9.22.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/e8/75/aa5286ae205dd6696238c53d7929a5325d26e94016f777c6ad6636e2361c/GoogleAppEngineMapReduce-1.9.22.0.tar.gz",
+        "tarRootDirPrefix": "GoogleAppEngineMapReduce-",
+        "rootDirPrefix": "gae-mapreduce-",
+        "targetDirPrefix": "gae-mapreduce-"
+      },
+      "gaePipeline": {
+        "version": "1.9.22.1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/a5/8b/36fb8e247ecb3b7106012125509ef3dec1a385a0b56a737be60f321a483c/GoogleAppEnginePipeline-1.9.22.1.tar.gz",
+        "tarRootDirPrefix": "GoogleAppEnginePipeline-",
+        "rootDirPrefix": "gae-pipeline-",
+        "targetDirPrefix": "gae-pipeline-"
+      },
+      "graphy": {
+        "version": "1.0.0",
+        "downloadFormat": "tar",
+        "url": "https://pypi.python.org/packages/source/G/Graphy/Graphy-1.0.0.tar.gz#md5=390b4f9194d81d0590abac90c8b717e0",
+        "tarRootDirPrefix": "Graphy-",
+        "rootDirPrefix": "graphy-",
+        "targetDirPrefix": "graphy-"
+      },
+      "html5Lib": {
+        "version": "1.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/html5lib/html5lib-python/archive/1.1.zip",
+        "rootDirPrefix": "html5lib-python-",
+        "targetDirPrefix": "html5lib-python-"
+      },
+      "packaging": {
+        "version": "20.4",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/55/fd/fc1aca9cf51ed2f2c11748fa797370027babd82f87829c7a8e6dbe720145/packaging-20.4.tar.gz#md5=3208229da731c5d8e29d4d8941e75005",
+        "tarRootDirPrefix": "packaging-",
+        "rootDirPrefix": "packaging-",
+        "targetDirPrefix": "packaging-"
+      },
+      "simpleJson": {
+        "version": "3.17.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/98/87/a7b98aa9256c8843f92878966dc3d8d914c14aad97e2c5ce4798d5743e07/simplejson-3.17.0.tar.gz",
+        "tarRootDirPrefix": "simplejson-",
+        "rootDirPrefix": "simplejson-",
+        "targetDirPrefix": "simplejson-"
+      },
+      "six": {
+        "version": "1.15.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/6b/34/415834bfdafca3c5f451532e8a8d9ba89a21c9743a0c59fbd0205c7f9426/six-1.15.0.tar.gz#md5=9f90a0eaa0ea7747fda01ca79d21ebcb",
+        "tarRootDirPrefix": "six-",
+        "rootDirPrefix": "six-",
+        "targetDirPrefix": "six-"
+      },
+      "webencodings": {
+        "version": "0.5.1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz",
+        "tarRootDirPrefix": "webencodings-",
+        "rootDirPrefix": "webencodings-",
+        "targetDirPrefix": "webencodings-"
+      },
+      "callbacks": {
+        "version": "0.3.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/eb/15/c71150189ea1cfd04a5853a40e2e074ec777755bd3924980fe51e5c6dd44/callbacks-0.3.0.tar.gz",
+        "tarRootDirPrefix": "callbacks-",
+        "rootDirPrefix": "callbacks-",
+        "targetDirPrefix": "callbacks-"
+      },
+      "beautifulSoup": {
+        "version": "4.9.1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/c6/62/8a2bef01214eeaa5a4489eca7104e152968729512ee33cb5fbbc37a896b7/beautifulsoup4-4.9.1.tar.gz#md5=57502b5b34ccfd97b180260071f5799a",
+        "tarRootDirPrefix": "beautifulsoup4-",
+        "rootDirPrefix": "beautifulsoup4-",
+        "targetDirPrefix": "beautifulsoup4-"
+      },
+      "mutagen": {
+        "version": "1.43.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/aa/fd/ed738775442e3614849fefdf41417d7bff3ccb010d49c8f729432cc3c1e5/mutagen-1.43.0.tar.gz#md5=3154511015860685b3882c068258ae65",
+        "tarRootDirPrefix": "mutagen-",
+        "rootDirPrefix": "mutagen-",
+        "targetDirPrefix": "mutagen-"
+      },
+      "pylatexenc": {
+        "version": "2.6",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/be/0b/7a3bc86c8f0b9bb2eb03c1c0e6be15d859ec4f30d642f15d5f38aaee8640/pylatexenc-2.6.tar.gz#md5=98832370ce1aaa96caf493538c1e6aef",
+        "tarRootDirPrefix": "pylatexenc-",
+        "rootDirPrefix": "pylatexenc-",
+        "targetDirPrefix": "pylatexenc-"
+      },
+      "soupsieve": {
+        "version": "1.9.5",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/92/cf/57dfed8a00f4ba33af3a6615d693bb65a19a11e26ab13293f62359216417/soupsieve-1.9.5.tar.gz#md5=9b6c71b20fb1a73d2594f9e609464132",
+        "tarRootDirPrefix": "soupsieve-",
+        "rootDirPrefix": "soupsieve-",
+        "targetDirPrefix": "soupsieve-"
+      }
+    },
+>>>>>>> upstream/develop
     "frontend": {
       "angular": {
         "version": "1.7.9",
