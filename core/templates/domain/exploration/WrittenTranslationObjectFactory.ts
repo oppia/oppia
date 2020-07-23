@@ -23,18 +23,18 @@ import { Injectable } from '@angular/core';
 export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
 export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
 
-type WrittenTranslationType = typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
+type WrittenTranslationDataFormat = typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
   typeof WRITTEN_TRANSLATION_TYPE_HTML;
 
-export interface ITranslationBackendDict {
-  'data_format': WrittenTranslationType;
+export interface TranslationBackendDict {
+  'data_format': WrittenTranslationDataFormat;
   'translation': string;
   'needs_update': boolean;
 }
 
 export class WrittenTranslation {
   constructor(
-      public translationType: WrittenTranslationType,
+      public dataFormat: WrittenTranslationDataFormat,
       public translation: string,
       public needsUpdate: boolean
   ) {}
@@ -48,22 +48,22 @@ export class WrittenTranslation {
   }
 
   getHtml(): string {
-    if (this.translationType !== WRITTEN_TRANSLATION_TYPE_HTML) {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
       throw new Error('This translation is not of type html');
     }
     return this.translation;
   }
 
   setHtml(html: string): void {
-    if (this.translationType !== WRITTEN_TRANSLATION_TYPE_HTML) {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
       throw new Error('This translation is not of type html');
     }
     this.translation = html;
   }
 
-  toBackendDict(): ITranslationBackendDict {
+  toBackendDict(): TranslationBackendDict {
     return {
-      data_format: this.translationType,
+      data_format: this.dataFormat,
       translation: this.translation,
       needs_update: this.needsUpdate
     };
@@ -74,11 +74,14 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(type: WrittenTranslationType, html: string): WrittenTranslation {
+  createNew(
+      type: WrittenTranslationDataFormat,
+      html: string
+  ): WrittenTranslation {
     return new WrittenTranslation(type, html, false);
   }
 
-  createFromBackendDict(translationBackendDict: ITranslationBackendDict) {
+  createFromBackendDict(translationBackendDict: TranslationBackendDict) {
     return new WrittenTranslation(
       translationBackendDict.data_format,
       translationBackendDict.translation,

@@ -27,6 +27,9 @@ export interface SubtitledHtmlBackendDict {
 
 export class SubtitledHtml {
   _html: string;
+  // A null content_id indicates that the SubtitledHtml has been created
+  // but not saved. Before the SubtitledHtml object is saved into a State,
+  // the content_id should be set to a string.
   _contentId: string | null;
   constructor(html: string, contentId: string | null) {
     this._html = html;

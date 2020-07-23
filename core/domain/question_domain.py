@@ -376,14 +376,46 @@ class Question(python_utils.OBJECT):
                 max_existing_content_id_index + 1)
             return question_state_dict
 
-        # Put next_content_id_index in a dict so we can modify it in an
-        # inner function later (generate_content_id_with_index).
-        next_content_id_index_dict = {
-            'value': max_existing_content_id_index + 1
-        }
-        all_new_content_ids = []
+        class ContentIdCounter(object):
+            """This helper class is used to keep track of
+            next_content_id_index and new_content_ids, and provides a
+            function to generate new content_ids.
+            """
+            new_content_ids = []
+
+            def __init__(self, next_content_id_index):
+                """Initializes a ContentIdCounter object.
+
+                Args:
+                    next_content_id_index: The next content id index.
+                """
+                self.next_content_id_index = next_content_id_index
+
+            def generate_content_id(self, content_id_prefix):
+                """Generate a new content_id from the prefix provided and
+                the next content id index.
+
+                Args:
+                    content_id_prefix: str. The prefix of the content_id.
+
+                Returns:
+                    str. The generated content_id.
+                """
+                content_id = '%s%i' % (
+                    content_id_prefix,
+                    self.next_content_id_index)
+                self.next_content_id_index += 1
+                self.new_content_ids.append(content_id)
+                return content_id
+
+        content_id_counter = (
+            ContentIdCounter(max_existing_content_id_index + 1))
 
         ca_dict = question_state_dict['interaction']['customization_args']
+        if (interaction_id == 'PencilCodeEditor' and
+                'initial_code' in ca_dict):
+            ca_dict['initialCode'] = ca_dict['initial_code']
+            del ca_dict['initial_code']
 
         # Retrieve a cached version (state schema v35) of
         # interaction_specs.json to ensure that this migration remains
@@ -401,91 +433,10 @@ class Question(python_utils.OBJECT):
             )
         ]
 
-        if (interaction_id == 'PencilCodeEditor' and
-                'initial_code' in ca_dict):
-            ca_dict['initialCode'] = ca_dict['initial_code']
-            del ca_dict['initial_code']
-
         for ca_spec in ca_specs:
             schema = ca_spec.schema
             ca_name = ca_spec.name
             content_id_prefix = 'ca_%s_' % ca_name
-            new_content_ids = []
-
-            def generate_content_id():
-                """Generate a content_id using content_id_prefix and
-                next_content_id_index from outer scope.
-                """
-                # Let inner function access cell variables content_id_prefix
-                # and next_content_id_index_dict.
-                # pylint: disable=cell-var-from-loop
-                content_id = '%s%i' % (
-                    content_id_prefix,
-                    next_content_id_index_dict['value'])
-                next_content_id_index_dict['value'] += 1
-                new_content_ids.append(content_id)
-                return content_id
-
-            def convert_str_to_subtitled_content(
-                    ca_value, default_value, obj_type):
-                """Convert a string to a SubtitledString or
-                SubtitledHtml dict. Assigns a content_id.
-
-                Args:
-                    ca_value: str|None. The original customization
-                        argument value. None indicates that the
-                        customization argument is missing, and should
-                        be populated with its default value.
-                    default_value: *. The default value of the
-                        customization argument.
-                    obj_type: str. Either 'SubtitledUnicode' or
-                        'SubtitledHtml'. Indicates which key to use in
-                        the return object.
-
-                Returns:
-                    dict. A SubtitledHtml or SubtitledUnicode dict.
-                """
-                obj_type_to_subtitled_dict_key = {
-                    'SubtitledUnicode': 'unicode_str',
-                    'SubtitledHtml': 'html'
-                }
-                subtitled_dict_key = (
-                    obj_type_to_subtitled_dict_key[obj_type])
-
-                if ca_value is None:
-                    ca_value = default_value[subtitled_dict_key]
-
-                return {
-                    'content_id': generate_content_id(),
-                    subtitled_dict_key: ca_value
-                }
-
-            def convert_str_list_to_subtitled_content_list(
-                    ca_value, default_value):
-                """Convert a list of html strings into a list of
-                SubtitledHtml dicts. Assigns a content_id for each
-                element.
-
-                Args:
-                    ca_value: list(str)|None. The original customization
-                        argument value. None indicates that the
-                        customization argument is missing, and should
-                        be populated with its default value.
-                    default_value: *. The default value of the
-                        customization argument.
-
-                Returns:
-                    list(dict). A list of SubtitledHtml dicts.
-                """
-                if ca_value is None:
-                    ca_value = default_value
-                    ca_value['content_id'] = generate_content_id()
-                    return ca_value
-
-                return [{
-                    'content_id': generate_content_id(),
-                    'html': ca_value_element
-                } for ca_value_element in ca_value]
 
             is_subtitled_html_spec = False
             is_subtitled_unicode_spec = False
@@ -500,45 +451,63 @@ class Question(python_utils.OBJECT):
             is_subtitled_html_list_spec = (
                 schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
                 (schema['items']['type'] ==
-                 schema_utils.SCHEMA_TYPE_CUSTOM) and
+                    schema_utils.SCHEMA_TYPE_CUSTOM) and
                 (schema['items']['obj_type'] ==
-                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML))
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML))
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
-                if ca_name not in ca_dict:
-                    ca_dict[ca_name] = {'value': None}
+                # Default is a SubtitledHtml dict or SubtitleUnicode dict.
+                new_value = ca_spec.default_value
 
-                ca_dict[ca_name]['value'] = (
-                    convert_str_to_subtitled_content(
-                        ca_dict[ca_name]['value'],
-                        ca_spec.default_value,
-                        schema['obj_type'])
+                # If available, assign value to html or unicode_str.
+                if ca_name in ca_dict:
+                    if is_subtitled_html_spec:
+                        new_value['html'] = ca_dict[ca_name]['value']
+                    elif is_subtitled_unicode_spec:
+                        new_value['unicode_str'] = ca_dict[ca_name]['value']
+
+                # Assign content_id.
+                new_value['content_id'] = (
+                    content_id_counter
+                    .generate_content_id(content_id_prefix)
                 )
+
+                ca_dict[ca_name] = {'value': new_value}
             elif is_subtitled_html_list_spec:
-                if ca_name not in ca_dict:
-                    ca_dict[ca_name] = {'value': None}
+                new_value = []
 
-                ca_dict[ca_name]['value'] = (
-                    convert_str_list_to_subtitled_content_list(
-                        ca_dict[ca_name]['value'],
-                        ca_spec.default_value)
-                )
+                if ca_name in ca_dict:
+                    # Assign values to html fields.
+                    for html in ca_dict[ca_name]['value']:
+                        new_value.append({
+                            'html': html, 'content_id': None
+                        })
+                else:
+                    # Default is a list of SubtitledHtml dict.
+                    new_value.extend(ca_spec.default_value)
+
+                # Assign content_ids.
+                for subtitled_html_dict in new_value:
+                    subtitled_html_dict['content_id'] = (
+                        content_id_counter
+                        .generate_content_id(content_id_prefix)
+                    )
+
+                ca_dict[ca_name] = {'value': new_value}
             elif ca_name not in ca_dict:
                 ca_dict[ca_name] = {'value': ca_spec.default_value}
 
-            all_new_content_ids.extend(new_content_ids)
-
-            (customization_args_util
-             .validate_customization_args_and_values(
-                 'interaction',
-                 interaction_id,
-                 ca_dict,
-                 ca_specs)
-            )
+        (customization_args_util
+         .validate_customization_args_and_values(
+             'interaction',
+             interaction_id,
+             ca_dict,
+             ca_specs)
+        )
 
         question_state_dict['next_content_id_index'] = (
-            next_content_id_index_dict['value'])
-        for new_content_id in all_new_content_ids:
+            content_id_counter.next_content_id_index)
+        for new_content_id in content_id_counter.new_content_ids:
             question_state_dict[
                 'written_translations'][
                     'translations_mapping'][new_content_id] = {}

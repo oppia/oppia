@@ -1378,7 +1378,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': 'hello',
                             'content_id': 'ca_choices_0'
                         }]
-                    }
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'MultipleChoiceInput',
@@ -1418,7 +1419,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': '<p>hello</p>',
                             'content_id': 'ca_choices_0'
                         }]
-                    }
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'MultipleChoiceInput',
@@ -1459,7 +1461,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': '<p>hello</p>',
                             'content_id': 'ca_choices_0'
                         }]
-                    }
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'MultipleChoiceInput',
@@ -1500,7 +1503,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': '<p>hello</p>',
                             'content_id': 'ca_choices_0'
                         }]
-                    }
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'MultipleChoiceInput',
@@ -1545,6 +1549,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
+
+        # We cannot use the above html strings as a test for customization args
+        # because the html is cleaned when constructing a SubtitledHtml domain
+        # object, which will remove attributes such as raw-latex-with-value,
+        # causing the conversion function
+        # html_validation_service.add_math_content_to_math_rte_components
+        # to fail.
+        old_customization_arg_html = 'should be in a p tag'
+        new_customization_arg_html = '<p>should be in a p tag</p>'
+        def customization_arg_conversion_fn(html_string):
+            if html_string == old_customization_arg_html:
+                return '<p>%s</p>' % html_string
+            return html_string
+
         written_translations_dict_with_old_math_schema = {
             'translations_mapping': {
                 'content1': {
@@ -1720,7 +1738,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': html_with_old_math_schema
+                            'html': old_customization_arg_html
                         }, {
                             'content_id': 'ca_choices_1',
                             'html': '<p>2</p>'
@@ -1731,7 +1749,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_choices_3',
                             'html': '<p>4</p>'
                         }]
-                    }
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
@@ -1799,7 +1818,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': html_with_new_math_schema
+                            'html': new_customization_arg_html
                         }, {
                             'content_id': 'ca_choices_1',
                             'html': '<p>2</p>'
@@ -1810,7 +1829,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_choices_3',
                             'html': '<p>4</p>'
                         }]
-                    }
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
@@ -1846,11 +1866,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'written_translations': (
                 written_translations_dict_with_new_math_schema)
         }
-        self.assertEqual(
+
+        first_conversion_result = (
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components)
+        )
+
+        second_conversion_result = (
+            state_domain.State.convert_html_fields_in_state(
+                first_conversion_result,
+                customization_arg_conversion_fn)
+        )
+
+        self.assertEqual(
+            second_conversion_result,
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_item_selection_interaction(self):
@@ -1865,6 +1896,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
+
+        # We cannot use the above html strings as a test for customization args
+        # because the html is cleaned when constructing a SubtitledHtml domain
+        # object, which will remove attributes such as raw-latex-with-value,
+        # causing the conversion function
+        # html_validation_service.add_math_content_to_math_rte_components
+        # to fail.
+        old_customization_arg_html = 'should be in a p tag'
+        new_customization_arg_html = '<p>should be in a p tag</p>'
+        def customization_arg_conversion_fn(html_string):
+            if html_string == old_customization_arg_html:
+                return '<p>%s</p>' % html_string
+            return html_string
+
         answer_group_with_old_math_schema = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
@@ -1992,7 +2037,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': '<p>init_state customization arg html 1</p>'
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': html_with_old_math_schema
+                            'html': old_customization_arg_html
                         }, {
                             'content_id': 'ca_choices_2',
                             'html': '<p>init_state customization arg html 3</p>'
@@ -2061,7 +2106,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': '<p>init_state customization arg html 1</p>'
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': html_with_new_math_schema
+                            'html': new_customization_arg_html
                         }, {
                             'content_id': 'ca_choices_2',
                             'html': '<p>init_state customization arg html 3</p>'
@@ -2081,11 +2126,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'ItemSelectionInput'))
         interaction.can_have_solution = True
 
-        self.assertEqual(
+        first_conversion_result = (
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components)
+        )
+
+        second_conversion_result = (
+            state_domain.State.convert_html_fields_in_state(
+                first_conversion_result,
+                customization_arg_conversion_fn)
+        )
+
+        self.assertEqual(
+            second_conversion_result,
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_text_input_interaction(self):

@@ -113,7 +113,7 @@ class Registry(python_utils.OBJECT):
     @classmethod
     def get_all_specs_for_state_schema_version(cls, state_schema_version):
         """Returns a dict containing the full specs of each interaction for the
-        given state version, if available.
+        given state schema version, if available.
 
         Args:
             state_schema_version: int. The state schema version to retrieve

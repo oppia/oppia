@@ -252,7 +252,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       let traverseSchemaAndAssignContentIds = (
           value: InteractionCustomizationArgsValue,
           schema: Schema,
-          currentContentId: string,
+          contentIdPrefix: string,
       ): void => {
         if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (
@@ -263,7 +263,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             traverseSchemaAndAssignContentIds(
               value[i],
               <Schema> schema.items,
-              `${currentContentId}`);
+              `${contentIdPrefix}`);
           }
         } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
           schema.properties.forEach(property => {
@@ -271,7 +271,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             traverseSchemaAndAssignContentIds(
               value[name],
               property.schema,
-              `${currentContentId}_${name}`);
+              `${contentIdPrefix}_${name}`);
           });
         } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
             ((schema.obj_type ===
@@ -280,7 +280,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         ) {
           if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
             (<SubtitledHtml|SubtitledUnicode>value).setContentId(
-              `${currentContentId}_${StateNextContentIdIndexService.displayed}`
+              `${contentIdPrefix}_${StateNextContentIdIndexService.displayed}`
             );
             StateNextContentIdIndexService.displayed += 1;
           }
@@ -291,7 +291,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       const caValues = StateCustomizationArgsService.displayed;
       for (const caSpec of caSpecs) {
         const name = caSpec.name;
-        if (name in caValues) {
+        if (caValues.hasOwnProperty(name)) {
           traverseSchemaAndAssignContentIds(
             caValues[name].value,
             caSpec.schema,

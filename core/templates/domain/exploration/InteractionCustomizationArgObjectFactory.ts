@@ -40,8 +40,9 @@ export interface InteractionCustomizationArgBackendDict {
 
 /**
  * InteractionCustomizationArg represents a single customization argument.
- * Customization arguments for an interaction are stored in a dictionary from
- * customization argument name to a InteractionCustomizationArg object.
+ * Customization arguments for an interaction are stored in a dictionary that
+ * maps customization arg names to the corresponding
+ * InteractionCustomizationArg objects.
  */
 export class InteractionCustomizationArg {
   constructor(public value: InteractionCustomizationArgsValue) {}
@@ -96,15 +97,14 @@ export class InteractionCustomizationArgObjectFactory {
         result = (
           (<InteractionCustomizationArgsBackendDictValue[]>value).map(element =>
             traverseSchemaAndConvertSubtitledFromDicts(
-              element,
-              <Schema> schema.items))
+              element, <Schema> schema.items)
+          )
         );
       } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
         schema.properties.forEach(property => {
           const name = property.name;
           result[name] = traverseSchemaAndConvertSubtitledFromDicts(
-            value[name],
-            property.schema);
+            value[name], property.schema);
         });
       } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM) {
         if (schema.obj_type ===

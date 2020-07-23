@@ -1133,6 +1133,11 @@ tags: []
         """Sets the interaction_id, sets the fully populated default
         interaction customization arguments, and increments
         next_content_id_index as needed.
+
+        Args:
+            state: State. The state domain object to set the interaction for.
+            interaction_id: str. The interaction id to set. Also sets the
+                default customization args for the given interaction id.
         """
 
         # We wrap next_content_id_index in a dict so that modifying it in the

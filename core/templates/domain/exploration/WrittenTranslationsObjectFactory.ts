@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ITranslationBackendDict,
+  TranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory,
   WRITTEN_TRANSLATION_TYPE_HTML
@@ -30,7 +30,7 @@ import {
 export interface IWrittenTranslationsBackendDict {
   'translations_mapping': {
     [contentId: string]: {
-      [langCode: string]: ITranslationBackendDict
+      [langCode: string]: TranslationBackendDict
     }
   }
 }

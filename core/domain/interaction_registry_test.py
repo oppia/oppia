@@ -124,11 +124,12 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(all_specs, specs_from_json)
 
     def test_interaction_specs_customization_arg_specs_names_are_valid(self):
-        """Test to ensure that all customization argument names are in
+        """Test to ensure that all customization argument names in
         interaction specs only include alphabetic letters and are
         lowerCamelCase. This is because these properties are involved in the
         generation of content_ids for customization arguments. Recursion is
-        required because names can be nested within type: dict inside a schema.
+        required because names can be nested within type: 'dict' inside a
+        schema.
         """
         all_specs = interaction_registry.Registry.get_all_specs()
         ca_names_in_schema = []

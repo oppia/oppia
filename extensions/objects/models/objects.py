@@ -136,7 +136,7 @@ class SubtitledUnicode(BaseObject):
         }, {
             'name': 'content_id',
             'schema': {
-                'type': 'optional_unicode'
+                'type': 'unicode_or_none'
             }
         }]
     }
@@ -166,7 +166,7 @@ class SubtitledHtml(BaseObject):
         }, {
             'name': 'content_id',
             'schema': {
-                'type': 'optional_unicode'
+                'type': 'unicode_or_none'
             }
         }]
     }

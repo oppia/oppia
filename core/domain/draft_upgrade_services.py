@@ -155,10 +155,16 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             conversion_fn(value))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                new_value = (
-                    state_domain.WrittenTranslations.
-                    convert_html_in_written_translations(
-                        new_value, conversion_fn))
+                for content_id, language_code_to_written_translation in (
+                    new_value['translations_mapping'].items()):
+                    for language_code in (
+                            language_code_to_written_translation.keys()):
+                        new_value['translations_mapping'][
+                            content_id][language_code]['html'] = (
+                                conversion_fn(new_value[
+                                    'translations_mapping'][content_id][
+                                        language_code]['html'])
+                            )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                 new_value = (

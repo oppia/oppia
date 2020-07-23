@@ -26,12 +26,13 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SubtitledUnicode {
-  _unicode: string;
-  _contentId: string;
-  constructor(unicode: string, contentId: string) {
-    this._unicode = unicode;
-    this._contentId = contentId;
-  }
+  // A null content_id indicates that the SubtitledHtml has been created
+  // but not saved. Before the SubtitledHtml object is saved into a State,
+  // the content_id should be set to a string.
+  constructor(
+    private _unicode: string,
+    private _contentId: string | null
+  ) {}
 
   getUnicode(): string {
     return this._unicode;

@@ -367,14 +367,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-        exp_services.update_exploration(
-            self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
-            'Ran Exploration Migration job.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.create_and_migrate_new_exploration('33', '34')
         migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list, 1, exploration.version, self.EXP_ID))
+                draft_change_list, 1, 2, self.EXP_ID))
         self.assertEqual(
             migrated_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({
