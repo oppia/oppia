@@ -445,7 +445,7 @@
 /core/__init__.py @nithusha21
 /core/controllers/__init__.py @nithusha21
 /core/domain/__init__.py @nithusha21
-/core/domain/config*.py @BenHenning @vinitamurthi
+/core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
@@ -571,6 +571,7 @@
 
 
 # Dynamic Feature Gating project
+/core/storage/config/ @BenHenning @vinitamurthi
 /core/domain/platform_parameter_domain*.py @BenHenning @vinitamurthi
 /core/domain/feature_gating_services*.py @BenHenning @vinitamurthi
 /core/features_registry*.py @BenHenning @vinitamurthi
