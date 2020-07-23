@@ -128,7 +128,7 @@ const createExplorations = async function(context, page) {
     await page.waitFor(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click(
-      'div:nth-child(2) > span.col-lg-2.col-md-2.col-sm-2.ml-auto > button');
+      '.protractor-test-reload-exploration-button');
     // eslint-disable-next-line no-console
     console.log('Exploration Created');
   } catch (e) {
