@@ -34,10 +34,7 @@ memcache_services = models.Registry.import_memcache_services()
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterChange class."""
 
-    CMD_EDIT_RULES = (
-        parameter_domain
-        .PlatformParameterChange
-        .CMD_EDIT_RULES)
+    CMD_EDIT_RULES = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
 
     def test_param_change_object_with_missing_cmd_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -52,9 +49,8 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_missing_attribute_in_cmd_raises_exception(
             self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following required attributes are missing: '
-                'new_rules')):
+            utils.ValidationError,
+            'The following required attributes are missing: new_rules'):
             parameter_domain.PlatformParameterChange({
                 'cmd': self.CMD_EDIT_RULES
             })
@@ -62,8 +58,8 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
             self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
+            utils.ValidationError,
+            'The following extra attributes are present: invalid'):
             parameter_domain.PlatformParameterChange({
                 'cmd': self.CMD_EDIT_RULES,
                 'new_rules': [],
@@ -87,9 +83,8 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': []
         }
-        param_change_object = (
-            parameter_domain.PlatformParameterChange(
-                param_change_dict))
+        param_change_object = parameter_domain.PlatformParameterChange(
+            param_change_dict)
         self.assertEqual(
             param_change_object.to_dict(),
             param_change_dict)
