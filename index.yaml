@@ -235,6 +235,11 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
+- kind: TaskEntryModel
+  properties:
+  - name: composite_entity_id
+  - name: status
+
 - kind: UserContributionScoringModel
   properties:
   - name: deleted
