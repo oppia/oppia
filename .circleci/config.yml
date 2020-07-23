@@ -170,7 +170,7 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
       - store_artifacts:
-          path: ../core/protractor-screenshots
+          path: /home/circleci/oppia/core/protractor-screenshots
       - run:
           name: Run e2e publication test
           command: |
