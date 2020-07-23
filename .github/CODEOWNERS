@@ -150,7 +150,6 @@
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
-/scripts/linters/excluded_any_type_files.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
 
 
@@ -542,7 +541,7 @@
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
 /puppeteer-login-script.js @jimbyo
-/scripts/run_lighthouse_tests.py @jameesjohn @jimbyo @vojtechjelinek
+/scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek

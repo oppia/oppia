@@ -300,6 +300,10 @@ indexes:
   - name: committer_id
   - name: commit_message
   - name: commit_type
+- kind: TaskEntryModel
+  properties:
+  - name: composite_entity_id
+  - name: status
 
 - kind: UserContributionScoringModel
   properties:
