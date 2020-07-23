@@ -126,9 +126,6 @@ def apply_change_list(story_id, change_list):
                     story.mark_node_outline_as_finalized(change.node_id)
                 else:
                     story.mark_node_outline_as_unfinalized(change.node_id)
-            elif change.cmd == story_domain.CMD_REARRANGE_STORY_NODE:
-                story.rearrange_node_in_story(
-                    change.from_index, change.to_index)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):

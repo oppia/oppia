@@ -62,7 +62,6 @@ CMD_UPDATE_STORY_CONTENTS_PROPERTY = 'update_story_contents_property'
 
 # These take node_id as parameter.
 CMD_ADD_STORY_NODE = 'add_story_node'
-CMD_REARRANGE_STORY_NODE = 'rearrange_story_node'
 CMD_DELETE_STORY_NODE = 'delete_story_node'
 CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status'
 
