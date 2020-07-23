@@ -436,7 +436,6 @@
 /core/templates/services/interaction-rules-registry.service*.ts @bansalnitish
 /core/templates/services/interaction-specs.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
-/release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
 
 # Miscellaneous.
@@ -462,10 +461,6 @@
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
-
-
-# Release team.
-/scripts/release_scripts/ @ankita240796
 
 
 # Rich text editor team.

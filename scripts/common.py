@@ -29,7 +29,6 @@ import sys
 import time
 
 import python_utils
-import release_constants
 
 
 CURRENT_PYTHON_BIN = sys.executable
@@ -76,11 +75,17 @@ OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
 
+# Release related constants.
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
+AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
+BLOCKING_BUG_MILESTONE_NUMBER = 39
+LABEL_FOR_CURRENT_RELEASE_PRS = 'PR: for current release'
+LABEL_FOR_RELEASED_PRS = 'PR: released'
+
 
 FECONF_PATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
@@ -419,7 +424,7 @@ def ask_user_to_confirm(message):
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
         answer = python_utils.INPUT().lower()
-        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
 
@@ -456,7 +461,7 @@ def check_blocking_bug_issue_count(repo):
         Exception: The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
-        number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
+        number=BLOCKING_BUG_MILESTONE_NUMBER)
     if blocking_bugs_milestone.state == 'closed':
         raise Exception('The blocking bug milestone is closed.')
     if blocking_bugs_milestone.open_issues:
@@ -481,12 +486,12 @@ def check_prs_for_current_release_are_released(repo):
             "PR: released" label.
     """
     current_release_label = repo.get_label(
-        release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
+        LABEL_FOR_CURRENT_RELEASE_PRS)
     current_release_prs = repo.get_issues(
         state='all', labels=[current_release_label])
     for pr in current_release_prs:
         label_names = [label.name for label in pr.labels]
-        if release_constants.LABEL_FOR_RELEASED_PRS not in label_names:
+        if LABEL_FOR_RELEASED_PRS not in label_names:
             open_new_tab_in_browser_if_possible(
                 'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
                 '+label%3A%22PR%3A+for+current+release%22+')
