@@ -19,13 +19,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationFeaturesService, IExplorationDataDict,
-  IFeatureDataDict, IParamChanges } from
+import { ExplorationFeaturesService, IExplorationDataDict, IParamChanges } from
   'services/exploration-features.service';
 
 describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService = null;
-  let featureData: IFeatureDataDict = null;
+  let featureData = null;
   let explorationData: IExplorationDataDict = null;
   let explorationData2: IExplorationDataDict = null;
   let testParamChanges: IParamChanges = null;
@@ -38,8 +37,8 @@ describe('ExplorationFeatureService', () => {
     ExplorationFeaturesService.serviceIsInitialized = false;
 
     featureData = {
-      is_improvements_tab_enabled: true,
-      is_exploration_whitelisted: true,
+      isImprovementsTabEnabled: true,
+      isExplorationWhitelisted: true,
     };
     explorationData = {
       param_changes: [testParamChanges],
