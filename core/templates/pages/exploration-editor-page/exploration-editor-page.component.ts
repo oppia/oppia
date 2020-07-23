@@ -231,7 +231,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
       // Initializes the exploration page using data from the backend.
       // Called on page load.
-      ctrl.initExplorationPage = (successCallback) => {
+      ctrl.initExplorationPage = () => {
         return $q.all([
           ExplorationDataService.getData((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
@@ -357,10 +357,6 @@ angular.module('oppia').component('explorationEditorPage', {
             $scope.$broadcast('refreshStateEditor');
           }
 
-          if (successCallback) {
-            successCallback();
-          }
-
           StateTutorialFirstTimeService.initEditor(
             explorationData.show_state_editor_tutorial_on_load,
             ctrl.explorationId);
@@ -461,7 +457,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationWarningsService.updateWarnings();
         });
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
-          ctrl.initExplorationPage(successCallback);
+          ctrl.initExplorationPage().then(successCallback);
         });
         $scope.$on(
           'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);

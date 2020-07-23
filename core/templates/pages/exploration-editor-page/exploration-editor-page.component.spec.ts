@@ -364,9 +364,13 @@ describe('Exploration editor page component', function() {
 
       var successCallback = jasmine.createSpy('success');
       $rootScope.$broadcast('initExplorationPage', successCallback);
+
+      // Need to flush and $apply twice to fire the callback. In practice, this
+      // will occur seamlessly.
       flushMicrotasks();
       $scope.$apply();
       flushMicrotasks();
+      $scope.$apply();
 
       expect(successCallback).toHaveBeenCalled();
     }));
