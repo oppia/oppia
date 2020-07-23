@@ -3,7 +3,7 @@
     <a href="/topics-and-skills-dashboard" uib-tooltip="Back to Topics and Skills Dashboard" ng-if="!canNavigateToTopicEditorPage()" class="back-to-dashboard">
       <i class="fa fa-arrow-left"></i>
     </a>
-    <i class="fa fa-arrow-left protractor-test-edit-topic-tab" uib-tooltip="Back to Topic" ng-if="canNavigateToTopicEditorPage()" ng-click="navigateToMainTab()"></i>
+    <i class="fa fa-arrow-left back-to-topic-icon protractor-test-edit-topic-tab" uib-tooltip="Back to Topic" ng-if="canNavigateToTopicEditorPage()" ng-click="navigateToMainTab()"></i>
     <[topic.getName()]> (v<[topic.getVersion()]>)
   </span>
 </div>
@@ -11,5 +11,8 @@
   topic-editor-navbar-breadcrumb .back-to-dashboard {
     color: #FFF;
     text-decoration: none;
+  }
+  topic-editor-navbar-breadcrumb .back-to-topic-icon {
+    cursor: pointer;
   }
 </style>
