@@ -34,6 +34,8 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('pages/topic-editor-page/modal-templates/' +
+    'preview-thumbnail.component.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -224,7 +226,12 @@ angular.module('oppia').directive('storyEditor', [
             }
           };
 
+          $scope.togglePreview = function() {
+            $scope.storyPreviewCardIsShown = !($scope.storyPreviewCardIsShown);
+          };
+
           ctrl.$onInit = function() {
+            $scope.storyPreviewCardIsShown = false;
             $scope.NOTES_SCHEMA = {
               type: 'html',
               ui_config: {

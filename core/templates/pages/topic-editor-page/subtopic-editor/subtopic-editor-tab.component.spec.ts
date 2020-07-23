@@ -43,7 +43,7 @@ describe('Subtopic editor tab', function() {
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var QuestionBackendApiService = null;
-  var SkillSummaryObjectFactory = null;
+  var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -58,7 +58,8 @@ describe('Subtopic editor tab', function() {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    ShortSkillSummaryObjectFactory = $injector.get(
+      'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     QuestionBackendApiService = $injector.get('QuestionBackendApiService');
@@ -156,7 +157,7 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should return if skill is deleted', function() {
-    var skillSummary = SkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummaryObjectFactory.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });

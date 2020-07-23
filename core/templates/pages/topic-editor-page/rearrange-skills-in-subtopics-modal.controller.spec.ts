@@ -21,6 +21,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var $scope = null;
+  var ctrl = null;
   var topic = null;
   var $uibModalInstance = null;
   var TopicEditorStateService = null;
@@ -38,7 +39,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     $uibModalInstance = $injector.get('$uibModal');
@@ -47,7 +48,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     topic = TopicObjectFactory.createInterstitialTopic();
     topic._subtopics = [subtopic];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    $controller('RearrangeSkillsInSubtopicsModalController', {
+    ctrl = $controller('RearrangeSkillsInSubtopicsModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
 
@@ -55,41 +56,64 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   }));
 
   it('should initialize the variables', function() {
-    $scope.init();
-    expect($scope.topic).toEqual(topic);
+    ctrl.init();
+    expect(ctrl.topic).toEqual(topic);
   });
 
   it('get skill editor url', function() {
-    expect($scope.getSkillEditorUrl('1')).toBe('/skill_editor/1');
+    expect(ctrl.getSkillEditorUrl('1')).toBe('/skill_editor/1');
   });
-
 
   it('should record skill summary to move and subtopic Id', function() {
     var skillSummary = SkillSummaryObjectFactory.create(
       '1', 'Skill description');
-    $scope.onMoveSkillStart(1, skillSummary);
-    expect($scope.skillSummaryToMove).toEqual(skillSummary);
-    expect($scope.oldSubtopicId).toEqual(1);
+    ctrl.onMoveSkillStart(1, skillSummary);
+    expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
+    expect(ctrl.oldSubtopicId).toEqual(1);
   });
 
   it('should call TopicUpdateService when skill is moved', function() {
     var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
-    $scope.onMoveSkillEnd(1);
+    ctrl.onMoveSkillEnd(1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic',
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      $scope.onMoveSkillEnd(null);
+      ctrl.onMoveSkillEnd(null);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
   it('should not call TopicUpdateService when skill is moved to same subtopic',
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      $scope.oldSubtopicId = null;
-      $scope.onMoveSkillEnd(null);
+      ctrl.oldSubtopicId = null;
+      ctrl.onMoveSkillEnd(null);
       expect(removeSkillSpy).not.toHaveBeenCalled();
     });
+
+  it('should not call TopicUpdateService if subtopic name validation fails',
+    function() {
+      ctrl.editableName = 'subtopic1';
+      var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
+      ctrl.updateSubtopicTitle(1);
+      expect(subtopicTitleSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call TopicUpdateService to update subtopic title', function() {
+    var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
+    ctrl.updateSubtopicTitle(1);
+    expect(subtopicTitleSpy).toHaveBeenCalled();
+  });
+
+  it('should call set and reset the selected subtopic index', function() {
+    ctrl.editNameOfSubtopicWithId(1);
+    expect(ctrl.selectedSubtopicId).toEqual(1);
+    ctrl.editNameOfSubtopicWithId(10);
+    expect(ctrl.selectedSubtopicId).toEqual(10);
+    ctrl.editNameOfSubtopicWithId(0);
+    expect(ctrl.editableName).toEqual('');
+    expect(ctrl.selectedSubtopicId).toEqual(0);
+  });
 });
