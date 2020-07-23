@@ -378,7 +378,15 @@ class DraftChangeMathRichTextAuditOneOffJob(
     @staticmethod
     def map(item):
         exp_id = item.exploration_id
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration = exp_models.ExplorationModel.get_by_id(exp_id)
+        if exploration is None or exploration.deleted:
+            yield (
+                'Invalid Draft change list found.',
+                'Exploration corresponding to Draft change %s does not exist' %
+                (item.id))
+            return
+        if item.draft_change_list is None:
+            return
         draft_change_list = [
             exp_domain.ExplorationChange(change)
             for change in item.draft_change_list]

@@ -398,9 +398,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         for latex_string in self.latex_strings_without_svg:
             # The characters in special LaTeX keywords like 'frac' and 'sqrt'
             # don't add up to the total size of SVG.
-            length_of_expression = len(
-                latex_string.replace('frac', '').replace('sqrt', '').replace(
-                    ' ', ''))
+            length_of_expression = len(latex_string)
             size_in_bytes += (length_of_expression * 1000)
         return size_in_bytes
 

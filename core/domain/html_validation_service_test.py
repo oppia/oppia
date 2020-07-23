@@ -1693,13 +1693,50 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         expected_list_of_latex_strings = [
             '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+
         list_of_latex_string = (
             html_validation_service.
             get_latex_strings_without_svg_from_html(
                 html_string))
         self.assertEqual(
             sorted(list_of_latex_string),
-            sorted(expected_list_of_latex_strings))
+            sorted(expected_list_of_encoded_latex_strings))
+
+    def test_extract_latex_strings_when_latex_strings_have_unicode_characters(
+            self):
+        """Test that get_latex_strings_without_svg_from_html
+        extracts filenames when LaTeX strings have unicode characters.
+        """
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\u03A7\u03A6'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈ&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
+
+        expected_list_of_latex_strings = [
+            'ÀÁÂÃÄÅÆÇÈ', '\u03A7\u03A6',
+            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+        list_of_latex_string = (
+            html_validation_service.
+            get_latex_strings_without_svg_from_html(
+                html_string))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_encoded_latex_strings))
 
     def test_extract_latex_strings_when_math_tags_have_non_empty_svg_filename(
             self):
@@ -1723,7 +1760,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         # Here '+,+,+,+(x^2)' won't be extracted because the corresponding
         # math tag has a non-empty svg_filename field.
-        expected_list_of_latex_strings = ['\\sqrt{x}', '\\frac{x}{y}']
+        expected_list_of_latex_strings = [b'\\sqrt{x}', b'\\frac{x}{y}']
         list_of_latex_string = (
             html_validation_service.
             get_latex_strings_without_svg_from_html(

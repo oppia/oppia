@@ -2932,7 +2932,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
         exp_services.save_new_exploration(self.albert_id, exploration2)
         exp_services.save_new_exploration(self.albert_id, exploration3)
 
-        mock_max_size_of_math_svgs_batch = 0.06 * 1024 * 1024
+        mock_max_size_of_math_svgs_batch = 0.1 * 1024 * 1024
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.
             get_all().count(), 0)
@@ -2971,7 +2971,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id3'))
         self.assertEqual(
             exp1_math_image_model.estimated_max_size_of_images_in_bytes,
-            47000)
+            57000)
         expected_latex_strings_1 = [
             '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
         expected_latex_strings_2 = [
@@ -2982,18 +2982,87 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             sorted(expected_latex_strings_1))
         self.assertEqual(
             exp2_math_image_model.estimated_max_size_of_images_in_bytes,
-            54000)
+            68000)
         self.assertEqual(
             sorted(exp2_math_image_model.latex_strings_without_svg),
             sorted(expected_latex_strings_2))
         self.assertEqual(
             exp3_math_image_model.estimated_max_size_of_images_in_bytes,
-            47000)
+            57000)
         self.assertEqual(
             sorted(exp3_math_image_model.latex_strings_without_svg),
             sorted(expected_latex_strings_1))
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 3)
+
+    def test_one_off_job_handles_unicode_in_latex_strings_correctly(self):
+        """Test that the one-off job handles LaTeX strings with unicode
+        characters correctly.
+        """
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+
+        exploration1.add_states(['FirstState'])
+
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content_with_unicode = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ&'
+            'amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&am'
+            'p;quot;}"></oppia-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content_with_unicode
+        }
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+
+        mock_max_size_of_math_svgs_batch = 0.1 * 1024 * 1024
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.
+            get_all().count(), 0)
+        with self.swap(
+            feconf, 'MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES',
+            mock_max_size_of_math_svgs_batch):
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                create_new())
+            (
+                exp_jobs_one_off.
+                ExplorationMathRichTextInfoModelGenerationOneOffJob.enqueue(
+                    job_id))
+            self.process_and_flush_pending_tasks()
+            actual_output = (
+                exp_jobs_one_off
+                .ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                get_output(job_id))
+
+        actual_output_list = ast.literal_eval(actual_output[0])
+        self.assertEqual(
+            actual_output_list[1]['longest_raw_latex_string'],
+            'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ')
+        self.assertEqual(
+            actual_output_list[1]['number_of_explorations_having_math'], 1)
+        self.assertEqual(
+            actual_output_list[1]['estimated_no_of_batches'], 1)
+        # Checks below assert that the temporary models are created with
+        # values.
+        exp1_math_image_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
+        self.assertEqual(
+            exp1_math_image_model.estimated_max_size_of_images_in_bytes,
+            46000)
+        expected_latex_strings = ['ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ']
+        self.assertEqual(
+            sorted(exp1_math_image_model.latex_strings_without_svg),
+            sorted(expected_latex_strings))
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 1)
+
 
     def test_one_off_job_fails_with_invalid_exploration(self):
         """Test the audit job fails when there is an invalid exploration."""

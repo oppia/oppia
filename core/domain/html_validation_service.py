@@ -947,7 +947,7 @@ def get_latex_strings_without_svg_from_html(html_string):
         svg_filename = (
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
-            latex_strings.add(raw_latex)
+            latex_strings.add(raw_latex.encode('utf-8'))
 
     unique_latex_strings = list(latex_strings)
     return unique_latex_strings
