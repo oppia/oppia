@@ -31,6 +31,7 @@ import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { cloneDeep } from 'lodash';
 
 type InteractionCustomizationArgsHtmlValue = (
   Exclude<
@@ -59,41 +60,44 @@ export class ExplorationHtmlFormatterService {
   /**
    * Convert SubtitledHtml to html string and SubtitledUnicode to unicode
    * string.
-   * @param caValues customization argument values
+   * @param caValues The customization arg values whose fields should be
+   *  converted.
    */
   convertCustomizationArgsToCustomizationArgsHtml(
       caValues: InteractionCustomizationArgs
   ) : InteractionCustomizationArgsHtml {
     if (!caValues) {
-      return {};
+      throw Error('The customization argument value is empty or null');
     }
 
     const traverseAndConvertSubtitledContentToString = (
         value: Array<Object> | Object
     ) => {
+      let result: InteractionCustomizationArgsHtmlValue;
+
       if (value instanceof SubtitledUnicode) {
-        value = value.getUnicode();
+        result = value.getUnicode();
       } else if (value instanceof SubtitledHtml) {
-        value = value.getHtml();
+        result = value.getHtml();
       } else if (value instanceof Array) {
-        for (let i = 0; i < value.length; i++) {
-          value[i] = traverseAndConvertSubtitledContentToString(value[i]);
-        }
+        result = value.map(element =>
+          traverseAndConvertSubtitledContentToString(element));
       } else if (value instanceof Object) {
+        result = {};
         Object.keys(value).forEach(key => {
-          value[key] = traverseAndConvertSubtitledContentToString(value[key]);
+          result[key] = traverseAndConvertSubtitledContentToString(value[key]);
         });
       }
 
-      return value;
+      return result || value;
     };
 
-    let unwrappedCaValues = {};
+    let convertedCaValues = {};
     Object.keys(caValues).forEach(key => {
-      unwrappedCaValues[key] = (
+      convertedCaValues[key] = (
         traverseAndConvertSubtitledContentToString(caValues[key]));
     });
-    return unwrappedCaValues;
+    return convertedCaValues;
   }
 
   /**
@@ -118,11 +122,11 @@ export class ExplorationHtmlFormatterService {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
-    const ca = angular.copy(interactionCustomizationArgs);
-    this.convertCustomizationArgsToCustomizationArgsHtml(ca);
+    const caHtml = this.convertCustomizationArgsToCustomizationArgsHtml(
+      cloneDeep(interactionCustomizationArgs));
 
     element = (
-      this.extensionTagAssembler.formatCustomizationArgAttrs(element, ca));
+      this.extensionTagAssembler.formatCustomizationArgAttrs(element, caHtml));
     element.attr('last-answer', parentHasLastAnswerProperty ?
       'lastAnswer' : 'null');
     if (labelForFocusTarget) {

@@ -431,11 +431,10 @@ describe('Customize Interaction Modal Controller', function() {
       }).toThrowError(
         'Interaction is missing customization argument highlightRegionsOnHover'
       );
-
-      // Change customizationArgs to the older one in order to not affect other
-      // specs.
-      stateCustomizationArgsService.displayed = {};
     });
+    // Change customizationArgs to the older one in order to not affect other
+    // specs.
+    stateCustomizationArgsService.displayed = {};
   });
 
   it('should correctly populate null content ids of complex nested ' +
@@ -505,26 +504,25 @@ describe('Customize Interaction Modal Controller', function() {
         StateNextContentIdIndexService: stateNextContentIdIndexService,
         INTERACTION_SPECS: INTERACTION_SPECS
       });
-
-      stateNextContentIdIndexService.displayed = 0;
-      $scope.save();
-      expect(stateCustomizationArgsService.displayed).toEqual({
-        dummyCustArg: new InteractionCustomizationArg([{
-          content:
-            new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
-          show: true
-        },
-        {
-          content:
-            new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
-          show: true
-        }])
-      });
-      expect(stateNextContentIdIndexService.displayed).toEqual(2);
-
-      // Change customizationArgs to the older one in order to not affect other
-      // specs.
-      stateCustomizationArgsService.displayed = {};
     });
+    stateNextContentIdIndexService.displayed = 0;
+    $scope.save();
+    expect(stateCustomizationArgsService.displayed).toEqual({
+      dummyCustArg: new InteractionCustomizationArg([{
+        content:
+          new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
+        show: true
+      },
+      {
+        content:
+          new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
+        show: true
+      }])
+    });
+    expect(stateNextContentIdIndexService.displayed).toEqual(2);
+
+    // Change customizationArgs to the older one in order to not affect other
+    // specs.
+    stateCustomizationArgsService.displayed = {};
   });
 });

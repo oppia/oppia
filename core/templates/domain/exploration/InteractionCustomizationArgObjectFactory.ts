@@ -38,6 +38,11 @@ export interface InteractionCustomizationArgBackendDict {
   value: InteractionCustomizationArgsBackendDictValue
 }
 
+/**
+ * InteractionCustomizationArg represents a single customization argument.
+ * Customization arguments for an interaction are stored in a dictionary from
+ * customization argument name to a InteractionCustomizationArg object.
+ */
 export class InteractionCustomizationArg {
   constructor(public value: InteractionCustomizationArgsValue) {}
 
@@ -50,10 +55,8 @@ export class InteractionCustomizationArg {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         result = value.toBackendDict();
       } else if (value instanceof Array) {
-        result = [];
-        for (let i = 0; i < value.length; i++) {
-          result[i] = traverseSchemaAndConvertSubtitledToDicts(value[i]);
-        }
+        result = value.map(element =>
+          traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
         result = {};
         Object.keys(value).forEach(key => {
@@ -90,15 +93,12 @@ export class InteractionCustomizationArgObjectFactory {
     ): InteractionCustomizationArgsValue => {
       let result: InteractionCustomizationArgsValue = value;
       if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (
-          let i = 0;
-          i < (<InteractionCustomizationArgsBackendDictValue[]>value).length;
-          i++
-        ) {
-          result[i] = traverseSchemaAndConvertSubtitledFromDicts(
-            value[i],
-            <Schema> schema.items);
-        }
+        result = (
+          (<InteractionCustomizationArgsBackendDictValue[]>value).map(element =>
+            traverseSchemaAndConvertSubtitledFromDicts(
+              element,
+              <Schema> schema.items))
+        );
       } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
         schema.properties.forEach(property => {
           const name = property.name;

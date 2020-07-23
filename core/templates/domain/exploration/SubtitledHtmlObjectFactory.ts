@@ -49,10 +49,6 @@ export class SubtitledHtml {
     this._contentId = newContentId;
   }
 
-  hasNoHtml(): boolean {
-    return !this._html;
-  }
-
   toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
@@ -61,7 +57,7 @@ export class SubtitledHtml {
   }
 
   isEmpty(): boolean {
-    return this.hasNoHtml();
+    return !this._html;
   }
 }
 

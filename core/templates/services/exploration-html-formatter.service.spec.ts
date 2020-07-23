@@ -55,7 +55,7 @@ describe('Exploration Html Formatter Service', () => {
       .toBe(expectedHtmlTag);
   });
 
-  it('should correctly unwrap SubtitledUnicode and SubtitledHtml', () => {
+  it('should correctly convert SubtitledUnicode and SubtitledHtml', () => {
     // No interactions currently have dictionaries in their customization
     // arguments, but we test here for coverage + future development.
     let convertedCA = ehfs.convertCustomizationArgsToCustomizationArgsHtml(
@@ -92,12 +92,12 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML when it is in player mode',
     () => {
-      var interactionId = 'sampleId';
+      var interactionId = 'TextInput';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-sample-id ' +
+      var expectedHtmlTag = '<oppia-interactive-text-input ' +
         'last-answer="null" label-for-focus-target="' + focusLabel + '">' +
-        '</oppia-interactive-sample-id>';
-      expect(ehfs.getInteractionHtml(interactionId, null, false, focusLabel)
+        '</oppia-interactive-text-input>';
+      expect(ehfs.getInteractionHtml(interactionId, {}, false, focusLabel)
       ).toBe(expectedHtmlTag);
     });
 

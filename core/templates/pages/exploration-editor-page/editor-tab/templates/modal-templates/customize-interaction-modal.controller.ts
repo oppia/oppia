@@ -187,11 +187,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         StateCustomizationArgsService.displayed = customizationArgs;
       }
 
-      if (
-        Object.keys(
-          StateCustomizationArgsService.displayed
-        ).length === 0
-      ) {
+      if (Object.keys(
+        StateCustomizationArgsService.displayed).length === 0) {
         $scope.save();
         $scope.hasCustomizationArgs = false;
       } else {
@@ -255,7 +252,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       let traverseSchemaAndAssignContentIds = (
           value: InteractionCustomizationArgsValue,
           schema: Schema,
-          contentId: string,
+          currentContentId: string,
       ): void => {
         if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (
@@ -266,7 +263,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             traverseSchemaAndAssignContentIds(
               value[i],
               <Schema> schema.items,
-              `${contentId}`);
+              `${currentContentId}`);
           }
         } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
           schema.properties.forEach(property => {
@@ -274,7 +271,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             traverseSchemaAndAssignContentIds(
               value[name],
               property.schema,
-              `${contentId}_${name}`);
+              `${currentContentId}_${name}`);
           });
         } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
             ((schema.obj_type ===
@@ -282,9 +279,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
             schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
         ) {
           if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
-            contentId = (
-              `${contentId}_${StateNextContentIdIndexService.displayed}`);
-            (<SubtitledHtml|SubtitledUnicode>value).setContentId(contentId);
+            (<SubtitledHtml|SubtitledUnicode>value).setContentId(
+              `${currentContentId}_${StateNextContentIdIndexService.displayed}`
+            );
             StateNextContentIdIndexService.displayed += 1;
           }
         }
@@ -292,7 +289,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
       const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
       const caValues = StateCustomizationArgsService.displayed;
-      for (let caSpec of caSpecs) {
+      for (const caSpec of caSpecs) {
         const name = caSpec.name;
         if (name in caValues) {
           traverseSchemaAndAssignContentIds(

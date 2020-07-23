@@ -56,7 +56,7 @@ describe('Editor state service', () => {
   });
 
   it('should correctly set and get misconceptionsBySkill', () => {
-    var misconceptionsBySkill = {
+    const misconceptionsBySkill = {
       skillId1: [0],
       skillId2: [1, 2]
     };
@@ -66,7 +66,7 @@ describe('Editor state service', () => {
   });
 
   it('should correctly return answer choices for interaction', () => {
-    var customizationArgsForMultipleChoiceInput = {
+    const customizationArgsForMultipleChoiceInput = {
       choices: {
         value: [
           new SubtitledHtml('Choice 1', ''),
@@ -85,7 +85,7 @@ describe('Editor state service', () => {
       label: 'Choice 2',
     }]);
 
-    var customizationArgsForImageClickInput = {
+    const customizationArgsForImageClickInput = {
       imageAndRegions: {
         value: {
           labeledRegions: [{
@@ -107,7 +107,7 @@ describe('Editor state service', () => {
       label: 'Label 2',
     }]);
 
-    var customizationArgsForItemSelectionAndDragAndDropInput = {
+    const customizationArgsForItemSelectionAndDragAndDropInput = {
       choices: {
         value: [
           new SubtitledHtml('Choice 1', ''),

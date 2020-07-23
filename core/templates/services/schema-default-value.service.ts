@@ -26,6 +26,7 @@ import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
+import { cloneDeep } from 'lodash';
 
 const OBJECT_DEFAULTS = require('objects/object_defaults.json');
 
@@ -134,7 +135,7 @@ export class SchemaDefaultValueService {
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM) {
-      let defaultValue = angular.copy(OBJECT_DEFAULTS[schema.obj_type]);
+      let defaultValue = cloneDeep(OBJECT_DEFAULTS[schema.obj_type]);
 
       if (schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) {
         return this.subtitledHtmlObjectFactory.createFromBackendDict(

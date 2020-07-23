@@ -26,7 +26,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Interaction customization arg object factory', () => {
-  var icaof: InteractionCustomizationArgObjectFactory = null;
+  let icaof: InteractionCustomizationArgObjectFactory = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

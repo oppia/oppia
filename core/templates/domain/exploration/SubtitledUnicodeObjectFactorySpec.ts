@@ -61,7 +61,7 @@ describe('SubtitledUnicode object factory', () => {
   });
 
   it('should create default object', () => {
-    var defaultSubtitledUnicode = suof
+    const defaultSubtitledUnicode = suof
       .createDefault('test string', 'content_id');
     expect(defaultSubtitledUnicode.getUnicode()).toEqual('test string');
     expect(defaultSubtitledUnicode.getContentId()).toEqual('content_id');

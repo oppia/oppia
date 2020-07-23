@@ -43,12 +43,6 @@ describe('SubtitledHtml object factory', () => {
     expect(subtitledHtml.getContentId()).toEqual('new_content_id');
   });
 
-  it('should correctly check existence of HTML', () => {
-    expect(subtitledHtml.hasNoHtml()).toBe(false);
-    subtitledHtml.setHtml('');
-    expect(subtitledHtml.hasNoHtml()).toBe(true);
-  });
-
   it('should correctly check emptiness', () => {
     expect(subtitledHtml.isEmpty()).toBe(false);
 
@@ -67,7 +61,7 @@ describe('SubtitledHtml object factory', () => {
   });
 
   it('should create default object', () => {
-    var defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
+    const defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
     expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
     expect(defaultSubtitledHtml.getContentId()).toEqual('content_id');
   });
