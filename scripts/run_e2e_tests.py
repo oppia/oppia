@@ -150,6 +150,7 @@ _PARSER.add_argument(
 # the oppia web server.
 SUBPROCESSES = []
 
+
 def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
