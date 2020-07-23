@@ -2222,12 +2222,12 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 
 class UserAuthModelTests(test_utils.GenericTestBase):
     """Tests for UserAuthModel."""
-    
+
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_GAE_ID = 'gae_1_id'
     USER_2_ID = 'user_2_id'
-    USER_2_GAE_IDs = ['gae_2_id_1','gae_2_id_2']
+    USER_2_GAE_IDs = ['gae_2_id_1', 'gae_2_id_2']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2261,7 +2261,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
                 self.USER_1_ID
             ).get()
         )
-        
+
         # Test that calling apply_deletion_policy with no existing model
         # doesn't fail.
         user_models.UserAuthModel.apply_deletion_policy(

@@ -2222,7 +2222,7 @@ class UserAuthModel(base_models.BaseModel):
     Instances of this class are keyed by user id.
     """
 
-    # Authentication detail for sign in using google id (GAE)
+    # Authentication detail for sign in using google id (GAE).
     gae_id = ndb.StringProperty(indexed=True, repeated=True)
 
     @staticmethod
