@@ -2512,6 +2512,7 @@ class Exploration(python_utils.OBJECT):
                 next_content_id_index and new_content_ids, and provides a
                 function to generate new content_ids.
                 """
+
                 new_content_ids = []
 
                 def __init__(self, next_content_id_index):
@@ -2541,7 +2542,7 @@ class Exploration(python_utils.OBJECT):
 
             content_id_counter = (
                 ContentIdCounter(max_existing_content_id_index + 1))
-            
+
             ca_dict = state_dict['interaction']['customization_args']
             if (interaction_id == 'PencilCodeEditor' and
                     'initial_code' in ca_dict):

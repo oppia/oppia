@@ -1559,6 +1559,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_customization_arg_html = 'should be in a p tag'
         new_customization_arg_html = '<p>should be in a p tag</p>'
         def customization_arg_conversion_fn(html_string):
+            """Conversion function that wraps old_customization_arg_html
+            in p tags, and does not apply any conversions otherwise."""
             if html_string == old_customization_arg_html:
                 return '<p>%s</p>' % html_string
             return html_string
@@ -1906,6 +1908,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         old_customization_arg_html = 'should be in a p tag'
         new_customization_arg_html = '<p>should be in a p tag</p>'
         def customization_arg_conversion_fn(html_string):
+            """Conversion function that wraps old_customization_arg_html
+            in p tags, and does not apply any conversions otherwise."""
             if html_string == old_customization_arg_html:
                 return '<p>%s</p>' % html_string
             return html_string

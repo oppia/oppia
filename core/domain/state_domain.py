@@ -975,7 +975,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
             self.schema,
             self.value,
             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML,
-            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
             lambda x: x.content_id
         )
 
@@ -2971,7 +2971,7 @@ class State(python_utils.OBJECT):
                             for html in state_dict[
                                 'interaction']['customization_args'][
                                     'choices']['value']
-                    ])
+                        ])
         else:
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(

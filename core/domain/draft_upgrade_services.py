@@ -108,8 +108,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         """
         for change in draft_change_list:
             if (change.property_name ==
-                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
-            ):
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 # Converting the customization arguments depends on getting an
                 # exploration state of v34. Since we do not yet support passing
                 # an exploration state of a given version into draft conversion
@@ -118,7 +117,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 raise Exception('Conversion cannot be completed.')
 
         return draft_change_list
-        
 
     @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):
@@ -156,7 +154,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 for content_id, language_code_to_written_translation in (
-                    new_value['translations_mapping'].items()):
+                        new_value['translations_mapping'].items()):
                     for language_code in (
                             language_code_to_written_translation.keys()):
                         new_value['translations_mapping'][

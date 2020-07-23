@@ -88,6 +88,9 @@ export class InteractionCustomizationArgObjectFactory {
         InteractionCustomizationArgBackendDict,
       customizationArgSchema: Schema
   ): InteractionCustomizationArg {
+    // Find SubtitledHtml and SubtitledUnicode dictionaries in the customization
+    // argument value and to convert them to SubtitledHtml and SubtitledUnicode
+    // domain objects.
     const traverseSchemaAndConvertSubtitledFromDicts = (
         value: InteractionCustomizationArgsBackendDictValue,
         schema: Schema
