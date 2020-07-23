@@ -23,6 +23,7 @@ import datetime
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import exp_jobs_one_off
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
@@ -30,7 +31,10 @@ from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
+
+from pylatexenc import latex2text
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
@@ -326,6 +330,89 @@ class Question(python_utils.OBJECT):
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.add_math_content_to_math_rte_components)
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
+        """Converts from version 34 to 35. Version 35 upgrades all explorations
+        that use the MathExpressionInput interaction to use one of
+        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
+        interactions.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        if question_state_dict['interaction']['id'] == 'MathExpressionInput':
+            new_answer_groups = []
+            types_of_inputs = set()
+            for group in question_state_dict['interaction']['answer_groups']:
+                new_answer_group = copy.deepcopy(group)
+                for rule_spec in new_answer_group['rule_specs']:
+                    rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+
+                    rule_input = exp_jobs_one_off.clean_math_expression(
+                        rule_input)
+
+                    type_of_input = exp_job_one_off.TYPE_INVALID_EXPRESSION
+                    if is_valid_algebraic_expression(rule_input):
+                        type_of_input = exp_jobs_one_off.TYPE_VALID_ALGEBRAIC_EXPRESSION
+                    elif is_valid_numeric_expression(rule_input):
+                        type_of_input = exp_jobs_one_off.TYPE_VALID_NUMERIC_EXPRESSION
+                    elif is_valid_math_equation(rule_input):
+                        type_of_input = exp_jobs_one_off.TYPE_VALID_MATH_EQUATION
+
+                    types_of_inputs.add(type_of_input)
+
+                    if type_of_input != exp_job_one_off.TYPE_INVALID_EXPRESSION:
+                        rule_spec['inputs']['x'] = rule_input
+                        if type_of_input == exp_jobs_one_off.TYPE_VALID_MATH_EQUATION:
+                            rule_spec['inputs']['y'] = 'both'
+                        rule_spec.rule_type = 'MatchesExactlyWith'
+
+                new_answer_groups.append(new_answer_group.to_dict())
+            
+            if exp_job_one_off.TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                # If at least one rule input is an equation, we remove
+                # all other rule inputs that are expressions.
+                if exp_jobs_one_off.TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_math_equation(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+                # Otherwise, if at least one rule_input is an algebraic
+                # expression, we remove all other rule inputs that are
+                # numeric expressions.
+                elif exp_jobs_one_off.TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                        types_of_inputs):
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_algebraic_expression(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+
+                question_state_dict['interaction']['id'] = list(
+                    types_of_inputs)[0]
+                question_state_dict['interaction']['answer_groups'] = (
+                    new_answer_groups)
+
         return question_state_dict
 
     @classmethod

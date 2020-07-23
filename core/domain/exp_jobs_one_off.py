@@ -83,13 +83,13 @@ AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 # we don't need to closely inspect all of the valid inputs, they are displayed
 # just to make sure that the job output is what we expect.
 VALID_MATH_INPUTS_YIELD_LIMIT = 200
-_TYPE_INVALID_EXPRESSION = 'Invalid'
-_TYPE_VALID_ALGEBRAIC_EXPRESSION = 'AlgebraicExpressionInput'
-_TYPE_VALID_NUMERIC_EXPRESSION = 'NumericExpressionInput'
-_TYPE_VALID_MATH_EQUATION = 'MathEquationInput'
+TYPE_INVALID_EXPRESSION = 'Invalid'
+TYPE_VALID_ALGEBRAIC_EXPRESSION = 'AlgebraicExpressionInput'
+TYPE_VALID_NUMERIC_EXPRESSION = 'NumericExpressionInput'
+TYPE_VALID_MATH_EQUATION = 'MathEquationInput'
 
 
-def _clean_math_expression(math_expression):
+def clean_math_expression(math_expression):
     """Cleans a given math expression and formats it so that it is compatible
     with the new interactions' validators.
 
@@ -274,15 +274,15 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
 
-                            rule_input = _clean_math_expression(rule_input)
+                            rule_input = clean_math_expression(rule_input)
 
-                            type_of_input = _TYPE_INVALID_EXPRESSION
+                            type_of_input = TYPE_INVALID_EXPRESSION
                             if is_valid_algebraic_expression(rule_input):
-                                type_of_input = _TYPE_VALID_ALGEBRAIC_EXPRESSION
+                                type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
                             elif is_valid_numeric_expression(rule_input):
-                                type_of_input = _TYPE_VALID_NUMERIC_EXPRESSION
+                                type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
                             elif is_valid_math_equation(rule_input):
-                                type_of_input = _TYPE_VALID_MATH_EQUATION
+                                type_of_input = TYPE_VALID_MATH_EQUATION
 
                             output_values = '%s %s: %s' % (
                                 item.id, state_name, rule_input)
@@ -291,7 +291,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key != _TYPE_INVALID_EXPRESSION:
+        if key != TYPE_INVALID_EXPRESSION:
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
@@ -332,21 +332,21 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
 
-                            rule_input = _clean_math_expression(rule_input)
+                            rule_input = clean_math_expression(rule_input)
 
-                            type_of_input = _TYPE_INVALID_EXPRESSION
+                            type_of_input = TYPE_INVALID_EXPRESSION
                             if is_valid_algebraic_expression(rule_input):
-                                type_of_input = _TYPE_VALID_ALGEBRAIC_EXPRESSION
+                                type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
                             elif is_valid_numeric_expression(rule_input):
-                                type_of_input = _TYPE_VALID_NUMERIC_EXPRESSION
+                                type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
                             elif is_valid_math_equation(rule_input):
-                                type_of_input = _TYPE_VALID_MATH_EQUATION
+                                type_of_input = TYPE_VALID_MATH_EQUATION
 
                             types_of_inputs.add(type_of_input)
 
-                            if type_of_input != _TYPE_INVALID_EXPRESSION:
+                            if type_of_input != TYPE_INVALID_EXPRESSION:
                                 rule_spec.inputs['x'] = rule_input
-                                if type_of_input == _TYPE_VALID_MATH_EQUATION:
+                                if type_of_input == TYPE_VALID_MATH_EQUATION:
                                     rule_spec.inputs['y'] = 'both'
                                 rule_spec.rule_type = 'MatchesExactlyWith'
 
@@ -357,10 +357,10 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                         new_answer_groups.append(new_answer_group.to_dict())
 
-                    if _TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                    if TYPE_INVALID_EXPRESSION not in types_of_inputs:
                         # If at least one rule input is an equation, we remove
                         # all other rule inputs that are expressions.
-                        if _TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                        if TYPE_VALID_MATH_EQUATION in types_of_inputs:
                             for group in new_answer_groups:
                                 new_rule_specs = []
                                 for rule_spec in group['rule_specs']:
@@ -371,7 +371,7 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         # Otherwise, if at least one rule_input is an algebraic
                         # expression, we remove all other rule inputs that are
                         # numeric expressions.
-                        elif _TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                        elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
                                 types_of_inputs):
                             for group in new_answer_groups:
                                 new_rule_specs = []
@@ -414,7 +414,7 @@ class MathExpressionUpgradeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key != _TYPE_INVALID_EXPRESSION:
+        if key != TYPE_INVALID_EXPRESSION:
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
