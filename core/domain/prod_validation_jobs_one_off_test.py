@@ -6258,6 +6258,7 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 4]']
         run_job_and_check_output(self, expected_output)
 
+
 class QuestionSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
 
