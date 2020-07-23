@@ -2225,7 +2225,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
-    USER_1_GAE_ID = 'gae_1_id'
+    USER_1_GAE_ID = ['gae_1_id']
     USER_2_ID = 'user_2_id'
     USER_2_GAE_IDs = ['gae_2_id_1', 'gae_2_id_2']
 
@@ -2256,10 +2256,9 @@ class UserAuthModelTests(test_utils.GenericTestBase):
         user_models.UserAuthModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
-            user_models.UserAuthModel.query(
-                user_models.UserAuthModel.id ==
+            user_models.UserAuthModel.get_by_id(
                 self.USER_1_ID
-            ).get()
+            )
         )
 
         # Test that calling apply_deletion_policy with no existing model
@@ -2271,20 +2270,19 @@ class UserAuthModelTests(test_utils.GenericTestBase):
         user_models.UserAuthModel.apply_deletion_policy(
             self.USER_2_ID)
         self.assertIsNone(
-            user_models.UserAuthModel.query(
-                user_models.UserAuthModel.id ==
+            user_models.UserAuthModel.get_by_id(
                 self.USER_2_ID
-            ).get()
+            )
         )
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.UserAuthModel
-            .has_reference_to_user_id(self.USER_ID)
+            .has_reference_to_user_id(self.USER_1_ID)
         )
         self.assertTrue(
             user_models.UserAuthModel
-            .has_reference_to_user_id(self.USER_ID)
+            .has_reference_to_user_id(self.USER_2_ID)
         )
         self.assertFalse(
             user_models.UserAuthModel
