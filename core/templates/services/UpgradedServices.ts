@@ -538,6 +538,8 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from
   'domain/statistics/state-top-answers-stats-object.factory';
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -1430,9 +1432,9 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StateTopAnswersStatsBackendApiService'] =
       new StateTopAnswersStatsBackendApiService(
-        upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient'],
-        upgradedServices['StateTopAnswersStatsObjectFactory']);
+        upgradedServices['StateTopAnswersStatsObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StatsReportingBackendApiService'] =
       new StatsReportingBackendApiService(
         upgradedServices['ContextService'],
@@ -1568,6 +1570,11 @@ export class UpgradedServices {
         upgradedServices['FractionObjectFactory'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateInteractionStatsBackendApiService']);
+    upgradedServices['StateTopAnswersStatsService'] =
+      new StateTopAnswersStatsService(
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['StateTopAnswersStatsBackendApiService']);
     upgradedServices['StatsReportingService'] = new StatsReportingService(
       upgradedServices['ContextService'],
       upgradedServices['MessengerService'],

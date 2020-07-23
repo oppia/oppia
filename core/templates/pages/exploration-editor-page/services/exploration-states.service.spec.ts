@@ -251,7 +251,8 @@ describe('ExplorationStatesService', function() {
         ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
         ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
 
-        expect(spy).toHaveBeenCalledWith('Hola');
+        expect(spy)
+          .toHaveBeenCalledWith(ExplorationStatesService.getState('Hola'));
       });
     });
   });
