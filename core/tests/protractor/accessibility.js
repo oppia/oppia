@@ -212,7 +212,7 @@ describe('screenreader and keyboard user accessibility features', function() {
         await (await browser.driver.switchTo().activeElement())
           .getAttribute('id'));
 
-      // Should move the focus away from the skip to main content button. 
+      // Should move the focus away from the skip to main content button.
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       expect(await skipButton.getAttribute('id')).not.toEqual(
