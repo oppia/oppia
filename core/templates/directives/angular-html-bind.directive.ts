@@ -28,12 +28,28 @@ angular.module('oppia').directive('angularHtmlBind', [
         // Clean up old scopes if the html changes.
         // Reference: https://stackoverflow.com/a/42927814
         var newScope;
-        scope.$watch(attrs.htmlData, function(newValue) {
+        scope.$watch(attrs.htmlData, function(newValue: string) {
           if (newScope) {
             newScope.$destroy();
           }
           elm.empty();
           newScope = scope.$new();
+          // When there are trailing spaces in the HTML, CKEditor adds &nbsp;
+          // to the HTML (eg: '<p> Text &nbsp; &nbsp; %nbsp;</p>'), which can
+          // lead to UI issues when displaying it. Hence, the following block
+          // replaces the trailing ' &nbsp; &nbsp; %nbsp;</p>' with just '</p>'.
+          // We can't just find and replace '&nbsp;' here since, those in the
+          // middle may actually be required. Only the trailing ones need to be
+          // replaced.
+          if (newValue) {
+            newValue = newValue.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
+            // The following line is required since blank newlines in between
+            // paragraphs are treated as <p>&nbsp;</p> by ckedior. So, these
+            // have to be restored, as this will get reduced to <p></p> above.
+            // There is no other via user input to get <p></p>, so this wouldn't
+            // affect any other data.
+            newValue = newValue.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
+          }
           elm.html(<string>newValue);
           $compile(elm.contents())(newScope);
         });
