@@ -40,7 +40,7 @@ angular.module('oppia').component('paramChangesEditor', {
     postSaveHook: '=',
     isCurrentlyInSettingsTab: '&currentlyInSettingsTab'
   },
-  templateUrl: require('./param-changes-editor.component.html'),
+  template: require('./param-changes-editor.component.html'),
   controller: [
     '$scope', 'EditabilityService', 'ExplorationParamSpecsService',
     'AlertsService', 'ParamChangeObjectFactory', 'ExplorationStatesService',
