@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import {
   InteractionCustomizationArgObjectFactory, InteractionCustomizationArg
-} from 'domain/exploration/InteractionCustomizationArgObjectFactory';
+} from 'domain/exploration/interaction-customization-arg-object.factory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';

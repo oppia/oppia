@@ -27,7 +27,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { InteractionCustomizationArg } from
-  'domain/exploration/InteractionCustomizationArgObjectFactory';
+  'domain/exploration/interaction-customization-arg-object.factory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from

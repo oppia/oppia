@@ -41,7 +41,7 @@ import { ImageClickInputValidationService } from
 import {
   InteractionCustomizationArgObjectFactory,
   InteractionCustomizationArg
-} from 'domain/exploration/InteractionCustomizationArgObjectFactory';
+} from 'domain/exploration/interaction-customization-arg-object.factory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';

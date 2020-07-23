@@ -34,7 +34,7 @@ import {
 } from 'extensions/interactions/customization-args-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionCustomizationArg } from
-  'domain/exploration/InteractionCustomizationArgObjectFactory';
+  'domain/exploration/interaction-customization-arg-object.factory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from

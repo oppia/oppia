@@ -27,7 +27,7 @@ import { AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { IInteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArg } from
-  'domain/exploration/InteractionCustomizationArgObjectFactory';
+  'domain/exploration/interaction-customization-arg-object.factory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from

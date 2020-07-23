@@ -30,7 +30,7 @@ import { InteractionObjectFactory } from
 import { LoggerService } from 'services/contextual/logger.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { InteractionCustomizationArg } from
-  'domain/exploration/InteractionCustomizationArgObjectFactory';
+  'domain/exploration/interaction-customization-arg-object.factory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 

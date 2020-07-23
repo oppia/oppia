@@ -262,7 +262,7 @@ import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { InteractionCustomizationArgObjectFactory } from
-  'domain/exploration/InteractionCustomizationArgObjectFactory';
+  'domain/exploration/interaction-customization-arg-object.factory';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';

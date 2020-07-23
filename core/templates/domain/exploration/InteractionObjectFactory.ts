@@ -32,7 +32,7 @@ import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
 import { IInteractionAnswer } from 'interactions/answer-defs';
 import {
   InteractionCustomizationArgObjectFactory, InteractionCustomizationArg
-} from 'domain/exploration/InteractionCustomizationArgObjectFactory';
+} from 'domain/exploration/interaction-customization-arg-object.factory';
 import {
   InteractionCustomizationArgsBackendDict,
 } from 'interactions/customization-args-defs';
