@@ -46,9 +46,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-1.45'),
     CURR_DIR,
-<<<<<<< HEAD
-    THIRD_PARTY_DIR
-=======
     os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
     os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
     os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.5'),
@@ -66,7 +63,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(THIRD_PARTY_DIR, 'six-1.15.0'),
     os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
     os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
->>>>>>> upstream/develop
 ]
 
 _PARSER = argparse.ArgumentParser()

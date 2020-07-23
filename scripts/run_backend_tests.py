@@ -74,26 +74,23 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     common.CURR_DIR,
-<<<<<<< HEAD
-    common.THIRD_PARTY_DIR
-=======
-    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.43.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.4'),
-    os.path.join(common.THIRD_PARTY_DIR, 'pylatexenc-2.6'),
-    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.17.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'six-1.15.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
->>>>>>> upstream/develop
+    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
+    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
+    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.5'),
+    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(THIRD_PARTY_DIR, 'future-0.17.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.1'),
+    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.43.0'),
+    os.path.join(THIRD_PARTY_DIR, 'packaging-20.4'),
+    os.path.join(THIRD_PARTY_DIR, 'pylatexenc-2.6'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.17.0'),
+    os.path.join(THIRD_PARTY_DIR, 'six-1.15.0'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
+    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
 COVERAGE_DIR = os.path.join(

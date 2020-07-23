@@ -1,7 +1,5 @@
 {
   "dependencies": {
-<<<<<<< HEAD
-=======
     "backend": {
       "backports.functools_lru_cache": {
         "version": "1.6.1",
@@ -130,7 +128,6 @@
         "targetDirPrefix": "soupsieve-"
       }
     },
->>>>>>> upstream/develop
     "frontend": {
       "angular": {
         "version": "1.7.9",
