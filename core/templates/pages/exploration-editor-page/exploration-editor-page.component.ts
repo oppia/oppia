@@ -151,7 +151,7 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$http', '$log', '$q', '$scope', '$templateCache',
+    '$http', '$log', '$q', '$scope', '$rootScope', '$templateCache',
     '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
     'ChangeListService', 'ContextService', 'EditabilityService',
     'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
@@ -172,7 +172,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserExplorationPermissionsService',
     'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
-        $http, $log, $q, $scope, $templateCache,
+        $http, $log, $q, $scope, $rootScope, $templateCache,
         $timeout, $uibModal, $window, AutosaveInfoModalsService,
         ChangeListService, ContextService, EditabilityService,
         ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,

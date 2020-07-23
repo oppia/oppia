@@ -167,6 +167,8 @@ import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
+import { ExplorationDataService } from
+  'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
