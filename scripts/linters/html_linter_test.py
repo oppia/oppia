@@ -114,22 +114,18 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
     def test_custom_linter_with_invalid_tags(self):
         with self.print_swap:
             with self.assertRaisesRegexp(
-                html_linter.TagMismatchException,
-                'Error in line 2 of file') as e:
+                html_linter.TagMismatchException, 'Error in line 2 of file'):
                 html_linter.HTMLLintChecksManager(
                     [INVALID_MISMATCHED_TAGS_HTML_FILEPATH], FILE_CACHE, True,
                     debug=True).perform_all_lint_checks()
-        self.assertTrue('Error in line 2 of file' in e.exception.message)
 
     def test_custom_linter_with_tag_mismatch(self):
         with self.print_swap:
             with self.assertRaisesRegexp(
-                html_linter.TagMismatchException,
-                'Error in line 13 of file') as e:
+                html_linter.TagMismatchException, 'Error in line 13 of file'):
                 html_linter.HTMLLintChecksManager(
                     [INVALID_TAG_MISMATCH_HTML_FILEPATH], FILE_CACHE, True,
                     debug=True).perform_all_lint_checks()
-        self.assertTrue('Error in line 13 of file' in e.exception.message)
 
     def test_custom_linter_with_mismatched_indentation(self):
         with self.print_swap:
@@ -144,11 +140,10 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
     def test_custom_without_html_end_tag(self):
         with self.print_swap:
             with self.assertRaisesRegexp(
-                html_linter.TagMismatchException, 'Error in file') as e:
+                html_linter.TagMismatchException, 'Error in file'):
                 html_linter.HTMLLintChecksManager(
                     [INVALID_MISSING_HTML_TAG_HTML_FILEPATH], FILE_CACHE, True,
                     debug=True).perform_all_lint_checks()
-        self.assertTrue('Error in file' in e.exception.message)
 
     def test_valid_html_file_with_custom_linter(self):
         with self.print_swap:

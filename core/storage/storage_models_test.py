@@ -114,8 +114,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
             if clazz.__name__ in self.BASE_CLASSES:
                 with self.assertRaisesRegexp(
                     NotImplementedError,
-                    r'get_deletion_policy\(\) method is not '
-                    r'overwritten in a derived class'):
+                    r'The get_deletion_policy\(\) method is missing from the '
+                    r'derived class. It should be implemented in the '
+                    r'derived class.'):
                     clazz.get_deletion_policy()
 
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
@@ -125,8 +126,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
                 with self.assertRaisesRegexp(
                     NotImplementedError,
-                    r'has_reference_to_user_id\(\) method is not '
-                    r'overwritten in a derived class.'):
+                    r'The has_reference_to_user_id\(\) method is missing from '
+                    r'the derived class. It should be implemented in the '
+                    r'derived class.'):
                     clazz.has_reference_to_user_id('any_id')
             else:
                 try:

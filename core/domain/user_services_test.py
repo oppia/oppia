@@ -158,27 +158,38 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(
             gae_id, 'user@example.com').user_id
-        bad_usernames = [
-            ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020',
-            'AbcOppiaMigrationBotXyz', 'OppiaMigrATIONBOTXyz',
-            'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB',
-            'xyzOppia', 'oppiaXyz', 'abcOppiaXyz']
-        for username in bad_usernames:
-            with self.assertRaisesRegexp(
-                utils.ValidationError,
-                r'(Usernames can only have alphanumeric characters.)|'
-                r'(Empty username supplied.)|'
-                r'(A username can have at most 30 characters.)|'
-                r'(This username is not available.)'):
+        bad_usernames_with_expected_error_message = [
+            (' bob ', 'Usernames can only have alphanumeric characters.'),
+            ('@', 'Usernames can only have alphanumeric characters.'),
+            ('', 'Empty username supplied.'),
+            ('a' * 100, 'A username can have at most 30 characters.'),
+            ('ADMIN', 'This username is not available.'),
+            ('admin', 'This username is not available.'),
+            ('AdMiN2020', 'This username is not available.'),
+            ('AbcOppiaMigrationBotXyz', 'This username is not available.'),
+            ('OppiaMigrATIONBOTXyz', 'This username is not available.'),
+            ('AbcOppiaSuggestionBotXyz', 'This username is not available.'),
+            ('AAAOPPIASuggestionBotBBB', 'This username is not available.'),
+            ('xyzOppia', 'This username is not available.'),
+            ('oppiaXyz', 'This username is not available.'),
+            ('abcOppiaXyz', 'This username is not available.')]
+        for username, error_msg in bad_usernames_with_expected_error_message:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
     def test_invalid_emails(self):
-        bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
-        for email in bad_email_addresses:
-            with self.assertRaisesRegexp(
-                utils.ValidationError,
-                r'(Invalid email address: \S)|(No user email specified.)|'
-                r'(Expected email to be a string, received \S)'):
+        bad_email_addresses_with_expected_error_message = [
+            ('@', 'Invalid email address: @'),
+            ('@@', 'Invalid email address: @@'),
+            ('abc', 'Invalid email address: abc'),
+            ('', 'No user email specified.'),
+            (None, 'Expected email to be a string, received None'),
+            (
+                ['a', '@', 'b.com'],
+                r'Expected email to be a string, received '
+                r'\[u\'a\', u\'@\', u\'b.com\'\]')]
+        for email, error_msg in bad_email_addresses_with_expected_error_message:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):

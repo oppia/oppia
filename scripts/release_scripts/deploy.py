@@ -153,7 +153,8 @@ def preprocess_release(app_name, deploy_data_path):
 
     assert '"DEV_MODE": true' in content, 'Invalid DEV_MODE'
     assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content, (
-        'Invalid bucket name.')
+        'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+            common.CONSTANTS_FILE_PATH))
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,

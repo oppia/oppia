@@ -521,7 +521,9 @@ class DeployTests(test_utils.GenericTestBase):
             INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
         with self.exists_swap, self.copyfile_swap, constants_swap:
             with self.listdir_swap, self.assertRaisesRegexp(
-                AssertionError, 'Invalid bucket name.'):
+                AssertionError,
+                'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+                    common.CONSTANTS_FILE_PATH)):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_constants_are_updated_correctly(self):

@@ -106,12 +106,12 @@ class JsTsLintTests(test_utils.GenericTestBase):
 
     def test_validate_and_parse_js_and_ts_files_with_exception(self):
         def mock_parse_script(unused_file_content, comment):  # pylint: disable=unused-argument
-            raise Exception('Dummy Exception')
+            raise Exception('Exception raised from parse_script()')
 
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
         with self.print_swap, esprima_swap, self.assertRaisesRegexp(
-            Exception, 'Dummy Exception'):
+            Exception, r'Exception raised from parse_script\(\)'):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
@@ -459,11 +459,10 @@ class JsTsLintTests(test_utils.GenericTestBase):
 
     def test_third_party_linter_with_stderr(self):
         with self.print_swap, self.assertRaisesRegexp(
-            SystemExit, '1') as e:
+            SystemExit, '1'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 INVALID_SORTED_DEPENDENCIES_FILEPATH,
                 True).perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_third_party_linter_with_invalid_eslint_path(self):
         def mock_exists(unused_path):
@@ -472,11 +471,10 @@ class JsTsLintTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
         with self.print_swap, exists_swap, self.assertRaisesRegexp(
-            SystemExit, '1') as e:
+            SystemExit, '1'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH],
                 True).perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_third_party_linter_with_success_message(self):
         with self.print_swap:

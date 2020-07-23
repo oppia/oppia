@@ -285,8 +285,8 @@ class BaseModelValidator(python_utils.OBJECT):
             NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError(
-            '_get_external_id_relationships() method has '
-            'not yet been implemented')
+            'The _get_external_id_relationships() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_external_id_relationships(cls, item):
@@ -439,8 +439,8 @@ class BaseSummaryModelValidator(BaseModelValidator):
             NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError(
-            '_get_external_model_properties() method has not '
-            'yet been implemented')
+            'The _get_external_model_properties() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_external_model_properties(
@@ -655,7 +655,8 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError(
-            '_get_change_domain_class() method has not yet been implemented')
+            'The _get_change_domain_class() method is missing from the derived '
+            'class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_commit_cmds_schema(cls, item):
@@ -6367,7 +6368,8 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
             NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError(
-            'entity_classes_to_map_over() method has not yet been implemented')
+            'The entity_classes_to_map_over() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def map(model_instance):

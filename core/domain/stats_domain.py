@@ -718,8 +718,8 @@ class ExplorationIssue(python_utils.OBJECT):
         actual schema migration from v1 to v2 takes place.
         """
         raise NotImplementedError(
-            '_convert_issue_v1_dict_to_v2_dict() method has '
-            'not yet been implemented')
+            'The _convert_issue_v1_dict_to_v2_dict() method is missing from the'
+            ' derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
@@ -829,8 +829,8 @@ class LearnerAction(python_utils.OBJECT):
         actual schema migration from v1 to v2 takes place.
         """
         raise NotImplementedError(
-            '_convert_action_v1_dict_to_v2_dict() method '
-            'has not yet been implemented')
+            'The _convert_action_v1_dict_to_v2_dict() method is missing from '
+            'the derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the LearnerAction domain object."""

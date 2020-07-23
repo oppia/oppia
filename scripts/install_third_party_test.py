@@ -78,7 +78,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             zipfile.ZipFile, 'extractall', mock_extractall)
 
     def test_download_files_with_invalid_source_filenames(self):
-        with self.assertRaisesRegexp(AssertionError, 'Invalid source filename'):
+        with self.assertRaisesRegexp(
+            AssertionError,
+            'Expected list of filenames, got \'invalid source filename\''):
             install_third_party.download_files(
                 'source_url', 'target_dir', 'invalid source filename')
 

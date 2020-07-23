@@ -2050,7 +2050,7 @@ tags: []
             'self.assertRaises should not be used in these tests. Please use '
             'self.assertRaisesRegexp instead.')
 
-    def assertRaisesRegexp(  # pylint:disable=keyword-arg-before-vararg
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
             self, expected_exception, expected_regexp, callable_obj=None,
             *args, **kwargs):
         if expected_regexp == '':

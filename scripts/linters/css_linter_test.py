@@ -94,9 +94,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [INVALID_CSS_FILEPATH], False)
         with self.print_swap, join_swap, self.assertRaisesRegexp(
-            SystemExit, '1') as e:
+            SystemExit, '1'):
             third_party_linter.perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_perform_all_lint_checks_with_stderr(self):
         # pylint: disable=unused-argument
@@ -115,9 +114,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH], True)
         with self.print_swap, popen_swap, self.assertRaisesRegexp(
-            SystemExit, '1') as e:
+            SystemExit, '1'):
             third_party_linter.perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_perform_all_lint_checks_with_no_files(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(

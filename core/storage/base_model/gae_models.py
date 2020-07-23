@@ -91,8 +91,8 @@ class BaseModel(ndb.Model):
                 class.
         """
         raise NotImplementedError(
-            'get_deletion_policy() method is not overwritten '
-            'in a derived class')
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -106,8 +106,8 @@ class BaseModel(ndb.Model):
                 class.
         """
         raise NotImplementedError(
-            'has_reference_to_user_id() method is not overwritten '
-            'in a derived class.')
+            'The has_reference_to_user_id() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def export_data(user_id):
@@ -121,7 +121,8 @@ class BaseModel(ndb.Model):
                 class.
         """
         raise NotImplementedError(
-            'export_data() method is not overwritten in a derived class')
+            'The export_data() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def get_export_policy():
@@ -132,7 +133,8 @@ class BaseModel(ndb.Model):
                 class.
         """
         raise NotImplementedError(
-            'get_export_policy() method is not overwritten in a derived class')
+            'The get_export_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -464,7 +466,8 @@ class BaseCommitLogEntryModel(BaseModel):
                 classes.
         """
         raise NotImplementedError(
-            '_get_instance_id() method is not overwritten in derived classes')
+            'The _get_instance_id() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
@@ -789,7 +792,9 @@ class VersionedModel(BaseModel):
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
-        raise NotImplementedError('put() method has not yet been implemented')
+        raise NotImplementedError(
+            'The put() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     def commit(self, committer_id, commit_message, commit_cmds):
         """Saves a version snapshot and updates the model.

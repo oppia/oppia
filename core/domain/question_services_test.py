@@ -260,7 +260,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
         with self.assertRaisesRegexp(
-            Exception, r'Entity for class QuestionModel with id \w+ not found'):
+            Exception,
+            r'Entity for class QuestionModel with id %s not found' % (
+                question_id_2)):
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id_2, 'skill_1', 0.5)
 

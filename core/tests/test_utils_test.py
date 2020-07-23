@@ -416,14 +416,35 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_capature_exception_raised_by_tested_function(
             self):
         def mock_getcwd():
-            raise ValueError('Dummy Exception')
+            raise ValueError('Exception raised from getcwd()')
 
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
-        with self.assertRaisesRegexp(ValueError, 'Dummy Exception'):
+        with self.assertRaisesRegexp(
+            ValueError, r'Exception raised from getcwd\(\)'):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
+
+    def test_assert_raises_with_error_message(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.'):
+            self.assertRaises(Exception, mock_exception_func)
+
+    def test_assert_raises_regexp_with_empty_string(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please provide a sufficiently strong regexp string to '
+            'validate that the correct error is being raised.'):
+            self.assertRaisesRegexp(Exception, '', mock_exception_func)
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):

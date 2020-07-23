@@ -43,15 +43,15 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'get_deletion_policy\(\) method is not overwritten '
-            r'in a derived class'):
+            r'The get_deletion_policy\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.get_deletion_policy()
 
     def test_has_reference_to_user_id(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'has_reference_to_user_id\(\) method is not overwritten '
-            r'in a derived class.'):
+            r'The has_reference_to_user_id\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_error_cases_for_get_method(self):
@@ -70,20 +70,22 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_base_model_export_data_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'export_data\(\) method is not overwritten in a derived class'):
+            r'The export_data\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('')
 
     def test_export_data(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'export_data\(\) method is not overwritten in a derived class'):
+            r'The export_data\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
 
     def test_get_export_policy(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'get_export_policy\(\) method is not overwritten '
-            r'in a derived class'):
+            r'The get_export_policy\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.get_export_policy()
 
     def test_generic_query_put_get_and_delete_operations(self):
@@ -331,8 +333,8 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
         # in child classes of BaseCommitLogEntryModel.
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'_get_instance_id\(\) method is not overwritten '
-            'in derived classes'):
+            r'The _get_instance_id\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseCommitLogEntryModel.get_commit('id', 1)
 
 
@@ -518,7 +520,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'put\(\) method has not yet been implemented'):
+            r'The put\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             model1.put()
 
     def test_commit_with_invalid_change_list_raises_error(self):

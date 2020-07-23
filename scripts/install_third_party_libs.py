@@ -102,7 +102,7 @@ def pip_install(package, version, install_path):
         python_utils.PRINT('Checking if pip is installed on the local machine')
         # Importing pip just to check if its installed.
         import pip  #pylint: disable=unused-variable
-    except ImportError:
+    except ImportError as e:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
             'found on your local machine.',
@@ -121,7 +121,7 @@ def pip_install(package, version, install_path):
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
-        raise Exception('Error importing pip')
+        raise ImportError('Error importing pip: %s' % e)
 
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.

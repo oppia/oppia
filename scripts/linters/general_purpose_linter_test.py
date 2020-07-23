@@ -134,8 +134,6 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
-INVALID_ASSERT_RAISES_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_assert_raises.py')
 INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
 
 
@@ -637,17 +635,6 @@ class PythonLintTests(LintTests):
         self.assert_same_list_elements(
             ['Line 43: Please use keys() instead.'],
             self.linter_stdout)
-
-    def test_invalid_use_of_assert_raises(self):
-        with self.print_swap:
-            general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_ASSERT_RAISES_FILEPATH], FILE_CACHE, True
-            ).perform_all_lint_checks()
-        self.assert_same_list_elements([
-            'Please do not use the assertRaises method. Instead, use '
-            'assertRaisesRegexp and provide a sufficiently strong regexp '
-            'string to validate that the correct error is being raised.'
-            ], self.linter_stdout)
 
 
 class GeneralLintTests(LintTests):
