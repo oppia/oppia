@@ -33,6 +33,7 @@ from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import feature_gating
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
@@ -786,6 +787,9 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
+
+    get_redirect_route(
+        r'/featuregatinghandler', feature_gating.FeatureGatingHandler)
 ]
 
 # Adding redirects for classroom pages.
