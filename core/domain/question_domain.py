@@ -487,6 +487,12 @@ class Question(python_utils.OBJECT):
                                 new_rule_specs.append(rule_spec)
                         group['rule_specs'] = new_rule_specs
 
+                # Removing answer groups that have no rule specs left after
+                # the filtration done above.
+                new_answer_groups = [
+                    answer_group for answer_group in new_answer_groups if (
+                        len(answer_group['rule_specs']) != 0)]
+
                 question_state_dict['interaction']['id'] = list(
                     types_of_inputs)[0]
                 question_state_dict['interaction']['answer_groups'] = (
