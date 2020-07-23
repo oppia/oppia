@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to set the title of the page.
+ * @fileoverview Service to set and get the title of the page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +28,10 @@ export class PageTitleService {
 
   setPageTitle(title: string) {
     this.titleService.setTitle(title);
+  }
+
+  getPageTitle(): string {
+    return this.titleService.getTitle();
   }
 }
 
