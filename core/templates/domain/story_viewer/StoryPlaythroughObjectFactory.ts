@@ -30,20 +30,24 @@ export interface StoryPlaythroughBackendDict {
   'story_nodes': StoryNodeBackendDict[];
   'story_title': string;
   'story_description': string;
+  'topic_name': string;
 }
 
 export class StoryPlaythrough {
   nodes: ReadOnlyStoryNode[];
   title: string;
   description: string;
+  topicName: string;
 
   constructor(
       nodes: ReadOnlyStoryNode[],
       title: string,
-      description: string) {
+      description: string,
+      topicName: string) {
     this.nodes = nodes;
     this.title = title;
     this.description = description;
+    this.topicName = topicName;
   }
 
   getInitialNode(): ReadOnlyStoryNode {
@@ -92,7 +96,8 @@ export class StoryPlaythroughObjectFactory {
     return new StoryPlaythrough(
       nodeObjects,
       storyPlaythroughBackendDict.story_title,
-      storyPlaythroughBackendDict.story_description);
+      storyPlaythroughBackendDict.story_description,
+      storyPlaythroughBackendDict.topic_name);
   }
 }
 
