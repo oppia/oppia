@@ -61,7 +61,7 @@ describe('StateTopAnswersStatsBackendApiService', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      stateTopAnswersStatsBackendApiService.fetchStats('7')
+      stateTopAnswersStatsBackendApiService.fetchStatsAsync('7')
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
@@ -81,7 +81,7 @@ describe('StateTopAnswersStatsBackendApiService', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      stateTopAnswersStatsBackendApiService.fetchStats('7')
+      stateTopAnswersStatsBackendApiService.fetchStatsAsync('7')
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
