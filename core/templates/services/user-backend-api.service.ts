@@ -144,21 +144,19 @@ export class UserBackendApiService {
     }
     getUserCommunityRightsData():
       Promise<UserCommunityRightsDataBackendDict> {
-      if (this.userCommunityRightsInfo) {
-        return new Promise((resolve, reject) => {
-          resolve(this.userCommunityRightsInfo);
-        });
-      } else {
-        return this.http.get<UserCommunityRightsDataBackendDict>(
-          this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
-          (backendDict) => {
-            this.userCommunityRightsInfo = backendDict;
-            return new Promise((resolve, reject) => {
-              resolve(this.userCommunityRightsInfo);
+      return new Promise((resolve, reject) => {
+        if (this.userCommunityRightsInfo) {
+          return resolve(this.userCommunityRightsInfo);
+        } else {
+          return this.http.get<UserCommunityRightsDataBackendDict>(
+            this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
+            (backendDict) => {
+              this.userCommunityRightsInfo = backendDict;
+              return resolve(this.userCommunityRightsInfo);
             });
-          });
-      }
-    }
+        }
+    });
+  }
 }
 
 angular.module('oppia').factory(

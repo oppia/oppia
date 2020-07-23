@@ -24,7 +24,7 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { CsrfTokenService } from 'services/csrf-token.service';  
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UrlService } from './contextual/url.service';
 
