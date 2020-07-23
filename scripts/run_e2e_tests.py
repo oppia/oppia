@@ -520,8 +520,8 @@ def main(args=None):
     atexit.register(cleanup_portserver, portserver_process)
     start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
-    wait_for_port_to_be_open(WEB_DRIVER_PORT)
-    wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+    common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
+    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     # ADD FUNCTION BACK LATER ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
