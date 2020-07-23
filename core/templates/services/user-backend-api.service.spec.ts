@@ -18,15 +18,16 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { CsrfTokenService } from 'services/csrf-token.service';  
+import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UrlService } from './contextual/url.service';
+
 
 class MockWindowRef {
   _window = {
@@ -73,7 +74,7 @@ describe('User Backend Api Service', () => {
 
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
+    const sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -84,7 +85,7 @@ describe('User Backend Api Service', () => {
       email: 'test@test.com',
       user_is_logged_in: true
     };
-    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
+    const sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
     userBackendApiService.getUserInfoAsync().then((userInfo) => {
@@ -102,7 +103,7 @@ describe('User Backend Api Service', () => {
         sampleUserInfo.getPreferredSiteLanguageCode());
     });
 
-    var req = httpTestingController.expectOne('/userinfohandler');
+    const req = httpTestingController.expectOne('/userinfohandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserInfoBackendObject);
 
@@ -112,7 +113,7 @@ describe('User Backend Api Service', () => {
   it('should return new userInfo data when url path is signup',
     fakeAsync(() => {
       spyOn(urlService, 'getPathname').and.returnValue('/signup');
-      var sampleUserInfo = userInfoObjectFactory.createDefault();
+      const sampleUserInfo = userInfoObjectFactory.createDefault();
 
       userBackendApiService.getUserInfoAsync().then((userInfo) => {
         expect(userInfo).toEqual(sampleUserInfo);
@@ -121,7 +122,7 @@ describe('User Backend Api Service', () => {
 
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
+    const sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -132,7 +133,7 @@ describe('User Backend Api Service', () => {
       email: 'test@test.com',
       user_is_logged_in: true
     };
-    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
+    const sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
     userBackendApiService.getUserInfoAsync().then((userInfo) => {
@@ -142,7 +143,7 @@ describe('User Backend Api Service', () => {
         expect(sameUserInfo).toEqual(userInfo);
       });
     });
-    var req = httpTestingController.expectOne('/userinfohandler');
+    const req = httpTestingController.expectOne('/userinfohandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserInfoBackendObject);
 
@@ -151,7 +152,7 @@ describe('User Backend Api Service', () => {
 
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
+    const sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -162,12 +163,12 @@ describe('User Backend Api Service', () => {
       email: 'test@test.com',
       user_is_logged_in: false
     };
-    var sampleUserInfo = userInfoObjectFactory.createDefault();
+    const sampleUserInfo = userInfoObjectFactory.createDefault();
 
     userBackendApiService.getUserInfoAsync().then((userInfo) => {
       expect(userInfo).toEqual(sampleUserInfo);
     });
-    var req = httpTestingController.expectOne('/userinfohandler');
+    const req = httpTestingController.expectOne('/userinfohandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserInfoBackendObject);
 
@@ -177,7 +178,7 @@ describe('User Backend Api Service', () => {
   it('should return the default profile image path when user is not logged',
     fakeAsync(() => {
       // Creating a test user for checking profile picture of user.
-      var sampleUserInfoBackendObject = {
+      const sampleUserInfoBackendObject = {
         is_moderator: false,
         is_admin: false,
         is_super_admin: false,
@@ -193,7 +194,7 @@ describe('User Backend Api Service', () => {
         expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
           '/avatar/user_blue_72px.webp'));
       });
-      var req = httpTestingController.expectOne('/userinfohandler');
+      const req = httpTestingController.expectOne('/userinfohandler');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleUserInfoBackendObject);
 
@@ -201,13 +202,13 @@ describe('User Backend Api Service', () => {
     }));
 
   it('should return the login url', fakeAsync(() => {
-    var loginUrl = '/login';
-    var currentUrl = 'home';
+    const loginUrl = '/login';
+    const currentUrl = 'home';
 
     userBackendApiService.getLoginUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(loginUrl);
     });
-    var req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/url_handler?current_url=' + currentUrl);
     expect(req.request.method).toEqual('GET');
     req.flush({login_url: loginUrl});
@@ -216,14 +217,14 @@ describe('User Backend Api Service', () => {
   }));
 
   it('should set a profile image data url', fakeAsync(() => {
-    var newProfileImageDataurl = '/avatar/x.png';
+    const newProfileImageDataurl = '/avatar/x.png';
     userBackendApiService.setProfileImageDataUrlAsync(
       newProfileImageDataurl).then((response) => {
       expect(response.profile_picture_data_url).toBe(
         newProfileImageDataurl);
     }
     );
-    var req = httpTestingController.expectOne('/preferenceshandler/data');
+    const req = httpTestingController.expectOne('/preferenceshandler/data');
     expect(req.request.method).toEqual('PUT');
     req.flush({profile_picture_data_url: newProfileImageDataurl});
 
@@ -232,15 +233,15 @@ describe('User Backend Api Service', () => {
 
   it('should handle when set profile image data url is reject',
     fakeAsync(() => {
-      var newProfileImageDataurl = '/avatar/x.png';
-      var errorMessage = 'It\'s not possible to set a new profile image data';
+      const newProfileImageDataurl = '/avatar/x.png';
+      const errorMessage = 'It\'s not possible to set a new profile image data';
       userBackendApiService.setProfileImageDataUrlAsync(newProfileImageDataurl)
         /* eslint-disable dot-notation */
         .catch((error) => {
         /* eslint-enable dot-notation */
           expect(error.data).toEqual(errorMessage);
         });
-      var req = httpTestingController.expectOne('/preferenceshandler/data');
+      const req = httpTestingController.expectOne('/preferenceshandler/data');
       expect(req.request.method).toEqual('PUT');
       req.flush(errorMessage);
 
@@ -248,7 +249,7 @@ describe('User Backend Api Service', () => {
     }));
 
   it('should return user community rights data', fakeAsync(() => {
-    var sampleUserCommunityRightsDict = {
+    const sampleUserCommunityRightsDict = {
       translation: ['hi'],
       voiceover: [],
       question: true
@@ -258,7 +259,7 @@ describe('User Backend Api Service', () => {
       (userCommunityRights) => {
         expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
       });
-    var req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/usercommunityrightsdatahandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserCommunityRightsDict);
@@ -268,7 +269,7 @@ describe('User Backend Api Service', () => {
 
   it('should not fetch userCommunityRights if it is was fetched before',
     fakeAsync(() => {
-      var sampleUserCommunityRightsDict = {
+      const sampleUserCommunityRightsDict = {
         translation: ['hi'],
         voiceover: [],
         question: true
@@ -284,7 +285,7 @@ describe('User Backend Api Service', () => {
               sampleUserCommunityRightsDict);
           });
         });
-      var req = httpTestingController.expectOne(
+      const req = httpTestingController.expectOne(
         '/usercommunityrightsdatahandler');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleUserCommunityRightsDict);

@@ -16,25 +16,26 @@
  * @fileoverview Service for user data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { List } from 'lodash';
+
+import { AppConstants } from 'app.constants';
+import { UserInfo, UserInfoBackendDict, UserInfoObjectFactory } from
+  'domain/user/UserInfoObjectFactory.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service.ts';
-import { UserInfoObjectFactory, UserInfo, IUserInfoBackendDict } from
-  'domain/user/UserInfoObjectFactory.ts';
-import { AppConstants } from 'app.constants';
-import { List } from 'lodash';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-interface subscriptionSummary {
+interface SubscriptionSummary {
   'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
 }
-interface IPreferencesBackendDict {
+interface PreferencesBackendDict {
   'preferred_language_codes': string;
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
@@ -46,12 +47,12 @@ interface IPreferencesBackendDict {
   'can_receive_editor_role_email': boolean;
   'can_receive_feedback_message_email': boolean;
   'can_receive_subscription_email': boolean;
-  'subscription_list': List<subscriptionSummary>;
+  'subscription_list': List<SubscriptionSummary>;
 }
-interface IUrlBackendDict {
+interface UrlBackendDict {
   'login_url': string;
 }
-interface IUserCommunityRightsDataBackendDict {
+interface UserCommunityRightsDataBackendDict {
   'can_review_translation_for_language_codes': boolean;
   'can_review_voiceover_for_language_codes': boolean;
   'can_review_questions': boolean;
@@ -76,25 +77,27 @@ export class UserBackendApiService {
     private userCommunityRightsInfo = null;
 
     getUserInfoAsync(): Promise<UserInfo> {
-      if (this.urlService.getPathname() === '/signup') {
-        return Promise.resolve(this.userInfoObjectFactory.createDefault());
-      }
-      if (this.userInfo) {
-        return Promise.resolve(this.userInfo);
-      }
-      return this.http.get<IUserInfoBackendDict>(
-        '/userinfohandler').toPromise().then(
-        (backendDict) => {
-          if (backendDict.user_is_logged_in) {
-            this.userInfo =
-              this.userInfoObjectFactory.createFromBackendDict(
-                backendDict);
-            return Promise.resolve(this.userInfo);
-          } else {
-            return Promise.resolve(
-              this.userInfoObjectFactory.createDefault());
-          }
-        });
+      return new Promise((resolve, reject) => {
+        if (this.urlService.getPathname() === '/signup') {
+          return resolve(this.userInfoObjectFactory.createDefault());
+        }
+        if (this.userInfo) {
+          return resolve(this.userInfo);
+        }
+        return this.http.get<UserInfoBackendDict>(
+          '/userinfohandler').toPromise().then(
+          (backendDict) => {
+            if (backendDict.user_is_logged_in) {
+              this.userInfo =
+                this.userInfoObjectFactory.createFromBackendDict(
+                  backendDict);
+              return resolve(this.userInfo);
+            } else {
+              return resolve(
+                this.userInfoObjectFactory.createDefault());
+            }
+          });
+      });
     }
     getProfileImageDataUrlAsync(): Promise<string> {
       let profilePictureDataUrl = (
@@ -103,7 +106,7 @@ export class UserBackendApiService {
       return this.getUserInfoAsync().then(
         (userInfo) => {
           if (userInfo.isLoggedIn()) {
-            return this.http.get<IPreferencesBackendDict>(
+            return this.http.get<PreferencesBackendDict>(
               '/preferenceshandler/profile_picture'
             ).toPromise().then(
               (backendDict) => {
@@ -114,39 +117,45 @@ export class UserBackendApiService {
                 return profilePictureDataUrl;
               });
           } else {
-            return Promise.resolve(profilePictureDataUrl);
+            return new Promise((resolve, reject) => {
+              resolve(profilePictureDataUrl);
+            });
           }
         });
     }
     setProfileImageDataUrlAsync(newProfileImageDataUrl: string):
-      Promise<IPreferencesBackendDict> {
-      let putData = {
+      Promise<PreferencesBackendDict> {
+      const putData = {
         update_type: 'profile_picture_data_url',
         data: newProfileImageDataUrl
       };
-      return this.http.put<IPreferencesBackendDict>(
+      return this.http.put<PreferencesBackendDict>(
         this.PREFERENCES_DATA_URL, putData).toPromise();
     }
     getLoginUrlAsync(): Promise<string> {
-      let urlParameters = {
+      const urlParameters = {
         current_url: this.windowRef.nativeWindow.location.pathname
       };
-      return this.http.get<IUrlBackendDict>('/url_handler',
+      return this.http.get<UrlBackendDict>('/url_handler',
         { params: urlParameters }).toPromise().then(
         (backendDict) => {
           return backendDict.login_url;
         });
     }
     getUserCommunityRightsData():
-      Promise<IUserCommunityRightsDataBackendDict> {
+      Promise<UserCommunityRightsDataBackendDict> {
       if (this.userCommunityRightsInfo) {
-        return Promise.resolve(this.userCommunityRightsInfo);
+        return new Promise((resolve, reject) => {
+          resolve(this.userCommunityRightsInfo);
+        });
       } else {
-        return this.http.get<IUserCommunityRightsDataBackendDict>(
+        return this.http.get<UserCommunityRightsDataBackendDict>(
           this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
           (backendDict) => {
             this.userCommunityRightsInfo = backendDict;
-            return Promise.resolve(this.userCommunityRightsInfo);
+            return new Promise((resolve, reject) => {
+              resolve(this.userCommunityRightsInfo);
+            });
           });
       }
     }
