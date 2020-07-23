@@ -290,7 +290,7 @@ import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import {LearnerAnswerDetailsDataService} from 
+import {LearnerAnswerDetailsDataService} from
   'pages/exploration-editor-page/services/learner-answer-details-data.service';
 import { LearnerExplorationSummaryObjectFactory } from
   'domain/summary/learner-exploration-summary-object.factory';

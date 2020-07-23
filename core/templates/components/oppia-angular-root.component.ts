@@ -650,7 +650,7 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
-import { LearnerAnswerDetailsDataService } from 
+import { LearnerAnswerDetailsDataService } from
   'pages/exploration-editor-page/services/learner-answer-details-data.service';
 @Component({
   selector: 'oppia-angular-root',
