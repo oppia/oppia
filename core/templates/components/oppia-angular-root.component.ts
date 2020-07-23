@@ -583,6 +583,8 @@ import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
+import { StoryEditorNavigationService } from
+  'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -672,7 +674,6 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
-import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
 
 @Component({
   selector: 'oppia-angular-root',

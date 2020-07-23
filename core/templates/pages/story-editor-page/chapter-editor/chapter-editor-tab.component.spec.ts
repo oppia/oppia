@@ -13,18 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for maintenance page controller.
+ * @fileoverview Unit tests for chapter editor tab controller.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
+// TODO(#7222): Remove the following block of unnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-
 // ^^^ This block is to be removed.
 
-require('pages/maintenance-page/maintenance-page.component.ts');
-
-fdescribe('Chapter Editor tab', function() {
+describe('Chapter Editor tab', function() {
   var $scope = null;
   var ctrl = null;
   var MockStoryEditorNavigationService = null;

@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to handle navigation in story editor.
- * page.
+ * @fileoverview Service to handle navigation in story editor page.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 const STORY_EDITOR = 'story_editor';
@@ -46,7 +46,7 @@ export class StoryEditorNavigationService {
       return this.chapterId;
     }
     navigateToChapterEditorWithId(id, index) {
-      this.activeTab = 'chapter_editor';
+      this.activeTab = CHAPTER_EDITOR;
       this.setChapterId(id);
       this.chapterIndex = index;
       this.windowRef.nativeWindow.location.hash = '/chapter_editor/' + id;
@@ -63,7 +63,7 @@ export class StoryEditorNavigationService {
       this.navigateToChapterEditorWithId(this.chapterId, null);
     }
     navigateToStoryEditor() {
-      this.activeTab = 'story_editor';
+      this.activeTab = STORY_EDITOR;
       this.windowRef.nativeWindow.location.hash = '';
     }
 }

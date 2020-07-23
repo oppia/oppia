@@ -1,3 +1,11 @@
+<div class="topic-story-name">
+  <span class="topic-name protractor-test-return-to-topic-button" ng-click="returnToTopicEditorPage()">
+    <[getTopicName()]> /
+  </span>
+  <span class="chapter-name">
+    <[story.getTitle()]>
+  </span>
+</div>
 <div role="form" class="form-horizontal">
   <div class="parent-container">
     <div class="content-container">
@@ -82,20 +90,19 @@
         </div>
         <div ng-if="!storyPreviewCardIsShown" >
           <button class="btn btn-default show-story-preview-button" ng-click="togglePreview()">
-            Preview Story Card
+            Expand Preview
             <i class="fa fa-angle-down"></i>
           </button>
         </div>
         <div ng-if="storyPreviewCardIsShown">
           <button class="btn btn-default show-story-preview-button" ng-click="togglePreview()">
-            Collapse Story Card
+            Collapse Preview
             <i class="fa fa-angle-up"></i>
           </button>
         </div>
         <div ng-if="story.getId() && storyPreviewCardIsShown">
           <preview-thumbnail name="editableTitle"
                              description="editableDescription"
-                             preview-footer="getPreviewFooter()"
                              filename = "story.getThumbnailFilename()"
                              thumbnail-bg-color="story.getThumbnailBgColor()"
                              bg-color="'#2F6687'">
@@ -305,5 +312,14 @@
   }
   story-editor .story-contain-text {
     font-size: smaller;
+  }
+  story-editor .topic-story-name {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
+  }
+  story-editor .topic-name {
+    color: #666;
+    cursor: pointer;
   }
 </style>

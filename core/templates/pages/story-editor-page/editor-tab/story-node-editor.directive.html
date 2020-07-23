@@ -45,24 +45,24 @@
                 <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!expIdCanBeSaved || (explorationId === currentExplorationId)">Save</button>
               </div>
               <span class="form-text error-message" ng-if="invalidExpErrorIsShown">
-            <em>Please enter a valid exploration id.</em>
-          </span>
+                <em>Please enter a valid exploration id.</em>
+              </span>
             </form>
           </div>
           <div class="story-node-thumbnail">
-          <label class="form-heading">Thumbnail Image*</label>
-          <thumbnail-uploader filename="getThumbnailFilename()"
-                              update-filename="updateThumbnailFilename"
-                              bg-color="getThumbnailBgColor()"
-                              update-bg-color="updateThumbnailBgColor"
-                              allowed-bg-colors="allowedBgColors"
-                              aspect-ratio="'16:9'"
-                              preview-title="editableTitle"
-                              preview-description="editableDescription"
-                              preview-description-bg-color=""
-                              preview-footer="">
-          </thumbnail-uploader>
-        </div>
+            <label class="form-heading">Thumbnail Image*</label>
+            <thumbnail-uploader filename="getThumbnailFilename()"
+                                update-filename="updateThumbnailFilename"
+                                bg-color="getThumbnailBgColor()"
+                                update-bg-color="updateThumbnailBgColor"
+                                allowed-bg-colors="allowedBgColors"
+                                aspect-ratio="'16:9'"
+                                preview-title="editableTitle"
+                                preview-description="editableDescription"
+                                preview-description-bg-color=""
+                                preview-footer="">
+            </thumbnail-uploader>
+          </div>
         </div>
         <div>
           <div ng-if="!chapterPreviewCardIsShown" >
@@ -80,7 +80,6 @@
           <div ng-if="chapterPreviewCardIsShown">
             <preview-thumbnail name="editableTitle"
                                filename = "getThumbnailFilename()"
-                               preview-footer="editableDescription"
                                description="editableDescription"
                                thumbnail-bg-color="getThumbnailBgColor()"
                                bg-color="getThumbnailBgColor()">
@@ -94,20 +93,20 @@
             <span>Chapter Outline</span>
           </div>
           <div class="chapter-card-inputs">
-          Outline Finalized
-          <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
-          <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
-          <schema-based-editor id="storyNodeOutline"
-                               schema="OUTLINE_SCHEMA"
-                               local-value="editableOutline">
-          </schema-based-editor>
+            Outline Finalized
+            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
+            <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+            <schema-based-editor id="storyNodeOutline"
+                                 schema="OUTLINE_SCHEMA"
+                                 local-value="editableOutline">
+            </schema-based-editor>
             <div class="save-button-container">
-          <button type="button"
-                  class="btn btn-success save-button protractor-test-node-outline-save-button"
-                  ng-disabled="!isOutlineModified(editableOutline)"
-                  ng-click="updateOutline(editableOutline)">
-            Save
-          </button>
+              <button type="button"
+                      class="btn btn-success save-button protractor-test-node-outline-save-button"
+                      ng-disabled="!isOutlineModified(editableOutline)"
+                      ng-click="updateOutline(editableOutline)">
+                Save
+              </button>
             </div>
           </div>
         </div>
@@ -144,18 +143,18 @@
             <div class="skill-header">
               <span>Acquired</span>
             </div>
-          <div>
-            <div class="skills-card-item" ng-repeat="skillId in getAcquiredSkillIds()">
-              <div class="skill-description-card protractor-test-acquired-skill-description-card">
-                <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
-                <span class="protractor-test-remove-acquired-skill" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
-                  <i class="material-icons md-18">&#xE14C;</i>
-                </span>
+            <div>
+              <div class="skills-card-item" ng-repeat="skillId in getAcquiredSkillIds()">
+                <div class="skill-description-card protractor-test-acquired-skill-description-card">
+                  <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
+                  <span class="protractor-test-remove-acquired-skill" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
+                    <i class="material-icons md-18">&#xE14C;</i>
+                  </span>
+                </div>
               </div>
+              <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">+ ADD ACQUIRED SKILL</button>
             </div>
-            <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">+ ADD ACQUIRED SKILL</button>
           </div>
-        </div>
         </div>
       </md-card>
       <div class="node-field">
@@ -236,12 +235,12 @@
     margin-bottom: 25px;
     margin-top: 0;
   }
-  .story-node-input-card {
+  story-node-editor .story-node-input-card {
     margin-bottom: 20px;
     margin-top: 0;
     padding: 0;
   }
-  .chapter-card-inputs {
+  story-node-editor .chapter-card-inputs {
     padding: 30px 55px 30px 45px;
   }
   story-node-editor .story-node-header {
@@ -285,42 +284,38 @@
     margin-top: 12px;
     text-align: left;
   }
-  .skill-header {
+  story-node-editor .skill-header {
     border-bottom: 2px solid #000;
     margin: 8px 0;
   }
-  .skill-description-card {
+  story-node-editor .skill-description-card {
+    border-bottom: 1px solid #e6e6e6;
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
-    border-bottom: 1px solid #e6e6e6;
   }
-  .skill-description-card a {
+  story-node-editor .skill-description-card a {
     color: inherit;
     text-decoration: none;
   }
-  .skill-description-card a:hover {
+  story-node-editor .skill-description-card a:hover {
     font-weight: bold;
   }
-  .todo-completed {
+  story-node-editor .todo-completed {
     color: #00FF7F;
   }
-  .story-node-title {
+  story-node-editor .story-node-title,
+  story-node-editor .story-node-description,
+  story-node-editor .story-node-exploration {
     margin-bottom: 25px;
   }
-  .story-node-description {
-    margin-bottom: 25px;
-  }
-  .story-node-exploration {
-    margin-bottom: 25px;
-  }
-  .todo-item-container {
+  story-node-editor .todo-item-container {
     margin-bottom: 5px;
   }
-  .save-button-container {
+  story-node-editor .save-button-container {
     text-align: right;
   }
-  .save-button-container button {
+  story-node-editor .save-button-container button {
     margin-top: 2px;
   }
 </style>

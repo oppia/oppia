@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for UrlService.
+ * @fileoverview Unit tests for StoryEditorNavigationService.
  */
 
 import { TestBed } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/window-ref.service';
+
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Story editor navigation service', () => {
   let windowRef: WindowRef = null;
   let sens: StoryEditorNavigationService = null;
   let sampleHash = '/chapter_editor/node_1';
-  let pathname = '/chapter_editor/node_1';
+  let pathname = '/chapter_editor';
   let mockLocation = null;
   let origin = 'http://sample.com';
 
