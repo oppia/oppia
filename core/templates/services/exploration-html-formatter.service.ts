@@ -67,7 +67,7 @@ export class ExplorationHtmlFormatterService {
       caValues: InteractionCustomizationArgs
   ) : InteractionCustomizationArgsHtml {
     if (!caValues) {
-      throw Error('The customization argument value is empty or null');
+      throw new Error('The customization argument value is empty or null');
     }
 
     const traverseAndConvertSubtitledContentToString = (
