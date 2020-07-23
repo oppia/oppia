@@ -155,8 +155,8 @@ export class UserBackendApiService {
               return resolve(this.userCommunityRightsInfo);
             });
         }
-    });
-  }
+      });
+    }
 }
 
 angular.module('oppia').factory(
