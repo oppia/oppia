@@ -69,7 +69,7 @@ describe('Exploration player page', function() {
         exploration: exploration
       }));
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-    
+
     spyOn(document, 'getElementById').and.callFake(function() {
       return document.createElement('button');
     });
