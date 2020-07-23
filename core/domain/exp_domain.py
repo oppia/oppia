@@ -2567,9 +2567,7 @@ class Exploration(python_utils.OBJECT):
                             rule_spec['rule_type'] = 'MatchesExactlyWith'
 
                     new_answer_groups.append(new_answer_group)
-                print('\n'*10)
-                print(new_answer_groups)
-                print('\n'*10)
+
                 if TYPE_INVALID_EXPRESSION not in types_of_inputs:
                     # If at least one rule input is an equation, we remove
                     # all other rule inputs that are expressions.
@@ -2594,9 +2592,11 @@ class Exploration(python_utils.OBJECT):
                                     new_rule_specs.append(rule_spec)
                             group['rule_specs'] = new_rule_specs
 
-                    print('\n'*10)
-                    print(new_answer_groups)
-                    print('\n'*10)
+                    # Removing answer groups that have no rule specs left after
+                    # the filtration done above.
+                    new_answer_groups = [
+                        answer_group for answer_group in new_answer_groups if (
+                            len(answer_group['rule_specs']) != 0)]
 
                     state_dict['interaction']['id'] = list(types_of_inputs)[0]
                     state_dict['interaction']['answer_groups'] = (
