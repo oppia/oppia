@@ -21,22 +21,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ContextService } from 'services/context.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationFeaturesBackendApiService } from
-  'services/exploration-features-backend-api.service';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
-import { PageTitleService } from 'services/page-title.service';
-import { LoaderService } from 'services/loader.service';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
-import { StateTopAnswersStats } from
-  'domain/statistics/state-top-answers-stats-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UserExplorationPermissionsService } from
@@ -45,10 +33,10 @@ import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
 import { ExplorationFeaturesBackendApiService } from
   'services/exploration-features-backend-api.service';
+import { ExplorationFeaturesService } from
+  'services/exploration-features.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -70,6 +58,8 @@ describe('Exploration editor page component', function() {
   var es = null;
   var ess = null;
   var efbas = null;
+  var eibas = null;
+  var eis = null;
   var ers = null;
   var ets = null;
   var ews = null;
@@ -77,13 +67,10 @@ describe('Exploration editor page component', function() {
   var pts = null;
   var rs = null;
   var ses = null;
-  var stasbas = null;
   var stass = null;
   var sas = null;
   var tds = null;
   var ueps = null;
-  var eis = null;
-  var eibas = null;
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -220,13 +207,12 @@ describe('Exploration editor page component', function() {
     pts = $injector.get('PageTitleService');
     rs = $injector.get('RouterService');
     ses = $injector.get('StateEditorService');
-    stasbas = $injector.get('StateTopAnswersStatsBackendApiService');
     stass = $injector.get('StateTopAnswersStatsService');
     sas = $injector.get('SiteAnalyticsService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
-    eis = $injector.get('ExplorationImprovementsService');
     eibas = $injector.get('ExplorationImprovementsBackendApiService');
+    eis = $injector.get('ExplorationImprovementsService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage');
@@ -240,8 +226,7 @@ describe('Exploration editor page component', function() {
       };
 
       beforeEach(function() {
-        getPermissionsSpy = spyOn(
-          ueps, 'getPermissionsAsync');
+        getPermissionsSpy = spyOn(ueps, 'getPermissionsAsync');
         spyOnAllFunctions(sas);
         spyOn(ews, 'updateWarnings').and.callThrough();
         spyOn(gds, 'recompute').and.callThrough();
@@ -251,11 +236,10 @@ describe('Exploration editor page component', function() {
         spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
         spyOn(efbas, 'fetchExplorationFeatures')
           .and.returnValue($q.resolve({}));
+        spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+        spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(0));
-        spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-          new ExplorationImprovementsConfig(
-            explorationId, 1, true, 0.25, 0.20, 100)));
 
         explorationData.is_version_of_draft_valid = false;
 
@@ -331,11 +315,10 @@ describe('Exploration editor page component', function() {
         spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
         spyOn(efbas, 'fetchExplorationFeatures')
           .and.returnValue($q.resolve({}));
+        spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+        spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
         spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
           $q.resolve(1));
-        spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-          new ExplorationImprovementsConfig(
-            explorationId, 1, true, 0.25, 0.20, 100)));
 
         explorationData.is_version_of_draft_valid = true;
 
@@ -368,18 +351,6 @@ describe('Exploration editor page component', function() {
 
           expect(ctrl.tutorialInProgress).toBeFalse();
         });
-
-      it('should get state top answers stats after initing exploration page',
-        fakeAsync(function() {
-          spyOn(ers, 'isPublic').and.returnValue(true);
-          spyOn(stasbas, 'fetchStatsAsync').and
-            .returnValue(Promise.resolve(new StateTopAnswersStats({}, {})));
-          $scope.$apply();
-          flushMicrotasks();
-
-          expect(ews.updateWarnings)
-            .toHaveBeenCalled();
-        }));
 
       it('should navigate to feedback tab', function() {
         spyOn(rs, 'isLocationSetToNonStateEditorTab').and
@@ -415,15 +386,17 @@ describe('Exploration editor page component', function() {
         expect(ews.updateWarnings).toHaveBeenCalled();
       });
 
-      it('should react when initExplorationPage is broadcasted', function() {
+      it('should react to initExplorationPage broadcasts', fakeAsync(() => {
         $scope.$apply();
 
         var successCallback = jasmine.createSpy('success');
         $rootScope.$broadcast('initExplorationPage', successCallback);
+        flushMicrotasks();
         $scope.$apply();
+        flushMicrotasks();
 
         expect(successCallback).toHaveBeenCalled();
-      });
+      }));
 
       it('should accept tutorial when closing welcome exploration modal and' +
         ' then skip it', function() {
@@ -712,86 +685,72 @@ describe('Exploration editor page component', function() {
       });
     });
 
-  describe('Initializaing the improvements tab', () => {
+  describe('Initializing improvements tab', () => {
     beforeEach(() => {
       spyOnAllFunctions(sas);
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeatures')
+        .and.returnValue(Promise.resolve({}));
+      spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
-
-      spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeatures')
-        .and.returnValue($q.resolve({}));
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
-      spyOn(stasbas, 'fetchStats')
-        .and.returnValue($q.resolve(new StateTopAnswersStats({}, {})));
+      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(tds, 'getOpenThreadsCountAsync')
+        .and.returnValue(Promise.resolve(1));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve({canEdit: true}));
 
       explorationData.is_version_of_draft_valid = true;
     });
 
-    it('should be disabled when missing edit permissions', fakeAsync(() => {
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: false}));
-      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-        new ExplorationImprovementsConfig(
-          explorationId, 1, true, 0.25, 0.20, 100)));
+    it('should recognize when improvements tab is enabled', fakeAsync(() => {
+      spyOn(eibas, 'getConfigAsync')
+        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: true}));
 
       ctrl.$onInit();
-      flushMicrotasks();
-      $scope.$apply();
-
-      expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
-    }));
-
-    it('should be disabled if backend response matches', fakeAsync(() => {
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: true}));
-      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-        new ExplorationImprovementsConfig(
-          explorationId, 1, false, 0.25, 0.20, 100)));
-
-      ctrl.$onInit();
-      flushMicrotasks();
-      $scope.$apply();
-
-      expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
-    }));
-
-    it('should be enabled if backend response matches', fakeAsync(() => {
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: true}));
-      spyOn(eibas, 'getConfigAsync').and.returnValue(Promise.resolve(
-        new ExplorationImprovementsConfig(
-          explorationId, 1, true, 0.25, 0.20, 100)));
-
-      ctrl.$onInit();
+      // We need to flush and $apply twice to fire the callback under test.
       flushMicrotasks();
       $scope.$apply();
       flushMicrotasks();
+      $scope.$apply();
 
       expect(ctrl.isImprovementsTabEnabled()).toBeTrue();
-    });
+    }));
+
+    it('should recognize when improvements tab is disabled', fakeAsync(() => {
+      spyOn(eibas, 'getConfigAsync')
+        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: false}));
+
+      ctrl.$onInit();
+      // We need to flush and $apply twice to fire the callback under test.
+      flushMicrotasks();
+      $scope.$apply();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
+    }));
   });
 
-  describe('Should register stats hooks', () => {
+  describe('State-change registration', () => {
     var userPermissions = {
       canEdit: false
     };
 
     beforeEach(function() {
       spyOnAllFunctions(sas);
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve(userPermissions));
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
-      spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(stasbas, 'fetchStatsAsync')
-        .and.returnValue(Promise.resolve(new StateTopAnswersStats({}, {})));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve(userPermissions));
       $scope.$apply();
 
       explorationData.is_version_of_draft_valid = true;

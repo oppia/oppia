@@ -24,10 +24,10 @@ require('services/exploration-improvements-backend-api.service.ts');
 
 angular.module('oppia').factory('ExplorationImprovementsService', [
   'ContextService', 'ExplorationImprovementsBackendApiService',
-  'UserExplorationPermissionsService',
+  'ExplorationRightsService', 'UserExplorationPermissionsService',
   function(
       ContextService, ExplorationImprovementsBackendApiService,
-      UserExplorationPermissionsService) {
+      ExplorationRightsService, UserExplorationPermissionsService) {
     /** @private */
     let initializationHasStarted: boolean;
     /** @private */
@@ -52,7 +52,8 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
             const expId = ContextService.getExplorationId();
             const userPermissions = (
               await UserExplorationPermissionsService.getPermissionsAsync());
-            improvementsTabIsAccessible = userPermissions.canEdit;
+            improvementsTabIsAccessible = (
+              ExplorationRightsService.isPublic() && userPermissions.canEdit);
             if (improvementsTabIsAccessible) {
               config = (
                 await ExplorationImprovementsBackendApiService.getConfigAsync(

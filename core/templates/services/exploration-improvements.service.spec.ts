@@ -35,6 +35,7 @@ describe('ExplorationImprovementsService', function() {
   let contextService: ContextService;
   let explorationImprovementsBackendApiService:
     ExplorationImprovementsBackendApiService;
+  let explorationRightsService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
 
   const expId = 'eid';
@@ -56,6 +57,7 @@ describe('ExplorationImprovementsService', function() {
       $injector.get('ExplorationImprovementsBackendApiService'));
     explorationImprovementsService = (
       $injector.get('ExplorationImprovementsService'));
+    explorationRightsService = $injector.get('ExplorationRightsService');
     userExplorationPermissionsService = (
       $injector.get('UserExplorationPermissionsService'));
   }));
@@ -66,6 +68,7 @@ describe('ExplorationImprovementsService', function() {
 
   it('should enable improvements tab based on backend response',
     fakeAsync(async() => {
+      spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(true)));
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
@@ -81,6 +84,7 @@ describe('ExplorationImprovementsService', function() {
 
   it('should disable improvements tab based on backend response',
     fakeAsync(async() => {
+      spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(true)));
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
@@ -94,8 +98,25 @@ describe('ExplorationImprovementsService', function() {
       ).toBeFalse();
     }));
 
+  it('should disable improvements tab for private explorations',
+    fakeAsync(async() => {
+      spyOn(explorationRightsService, 'isPublic').and.returnValue(false);
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
+      spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeFalse();
+    }));
+
   it('should disable improvements tab for non-editors when config gives false',
     fakeAsync(async() => {
+      spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(false)));
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
@@ -111,6 +132,7 @@ describe('ExplorationImprovementsService', function() {
 
   it('should disable improvements tab for non-editors when config gives true',
     fakeAsync(async() => {
+      spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(false)));
       spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')

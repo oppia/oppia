@@ -159,36 +159,38 @@ angular.module('oppia').component('explorationEditorPage', {
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
-    'ExplorationFeaturesService', 'ExplorationInitStateNameService',
-    'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
-    'ExplorationParamChangesService', 'ExplorationParamSpecsService',
-    'ExplorationRightsService', 'ExplorationStatesService',
-    'ExplorationTagsService', 'ExplorationTitleService',
-    'ExplorationWarningsService', 'GraphDataService', 'PageTitleService',
-    'LoaderService', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-    'RouterService', 'SiteAnalyticsService', 'StateClassifierMappingService',
-    'StateEditorService', 'StateTopAnswersStatsService',
-    'StateTutorialFirstTimeService', 'ThreadDataService',
-    'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
+    'ExplorationFeaturesService', 'ExplorationImprovementsService',
+    'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
+    'ExplorationObjectiveService', 'ExplorationParamChangesService',
+    'ExplorationParamSpecsService', 'ExplorationRightsService',
+    'ExplorationStatesService', 'ExplorationTagsService',
+    'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
+    'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
+    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'StateClassifierMappingService', 'StateEditorService',
+    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
+    'ThreadDataService', 'UrlInterpolationService',
+    'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+    'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
         $q, $scope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
-        ExplorationFeaturesService, ExplorationInitStateNameService,
-        ExplorationLanguageCodeService, ExplorationObjectiveService,
-        ExplorationParamChangesService, ExplorationParamSpecsService,
-        ExplorationRightsService, ExplorationStatesService,
-        ExplorationTagsService, ExplorationTitleService,
-        ExplorationWarningsService, GraphDataService, PageTitleService,
-        LoaderService, ParamChangesObjectFactory, ParamSpecsObjectFactory,
-        RouterService, SiteAnalyticsService, StateClassifierMappingService,
-        StateEditorService, StateTopAnswersStatsService,
-        StateTutorialFirstTimeService, ThreadDataService,
-        UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
+        ExplorationFeaturesService, ExplorationImprovementsService,
+        ExplorationInitStateNameService, ExplorationLanguageCodeService,
+        ExplorationObjectiveService, ExplorationParamChangesService,
+        ExplorationParamSpecsService, ExplorationRightsService,
+        ExplorationStatesService, ExplorationTagsService,
+        ExplorationTitleService, ExplorationWarningsService, GraphDataService,
+        PageTitleService, LoaderService, ParamChangesObjectFactory,
+        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        StateClassifierMappingService, StateEditorService,
+        StateTopAnswersStatsService, StateTutorialFirstTimeService,
+        ThreadDataService, UrlInterpolationService,
+        UserEmailPreferencesService, UserExplorationPermissionsService,
+        EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -229,8 +231,8 @@ angular.module('oppia').component('explorationEditorPage', {
 
       // Initializes the exploration page using data from the backend.
       // Called on page load.
-      ctrl.initExplorationPage = function(successCallback) {
-        $q.all([
+      ctrl.initExplorationPage = (successCallback) => {
+        return $q.all([
           ExplorationDataService.getData((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
@@ -240,7 +242,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
             ContextService.getExplorationId()),
           ThreadDataService.getOpenThreadsCountAsync()
-        ]).then(function([explorationData, featuresData, openThreadsCount]) {
+        ]).then(async([explorationData, featuresData, openThreadsCount]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ContextService.setExplorationIsLinkedToStory();
           }
@@ -298,7 +300,7 @@ angular.module('oppia').component('explorationEditorPage', {
               .mute_suggestion_notifications);
 
           UserExplorationPermissionsService.getPermissionsAsync()
-            .then(function(permissions) {
+            .then(permissions => {
               if (permissions.canEdit) {
                 EditabilityService.markEditable();
               }
@@ -328,8 +330,6 @@ angular.module('oppia').component('explorationEditorPage', {
               RouterService.navigateToMainTab();
             }
           }
-
-          ExplorationWarningsService.updateWarnings();
 
           // Initialize changeList by draft changes if they exist.
           if (explorationData.draft_changes !== null) {
@@ -371,39 +371,34 @@ angular.module('oppia').component('explorationEditorPage', {
           }
 
           // Statistics and the improvement tasks derived from them are only
-          // relevant when an exploration is published and being played by
+          // relevant when an exploration is published and is being played by
           // learners.
           if (ExplorationRightsService.isPublic()) {
-            StateTopAnswersStatsBackendApiService.fetchStats(ctrl.explorationId)
-              .then(stats => StateTopAnswersStatsService.init(stats))
-              .then(() => ExplorationImprovementsService.initAsync())
-              .then(() => {
-                ExplorationWarningsService.updateWarnings();
-                $scope.$broadcast('refreshStateEditor');
+            await StateTopAnswersStatsService.initAsync(
+              ctrl.explorationId, ExplorationStatesService.getStates());
+
+            ExplorationStatesService.registerOnStateAddedCallback(
+              (stateName: string) => {
+                StateTopAnswersStatsService.onStateAdded(stateName);
               });
-            // Stats are loaded asynchronously after the exploration data
-            // because they are not needed to interact with the editor.
-            StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates()
-            ).then(() => {
-              ExplorationStatesService.registerOnStateAddedCallback(
-                (stateName: string) => (
-                  StateTopAnswersStatsService.onStateAdded(stateName)));
-              ExplorationStatesService.registerOnStateDeletedCallback(
-                (stateName: string) => (
-                  StateTopAnswersStatsService.onStateDeleted(stateName)));
-              ExplorationStatesService.registerOnStateRenamedCallback(
-                (oldStateName: string, newStateName: string) => (
-                  StateTopAnswersStatsService.onStateRenamed(
-                    oldStateName, newStateName)));
-              ExplorationStatesService.registerOnStateInteractionSavedCallback(
-                (updatedState: State) => (
-                  StateTopAnswersStatsService.onStateInteractionSaved(
-                    updatedState)));
-              ExplorationWarningsService.updateWarnings();
-              $scope.$broadcast('refreshStateEditor');
-            });
+            ExplorationStatesService.registerOnStateDeletedCallback(
+              (stateName: string) => {
+                StateTopAnswersStatsService.onStateDeleted(stateName);
+              });
+            ExplorationStatesService.registerOnStateRenamedCallback(
+              (oldName: string, newName: string) => {
+                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
+              });
+            ExplorationStatesService.registerOnStateInteractionSavedCallback(
+              (state: State) => {
+                StateTopAnswersStatsService.onStateInteractionSaved(state);
+              });
           }
+
+          await ExplorationImprovementsService.initAsync();
+
+          ExplorationWarningsService.updateWarnings();
+          $scope.$broadcast('refreshStateEditor');
         });
       };
 
@@ -465,8 +460,7 @@ angular.module('oppia').component('explorationEditorPage', {
           GraphDataService.recompute();
           ExplorationWarningsService.updateWarnings();
         });
-        $scope.$on('initExplorationPage', function(
-            unusedEvtData, successCallback) {
+        $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage(successCallback);
         });
         $scope.$on(
@@ -618,12 +612,12 @@ angular.module('oppia').component('explorationEditorPage', {
             }
           });
 
-        ctrl.improvementsTabIsEnabled = false;
+        let improvementsTabIsEnabled = false;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
-          .then(improvementsTabIsEnabled => {
-            ctrl.improvementsTabIsEnabled = improvementsTabIsEnabled;
+          .then(improvementsTabIsEnabledResponse => {
+            improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
           });
-        ctrl.isImprovementsTabEnabled = () => ctrl.improvementsTabIsEnabled;
+        ctrl.isImprovementsTabEnabled = () => improvementsTabIsEnabled;
 
         // Replace the ng-joyride template with one that uses <[...]>
         // interpolators instead of/ {{...}} interpolators.
