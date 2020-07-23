@@ -384,15 +384,17 @@ class Question(python_utils.OBJECT):
         all_new_content_ids = []
 
         ca_dict = question_state_dict['interaction']['customization_args']
-        # We need to retrieve an cached version of interaction_specs in
-        # the case that interaction_specs.json changes in the future.
+
+        # Retrieve a cached version (state schema v35) of
+        # interaction_specs.json to ensure that this migration remains
+        # stable even when interaction_specs.json is changed.
         ca_specs = [
             domain.CustomizationArgSpec(
-                caSpecDict['name'],
-                caSpecDict['description'],
-                caSpecDict['schema'],
-                caSpecDict['default_value']
-            ) for caSpecDict in (
+                ca_spec_dict['name'],
+                ca_spec_dict['description'],
+                ca_spec_dict['schema'],
+                ca_spec_dict['default_value']
+            ) for ca_spec_dict in (
                 interaction_registry.Registry
                 .get_all_specs_for_state_schema_version(35)[
                     interaction_id]['customization_arg_specs']

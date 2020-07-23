@@ -115,6 +115,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     def create_and_migrate_new_exploration(
             self, current_schema_version, target_schema_version):
         """Creates an exploration and applies a state schema migration to it.
+
         Creates an exploration and migrates its state schema from version
         current_schema_version to target_schema_version. Asserts that the
         exploration was successfully migrated.

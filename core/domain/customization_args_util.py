@@ -106,10 +106,15 @@ def validate_customization_args_and_values(
             raise utils.ValidationError(
                 'Customization argument is missing key: %s' % ca_spec.name)
         try:
-            # Since SubtitledHtml is a custom object in objects.py,
-            # we use apply_custom_validators=False so that SubtitledHtml's
-            # html is validated with the HTML schema rather than the
-            # SubtitledHtml custom validator from objects.py.
+            # Since SubtitledHtml is a custom object which contains a html
+            # field as one of the properties in its dict schema, we use
+            # apply_custom_validators=False so that normalize_against_schema
+            # traverses to the nested html schema inside SubtitledHtml and
+            # properly normzalizes the html.
+            # Using apply_custom_validators=True here would apply the
+            # SubtitledHtml's custom validator in objects.py (which is not
+            # implemented) and result in normalize_against_schema
+            # not traversing to the nested html schema.
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
                     customization_args[ca_spec.name]['value'],

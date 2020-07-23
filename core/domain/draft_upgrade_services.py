@@ -93,21 +93,32 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _convert_states_v34_dict_to_v35_dict(cls, unused_draft_change_list):
+    def _convert_states_v34_dict_to_v35_dict(cls, draft_change_list):
         """Converts draft change list from version 34 to 35.
 
         Args:
-            unused_draft_change_list: list(ExplorationChange). The list of
+            draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
 
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
         Raises:
-            Exception. Conversion cannot be complete.
+            Exception. Conversion cannot be completed.
         """
-        # This conversion depends on getting an exploration state of v34. Since
-        # we do not support passing a exploration state of a given version
-        # into draft conversion functions as of yet, we throw an Exception to
-        # indicate that the conversion cannot be complete.
-        raise Exception('Conversion cannot be complete.')
+        for change in draft_change_list:
+            if (change.property_name ==
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+            ):
+                # Converting the customization arguments depends on getting an
+                # exploration state of v34. Since we do not yet support passing
+                # an exploration state of a given version into draft conversion
+                # functions, we throw an Exception to indicate that the
+                # conversion cannot be completed.
+                raise Exception('Conversion cannot be completed.')
+
+        return draft_change_list
+        
 
     @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):

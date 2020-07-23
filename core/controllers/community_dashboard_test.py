@@ -121,8 +121,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # The content_count is 4 for the expected dicts below since a valid
         # exploration with EndExploration is created above, so the content in
-        # the last state is also included in the count. 2 content, 1 TextInput
-        # interaction customization argument (placeholder), and 1 outcome.
+        # the last state is also included in the count. This content includes:
+        # 2 content, 1 TextInput interaction customization argument
+        # (placeholder), and 1 outcome.
         self.expected_opportunity_dict_1 = {
             'id': '0',
             'topic_name': 'topic',
