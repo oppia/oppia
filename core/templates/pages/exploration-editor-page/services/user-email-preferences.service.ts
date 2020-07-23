@@ -16,111 +16,77 @@
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+require('domain/utilities/url-interpolation.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('services/alerts.service.ts');
 
-import { HttpClient } from '@angular/common/http';
-
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
-import { ExplorationDataService } from
-  'pages/exploration-editor-page/services/exploration-data.service.ts';
-import { AlertsService } from 'services/alerts.service.ts';
-
-import { UserEmailPreferencesBackendApiService } from
-  'domain/user/user-email-preferences-backend-api.service';
-
-// require('domain/utilities/url-interpolation.service.ts')
-// require('pages/exploration-editor-page/services/exploration-data.service.ts')
-// require('services/alerts.service.ts')
-
-
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class UserEmailPreferencesService {
-  MESSAGE_TYPE_SUGGESTION = 'suggestion';
-  MESSAGE_TYPE_FEEDBACK = 'feedback';
-
-  constructor(
-  private urlInterpolationService: UrlInterpolationService,
-  private explorationDataService: ExplorationDataService,
-  private alertsService: AlertsService,
-  private userEmailPreferencesBackendApiService:
-   UserEmailPreferencesBackendApiService,
-  private feedbackNotificationsMuted, // ????? Not sure if it's like this.
-  private suggestionNotificationsMuted
-  ) {
-
-  }
-
-  init(feedbackNotificationsMuted, suggestionNotificationsMuted) {
-    this.feedbackNotificationsMuted = feedbackNotificationsMuted;
-    this.suggestionNotificationsMuted = suggestionNotificationsMuted;
-  }
-
-  /**
+angular.module('oppia').factory('UserEmailPreferencesService', [
+  '$http', 'AlertsService', 'ExplorationDataService',
+  'UrlInterpolationService',
+  function(
+      $http, AlertsService,
+      ExplorationDataService, UrlInterpolationService) {
+    var MESSAGE_TYPE_SUGGESTION = 'suggestion';
+    var MESSAGE_TYPE_FEEDBACK = 'feedback';
+    return {
+      init: function(
+          feedbackNotificationsMuted, suggestionNotificationsMuted) {
+        this.feedbackNotificationsMuted = feedbackNotificationsMuted;
+        this.suggestionNotificationsMuted = suggestionNotificationsMuted;
+      },
+      /**
        * @return {boolean} Whether the feedback notification is muted.
        */
-  areFeedbackNotificationsMuted() :boolean {
-    return this.feedbackNotificationsMuted;
-  }
-  /**
+      areFeedbackNotificationsMuted: function() {
+        return this.feedbackNotificationsMuted;
+      },
+      /**
        * @return {boolean} Whether the suggestion notification is muted.
        */
-  areSuggestionNotificationsMuted() :boolean {
-    return this.suggestionNotificationsMuted;
-  }
-  /**
+      areSuggestionNotificationsMuted: function() {
+        return this.suggestionNotificationsMuted;
+      },
+      /**
        * Set the message type to feedback and mute to true or false.
        * @param {boolean} mute - Whether the feedback notification is muted.
        */
-  setFeedbackNotificationPreferences(mute) :void {
-    this.saveChangeToBackend({
-      message_type: this.MESSAGE_TYPE_FEEDBACK,
-      mute: mute
-    });
-  }
-  /**
+      setFeedbackNotificationPreferences: function(mute) {
+        this.saveChangeToBackend({
+          message_type: MESSAGE_TYPE_FEEDBACK,
+          mute: mute
+        });
+      },
+      /**
        * Set the message type to suggestion and mute to true or false.
        * @param {boolean} mute - Whether the suggestion notification is muted.
        */
-  setSuggestionNotificationPreferences(mute) :void {
-    this.saveChangeToBackend({
-      message_type: this.MESSAGE_TYPE_SUGGESTION,
-      mute: mute
-    });
-  }
-  /**
+      setSuggestionNotificationPreferences: function(mute) {
+        this.saveChangeToBackend({
+          message_type: MESSAGE_TYPE_SUGGESTION,
+          mute: mute
+        });
+      },
+      /**
        * Save the change of message_type and mute to backend.
        * @param {object} requestParams - Info about message_type and mute.
        */
-  saveChangeToBackend(requestParams) :Promise< void |Object> {
-    let that = this;
-    var emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
-      '/createhandler/notificationpreferences/<exploration_id>', {
-        exploration_id: ExplorationDataService.explorationId
+      saveChangeToBackend: function(requestParams) {
+        var that = this;
+        var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(
+          '/createhandler/notificationpreferences/<exploration_id>', {
+            exploration_id: ExplorationDataService.explorationId
+          }
+        );
+        return $http.put(emailPreferencesUrl, requestParams).then(
+          function(response) {
+            var data = response.data;
+            AlertsService.clearWarnings();
+            that.init(
+              data.email_preferences.mute_feedback_notifications,
+              data.email_preferences.mute_suggestion_notifications);
+          }
+        );
       }
-    );
-
-
-    return this.userEmailPreferencesBackendApiService
-      .saveChangeToBackend(requestParams).then(
-        (response:any) => {
-          let data = response.data;
-          this.alertsService.clearWarnings();
-          that.init(
-            data.email_preferences.mute_feedback_notifications,
-            data.email_preferences.mute_suggestion_notifications);
-        }
-      );
+    };
   }
-}
-
-angular.module('oppia').factory('UserEmailPreferencesService',
-  downgradeInjectable(UserEmailPreferencesService));
-
-
-
+]);
