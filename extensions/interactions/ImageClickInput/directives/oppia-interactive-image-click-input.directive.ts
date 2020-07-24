@@ -32,14 +32,14 @@ require(
 
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
   'AssetsBackendApiService', 'ContextService',
-  'InteractionAttributesExtractorService', 'ImageClickInputRulesService',
-  'ImagePreloaderService', 'UrlInterpolationService',
+  'ImageClickInputRulesService', 'ImagePreloaderService',
+  'InteractionAttributesExtractorService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
-      InteractionAttributesExtractorService, ImageClickInputRulesService,
-      ImagePreloaderService, UrlInterpolationService,
+      ImageClickInputRulesService, ImagePreloaderService,
+      InteractionAttributesExtractorService, UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE, EXPLORATION_EDITOR_TAB_CONTEXT,
       LOADING_INDICATOR_URL) {
     return {
