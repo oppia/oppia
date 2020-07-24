@@ -1836,7 +1836,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# coding: utf-8\n# pylint: disable
+                u"""# coding: utf-8
+                # pylint: disable
                 """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
@@ -2911,6 +2912,37 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
 
         self.checker_test_object.checker.process_tokens(
             utils.tokenize_module(node_enable_single_line_pragma_for_muliline))
+
+        message = testutils.Message(
+            msg_id='single-line-pragma',
+            line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_enable_single_line_pragma_with_invalid_name(self):
+        node_enable_single_line_pragma_with_invalid_name = (
+            astroid.scoped_nodes.Module(name='test', doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    # pylint: disable=invalid-name, single-line-pragma
+                    def funcName():
+                        \"\"\"
+                        # pylint: disable=testing-purpose
+                        \"\"\"
+                        pass
+                    # pylint: enable=invalid_name, single-line-pragma
+                """)
+        node_enable_single_line_pragma_with_invalid_name.file = filename
+        node_enable_single_line_pragma_with_invalid_name.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(
+                node_enable_single_line_pragma_with_invalid_name))
 
         message = testutils.Message(
             msg_id='single-line-pragma',

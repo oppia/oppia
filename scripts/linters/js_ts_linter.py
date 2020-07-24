@@ -31,6 +31,7 @@ import time
 import python_utils
 
 from . import linter_utils
+from .. import build
 from .. import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -42,8 +43,6 @@ ESPRIMA_PATH = os.path.join(
 sys.path.insert(1, ESPRIMA_PATH)
 
 import esprima  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from .. import build  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
     CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')
 

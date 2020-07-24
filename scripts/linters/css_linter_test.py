@@ -42,7 +42,8 @@ class MockProcessClass(python_utils.OBJECT):
 
     kill_count = 0
 
-    def kill(self):  # pylint: disable=missing-docstring
+    def kill(self):
+        """Mock method to kill process."""
         MockProcessClass.kill_count += 1
 
 

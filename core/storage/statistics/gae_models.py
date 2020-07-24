@@ -1609,7 +1609,7 @@ class StateAnswersModel(base_models.BaseModel):
     # submitted_answer_list, minus any overhead of the property itself. This
     # value is found by summing the JSON sizes of all answer dicts stored inside
     # submitted_answer_list.
-    accumulated_answer_json_size_bytes = ndb.IntegerProperty(  # pylint: disable=invalid-name
+    accumulated_answer_json_size_bytes = ndb.IntegerProperty(
         indexed=False, required=False, default=0)
 
     # List of answer dicts, each of which is stored as JSON blob. The content
