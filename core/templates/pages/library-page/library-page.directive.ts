@@ -36,6 +36,7 @@ require('services/search.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/KeyboardShortcutService')
 
 require('pages/library-page/library-page.constants.ajs.ts');
 
@@ -50,8 +51,8 @@ angular.module('oppia').directive('libraryPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
-        '$window', 'AlertsService', 'ClassroomBackendApiService',
-        'LearnerDashboardActivityIdsObjectFactory',
+        '$window', 'AlertsService', 'ClassroomBackendApiService', 
+        'KeyboardShortcutService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
@@ -60,8 +61,8 @@ angular.module('oppia').directive('libraryPage', [
         'LIBRARY_TILE_WIDTH_PX',
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
-            $window, AlertsService, ClassroomBackendApiService,
-            LearnerDashboardActivityIdsObjectFactory,
+            $window, AlertsService, ClassroomBackendApiService, 
+            KeyboardShortcutService, LearnerDashboardActivityIdsObjectFactory, 
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,
@@ -192,27 +193,6 @@ angular.module('oppia').directive('libraryPage', [
                 }, 50);
               });
             }
-          };
-
-          var moveFocusToSearch = function() {
-            Mousetrap.bind('/', function() {
-              document.getElementById('searchBar').focus();
-              return false;
-            });
-          };
-
-          var moveFocusToCategory = function() {
-            Mousetrap.bind('c', function() {
-              document.getElementById('categoryBar').focus();
-              return false;
-            });
-          };
-
-          var moveFocusToSkipButton = function() {
-            Mousetrap.bind('s', function() {
-              document.getElementById('skipToMainContentId').focus();
-              return false;
-            });
           };
 
           // The following loads explorations belonging to a particular group.
@@ -352,9 +332,8 @@ angular.module('oppia').directive('libraryPage', [
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
                 $timeout(initCarousels, 390);
-                $timeout(moveFocusToSearch);
-                $timeout(moveFocusToCategory);
-                $timeout(moveFocusToSkipButton);
+                $timeout(KeyboardShortcutService.bindLibraryPageShortcuts);
+                $timeout(KeyboardShortcutService.bindNavigationShortcuts);
 
 
 

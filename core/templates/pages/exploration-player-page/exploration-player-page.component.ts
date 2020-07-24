@@ -32,14 +32,15 @@ require(
 
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
+require('services/KeyboardShortcutService')
 
 angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
-    'ContextService', '$timeout', 'PageTitleService',
+    'ContextService', 'KeyboardShortcutService', '$timeout', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService',
     function(
-        ContextService, $timeout, PageTitleService,
+        ContextService, KeyboardShortcutService, $timeout, PageTitleService,
         ReadOnlyExplorationBackendApiService) {
       var ctrl = this;
       ctrl.$onInit = function() {
@@ -58,46 +59,8 @@ angular.module('oppia').component('explorationPlayerPage', {
             angular.element('meta[property="og:description"]').attr(
               'content', response.exploration.objective);
           });
-        var moveFocusToBackButton = function() {
-          Mousetrap.bind('k', function() {
-            var previousButton = document.getElementById('backButtonId');
 
-            if (previousButton !== null) {
-              previousButton.focus();
-            }
-
-            return false;
-          });
-        };
-
-        var moveFocusToNextButton = function() {
-          Mousetrap.bind('j', function() {
-            var nextButton = <HTMLElement>document.querySelector(
-              '.protractor-test-next-button');
-
-            if (nextButton !== null) {
-              nextButton.focus();
-            }
-
-            return false;
-          });
-        };
-
-        var moveFocusToSkipButton = function() {
-          Mousetrap.bind('s', function() {
-            var skipButton = document.getElementById('skipToMainContentId');
-
-            if (skipButton !== null) {
-              skipButton.focus();
-            }
-
-            return false;
-          });
-        };
-
-        $timeout(moveFocusToSkipButton());
-        $timeout(moveFocusToBackButton());
-        $timeout(moveFocusToNextButton());
+        $timeout(KeyboardShortcutService.bindExplorationPlayerShortcuts);
       };
     }
   ]
