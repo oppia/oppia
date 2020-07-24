@@ -164,3 +164,4 @@ export class CommandExecutorService{
 angular.module('oppia').factory(
   'CommandExecutorService',
   downgradeInjectable(CommandExecutorService));
+  
