@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import copy
 import itertools
 import logging
 import re
@@ -83,84 +82,6 @@ AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 # we don't need to closely inspect all of the valid inputs, they are displayed
 # just to make sure that the job output is what we expect.
 VALID_MATH_INPUTS_YIELD_LIMIT = 200
-TYPE_INVALID_EXPRESSION = 'Invalid'
-TYPE_VALID_ALGEBRAIC_EXPRESSION = 'AlgebraicExpressionInput'
-TYPE_VALID_NUMERIC_EXPRESSION = 'NumericExpressionInput'
-TYPE_VALID_MATH_EQUATION = 'MathEquationInput'
-
-
-def clean_math_expression(math_expression):
-    """Cleans a given math expression and formats it so that it is compatible
-    with the new interactions' validators.
-
-    Args:
-        math_expression: str. The string representing the math expression.
-
-    Returns:
-        str. The correctly formatted string representing the math expression.
-    """
-    unicode_to_text = {
-        u'\u221a': 'sqrt',
-        u'\xb7': '*',
-        u'\u03b1': 'alpha',
-        u'\u03b2': 'beta',
-        u'\u03b3': 'gamma',
-        u'\u03b4': 'delta',
-        u'\u03b5': 'epsilon',
-        u'\u03b6': 'zeta',
-        u'\u03b7': 'eta',
-        u'\u03b8': 'theta',
-        u'\u03b9': 'iota',
-        u'\u03ba': 'kappa',
-        u'\u03bb': 'lambda',
-        u'\u03bc': 'mu',
-        u'\u03bd': 'nu',
-        u'\u03be': 'xi',
-        u'\u03c0': 'pi',
-        u'\u03c1': 'rho',
-        u'\u03c3': 'sigma',
-        u'\u03c4': 'tau',
-        u'\u03c5': 'upsilon',
-        u'\u03c6': 'phi',
-        u'\u03c7': 'chi',
-        u'\u03c8': 'psi',
-        u'\u03c9': 'omega',
-    }
-    inverse_trig_fns_mapping = {
-        'asin': 'arcsin',
-        'acos': 'arccos',
-        'atan': 'arctan'
-    }
-    trig_fns = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
-
-    # Shifting powers in trig functions to the end.
-    # For eg. 'sin^2(x)' -> '(sin(x))^2'.
-    for trig_fn in trig_fns:
-        math_expression = re.sub(
-            r'%s(\^\d)\((.)\)' % trig_fn,
-            r'(%s(\2))\1' % trig_fn, math_expression)
-
-    # Adding parens to trig functions that don't have
-    # any. For eg. 'cosA' -> 'cos(A)'.
-    for trig_fn in trig_fns:
-        math_expression = re.sub(
-            r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
-
-    # The pylatexenc lib outputs the unicode values of special characters like
-    # sqrt and pi, which is why they need to be replaced with their
-    # corresponding text values before performing validation. Other unicode
-    # characters will be left in the string as-is, and will be rejected by the
-    # expression parser.
-    for unicode_char, text in unicode_to_text.items():
-        math_expression = math_expression.replace(unicode_char, text)
-
-    # Replacing trig functions that have format which is
-    # incompatible with the validations.
-    for invalid_trig_fn, valid_trig_fn in inverse_trig_fns_mapping.items():
-        math_expression = math_expression.replace(
-            invalid_trig_fn, valid_trig_fn)
-
-    return math_expression
 
 
 class DragAndDropSortInputInteractionOneOffJob(
@@ -274,15 +195,20 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
 
-                            rule_input = clean_math_expression(rule_input)
+                            rule_input = exp_domain.clean_math_expression(
+                                rule_input)
 
-                            type_of_input = TYPE_INVALID_EXPRESSION
+                            type_of_input = (
+                                exp_domain.TYPE_INVALID_EXPRESSION)
                             if is_valid_algebraic_expression(rule_input):
-                                type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
+                                type_of_input = (
+                                    exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
                             elif is_valid_numeric_expression(rule_input):
-                                type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
+                                type_of_input = (
+                                    exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
                             elif is_valid_math_equation(rule_input):
-                                type_of_input = TYPE_VALID_MATH_EQUATION
+                                type_of_input = (
+                                    exp_domain.TYPE_VALID_MATH_EQUATION)
 
                             output_values = '%s %s: %s' % (
                                 item.id, state_name, rule_input)
@@ -291,7 +217,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key != TYPE_INVALID_EXPRESSION:
+        if key != exp_domain.TYPE_INVALID_EXPRESSION:
             yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
