@@ -29,15 +29,23 @@ angular.module('oppia').component('onScreenKeyboard', {
     customLetters: '='
   },
   template: require('./on-screen-keyboard.component.html'),
-  controller: ['GuppyInitializationService', 'UrlInterpolationService',
-    'DeviceInfoService',
-    function(GuppyInitializationService, UrlInterpolationService,
-        DeviceInfoService) {
+  controller: [
+    'DeviceInfoService', 'GuppyInitializationService',
+    'UrlInterpolationService',
+    'OSK_FUNCTIONS_TAB', 'OSK_LETTERS_TAB', 'OSK_MAIN_TAB',
+    function(
+        DeviceInfoService, GuppyInitializationService,
+        UrlInterpolationService,
+        OSK_FUNCTIONS_TAB, OSK_LETTERS_TAB, OSK_MAIN_TAB) {
       const ctrl = this;
       let engine, guppyInstance;
 
-      ctrl.currentTab = 'mainTab';
-      ctrl.allLetters = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+      ctrl.functionsTab = OSK_FUNCTIONS_TAB;
+      ctrl.lettersTab = OSK_LETTERS_TAB;
+      ctrl.mainTab = OSK_MAIN_TAB;
+
+      ctrl.currentTab = ctrl.mainTab;
+      ctrl.lettersInKeyboardLayout = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.functions = [
         'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
         'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];

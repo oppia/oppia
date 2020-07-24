@@ -1,28 +1,27 @@
 <div class="oppia-osk-container" ng-if="$ctrl.showOSK()" ng-click="$ctrl.activateGuppy()">
   <div class="oppia-osk-navbar">
-    <button ng-class="($ctrl.currentTab === 'mainTab') ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab('mainTab')">
+    <button ng-class="($ctrl.currentTab === $ctrl.mainTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab($ctrl.mainTab)">
       123
     </button>
-    <button ng-class="($ctrl.currentTab === 'functionsTab') ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab('functionsTab')">
+    <button ng-class="($ctrl.currentTab === $ctrl.functionsTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab($ctrl.functionsTab)">
       f(x)
     </button>
-    <button ng-if="!$ctrl.customizable" ng-class="($ctrl.currentTab === 'lettersTab') ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab('lettersTab')">
+    <button ng-if="!$ctrl.customizable" ng-class="($ctrl.currentTab === $ctrl.lettersTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" ng-click="$ctrl.changeTab($ctrl.lettersTab)">
       abc
     </button>
     <button class="oppia-osk-btn-hide" ng-click="$ctrl.hideOSK()">
       HIDE <i class="fa fa-angle-down"></i>
     </button>
-
   </div>
-  <div class="oppia-osk-custom-letters-div" ng-if="$ctrl.customizable && $ctrl.currentTab === 'mainTab'">
+  <div class="oppia-osk-custom-letters-div" ng-if="$ctrl.customizable && $ctrl.currentTab === $ctrl.mainTab">
     <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.customLetters"><[letter]></button>
   </div>
-  <div class="oppia-osk-main-tab" ng-if="$ctrl.currentTab==='mainTab'">
+  <div class="oppia-osk-main-tab" ng-if="$ctrl.currentTab===$ctrl.mainTab">
     <button class="oppia-osk-btn-number number-7" ng-click="$ctrl.insertString('7')">7</button>
     <button class="oppia-osk-btn-number number-8" ng-click="$ctrl.insertString('8')">8</button>
     <button class="oppia-osk-btn-number number-9" ng-click="$ctrl.insertString('9')">9</button>
     <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('+')">+</button>
-    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('*')">•</button>
+    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('*')">*</button>
     <button class="oppia-osk-btn-number number-4" ng-click="$ctrl.insertString('4')">4</button>
     <button class="oppia-osk-btn-number number-5" ng-click="$ctrl.insertString('5')">5</button>
     <button class="oppia-osk-btn-number number-6" ng-click="$ctrl.insertString('6')">6</button>
@@ -43,7 +42,7 @@
       <i class="fa fa-angle-right"></i>
     </button>
   </div>
-  <div class="oppia-osk-functions-tab" ng-if="$ctrl.currentTab==='functionsTab'">
+  <div class="oppia-osk-functions-tab" ng-if="$ctrl.currentTab===$ctrl.functionsTab">
     <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('(')">(</button>
     <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString(')')">)</button>
     <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('abs')">||</button>
@@ -52,15 +51,15 @@
     <button class="oppia-osk-btn-function" ng-click="$ctrl.insertString(function)" ng-repeat="function in $ctrl.functions"><[function]></button>
     <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.backspace()">
   </div>
-  <div class="oppia-osk-letters-tab" ng-if="$ctrl.currentTab==='lettersTab'">
+  <div class="oppia-osk-letters-tab" ng-if="$ctrl.currentTab===$ctrl.lettersTab">
     <div class="oppia-osk-letters-tab-row-1">
-      <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.allLetters[0]"><[letter]></button>
+      <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.lettersInKeyboardLayout[0]"><[letter]></button>
     </div>
     <div class="oppia-osk-letters-tab-row-2">
-      <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.allLetters[1]"><[letter]></button>
+      <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.lettersInKeyboardLayout[1]"><[letter]></button>
     </div>
     <div class="oppia-osk-letters-tab-row-3">
-      <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.allLetters[2]"><[letter]></button>
+      <button class="oppia-osk-btn-letter" ng-click="$ctrl.insertString(letter)" ng-repeat="letter in $ctrl.lettersInKeyboardLayout[2]"><[letter]></button>
       <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-delete.svg')]>" class="oppia-osk-btn-delete" alt="delete" ng-click="$ctrl.backspace()">
     </div>
   </div>
@@ -78,7 +77,6 @@
   }
 
   .oppia-osk-container button {
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
     outline: none;
     padding: 11.2px 0px;
   }
@@ -145,6 +143,7 @@
     border: none;
     border-bottom: 3px #015c53 solid;
     color: #015c53;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 19px;
     margin: 0px 10px;
   }
@@ -153,6 +152,7 @@
     background-color: transparent;
     border: none;
     color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 19px;
     margin: 0px 10px;
   }
@@ -161,6 +161,7 @@
     background-color: transparent;
     border: none;
     color: #015c53;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 19px;
     position: absolute;
     right: 16px;
@@ -175,6 +176,7 @@
     background-color: #fff;
     border: 1px #d3d3d3 solid;
     color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 25px;
   }
 
@@ -182,6 +184,7 @@
     background-color: #ffffcb;
     border: 1px #d3d3d3 solid;
     color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 25px;
   }
 
@@ -189,6 +192,7 @@
     background-color: #fff;
     border: 1px #d3d3d3 solid;
     color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 15px;
   }
 
@@ -196,6 +200,7 @@
     background-color: #e4ffcb;
     border: 1px #d3d3d3 solid;
     color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 25px;
   }
 
@@ -203,6 +208,7 @@
     background-color: inherit;
     border: none;
     color: #000;
+    font-family: 'Noto Serif', serif;
     font-size: 25px;
     width: 10%;
   }

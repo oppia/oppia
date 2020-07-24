@@ -33,13 +33,15 @@ require('services/math-interactions.service.ts');
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
   controller: [
-    '$scope', 'CurrentInteractionService', 'GuppyConfigurationService',
-    'AlgebraicExpressionInputRulesService', 'MathInteractionsService',
-    'GuppyInitializationService', 'DeviceInfoService',
+    '$scope', 'AlgebraicExpressionInputRulesService',
+    'CurrentInteractionService', 'DeviceInfoService',
+    'GuppyConfigurationService', 'GuppyInitializationService',
+    'MathInteractionsService',
     function(
-        $scope, CurrentInteractionService, GuppyConfigurationService,
-        AlgebraicExpressionInputRulesService, MathInteractionsService,
-        GuppyInitializationService, DeviceInfoService) {
+        $scope, AlgebraicExpressionInputRulesService,
+        CurrentInteractionService, DeviceInfoService,
+        GuppyConfigurationService, GuppyInitializationService,
+        MathInteractionsService) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
