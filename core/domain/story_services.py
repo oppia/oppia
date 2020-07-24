@@ -522,10 +522,8 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # Delete the opportunities and suggestions available related to the
     # exploration used in the story.
     opportunity_services.delete_exploration_opportunities(exp_ids)
-    for exp_id in exp_ids:
-        suggestion_services.reject_translation_suggestions_with_exp_target_id(
-            exp_id
-        )
+    suggestion_services.reject_translation_suggestions_with_exp_target_ids(
+        exp_ids)
 
 
 def delete_story_summary(story_id):
