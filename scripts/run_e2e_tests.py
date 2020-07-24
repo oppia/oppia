@@ -22,6 +22,7 @@ import atexit
 import contextlib
 import os
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -37,10 +38,14 @@ GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
+# Path relative to current working directory where portserver socket
+# file will be created.
+PORTSERVER_SOCKET_FILEPATH = os.path.join(
+    os.getcwd(), 'portserver.socket')
+KILL_PORTSERVER_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 WEBDRIVER_HOME_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
@@ -196,25 +201,6 @@ def is_oppia_server_already_running():
             running = True
             break
     return running
-
-
-def wait_for_port_to_be_open(port_number):
-    """Wait until the port is open.
-
-    Args:
-        port_number: int. The port number to wait.
-    """
-    waited_seconds = 0
-    while (not common.is_port_open(port_number) and
-           waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
-        time.sleep(1)
-        waited_seconds += 1
-    if (waited_seconds ==
-            MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
-            not common.is_port_open(port_number)):
-        python_utils.PRINT(
-            'Failed to start server on port %s, exiting ...' % port_number)
-        sys.exit(1)
 
 
 def run_webpack_compilation():
@@ -437,6 +423,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         '--log_level=%s --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
             GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
+        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
         shell=True)
     SUBPROCESSES.append(p)
 
@@ -469,6 +456,54 @@ def get_chrome_driver_version():
     return chrome_driver_version
 
 
+def start_portserver():
+    """Start a portserver in a subprocess.
+
+    The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
+    ports to clients. This prevents race conditions when two clients
+    request ports in quick succession. The local Google App Engine
+    server that we use to serve the development version of Oppia uses
+    python_portpicker, which is compatible with the portserver this
+    function starts, to request ports.
+
+    By "compatible" we mean that python_portpicker requests a port by
+    sending a request consisting of the PID of the requesting process
+    and expects a response consisting of the allocated port number. This
+    is the interface provided by this portserver.
+
+    Returns:
+        subprocess.Popen. The Popen subprocess object.
+    """
+    process = subprocess.Popen([
+        'python', '-m',
+        '.'.join(['scripts', 'run_portserver']),
+        '--portserver_unix_socket_address',
+        PORTSERVER_SOCKET_FILEPATH,
+    ])
+    return process
+
+
+def cleanup_portserver(portserver_process):
+    """Shut down the portserver.
+
+    We wait KILL_PORTSERVER_TIMEOUT_SECS seconds for the portserver to
+    shut down after sending CTRL-C (SIGINT). The portserver is configured
+    to shut down cleanly upon receiving this signal. If the server fails
+    to shut down, we kill the process.
+
+    Args:
+        portserver_process: subprocess.Popen. The Popen subprocess
+            object for the portserver.
+    """
+    portserver_process.send_signal(signal.SIGINT)
+    for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT_SECS):
+        time.sleep(1)
+        if not portserver_process.poll():
+            break
+    if portserver_process.poll():
+        portserver_process.kill()
+
+
 def main(args=None):
     """Run the scripts to start end-to-end tests."""
 
@@ -495,10 +530,12 @@ def main(args=None):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
+    portserver_process = start_portserver()
+    atexit.register(cleanup_portserver, portserver_process)
     start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
-    wait_for_port_to_be_open(WEB_DRIVER_PORT)
-    wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+    common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
+    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:

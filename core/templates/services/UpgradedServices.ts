@@ -185,6 +185,8 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
+import { ExplorationImprovementsConfigObjectFactory } from
+  'domain/improvements/exploration-improvements-config-object.factory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationMetadataObjectFactory } from
@@ -533,6 +535,8 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from
   'domain/statistics/state-top-answers-stats-object.factory';
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -720,6 +724,8 @@ export class UpgradedServices {
       new ExplorationDraftObjectFactory();
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
+    upgradedServices['ExplorationImprovementsConfigObjectFactory'] =
+      new ExplorationImprovementsConfigObjectFactory();
     upgradedServices['ExplorationPermissionsObjectFactory'] =
       new ExplorationPermissionsObjectFactory();
     upgradedServices['ExplorationMetadataObjectFactory'] =
@@ -1301,8 +1307,8 @@ export class UpgradedServices {
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationFeaturesBackendApiService'] =
       new ExplorationFeaturesBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
@@ -1311,6 +1317,7 @@ export class UpgradedServices {
     upgradedServices['ExplorationImprovementsBackendApiService'] =
       new ExplorationImprovementsBackendApiService(
         upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['ExplorationImprovementsConfigObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
@@ -1414,9 +1421,9 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StateTopAnswersStatsBackendApiService'] =
       new StateTopAnswersStatsBackendApiService(
-        upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient'],
-        upgradedServices['StateTopAnswersStatsObjectFactory']);
+        upgradedServices['StateTopAnswersStatsObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StatsReportingBackendApiService'] =
       new StatsReportingBackendApiService(
         upgradedServices['ContextService'],
@@ -1554,6 +1561,11 @@ export class UpgradedServices {
         upgradedServices['FractionObjectFactory'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateInteractionStatsBackendApiService']);
+    upgradedServices['StateTopAnswersStatsService'] =
+      new StateTopAnswersStatsService(
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['StateTopAnswersStatsBackendApiService']);
     upgradedServices['StatsReportingService'] = new StatsReportingService(
       upgradedServices['ContextService'],
       upgradedServices['MessengerService'],
