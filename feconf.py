@@ -390,12 +390,10 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
-# To use GAE email service.
-EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
 # To use mailgun email service.
 EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
-EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun API key.
 MAILGUN_API_KEY = None
@@ -724,6 +722,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
+IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
