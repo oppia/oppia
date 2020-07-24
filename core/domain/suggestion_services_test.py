@@ -865,6 +865,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp1'
+    TOPIC_ID = 'topic1'
+    STORY_ID = 'story1'
     TRANSLATION_LANGUAGE_CODE = 'en'
 
     AUTHOR_EMAIL = 'author@example.com'
@@ -941,6 +943,68 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         }
 
         self.target_version_at_submission = exploration.version
+
+        # Set up for testing translation suggestions. Translation suggestions
+        # correspond to a given topic, story and exploration.
+
+        self.save_new_topic(self.TOPIC_ID, self.owner_id)
+
+        self.save_new_story(
+            self.STORY_ID, self.owner_id, title='A story',
+            description='Description', notes='Notes',
+            corresponding_topic_id=self.TOPIC_ID)
+
+        # Adds the story to the topic.
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        # Adds the exploration to the story.
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })], 'Added exploration.')
+
+    def create_translation_suggestion_associated_with_exp(
+            self, exp_id, author_id):
+        """Creates a translation suggestion that is associated with an
+        exploration with id exp_id. The author of the created suggestion is
+        author_id.
+        """
+
+        # Gets the html content in the exploration to be translated.
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_html = exploration.states['State 1'].content.html
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': content_html,
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            exp_id, 1, author_id, add_translation_change_dict,
+            'test description')
+
+        # Check that there is only one suggestion associated with the
+        # exploration and that the suggestion is in review.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
 
     def test_create_and_accept_suggestion(self):
         with self.swap(
@@ -1060,66 +1124,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def test_delete_topic_rejects_translation_suggestion(self):
 
-        # Create test topic to be deleted.
-        topic_id = topic_services.get_new_topic_id()
-        self.save_new_topic(topic_id, self.owner_id)
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
 
-        # A story is created because stories are linked to explorations
-        # and translation suggestions are linked to the explorations.
-        story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            story_id, self.owner_id, title='A story',
-            description='Description', notes='Notes',
-            corresponding_topic_id=topic_id)
-
-        # Adds the story to the topic.
-        topic_services.add_canonical_story(
-            self.owner_id, topic_id, story_id)
-
-        # Adds the exploration to the story.
-        story_services.update_story(
-            self.owner_id, story_id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': self.EXP_ID
-            })], 'Added exploration.')
-
-        # Gets the html content in the exploration to be translated.
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        content_html = exploration.states['State 1'].content.html
-
-        # Creates the add translation dict that's related to the exploration in
-        # the story.
-        add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'State 1',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': content_html,
-            'translation_html': '<p>This is translated html.</p>'
-        }
-
-        # Creates the translation suggestion asscoiated to the exploration and
-        # the add translation dict.
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.EXP_ID, 1, self.author_id, add_translation_change_dict,
-            'test description')
-
-        # Checks that there is only one suggestion associated with the
-        # exploration.
-        suggestions = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
-        self.assertEqual(len(suggestions), 1)
-
-        topic_services.delete_topic(self.author_id, topic_id)
+        topic_services.delete_topic(self.author_id, self.TOPIC_ID)
 
         # Suggestion should be rejected after corresponding topic is deleted.
         suggestions = suggestion_services.query_suggestions(
