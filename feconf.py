@@ -244,6 +244,10 @@ CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 # dict schema changes.
 CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
+# This value should be updated if the schema of PlatformParameterRule dict
+# schema changes.
+CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
+
 # The default number of exploration tiles to load at a time in the search
 # results page.
 SEARCH_RESULTS_PAGE_SIZE = 20
@@ -387,12 +391,10 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
-# To use GAE email service.
-EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
 # To use mailgun email service.
 EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
-EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun API key.
 MAILGUN_API_KEY = None
@@ -530,6 +532,10 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
+
+# We generate images for existing math rich text components in batches. This
+# gives the maximum size for a batch of Math SVGs in bytes.
+MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576

@@ -926,6 +926,64 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
+def get_latex_strings_without_svg_from_html(html_string):
+    """Extract LaTeX strings from math rich-text components whose svg_filename
+    field is empty.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). List of unique LaTeX strings from math-tags without svg
+        filename.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    latex_strings = set()
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(
+                unescape_html(
+                    math_tag['math_content-with-value'])))
+        raw_latex = (
+            objects.UnicodeString.normalize(math_content_dict['raw_latex']))
+        svg_filename = (
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+        if svg_filename == '':
+            latex_strings.add(raw_latex.encode('utf-8'))
+
+    unique_latex_strings = list(latex_strings)
+    return unique_latex_strings
+
+
+def extract_svg_filenames_in_math_rte_components(html_string):
+    """Extracts the svg_filenames from all the math-rich text components in
+    an HTML string.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of svg_filenames present in the HTML.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    filenames = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(
+                unescape_html(
+                    math_tag['math_content-with-value'])))
+        svg_filename = math_content_dict['svg_filename']
+        if svg_filename != '':
+            normalized_svg_filename = (
+                objects.UnicodeString.normalize(svg_filename))
+            filenames.append(normalized_svg_filename)
+    return filenames
+
+
 def add_math_content_to_math_rte_components(html_string):
     """Replaces the attribute raw_latex-with-value in all Math component tags
     with a new attribute math_content-with-value. The new attribute has an
@@ -953,7 +1011,7 @@ def add_math_content_to_math_rte_components(html_string):
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
                 error_message = (
-                    'Invalid raw_latex value found in the math tag : %s' % (
+                    'Invalid raw_latex string found in the math tag : %s' % (
                         python_utils.UNICODE(e)))
                 raise Exception(error_message)
             math_content_dict = {

@@ -39,7 +39,7 @@ import python_utils
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
-class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
+class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
@@ -168,10 +168,10 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
                 # Check that there are no sent emails to either
                 # email address before posting json.
-                messages = self.mail_stub.get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
-                messages = self.mail_stub.get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to='moderator@example.com')
                 self.assertEqual(len(messages), 0)
 
@@ -181,12 +181,12 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
                     expected_status_int=500)
 
                 # Check that there are now emails sent.
-                messages = self.mail_stub.get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
-                messages = self.mail_stub.get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to='moderator@example.com')
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)

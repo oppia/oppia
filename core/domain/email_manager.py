@@ -24,6 +24,7 @@ import logging
 
 from constants import constants
 from core.domain import config_domain
+from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -35,7 +36,6 @@ import utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
-email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -341,7 +341,7 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin,
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
             reply_to_id=reply_to_id)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,

@@ -910,8 +910,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # in import statements.
         node_no_err_import = astroid.extract_node(
             """
-            import core.platform.email.gae_email_services #@
-        """)
+                import core.platform.email.mailgun_email_services #@
+            """)
         node_no_err_import.root().name = 'oppia.core.storage.topic'
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_import(node_no_err_import)
@@ -936,7 +936,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # in import-from statements.
         node_no_err_importfrom = astroid.extract_node(
             """
-            from core.platform.email import gae_email_services #@
+            from core.platform.email import mailgun_email_services #@
         """)
         node_no_err_importfrom.root().name = 'oppia.core.storage.topicl'
         with checker_test_object.assertNoMessages():
@@ -962,7 +962,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # in import statements.
         node_no_err_import = astroid.extract_node(
             """
-            import core.platform.email.gae_email_services_test #@
+            import core.platform.email.mailgun_email_services_test #@
         """)
         node_no_err_import.root().name = 'oppia.core.domain'
         with checker_test_object.assertNoMessages():
@@ -988,7 +988,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # in import-from statements.
         node_no_err_importfrom = astroid.extract_node(
             """
-            from core.platform.email import gae_email_services_test #@
+            from core.platform.email import mailgun_email_services_test #@
         """)
         node_no_err_importfrom.root().name = 'oppia.core.domain'
         with checker_test_object.assertNoMessages():

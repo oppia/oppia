@@ -616,7 +616,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RecommendationsHandlerTests(test_utils.GenericTestBase):
+class RecommendationsHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for recommended explorations for after an
     exploration is completed.
     """
@@ -1073,7 +1073,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         )
 
 
-class FlagExplorationHandlerTests(test_utils.GenericTestBase):
+class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
     EXP_ID = '0'
@@ -1156,7 +1156,8 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx:
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                to=self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),

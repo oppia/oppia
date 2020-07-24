@@ -105,6 +105,7 @@ describe('Topic editor tab directive', function() {
     topic = TopicObjectFactory.createInterstitialTopic();
     skillSummary = SkillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
+    subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
     story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');

@@ -1712,7 +1712,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         self.logout()
 
 
-class ModeratorEmailsTests(test_utils.GenericTestBase):
+class ModeratorEmailsTests(test_utils.EmailTestBase):
     """Integration test for post-moderator action emails."""
 
     EXP_ID = 'eid'
@@ -1815,14 +1815,14 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
                 valid_payload, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self.mail_stub.get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             self.assertEqual(
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertFalse(hasattr(messages[0], 'cc'))
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
