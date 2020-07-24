@@ -1247,6 +1247,13 @@ class ManageOwnProfileTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
+    def test_guest_cannot_update_profile_preferences(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
     def test_normal_user_can_manage_profile_preferences(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
