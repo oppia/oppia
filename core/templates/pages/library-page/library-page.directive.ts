@@ -112,7 +112,7 @@ angular.module('oppia').directive('libraryPage', [
             for (var i = 0; i < ctrl.libraryGroups.length; i++) {
               var carouselJQuerySelector = (
                 '.oppia-library-carousel-tiles:eq(n)'.replace(
-                  'n', <string><any>i));
+                  'n', String(i)));
               var carouselScrollPositionPx = $(
                 carouselJQuerySelector).scrollLeft();
               var index = Math.ceil(
