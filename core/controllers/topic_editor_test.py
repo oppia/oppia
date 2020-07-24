@@ -102,11 +102,21 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             subtopics=[], next_subtopic_id=1)
 
         self.save_new_story(
-            canonical_story_id, self.admin_id, 'title', 'description',
-            'note', topic_id)
+            canonical_story_id,
+            self.admin_id,
+            topic_id,
+            title='title',
+            description='description',
+            notes='note'
+        )
         self.save_new_story(
-            additional_story_id, self.admin_id, 'another title',
-            'another description', 'another note', topic_id)
+            additional_story_id,
+            self.admin_id,
+            topic_id,
+            title='another title',
+            description='another description',
+            notes='another note'
+        )
 
         topic_services.publish_story(
             topic_id, canonical_story_id, self.admin_id)
@@ -299,7 +309,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
         self.logout()
 
-
     def test_editable_topic_handler_get(self):
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
         # Check that non-admins cannot access the editable topic data.
@@ -320,6 +329,14 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
             self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertTrue(
+                self.skill_id in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id], 0)
+            self.assertTrue(
+                self.skill_id_2 in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id_2], 0)
             self.assertEqual(
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])

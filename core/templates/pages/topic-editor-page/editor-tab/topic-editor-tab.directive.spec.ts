@@ -36,6 +36,7 @@ describe('Topic editor tab directive', function() {
   var ctrl = null;
   var $rootScope = null;
   var topic = null;
+  var $q = null;
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
@@ -49,6 +50,7 @@ describe('Topic editor tab directive', function() {
   var SkillSummaryObjectFactory = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
+  var SubtopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
   var WindowDimensionsService = null;
@@ -58,6 +60,7 @@ describe('Topic editor tab directive', function() {
     $scope = $rootScope.$new();
     ContextService = $injector.get('ContextService');
     $uibModalInstance = $injector.get('$uibModal');
+    $q = $injector.get('$q');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     directive = $injector.get('topicEditorTabDirective')[0];
@@ -81,6 +84,7 @@ describe('Topic editor tab directive', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     EntityCreationService = $injector.get('EntityCreationService');
+    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     ctrl = $injector.instantiate(directive.controller, {
@@ -97,10 +101,13 @@ describe('Topic editor tab directive', function() {
       TopicEditorStateService: TopicEditorStateService,
       EntityCreationService: EntityCreationService
     });
+    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
     skillSummary = SkillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
+    subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];
+    topic._subtopics = [subtopic];
     story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
     story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
@@ -165,8 +172,6 @@ describe('Topic editor tab directive', function() {
     expect($scope.subtopicEditOptionsAreShown).toEqual(1);
     $scope.showSubtopicEditOptions(2);
     expect($scope.subtopicEditOptionsAreShown).toEqual(2);
-    $scope.showSubtopicEditOptions(1);
-    expect($scope.subtopicEditOptionsAreShown).toEqual(1);
   });
 
   it('should show skill edit options', function() {
@@ -348,6 +353,46 @@ describe('Topic editor tab directive', function() {
     expect($scope.subtopicsListIsShown).toEqual(false);
     expect($scope.storiesListIsShown).toEqual(false);
   });
+
+  it('should toggle uncategorized skill options', function() {
+    $scope.toggleUncategorizedSkillOptions(10);
+    expect($scope.uncategorizedEditOptionsIndex).toEqual(10);
+    $scope.toggleUncategorizedSkillOptions(20);
+    expect($scope.uncategorizedEditOptionsIndex).toEqual(20);
+  });
+
+  it('should open ChangeSubtopicAssignment modal when change ' +
+      'subtopic assignment is called', function() {
+    var modalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+    $scope.changeSubtopicAssignment(1, skillSummary);
+    expect(modalSpy).toHaveBeenCalled();
+  });
+
+  it('should open ChangeSubtopicAssignment modal and call TopicUpdateService',
+    function() {
+      var deferred = $q.defer();
+      deferred.resolve(1);
+      spyOn($uibModalInstance, 'open').and.returnValue(
+        {result: deferred.promise});
+      var moveSkillUpdateSpy = spyOn(
+        TopicUpdateService, 'moveSkillToSubtopic');
+      $scope.changeSubtopicAssignment(null, skillSummary);
+      $rootScope.$apply();
+      expect(moveSkillUpdateSpy).toHaveBeenCalled();
+    });
+
+  it('should not call the TopicUpdateService if subtopicIds are same',
+    function() {
+      var deferred = $q.defer();
+      deferred.resolve(1);
+      spyOn($uibModalInstance, 'open').and.returnValue(
+        {result: deferred.promise});
+      var moveSkillSpy = (
+        spyOn(TopicUpdateService, 'moveSkillToSubtopic'));
+      $scope.changeSubtopicAssignment(1, skillSummary);
+      $rootScope.$apply();
+      expect(moveSkillSpy).not.toHaveBeenCalled();
+    });
 
   it('should record the index of the subtopic being moved', function() {
     $scope.onRearrangeSubtopicStart(10);

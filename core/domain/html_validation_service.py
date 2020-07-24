@@ -1035,21 +1035,21 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
-def get_latext_values_without_svg_from_html(html_string):
-    """Extract latex values from math rich-text components whose svg_filename
+def get_latex_strings_without_svg_from_html(html_string):
+    """Extract LaTeX strings from math rich-text components whose svg_filename
     field is empty.
 
     Args:
         html_string: str. The HTML string.
 
     Returns:
-        list(str). list of unique latex values of math-tags without svg
+        list(str). List of unique LaTeX strings from math-tags without svg
         filename.
     """
 
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    latex_values = set()
+    latex_strings = set()
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
             json.loads(unescape_html(
@@ -1059,10 +1059,10 @@ def get_latext_values_without_svg_from_html(html_string):
         svg_filename = (
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
-            latex_values.add(raw_latex)
+            latex_strings.add(raw_latex.encode('utf-8'))
 
-    unique_latex_values = list(latex_values)
-    return unique_latex_values
+    unique_latex_strings = list(latex_strings)
+    return unique_latex_strings
 
 
 def extract_svg_filenames_in_math_rte_components(html_string):
@@ -1118,7 +1118,7 @@ def add_math_content_to_math_rte_components(html_string):
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
                 error_message = (
-                    'Invalid raw_latex value found in the math tag : %s' % (
+                    'Invalid raw_latex string found in the math tag : %s' % (
                         python_utils.UNICODE(e)))
                 raise Exception(error_message)
             math_content_dict = {

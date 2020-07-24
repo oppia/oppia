@@ -26,6 +26,8 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
     var SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
     var SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
     var QUESTIONS_TAB = 'questions';
+    var lastTabVisited = 'main';
+    var lastSubtopicId = null;
 
     var activeTabName = MAIN_TAB;
 
@@ -58,20 +60,30 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
       getActiveTabName: function() {
         return activeTabName;
       },
+      getLastTabVisited: function() {
+        return lastTabVisited;
+      },
+      getLastSubtopicIdVisited: function() {
+        return lastSubtopicId;
+      },
       navigateToMainTab: function() {
+        lastTabVisited = 'topic';
         $location.path('');
       },
       navigateToSubtopicPreviewTab: function(subtopicId) {
+        lastTabVisited = 'subtopic';
         $location.path('/subtopic_preview/' + subtopicId);
       },
       navigateToSubtopicEditorWithId: function(subtopicId) {
+        lastTabVisited = 'subtopic';
         $location.path('/subtopic_editor/' + subtopicId);
       },
       navigateToQuestionsTab: function() {
+        lastSubtopicId = this.getSubtopicIdFromUrl();
         $location.path('/questions');
       },
       getSubtopicIdFromUrl: function() {
-        return $location.path().split('/')[2];
+        return parseInt($location.path().split('/')[2]);
       },
       navigateToSkillEditorWithId: function(skillId) {
         var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';

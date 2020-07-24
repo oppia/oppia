@@ -1583,7 +1583,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 invalid_cases[0]['html_content'])
 
         with self.assertRaisesRegexp(
-            Exception, 'Invalid raw_latex value found in the math tag'):
+            Exception, 'Invalid raw_latex string found in the math tag'):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[1]['html_content'])
 
@@ -1672,9 +1672,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertTrue(
                 python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
 
-    def test_extract_latex_values_when_all_math_tags_have_empty_svg_filename(
+    def test_extract_latex_strings_when_all_math_tags_have_empty_svg_filename(
             self):
-        """Test that get_latext_values_without_svg_from_html
+        """Test that get_latex_strings_without_svg_from_html
         extracts filenames when all math tags have empty filename field.
         """
         html_string = (
@@ -1691,127 +1691,57 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
             ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
 
-        expected_list_of_latex = [
+        expected_list_of_latex_strings = [
             '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
-        list_of_latex = (
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+
+        list_of_latex_string = (
             html_validation_service.
-            get_latext_values_without_svg_from_html(
+            get_latex_strings_without_svg_from_html(
                 html_string))
-        self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_encoded_latex_strings))
 
-    def test_generate_math_svgs_filename(self):
-        """Test that generate_math_svgs_filename generates the correct format
-        for SVG filename when given the dimensions.
-        """
-        generated_filename = (
-            html_validation_service.generate_math_svgs_filename(
-                '2d059', '4d842', '0d464'))
-        filename_components = generated_filename.split('_')
-        height = filename_components[filename_components.index('height') + 1]
-        width = filename_components[filename_components.index('width') + 1]
-        vertical_padding_with_extension = (
-            filename_components[
-                filename_components.index('vertical') + 1])
-        vertical_padding = vertical_padding_with_extension.split('.')[0]
-        extension = vertical_padding_with_extension.split('.')[1]
-        self.assertEqual(height, '2d059')
-        self.assertEqual(width, '4d842')
-        self.assertEqual(vertical_padding, '0d464')
-        self.assertEqual(extension, 'svg')
-
-    def test_add_svg_filenames_for_latex_values_in_html_string(self):
-        """Test that add_svg_filenames_for_latex_values_in_html_string generates
-        and adds a valid and unique filename for each latex value based on the
-        image data dict.
+    def test_extract_latex_strings_when_latex_strings_have_unicode_characters(
+            self):
+        """Test that get_latex_strings_without_svg_from_html
+        extracts filenames when LaTeX strings have unicode characters.
         """
         html_string = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
-            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\u03A7\u03A6'
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
             ';quot;}"></oppia-noninteractive-math>'
             '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+(x^2)&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}"></oppia'
+            'quot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈ&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>'
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;\\\\sqrt{x}&amp;quot;, &am'
-            'p;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></opp'
-            'ia-noninteractive-math>')
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
 
-        image_data = {
-            '\\sqrt{x}': {
-                'dimensions': {
-                    'height': '1d429',
-                    'width': '1d33',
-                    'verticalPadding': '0d241'
-                }
-            },
-            '\\frac{x}{y}': {
-                'dimensions': {
-                    'height': '1d525',
-                    'width': '3d33',
-                    'verticalPadding': '0d241'
-                }
-            }
-        }
-
-        converted_html = (
+        expected_list_of_latex_strings = [
+            'ÀÁÂÃÄÅÆÇÈ', '\u03A7\u03A6',
+            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+        list_of_latex_string = (
             html_validation_service.
-            add_svg_filenames_for_latex_values_in_html_string(
-                image_data, html_string))
-        svg_filenames = (
-            html_validation_service.
-            extract_svg_filenames_in_math_rte_components(converted_html))
-        self.assertEqual(len(svg_filenames), 3)
-        latex_values_without_svg = (
-            html_validation_service.
-            get_latext_values_without_svg_from_html(converted_html))
-        self.assertEqual(latex_values_without_svg, [])
-
-    def test_extract_svg_filename_latex_mapping_in_math_rte_components(self):
-        """Test that xtract_svg_filename_latex_mapping_in_math_rte_components
-        extracts the correct mapping of latex values with the filenames.
-        """
-        html_string = (
-            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
-            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}'
-            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
-            'mathImg_2020721155013f9ppq5bur6_height_1d525_width_3d33_vertic'
-            'al_0d241.svg&amp;quot;}"></oppia-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+(x^2)&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;mathImg_2020721165013f9pp'
-            'q5bur6_height_3d525_width_1d553_vertical_0d251.svg&amp;quot;}"'
-            '></oppia-noninteractive-math>'
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;\\\\sqrt{x}&amp;quot;, &am'
-            'p;quot;svg_filename&amp;quot;: &amp;quot;mathImg_202072315501'
-            '3f9ppqdf4ur6_height_4d625_width_1d435_vertical_0d145.svg&amp;q'
-            'uot;}"></oppia-noninteractive-math>')
-
-        expected_mapping = [
-            (
-                'mathImg_2020721155013f9ppq5bur6_height_1d525_width_3d33_ve'
-                'rtical_0d241.svg', '\\frac{x}{y}'),
-            (
-                'mathImg_2020721165013f9ppq5bur6_height_3d525_width_1d553_ve'
-                'rtical_0d251.svg', '+,+,+,+(x^2)'),
-            (
-                'mathImg_2020723155013f9ppqdf4ur6_height_4d625_width_1d435_ve'
-                'rtical_0d145.svg', '\\sqrt{x}')]
-
-
-
-        filenames_mapping = (
-            html_validation_service.
-            extract_svg_filename_latex_mapping_in_math_rte_components(
+            get_latex_strings_without_svg_from_html(
                 html_string))
-        self.assertEqual(sorted(filenames_mapping), sorted(expected_mapping))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_encoded_latex_strings))
 
-    def test_extract_latex_values_when_math_tags_have_non_empty_svg_filename(
+    def test_extract_latex_strings_when_math_tags_have_non_empty_svg_filename(
             self):
-        """Test that get_latext_values_without_svg_from_html
-        extracts filenames when some math tags have non emoty filename field.
+        """Test that get_latex_strings_without_svg_from_html
+        extracts filenames when some math tags have non empty filename field.
         """
 
         html_string = (
@@ -1830,15 +1760,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         # Here '+,+,+,+(x^2)' won't be extracted because the corresponding
         # math tag has a non-empty svg_filename field.
-        expected_list_of_latex = ['\\sqrt{x}', '\\frac{x}{y}']
-        list_of_latex = (
+        expected_list_of_latex_strings = ['\\sqrt{x}', '\\frac{x}{y}']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+        list_of_latex_string = (
             html_validation_service.
-            get_latext_values_without_svg_from_html(
+            get_latex_strings_without_svg_from_html(
                 html_string))
-        self.assertEqual(sorted(list_of_latex), sorted(expected_list_of_latex))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_encoded_latex_strings))
 
-    def test_extract_latex_values_when_no_math_tags_are_present(self):
-        """Test that get_latext_values_without_svg_from_html
+    def test_extract_latex_strings_when_no_math_tags_are_present(self):
+        """Test that get_latex_strings_without_svg_from_html
         when there are no math tags present in the HTML.
         """
         html_string_with_no_math = (
@@ -1848,7 +1783,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             html_validation_service.
-            get_latext_values_without_svg_from_html(
+            get_latex_strings_without_svg_from_html(
                 html_string_with_no_math), [])
 
     def test_extract_svg_filenames_in_math_rte_components(self):

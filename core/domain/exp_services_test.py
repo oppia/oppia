@@ -1027,19 +1027,19 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exp1_math_image_model = (
             exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
         self.assertEqual(
-            sorted(exp1_math_image_model.latex_values_without_svg),
+            sorted(exp1_math_image_model.latex_strings_without_svg),
             sorted(['abc1', 'xyz1']))
 
         exp2_math_image_model = (
             exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id2'))
         self.assertEqual(
-            sorted(exp2_math_image_model.latex_values_without_svg),
+            sorted(exp2_math_image_model.latex_strings_without_svg),
             sorted(['abc2', 'xyz2']))
 
         exp3_math_image_model = (
             exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id3'))
         self.assertEqual(
-            sorted(exp3_math_image_model.latex_values_without_svg),
+            sorted(exp3_math_image_model.latex_strings_without_svg),
             sorted(['abc3', 'xyz3']))
 
 

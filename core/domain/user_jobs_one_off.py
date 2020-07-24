@@ -364,11 +364,10 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_model.put()
 
 
-class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
+class DraftChangeMathRichTextAuditOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that finds all the valid exploration draft changes with math rich
-    text components and creates a temporary storage model with all the
-    information required for generating math rich text component SVG images.
+    text components having no SVG and outputs the corresponding exploration IDs.
     """
 
     _SUCCESS_KEY = 'found_draft_changes_with_math_tags'
@@ -379,7 +378,15 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
     @staticmethod
     def map(item):
         exp_id = item.exploration_id
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration = exp_models.ExplorationModel.get_by_id(exp_id)
+        if exploration is None or exploration.deleted:
+            yield (
+                'Invalid Draft change list found.',
+                'Exploration corresponding to Draft change %s does not exist' %
+                (item.id))
+            return
+        if item.draft_change_list is None:
+            return
         draft_change_list = [
             exp_domain.ExplorationChange(change)
             for change in item.draft_change_list]
@@ -409,13 +416,13 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
                     draft_upgrade_services.
                     extract_html_from_draft_change_list(
                         final_draft_change_list))
-                latex_values = (
+                latex_strings = (
                     html_validation_service.
-                    get_latext_values_without_svg_from_html(
+                    get_latex_strings_without_svg_from_html(
                         html_string))
-                if len(latex_values) > 0:
+                if len(latex_strings) > 0:
                     yield (
-                        DraftChangesMathRichTextInfoModelGenerationOneOffJob.
+                        DraftChangeMathRichTextAuditOneOffJob.
                         _SUCCESS_KEY, item.exploration_id)
 
             except Exception as e:
@@ -430,7 +437,7 @@ class DraftChangesMathRichTextInfoModelGenerationOneOffJob(
     @staticmethod
     def reduce(key, values):
         if key == (
-                DraftChangesMathRichTextInfoModelGenerationOneOffJob.
+                DraftChangeMathRichTextAuditOneOffJob.
                 _SUCCESS_KEY):
             final_values = list(set(values))
             yield (
