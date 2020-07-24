@@ -1620,7 +1620,7 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
             node=node_division_operator_with_spaces)
 
         with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_assign(
+            self.checker_test_object.checker.visit_binop(
                 node_division_operator_with_spaces)
 
     def test_division_operator_without_spaces(self):
@@ -1634,7 +1634,7 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
             node=node_division_operator_without_spaces)
 
         with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_assign(
+            self.checker_test_object.checker.visit_binop(
                 node_division_operator_without_spaces)
 
     def test_divide_method_used(self):
@@ -1642,7 +1642,7 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
             u"""division = python_utils.divide(a, b)""")
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_assign(
+            self.checker_test_object.checker.visit_binop(
                 node_with_no_error_message)
 
 

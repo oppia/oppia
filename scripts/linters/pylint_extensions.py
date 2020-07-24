@@ -1065,11 +1065,8 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
             node: astroid.nodes.Yield. Nodes to access yield statements.
                 content.
         """
-        python_utils.PRINT(node)
         line_number = node.fromlineno
         line = linecache.getline(node.root().file, line_number).lstrip()
-        python_utils.PRINT(line_number)
-        python_utils.PRINT(line)
         if (line.startswith(b'yield') and
                 not re.search(br'^(yield)( \S|$|\w)', line)):
             self.add_message('single-space-after-yield', node=node)
@@ -1226,15 +1223,15 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         )
     }
 
-    def visit_assign(self, node):
+    def visit_binop(self, node):
         """Visit assign statements to ensure that the division operator('/')
         is not used and python_utils.divide() is used instead.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.node.BinOp. Node to access module content.
         """
         line = node.as_string()
-        if re.search(br'[^/]/[^/]', line) and not b'\'' in line:
+        if re.search(br'[^/]/[^/]', line):
             self.add_message(
                 'division-operator-used', node=node)
 
