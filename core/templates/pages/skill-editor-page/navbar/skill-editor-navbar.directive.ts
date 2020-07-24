@@ -92,7 +92,46 @@ angular.module('oppia').directive('skillEditorNavbar', [
             });
           };
 
+          $scope.toggleNavigationOptions = function() {
+            $scope.showNavigationOptions = !$scope.showNavigationOptions;
+          };
+          $scope.selectMainTab = function() {
+            $scope.activeTab = 'Editor';
+            SkillEditorRoutingService.navigateToMainTab();
+          };
+          $scope.selectPreviewTab = function() {
+            $scope.activeTab = 'Preview';
+            SkillEditorRoutingService.navigateToPreviewTab();
+          };
+          $scope.toggleSkillEditOptions = function() {
+            $scope.showSkillEditOptions = !$scope.showSkillEditOptions;
+          };
+          $scope.selectQuestionsTab = function() {
+            // This check is needed because if a skill has unsaved changes to
+            // misconceptions, then these will be reflected in the questions
+            // created at that time, but if page is refreshed/changes are
+            // discarded, the misconceptions won't be saved, but there will be
+            // some questions with these now non-existent misconceptions.
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill-editor-page/modal-templates/' +
+                    'save-pending-changes-modal.directive.html'),
+                backdrop: true,
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(null, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
+            } else {
+              $scope.activeTab = 'Questions';
+              SkillEditorRoutingService.navigateToQuestionsTab();
+            }
+          };
+
           ctrl.$onInit = function() {
+            $scope.activeTab = 'Editor';
             ctrl.skill = SkillEditorStateService.getSkill();
           };
         }]
