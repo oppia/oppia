@@ -42,7 +42,8 @@ describe('Story editor page', function() {
   };
   var MockStoryEditorNavigationService = {
     activeTab: 'story_editor',
-    checkIfPresentInChapterEditor: () => true,
+    checkIfPresentInChapterEditor: () => this.activeTab === 'chapter_editor',
+    checkIfPresentInStoryPreviewTab: () => this.activeTab === 'story_preview',
     getActiveTab: () => this.activeTab,
     navigateToChapterEditor: () => {
       this.activeTab = 'chapter_editor';
@@ -50,7 +51,7 @@ describe('Story editor page', function() {
     navigateToStoryEditor: () => {
       this.activeTab = 'story_editor';
     },
-    navigateToStoryPreview: () => {
+    navigateToStoryPreviewTab: () => {
       this.activeTab = 'story_preview';
     }
   };
@@ -138,7 +139,7 @@ describe('Story editor page', function() {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () => true;
     ctrl.$onInit();
     $scope.$broadcast('storyInitialized');
     $scope.$broadcast('storyReinitialized');
@@ -184,6 +185,8 @@ describe('Story editor page', function() {
     });
 
   it('should return the active tab', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     MockStoryEditorNavigationService.navigateToStoryEditor();
     expect(ctrl.getActiveTab()).toEqual('story_editor');
   });
@@ -206,19 +209,57 @@ describe('Story editor page', function() {
     expect(ctrl.warningsAreShown).toEqual(true);
   });
 
-  it('should return if the main editor tab is select', function() {
-    MockStoryEditorNavigationService.navigateToStoryEditor();
+  it('should return true if the main editor tab is select', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     expect(ctrl.isMainEditorTabSelected()).toEqual(true);
-    MockStoryEditorNavigationService.navigateToStoryPreview();
+
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
     expect(ctrl.isMainEditorTabSelected()).toEqual(false);
   });
 
+  it('should check if url contains story preview', function() {
+    spyOn(StoryEditorStateService, 'loadStory').and.stub();
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = (
+      () => false);
+    MockStoryEditorNavigationService.checkIfPresentInStoryPreviewTab = (
+      () => true);
+    ctrl.$onInit();
+    expect(ctrl.isMainEditorTabSelected()).toEqual(false);
+
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+  });
+
+  it('should navigate to story editor', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+    ctrl.navigateToStoryEditor();
+    expect(ctrl.getActiveTab()).toEqual('story_editor');
+  });
+
+  it('should navigate to story preview tab', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
+    ctrl.navigateToStoryPreviewTab();
+    expect(ctrl.getActiveTab()).toEqual('story_preview');
+  });
+
   it('should return the navbar helper text', function() {
-    MockStoryEditorNavigationService.navigateToChapterEditor();
+    MockStoryEditorNavigationService.activeTab = 'chapter_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'chapter_editor';
     expect(ctrl.getNavbarText()).toEqual('Chapter Editor');
-    MockStoryEditorNavigationService.navigateToStoryPreview();
+
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
     expect(ctrl.getNavbarText()).toEqual('Story Preview');
-    MockStoryEditorNavigationService.navigateToStoryEditor();
+
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     expect(ctrl.getNavbarText()).toEqual('Story Editor');
   });
 });

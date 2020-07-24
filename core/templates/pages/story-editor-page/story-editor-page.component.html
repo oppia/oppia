@@ -8,7 +8,7 @@
         <li ng-class="{'navbar-tab-active': $ctrl.isMainEditorTabSelected(), 'uib-dropdown': $ctrl.getTotalWarningsCount()}"
             ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>"
             class="nav-item icon nav-list-item"
-            ng-click="$ctrl.selectMainTab()">
+            ng-click="$ctrl.navigateToStoryEditor()">
           <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab">
             <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected()}">&#xE254;</i>
           </a>
@@ -35,7 +35,7 @@
           </div>
         </li>
 
-        <li ng-if="!($ctrl.getActiveTab() === 'chapter_editor')" ng-class="{'navbar-tab-active': $ctrl.getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.openTopicViewer()">
+        <li ng-if="!($ctrl.getActiveTab() === 'chapter_editor')" ng-class="{'navbar-tab-active': $ctrl.getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.navigateToStoryPreviewTab()">
           <a class="nav-link navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom">
             <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}">&#xE037;</i>
           </a>
@@ -49,6 +49,9 @@
     </div>
     <div ng-if="$ctrl.getActiveTab() === 'chapter_editor'">
       <chapter-editor-tab></chapter-editor-tab>
+    </div>
+    <div ng-if="$ctrl.getActiveTab() === 'story_preview'">
+      <story-preview-tab></story-preview-tab>
     </div>
   </div>
 </div>

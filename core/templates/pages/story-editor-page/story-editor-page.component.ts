@@ -29,6 +29,8 @@ require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
+require(
+  'pages/story-editor-page/story-preview-tab/story-preview-tab.component.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -165,6 +167,14 @@ angular.module('oppia').component('storyEditorPage', {
         _validateStory();
       };
 
+      ctrl.navigateToStoryPreviewTab = function() {
+        StoryEditorNavigationService.navigateToStoryPreviewTab();
+      };
+
+      ctrl.navigateToStoryEditor = function() {
+        StoryEditorNavigationService.navigateToStoryEditor();
+      };
+
       ctrl.$onInit = function() {
         ctrl.validationIssues = [];
         ctrl.prepublishValidationIssues = [];
@@ -173,6 +183,9 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
           StoryEditorNavigationService.navigateToChapterEditor();
+        } else if (
+          StoryEditorNavigationService.checkIfPresentInStoryPreviewTab()) {
+          StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
         $scope.$on(EVENT_STORY_INITIALIZED, _initPage);
         $scope.$on(EVENT_STORY_REINITIALIZED, _initPage);

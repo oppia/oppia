@@ -63,20 +63,38 @@ describe('Story editor navigation service', () => {
     expect(sens.getActiveTab()).toEqual('story_editor');
   });
 
-  it('should return true if url has is in chapter editor', function() {
+  it('should return true if url has is in chapter editor tab', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
       location: mockLocation
     }));
     expect(sens.checkIfPresentInChapterEditor()).toEqual(true);
   });
 
-  it('should return false if the url is not in chapter editor', function() {
-    mockLocation.hash = 'story/';
+  it('should return false if the url is not in chapter editor tab', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
       location: mockLocation
     }));
+    expect(sens.checkIfPresentInChapterEditor()).toEqual(true);
+
+    mockLocation.hash = 'story/';
     expect(sens.checkIfPresentInChapterEditor()).toEqual(false);
     mockLocation.hash = '/chapter_editor/node_1';
+  });
+
+  it('should return true if url is in story preview', function() {
+    mockLocation.hash = '/story_preview/';
+    spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
+      location: mockLocation
+    }));
+    expect(sens.checkIfPresentInStoryPreviewTab()).toEqual(true);
+
+    mockLocation.hash = '/chapter_editor/';
+    expect(sens.checkIfPresentInStoryPreviewTab()).toEqual(false);
+  });
+
+  it('should navigate to story preview tab', function() {
+    sens.navigateToStoryPreviewTab();
+    expect(sens.getActiveTab()).toEqual('story_preview');
   });
 
   it('should navigate to chapter editor', function() {

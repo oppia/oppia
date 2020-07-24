@@ -23,6 +23,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 const STORY_EDITOR = 'story_editor';
 const CHAPTER_EDITOR = 'chapter_editor';
+const STORY_PREVIEW = 'story_preview';
 
 @Injectable({
   providedIn: 'root'
@@ -59,12 +60,21 @@ export class StoryEditorNavigationService {
       }
       return false;
     }
+    checkIfPresentInStoryPreviewTab() {
+      return (
+        this.windowRef.nativeWindow.location.hash.split('/')[1] ===
+          'story_preview');
+    }
     navigateToChapterEditor() {
       this.navigateToChapterEditorWithId(this.chapterId, null);
     }
     navigateToStoryEditor() {
       this.activeTab = STORY_EDITOR;
       this.windowRef.nativeWindow.location.hash = '';
+    }
+    navigateToStoryPreviewTab() {
+      this.windowRef.nativeWindow.location.hash = '/story_preview/';
+      this.activeTab = STORY_PREVIEW;
     }
 }
 
