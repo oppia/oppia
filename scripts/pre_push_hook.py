@@ -343,7 +343,9 @@ def install_hook():
             if e.errno == errno.EEXIST:
                 os.unlink(pre_push_file)
                 os.symlink(os.path.abspath(__file__), pre_push_file)
-                python_utils.PRINT('Unlinked and created symlink in .git/hooks directory')
+                python_utils.PRINT(
+                    'Unlinked and created symlink in .git/hooks directory'
+                )
             else:       # Fail safe
                 shutil.copy(__file__, pre_push_file)
                 python_utils.PRINT('Copied file to .git/hooks directory')
