@@ -1612,7 +1612,7 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
     def test_division_operator_with_spaces(self):
         node_division_operator_with_spaces = astroid.extract_node(
             u"""
-            division = a / b #@
+            a / b #@
             """)
 
         message = testutils.Message(
@@ -1626,7 +1626,7 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
     def test_division_operator_without_spaces(self):
         node_division_operator_without_spaces = astroid.extract_node(
             u"""
-            division = a/b #@
+            a/b #@
             """)
 
         message = testutils.Message(
@@ -1636,14 +1636,6 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_binop(
                 node_division_operator_without_spaces)
-
-    def test_divide_method_used(self):
-        node_with_no_error_message = astroid.extract_node(
-            u"""division = python_utils.divide(a, b)""")
-
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_binop(
-                node_with_no_error_message)
 
 
 class SingleLineCommentCheckerTests(unittest.TestCase):

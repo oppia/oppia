@@ -1230,8 +1230,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         Args:
             node: astroid.node.BinOp. Node to access module content.
         """
-        line = node.as_string()
-        if re.search(br'[^/]/[^/]', line):
+        if node.op == b'/':
             self.add_message(
                 'division-operator-used', node=node)
 
