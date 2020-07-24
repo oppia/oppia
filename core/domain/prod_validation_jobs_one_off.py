@@ -40,6 +40,7 @@ from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
+from core.domain import platform_parameter_domain
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
@@ -1887,7 +1888,7 @@ class ConfigPropertyModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*$'
+        return r'^[A-Za-z0-9_]{1,100}$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1913,7 +1914,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1939,7 +1940,7 @@ class ConfigPropertySnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -6323,6 +6324,83 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
         return [cls._validate_user_settings_with_same_id_not_exist]
 
 
+class PlatformParameterModelValidator(BaseModelValidator):
+    """Class for validating PlatformParameterModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^[A-Za-z0-9_]{1,100}$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version)
+            for version in python_utils.RANGE(1, item.version + 1)]
+        return [
+            ExternalModelFetcherDetails(
+                'snapshot_metadata_ids',
+                config_models.PlatformParameterSnapshotMetadataModel,
+                snapshot_model_ids
+            ),
+            ExternalModelFetcherDetails(
+                'snapshot_content_ids',
+                config_models.PlatformParameterSnapshotContentModel,
+                snapshot_model_ids
+            ),
+        ]
+
+
+class PlatformParameterSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating PlatformParameterSnapshotMetadataModel."""
+
+    EXTERNAL_MODEL_NAME = 'platform parameter'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return platform_parameter_domain.PlatformParameterChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'platform_parameter_ids',
+                config_models.PlatformParameterModel,
+                [item.id[:item.id.find('-')]]
+            ),
+            ExternalModelFetcherDetails(
+                'committer_ids',
+                user_models.UserSettingsModel,
+                [item.committer_id]
+            )
+        ]
+
+
+class PlatformParameterSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating PlatformParameterSnapshotContentModel."""
+
+    EXTERNAL_MODEL_NAME = 'platform parameter'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'platform_parameter_ids',
+                config_models.PlatformParameterModel,
+                [item.id[:item.id.find('-')]]
+            )
+        ]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -6349,6 +6427,11 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ConfigPropertySnapshotMetadataModelValidator),
     config_models.ConfigPropertySnapshotContentModel: (
         ConfigPropertySnapshotContentModelValidator),
+    config_models.PlatformParameterModel: PlatformParameterModelValidator,
+    config_models.PlatformParameterSnapshotMetadataModel: (
+        PlatformParameterSnapshotMetadataModelValidator),
+    config_models.PlatformParameterSnapshotContentModel: (
+        PlatformParameterSnapshotContentModelValidator),
     email_models.SentEmailModel: SentEmailModelValidator,
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
@@ -7329,3 +7412,29 @@ class PseudonymizedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PseudonymizedUserModel]
+
+
+class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.PlatformParameterModel]
+
+
+class PlatformParameterSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.PlatformParameterSnapshotMetadataModel]
+
+
+class PlatformParameterSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.PlatformParameterSnapshotContentModel]
