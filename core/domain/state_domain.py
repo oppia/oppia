@@ -811,7 +811,8 @@ class InteractionInstance(python_utils.OBJECT):
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
                 interaction_id,
-                interaction_dict['customization_args'])
+                interaction_dict['customization_args'],
+                skip_html_cleaning=True)
         )
         ca_specs = interaction_registry.Registry.get_interaction_by_id(
             interaction_id).customization_arg_specs
@@ -839,7 +840,7 @@ class InteractionInstance(python_utils.OBJECT):
 
     @staticmethod
     def convert_customization_args_dict_to_customization_args(
-            interaction_id, customization_args_dict):
+            interaction_id, customization_args_dict, skip_html_cleaning=False):
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
         InteractionCustomizationArg domain object.
@@ -850,6 +851,10 @@ class InteractionInstance(python_utils.OBJECT):
                 argument name to a customization argument dict, which is a dict
                 of the single key 'value' to the value of the customization
                 argument.
+            skip_html_cleaning: boolean. Whether or not to skip html cleaning
+                when constructing the SubtitledHtml domain objects. This
+                should be used if the end goal is to apply conversion functions
+                on the html, and the old html is no longer valid.
 
         Returns:
             dict. A dictionary of customization argument names to the
@@ -864,7 +869,8 @@ class InteractionInstance(python_utils.OBJECT):
         customization_args = {
             spec.name: InteractionCustomizationArg.from_customization_arg_dict(
                 customization_args_dict[spec.name],
-                spec.schema
+                spec.schema,
+                skip_html_cleaning=skip_html_cleaning
             ) for spec in ca_specs
         }
 
@@ -919,8 +925,9 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_customization_arg_dict(cls, ca_dict, ca_schema):
-        """Converts an customization argument dictionary to a
+    def from_customization_arg_dict(
+            cls, ca_dict, ca_schema, skip_html_cleaning=False):
+        """Converts a customization argument dictionary to an
         InteractionCustomizationArgument domain object. This is done by
         traversing the customization argument schema, and converting
         unicode to SubtitledUnicode and html to SubtitledHtml where appropriate.
@@ -930,6 +937,10 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 single key 'value' to the value of the customization argument.
             ca_schema: dict. The schema that defines the customization argument
                 value.
+            skip_html_cleaning: boolean. Whether or not to skip html cleaning
+                when constructing the SubtitledHtml domain objects. This
+                should be used if the end goal is to apply conversion functions
+                on the html, and the old html is no longer valid.
 
         Returns:
             InteractionCustomizationArg. The customization argument domain
@@ -954,7 +965,9 @@ class InteractionCustomizationArg(python_utils.OBJECT):
 
             if obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 return SubtitledHtml(
-                    ca_value['content_id'], ca_value['html'])
+                    ca_value['content_id'],
+                    ca_value['html'],
+                    skip_html_cleaning=skip_html_cleaning)
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
@@ -1059,9 +1072,9 @@ class InteractionCustomizationArg(python_utils.OBJECT):
             search_obj_types: list(str). The specified obj_types to extract
                 values from.
             value_extractor: function. The function that extracts the wanted
-                value from each value that matches the obj_type's. It accepts
-                one parameter, the value that matches the search object type,
-                and optionally returns a property of that value.
+                computed value from each value that matches the obj_types. It
+                accepts one parameter, the value that matches the search object
+                type, and returns a desired computed value.
 
         Returns:
             list(*). A list of the extracted values returned from
@@ -2048,7 +2061,7 @@ class RuleSpec(python_utils.OBJECT):
 class SubtitledHtml(python_utils.OBJECT):
     """Value object representing subtitled HTML."""
 
-    def __init__(self, content_id, html):
+    def __init__(self, content_id, html, skip_html_cleaning=False):
         """Initializes a SubtitledHtml domain object.
 
         Args:
@@ -2056,9 +2069,15 @@ class SubtitledHtml(python_utils.OBJECT):
                 content.
             html: str. A piece of user-submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
+            skip_html_cleaning: boolean. Whether or not to skip html cleaning.
+                This should be used if the end goal is to apply conversion
+                functions on the html, and the old html is no longer valid.
         """
         self.content_id = content_id
-        self.html = html_cleaner.clean(html)
+        if skip_html_cleaning:
+            self.html = html
+        else:
+            self.html = html_cleaner.clean(html)
         self.validate()
 
     def to_dict(self):
@@ -2568,9 +2587,6 @@ class State(python_utils.OBJECT):
         new_content_id_list = list(itertools.chain.from_iterable([
             self.interaction.customization_args[ca_name].get_content_ids()
             for ca_name in self.interaction.customization_args]))
-        if None in new_content_id_list:
-            raise Exception(
-                'content_id from customization argument cannot be None.')
 
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)

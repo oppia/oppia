@@ -2519,7 +2519,7 @@ class Exploration(python_utils.OBJECT):
                     """Initializes a ContentIdCounter object.
 
                     Args:
-                        next_content_id_index: The next content id index.
+                        next_content_id_index: int. The next content id index.
                     """
                     self.next_content_id_index = next_content_id_index
 

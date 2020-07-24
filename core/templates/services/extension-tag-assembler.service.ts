@@ -23,6 +23,8 @@ import { Injectable } from '@angular/core';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { InteractionCustomizationArg } from
+  'domain/exploration/interaction-customization-arg-object.factory';
 
 // Service for assembling extension tags (for interactions).
 @Injectable({
@@ -33,12 +35,14 @@ export class ExtensionTagAssemblerService {
               private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
 
   formatCustomizationArgAttrs(
-      element: JQuery, customizationArgSpecs: Object): JQuery {
-    for (let caSpecName in customizationArgSpecs) {
-      let caSpecValue = customizationArgSpecs[caSpecName].value;
+      element: JQuery,
+      customizationArgs: {[name: string]: InteractionCustomizationArg}
+  ): JQuery {
+    for (let caName in customizationArgs) {
+      let caBackendDictValue = customizationArgs[caName].toBackendDict().value;
       element.attr(
-        this.camelCaseToHyphens.transform(caSpecName) + '-with-value',
-        this.htmlEscaperService.objToEscapedJson(caSpecValue));
+        this.camelCaseToHyphens.transform(caName) + '-with-value',
+        this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
     }
     return element;
   }

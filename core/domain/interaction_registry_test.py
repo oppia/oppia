@@ -128,7 +128,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         interaction specs only include alphabetic letters and are
         lowerCamelCase. This is because these properties are involved in the
         generation of content_ids for customization arguments. Recursion is
-        required because names can be nested within type: 'dict' inside a
+        required because names can be nested within 'type: dict' inside a
         schema.
         """
         all_specs = interaction_registry.Registry.get_all_specs()

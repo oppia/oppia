@@ -110,11 +110,10 @@ def validate_customization_args_and_values(
             # field as one of the properties in its dict schema, we use
             # apply_custom_validators=False so that normalize_against_schema
             # traverses to the nested html schema inside SubtitledHtml and
-            # properly normzalizes the html.
-            # Using apply_custom_validators=True here would apply the
-            # SubtitledHtml's custom validator in objects.py (which is not
-            # implemented) and result in normalize_against_schema
-            # not traversing to the nested html schema.
+            # properly normalizes the html.
+            # Additionally, default values might not pass custom validation
+            # checks (e.g. the Image component has a required field whose
+            # default value is empty).
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
                     customization_args[ca_spec.name]['value'],

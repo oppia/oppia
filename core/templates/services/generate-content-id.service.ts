@@ -53,6 +53,8 @@ export class GenerateContentIdService {
 
   _getNextId(existingComponentIds: Array<string>,
       componentName: string): string {
+    // Worked example questions and explanations do not live in the State domain
+    // so they do not use next content id index.
     if (componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION ||
         componentName ===
         AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION) {
@@ -63,6 +65,8 @@ export class GenerateContentIdService {
   }
 
   _getNextStateId(prefix: string) {
+    // This function is used to generate content_ids for content that live in
+    // the State domain. This includes hints, feedback, and customization args.
     const contentIdIndex = this.stateNextContentIdIndexService.displayed;
     this.stateNextContentIdIndexService.displayed += 1;
     return `${prefix}_${contentIdIndex}`;

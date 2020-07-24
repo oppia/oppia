@@ -106,8 +106,7 @@ export class InteractionCustomizationArgObjectFactory {
   ) {}
 
   createFromBackendDict(
-      customizationArgBackendDict:
-        InteractionCustomizationArgBackendDict,
+      customizationArgBackendDict: InteractionCustomizationArgBackendDict,
       customizationArgSchema: Schema
   ): InteractionCustomizationArg {
     // Find SubtitledHtml and SubtitledUnicode dictionaries in the customization

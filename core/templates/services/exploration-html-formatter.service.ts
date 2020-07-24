@@ -32,6 +32,7 @@ import { SubtitledHtml } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { cloneDeep } from 'lodash';
+import { InteractionCustomizationArg } from 'domain/exploration/interaction-customization-arg-object.factory';
 
 type InteractionCustomizationArgsHtmlValue = (
   Exclude<
@@ -58,45 +59,6 @@ export class ExplorationHtmlFormatterService {
       private htmlEscaper: HtmlEscaperService
   ) {}
   /**
-   * Convert SubtitledHtml to html string and SubtitledUnicode to unicode
-   * string.
-   * @param caValues The customization arg values whose fields should be
-   *  converted.
-   */
-  convertCustomizationArgsToCustomizationArgsHtml(
-      caValues: InteractionCustomizationArgs
-  ) : InteractionCustomizationArgsHtml {
-    const traverseAndConvertSubtitledContentToString = (
-        value: Object[] | Object
-    ) => {
-      let result: InteractionCustomizationArgsHtmlValue;
-
-      if (value instanceof SubtitledUnicode) {
-        result = value.getUnicode();
-      } else if (value instanceof SubtitledHtml) {
-        result = value.getHtml();
-      } else if (value instanceof Array) {
-        result = value.map(element =>
-          traverseAndConvertSubtitledContentToString(element));
-      } else if (value instanceof Object) {
-        result = {};
-        Object.keys(value).forEach(key => {
-          result[key] = traverseAndConvertSubtitledContentToString(value[key]);
-        });
-      }
-
-      return result || value;
-    };
-
-    let convertedCaValues = {};
-    Object.keys(caValues).forEach(key => {
-      convertedCaValues[key] = (
-        traverseAndConvertSubtitledContentToString(caValues[key]));
-    });
-    return convertedCaValues;
-  }
-
-  /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgSpecs - The various
    *   attributes that the interaction depends on.
@@ -112,17 +74,16 @@ export class ExplorationHtmlFormatterService {
    */
   getInteractionHtml(
       interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs,
+      interactionCustomizationArgs:
+        {[name: string]: InteractionCustomizationArg},
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
-    const caHtml = this.convertCustomizationArgsToCustomizationArgsHtml(
-      cloneDeep(interactionCustomizationArgs));
-
     element = (
-      this.extensionTagAssembler.formatCustomizationArgAttrs(element, caHtml));
+      this.extensionTagAssembler.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs));
     element.attr('last-answer', parentHasLastAnswerProperty ?
       'lastAnswer' : 'null');
     if (labelForFocusTarget) {

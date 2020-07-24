@@ -675,8 +675,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state.update_interaction_id('ItemSelectionInput')
         with self.assertRaisesRegexp(
-            Exception,
-            'content_id from customization argument cannot be None.'
+            utils.ValidationError,
+            'Expected content id to be a string, received None'
         ):
             state.update_interaction_customization_args(
                 state_customization_args_dict)
@@ -1586,23 +1586,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-
-        # We cannot use the above html strings as a test for customization args
-        # because the html is cleaned when constructing a SubtitledHtml domain
-        # object, which will remove attributes such as raw-latex-with-value,
-        # causing the conversion function
-        # html_validation_service.add_math_content_to_math_rte_components
-        # to fail.
-        old_customization_arg_html = 'should be in a p tag'
-        new_customization_arg_html = '<p>should be in a p tag</p>'
-        def customization_arg_conversion_fn(html_string):
-            """Conversion function that wraps old_customization_arg_html
-            in p tags, and does not apply any conversions otherwise.
-            """
-            if html_string == old_customization_arg_html:
-                return '<p>%s</p>' % html_string
-            return html_string
-
         written_translations_dict_with_old_math_schema = {
             'translations_mapping': {
                 'content1': {
@@ -1778,7 +1761,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': old_customization_arg_html
+                            'html': html_with_old_math_schema
                         }, {
                             'content_id': 'ca_choices_1',
                             'html': '<p>2</p>'
@@ -1858,7 +1841,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'choices': {
                         'value': [{
                             'content_id': 'ca_choices_0',
-                            'html': new_customization_arg_html
+                            'html': html_with_new_math_schema
                         }, {
                             'content_id': 'ca_choices_1',
                             'html': '<p>2</p>'
@@ -1906,22 +1889,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'written_translations': (
                 written_translations_dict_with_new_math_schema)
         }
-
-        first_conversion_result = (
+        self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components)
-        )
-
-        second_conversion_result = (
-            state_domain.State.convert_html_fields_in_state(
-                first_conversion_result,
-                customization_arg_conversion_fn)
-        )
-
-        self.assertEqual(
-            second_conversion_result,
+                add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_item_selection_interaction(self):
@@ -1936,23 +1908,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
-
-        # We cannot use the above html strings as a test for customization args
-        # because the html is cleaned when constructing a SubtitledHtml domain
-        # object, which will remove attributes such as raw-latex-with-value,
-        # causing the conversion function
-        # html_validation_service.add_math_content_to_math_rte_components
-        # to fail.
-        old_customization_arg_html = 'should be in a p tag'
-        new_customization_arg_html = '<p>should be in a p tag</p>'
-        def customization_arg_conversion_fn(html_string):
-            """Conversion function that wraps old_customization_arg_html
-            in p tags, and does not apply any conversions otherwise.
-            """
-            if html_string == old_customization_arg_html:
-                return '<p>%s</p>' % html_string
-            return html_string
-
         answer_group_with_old_math_schema = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
@@ -2080,7 +2035,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': '<p>init_state customization arg html 1</p>'
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': old_customization_arg_html
+                            'html': html_with_old_math_schema
                         }, {
                             'content_id': 'ca_choices_2',
                             'html': '<p>init_state customization arg html 3</p>'
@@ -2149,7 +2104,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': '<p>init_state customization arg html 1</p>'
                         }, {
                             'content_id': 'ca_choices_1',
-                            'html': new_customization_arg_html
+                            'html': html_with_new_math_schema
                         }, {
                             'content_id': 'ca_choices_2',
                             'html': '<p>init_state customization arg html 3</p>'
@@ -2169,21 +2124,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'ItemSelectionInput'))
         interaction.can_have_solution = True
 
-        first_conversion_result = (
+        self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components)
-        )
-
-        second_conversion_result = (
-            state_domain.State.convert_html_fields_in_state(
-                first_conversion_result,
-                customization_arg_conversion_fn)
-        )
-
-        self.assertEqual(
-            second_conversion_result,
+                add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_text_input_interaction(self):
