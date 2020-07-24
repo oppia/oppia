@@ -196,7 +196,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [([3.5, 1.3], [3.5, 1.3]), ([0, 1], [0, 1])]
         invalid_values_with_error_messages = [
             ('123', 'Expected list, received 123'),
-            ('a', 'Expected list, received a'), ([0, 1, 2], '^$'),
+            ('a', 'Expected list, received a'),
+            ([0, 1, 2], 'Expected length of 2 got 3'),
             (None, 'Expected list, received None'),
             ('-1, 2.2', 'Expected list, received -1, 2.2'),
             (' -1 , 3.5', 'Expected list, received  -1 , 3.5')]
