@@ -74,7 +74,7 @@ def install_hook():
         try:
             os.symlink(os.path.abspath(this_file), pre_commit_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
-        # Raises OSError when the symlink already exists but is broken
+        # Raises OSError when the symlink already exists but is broken.
         except OSError as e:
             if e.errno == errno.EEXIST:
                 os.unlink(pre_commit_file)
@@ -82,10 +82,10 @@ def install_hook():
                 python_utils.PRINT(
                     'Unlinked and created symlink in .git/hooks directory'
                 )
-            else:       # Fail safe
+            else:       # Fail safe.
                 shutil.copy(this_file, pre_commit_file)
                 python_utils.PRINT('Copied file to .git/hooks directory')
-        # Raises AttributeError on windows
+        # Raises AttributeError on windows.
         except AttributeError:
             shutil.copy(this_file, pre_commit_file)
             python_utils.PRINT('Copied file to .git/hooks directory')
