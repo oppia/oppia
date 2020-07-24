@@ -60,8 +60,7 @@ class FractionInput(base.BaseInteraction):
         'name': 'customPlaceholder',
         'description': 'Custom placeholder text (optional)',
         'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode'
+            'type': 'SubtitledUnicode'
         },
         'default_value': {
             'content_id': None,

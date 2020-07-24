@@ -62,7 +62,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             'ImageClickInput',
             $attrs
           );
-          console.log(imageAndRegions)
           ctrl.updateCurrentlyHoveredRegions = function() {
             for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
               var labeledRegion = imageAndRegions.labeledRegions[i];

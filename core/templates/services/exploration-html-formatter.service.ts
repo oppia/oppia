@@ -25,26 +25,10 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IInteractionAnswer } from 'interactions/answer-defs';
-import { InteractionCustomizationArgs, InteractionCustomizationArgsValue } from
+import { InteractionCustomizationArg } from
+  'domain/exploration/interaction-customization-arg-object.factory';
+import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { cloneDeep } from 'lodash';
-import { InteractionCustomizationArg } from 'domain/exploration/interaction-customization-arg-object.factory';
-
-type InteractionCustomizationArgsHtmlValue = (
-  Exclude<
-    InteractionCustomizationArgsValue,
-    SubtitledUnicode | SubtitledHtml | SubtitledUnicode[] | SubtitledHtml[]
-  >);
-
-type InteractionCustomizationArgsHtml = {
-  [caName: string]: {
-    value: InteractionCustomizationArgsHtmlValue
-  }
-};
 
 
 // A service that provides a number of utility functions useful to both the

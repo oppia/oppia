@@ -68,8 +68,16 @@ interface DictSchema {
 }
 
 interface CustomSchema {
-  'type': 'custom',
+  'type': 'custom';
   'obj_type': string;
+}
+
+interface SubtitledHtmlSchema {
+  'type': 'SubtitledHtml';
+}
+
+interface SubtitledUnicodeSchema {
+  'type': 'SubtitledUnicode';
 }
 
 export type Schema = (
@@ -80,7 +88,9 @@ export type Schema = (
   FloatSchema |
   ListSchema |
   DictSchema |
-  CustomSchema
+  CustomSchema |
+  SubtitledHtmlSchema |
+  SubtitledUnicodeSchema
 );
 
 interface DictSchemaDefaultValue {
@@ -134,19 +144,12 @@ export class SchemaDefaultValueService {
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_INT ||
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
-    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM) {
-      let defaultValue = cloneDeep(OBJECT_DEFAULTS[schema.obj_type]);
-
-      if (schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML) {
-        return this.subtitledHtmlObjectFactory.createFromBackendDict(
-          defaultValue);
-      } else if (schema.obj_type ===
-          SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE) {
-        return this.subtitledUnicodeObjectFactory.createFromBackendDict(
-          defaultValue);
-      }
-
-      return defaultValue;
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_HTML) {
+      return this.subtitledHtmlObjectFactory.createFromBackendDict(
+        cloneDeep(OBJECT_DEFAULTS[schema.type]));
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_UNICODE) {
+      return this.subtitledUnicodeObjectFactory.createFromBackendDict(
+        cloneDeep(OBJECT_DEFAULTS[schema.type]));
     } else {
       // TS Ignore is used here to log an error in case of a
       // invalid schema.

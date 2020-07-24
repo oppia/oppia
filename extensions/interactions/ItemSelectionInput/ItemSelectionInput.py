@@ -66,8 +66,7 @@ class ItemSelectionInput(base.BaseInteraction):
         'schema': {
             'type': 'list',
             'items': {
-                'type': 'custom',
-                'obj_type': 'SubtitledHtml',
+                'type': 'SubtitledHtml',
                 'ui_config': {
                     'hide_complex_extensions': True,
                     'placeholder': 'Sample item answer',

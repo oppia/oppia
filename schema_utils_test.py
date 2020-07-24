@@ -30,7 +30,6 @@ SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
 SCHEMA_KEY_PROPERTIES = schema_utils.SCHEMA_KEY_PROPERTIES
 SCHEMA_KEY_TYPE = schema_utils.SCHEMA_KEY_TYPE
-SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
 SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
 SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
@@ -53,19 +52,19 @@ SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
+SCHEMA_TYPE_SUBTITLED_HTML = schema_utils.SCHEMA_TYPE_SUBTITLED_HTML
+SCHEMA_TYPE_SUBTITLED_UNICODE = schema_utils.SCHEMA_TYPE_SUBTITLED_UNICODE
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
-SCHEMA_TYPE_SUBTITLED_HTML = schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
-SCHEMA_TYPE_SUBTITLED_UNICODE = schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
 SCHEMA_TYPE_UNICODE_OR_NONE = schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
-    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE,
-    SCHEMA_TYPE_UNICODE_OR_NONE]
+    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST,
+    SCHEMA_TYPE_SUBTITLED_HTML, SCHEMA_TYPE_SUBTITLED_UNICODE,
+    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
-    'ListOfTabs', 'SkillSelector', 'SvgFilename', 'SubtitledUnicode',
-    'SubtitledHtml']
+    'ListOfTabs', 'SkillSelector', 'SvgFilename']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
@@ -90,6 +89,15 @@ UI_CONFIG_SPECS = {
             'type': SCHEMA_TYPE_UNICODE
         }
     },
+    SCHEMA_TYPE_SUBTITLED_HTML: {
+        'hide_complex_extensions': {
+            'type': SCHEMA_TYPE_BOOL
+        },
+        'placeholder': {
+            'type': SCHEMA_TYPE_UNICODE
+        }
+    },
+    SCHEMA_TYPE_SUBTITLED_HTML: {},
     SCHEMA_TYPE_UNICODE: {
         'rows': {
             'type': SCHEMA_TYPE_INT,
@@ -106,27 +114,6 @@ UI_CONFIG_SPECS = {
             'type': SCHEMA_TYPE_UNICODE,
         },
     },
-}
-
-# Schemas for the UI config for the schemas of type equal to 'custom'. Maps
-# schemas obj_type to the UI config schemas.
-OBJ_TYPE_TO_UI_CONFIG_SPECS = {
-    SCHEMA_TYPE_SUBTITLED_HTML: {
-        'hide_complex_extensions': {
-            'type': SCHEMA_TYPE_BOOL,
-        },
-        'placeholder': {
-            'type': SCHEMA_TYPE_UNICODE,
-        }
-    },
-    SCHEMA_TYPE_SUBTITLED_UNICODE: {
-        'hide_complex_extensions': {
-            'type': SCHEMA_TYPE_BOOL,
-        },
-        'placeholder': {
-            'type': SCHEMA_TYPE_UNICODE,
-        }
-    }
 }
 
 # Schemas for validators for the various types.
@@ -202,16 +189,9 @@ VALIDATOR_SPECS = {
 }
 
 
-def _validate_ui_config(schema):
+def _validate_ui_config(obj_type, ui_config):
     """Validates the value of a UI configuration."""
-    schema_type = schema[SCHEMA_KEY_TYPE]
-    ui_config = schema[SCHEMA_KEY_UI_CONFIG]
-
-    if schema_type == schema_utils.SCHEMA_TYPE_CUSTOM:
-        schema_obj_type = schema[SCHEMA_KEY_OBJ_TYPE]
-        reference_dict = OBJ_TYPE_TO_UI_CONFIG_SPECS[schema_obj_type]
-    else:
-        reference_dict = UI_CONFIG_SPECS[schema_type]
+    reference_dict = UI_CONFIG_SPECS[obj_type]
     assert set(ui_config.keys()) <= set(reference_dict.keys())
     for key, value in ui_config.items():
         schema_utils.normalize_against_schema(
@@ -281,7 +261,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            OPTIONAL_SCHEMA_KEYS)
+            [])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
@@ -314,7 +294,8 @@ def validate_schema(schema):
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
     if SCHEMA_KEY_UI_CONFIG in schema:
-        _validate_ui_config(schema)
+        _validate_ui_config(
+            schema[SCHEMA_KEY_TYPE], schema[SCHEMA_KEY_UI_CONFIG])
 
     if SCHEMA_KEY_POST_NORMALIZERS in schema:
         assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list)
@@ -618,14 +599,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [(1.2, 1.2), (3, 3.0), (-1, -1.0), ('1', 1.0)]
         invalid_vals = [[13], 'abc', None]
-        self.check_normalization(schema, mappings, invalid_vals)
-
-    def test_unicode_or_none_schema(self):
-        schema = {
-            'type': schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE,
-        }
-        mappings = [(b'', ''), ('hello', 'hello'), (None, None)]
-        invalid_vals = [[13], 3, {}]
         self.check_normalization(schema, mappings, invalid_vals)
 
     def test_list_schema_with_len(self):

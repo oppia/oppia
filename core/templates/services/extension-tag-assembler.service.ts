@@ -38,7 +38,7 @@ export class ExtensionTagAssemblerService {
       element: JQuery,
       customizationArgs: {[name: string]: InteractionCustomizationArg}
   ): JQuery {
-    for (let caName in customizationArgs) {
+    for (const caName in customizationArgs) {
       let caBackendDictValue = customizationArgs[caName].toBackendDict().value;
       element.attr(
         this.camelCaseToHyphens.transform(caName) + '-with-value',

@@ -42,8 +42,7 @@ class SetInput(base.BaseInteraction):
         'name': 'buttonText',
         'description': 'Label for the \'Add Item\' button',
         'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode'
+            'type': 'SubtitledUnicode'
         },
         'default_value': {
             'content_id': None,

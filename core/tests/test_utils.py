@@ -1158,15 +1158,12 @@ tags: []
             """
             schema_type = schema['type']
 
-            is_subtitled_html_spec = False
-            is_subtitled_unicode_spec = False
-            if schema_type == schema_utils.SCHEMA_TYPE_CUSTOM:
-                is_subtitled_html_spec = (
-                    schema['obj_type'] ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
-                is_subtitled_unicode_spec = (
-                    schema['obj_type'] ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+            is_subtitled_html_spec = (
+                schema_type ==
+                schema_utils.SCHEMA_TYPE_SUBTITLED_HTML)
+            is_subtitled_unicode_spec = (
+                schema_type ==
+                schema_utils.SCHEMA_TYPE_SUBTITLED_UNICODE)
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
                 value['content_id'] = '%s_%i' % (

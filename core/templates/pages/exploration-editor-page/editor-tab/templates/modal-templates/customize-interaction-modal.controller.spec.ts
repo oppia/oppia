@@ -474,8 +474,7 @@ describe('Customize Interaction Modal Controller', function() {
                 properties: [{
                   name: 'content',
                   schema: {
-                    type: 'custom',
-                    obj_type: 'SubtitledUnicode'
+                    type: 'SubtitledUnicode'
                   }
                 }, {
                   name: 'show',

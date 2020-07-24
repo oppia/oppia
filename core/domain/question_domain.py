@@ -439,22 +439,16 @@ class Question(python_utils.OBJECT):
             ca_name = ca_spec.name
             content_id_prefix = 'ca_%s_' % ca_name
 
-            is_subtitled_html_spec = False
-            is_subtitled_unicode_spec = False
-            if schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM:
-                is_subtitled_html_spec = (
-                    schema['obj_type'] ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
-                is_subtitled_unicode_spec = (
-                    schema['obj_type'] ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
-
+            is_subtitled_html_spec = (
+                schema['type'] ==
+                schema_utils.SCHEMA_TYPE_SUBTITLED_HTML)
+            is_subtitled_unicode_spec = (
+                schema['type'] ==
+                schema_utils.SCHEMA_TYPE_SUBTITLED_UNICODE)
             is_subtitled_html_list_spec = (
                 schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
                 (schema['items']['type'] ==
-                 schema_utils.SCHEMA_TYPE_CUSTOM) and
-                (schema['items']['obj_type'] ==
-                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML))
+                 schema_utils.SCHEMA_TYPE_SUBTITLED_HTML))
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
                 # Default is a SubtitledHtml dict or SubtitleUnicode dict.

@@ -48,8 +48,7 @@ class TextInput(base.BaseInteraction):
         'name': 'placeholder',
         'description': 'Placeholder text (optional)',
         'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode'
+            'type': 'SubtitledUnicode'
         },
         'default_value': {
             'content_id': None,

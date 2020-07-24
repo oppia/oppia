@@ -27,6 +27,8 @@ import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { InteractionCustomizationArg } from
+  'domain/exploration/interaction-customization-arg-object.factory';
 
 describe('Exploration Html Formatter Service', () => {
   let ehfs: ExplorationHtmlFormatterService = null;
@@ -42,52 +44,17 @@ describe('Exploration Html Formatter Service', () => {
      ' editor mode', () => {
     var interactionId = 'TextInput';
     let custArgs = {
-      placeholder: {
-        value: new SubtitledUnicode('enter here', '')
-      },
-      rows: { value: 1 }
+      placeholder: new InteractionCustomizationArg(
+        new SubtitledUnicode('enter here', '')),
+      rows: new InteractionCustomizationArg(1)
     };
     var expectedHtmlTag = '<oppia-interactive-text-input ' +
-      'placeholder-with-value="&amp;quot;enter here&amp;quot;" ' +
-      'rows-with-value="1" last-answer="lastAnswer">' +
+      'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
+      'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
+      'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
       '</oppia-interactive-text-input>';
     expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null))
       .toBe(expectedHtmlTag);
-  });
-
-  it('should correctly convert SubtitledUnicode and SubtitledHtml', () => {
-    // No interactions currently have dictionaries in their customization
-    // arguments, but we test here for coverage + future development.
-    let convertedCA = ehfs.convertCustomizationArgsToCustomizationArgsHtml(
-      {
-        test: [
-          {
-            content: new SubtitledUnicode('first', ''),
-            show: true
-          },
-          {
-            content: new SubtitledUnicode('second', ''),
-            show: true
-          }
-        ],
-        test2: new SubtitledHtml('third', '')
-      }
-    );
-
-    expect(convertedCA)
-      .toEqual({
-        test: [
-          {
-            content: 'first',
-            show: true
-          },
-          {
-            content: 'second',
-            show: true
-          }
-        ],
-        test2: 'third'
-      });
   });
 
   it('should correctly set interaction HTML when it is in player mode',

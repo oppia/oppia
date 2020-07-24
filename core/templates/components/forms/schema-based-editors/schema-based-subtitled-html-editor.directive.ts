@@ -13,33 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for subtitled HTML editor.
+ * @fileoverview Directive for a schema-based editor for subtitled HTML.
  */
 
-angular.module('oppia').directive('subtitledHtmlEditor', [
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+
+angular.module('oppia').directive('schemaBasedSubtitledHtmlEditor', [
   function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
-        value: '=',
-        getInitArgs: '&'
+        localValue: '=',
+        isDisabled: '&',
+        labelForFocusTarget: '&',
+        uiConfig: '&'
       },
-      template: require('./subtitled-html-editor.directive.html'),
+      template: require('./schema-based-subtitled-html-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.initArgs = ctrl.getInitArgs();
-          ctrl.schema = { type: 'html' };
-
-          if (ctrl.initArgs &&
-            ctrl.initArgs.schema &&
-            ctrl.initArgs.schema.ui_config
-          ) {
-            ctrl.schema.ui_config = ctrl.initArgs.schema.ui_config;
-          }
-        };
-      }]
+      controller: [function() {}]
     };
   }]);

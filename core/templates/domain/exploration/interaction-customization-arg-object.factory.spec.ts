@@ -49,8 +49,7 @@ describe('Interaction customization arg object factory', () => {
       caBackendDict,
       {
         items: {
-          type: 'custom',
-          obj_type: 'SubtitledHtml',
+          type: 'SubtitledHtml'
         },
         type: 'list',
       }
@@ -92,8 +91,7 @@ describe('Interaction customization arg object factory', () => {
           properties: [{
             name: 'content',
             schema: {
-              type: 'custom',
-              obj_type: 'SubtitledUnicode'
+              type: 'SubtitledUnicode'
             }
           }, {
             name: 'show',
@@ -144,8 +142,7 @@ describe('Interaction customization arg object factory', () => {
           properties: [{
             name: 'content',
             schema: {
-              type: 'custom',
-              obj_type: 'SubtitledUnicode'
+              type: 'SubtitledUnicode'
             }
           }, {
             name: 'show',

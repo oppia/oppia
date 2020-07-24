@@ -116,36 +116,22 @@ describe('Schema Default Value Service', () => {
     expect(sdvs.getDefaultValue(schema)).toBe(0);
   });
 
-  it('should get default value if schema type is custom with obj_type as ' +
-     'SubtitledHtml', () => {
+  it('should get default value if schema type SubtitledHtml', () => {
     let schema = {
-      type: 'custom',
-      obj_type: 'SubtitledHtml'
+      type: 'SubtitledHtml',
     };
     expect(
       sdvs.getDefaultValue(schema)
     ).toEqual(new SubtitledHtml('', null));
   });
 
-  it('should get default value if schema type is custom with obj_type as ' +
-     'SubtitledUnicode', () => {
+  it('should get default value if schema type is SubtitledUnicode', () => {
     let schema = {
-      type: 'custom',
-      obj_type: 'SubtitledUnicode'
+      type: 'SubtitledUnicode',
     };
     expect(
       sdvs.getDefaultValue(schema)
     ).toEqual(new SubtitledUnicode('', null));
-  });
-
-  it('should get default value if schema type is custom', () => {
-    let schema = {
-      type: 'custom',
-      obj_type: 'CodeString'
-    };
-    expect(
-      sdvs.getDefaultValue(schema)
-    ).toEqual('');
   });
 
   it('should not get default value if schema type is invalid', () => {

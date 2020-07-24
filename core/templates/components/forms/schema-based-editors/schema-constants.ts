@@ -23,8 +23,7 @@ export class SchemaConstants {
   static readonly SCHEMA_TYPE_FLOAT = 'float';
   static readonly SCHEMA_TYPE_HTML = 'html';
   static readonly SCHEMA_TYPE_INT = 'int';
+  static readonly SCHEMA_TYPE_SUBTITLED_HTML = 'SubtitledHtml';
+  static readonly SCHEMA_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode';
   static readonly SCHEMA_TYPE_UNICODE = 'unicode';
-
-  static readonly SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml';
-  static readonly SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode';
 }

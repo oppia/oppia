@@ -276,10 +276,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
               property.schema,
               `${contentIdPrefix}_${name}`);
           });
-        } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
-            ((schema.obj_type ===
-              SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE) ||
-            schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+        } else if (
+          schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_UNICODE ||
+          schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_HTML
         ) {
           if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
             (<SubtitledHtml|SubtitledUnicode>value).setContentId(

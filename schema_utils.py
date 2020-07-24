@@ -55,9 +55,8 @@ SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
-
-SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
-SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
+SCHEMA_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
+SCHEMA_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
@@ -93,7 +92,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
                 obj, obj_class.SCHEMA, apply_custom_validators=False)
         else:
             normalized_obj = obj_class.normalize(obj)
-    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
+    elif (schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT or
+                schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_HTML or
+                schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_UNICODE):
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
             p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]

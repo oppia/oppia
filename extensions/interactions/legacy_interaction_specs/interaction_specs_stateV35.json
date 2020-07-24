@@ -129,8 +129,7 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "custom",
-            "obj_type": "SubtitledHtml",
+            "type": "SubtitledHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to drag and drop."
@@ -219,8 +218,7 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "custom",
-            "obj_type": "SubtitledHtml",
+            "type": "SubtitledHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Sample item answer"
@@ -261,8 +259,7 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "SubtitledUnicode"
         },
         "default_value": {
           "content_id": null,
@@ -444,8 +441,7 @@
         "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "SubtitledUnicode"
         },
         "default_value": {
           "content_id": null,
@@ -626,8 +622,7 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "custom",
-            "obj_type": "SubtitledHtml",
+            "type": "SubtitledHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to select"
@@ -719,8 +714,7 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "SubtitledUnicode"
         },
         "default_value": {
           "content_id": null,
@@ -949,8 +943,7 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "custom",
-          "obj_type": "SubtitledUnicode"
+          "type": "SubtitledUnicode"
         },
         "default_value": {
           "content_id": null,

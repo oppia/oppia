@@ -199,8 +199,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'name': 'placeholder',
                 'description': 'Placeholder text (optional)',
                 'schema': {
-                    'type': 'custom',
-                    'obj_type': 'SubtitledUnicode'
+                    'type': 'SubtitledUnicode'
                 },
                 'default_value': {
                     'content_id': None,

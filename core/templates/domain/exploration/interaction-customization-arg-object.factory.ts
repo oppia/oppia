@@ -130,19 +130,14 @@ export class InteractionCustomizationArgObjectFactory {
           result[name] = traverseSchemaAndConvertSubtitledFromDicts(
             value[name], property.schema);
         });
-      } else if (schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM) {
-        if (schema.obj_type ===
-            SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
-        ) {
-          result = this.subtitledHtmlObjectFactory.createFromBackendDict(
-            <SubtitledHtmlBackendDict> value);
-        } else if (schema.obj_type ===
-            SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE) {
-          result = this.subtitledUnicodeObjectFactory.createFromBackendDict(
-            <SubtitledUnicodeBackendDict> value);
-        }
+      } else if (schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_HTML) {
+        result = this.subtitledHtmlObjectFactory.createFromBackendDict(
+          <SubtitledHtmlBackendDict> value);
+      } else if (schema.type ===
+          SchemaConstants.SCHEMA_TYPE_SUBTITLED_UNICODE) {
+        result = this.subtitledUnicodeObjectFactory.createFromBackendDict(
+          <SubtitledUnicodeBackendDict> value);
       }
-
       return result;
     };
     const customizationArg = traverseSchemaAndConvertSubtitledFromDicts(
