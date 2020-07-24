@@ -262,69 +262,28 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         stats_models.CompleteExplorationEventLogEntryModel,
                         stats_models.StartExplorationEventLogEntryModel,
                         stats_models.StateHitEventLogEntryModel))):
-            if isinstance(
-                    item, stats_models.CompleteExplorationEventLogEntryModel):
-                event_dict = {
-                    'event_type': class_name_to_event_type[
-                        'CompleteExplorationEventLogEntryModel'],
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                }
-            elif isinstance(
-                    item, stats_models.StartExplorationEventLogEntryModel):
-                event_dict = {
-                    'event_type': class_name_to_event_type[
-                        'StartExplorationEventLogEntryModel'],
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                }
-            elif isinstance(
-                    item, stats_models.StateHitEventLogEntryModel):
-                event_dict = {
-                    'event_type': class_name_to_event_type[
-                        'StateHitEventLogEntryModel'],
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                }
-
+            event_dict = {
+                'event_type': class_name_to_event_type[type(item).__name__],
+                'version': item.exploration_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
             return (item.exploration_id, event_dict)
 
         elif (
                 isinstance(item, (
                     stats_models.SolutionHitEventLogEntryModel,
                     stats_models.ExplorationActualStartEventLogEntryModel))):
-            if isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-                event_dict = {
-                    'event_type': class_name_to_event_type[
-                        'SolutionHitEventLogEntryModel'],
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                }
-            elif isinstance(
-                    item,
-                    stats_models.ExplorationActualStartEventLogEntryModel):
-                event_dict = {
-                    'event_type': class_name_to_event_type[
-                        'ExplorationActualStartEventLogEntryModel'],
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                }
-
+            event_dict = {
+                'event_type': class_name_to_event_type[type(item).__name__],
+                'version': item.exp_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
             return (item.exp_id, event_dict)
 
     @staticmethod
