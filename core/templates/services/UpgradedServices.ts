@@ -603,7 +603,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { CommandExecutorService } from 'pages/exploration-player-page/services/command-executor.service';
+import { CommandExecutorService } from 
+'pages/exploration-player-page/services/command-executor.service';
 
 @Injectable({
   providedIn: 'root'
@@ -1478,7 +1479,8 @@ export class UpgradedServices {
       upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']);
-    upgradedServices['CommandExecutorService'] = new CommandExecutorService(upgradedServices['WindowRef']);
+    upgradedServices['CommandExecutorService'] = new CommandExecutorService(
+      upgradedServices['WindowRef']);
 
     /* eslint-enable dot-notation */
     return upgradedServices;

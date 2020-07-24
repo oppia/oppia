@@ -136,7 +136,6 @@ export class CommandExecutorService{
     var boxes = windowRef.nativeWindow.document.getElementsByClassName('form-control ng-pristine ng-untouched ng-valid ng-empty')
     for (var i = 0; i < boxes.length; i++) {
       if (boxes[i].value == element) {
-        //remove the element at i
         var deleteButton = windowRef.nativeWindow.document.getElementsByClassName('material-icons md-18')
         deleteButton[i].click()
       }
@@ -160,7 +159,6 @@ export class CommandExecutorService{
     var button = windowRef.nativeWindow.document.getElementsByClassName("multiple-choice-outer-radio-button")[message-1] as HTMLElement
     button.click()
   }
-
 }
 
 angular.module('oppia').factory(
