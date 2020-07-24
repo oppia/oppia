@@ -54,4 +54,6 @@ export namespace ImprovementsConstants {
     `/improvements/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
   export const EXPLORATION_IMPROVEMENTS_HISTORY_URL: string = (
     `/improvements/history/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
+  export const EXPLORATION_IMPROVEMENTS_CONFIG_URL: string = (
+    `/improvements/config/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
 }
