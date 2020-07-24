@@ -17,12 +17,11 @@
  * any learner answer info.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationDataService } from
-  'exploration-data.service';
+  'pages/exploration-editor-page/services/exploration-data.service';
 import { LearnerAnswerDetails } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfo } from
@@ -37,75 +36,76 @@ export class LearnerAnswerDetailsDataService {
     private explorationDataService:ExplorationDataService,
     private http:HttpClient,
     private urlInterpolationService: UrlInterpolationService,
-  ){}
-    _expId: string;
-    _data: [];
-    learnerAnswerInfoData=null;
-    LEARNER_ANSWER_INFO_DATA_URL = (
-      '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
-      '<entity_id>'
-    );
+  ) {}
+  _expId: string;
+  _data: [];
+  learnerAnswerInfoData=null;
+  LEARNER_ANSWER_INFO_DATA_URL = (
+    '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
+    '<entity_id>'
+  );
 
-   private _fetchLearnerAnswerInfoData(){
-      const learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
-        this.LEARNER_ANSWER_INFO_DATA_URL, {
-        entity_type : 'exploration',
-        entity_id : this._expId
-        });
-        return this.http.get(learnerAnswerInfoDataUrl).toPromise();
-    }
-    private _deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId){
-      const learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
-        this.LEARNER_ANSWER_INFO_DATA_URL,{
-          entity_type:'exploration',
-          entity_id:entityId
-        });
-      return this.http.delete(learnerAnswerInfoDataUrl, {
-        params: {
-          state_name: stateName,
-          learner_answer_info_id: learnerAnswerInfoId
-        }
+  private _fetchLearnerAnswerInfoData() {
+    const learnerAnswerInfoDataUrl =
+      this.urlInterpolationService.interpolateUrl(
+      this.LEARNER_ANSWER_INFO_DATA_URL, {
+      entity_type: 'exploration',
+      entity_id: this._expId
       });
-    };
-    public getData() {
-      return this._data;
-    }
-    public fetchLearnerAnswerInfoData() {
-      return this._fetchLearnerAnswerInfoData().toPromise().then(
-        (response)=>{
-          this.learnerAnswerInfoData = response.body.learner_answer_info_data;
-          for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
-            const stateName = this.learnerAnswerInfoData[i].state_name;
-            const interactionId = this.learnerAnswerInfoData[i].interaction_id;
-            const customizationArgs = 
-            this.learnerAnswerInfoData[i].customization_args;
-            const learnerAnswerInfoDicts = (
-              this.learnerAnswerInfoData[i].learner_answer_info_dicts
-            );
-            const learnerAnswerDetails = (
-              LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
-                this._expId, stateName, interactionId, customizationArgs,
-                learnerAnswerInfoDicts.map(
-                  LearnerAnswerInfo.createFormBackendDict
-                )
+      return this.http.get(learnerAnswerInfoDataUrl).toPromise();
+  }
+  private _deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
+    const learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
+      this.LEARNER_ANSWER_INFO_DATA_URL,{
+        entity_type: 'exploration',
+        entity_id: entityId
+      });
+    return this.http.delete(learnerAnswerInfoDataUrl, {
+      params: {
+        state_name: stateName,
+        learner_answer_info_id: learnerAnswerInfoId
+      }
+    });
+  }
+  public getData() {
+    return this._data;
+  }
+  public fetchLearnerAnswerInfoData() {
+    return this._fetchLearnerAnswerInfoData().toPromise().then(
+      (response)=>{
+        this.learnerAnswerInfoData = response.learner_answer_info_data;
+        for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
+          const stateName = this.learnerAnswerInfoData[i].state_name;
+          const interactionId = this.learnerAnswerInfoData[i].interaction_id;
+          const customizationArgs = 
+          this.learnerAnswerInfoData[i].customization_args;
+          const learnerAnswerInfoDicts = (
+            this.learnerAnswerInfoData[i].learner_answer_info_dicts
+          );
+          const learnerAnswerDetails = (
+            LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
+              this._expId, stateName, interactionId, customizationArgs,
+              learnerAnswerInfoDicts.map(
+                LearnerAnswerInfo.createFormBackendDict
               )
-            );
-            this._data.push(learnerAnswerDetails);
-          }
-          return response.body;
+            )
+          );
+          this._data.push(learnerAnswerDetails);
         }
-      );
-    }
-    public deleteLearnerAnswerInfo(entityId,stateName, learnerAnswerInfoId) {
-      return this._deleteLearnerAnswerInfo(
-        entityId,stateName,learnerAnswerInfoId
-      ).toPromise().then((response)=>{
-        return response.status;
-      },
-      (errorResponse)=>{
-        return Promise.reject(errorResponse.body);
-      });
-    }
+        return response;
+      }
+    );
+  }
+  public deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
+    return this._deleteLearnerAnswerInfo(
+      entityId,stateName,learnerAnswerInfoId
+    ).toPromise().then((response)=>{
+      return response.status;
+    },
+    (errorResponse)=>{
+      return Promise.reject(errorResponse.body);
+    });
+  }
 }
-angular.module('oppia').factory('LearnerAnswerDetailsDataService', 
+angular.module('oppia').factory('LearnerAnswerDetailsDataService',
   downgradeInjectable(LearnerAnswerDetailsDataService));
