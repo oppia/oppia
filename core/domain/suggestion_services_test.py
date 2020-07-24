@@ -978,7 +978,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         exploration with id exp_id. The author of the created suggestion is
         author_id.
         """
-
         # Gets the html content in the exploration to be translated.
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         content_html = exploration.states['State 1'].content.html
@@ -999,7 +998,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'test description')
 
         # Check that there is only one suggestion associated with the
-        # exploration and that the suggestion is in review.
+        # exploration and that the suggestion is out for review.
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])
         self.assertEqual(len(suggestions), 1)
@@ -1123,7 +1122,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
     def test_delete_topic_rejects_translation_suggestion(self):
-
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id)
 
