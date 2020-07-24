@@ -48,15 +48,16 @@ export class LearnerAnswerDetailsDataService {
   private _fetchLearnerAnswerInfoData() {
     const learnerAnswerInfoDataUrl =
       this.urlInterpolationService.interpolateUrl(
-      this.LEARNER_ANSWER_INFO_DATA_URL, {
-      entity_type: 'exploration',
-      entity_id: this._expId
-      });
-      return this.http.get(learnerAnswerInfoDataUrl).toPromise();
+        this.LEARNER_ANSWER_INFO_DATA_URL, {
+          entity_type: 'exploration',
+          entity_id: this._expId
+        });
+        return this.http.get(learnerAnswerInfoDataUrl).toPromise();
   }
-  private _deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
+  private _deleteLearnerAnswerInfo(
+    entityId, stateName, learnerAnswerInfoId) {
     const learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
-      this.LEARNER_ANSWER_INFO_DATA_URL,{
+      this.LEARNER_ANSWER_INFO_DATA_URL, {
         entity_type: 'exploration',
         entity_id: entityId
       });
@@ -77,7 +78,7 @@ export class LearnerAnswerDetailsDataService {
         for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
           const stateName = this.learnerAnswerInfoData[i].state_name;
           const interactionId = this.learnerAnswerInfoData[i].interaction_id;
-          const customizationArgs = 
+          const customizationArgs =
           this.learnerAnswerInfoData[i].customization_args;
           const learnerAnswerInfoDicts = (
             this.learnerAnswerInfoData[i].learner_answer_info_dicts
@@ -98,7 +99,7 @@ export class LearnerAnswerDetailsDataService {
   }
   public deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
     return this._deleteLearnerAnswerInfo(
-      entityId,stateName,learnerAnswerInfoId
+      entityId, stateName, learnerAnswerInfoId
     ).toPromise().then((response)=>{
       return response.status;
     },
