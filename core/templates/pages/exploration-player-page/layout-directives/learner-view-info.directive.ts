@@ -17,7 +17,7 @@
  * footer.
  */
 
-require('components/profile-link-directives/profile-link-image.directive.ts');
+require('components/profile-link-directives/profile-link-image.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.component.ts');
