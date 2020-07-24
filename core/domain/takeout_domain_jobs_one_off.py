@@ -34,6 +34,7 @@ import python_utils
     models.NAMES.topic, models.NAMES.question
 ])
 
+
 class SnapshotMetadataCommitMsgMigrationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that indexes the commit_message field of the
