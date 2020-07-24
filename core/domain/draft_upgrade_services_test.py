@@ -391,10 +391,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # Migrate exploration to state schema version 35.
         self.create_and_migrate_new_exploration('34', '35')
         with self.assertRaisesRegexp(
-                Exception, 'Conversion cannot be completed.'):
+            Exception, 'Conversion cannot be completed.'):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                    draft_change_list_v34, 1, 2, self.EXP_ID)
-        
+                draft_change_list_v34, 1, 2, self.EXP_ID)
 
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (
