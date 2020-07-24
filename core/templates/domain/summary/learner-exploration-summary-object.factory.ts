@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface ExpRatings {
+export interface ExplorationRatings {
   '1': number;
   '2': number;
   '3': number;
@@ -38,7 +38,7 @@ export interface LearnerExplorationSummaryBackendDict {
   'community_owned': boolean;
   'activity_type': string;
   'last_updated_msec': number;
-  'ratings': ExpRatings;
+  'ratings': ExplorationRatings;
   'id': string;
   'created_on_msec': number;
   'human_readable_contributors_summary': HumanReadableContributorsSummary;
@@ -68,7 +68,7 @@ export class LearnerExplorationSummary {
       public activityType: string,
       public lastUpdatedMsec: number,
       public createdOnMsec: number,
-      public ratings: ExpRatings,
+      public ratings: ExplorationRatings,
       public humanReadableContributorsSummary:
       HumanReadableContributorsSummary) {}
 }

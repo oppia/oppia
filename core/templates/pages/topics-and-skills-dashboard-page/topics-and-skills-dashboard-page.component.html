@@ -101,11 +101,12 @@
                          items-per-page="$ctrl.itemsPerPage"
                          editable-topic-summaries="$ctrl.editableTopicSummaries"
                          mergeable-skill-summaries="$ctrl.mergeableSkillSummaries"
+                         untriaged-skill-summaries="$ctrl.untriagedSkillSummaries"
                          user-can-create-skill="$ctrl.userCanCreateSkill"
                          user-can-delete-skill="$ctrl.userCanDeleteSkill"
                          skills-categorized-by-topics="$ctrl.skillsCategorizedByTopics">
             </skills-list>
-            <p class="intro-card-message" ng-if="!$ctrl.displayedSkillSummaries.length">
+            <p class="intro-card-message protractor-test-no-skills-present-message" ng-if="!$ctrl.displayedSkillSummaries.length">
               No skills to display.
             </p>
           </div>
@@ -153,14 +154,14 @@
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
               <span class="topic-skill-filter-reset protractor-test-topic-filter-reset" ng-click="$ctrl.resetFilters()">Reset</span>
-              <i class="fa fa-times dashboard-cross-icon"  ng-click="$ctrl.toggleFilterBox()"></i>
+              <i class="fa fa-times dashboard-cross-icon" ng-click="$ctrl.toggleFilterBox()"></i>
             </div>
             <div class="topic-skill-filter-header-mobile">
               <div class="topic-skill-filter-heading">
                 <span>Filter</span>
               </div>
               <div class="topic-skill-filter-action-box">
-                <i class="fa fa-times dashboard-cross-icon"  ng-click="$ctrl.toggleFilterBox()"></i>
+                <i class="fa fa-times dashboard-cross-icon" ng-click="$ctrl.toggleFilterBox()"></i>
                 <div class="topic-skill-filter-action-reset">
                   <span ng-click="$ctrl.resetFilters()">Reset</span>
                 </div>

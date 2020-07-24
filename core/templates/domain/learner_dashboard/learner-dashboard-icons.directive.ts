@@ -58,10 +58,8 @@ angular.module('oppia').directive('learnerDashboardIcons', [
           });
 
           LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
-            function(response) {
-              $scope.learnerDashboardActivityIds = (
-                LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
-                  response.learner_dashboard_activity_ids));
+            function(learnerDashboardActivityIds) {
+              $scope.learnerDashboardActivityIds = learnerDashboardActivityIds;
             }
           );
 

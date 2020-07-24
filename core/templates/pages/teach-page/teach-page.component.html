@@ -1,5 +1,5 @@
 <div class="oppia-static-header">
-  <h1 translate="I18N_TEACH_PAGE_HEADING"></h1>
+  <h1 [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
 </div>
 <background-banner></background-banner>
 <div>
@@ -7,20 +7,20 @@
     <div class="oppia-page-card oppia-static-content">
       <div class="about-nav oppia-about-teach-tabs">
         <ul class="oppia-about-tabs">
-          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_TEACH}">
-            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_TEACH)" class="oppia-about-tabs-text" href="" id="teach" translate="I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA">
+          <li [ngClass]="{'oppia-about-tabs-active': activeTabName === TAB_ID_TEACH}">
+            <a (click)="onTabClick(TAB_ID_TEACH)" class="oppia-about-tabs-text" id="teach" [innerHTML]="'I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA' | translate">
 
             </a>
           </li>
-          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_PARTICIPATION}">
-            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_PARTICIPATION)" class="oppia-about-tabs-text" href="" id="participation" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
+          <li [ngClass]="{'oppia-about-tabs-active': activeTabName === TAB_ID_PARTICIPATION}">
+            <a (click)="onTabClick(TAB_ID_PARTICIPATION)" class="oppia-about-tabs-text" id="participation" [innerHTML]="'I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK' | translate">
             </a>
           </li>
         </ul>
       </div>
 
       <div class="about-tab-container">
-        <div class="teach oppia-about-tab-content oppia-teach-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_TEACH}">
+        <div class="teach oppia-about-tab-content oppia-teach-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_TEACH}">
 
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
             <h2>Teach with Oppia</h2>
@@ -31,66 +31,66 @@
               The story-based lessons we're creating relate mathematics to a student's real-life experience (similar to this <a href="https://www.oppia.org/explore/DIWZiVgs0km-?collection_id=4UgTQUc1tala">sample lesson</a> on Fractions). We want them to be demonstrably effective, to represent the best that can be done with online teaching, and to be available to anyone free-of-charge. We also plan to improve the lessons over time, so that they're as useful for as many students around the world as possible.
             </p>
             <p>
-              The <a ng-href="<[$ctrl.TEACH_FORM_URL]>"><em>Teach with Oppia</em></a> program invites applications from volunteers who can demonstrate a passion and aptitude for helping students learn basic mathematics. Participants will receive personalized feedback on the lessons they create, as well as assistance with playtesting and promoting their lessons. They'll also be able to connect with other like-minded creators, as well as the Oppia development team, to ensure their creations are well-realized.
+              The <a [href]="TEACH_FORM_URL"><em>Teach with Oppia</em></a> program invites applications from volunteers who can demonstrate a passion and aptitude for helping students learn basic mathematics. Participants will receive personalized feedback on the lessons they create, as well as assistance with playtesting and promoting their lessons. They'll also be able to connect with other like-minded creators, as well as the Oppia development team, to ensure their creations are well-realized.
             </p>
             <p>
               Although the program runs year-round, we can only accommodate a limited number of participants. However, we are currently accepting submissions on a rolling basis -- so if you love coming up with engaging stories, explaining a topic clearly, or identifying roadblocks that students may run into and helping them overcome these, please don't hesitate to get in touch!
             </p>
 
           </div>
-          <a ng-click="$ctrl.onApplyToTeachWithOppia()" class="btn oppia-about-button oppia-teach-button"
-             translate="I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA" target="_blank" rel="noopener" tabindex="0">
+          <a (click)="onApplyToTeachWithOppia()" class="btn oppia-about-button oppia-teach-button"
+             [innerHTML]="'I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA' | translate" target="_blank" rel="noopener" tabindex="0">
           </a>
         </div>
 
-        <div class="participation oppia-about-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_PARTICIPATION}">
+        <div class="participation oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_PARTICIPATION}">
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
-            <h2 translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING"></h2>
+            <h2 [innerHTML]="'I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING' | translate"></h2>
             <ol>
               <li>
-                <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1">
+                <p [innerHTML]="'I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1' | translate">
                 </p>
               </li>
               <li>
-                <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_2">
+                <p [innerHTML]="'I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_2' | translate">
                 </p>
               </li>
               <li>
-                <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_3">
+                <p [innerHTML]="'I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_3' | translate">
                 </p>
               </li>
             </ol>
-            <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_TEXT">
+            <p [innerHTML]="'I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_TEXT' | translate">
             </p>
 
-            <h2 translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_HEADING"></h2>
+            <h2 [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_HEADING' | translate"></h2>
 
-            <p translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1">
+            <p [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1' | translate">
             </p>
 
-            <ul class="oppia-instructions-list">
-              <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_1">
+            <ul style="margin-left: 25px;">
+              <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_1' | translate">
               </li>
-              <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_2 ">
+              <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_2' | translate ">
               </li>
-              <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_3">
+              <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_3' | translate">
               </li>
-              <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_4">
+              <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_4' | translate">
               </li>
-              <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_5">
+              <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_5' | translate">
               </li>
-              <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_6">
+              <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_6' | translate">
               </li>
             </ul>
 
-            <p translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_2">
+            <p [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_2' | translate">
             </p>
 
-            <h2 translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_HEADING"></h2>
+            <h2 [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_POLICY_HEADING' | translate"></h2>
 
-            <p translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_1">
+            <p [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_1' | translate">
             </p>
-            <p translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2">
+            <p [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2' | translate">
             </p>
           </div>
         </div>
@@ -103,10 +103,10 @@
           <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
             <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
               <a href="/creator-dashboard?mode=create" class="btn oppia-about-button"
-                 translate="I18N_ACTION_CREATE_EXPLORATION">
+                 [innerHTML]="'I18N_ACTION_CREATE_EXPLORATION' | translate">
               </a>
               <a href="/community-library" class="btn oppia-about-button"
-                 translate="I18N_ACTION_BROWSE_EXPLORATIONS">
+                 [innerHTML]="'I18N_ACTION_BROWSE_EXPLORATIONS' | translate">
               </a>
             </div>
           </div>

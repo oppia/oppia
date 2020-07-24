@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -240,28 +241,14 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             self.registry_instance.import_app_identity_services(),
             gae_app_identity_services)
 
-    def test_import_gae_image_services(self):
-        """Tests import gae image services function."""
-        from core.platform.image import gae_image_services
-        self.assertEqual(
-            self.registry_instance.import_gae_image_services(),
-            gae_image_services)
-
-    def test_import_email_services_gae(self):
-        """Tests import email services method for when email service provider is
-        the default - GAE.
-        """
-        from core.platform.email import gae_email_services
-        self.assertEqual(
-            gae_email_services, self.registry_instance.import_email_services())
-
     def test_import_email_services_mailgun(self):
         """Tests import email services method for when email service provider is
         mailgun.
         """
         with self.swap(
             feconf, 'EMAIL_SERVICE_PROVIDER',
-            feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+            feconf.EMAIL_SERVICE_PROVIDER_MAILGUN), (
+                self.swap(constants, 'DEV_MODE', False)):
             from core.platform.email import mailgun_email_services
             self.assertEqual(
                 mailgun_email_services,
@@ -273,7 +260,8 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         """
         with self.swap(
             feconf, 'EMAIL_SERVICE_PROVIDER',
-            'invalid service provider'):
+            'invalid service provider'), (
+                self.swap(constants, 'DEV_MODE', False)):
             with self.assertRaisesRegexp(
                 Exception,
                 'Invalid email service provider: invalid service provider'):

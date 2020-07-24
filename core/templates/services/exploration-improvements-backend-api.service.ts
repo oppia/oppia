@@ -21,8 +21,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  IExplorationTaskBackendDict,
+  ExplorationImprovementsConfig,
+  ExplorationImprovementsConfigBackendDict,
+  ExplorationImprovementsConfigObjectFactory,
+} from 'domain/improvements/exploration-improvements-config-object.factory';
+import {
   ExplorationTask,
+  ExplorationTaskBackendDict,
   ExplorationTaskObjectFactory
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { ImprovementsConstants } from
@@ -31,14 +36,14 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 export interface IExplorationImprovementsResponseBackendDict {
-  'open_tasks': IExplorationTaskBackendDict[];
+  'open_tasks': ExplorationTaskBackendDict[];
   'resolved_task_types_by_state_name': {
     [stateName: string]: string[];
   };
 }
 
 export interface IExplorationImprovementsHistoryResponseBackendDict {
-  'results': IExplorationTaskBackendDict[];
+  'results': ExplorationTaskBackendDict[];
   'cursor': string;
   'more': boolean;
 }
@@ -60,6 +65,8 @@ export class ExplorationImprovementsHistoryResponse {
 export class ExplorationImprovementsBackendApiService {
   constructor(
       private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
+      private explorationImprovementsConfigObjectFactory:
+        ExplorationImprovementsConfigObjectFactory,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
@@ -110,6 +117,20 @@ export class ExplorationImprovementsBackendApiService {
           d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
         backendDict.cursor,
         backendDict.more));
+  }
+
+  async getConfigAsync(
+      expId: string): Promise<ExplorationImprovementsConfig> {
+    const explorationImprovementsConfigUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_CONFIG_URL, {
+          exploration_id: expId
+        }));
+    return this.http.get<ExplorationImprovementsConfigBackendDict>(
+      explorationImprovementsConfigUrl
+    ).toPromise().then(backendDict =>
+      this.explorationImprovementsConfigObjectFactory.createFromBackendDict(
+        backendDict));
   }
 }
 

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, async, tick} from
+import { ComponentFixture, fakeAsync, TestBed, async } from
   '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -88,7 +88,10 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   it('should select the embed url', fakeAsync(() => {
     const removeAllRanges = jasmine.createSpy('removeAllRanges');
     const addRange = jasmine.createSpy('addRange');
-    spyOn(window, 'getSelection').and.returnValue(<any>{
+    // TS ignore is used here because we are faking the getSelection function
+    // for this test.
+    // @ts-ignore
+    spyOn(window, 'getSelection').and.returnValue({
       removeAllRanges: removeAllRanges,
       addRange: addRange
     });

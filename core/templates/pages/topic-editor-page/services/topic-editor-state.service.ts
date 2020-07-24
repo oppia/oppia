@@ -64,6 +64,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
     var _skillIdToRubricsObject = {};
+    var _skillQuestionCountDict = {};
     var _groupedSkillSummaries = {
       current: [],
       others: []
@@ -164,6 +165,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
+            _skillQuestionCountDict = (
+              newBackendTopicObject.skillQuestionCountDict);
             _updateGroupedSkillSummaries(
               newBackendTopicObject.groupedSkillSummaries);
             _updateTopic(
@@ -200,6 +203,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
         return angular.copy(_groupedSkillSummaries);
       },
 
+      getSkillQuestionCountDict: function() {
+        return _skillQuestionCountDict;
+      },
       /**
        * Loads, or reloads, the subtopic page stored by this service given a
        * specified topic ID and subtopic ID.

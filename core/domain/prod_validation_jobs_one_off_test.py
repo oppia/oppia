@@ -35,6 +35,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
@@ -199,7 +200,7 @@ class MockSummaryModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
 
 class MockSnapshotContentModelValidator(
@@ -207,7 +208,7 @@ class MockSnapshotContentModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
 
 class MockSnapshotMetadataModelValidator(
@@ -216,9 +217,9 @@ class MockSnapshotMetadataModelValidator(
     EXTERNAL_MODEL_NAME = 'external model'
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'external_model_ids': (MockModel, [])
-        }
+        return [
+            prod_validation_jobs_one_off.ExternalModelFetcherDetails(
+                'external_model_ids', MockModel, [])]
 
 
 class MockBaseUserModelValidator(
@@ -226,14 +227,18 @@ class MockBaseUserModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {}
+        return []
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        return [cls._validate_common_properties_do_not_match]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
         return [
-            cls._validate_common_properties_do_not_match,
             cls._validate_explorations_are_public,
-            cls._validate_collections_are_public]
+            cls._validate_collections_are_public
+        ]
 
 
 class BaseValidatorTests(test_utils.GenericTestBase):
@@ -2486,7 +2491,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         self.model_instance_1.put()
         expected_output = [
             (
-                u'[u\'failed validation check for translation counts check '
+                u'[u\'failed validation check for translation count check '
                 'of ExplorationOpportunitySummaryModel\', '
                 '[u"Entity id 1: Translation counts: {u\'hi\': 2} does not '
                 'match the translation counts of external exploration model: '
@@ -6034,6 +6039,226 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class ExplorationMathRichTextInfoModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationMathRichTextInfoModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(3)]
+
+        for exp in explorations:
+            exp.add_states(['FirstState'])
+            exploration_state = exp.states['FirstState']
+            valid_html_content = (
+                '<oppia-noninteractive-math math_content-with-value="{&amp;'
+                'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+                'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+                '-noninteractive-math>'
+            )
+            content_dict = {
+                'content_id': 'content',
+                'html': valid_html_content
+            }
+            exploration_state.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        self.model_instance_0 = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='0',
+                latex_strings_without_svg=['+,+,+,+'],
+                math_images_generation_required=True,
+                estimated_max_size_of_images_in_bytes=7000))
+        self.model_instance_0.put()
+        self.model_instance_1 = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='1',
+                latex_strings_without_svg=['+,+,+,+'],
+                math_images_generation_required=True,
+                estimated_max_size_of_images_in_bytes=7000))
+        self.model_instance_1.put()
+        self.model_instance_2 = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='2',
+                latex_strings_without_svg=['+,+,+,+'],
+                math_images_generation_required=True,
+                estimated_max_size_of_images_in_bytes=7000))
+        self.model_instance_2.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.
+            ExplorationMathRichTextInfoModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_latex_strings_not_matching_exploration(self):
+        self.model_instance_2 = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='2',
+                latex_strings_without_svg=['+,+,+,+', 'x^2'],
+                math_images_generation_required=True,
+                estimated_max_size_of_images_in_bytes=7000))
+        self.model_instance_2.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for latex strings check of Explo'
+                'rationMathRichTextInfoModel\', '
+                '[u\'Entity id %s: latex strings in the model does not match '
+                'latex strings in the exploration model\']]') % (
+                    self.model_instance_2.id,
+                ),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_estimated_svg_size_not_matching_exploration(self):
+        self.model_instance_2.estimated_max_size_of_images_in_bytes = (
+            8000)
+        self.model_instance_2.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for svg size check of '
+                'ExplorationMathRichTextInfoModel\', '
+                '[u\'Entity id %s: estimated svg size in the model does not '
+                'match estimated svg size in the exploration model\']]') % (
+                    self.model_instance_2.id,
+                ),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_wrong_status_of_image_generation_requirement(self):
+        exploration = (
+            exp_domain.Exploration.create_default_exploration(
+                '3', title='title4', category='category4'))
+        exploration.add_states(['FirstState'])
+        exploration_state = exploration.states['FirstState']
+        valid_html_content = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;math.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        exploration_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        model_instance = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='3',
+                latex_strings_without_svg=['+,+,+,+'],
+                math_images_generation_required=False,
+                estimated_max_size_of_images_in_bytes=7000))
+        model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for image generation requirement'
+                ' check of ExplorationMathRichTextInfoModel\', '
+                '[u\'Entity id %s: status of image generation does not match '
+                'the image generation requirement for the exploration'
+                ' model\']]') % (model_instance.id),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
+
+        # We need to swap the return value of the method
+        # get_latex_strings_without_svg_from_html because
+        # normally this method returns LaTeX strings from math-tags without
+        # filenames.
+        with self.swap(
+            html_validation_service,
+            'get_latex_strings_without_svg_from_html',
+            lambda html: ['+,+,+,+']):
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of ExplorationMathRichTextInfoModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ExplorationMathRichTextInfoModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exp_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'exploration_ids field check of '
+                'ExplorationMathRichTextInfoModel\', '
+                '[u"Entity id 2: based on field '
+                'exploration_ids having value 2, expect model ExplorationModel '
+                'with id 2 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_standard_operation_when_latex_strings_have_unicode(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='title1', category='category')
+        exploration.add_states(['FirstState'])
+        exploration_state = exploration.states['FirstState']
+        valid_html_content_with_unicode = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ&'
+            'amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&am'
+            'p;quot;}"></oppia-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content_with_unicode
+        }
+        exploration_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        model_instance = (
+            exp_models.ExplorationMathRichTextInfoModel(
+                id='exp_id',
+                latex_strings_without_svg=['ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ'],
+                math_images_generation_required=True,
+                estimated_max_size_of_images_in_bytes=46000))
+        model_instance.put()
+        expected_output = [
+            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+
 class QuestionSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
 
@@ -9502,7 +9727,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for uncategorized skill '
-                'ids check of TopicModel\', '
+                'id check of TopicModel\', '
                 '[u\'Entity id 0: uncategorized skill id 0 is present '
                 'in subtopic for entity with id 1\']]'
             ), u'[u\'fully-validated TopicModel\', 2]']
@@ -12041,6 +12266,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12052,6 +12279,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('4').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('4').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -12094,7 +12323,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of CompletedActivitiesModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp\'] are '
+                '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12108,7 +12337,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of CompletedActivitiesModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12227,6 +12456,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12238,6 +12469,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('4').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('4').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -12280,7 +12513,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of IncompleteActivitiesModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp\'] are '
+                '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12294,7 +12527,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of IncompleteActivitiesModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12400,6 +12633,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12429,7 +12664,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
             (
                 u'[u\'failed validation check for public exploration check '
                 'of ExpUserLastPlaythroughModel\', '
-                '[u"Entity id %s.0: Explorations with ids [u\'0\'] are '
+                '[u"Entity id %s.0: Explorations with ids [\'0\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12575,6 +12810,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12586,6 +12823,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('6').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('6').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -12650,7 +12889,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of LearnerPlaylistModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp\'] are '
+                '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12664,7 +12903,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of LearnerPlaylistModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -13454,6 +13693,13 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
                 'exp0 but it doesn\'t exist"]]' % self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
+    def test_null_draft_change_list(self):
+        self.model_instance.draft_change_list = None
+        self.model_instance.put()
+        expected_output = [
+            u'[u\'fully-validated ExplorationUserDataModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
     def test_invalid_draft_change_list(self):
         self.model_instance.draft_change_list = [{
             'cmd': 'invalid'
@@ -13506,7 +13752,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.rating = -1
         self.model_instance.put()
         expected_output = [(
-            u'[u\'failed validation check for rating check of '
+            u'[u\'failed validation check for ratings check of '
             'ExplorationUserDataModel\', [u\'Entity id %s: Expected '
             'rating to be in range [1, 5], received -1\']]') % (
                 self.model_instance.id)]
@@ -13629,6 +13875,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -13640,6 +13888,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('col').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('col').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -13668,7 +13918,7 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of CollectionProgressModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'0\'] are '
+                '[u"Entity id %s: Explorations with ids [\'0\'] are '
                 'private"]]') % self.model_instance.id]
         run_job_and_check_output(self, expected_output)
 
@@ -13678,7 +13928,7 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of CollectionProgressModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.model_instance.id]
         run_job_and_check_output(self, expected_output)
 
@@ -14999,3 +15249,417 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             )
         ]
         run_job_and_check_output(self, expected_output)
+
+    def test_missing_exp_issues_model_failure(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        exp_issues_id = (
+            stats_models.ExplorationIssuesModel.get_entity_id(
+                self.exp.id, self.exp.version)
+        )
+        exp_issues = stats_models.ExplorationIssuesModel.get_by_id(
+            exp_issues_id)
+
+        exp_issues.delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for exp_issues_ids '
+                'field check of PlaythroughModel\', '
+                '[u"Entity id %s: based on '
+                'field exp_issues_ids having value '
+                '%s, expect model ExplorationIssuesModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    playthrough.id, exp_issues_id, exp_issues_id)]
+        run_job_and_check_output(self, expected_output)
+
+
+class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(PseudonymizedUserModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        self.model_instance = (
+            user_models.PseudonymizedUserModel(
+                id=user_models.PseudonymizedUserModel.get_new_id('')))
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.PseudonymizedUserModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated PseudonymizedUserModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of PseudonymizedUserModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PseudonymizedUserModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_model_not_same_id_as_user(self):
+        user_models.UserSettingsModel(
+            id=self.model_instance.id,
+            gae_id='224169184123',
+            email='email@email.com',
+            username='username').put()
+
+        expected_output = [(
+            '[u\'failed validation check for deleted user settings of '
+            'PseudonymizedUserModel\', '
+            '[u\'Entity id %s: User settings model exists\']]'
+        ) % self.model_instance.id]
+
+        run_job_and_check_output(self, expected_output)
+
+
+class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(PlatformParameterModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.parameter_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_model_1',
+            rule_dicts=[
+                {'filters': [], 'value_when_matched': True}
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
+        self.parameter_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        self.job_class = (
+            prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.parameter_model.created_on = (
+            self.parameter_model.last_updated + datetime.timedelta(days=1))
+        self.parameter_model.commit(self.admin_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of PlatformParameterModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.parameter_model.id,
+                    self.parameter_model.created_on,
+                    self.parameter_model.last_updated
+                )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PlatformParameterModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.parameter_model.id, self.parameter_model.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.parameter_model.id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_ids field'
+                ' check of PlatformParameterModel\', [u"Entity id %s: based on '
+                'field snapshot_metadata_ids having value %s-1, expect model '
+                'PlatformParameterSnapshotMetadataModel '
+                'with id %s-1 but it doesn\'t exist"]]' % (
+                    (self.parameter_model.id,) * 3))
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        config_models.PlatformParameterSnapshotContentModel.get_by_id(
+            '%s-1' % self.parameter_model.id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_ids field'
+                ' check of PlatformParameterModel\', [u"Entity id %s: based on '
+                'field snapshot_content_ids having value %s-1, expect model '
+                'PlatformParameterSnapshotContentModel '
+                'with id %s-1 but it doesn\'t exist"]]' % (
+                    (self.parameter_model.id,) * 3))
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class PlatformParameterSnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(
+            PlatformParameterSnapshotMetadataModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.parameter_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_model_1',
+            rule_dicts=[
+                {'filters': [], 'value_when_matched': True}
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
+        self.parameter_model.commit(self.admin_id, '', [])
+
+        user_models.UserSettingsModel(
+            id=feconf.SYSTEM_COMMITTER_ID,
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
+            email='system@committer.com').put()
+        self.model_instance = (
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.parameter_model.id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .PlatformParameterSnapshotMetadataModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        self.parameter_model.commit(self.admin_id, '', [])
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of PlatformParameterSnapshotMetadataModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id,
+                    self.model_instance.created_on,
+                    self.model_instance.last_updated)
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PlatformParameterSnapshotMetadataModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_parameter_model_model_failure(self):
+        self.parameter_model.delete(self.admin_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform_parameter_ids '
+                'field check of PlatformParameterSnapshotMetadataModel\', '
+                '[u"Entity id %s-1: based on field '
+                'platform_parameter_ids having value %s, '
+                'expect model PlatformParameterModel with '
+                'id %s but it doesn\'t exist", '
+                'u"Entity id %s-2: based on field '
+                'platform_parameter_ids having value %s, expect model '
+                'PlatformParameterModel with id %s but it doesn\'t '
+                'exist"]]' % ((self.parameter_model.id,) * 6)
+            )]
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_ids field '
+                'check of PlatformParameterSnapshotMetadataModel\', '
+                '[u"Entity id %s-1: based on field committer_ids '
+                'having value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.parameter_model.id, self.admin_id, self.admin_id)
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_parameter_model_model_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            config_models.PlatformParameterSnapshotMetadataModel(
+                id='%s-3' % self.parameter_model.id, committer_id=self.admin_id,
+                commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform parameter model '
+                'version check of PlatformParameterSnapshotMetadataModel\', '
+                '[u\'Entity id %s-3: PlatformParameter model corresponding to '
+                'id %s has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]' % (
+                    self.parameter_model.id, self.parameter_model.id)
+            ),
+            u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance.commit_cmds = [{
+            'cmd': 'edit_rules',
+            'invalid_attribute': 'invalid'
+        }]
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd edit_rules check '
+                'of PlatformParameterSnapshotMetadataModel\', [u"Entity id '
+                '%s-1: Commit command domain validation for command: {u\'cmd\''
+                ': u\'edit_rules\', u\'invalid_attribute\': u\''
+                'invalid\'} failed with error: The following required '
+                'attributes are missing: new_rules, The following extra '
+                'attributes are present: invalid_attribute"]]' % (
+                    self.parameter_model.id)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+
+class PlatformParameterSnapshotContentModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(
+            PlatformParameterSnapshotContentModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.parameter_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_model_1',
+            rule_dicts=[
+                {'filters': [], 'value_when_matched': True}
+            ],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
+        self.parameter_model.commit(self.admin_id, '', [])
+
+        user_models.UserSettingsModel(
+            id=feconf.SYSTEM_COMMITTER_ID,
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
+            email='system@committer.com').put()
+        self.model_instance = (
+            config_models.PlatformParameterSnapshotContentModel.get_by_id(
+                '%s-1' % self.parameter_model.id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .PlatformParameterSnapshotContentModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        self.parameter_model.commit(self.admin_id, '', [])
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterSnapshotContentModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of PlatformParameterSnapshotContentModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id,
+                    self.model_instance.created_on,
+                    self.model_instance.last_updated
+                )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PlatformParameterSnapshotContentModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_platform_parameter_model_failure(self):
+        self.parameter_model.delete(self.admin_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform_parameter_ids '
+                'field check of PlatformParameterSnapshotContentModel\', '
+                '[u"Entity id %s-1: based on field platform_parameter_ids '
+                'having value %s, expect model PlatformParameterModel with '
+                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
+                'field platform_parameter_ids having value %s, expect model '
+                'PlatformParameterModel with id %s but it doesn\'t exist"]]' % (
+                    (self.parameter_model.id,) * 6)
+            ),
+        ]
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_invalid_platform_parameter_model_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            config_models.PlatformParameterSnapshotContentModel(
+                id='%s-3' % (self.parameter_model.id)))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for platform parameter model '
+                'version check of PlatformParameterSnapshotContentModel\', '
+                '[u\'Entity id %s-3: PlatformParameter model corresponding '
+                'to id %s has a version 1 which is less than the version 3 '
+                'in snapshot content model id\']]' % (
+                    (self.parameter_model.id,) * 2)
+            ),
+            u'[u\'fully-validated PlatformParameterSnapshotContentModel\', 1]'
+        ]
+        run_job_and_check_output(self, expected_output, sort=True)

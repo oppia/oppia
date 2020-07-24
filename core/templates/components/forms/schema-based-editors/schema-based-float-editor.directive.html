@@ -1,7 +1,7 @@
 <span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($value)'">
   <span ng-form="$ctrl.floatForm">
     <span ng-if="!expressionMode">
-      <input step="any" ng-model="$ctrl.localValue" class="form-control oppia-float-form-input protractor-test-float-form-input"
+      <input type="number" step="any" autocomplete="off" ng-model="$ctrl.localValue" class="form-control oppia-float-form-input protractor-test-float-form-input"
              name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>"
              focus-on="<[$ctrl.labelForFocusTarget()]>" ng-keypress="$ctrl.onKeypress($event)"
              apply-validation validators="$ctrl.validators()"
@@ -30,11 +30,12 @@
   .oppia-numeric-input-error {
     margin-top: 10px;
   }
-  .oppia-float-form-input {
-    display: inline;
+  input.oppia-float-form-input {
+    -moz-appearance: textfield;
   }
-  .oppia-user-currently-typing {
-    font-size: 0.85em;
-    position: absolute;
+  input.oppia-float-form-input::-webkit-outer-spin-button,
+  input.oppia-float-form-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 </style>
