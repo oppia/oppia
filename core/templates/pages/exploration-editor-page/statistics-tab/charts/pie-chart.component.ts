@@ -25,8 +25,10 @@ angular.module('oppia').component('pieChart', {
     // chartAreaWidth, colors, height, legendPosition, width.
     options: '&'
   },
-  controller: ['$scope', '$element', function($scope, $element) {
+  controller: ['$scope', '$element', 'WindowDimensionsService', function(
+      $scope, $element, WindowDimensionsService) {
     var ctrl = this;
+    ctrl.resizeSubscription = null;
 
     ctrl.$onInit = function() {
       if (!$.isArray(ctrl.data())) {
@@ -67,16 +69,18 @@ angular.module('oppia').component('pieChart', {
       };
 
       $scope.$watch('data()', redrawChart);
-      $(window).resize(redrawChart);
+
+      ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
+        .subscribe(evt => {
+          redrawChart();
+          $scope.$applyAsync();
+        });
     };
 
-    // The destroy lifecycle hook is being used here to remove resize event
-    // listener because google charts api is only accessible in exploration
-    // editor page. This is for unit test purpose. Without this hook, the
-    // resize callback may be triggered by other specs that is not in
-    // exploration editor page, raising an error.
     ctrl.$onDestroy = function() {
-      $(window).off('resize');
+      if (ctrl.resizeSubscription) {
+        ctrl.resizeSubscription.unsubscribe();
+      }
     };
   }]
 });

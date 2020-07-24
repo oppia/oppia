@@ -16,13 +16,21 @@
  * @fileoverview Unit tests for pieChart.
  */
 
-describe('Pie Chart directive', function() {
+import { of } from 'rxjs';
+
+describe('Pie Chart component', function() {
   var ctrl = null;
+  var $flushPendingTasks = null;
   var $scope = null;
 
   var mockedChart = null;
+  var resizeEvent = new Event('resize');
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WindowDimensionsService', {
+      getResizeEvent: () => of(resizeEvent)
+    });
+  }));
 
   afterAll(function() {
     // Resetting google global property.
@@ -35,6 +43,7 @@ describe('Pie Chart directive', function() {
 
   describe('when $scope data is not an array', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
 
       mockedChart = {
@@ -77,12 +86,17 @@ describe('Pie Chart directive', function() {
     it('should not redraw chart', function() {
       const drawSpy = spyOn(mockedChart, 'draw');
       angular.element(window).triggerHandler('resize');
+
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+      $flushPendingTasks();
       expect(drawSpy).not.toHaveBeenCalled();
     });
   });
 
   describe('when chart is not defined', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
 
       mockedChart = {
@@ -113,7 +127,7 @@ describe('Pie Chart directive', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('pieChart', {
+      ctrl = $componentController('pieChart', {
         $scope: $scope,
         $element: []
       }, {
@@ -126,12 +140,17 @@ describe('Pie Chart directive', function() {
     it('should not redraw chart', function() {
       const pieChartSpy = spyOn(window.google.visualization, 'PieChart');
       angular.element(window).triggerHandler('resize');
+
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+      $flushPendingTasks();
       expect(pieChartSpy).not.toHaveBeenCalled();
     });
   });
 
   describe('when chart is defined and $scope data is an array', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
 
       mockedChart = {
@@ -162,7 +181,7 @@ describe('Pie Chart directive', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('pieChart', {
+      ctrl = $componentController('pieChart', {
         $scope: $scope,
         $element: []
       }, {
@@ -185,6 +204,10 @@ describe('Pie Chart directive', function() {
     it('should redraw chart', function() {
       const drawSpy = spyOn(mockedChart, 'draw');
       angular.element(window).triggerHandler('resize');
+
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+      $flushPendingTasks();
       expect(drawSpy).toHaveBeenCalled();
     });
   });

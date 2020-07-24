@@ -16,15 +16,24 @@
  * @fileoverview Unit tests for barChart.
  */
 
-describe('Bar Chart directive', function() {
+import { of } from 'rxjs';
+
+describe('Bar Chart component', function() {
   var ctrl = null;
+  var $flushPendingTasks = null;
   var $scope = null;
 
   var mockedChart = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WindowDimensionsService', {
+      getResizeEvent: function() {
+        return of(new Event('resize'));
+      }
+    });
+  }));
 
-  afterAll(function() {
+  afterEach(function() {
     // Resetting google global property.
     window.google = undefined;
     Object.defineProperty(window, 'google', {
@@ -35,6 +44,7 @@ describe('Bar Chart directive', function() {
 
   describe('when $scope data is not an array', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
 
       mockedChart = {
@@ -73,12 +83,17 @@ describe('Bar Chart directive', function() {
     it('should not redraw chart', function() {
       const drawSpy = spyOn(mockedChart, 'draw');
       angular.element(window).triggerHandler('resize');
+
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+      $flushPendingTasks();
       expect(drawSpy).not.toHaveBeenCalled();
     });
   });
 
   describe('when google is not defined', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
 
       mockedChart = {
@@ -117,6 +132,10 @@ describe('Bar Chart directive', function() {
 
     it('should not redraw chart', function() {
       angular.element(window).triggerHandler('resize');
+
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+      $flushPendingTasks();
       expect(window.google.visualization.BarChart).not.toBeDefined();
     });
   });
@@ -124,6 +143,7 @@ describe('Bar Chart directive', function() {
   describe('when google is defined and $scope data is an array',
     function() {
       beforeEach(angular.mock.inject(function($injector, $componentController) {
+        $flushPendingTasks = $injector.get('$flushPendingTasks');
         var $rootScope = $injector.get('$rootScope');
 
         mockedChart = {
@@ -169,6 +189,10 @@ describe('Bar Chart directive', function() {
       it('should redraw chart', function() {
         const drawSpy = spyOn(mockedChart, 'draw');
         angular.element(window).triggerHandler('resize');
+
+        // Waiting for $applyAsync be called, which can take ~10 miliseconds
+        // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+        $flushPendingTasks();
         expect(drawSpy).toHaveBeenCalled();
       });
     });
