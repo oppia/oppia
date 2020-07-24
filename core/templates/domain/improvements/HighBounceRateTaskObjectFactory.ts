@@ -16,15 +16,17 @@
  * @fileoverview Domain object for a high bounce-rate improvements task.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
+import { ImprovementsConstants } from
+  'domain/improvements/improvements.constants';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
 
 export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   constructor(backendDict: TaskEntryBackendDict<'high_bounce_rate'>) {
@@ -54,7 +56,9 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   }
 
   public refreshStatus(
-      expStats: ExplorationStats, numEarlyQuitPlaythroughs: number): void {
+      expStats: ExplorationStats,
+      numEarlyQuitPlaythroughs: number,
+      config: ExplorationImprovementsConfig): void {
     if (expStats.expId !== this.entityId ||
         expStats.expVersion !== this.entityVersion) {
       throw new Error(
@@ -64,31 +68,35 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
           'id="' + expStats.expId + '" v' + expStats.expVersion));
     }
     const expStarts = expStats.numStarts;
-    if (expStarts < ImprovementsConstants.HIGH_BOUNCE_RATE_MIN_EXP_STARTS) {
+    if (expStarts < config.highBounceRateTaskMinimumExplorationStarts) {
       // Too few visits for calculating a meaningful bounce-rate. Not an error.
       return;
     }
     const bounceRate = expStats.getBounceRate(this.targetId);
-    if (this.meetsCreationConditions(bounceRate, numEarlyQuitPlaythroughs)) {
+    if (
+      this.meetsCreationConditions(bounceRate, numEarlyQuitPlaythroughs, config)
+    ) {
       this.markAsOpen();
       this.generateIssueDescription(bounceRate);
-    } else if (this.meetsObsoletionConditions(bounceRate)) {
+    } else if (this.meetsObsoletionConditions(bounceRate, config)) {
       this.markAsObsolete();
     }
   }
 
   private meetsCreationConditions(
-      bounceRate: number, numEarlyQuitPlaythroughs: number): boolean {
+      bounceRate: number, numEarlyQuitPlaythroughs: number,
+      config: ExplorationImprovementsConfig): boolean {
     return (
       this.isObsolete() &&
       numEarlyQuitPlaythroughs > 0 &&
-      bounceRate >= ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH);
+      bounceRate >= config.highBounceRateTaskStateBounceRateCreationThreshold);
   }
 
-  private meetsObsoletionConditions(bounceRate: number): boolean {
+  private meetsObsoletionConditions(
+      bounceRate: number, config: ExplorationImprovementsConfig): boolean {
     return (
       this.isOpen() &&
-      bounceRate < ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW);
+      bounceRate < config.highBounceRateTaskStateBounceRateObsoletionThreshold);
   }
 
   private generateIssueDescription(bounceRate: number): void {
@@ -102,40 +110,6 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   providedIn: 'root'
 })
 export class HighBounceRateTaskObjectFactory {
-  private createNewObsoleteTask(
-      expId: string, expVersion: number,
-      stateName: string): HighBounceRateTask {
-    return new HighBounceRateTask({
-      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
-      entity_id: expId,
-      entity_version: expVersion,
-      task_type: ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE,
-      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
-      target_id: stateName,
-      issue_description: null,
-      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
-      resolver_username: null,
-      resolver_profile_picture_data_url: null,
-      resolved_on_msecs: null,
-    });
-  }
-
-  /**
-   * Returns list of tasks for each of the given state names when their stats
-   * demonstrate a high bounce rate. Otherwise, corresponding index will be
-   * null.
-   */
-  createFromExplorationStats(
-      expStats: ExplorationStats, stateNames: string[],
-      numEarlyQuitPlaythroughs: number): HighBounceRateTask[] {
-    const { expId, expVersion } = expStats;
-    return stateNames.map(stateName => {
-      const task = this.createNewObsoleteTask(expId, expVersion, stateName);
-      task.refreshStatus(expStats, numEarlyQuitPlaythroughs);
-      return task.isOpen() ? task : null;
-    });
-  }
-
   /**
    * Returns a new task from the given backend dict, or null if the dict does
    * not represent a high bounce rate task.

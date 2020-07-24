@@ -21,6 +21,27 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
 import {
+  ExplorationTask,
+  ExplorationTaskType,
+  ExplorationTaskBackendDict,
+  ExplorationTaskObjectFactory
+} from 'domain/improvements/ExplorationTaskObjectFactory';
+import { HighBounceRateTask } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { StateStatsBackendDict } from
+  'domain/statistics/StateStatsObjectFactory';
+import { IneffectiveFeedbackLoopTask } from
+  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from
+  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { SuccessiveIncorrectAnswersTask } from
+  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
+  'domain/statistics/ExplorationStatsObjectFactory';
+import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
   CyclicStateTransitionsPlaythroughIssueBackendDict,
@@ -29,30 +50,10 @@ import {
   MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssueObjectFactory,
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
-  'domain/statistics/ExplorationStatsObjectFactory';
-import {
-  ExplorationTask,
-  ExplorationTaskType,
-  ExplorationTaskBackendDict,
-  ExplorationTaskObjectFactory,
-} from 'domain/improvements/ExplorationTaskObjectFactory';
-import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
-import { StateBackendDict } from
-  'domain/state/StateObjectFactory';
-import { StateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
-import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { StatesObjectFactory } from
-  'domain/exploration/StatesObjectFactory';
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+
 
 describe('Exploration improvements task registrar service', () => {
   let explorationImprovementsTaskRegistryService:
@@ -76,6 +77,7 @@ describe('Exploration improvements task registrar service', () => {
   let stateStatsBackendDict: StateStatsBackendDict;
   let statesBackendDict: {[stateName: string]: StateBackendDict};
   let taskBackendDict: ExplorationTaskBackendDict;
+  let config: ExplorationImprovementsConfig;
 
   const expId = 'eid';
   const expVersion = 1;
@@ -89,6 +91,9 @@ describe('Exploration improvements task registrar service', () => {
     explorationTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
+
+    config = new ExplorationImprovementsConfig(
+      expId, expVersion, true, 0.25, 0.20, 100);
 
     stateBackendDict = {
       classifier_model_id: null,
@@ -253,7 +258,7 @@ describe('Exploration improvements task registrar service', () => {
   it('should initialize successfully using default test values', () => {
     expect(
       () => explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), new Map(), []))
       .not.toThrowError();
   });
@@ -264,7 +269,7 @@ describe('Exploration improvements task registrar service', () => {
       expStatsBackendDict.exp_id = 'wrong_exp_id';
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           new Map(), new Map(), []))
         .toThrowError(
           'Expected stats for exploration "eid", but got stats for ' +
@@ -276,7 +281,7 @@ describe('Exploration improvements task registrar service', () => {
       expStatsBackendDict.exp_version = 2;
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           new Map(), new Map(), []))
         .toThrowError(
           'Expected stats for exploration version 1, but got stats for ' +
@@ -288,7 +293,7 @@ describe('Exploration improvements task registrar service', () => {
       taskBackendDict.target_id = 'End';
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
+          config, makeStates(), makeExpStats(), [makeTask()],
           new Map(), new Map(), []))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
@@ -301,7 +306,7 @@ describe('Exploration improvements task registrar service', () => {
       ]);
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           resolvedTaskTypesByStateName, new Map(), []))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
@@ -312,7 +317,7 @@ describe('Exploration improvements task registrar service', () => {
       const answerStats = new Map([['End', [makeAnswerStats()]]]);
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           new Map(), answerStats, []))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
@@ -324,7 +329,7 @@ describe('Exploration improvements task registrar service', () => {
         .state_names.value = ['Introduction', 'End'];
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           new Map(), new Map(), [makeCstPlaythroughIssue()]))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
@@ -336,7 +341,7 @@ describe('Exploration improvements task registrar service', () => {
         .state_name.value = 'End';
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           new Map(), new Map(), [makeEqPlaythroughIssue()]))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
@@ -348,7 +353,7 @@ describe('Exploration improvements task registrar service', () => {
         .state_name.value = 'End';
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           new Map(), new Map(), [makeMisPlaythroughIssue()]))
         .toThrowError(
           'Unexpected reference to state "End", which does not exist');
@@ -359,7 +364,7 @@ describe('Exploration improvements task registrar service', () => {
       taskBackendDict.entity_id = 'wrong_exp_id';
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
+          config, makeStates(), makeExpStats(), [makeTask()],
           new Map(), new Map(), []))
         .toThrowError(
           'Expected task for exploration "eid", but got task for exploration ' +
@@ -371,7 +376,7 @@ describe('Exploration improvements task registrar service', () => {
       taskBackendDict.entity_version = 2;
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
+          config, makeStates(), makeExpStats(), [makeTask()],
           new Map(), new Map(), []))
         .toThrowError(
           'Expected task for exploration version 1, but got task for ' +
@@ -385,7 +390,7 @@ describe('Exploration improvements task registrar service', () => {
       const tasks = [makeTask(), makeTask()];
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), tasks,
+          config, makeStates(), makeExpStats(), tasks,
           new Map(), new Map(), []))
         .toThrowError(
           'Found duplicate task of type "high_bounce_rate" targeting state ' +
@@ -401,7 +406,7 @@ describe('Exploration improvements task registrar service', () => {
       ]);
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [makeTask()],
+          config, makeStates(), makeExpStats(), [makeTask()],
           resolvedTaskTypesByStateName, new Map(), []))
         .toThrowError(
           'Found duplicate task of type "high_bounce_rate" targeting state ' +
@@ -416,7 +421,7 @@ describe('Exploration improvements task registrar service', () => {
       ]);
       expect(
         () => explorationImprovementsTaskRegistryService.initialize(
-          expId, expVersion, makeStates(), makeExpStats(), [],
+          config, makeStates(), makeExpStats(), [],
           resolvedTaskTypesByStateName, new Map(), []))
         .toThrowError(
           'Found duplicate task of type "high_bounce_rate" targeting state ' +
@@ -437,7 +442,7 @@ describe('Exploration improvements task registrar service', () => {
         {...taskBackendDict, ...{task_type: 'successive_incorrect_answers'}});
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(statesBackendDict), makeExpStats(),
+        config, makeStates(statesBackendDict), makeExpStats(),
         [hbrTask, iflTask, ngrTask, siaTask],
         new Map(), new Map(), []);
 
@@ -470,7 +475,7 @@ describe('Exploration improvements task registrar service', () => {
         ]));
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         resolvedTaskTypesByStateName, new Map(), []);
 
       expect(
@@ -495,7 +500,7 @@ describe('Exploration improvements task registrar service', () => {
       const task = makeTask<HighBounceRateTask>(
         {...taskBackendDict, ...{status: 'open'}});
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [task],
+        config, makeStates(), makeExpStats(), [task],
         new Map(), new Map(), []);
 
       expect(
@@ -509,7 +514,7 @@ describe('Exploration improvements task registrar service', () => {
       const task = makeTask<HighBounceRateTask>(
         {...taskBackendDict, ...{target_id: 'End'}});
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), new Map(), []);
 
       expect(() => (
@@ -522,7 +527,7 @@ describe('Exploration improvements task registrar service', () => {
     it('should generate obsolete tasks when no tasks exist yet', () => {
       statesBackendDict = {Introduction: stateBackendDict};
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), new Map(), []);
 
       expect(
@@ -556,7 +561,7 @@ describe('Exploration improvements task registrar service', () => {
       };
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), new Map(), [makeEqPlaythroughIssue()]);
 
       const [hbrTask] = (
@@ -566,7 +571,7 @@ describe('Exploration improvements task registrar service', () => {
 
     it('should generate a new ineffective feedback loop task', () => {
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), new Map(), [makeCstPlaythroughIssue()]);
 
       const [iflTask] = (
@@ -581,7 +586,7 @@ describe('Exploration improvements task registrar service', () => {
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), stateAnswerStats, []);
 
       const [ngrTask] = (
@@ -592,7 +597,7 @@ describe('Exploration improvements task registrar service', () => {
 
     it('should generate a new successive incorrect answers task', () => {
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), new Map(), [makeMisPlaythroughIssue()]);
 
       const [siaTask] = (
@@ -618,7 +623,7 @@ describe('Exploration improvements task registrar service', () => {
       };
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [task],
+        config, makeStates(), makeExpStats(), [task],
         new Map(), new Map(), []);
 
       const [hbrTask] = (
@@ -632,7 +637,7 @@ describe('Exploration improvements task registrar service', () => {
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), stateAnswerStats, []);
 
       const [ngrTask] = (
@@ -652,7 +657,7 @@ describe('Exploration improvements task registrar service', () => {
     it('should create new obsolete tasks for newly created state', () => {
       statesBackendDict = {Introduction: stateBackendDict};
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), new Map(), []);
 
       expect(
@@ -722,7 +727,7 @@ describe('Exploration improvements task registrar service', () => {
       statesBackendDict = {Introduction: stateBackendDict};
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(),
+        config, makeStates(), makeExpStats(),
         [hbrTask, iflTask, ngrTask, siaTask],
         new Map(), stateAnswerStats, [makeEqPlaythroughIssue()]);
 
@@ -802,7 +807,7 @@ describe('Exploration improvements task registrar service', () => {
       statesBackendDict = {Introduction: stateBackendDict};
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(),
+        config, makeStates(), makeExpStats(),
         [hbrTask, iflTask, ngrTask, siaTask],
         new Map(), stateAnswerStats, [makeEqPlaythroughIssue()]);
 
@@ -830,7 +835,7 @@ describe('Exploration improvements task registrar service', () => {
       const stateAnswerStats = new Map([['Introduction', [answerStats]]]);
 
       explorationImprovementsTaskRegistryService.initialize(
-        expId, expVersion, makeStates(), makeExpStats(), [],
+        config, makeStates(), makeExpStats(), [],
         new Map(), stateAnswerStats, []);
 
       const [ngrTask] = (
