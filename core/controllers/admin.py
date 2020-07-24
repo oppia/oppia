@@ -596,24 +596,33 @@ class AdminMathSvgImageGenerationHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        latex_strings_mapping = (
+        latex_strings_to_exp_id_mapping = (
             exp_services.get_latex_strings_and_exp_ids_for_generating_svgs())
         self.render_json({
-            'result': latex_strings_mapping
+            'result': latex_strings_to_exp_id_mapping
         })
 
     @acl_decorators.can_access_admin_page
     def post(self):
-        data = self.payload.get('latexMapping')
-        for exp_id, latex_strings_dict in data.items():
-            for latex_value in latex_strings_dict.keys():
-                data[exp_id][latex_value]['file'] = (
-                    self.request.get(data[exp_id][latex_value]['latexId']))
-        for exp_id in data.keys():
+        latex_to_svg_mappings = self.payload.get('latexMapping')
+        for exp_id, latex_to_svg_mapping_dict in latex_to_svg_mappings.items():
+            for latex_string in latex_to_svg_mapping_dict.keys():
+                image = self.request.get(
+                    latex_to_svg_mappings[exp_id][latex_string]['latexId'])
+                if not image:
+                    raise self.InvalidInputException(
+                        'In Exploration %s SVG for latex value %s not supplied.'
+                        % (exp_id, latex_string))
+                latex_to_svg_mappings[exp_id][latex_string]['file'] = image
+
+        no_of_explorations_updated = 0
+        for exp_id in latex_to_svg_mappings.keys():
             exp_services.update_explorations_with_math_svgs(
-                self.user_id, exp_id, data[exp_id])
+                self.user_id, exp_id, latex_to_svg_mappings[exp_id])
+            no_of_explorations_updated += 1
         self.render_json({
-            'result': 'successfully updated'
+            'result': 'successfully updated %d explorations' % (
+                no_of_explorations_updated)
         })
 
 
