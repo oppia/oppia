@@ -48,7 +48,6 @@ export class ExplorationFeaturesService {
   static serviceIsInitialized = false;
   static settings = {
     areParametersEnabled: false,
-    isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false
   };
 
@@ -58,8 +57,6 @@ export class ExplorationFeaturesService {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }
-    ExplorationFeaturesService.settings.isImprovementsTabEnabled =
-      featuresData.isImprovementsTabEnabled;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
       featuresData.isExplorationWhitelisted;
     if (explorationData.param_changes &&
@@ -82,10 +79,6 @@ export class ExplorationFeaturesService {
 
   areParametersEnabled(): boolean {
     return ExplorationFeaturesService.settings.areParametersEnabled;
-  }
-
-  isImprovementsTabEnabled(): boolean {
-    return ExplorationFeaturesService.settings.isImprovementsTabEnabled;
   }
 
   isPlaythroughRecordingEnabled(): boolean {
