@@ -244,7 +244,7 @@ def update_contributor_dashboard_status_in_feconf_file(
 
     Args:
         feconf_file_path: str. Path to the feconf.py file.
-        enable_contributor_dashboard: bool. Represents whether community
+        enable_contributor_dashboard: bool. Represents whether contributor
             dashboard is enabled.
     """
     pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'

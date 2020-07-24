@@ -26,7 +26,7 @@ const CONSTANTS = require('constants.ts');
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 
-describe('Community dashboard page', function() {
+describe('Contributor dashboard page', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -34,7 +34,7 @@ describe('Community dashboard page', function() {
   var UserService = null;
   var TranslationLanguageService = null;
   var userProfileImage = 'profile-data-url';
-  var userCommunityRights = {
+  var userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
     can_review_questions: true
@@ -69,8 +69,8 @@ describe('Community dashboard page', function() {
     beforeEach(function() {
       spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
         $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserCommunityRightsData').and.returnValue(
-        $q.resolve(userCommunityRights));
+      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
+        $q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
@@ -140,8 +140,8 @@ describe('Community dashboard page', function() {
     beforeEach(function() {
       spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
         $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserCommunityRightsData').and.returnValue(
-        $q.resolve(userCommunityRights));
+      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
+        $q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();

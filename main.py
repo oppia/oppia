@@ -217,15 +217,15 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcommunityreviewerhandler', admin.AddCommunityReviewerHandler),
+        r'/addcontributionreviewerhandler', admin.AddContributionReviewerHandler),
     get_redirect_route(
-        r'/removecommunityreviewerhandler',
-        admin.RemoveCommunityReviewerHandler),
+        r'/removecontributionreviewerhandler',
+        admin.RemoveContributionReviewerHandler),
     get_redirect_route(
-        r'/getcommunityreviewershandler', admin.CommunityReviewersListHandler),
+        r'/getcontributionreviewershandler', admin.ContributionReviewersListHandler),
     get_redirect_route(
-        r'/communityreviewerrightsdatahandler',
-        admin.CommunityReviewerRightsDataHandler),
+        r'/contributionreviewerrightsdatahandler',
+        admin.ContributionReviewerRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
@@ -266,8 +266,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
-        r'/usercommunityrightsdatahandler',
-        contributor_dashboard.UserCommunityRightsDataHandler),
+        r'/usercontributionrightsdatahandler',
+        contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),

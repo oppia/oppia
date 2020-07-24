@@ -2725,15 +2725,15 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
 
 
-class CommunityReviewerEmailTest(test_utils.EmailTestBase):
-    """Test for assignment and removal of reviewer in community."""
+class ContributionReviewerEmailTest(test_utils.EmailTestBase):
+    """Test for assignment and removal of contribution reviewers."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(CommunityReviewerEmailTest, self).setUp()
+        super(ContributionReviewerEmailTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -2760,7 +2760,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
             self):
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -2771,7 +2771,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
     def test_assign_translation_reviewer_email_for_invalid_review_category(
             self):
         with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_new_reviewer_email_data_constant(self):
@@ -2807,7 +2807,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -2853,7 +2853,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.voiceover_reviewer_id,
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
@@ -2898,7 +2898,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.question_reviewer_id,
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
@@ -2928,7 +2928,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_email_is_not_sent_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -2939,7 +2939,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
     def test_remove_translation_reviewer_email_for_invalid_review_category(
             self):
         with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_removed_reviewer_email_data_constant(self):
@@ -2977,7 +2977,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -3023,7 +3023,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.voiceover_reviewer_id,
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
@@ -3067,7 +3067,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.question_reviewer_id, constants.REVIEW_CATEGORY_QUESTION,
                 language_code='hi')
 

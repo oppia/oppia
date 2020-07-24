@@ -426,11 +426,11 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(output, expected_output)
 
 
-class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
-    """Test for the UserCommunityRightsDataHandler."""
+class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
+    """Test for the UserContributionRightsDataHandler."""
 
-    def test_guest_user_check_community_rights(self):
-        response = self.get_json('/usercommunityrightsdatahandler')
+    def test_guest_user_check_contribution_rights(self):
+        response = self.get_json('/usercontributionrightsdatahandler')
 
         self.assertEqual(
             response, {
@@ -439,13 +439,13 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_review_questions': False
             })
 
-    def test_user_check_community_rights(self):
+    def test_user_check_contribution_rights(self):
         user_email = 'user@example.com'
         self.signup(user_email, 'user')
         user_id = self.get_user_id_from_email(user_email)
         self.login(user_email)
 
-        response = self.get_json('/usercommunityrightsdatahandler')
+        response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(
             response, {
                 'can_review_translation_for_language_codes': [],
@@ -455,7 +455,7 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
 
         user_services.allow_user_to_review_question(user_id)
 
-        response = self.get_json('/usercommunityrightsdatahandler')
+        response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(
             response, {
                 'can_review_translation_for_language_codes': [],

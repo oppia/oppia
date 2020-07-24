@@ -353,13 +353,13 @@ angular.module('oppia').directive('contributionsAndReview', [
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               ctrl.userDetailsLoading = false;
               if (ctrl.userIsLoggedIn) {
-                UserService.getUserCommunityRightsData().then(
-                  function(UserCommunityRights) {
+                UserService.getUserContributionRightsData().then(
+                  function(UserContributionRights) {
                     var userCanReviewTranslationSuggestionsInLanguages = (
-                      UserCommunityRights
+                      UserContributionRights
                         .can_review_translation_for_language_codes);
                     var userCanReviewQuestionSuggestions = (
-                      UserCommunityRights.can_review_questions);
+                      UserContributionRights.can_review_questions);
                     if (userCanReviewQuestionSuggestions) {
                       ctrl.reviewTabs.push({
                         suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,

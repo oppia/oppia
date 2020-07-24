@@ -216,7 +216,7 @@ AUDIT_JOB_MANAGERS = [
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserContributionRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,

@@ -718,7 +718,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddCommunityReviewerHandler(base.BaseHandler):
+class AddContributionReviewerHandler(base.BaseHandler):
     """Handles adding reviewer for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -771,12 +771,12 @@ class AddCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
 
-        email_manager.send_email_to_new_community_reviewer(
+        email_manager.send_email_to_new_contribution_reviewer(
             new_reviewer_user_id, review_category, language_code=language_code)
         self.render_json({})
 
 
-class RemoveCommunityReviewerHandler(base.BaseHandler):
+class RemoveContributionReviewerHandler(base.BaseHandler):
     """Handles removing reviewer for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -800,7 +800,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 'Invalid language_code: %s' % language_code)
 
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
-            user_services.remove_community_reviewer(user_id)
+            user_services.remove_contribution_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
             review_category = self.payload.get('review_category')
             if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
@@ -829,7 +829,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid review_category: %s' % review_category)
 
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 user_id, review_category, language_code=language_code)
         else:
             raise self.InvalidInputException(
@@ -838,7 +838,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
         self.render_json({})
 
 
-class CommunityReviewersListHandler(base.BaseHandler):
+class ContributionReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -857,12 +857,12 @@ class CommunityReviewersListHandler(base.BaseHandler):
                 constants.REVIEW_CATEGORY_QUESTION]:
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
-        usernames = user_services.get_community_reviewer_usernames(
+        usernames = user_services.get_contribution_reviewer_usernames(
             review_category, language_code=language_code)
         self.render_json({'usernames': usernames})
 
 
-class CommunityReviewerRightsDataHandler(base.BaseHandler):
+class ContributionReviewerRightsDataHandler(base.BaseHandler):
     """Handler to show the review rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -877,7 +877,7 @@ class CommunityReviewerRightsDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
         user_rights = (
-            user_services.get_user_community_rights(user_id))
+            user_services.get_user_contribution_rights(user_id))
         self.render_json({
             'can_review_translation_for_language_codes': (
                 user_rights.can_review_translation_for_language_codes),

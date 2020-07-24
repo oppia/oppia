@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Community dashboard constants.
+ * @fileoverview Tests for Contributor dashboard constants.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -25,7 +25,7 @@ require(
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
 
-describe('Community dashboard page constants', function() {
+describe('Contributor dashboard page constants', function() {
   var CONTRIBUTOR_DASHBOARD_TABS_DETAILS = null;
   var tabDetailsTemplate = {
     ariaLabel: 'string',

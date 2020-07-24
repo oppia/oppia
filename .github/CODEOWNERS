@@ -85,7 +85,7 @@
 /core/templates/pages/collection-player-page/ @kevintab95
 
 
-# Community contribution project
+# Contributor Dashboard project
 /core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
 /core/domain/voiceover_services*.py @sagangwee

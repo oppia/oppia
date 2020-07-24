@@ -209,7 +209,7 @@ class TranslatableTextHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class UserCommunityRightsDataHandler(base.BaseHandler):
+class UserContributionRightsDataHandler(base.BaseHandler):
     """Provides review rights of the logged in user in translation, voiceover
     and question category on the contributor dashboard.
     """
@@ -219,20 +219,20 @@ class UserCommunityRightsDataHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        community_rights = None
+        contribution_rights = None
         if self.username:
-            community_rights = user_services.get_user_community_rights(
+            contribution_rights = user_services.get_user_contribution_rights(
                 self.user_id)
         self.render_json({
             'can_review_translation_for_language_codes': (
-                community_rights.can_review_translation_for_language_codes
-                if community_rights else []),
+                contribution_rights.can_review_translation_for_language_codes
+                if contribution_rights else []),
             'can_review_voiceover_for_language_codes': (
-                community_rights.can_review_voiceover_for_language_codes
-                if community_rights else []),
+                contribution_rights.can_review_voiceover_for_language_codes
+                if contribution_rights else []),
             'can_review_questions': (
-                community_rights.can_review_questions
-                if community_rights else False)
+                contribution_rights.can_review_questions
+                if contribution_rights else False)
         })
 
 

@@ -1283,7 +1283,7 @@ def send_account_deleted_email(user_id, user_email):
         recipient_email=user_email)
 
 
-def send_email_to_new_community_reviewer(
+def send_email_to_new_contribution_reviewer(
         user_id, review_category, language_code=None):
     """Sends an email to user who is assigned as a reviewer.
 
@@ -1346,7 +1346,7 @@ def send_email_to_new_community_reviewer(
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_email_to_removed_community_reviewer(
+def send_email_to_removed_contribution_reviewer(
         user_id, review_category, language_code=None):
     """Sends an email to user who is removed from the reviewer position.
 

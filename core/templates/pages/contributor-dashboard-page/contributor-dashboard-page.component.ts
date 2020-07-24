@@ -48,7 +48,7 @@ require(
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts');
 
-angular.module('oppia').component('communityDashboardPage', {
+angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
     'LanguageUtilService', 'LocalStorageService',
@@ -106,20 +106,20 @@ angular.module('oppia').component('communityDashboardPage', {
           ctrl.profilePictureDataUrl = dataUrl;
         });
 
-        UserService.getUserCommunityRightsData().then(
-          function(userCommunityRights) {
+        UserService.getUserContributionRightsData().then(
+          function(userContributionRights) {
             ctrl.userCanReviewTranslationSuggestionsInLanguages = (
               getLanguageDescriptions(
-                userCommunityRights
+                userContributionRights
                   .can_review_translation_for_language_codes));
 
             ctrl.userCanReviewVoiceoverSuggestionsInLanguages = (
               getLanguageDescriptions(
-                userCommunityRights
+                userContributionRights
                   .can_review_voiceover_for_language_codes));
 
             ctrl.userCanReviewQuestions = (
-              userCommunityRights.can_review_questions);
+              userContributionRights.can_review_questions);
 
             ctrl.userIsReviewer = (
               ctrl.userCanReviewTranslationSuggestionsInLanguages
