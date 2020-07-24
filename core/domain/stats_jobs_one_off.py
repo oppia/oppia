@@ -223,6 +223,17 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Raises:
             Exception: The item type is wrong.
         """
+        class_name_to_event_type = {
+            'CompleteExplorationEventLogEntryModel':
+                feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            'StateHitEventLogEntryModel': feconf.EVENT_TYPE_STATE_HIT,
+            'StartExplorationEventLogEntryModel':
+                feconf.EVENT_TYPE_START_EXPLORATION,
+            'SolutionHitEventLogEntryModel': feconf.EVENT_TYPE_SOLUTION_HIT,
+            'ExplorationActualStartEventLogEntryModel':
+                feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
+        }
+
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             return (
                 item.exp_id,
@@ -245,31 +256,45 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'created_on': python_utils.UNICODE(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
-
-        if (
+        elif (
                 isinstance(
                     item, (
                         stats_models.CompleteExplorationEventLogEntryModel,
                         stats_models.StartExplorationEventLogEntryModel,
                         stats_models.StateHitEventLogEntryModel))):
-            event_dict = {
-                'version': item.exploration_version,
-                'state_name': item.state_name,
-                'id': item.id,
-                'created_on': python_utils.UNICODE(item.created_on),
-                'session_id': item.session_id
-            }
-
             if isinstance(
                     item, stats_models.CompleteExplorationEventLogEntryModel):
-                event_dict['event_type'] = (
-                    feconf.EVENT_TYPE_COMPLETE_EXPLORATION)
+                event_dict = {
+                    'event_type': class_name_to_event_type[
+                        'CompleteExplorationEventLogEntryModel'],
+                    'version': item.exploration_version,
+                    'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
+                    'session_id': item.session_id
+                }
             elif isinstance(
                     item, stats_models.StartExplorationEventLogEntryModel):
-                event_dict['event_type'] = feconf.EVENT_TYPE_START_EXPLORATION
+                event_dict = {
+                    'event_type': class_name_to_event_type[
+                        'StartExplorationEventLogEntryModel'],
+                    'version': item.exploration_version,
+                    'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
+                    'session_id': item.session_id
+                }
             elif isinstance(
                     item, stats_models.StateHitEventLogEntryModel):
-                event_dict['event_type'] = feconf.EVENT_TYPE_STATE_HIT
+                event_dict = {
+                    'event_type': class_name_to_event_type[
+                        'StateHitEventLogEntryModel'],
+                    'version': item.exploration_version,
+                    'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
+                    'session_id': item.session_id
+                }
 
             return (item.exploration_id, event_dict)
 
@@ -277,21 +302,28 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 isinstance(item, (
                     stats_models.SolutionHitEventLogEntryModel,
                     stats_models.ExplorationActualStartEventLogEntryModel))):
-            event_dict = {
-                'version': item.exp_version,
-                'state_name': item.state_name,
-                'id': item.id,
-                'created_on': python_utils.UNICODE(item.created_on),
-                'session_id': item.session_id
-            }
             if isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-                event_dict['event_type'] = feconf.EVENT_TYPE_SOLUTION_HIT
-
+                event_dict = {
+                    'event_type': class_name_to_event_type[
+                        'SolutionHitEventLogEntryModel'],
+                    'version': item.exp_version,
+                    'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
+                    'session_id': item.session_id
+                }
             elif isinstance(
                     item,
                     stats_models.ExplorationActualStartEventLogEntryModel):
-                event_dict['event_type'] = (
-                    feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION)
+                event_dict = {
+                    'event_type': class_name_to_event_type[
+                        'ExplorationActualStartEventLogEntryModel'],
+                    'version': item.exp_version,
+                    'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
+                    'session_id': item.session_id
+                }
 
             return (item.exp_id, event_dict)
 

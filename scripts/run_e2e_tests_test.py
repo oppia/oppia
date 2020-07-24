@@ -114,7 +114,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_build_main(args):  # pylint: disable=unused-argument
             pass
 
-        def mock_popen(args, env, shell):
+        def mock_popen(args, env, shell):  # pylint: disable=unused-argument
             return
 
         def mock_remove(unused_path):
