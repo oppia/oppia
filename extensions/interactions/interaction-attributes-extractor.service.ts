@@ -28,7 +28,6 @@ import { InteractionCustomizationArgsValue } from './customization-args-defs';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
-
 @Injectable({
   providedIn: 'root'
 })
