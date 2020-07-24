@@ -39,10 +39,10 @@ angular.module('oppia').component('explorationPlayerPage', {
   controller: [
     'ContextService', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService', 
-    'CommandExecutorService', 'ExplorationEngineService', '$rootScope',
+    'CommandExecutorService', '$rootScope',
     function(
         ContextService, PageTitleService,
-        ReadOnlyExplorationBackendApiService, CommandExecutorService, ExplorationEngineService, $rootScope) {
+        ReadOnlyExplorationBackendApiService, CommandExecutorService, $rootScope) {
       var ctrl = this;
       ctrl.$onInit = function() {
         $rootScope.$on('livePlayerStateChange', function(state, args) {
