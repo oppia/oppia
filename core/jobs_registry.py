@@ -55,6 +55,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
     exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
+    exp_jobs_one_off.ExplorationMathRichTextInfoModelGenerationOneOffJob,
+    exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
@@ -87,6 +89,7 @@ ONE_OFF_JOB_MANAGERS = [
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    user_jobs_one_off.DraftChangeMathRichTextAuditOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
@@ -131,6 +134,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationMathRichTextInfoModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
@@ -163,6 +167,13 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.PlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.PseudonymizedUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
