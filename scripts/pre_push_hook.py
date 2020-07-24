@@ -32,6 +32,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import collections
+import errno
 import os
 import pprint
 import shutil
@@ -331,14 +332,23 @@ def install_hook():
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
     chmod_cmd = ['chmod', '+x', pre_push_file]
-    if os.path.islink(pre_push_file):
+    if os.path.islink(pre_push_file) and os.path.exists(pre_push_file):
         python_utils.PRINT('Symlink already exists')
     else:
         try:
             os.symlink(os.path.abspath(__file__), pre_push_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
-        # Raises AttributeError on windows, OSError added as failsafe.
-        except (OSError, AttributeError):
+        # Raises OSError when the symlink already exists but is broken
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                os.unlink(pre_push_file)
+                os.symlink(os.path.abspath(__file__), pre_push_file)
+                python_utils.PRINT('Unlinked and created symlink in .git/hooks directory')
+            else:       # Fail safe
+                shutil.copy(__file__, pre_push_file)
+                python_utils.PRINT('Copied file to .git/hooks directory')
+        # Raises AttributeError on windows
+        except AttributeError:
             shutil.copy(__file__, pre_push_file)
             python_utils.PRINT('Copied file to .git/hooks directory')
 
