@@ -516,8 +516,7 @@ angular.module('oppia').factory('StoryUpdateService', [
        * Removes a node of a story and records the change in the
        * undo/redo service.
        */
-      rearrangeNodeInStory: function(
-          story, fromIndex, toIndex) {
+      rearrangeNodeInStory: function(story, fromIndex, toIndex) {
         _applyStoryContentsPropertyChange(
           story, NODE, fromIndex, toIndex,
           function(changeDict, story) {

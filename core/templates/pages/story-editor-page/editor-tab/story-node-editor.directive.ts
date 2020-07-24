@@ -140,6 +140,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
               ui_config: {
+                startupFocusEnabled: false,
                 rows: 100
               }
             };

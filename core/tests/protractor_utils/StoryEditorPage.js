@@ -17,7 +17,6 @@
  * in Protractor tests.
  */
 
-var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
@@ -62,9 +61,6 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-publish-story-button'));
   var unpublishStoryButton = element(
     by.css('.protractor-test-unpublish-story-button'));
-  var dragAndDrop = async function(fromElement, toElement) {
-    await browser.executeScript(dragAndDropScript, fromElement, toElement);
-  };
 
   /*
    * CHAPTER
@@ -170,19 +166,29 @@ var StoryEditorPage = function() {
   };
 
   this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
-    for (var i = 0;i < await chapterTitles.count(); i++) {
+    await waitFor.visibilityOf(
+      await chapterTitles.first(),
+      'Chapter titles taking too long to appear.');
+    var matchFound = false;
+    for (var i = 0; i < await chapterTitles.count(); i++) {
       if (await chapterTitles.get(i).getText() === chapter1) {
+        matchFound = true;
         break;
       }
     }
+    expect(matchFound).toBe(true);
     var toMove = chapterTitles.get(i);
+
+    matchFound = false;
     for (var i = 0; i < await chapterTitles.count(); i++) {
       if (await chapterTitles.get(i).getText() === chapter2) {
+        matchFound = true;
         break;
       }
     }
+    expect(matchFound).toBe(true);
     var target = chapterTitles.get(i);
-    await dragAndDrop(toMove, target);
+    await general.dragAndDrop(toMove, target);
   });
 
   this.expectDestinationToBe = async function(chapterName) {
