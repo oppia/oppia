@@ -27,9 +27,9 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import {
-  InteractionCustomizationArgs,
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
+  InteractionCustomizationArgs,
   ItemSelectionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';

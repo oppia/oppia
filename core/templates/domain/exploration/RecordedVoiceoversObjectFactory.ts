@@ -19,7 +19,7 @@
 export interface RecordedVoiceOverBackendDict {
   'voiceovers_mapping': {
     [propName: string]: {
-      [propName: string]: VoiceoverDict
+      [propName: string]: VoiceoverBackendDict
     }
   }
 }
@@ -35,7 +35,7 @@ export interface BindableVoiceovers {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { VoiceoverObjectFactory, VoiceoverDict, Voiceover } from
+import { VoiceoverObjectFactory, VoiceoverBackendDict, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 export class RecordedVoiceovers {
   voiceoversMapping: VoiceoverMapping;

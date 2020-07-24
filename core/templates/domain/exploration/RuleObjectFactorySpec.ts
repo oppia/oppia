@@ -18,12 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { RuleObjectFactory, BackendRuleDict, RuleInputs, Rule } from
+import { RuleObjectFactory, RuleBackendDict, RuleInputs, Rule } from
   'domain/exploration/RuleObjectFactory';
 
 describe('RuleObjectFactory', () => {
   let ruleObjectFactory: RuleObjectFactory = null;
-  let ruleBackendDict: BackendRuleDict = null;
+  let ruleBackendDict: RuleBackendDict = null;
   let inputBackend: RuleInputs = null;
 
   beforeEach(() => {

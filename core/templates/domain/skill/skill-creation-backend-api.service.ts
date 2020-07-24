@@ -20,16 +20,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-export interface RubricBackend {
-  difficulty: string,
-  explanations: Array<string>
+export interface RubricBackendDict {
+  difficulty: string;
+  explanations: string[];
 }
 
-export interface SkillCreationBackend {
-  description: string,
+export interface SkillCreationBackendDict {
+  'description': string,
   'explanation_dict': string,
   'linked_topic_ids': string[],
-  rubrics: RubricBackend
+  'rubrics': RubricBackendDict
 }
 
 export interface ImageData {
@@ -66,9 +66,9 @@ export class SkillCreationBackendApiService {
   _createSkill(
       successCallback: (value?: SkillCreationBackendResponse) => void,
       errorCallback:(reason?: string) => void,
-      description: string, rubrics: RubricBackend, explanation: string,
+      description: string, rubrics: RubricBackendDict, explanation: string,
       linkedTopicIds: string[], imagesData: ImageData[]): void {
-    let postData:SkillCreationBackend = {
+    let postData:SkillCreationBackendDict = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
@@ -97,7 +97,7 @@ export class SkillCreationBackendApiService {
       });
   }
 
-  createSkill(description: string, rubrics: RubricBackend,
+  createSkill(description: string, rubrics: RubricBackendDict,
       explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
   ): Promise<SkillCreationBackendResponse> {
     return new Promise((resolve, reject) => {

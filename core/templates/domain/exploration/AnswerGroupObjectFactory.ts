@@ -23,11 +23,11 @@ import { Injectable } from '@angular/core';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { BackendRuleDict, Rule, RuleObjectFactory } from
+import { Rule, RuleBackendDict, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 
 export interface AnswerGroupBackendDict {
-  'rule_specs': BackendRuleDict[];
+  'rule_specs': RuleBackendDict[];
   'outcome': OutcomeBackendDict;
   'training_data': InteractionAnswer;
   'tagged_skill_misconception_id': string;
@@ -67,7 +67,7 @@ export class AnswerGroupObjectFactory {
     private outcomeObjectFactory: OutcomeObjectFactory,
     private ruleObjectFactory: RuleObjectFactory) {}
 
-  generateRulesFromBackend(ruleBackendDicts: BackendRuleDict[]): Rule[] {
+  generateRulesFromBackend(ruleBackendDicts: RuleBackendDict[]): Rule[] {
     return ruleBackendDicts.map(this.ruleObjectFactory.createFromBackendDict);
   }
 

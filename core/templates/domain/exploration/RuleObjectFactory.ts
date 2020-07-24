@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
-export interface BackendRuleDict {
+export interface RuleBackendDict {
   'inputs': RuleInputs;
   'rule_type': string;
 }
@@ -39,7 +39,7 @@ export class Rule {
     this.type = type;
     this.inputs = inputs;
   }
-  toBackendDict(): BackendRuleDict {
+  toBackendDict(): RuleBackendDict {
     return {
       rule_type: this.type,
       inputs: this.inputs
@@ -55,7 +55,7 @@ export class RuleObjectFactory {
     return new Rule(type, inputs);
   }
 
-  createFromBackendDict(ruleDict: BackendRuleDict): Rule {
+  createFromBackendDict(ruleDict: RuleBackendDict): Rule {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   }
 }
