@@ -33,6 +33,7 @@ import python_utils
 import utils
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
+email_services = models.Registry.import_email_services()
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -423,6 +424,53 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.assertRaises(ValueError):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
+
+
+class EmailMockTests(test_utils.EmailTestBase):
+    """Class for testing EmailTestBase."""
+
+    def test_override_run_swaps_contexts(self):
+        """Test that the current_function
+        email_services.send_email_to_recipients() is correctly swapped to its
+        mock version when the testbase extends EmailTestBase.
+        """
+        referenced_function = getattr(
+            email_services, 'send_email_to_recipients')
+        correct_function = getattr(self, '_send_email_to_recipients')
+        self.assertEqual(referenced_function, correct_function)
+
+    def test_mock_send_email_to_recipients_sends_correct_emails(self):
+        """Test sending email to recipients using mock adds the correct objects
+        to emails_dict.
+        """
+        self._send_email_to_recipients(
+            sender_email='a@a.com',
+            recipient_emails=['b@b.com'],
+            subject=(
+                'Hola 😂 - invitation to collaborate'
+                .encode(encoding='utf-8')),
+            plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
+            html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+            bcc=['c@c.com'],
+            reply_to='abc',
+            recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
+        messages = self._get_sent_email_messages(
+            to='b@b.com')
+        all_messages = self._get_all_sent_email_messages()
+
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(len(all_messages), 1)
+        self.assertEqual(all_messages['b@b.com'], messages)
+        self.assertEqual(
+            messages[0].subject,
+            'Hola 😂 - invitation to collaborate'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].body,
+            'plaintext_body 😂'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].html,
+            'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+        self.assertEqual(messages[0].bcc, 'c@c.com')
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):

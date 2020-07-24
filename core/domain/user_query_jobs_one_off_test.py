@@ -35,7 +35,7 @@ import feconf
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class UserQueryJobOneOffTests(test_utils.GenericTestBase):
+class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     EXP_ID_3 = 'exp_id_3'
@@ -315,7 +315,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'Preferences page.'
         ) % query_id
 
-        messages = self.mail_stub.get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
@@ -359,7 +359,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.'
         ) % query_id
 
-        messages = self.mail_stub.get_sent_messages(
+        messages = self._get_sent_email_messages(
             to=self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
