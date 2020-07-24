@@ -89,6 +89,8 @@ var ExplorationEditorMainTab = function() {
   var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
   var stateEditContent = element(
     by.css('.protractor-test-edit-content'));
+  var stateEditButton = element(
+    by.css('.protractor-test-edit-content-pencil-button'))
   var stateContentDisplay = element(
     by.css('.protractor-test-state-content-display'));
   var stateNameContainer = element(
@@ -500,7 +502,10 @@ var ExplorationEditorMainTab = function() {
     await waitFor.elementToBeClickable(
       stateEditContent,
       'stateEditContent taking too long to appear to set content');
-    await stateEditContent.click();
+    await waitFor.elementToBeClickable(
+      stateEditButton,
+      'State edit button taking too long to show up');
+    await stateEditButton.click();
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
