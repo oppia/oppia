@@ -20,7 +20,6 @@ require('interactions/codemirrorRequires.ts');
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
-
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('services/contextual/device-info.service.ts');
 
@@ -47,7 +46,6 @@ angular.module('oppia').directive('schemaBasedSubtitledUnicodeEditor', [
         function(
             $scope, $filter, $sce, $timeout, $translate,
             DeviceInfoService) {
-          console.log('HELLLLO')
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
