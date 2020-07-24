@@ -46,14 +46,14 @@ export class StateCard {
   _contentHtml: string;
   _interactionHtml: string;
   _interaction: Interaction;
-  _inputResponsePairs: Array<InputResponsePair>;
+  _inputResponsePairs: InputResponsePair[];
   _recordedVoiceovers: RecordedVoiceovers;
   _contentId: string;
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
   constructor(
       stateName, contentHtml, interactionHtml, interaction: Interaction,
-      inputResponsePairs: Array<InputResponsePair>,
+      inputResponsePairs: InputResponsePair[],
       recordedVoiceovers: RecordedVoiceovers, contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
     this._stateName = stateName;
@@ -168,7 +168,7 @@ export class StateCard {
     return this._inputResponsePairs[index].oppiaResponse;
   }
 
-  getInputResponsePairs(): Array<InputResponsePair> {
+  getInputResponsePairs(): InputResponsePair[] {
     return this._inputResponsePairs;
   }
 

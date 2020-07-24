@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
+import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { BackendRuleDict, Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';

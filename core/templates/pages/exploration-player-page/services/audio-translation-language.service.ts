@@ -45,7 +45,7 @@ export class AudioTranslationLanguageService {
   _allAudioLanguageCodesInExploration: Array<string> = null;
   _explorationLanguageCode: string = null;
   _automaticTextToSpeechEnabled: boolean = null;
-  _languagesInExploration: Array<ExplorationLanguageInfo> = [];
+  _languagesInExploration: ExplorationLanguageInfo[] = [];
 
   attemptToSetAudioLanguageToExplorationLanguage(): void {
     // We minimize the number of related languages, because we want to
@@ -173,7 +173,7 @@ export class AudioTranslationLanguageService {
    * language codes as well as their displayed language description for
    * the exploration.
    */
-  getLanguageOptionsForDropdown(): Array<ExplorationLanguageInfo> {
+  getLanguageOptionsForDropdown(): ExplorationLanguageInfo[] {
     return this._languagesInExploration;
   }
 

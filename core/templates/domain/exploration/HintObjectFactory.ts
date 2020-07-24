@@ -21,8 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  SubtitledHtmlBackendDict,
   SubtitledHtml,
+  SubtitledHtmlBackendDict,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 

@@ -23,8 +23,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  CollectionNodeBackendDict,
   CollectionNode,
+  CollectionNodeBackendDict,
   CollectionNodeObjectFactory
 } from 'domain/collection/collection-node-object.factory';
 import {

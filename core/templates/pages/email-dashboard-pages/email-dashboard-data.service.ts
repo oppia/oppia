@@ -53,7 +53,7 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
-  submitQuery(data: QueryData): Promise<Array<EmailDashboardQuery>> {
+  submitQuery(data: QueryData): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 

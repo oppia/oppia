@@ -21,13 +21,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  EmailDashboardQueryResultsBackendDict,
   EmailDashboardQueryResults,
+  EmailDashboardQueryResultsBackendDict,
   EmailDashboardQueryResultsObjectFactory
 } from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import {
-  EmailDashboardQueryBackendDict,
   EmailDashboardQuery,
+  EmailDashboardQueryBackendDict,
   EmailDashboardQueryObjectFactory
 } from 'domain/email-dashboard/email-dashboard-query-object.factory';
 

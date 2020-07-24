@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AnswerGroupBackendDict, AnswerGroup, AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { HintBackendDict, Hint, HintObjectFactory } from
   'domain/exploration/HintObjectFactory';

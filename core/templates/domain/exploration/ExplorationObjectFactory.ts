@@ -39,9 +39,9 @@ import { BindableVoiceovers } from
 import { State } from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
-  VoiceoverObjectsDict,
   States,
-  StatesObjectFactory
+  StatesObjectFactory,
+  VoiceoverObjectsDict
 } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
