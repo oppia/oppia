@@ -26,6 +26,7 @@ describe('Editor Navigation Component', function() {
   var $verifyNoPendingTasks = null;
   var ContextService = null;
   var ExplorationFeaturesService = null;
+  var ExplorationImprovementsService = null;
   var ExplorationWarningsService = null;
   var ThreadDataService = null;
   var UserService = null;
@@ -36,6 +37,7 @@ describe('Editor Navigation Component', function() {
     isLoggedIn: () => true
   };
   var widthSpy = null;
+  var isImprovementsTabEnabledAsyncSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -46,17 +48,23 @@ describe('Editor Navigation Component', function() {
     $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
     ContextService = $injector.get('ContextService');
     ExplorationFeaturesService = $injector.get('ExplorationFeaturesService');
+    ExplorationImprovementsService = $injector.get(
+      'ExplorationImprovementsService');
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
     UserService = $injector.get('UserService');
     ThreadDataService = $injector.get('ThreadDataService');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
 
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve(userInfo));
+    spyOn(UserService, 'getUserInfoAsync').and.returnValue(userInfo);
 
     widthSpy = spyOn(WindowDimensionsService, 'getWidth');
     widthSpy.and.returnValue(1200);
+
+    isImprovementsTabEnabledAsyncSpy = spyOn(
+      ExplorationImprovementsService, 'isImprovementsTabEnabledAsync');
+
+    isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('editorNavigation', {
@@ -68,21 +76,12 @@ describe('Editor Navigation Component', function() {
 
   it('should evaluate $scope properties after controller initialization',
     function() {
-      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+      expect($scope.isPostTutorialHelpPopoverShown())
         .toBe(false);
-      expect($scope.isLargeScreen).toBe(true);
-      expect($scope.userIsLoggedIn).toBe(true);
+      expect($scope.isScreenLarge()).toBe(true);
+      expect($scope.isUserLoggedIn()).toBe(true);
+      expect($scope.isImprovementsTabEnabled()).toBe(false);
     });
-
-  it('should get open task count', function() {
-    expect($scope.getOpenTaskCount()).toBe(0);
-  });
-
-  it('should check if improvements tab is enabled', function() {
-    spyOn(ExplorationFeaturesService, 'isImprovementsTabEnabled')
-      .and.returnValue(false);
-    expect($scope.isImprovementsTabEnabled()).toBe(false);
-  });
 
   it('should evaluate warnings from exploration warning service', function() {
     var warnings = [{
@@ -93,7 +92,14 @@ describe('Editor Navigation Component', function() {
     spyOn(ExplorationWarningsService, 'getWarnings').and.returnValue(warnings);
     spyOn(ExplorationWarningsService, 'countWarnings').and.returnValue(
       warnings.length);
-    spyOn(ExplorationWarningsService, 'hasCriticalWarnings')
+    // This approach was choosen because spyOn() doesn't work on properties
+    // that doesn't have a get access type.
+    // eslint-disable-next-line max-len
+    // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+    Object.defineProperty(ExplorationWarningsService, 'hasCriticalWarnings', {
+      get: () => true
+    });
+    spyOnProperty(ExplorationWarningsService, 'hasCriticalWarnings')
       .and.returnValue(true);
 
     expect($scope.countWarnings()).toBe(2);
@@ -173,8 +179,7 @@ describe('Editor Navigation Component', function() {
 
   it('should navigate to improvements tab', function() {
     spyOn(ExplorationFeaturesService, 'isInitialized').and.returnValue(true);
-    spyOn(ExplorationFeaturesService, 'isImprovementsTabEnabled')
-      .and.returnValue(true);
+    isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
     $scope.selectImprovementsTab();
     $rootScope.$apply();
     expect($scope.getActiveTabName()).toBe('improvements');
@@ -197,38 +202,38 @@ describe('Editor Navigation Component', function() {
     expect($scope.getOpenThreadsCount()).toBe(5);
   });
 
-  it('should change isLargeScreen variable to true when resizing page',
+  it('should change isScreenLarge variable to true when resizing page',
     function() {
       widthSpy.and.returnValue(1200);
 
-      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+      expect($scope.isPostTutorialHelpPopoverShown())
         .toBe(false);
 
       window.dispatchEvent(new Event('resize'));
       $rootScope.$broadcast('openPostTutorialHelpPopover');
 
-      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+      expect($scope.isPostTutorialHelpPopoverShown())
         .toBe(true);
-      expect($scope.isLargeScreen).toBe(true);
+      expect($scope.isScreenLarge()).toBe(true);
 
       $flushPendingTasks();
       $verifyNoPendingTasks('timeout');
 
-      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+      expect($scope.isPostTutorialHelpPopoverShown())
         .toBe(false);
     });
 
-  it('should change isLargeScreen variable to false when resizing page',
+  it('should change isScreenLarge variable to false when resizing page',
     function() {
       widthSpy.and.returnValue(768);
 
-      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+      expect($scope.isPostTutorialHelpPopoverShown())
         .toBe(false);
 
       window.dispatchEvent(new Event('resize'));
       $rootScope.$broadcast('openPostTutorialHelpPopover');
 
-      expect($scope.popoverControlObject.postTutorialHelpPopoverIsShown)
+      expect($scope.isPostTutorialHelpPopoverShown())
         .toBe(false);
     });
 

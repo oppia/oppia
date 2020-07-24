@@ -35,7 +35,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-class TasksTests(test_utils.GenericTestBase):
+class TasksTests(test_utils.EmailTestBase):
 
     USER_A_EMAIL = 'a@example.com'
     USER_B_EMAIL = 'b@example.com'
@@ -81,12 +81,14 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 2)
 
             # Check that there are no feedback emails sent to Editor.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                to=self.EDITOR_EMAIL)
             expected_message = (
                 'Hi editor,\n\nYou\'ve received 2 new messages on your'
                 ' Oppia explorations:\n- Title:\n- some text\n- user b message'
@@ -110,7 +112,8 @@ class TasksTests(test_utils.GenericTestBase):
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                to=self.EDITOR_EMAIL)
 
             # What is expected in the email body.
             expected_message = (
@@ -175,14 +178,14 @@ class TasksTests(test_utils.GenericTestBase):
                 payload = {
                     'exploration_id': self.exploration.id,
                     'thread_id': thread_id}
-                messages = self.mail_stub.get_sent_messages()
+                messages = self._get_all_sent_email_messages()
                 self.assertEqual(len(messages), 0)
                 taskqueue_services.enqueue_email_task(
                     feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
                 self.process_and_flush_pending_tasks()
 
                 # Check that user B received message.
-                messages = self.mail_stub.get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=self.USER_B_EMAIL)
                 self.assertEqual(len(messages), 1)
 
@@ -214,7 +217,7 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 2)
 
             # Ensure that user A has no emails sent yet.
-            messages = self.mail_stub.get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -223,7 +226,7 @@ class TasksTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             # Ensure that user A has an email sent now.
-            messages = self.mail_stub.get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 1)
 
@@ -240,7 +243,6 @@ class TasksTests(test_utils.GenericTestBase):
     def test_email_sent_when_status_changed(self):
         """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
-
             # Create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
@@ -256,7 +258,7 @@ class TasksTests(test_utils.GenericTestBase):
                 None, 'user b message')
 
             # Ensure user A has no messages sent to him yet.
-            messages = self.mail_stub.get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -265,7 +267,7 @@ class TasksTests(test_utils.GenericTestBase):
 
             # Check that user A has 2 emails sent to him.
             # 1 instant feedback message email and 1 status change.
-            messages = self.mail_stub.get_sent_messages(
+            messages = self._get_sent_email_messages(
                 to=self.USER_A_EMAIL)
             self.assertEqual(len(messages), 2)
 
@@ -307,7 +309,7 @@ class TasksTests(test_utils.GenericTestBase):
                     feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
                     payload, 0)
                 # Ensure moderator has no messages sent to him yet.
-                messages = self.mail_stub.get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 0)
 
@@ -315,7 +317,7 @@ class TasksTests(test_utils.GenericTestBase):
                 self.process_and_flush_pending_tasks()
 
                 # Ensure moderator has 1 email now.
-                messages = self.mail_stub.get_sent_messages(
+                messages = self._get_sent_email_messages(
                     to=self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 1)
 
