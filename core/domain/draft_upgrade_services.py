@@ -179,6 +179,14 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
+        for change in draft_change_list:
+            # We don't want to migrate any changes that involve the
+                # MathExpressionInput interaction.
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID and (
+                        change.new_value == 'MathExpressionInput')):
+                raise Exception('Conversion cannot be completed.')
+
         return draft_change_list
 
     @classmethod

@@ -2701,6 +2701,12 @@ class Exploration(python_utils.OBJECT):
                     state_dict['interaction']['id'] = new_interaction_id
                     state_dict['interaction']['answer_groups'] = (
                         new_answer_groups)
+                    if state_dict['interaction']['solution']:
+                        correct_answer = state_dict['interaction'][
+                            'solution']['correct_answer']['ascii']
+                        correct_answer = clean_math_expression(correct_answer)
+                        state_dict['interaction'][
+                            'solution']['correct_answer'] = correct_answer
 
         return states_dict
 

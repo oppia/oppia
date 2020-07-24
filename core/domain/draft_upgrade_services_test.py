@@ -380,31 +380,21 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
             })
         ]
         # Migrate exploration to state schema version 35.
         self.create_and_migrate_new_exploration('34', '35')
-        # Migrate the draft change list's state schema to the migrated
-        # exploration's schema. In this case there are no changes to the
-        # draft change list since version 35 upgrades all explorations that use
-        # the MathExpressionInput interaction to use one of
-        # AlgebraicExpressionInput, NumericExpressionInput, or
-        # MathEquationInput interactions.
-        migrated_draft_change_list_v35 = (
+        with self.assertRaisesRegexp(
+                Exception, 'Conversion cannot be completed.'):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v34, 1, 2, self.EXP_ID)
-        )
-        # Change draft change lists into a list of dicts so that it is
-        # easy to compare the whole draft change list.
-        draft_change_list_v34_dict_list = [
-            change.to_dict() for change in draft_change_list_v34
-        ]
-        migrated_draft_change_list_v35_dict_list = [
-            change.to_dict() for change in migrated_draft_change_list_v35
-        ]
-        self.assertEqual(
-            draft_change_list_v34_dict_list,
-            migrated_draft_change_list_v35_dict_list)
+                    draft_change_list_v34, 1, 2, self.EXP_ID)
+        
 
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (

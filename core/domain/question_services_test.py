@@ -1177,7 +1177,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': {
+                    'correct_answer': {
+                        'ascii': 'x=y',
+                        'latex': 'x=y'
+                    },
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'html': 'Solution explanation',
+                        'content_id': 'content_2'
+                    }
+                },
                 'id': 'MathExpressionInput'
             },
             'param_changes': [],
@@ -1275,7 +1285,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': {
+                    'correct_answer': {
+                        'ascii': 'x+y',
+                        'latex': 'x+y'
+                    },
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'html': 'Solution explanation',
+                        'content_id': 'content_2'
+                    }
+                },
                 'id': 'MathExpressionInput'
             },
             'param_changes': [],
@@ -1369,7 +1389,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': {
+                    'correct_answer': {
+                        'ascii': '1.2 + 3',
+                        'latex': '1.2 + 3'
+                    },
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'html': 'Solution explanation',
+                        'content_id': 'content_2'
+                    }
+                },
                 'id': 'MathExpressionInput'
             },
             'param_changes': [],

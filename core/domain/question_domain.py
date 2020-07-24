@@ -424,6 +424,13 @@ class Question(python_utils.OBJECT):
                 question_state_dict['interaction']['id'] = new_interaction_id
                 question_state_dict['interaction']['answer_groups'] = (
                     new_answer_groups)
+                if question_state_dict['interaction']['solution']:
+                    correct_answer = question_state_dict['interaction'][
+                        'solution']['correct_answer']['ascii']
+                    correct_answer = exp_domain.clean_math_expression(
+                        correct_answer)
+                    question_state_dict['interaction'][
+                        'solution']['correct_answer'] = correct_answer
 
         return question_state_dict
 
