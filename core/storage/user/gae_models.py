@@ -2235,8 +2235,8 @@ class UserAuthModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not need to exported as it hold authentication details
-        relavant only for backend, and does not contain any information
-        relevant to the user for data export.
+        relavant only for backend, and does not contain any exportable
+        user data.
         """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
@@ -2272,8 +2272,10 @@ class UserAuthModel(base_models.BaseModel):
 
         Returns:
             UserAuthModel. The UserAuthModel instance having a
-            particular user mapped to the given auth_id and the auth service.
+            particular user mapped to the given auth_id and the auth service
+            if there exists one, else None.
         """
 
         if auth_service == 'gae':
             return cls.query(cls.gae_id == auth_id).get()
+        return None

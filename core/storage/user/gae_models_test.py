@@ -2223,12 +2223,13 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 class UserAuthModelTests(test_utils.GenericTestBase):
     """Tests for UserAuthModel."""
 
+    NONEXISTENT_AUTH_TYPE_NAME = 'id_x'
     NONEXISTENT_USER_ID = 'id_x'
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_1_ID = 'user_1_id'
     USER_1_GAE_ID = ['gae_1_id']
     USER_2_ID = 'user_2_id'
-    USER_2_GAE_IDs = ['gae_2_id_1', 'gae_2_id_2']
+    USER_2_GAE_ID = ['gae_2_id_1', 'gae_2_id_2']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2240,20 +2241,20 @@ class UserAuthModelTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserAuthModel(
             id=self.USER_2_ID,
-            gae_id=self.USER_2_GAE_IDs,
+            gae_id=self.USER_2_GAE_ID,
         ).put()
 
-    def test_get_export_policy(self):
+    def test_get_export_policy_policy_is_not_applicable(self):
         self.assertEqual(
             user_models.UserAuthModel.get_export_policy(),
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserAuthModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy(self):
+    def test_apply_deletion_policy_user1_is_deleted(self):
         user_models.UserAuthModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
@@ -2262,6 +2263,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_apply_deletion_policy_user2_is_deleted(self):
         user_models.UserAuthModel.apply_deletion_policy(
             self.USER_2_ID)
         self.assertIsNone(
@@ -2270,46 +2272,59 @@ class UserAuthModelTests(test_utils.GenericTestBase):
             )
         )
 
-        # Test that calling apply_deletion_policy with no existing model
-        # doesn't fail.
+    def test_apply_deletion_policy_nonexistent_user_no_exception_raised(self):
         user_models.UserAuthModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
-            user_models.UserAuthModel
-            .has_reference_to_user_id(self.USER_1_ID)
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.USER_1_ID)
         )
         self.assertTrue(
-            user_models.UserAuthModel
-            .has_reference_to_user_id(self.USER_2_ID)
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.USER_2_ID)
         )
         self.assertFalse(
-            user_models.UserAuthModel
-            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID)
         )
 
     def test_get_by_auth_id_for_unregistered_auth_id(self):
         self.assertIsNone(
-            user_models.UserAuthModel
-            .get_by_auth_id('gae', self.NONREGISTERED_GAE_ID)
+            user_models.UserAuthModel.get_by_auth_id(
+                'gae', self.NONREGISTERED_GAE_ID)
         )
 
     def test_get_by_auth_id_for_single_element_in_auth_id_attribute(self):
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_1_ID),
-            user_models.UserAuthModel
-            .get_by_auth_id('gae', self.USER_1_GAE_ID[0])
+            user_models.UserAuthModel.get_by_auth_id(
+                'gae', self.USER_1_GAE_ID[0])
         )
 
     def test_get_by_auth_id_for_list_in_auth_id_attribute(self):
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_2_ID),
-            user_models.UserAuthModel
-            .get_by_auth_id('gae', self.USER_2_GAE_IDs[0])
+            user_models.UserAuthModel.get_by_auth_id(
+                'gae', self.USER_2_GAE_ID[0])
         )
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_2_ID),
-            user_models.UserAuthModel
-            .get_by_auth_id('gae', self.USER_2_GAE_IDs[1])
+            user_models.UserAuthModel.get_by_auth_id(
+                'gae', self.USER_2_GAE_ID[1])
+        )
+
+    def test_get_by_auth_id_with_invalid_auth_type_name(self):
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_2_GAE_ID[0])
+        )
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_2_GAE_ID[1])
+        )
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_1_GAE_ID[0])
         )
