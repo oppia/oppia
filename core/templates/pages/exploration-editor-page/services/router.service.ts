@@ -17,24 +17,22 @@
  */
 
 require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
   'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require('services/exploration-features.service.ts');
+require('services/exploration-improvements.service.ts');
 
 angular.module('oppia').factory('RouterService', [
-  '$interval', '$location', '$rootScope', '$timeout', '$window',
-  'ExplorationFeaturesService',
-  'ExplorationInitStateNameService', 'ExplorationStatesService',
-  'StateEditorService',
+  '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
+  'ExplorationImprovementsService', 'ExplorationInitStateNameService',
+  'ExplorationStatesService', 'StateEditorService',
   function(
-      $interval, $location, $rootScope, $timeout, $window,
-      ExplorationFeaturesService,
-      ExplorationInitStateNameService, ExplorationStatesService,
-      StateEditorService) {
+      $interval, $location, $q, $rootScope, $timeout, $window,
+      ExplorationImprovementsService, ExplorationInitStateNameService,
+      ExplorationStatesService, StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -65,21 +63,6 @@ angular.module('oppia').factory('RouterService', [
     var PREVIEW_TAB_WAIT_TIME_MSEC = 200;
 
     var activeTabName = TABS.MAIN.name;
-
-    // Makes final changes to the location after trying to navigate to the
-    // improvements tab. Requires ExplorationFeaturesService to have been
-    // initialized, and will defer making any changes until that happens.
-    var finalizeNavigationToImprovementsTab = function() {
-      if (!ExplorationFeaturesService.isInitialized()) {
-        $timeout(finalizeNavigationToImprovementsTab, 300);
-        return;
-      }
-      if (activeTabName === TABS.IMPROVEMENTS.name &&
-          !ExplorationFeaturesService.isImprovementsTabEnabled()) {
-        // Redirect to the main tab.
-        _actuallyNavigate(SLUG_GUI, null);
-      }
-    };
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -121,7 +104,14 @@ angular.module('oppia').factory('RouterService', [
         $rootScope.$broadcast('refreshStatisticsTab');
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
-        finalizeNavigationToImprovementsTab();
+        $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
+          .then(improvementsTabIsEnabled => {
+            if (activeTabName === TABS.IMPROVEMENTS.name &&
+                !improvementsTabIsEnabled) {
+              // Redirect to the main tab.
+              _actuallyNavigate(SLUG_GUI, null);
+            }
+          });
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {

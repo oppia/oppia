@@ -32,12 +32,10 @@ describe('ExplorationFeatureService', () => {
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
     ExplorationFeaturesService.settings.areParametersEnabled = false;
-    ExplorationFeaturesService.settings.isImprovementsTabEnabled = false;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
     ExplorationFeaturesService.serviceIsInitialized = false;
 
     featureData = {
-      isImprovementsTabEnabled: true,
       isExplorationWhitelisted: true,
     };
     explorationData = {
@@ -66,7 +64,6 @@ describe('ExplorationFeatureService', () => {
     explorationFeatureService.init(explorationData, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
-    expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(true);
   });
@@ -75,7 +72,6 @@ describe('ExplorationFeatureService', () => {
     explorationFeatureService.init(explorationData2, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
-    expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(true);
   });
@@ -86,8 +82,6 @@ describe('ExplorationFeatureService', () => {
       explorationFeatureService.init(explorationData, featureData);
       expect(explorationFeatureService.isInitialized()).toEqual(true);
       expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
-      expect(explorationFeatureService.isImprovementsTabEnabled())
-        .toEqual(false);
       expect(explorationFeatureService.isPlaythroughRecordingEnabled())
         .toEqual(false);
     });
